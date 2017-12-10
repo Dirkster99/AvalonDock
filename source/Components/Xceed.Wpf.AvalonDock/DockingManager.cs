@@ -333,12 +333,6 @@ namespace Xceed.Wpf.AvalonDock
 
         internal UIElement CreateUIElementForModel(ILayoutElement model)
         {
-            // DEBUG XXX
-            if (model == Layout.LeftSide)
-            {
-                Console.WriteLine("XXX DEBUG XXX");
-            }
-
             if (model is LayoutPanel)
                 return new LayoutPanelControl(model as LayoutPanel);
             if (model is LayoutAnchorablePaneGroup)

@@ -696,24 +696,31 @@ namespace Xceed.Wpf.AvalonDock.Layout
             TopSide.Children.Add( ( LayoutAnchorGroup )ReadElement( reader ) );
             reader.Read();
           }
+          else TopSide = new LayoutAnchorSide();
+
           RightSide = ( LayoutAnchorSide )ReadElement( reader );
           if( RightSide != null )
           {
             RightSide.Children.Add( ( LayoutAnchorGroup )ReadElement( reader ) );
             reader.Read();
           }
+          else RightSide  = new LayoutAnchorSide();
+
           LeftSide = ( LayoutAnchorSide )ReadElement( reader );
           if( LeftSide != null )
           {
             LeftSide.Children.Add( ( LayoutAnchorGroup )ReadElement( reader ) );
             reader.Read();
           }
+          else LeftSide  = new LayoutAnchorSide();
+
           BottomSide = ( LayoutAnchorSide )ReadElement( reader );
           if( BottomSide != null )
           {
             BottomSide.Children.Add( ( LayoutAnchorGroup )ReadElement( reader ) );
             reader.Read();
           }
+          else BottomSide  = new LayoutAnchorSide();
 
           FloatingWindows.Clear();
           var floatingWindows = ReadElementList( reader );
