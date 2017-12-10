@@ -24,6 +24,7 @@ using System.Windows;
 using System.Globalization;
 using System.Windows.Media;
 using System.ComponentModel;
+using Xceed.Wpf.AvalonDock.Controls;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
@@ -127,6 +128,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
                         parentSelector.SelectedContentIndex = _isSelected ? parentSelector.IndexOf(this) : -1;
                     OnIsSelectedChanged(oldValue, value);
                     RaisePropertyChanged("IsSelected");
+		    LayoutAnchorableTabItem.CancelMouseLeave();
                 }
             }
         }
@@ -772,6 +774,27 @@ namespace Xceed.Wpf.AvalonDock.Layout
                     RaisePropertyChanged("CanFloat");
                 }
             }
+        }
+
+        #endregion
+
+        #region IsEnabled
+
+        private bool _isEnabled = true;
+        public bool IsEnabled
+        {
+          get
+          {
+            return _isEnabled;
+          }
+          set
+          {
+            if( _isEnabled != value )
+            {
+              _isEnabled = value;
+              RaisePropertyChanged( "IsEnabled" );
+            }
+          }
         }
 
         #endregion
