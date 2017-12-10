@@ -19,4 +19,4 @@ tmp/
 *.sqlite
 /.vs/
 /packages/
-/source/.vs/AvalonDock/v15/Server/sqlite3
+/source/.vs/
