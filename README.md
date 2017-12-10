@@ -11,5 +11,28 @@ with Theme Support for:
 * Metro (Light Only)
 * VS2013 (Dark, Light, and Blue)
 
-This project contains a feature added fork from:
+This repository contains a feature added fork from:
 https://github.com/xceedsoftware/wpftoolkit
+
+# Feature Added - Dark and Light Theme Samples
+
+## VS2013 Dark
+<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/VS2013_Dark.png">
+
+## VS2013
+<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/VS2013.png">
+
+## Metro
+<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/Metro.png">
+
+## ExpressionLight
+<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/ExpressionLight.png">
+
+## Expressiondark
+<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/Expressiondark.png">
+
+## Generic
+<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/Generic.png">
+
+## VS2010
+<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/VS2010.png">
