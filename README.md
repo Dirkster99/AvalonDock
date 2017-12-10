@@ -49,6 +49,8 @@ https://github.com/Dirkster99/AvalonDock/commit/5e3d81a9586dc3a4b06d28ad78bb5abc
 # Update to Xceed Version 3.2
 https://github.com/Dirkster99/AvalonDock/commit/b7cde7d2a2ef2a56f23f74cad762305113686642
 
+merged with this commit: https://github.com/xceedsoftware/wpftoolkit/commit/6dc73683a77ab62f9bfaf6dd8cc2587f1ebfd11b
+
 # Initial Commit
 https://github.com/Dirkster99/AvalonDock/commit/4bcb07f45e89e416257e668a209b238a26e5f414
 
