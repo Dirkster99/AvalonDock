@@ -1,0 +1,124 @@
+﻿<!--***********************************************************************************
+
+   AvalonDock
+
+   Copyright (C) 2007-2013 Xceed Software Inc.
+
+   This program is provided to you under the terms of the New BSD
+   License (BSD) as published at http://avalondock.codeplex.com/license 
+
+   For more features, controls, and fast professional support,
+   pick up AvalonDock in Extended WPF Toolkit Plus at http://xceed.com/wpf_toolkit
+
+   Stay informed: follow @datagrid on Twitter or Like facebook.com/datagrids
+
+  **********************************************************************************-->
+
+<Window x:Class="AvalonDock.MVVMTestApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:avalonDock="clr-namespace:Xceed.Wpf.AvalonDock;assembly=Xceed.Wpf.AvalonDock"
+        xmlns:avalonDockControls="clr-namespace:Xceed.Wpf.AvalonDock.Controls;assembly=Xceed.Wpf.AvalonDock"
+        xmlns:avalonDockLayout="clr-namespace:Xceed.Wpf.AvalonDock.Layout;assembly=Xceed.Wpf.AvalonDock"
+
+        xmlns:local="clr-namespace:AvalonDock.MVVMTestApp"
+        xmlns:conv="clr-namespace:AvalonDock.MVVMTestApp.Converters"
+        x:Name="mainWindow"
+        Title="MainWindow" Height="350" Width="525"
+        UseLayoutRounding="True">
+    <Window.Resources>
+        <conv:ActiveDocumentConverter x:Key="ActiveDocumentConverter"/>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Menu>
+            <MenuItem Header="File">
+                <MenuItem Header="New" Command="{Binding NewCommand}"/>
+                <MenuItem Header="Open" Command="{Binding OpenCommand}"/>
+                <Separator/>
+                <MenuItem Header="Save" Command="{Binding ActiveDocument.SaveCommand}"/>
+                <MenuItem Header="Save As..." Command="{Binding ActiveDocument.SaveAsCommand}"/>
+                <Separator/>
+                <MenuItem Header="Close" Command="{Binding ActiveDocument.CloseCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Tools">
+                <MenuItem Header="Properties" IsChecked="{Binding FileStats.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+            </MenuItem>
+            <MenuItem Header="Layout">
+                <MenuItem Header="Load" Command="{Binding LoadLayoutCommand, ElementName=mainWindow}"/>
+                <MenuItem Header="Save" Command="{Binding SaveLayoutCommand, ElementName=mainWindow}"/>
+                <MenuItem Header="Dump to Console" Click="OnDumpToConsole"/>
+
+            </MenuItem>
+        </Menu><!--AnchorablesSource="{Binding Tools}" DocumentsSource="{Binding Files}"-->
+        <avalonDock:DockingManager x:Name="dockManager" 
+                                   AnchorablesSource="{Binding Tools}" 
+                                   DocumentsSource="{Binding Files}"
+                                   ActiveContent="{Binding ActiveDocument, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
+                                   Grid.Row="1">
+            <!-- avalonDock:DockingManager.Theme>
+                <avalonDock:Vs2013LightTheme/>
+            </avalonDock:DockingManager.Theme -->
+            <avalonDock:DockingManager.LayoutItemTemplateSelector>
+                <local:PanesTemplateSelector>
+                    <local:PanesTemplateSelector.FileViewTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}"
+                                     BorderThickness="0" />
+                        </DataTemplate>
+                    </local:PanesTemplateSelector.FileViewTemplate>
+                    <local:PanesTemplateSelector.FileStatsViewTemplate>
+                        <DataTemplate>
+                            <Border Padding="5">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="{Binding FileSize}"/>
+                                    <TextBlock Text="{Binding LastModified}"/>
+                                    <TextBox Text="test"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </local:PanesTemplateSelector.FileStatsViewTemplate>
+                </local:PanesTemplateSelector>
+            </avalonDock:DockingManager.LayoutItemTemplateSelector>
+
+            <avalonDock:DockingManager.LayoutItemContainerStyleSelector>
+                <local:PanesStyleSelector>
+                    <local:PanesStyleSelector.ToolStyle>
+                        <Style TargetType="{x:Type avalonDockControls:LayoutAnchorableItem}">
+                            <Setter Property="Title" Value="{Binding Model.Title}"/>
+                            <Setter Property="IconSource" Value="{Binding Model.IconSource}"/>
+                            <Setter Property="Visibility" Value="{Binding Model.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}"/>
+                            <Setter Property="ContentId" Value="{Binding Model.ContentId}"/>
+                            <Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}"/>
+                            <Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}"/>
+                        </Style>
+                    </local:PanesStyleSelector.ToolStyle>
+                    <local:PanesStyleSelector.FileStyle>
+                        <Style TargetType="{x:Type avalonDockControls:LayoutItem}">
+                            <Setter Property="Title" Value="{Binding Model.Title}"/>
+                            <Setter Property="ToolTip" Value="{Binding Model.FilePath}"/>
+                            <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}"/>
+                            <Setter Property="IconSource" Value="{Binding Model.IconSource}"/>
+                            <Setter Property="ContentId" Value="{Binding Model.ContentId}"/>
+                        </Style>
+                    </local:PanesStyleSelector.FileStyle>
+                </local:PanesStyleSelector>
+            </avalonDock:DockingManager.LayoutItemContainerStyleSelector>
+            <avalonDock:DockingManager.LayoutUpdateStrategy>
+                <local:LayoutInitializer/>
+            </avalonDock:DockingManager.LayoutUpdateStrategy>
+
+            <avalonDockLayout:LayoutRoot>
+                <avalonDockLayout:LayoutPanel Orientation="Vertical">
+                    <avalonDockLayout:LayoutDocumentPane/>
+                    <avalonDockLayout:LayoutAnchorablePane Name="ToolsPane" DockHeight="150">
+                    </avalonDockLayout:LayoutAnchorablePane>
+                </avalonDockLayout:LayoutPanel>
+            </avalonDockLayout:LayoutRoot>
+        </avalonDock:DockingManager>
+    </Grid>
+</Window>
