@@ -11,6 +11,8 @@ PhotoShop and so forth. Here are some CodeProject articles:
 * [AvalonDock [2.0] Tutorial Part 4 - Integrating AvalonEdit Options](https://www.codeproject.com/Articles/570324/AvalonDock-Tutorial-Part-Integrating-AvalonE)
 * [AvalonDock [2.0] Tutorial Part 5 - Load/Save Layout with De-Referenced DockingManager](https://www.codeproject.com/Articles/719143/AvalonDock-Tutorial-Part-Load-Save-Layout)
 
+My editor [Edi](https://github.com/Dirkster99/Edi) is based on AvlonDock.
+
 This repository contains a feature added fork from:
 https://github.com/xceedsoftware/wpftoolkit
 
