@@ -11,3 +11,5 @@ with Theme Support for:
 * Metro (Light Only)
 * VS2013 (Dark, Light, and Blue)
 
+This project contains a feature added fork from:
+https://github.com/xceedsoftware/wpftoolkit
