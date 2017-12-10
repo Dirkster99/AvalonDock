@@ -1,15 +1,5 @@
 
-# AvalonDock Test Application
-
-with the last Edi build: 131594
-http://edi.codeplex.com/releases/view/131594
-
-from CodePlex
-
-with Theme Support for:
-* Expression Dark and Light
-* Metro (Light Only)
-* VS2013 (Dark, Light, and Blue)
+# AvalonDock
 
 This repository contains a feature added fork from:
 https://github.com/xceedsoftware/wpftoolkit
@@ -36,3 +26,21 @@ https://github.com/xceedsoftware/wpftoolkit
 
 ## VS2010
 <img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/VS2010.png">
+
+# Mile Stone History
+
+## Initial Commit
+
+# Bug Fix on Re-load of Xml Layout
+https://github.com/Dirkster99/AvalonDock/commit/5e3d81a9586dc3a4b06d28ad78bb5abc2af8fb93
+
+# Update to Xceed Version 3.2
+https://github.com/Dirkster99/AvalonDock/commit/b7cde7d2a2ef2a56f23f74cad762305113686642
+
+# Initial Commit
+https://github.com/Dirkster99/AvalonDock/commit/4bcb07f45e89e416257e668a209b238a26e5f414
+
+in this repository was taken from the last Edi build: 131594
+http://edi.codeplex.com/releases/view/131594
+
+from CodePlex
