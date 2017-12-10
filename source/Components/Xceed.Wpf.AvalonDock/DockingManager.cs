@@ -17,11 +17,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Markup;
 using System.ComponentModel;
 using System.Windows.Interop;
+using System.Diagnostics;
 
 using Xceed.Wpf.AvalonDock.Layout;
 using Xceed.Wpf.AvalonDock.Controls;
@@ -30,6 +32,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.Windows.Data;
 using System.Windows.Threading;
+using Xceed.Wpf.AvalonDock.Commands;
 using Xceed.Wpf.AvalonDock.Themes;
 
 namespace Xceed.Wpf.AvalonDock
@@ -50,11 +53,13 @@ namespace Xceed.Wpf.AvalonDock
 
         public DockingManager()
         {
-            Layout = new LayoutRoot() { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) };
-
-
-            this.Loaded += new RoutedEventHandler(DockingManager_Loaded);
-            this.Unloaded += new RoutedEventHandler(DockingManager_Unloaded);
+#if !VS2008
+          Layout = new LayoutRoot() { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) };
+#else
+          this.SetCurrentValue( DockingManager.LayoutProperty, new LayoutRoot() { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) } );
+#endif
+          this.Loaded += new RoutedEventHandler(DockingManager_Loaded);
+          this.Unloaded += new RoutedEventHandler(DockingManager_Unloaded);
         }
 
         #region Layout
@@ -158,7 +163,7 @@ namespace Xceed.Wpf.AvalonDock
             CommandManager.InvalidateRequerySuggested();
         }
 
-        DispatcherOperation _setFocusAsyncOperation = null;
+      //  DispatcherOperation _setFocusAsyncOperation = null;
 
         void OnLayoutRootPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -178,21 +183,25 @@ namespace Xceed.Wpf.AvalonDock
 
                     //set focus on active element only after a layout pass is completed
                     //it's possible that it is not yet visible in the visual tree
-                    if (_setFocusAsyncOperation == null)
-                    {
-                        _setFocusAsyncOperation = Dispatcher.BeginInvoke(new Action(() =>
-                            {
+                    //if (_setFocusAsyncOperation == null)
+                    //{
+                    //    _setFocusAsyncOperation = Dispatcher.BeginInvoke(new Action(() =>
+                           // {
                                 if (Layout.ActiveContent != null)
                                     FocusElementManager.SetFocusOnLastElement(Layout.ActiveContent);
-                                _setFocusAsyncOperation = null;
-                            }), DispatcherPriority.Background);
-                    }
+                                //_setFocusAsyncOperation = null;
+                          //  } ), DispatcherPriority.Input );
+                    //}
                 }
 
-                if (!_insideInternalSetActiveContent)
-                    ActiveContent = Layout.ActiveContent != null ?
-                        Layout.ActiveContent.Content : null;
+            //if (!_insideInternalSetActiveContent)
+            //    ActiveContent = Layout.ActiveContent != null ?
+            //        Layout.ActiveContent.Content : null;
+            if( !_insideInternalSetActiveContent && (Layout.ActiveContent != null) )
+            {
+              this.ActiveContent = Layout.ActiveContent.Content;
             }
+          }
         }
 
         void OnLayoutRootUpdated(object sender, EventArgs e)
@@ -262,7 +271,7 @@ namespace Xceed.Wpf.AvalonDock
         {
             base.OnApplyTemplate();
 
-            SetupAutoHideWindow();
+          //  SetupAutoHideWindow();
         }
 
         protected override void OnInitialized( EventArgs e )
@@ -282,6 +291,8 @@ namespace Xceed.Wpf.AvalonDock
                   RightSidePanel = CreateUIElementForModel( Layout.RightSide ) as LayoutAnchorSideControl;
                   BottomSidePanel = CreateUIElementForModel( Layout.BottomSide ) as LayoutAnchorSideControl;
                 }
+
+                SetupAutoHideWindow();
 
                 //load windows not already loaded!
                 foreach (var fw in Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)))
@@ -303,6 +314,9 @@ namespace Xceed.Wpf.AvalonDock
               {
                 _autoHideWindowManager.HideAutoWindow();
               }
+
+              if( AutoHideWindow != null )
+                AutoHideWindow.Dispose();
 
               foreach (var fw in _fwList.ToArray())
               {
@@ -1241,6 +1255,14 @@ namespace Xceed.Wpf.AvalonDock
             }
         }
 
+    public System.Collections.IEnumerator LogicalChildrenPublic
+    {
+      get
+      {
+        return this.LogicalChildren;
+      }
+    }
+
 
         internal void InternalAddLogicalChild(object element)
         {
@@ -2006,7 +2028,7 @@ namespace Xceed.Wpf.AvalonDock
                 CreateDocumentLayoutItem(documentToImport);
 
             }
-            _suspendLayoutItemCreation = true;
+            _suspendLayoutItemCreation = false;
 
 
             var documentsSourceAsNotifier = documentsSource as INotifyCollectionChanged;
@@ -2036,6 +2058,7 @@ namespace Xceed.Wpf.AvalonDock
                     {
                         (documentToRemove.Parent as ILayoutContainer).RemoveChild(
                             documentToRemove);
+                        this.RemoveViewFromLogicalChild( documentToRemove );
                     }
                 }
             }
@@ -2111,6 +2134,7 @@ namespace Xceed.Wpf.AvalonDock
                 {
                     (documentToRemove.Parent as ILayoutContainer).RemoveChild(
                         documentToRemove);
+                    this.RemoveViewFromLogicalChild( documentToRemove );
                 }
             }
 
@@ -2135,6 +2159,7 @@ namespace Xceed.Wpf.AvalonDock
             {
                 (documentToRemove.Parent as ILayoutContainer).RemoveChild(
                     documentToRemove);
+                this.RemoveViewFromLogicalChild( documentToRemove );
             }
 
             var documentsSourceAsNotifier = documentsSource as INotifyCollectionChanged;
@@ -2159,6 +2184,8 @@ namespace Xceed.Wpf.AvalonDock
 
             if( document.CloseDocument() )
             {
+              this.RemoveViewFromLogicalChild( document );
+
               if( DocumentClosed != null )
               {
                 var evargs = new DocumentClosedEventArgs( document );
@@ -2186,23 +2213,36 @@ namespace Xceed.Wpf.AvalonDock
         {
             foreach (var contentToClose in Layout.Descendents().OfType<LayoutContent>().Where(d => d != contentSelected && (d.Parent is LayoutDocumentPane || d.Parent is LayoutDocumentFloatingWindow)).ToArray())
             {
-                if (!contentToClose.CanClose)
-                    continue;
-
-                var layoutItem = GetLayoutItemFromModel(contentToClose);
-                if (layoutItem.CloseCommand != null)
-                {
-                    if (layoutItem.CloseCommand.CanExecute(null))
-                        layoutItem.CloseCommand.Execute(null);
-                }
-                else
-                {
-                    if (contentToClose is LayoutDocument)
-                        _ExecuteCloseCommand(contentToClose as LayoutDocument);
-                    else if (contentToClose is LayoutAnchorable)
-                        _ExecuteCloseCommand(contentToClose as LayoutAnchorable);
-                }
+              this.Close( contentToClose );              
             }
+        }
+
+        internal void _ExecuteCloseAllCommand( LayoutContent contentSelected )
+        {
+          foreach( var contentToClose in Layout.Descendents().OfType<LayoutContent>().Where( d => ( d.Parent is LayoutDocumentPane || d.Parent is LayoutDocumentFloatingWindow ) ).ToArray() )
+          {
+            this.Close( contentToClose );
+          }
+        }
+
+        private void Close( LayoutContent contentToClose )
+        {
+          if( !contentToClose.CanClose )
+            return;
+
+          var layoutItem = GetLayoutItemFromModel( contentToClose );
+          if( layoutItem.CloseCommand != null )
+          {
+            if( layoutItem.CloseCommand.CanExecute( null ) )
+              layoutItem.CloseCommand.Execute( null );
+          }
+          else
+          {
+            if( contentToClose is LayoutDocument )
+              _ExecuteCloseCommand( contentToClose as LayoutDocument );
+            else if( contentToClose is LayoutAnchorable )
+              _ExecuteCloseCommand( contentToClose as LayoutAnchorable );
+          }
         }
 
         #region DocumentContextMenu
@@ -2370,8 +2410,10 @@ namespace Xceed.Wpf.AvalonDock
                     var anchorablesToRemove = Layout.Descendents().OfType<LayoutAnchorable>().Where(d => e.OldItems.Contains(d.Content)).ToArray();
                     foreach (var anchorableToRemove in anchorablesToRemove)
                     {
+                        anchorableToRemove.Content = null;
                         (anchorableToRemove.Parent as ILayoutContainer).RemoveChild(
                             anchorableToRemove);
+                        this.RemoveViewFromLogicalChild( anchorableToRemove );
                     }
                 }
             }
@@ -2462,6 +2504,7 @@ namespace Xceed.Wpf.AvalonDock
                 {
                     (anchorableToRemove.Parent as ILayoutContainer).RemoveChild(
                         anchorableToRemove);
+                    this.RemoveViewFromLogicalChild( anchorableToRemove );
                 }
             }
 
@@ -2484,6 +2527,7 @@ namespace Xceed.Wpf.AvalonDock
             {
                 (anchorableToRemove.Parent as ILayoutContainer).RemoveChild(
                     anchorableToRemove);
+                this.RemoveViewFromLogicalChild( anchorableToRemove );
             }
 
             var anchorablesSourceAsNotifier = anchorablesSource as INotifyCollectionChanged;
@@ -2499,6 +2543,7 @@ namespace Xceed.Wpf.AvalonDock
             if (model != null )
             {
               model.CloseAnchorable();
+              this.RemoveViewFromLogicalChild( anchorable );
             }
         }
 
@@ -2530,6 +2575,21 @@ namespace Xceed.Wpf.AvalonDock
         internal void _ExecuteDockAsDocumentCommand(LayoutContent content)
         {
             content.DockAsDocument();
+        }
+
+        private void RemoveViewFromLogicalChild( LayoutContent layoutContent )
+        {
+          if( layoutContent == null )
+            return;
+
+          var layoutItem = this.GetLayoutItemFromModel( layoutContent );
+          if( layoutItem != null )
+          {
+            if( layoutItem.IsViewExists() )
+            {
+              this.InternalRemoveLogicalChild( layoutItem.View );
+            }
+          }
         }
 
         #region ActiveContent
@@ -2952,21 +3012,18 @@ namespace Xceed.Wpf.AvalonDock
                 foreach (var document in Layout.Descendents().OfType<LayoutDocument>().ToArray())
                 {
                     CreateDocumentLayoutItem(document);
-                    
-                    var documentItem = new LayoutDocumentItem();
-                    documentItem.Attach(document);
-                    ApplyStyleToLayoutItem(documentItem);
-                    _layoutItems.Add(documentItem);
+                    //var documentItem = new LayoutDocumentItem();
+                    //documentItem.Attach(document);
+                    //ApplyStyleToLayoutItem(documentItem);
+                    //_layoutItems.Add(documentItem);
                 }
-
                 foreach (var anchorable in Layout.Descendents().OfType<LayoutAnchorable>().ToArray())
                 {
                     CreateAnchorableLayoutItem(anchorable);
-
-                    var anchorableItem = new LayoutAnchorableItem();
-                    anchorableItem.Attach(anchorable);
-                    ApplyStyleToLayoutItem(anchorableItem);
-                    _layoutItems.Add(anchorableItem);
+                    //var anchorableItem = new LayoutAnchorableItem();
+                    //anchorableItem.Attach(anchorable);
+                    //ApplyStyleToLayoutItem(anchorableItem);
+                    //_layoutItems.Add(anchorableItem);
                 }
 
                 Layout.ElementAdded += new EventHandler<LayoutElementEventArgs>(Layout_ElementAdded);

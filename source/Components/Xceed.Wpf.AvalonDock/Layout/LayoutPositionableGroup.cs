@@ -26,7 +26,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
     [Serializable]
     public abstract class LayoutPositionableGroup<T> : LayoutGroup<T>, ILayoutPositionableElement, ILayoutPositionableElementWithActualSize where T : class, ILayoutElement
     {
-        public LayoutPositionableGroup()
+        public LayoutPositionableGroup() 
         { }
 
         GridLength _dockWidth = new GridLength(1.0, GridUnitType.Star);
@@ -80,6 +80,55 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         }
 
+        #region AllowDuplicateContent
+
+        private bool _allowDuplicateContent = true;
+        /// <summary>
+        /// Gets or sets the AllowDuplicateContent property.
+        /// When this property is true, then the LayoutDocumentPane or LayoutAnchorablePane allows dropping
+        /// duplicate content (according to its Title and ContentId). When this dependency property is false,
+        /// then the LayoutDocumentPane or LayoutAnchorablePane hides the OverlayWindow.DropInto button to prevent dropping of duplicate content.
+        /// </summary>
+        public bool AllowDuplicateContent
+        {
+          get
+          {
+            return _allowDuplicateContent;
+          }
+          set
+          {
+            if( _allowDuplicateContent != value )
+            {
+              RaisePropertyChanging( "AllowDuplicateContent" );
+              _allowDuplicateContent = value;
+              RaisePropertyChanged( "AllowDuplicateContent" );
+            }
+          }
+        }
+
+        #endregion
+
+        #region CanRepositionItems
+
+        private bool _canRepositionItems = true;
+        public bool CanRepositionItems
+        {
+          get
+          {
+            return _canRepositionItems;
+          }
+          set
+          {
+            if( _canRepositionItems != value )
+            {
+              RaisePropertyChanging( "CanRepositionItems" );
+              _canRepositionItems = value;
+              RaisePropertyChanged( "CanRepositionItems" );
+            }
+          }
+        }
+
+        #endregion
 
         #region DockMinWidth
 
