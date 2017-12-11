@@ -1,3 +1,4 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/kq2wyupx5hm7fok2?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock)
 
 # AvalonDock
 
