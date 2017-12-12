@@ -768,7 +768,7 @@
                         <Border x:Name="WindowBorder" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}">
                             <Grid Margin="3">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="16"/>
+                                    <RowDefinition MinHeight="16"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <Grid UseLayoutRounding="True"><!-- https://github.com/xceedsoftware/wpftoolkit/issues/1203 -->
