@@ -771,7 +771,7 @@
                                     <RowDefinition Height="16"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-                                <Grid>
+                                <Grid UseLayoutRounding="True"><!-- https://github.com/xceedsoftware/wpftoolkit/issues/1203 -->
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
