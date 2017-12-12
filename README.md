@@ -2,6 +2,8 @@
 [![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)
 # AvalonDock
 
+My IDE called <a hef="https://dirkster99.github.io/Edi/">Edi</a> is powered by this project.
+
 AvalonDock is a WPF Document and Tool Window layout container that is used to arrange documents
 and tool windows in similar ways than many well known IDEs, such as, Eclipse, Visual, Studio,
 PhotoShop and so forth. Here are some CodeProject articles:
