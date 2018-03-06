@@ -44,9 +44,12 @@ https://github.com/xceedsoftware/wpftoolkit
 
 # Mile Stone History
 
-## Initial Commit
+## Patch History
 
-# Bug Fix on Re-load of Xml Layout (Newest Commit First)
+# Bug Fix on Document Context Menu (Latest Commit First)
+https://github.com/Dirkster99/AvalonDock/commit/105e9d9519b2a711500245f0d6d6c517fce98109
+
+# Bug Fix on Re-load of Xml Layout
 https://github.com/Dirkster99/AvalonDock/commit/5e3d81a9586dc3a4b06d28ad78bb5abc2af8fb93
 
 # Update to Xceed Version 3.2
