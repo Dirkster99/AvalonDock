@@ -47,28 +47,20 @@ https://github.com/xceedsoftware/wpftoolkit
 ## Patch History for AvalonDock Version 3.2
 
 - Fixing an old styling issue on the Document Context Menu which appears with
-  white backgounrd when styling for dark
-  
-  https://github.com/Dirkster99/AvalonDock/commit/105e9d9519b2a711500245f0d6d6c517fce98109
+  white backgounrd when styling for dark <a href="https://github.com/Dirkster99/AvalonDock/commit/105e9d9519b2a711500245f0d6d6c517fce98109">-&gt;</a> 
 
-- Applied fix to LayoutAnchorable drawn behind LayoutDocument since v3.1
-  https://github.com/Dirkster99/AvalonDock/commit/5a26edaef16063f01ca2d6a353a239ee84fa3c63
+- Applied fix to LayoutAnchorable drawn behind LayoutDocument since v3.1 <a href="https://github.com/Dirkster99/AvalonDock/commit/5a26edaef16063f01ca2d6a353a239ee84fa3c63">-&gt;</a>
 
-- Fixed Close Button Position in Generic Theme
-  https://github.com/Dirkster99/AvalonDock/commit/fa81b3f9f7e043a3dca3fa1007c23b8d4f229675
+- Fixed Close Button Position in Generic Theme <a href="https://github.com/Dirkster99/AvalonDock/commit/fa81b3f9f7e043a3dca3fa1007c23b8d4f229675">-&gt;</a>
 
-- Turned Height in MinHeight
-  https://github.com/Dirkster99/AvalonDock/commit/1c2163e03178ed1a0cc3fafc57d0119b3a238d4a
+- Turned Height in MinHeight <a href="https://github.com/Dirkster99/AvalonDock/commit/1c2163e03178ed1a0cc3fafc57d0119b3a238d4a">-&gt;</a>
 
-- Added fix on UseLayoutRounding="True"
-  https://github.com/Dirkster99/AvalonDock/commit/517ba40a63c7eaf080e1d95d65d28dd718fe4822
+- Added fix on UseLayoutRounding="True" <a href="https://github.com/Dirkster99/AvalonDock/commit/517ba40a63c7eaf080e1d95d65d28dd718fe4822">-&gt;</a>
 
-- Correct Build Configs for Any CPU, x86, x64
-  https://github.com/Dirkster99/AvalonDock/commit/282fdf296745ad4ccbd1986d938ffea9efe0aa9c
+- Correct Build Configs for Any CPU, x86, x64 <a href="https://github.com/Dirkster99/AvalonDock/commit/282fdf296745ad4ccbd1986d938ffea9efe0aa9c">-&gt;</a>
 
 - Fixed DocManager.Layout Properties null after Layout load:
-  LeftSide, TopSide, BottomSide, RightSide null bug after loading layout.
-  https://github.com/Dirkster99/AvalonDock/commit/06b9682c1d5cfb9e895f63fdbc2ae6e9532dfc53
+  LeftSide, TopSide, BottomSide, RightSide null bug after loading layout <a href="https://github.com/Dirkster99/AvalonDock/commit/06b9682c1d5cfb9e895f63fdbc2ae6e9532dfc53">-&gt;</a>
 
 # Initial Commit
 https://github.com/Dirkster99/AvalonDock/commit/4bcb07f45e89e416257e668a209b238a26e5f414
