@@ -15,8 +15,6 @@
   **********************************************************************/
 
 using System.Reflection;
-using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Markup;
@@ -28,9 +26,9 @@ using System;
 [assembly: AssemblyTitle("Xceed AvalonDock VS2013 Theme")]
 [assembly: AssemblyDescription("VS2013 Theme for Xceed AvalonDock")]
 
-[assembly: AssemblyCompany("Roman '4ux-nbIx' Novitsky")]
+[assembly: AssemblyCompany("Open Source")]
 [assembly: AssemblyProduct( "Xceed - AvalonDock" )]
-[assembly: AssemblyCopyright("Copyright © Roman '4ux-nbIx' Novitsky 2013-2016")]
+[assembly: AssemblyCopyright("Copyright © 2018")]
 
 
 
@@ -66,4 +64,6 @@ using System;
 [assembly: AssemblyDelaySign( false )]
 ////[assembly: AssemblyKeyFile( @"..\..\sn.snk" )]
 [assembly: AssemblyKeyName( "" )]
+[assembly: AssemblyVersion("1.0.1.0")]
+[assembly: AssemblyFileVersion("1.0.1.0")]
 #pragma warning restore 1699
