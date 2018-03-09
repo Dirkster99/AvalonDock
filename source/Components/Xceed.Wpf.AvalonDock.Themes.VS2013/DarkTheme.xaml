@@ -131,12 +131,15 @@
 
     <!-- Tool Window : Tab -->
     <SolidColorBrush x:Key="AvalonDockThemeVs2013ToolWindowTabSelectedActiveBackground" Color="#252526" />
+    <!-- (AccentColor) -->
     <SolidColorBrush x:Key="AvalonDockThemeVs2013ToolWindowTabSelectedActiveText" Color="#0097FB" />
     <SolidColorBrush x:Key="AvalonDockThemeVs2013ToolWindowTabSelectedInactiveBackground" Color="#252526" />
+    <!-- (AccentColor) -->
     <SolidColorBrush x:Key="AvalonDockThemeVs2013ToolWindowTabSelectedInactiveText" Color="#0097FB" />
     <SolidColorBrush x:Key="AvalonDockThemeVs2013ToolWindowTabUnselectedBackground" Color="#2D2D30" />
     <SolidColorBrush x:Key="AvalonDockThemeVs2013ToolWindowTabUnselectedText" Color="#D0D0D0" />
     <SolidColorBrush x:Key="AvalonDockThemeVs2013ToolWindowTabUnselectedHoveredBackground" Color="#3E3E40" />
+    <!-- (AccentColor) -->
     <SolidColorBrush x:Key="AvalonDockThemeVs2013ToolWindowTabUnselectedHoveredText" Color="#55AAFF" />
     
     <!-- Floating Document Window -->
