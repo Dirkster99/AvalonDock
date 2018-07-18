@@ -132,7 +132,7 @@
                                            Fill="{DynamicResource AvalonDockThemeVs2013DocumentWellOverflowButtonDefaultGlyph}"
                                            Width="12" Height="12">
                                     <Rectangle.OpacityMask>
-                                        <ImageBrush ImageSource="Images/PinDocMenu.png" />
+                                        <ImageBrush ImageSource="../Images/PinDocMenu.png" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
                             </avalonDockControls:DropDownButton>
@@ -513,7 +513,7 @@
                                            Fill="{DynamicResource AvalonDockThemeVs2013ToolWindowCaptionButtonInactiveGlyph}"
                                            Width="13" Height="13">
                                     <Rectangle.OpacityMask>
-                                        <ImageBrush ImageSource="Images/PinMenu.png" />
+                                        <ImageBrush ImageSource="../Images/PinMenu.png" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
                             </avalonDockControls:DropDownButton>
@@ -535,7 +535,7 @@
                                            Fill="{DynamicResource AvalonDockThemeVs2013ToolWindowCaptionButtonInactiveGlyph}"
                                            Width="13" Height="13">
                                     <Rectangle.OpacityMask>
-                                        <ImageBrush ImageSource="Images/PinAutoHide.png" />
+                                        <ImageBrush ImageSource="../Images/PinAutoHide.png" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
                             </Button>
@@ -556,7 +556,7 @@
                                            Fill="{DynamicResource AvalonDockThemeVs2013ToolWindowCaptionButtonInactiveGlyph}"
                                            Width="13" Height="13">
                                     <Rectangle.OpacityMask>
-                                        <ImageBrush ImageSource="Images/PinClose.png" />
+                                        <ImageBrush ImageSource="../Images/PinClose.png" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
                             </Button>
@@ -748,22 +748,22 @@
                             <Image x:Name="PART_DockingManagerDropTargetLeft"
                                    HorizontalAlignment="Left"
                                    VerticalAlignment="Center"
-                                   Source="Images/DockAnchorableLeft.PNG"
+                                   Source="../Images/DockAnchorableLeft.PNG"
                                    Stretch="None" />
                             <Image x:Name="PART_DockingManagerDropTargetRight"
                                    HorizontalAlignment="Right"
                                    VerticalAlignment="Center"
-                                   Source="Images/DockAnchorableRight.PNG"
+                                   Source="../Images/DockAnchorableRight.PNG"
                                    Stretch="None" />
                             <Image x:Name="PART_DockingManagerDropTargetBottom"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Bottom"
-                                   Source="Images/DockAnchorableBottom.PNG"
+                                   Source="../Images/DockAnchorableBottom.PNG"
                                    Stretch="None" />
                             <Image x:Name="PART_DockingManagerDropTargetTop"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Top"
-                                   Source="Images/DockAnchorableTop.PNG"
+                                   Source="../Images/DockAnchorableTop.PNG"
                                    Stretch="None" />
                         </Grid>
                         <Grid x:Name="PART_AnchorablePaneDropTargets">
@@ -784,37 +784,37 @@
                                 <Image Grid.RowSpan="3"
                                        Grid.ColumnSpan="3"
                                        Margin="0,0.5,0,-0.5"
-                                       Source="Images/DockPaneEmpty.png"
+                                       Source="../Images/DockPaneEmpty.png"
                                        Stretch="None" />
                                 <Border Name="PART_AnchorablePaneDropTargetTop"
                                         Grid.Row="0"
                                         Grid.Column="1"
                                         Margin="0,3.5,0, 0">
-                                    <Image Source="Images/DockDocumentAsAnchorableTop.png" Stretch="None" />
+                                    <Image Source="../Images/DockDocumentAsAnchorableTop.png" Stretch="None" />
                                 </Border>
                                 <Border Name="PART_AnchorablePaneDropTargetRight"
                                         Grid.Row="1"
                                         Grid.Column="2"
                                         Margin="2">
-                                    <Image Source="Images/DockDocumentAsAnchorableRight.png" Stretch="None" />
+                                    <Image Source="../Images/DockDocumentAsAnchorableRight.png" Stretch="None" />
                                 </Border>
                                 <Border Name="PART_AnchorablePaneDropTargetBottom"
                                         Grid.Row="2"
                                         Grid.Column="1"
                                         Margin="0,-0.5,0,0">
-                                    <Image Source="Images/DockDocumentAsAnchorableBottom.png" Stretch="None" />
+                                    <Image Source="../Images/DockDocumentAsAnchorableBottom.png" Stretch="None" />
                                 </Border>
                                 <Border Name="PART_AnchorablePaneDropTargetLeft"
                                         Grid.Row="1"
                                         Grid.Column="0"
                                         Margin="2">
-                                    <Image Source="Images/DockDocumentAsAnchorableLeft.png" Stretch="None" />
+                                    <Image Source="../Images/DockDocumentAsAnchorableLeft.png" Stretch="None" />
                                 </Border>
                                 <Border Name="PART_AnchorablePaneDropTargetInto"
                                         Grid.Row="1"
                                         Grid.Column="1"
                                         Margin="0,0.5,0,0">
-                                    <Image Source="Images/DockDocumentInside.png" Stretch="None" />
+                                    <Image Source="../Images/DockDocumentInside.png" Stretch="None" />
                                 </Border>
                             </Grid>
                         </Grid>
@@ -835,36 +835,36 @@
                                 </Grid.RowDefinitions>
                                 <Image Grid.RowSpan="3"
                                        Grid.ColumnSpan="3"
-                                       Source="Images/DockPaneEmpty.PNG"
+                                       Source="../Images/DockPaneEmpty.PNG"
                                        Stretch="None" />
                                 <Border Name="PART_DocumentPaneDropTargetTop"
                                         Grid.Row="0"
                                         Grid.Column="1"
                                         Margin="2">
-                                    <Image Source="Images/DockDocumentTop.png" Stretch="None" />
+                                    <Image Source="../Images/DockDocumentTop.png" Stretch="None" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetRight"
                                         Grid.Row="1"
                                         Grid.Column="2"
                                         Margin="2">
-                                    <Image Source="Images/DockDocumentRight.png" Stretch="None" />
+                                    <Image Source="../Images/DockDocumentRight.png" Stretch="None" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetBottom"
                                         Grid.Row="2"
                                         Grid.Column="1"
                                         Margin="2">
-                                    <Image Source="Images/DockDocumentBottom.png" Stretch="None" />
+                                    <Image Source="../Images/DockDocumentBottom.png" Stretch="None" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetLeft"
                                         Grid.Row="1"
                                         Grid.Column="0"
                                         Margin="2">
-                                    <Image Source="Images/DockDocumentLeft.png" Stretch="None" />
+                                    <Image Source="../Images/DockDocumentLeft.png" Stretch="None" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetInto"
                                         Grid.Row="1"
                                         Grid.Column="1">
-                                    <Image Source="Images/DockDocumentInside.png" Stretch="None" />
+                                    <Image Source="../Images/DockDocumentInside.png" Stretch="None" />
                                 </Border>
                             </Grid>
                         </Grid>
@@ -890,68 +890,68 @@
                                 </Grid.RowDefinitions>
                                 <Image Grid.RowSpan="5"
                                        Grid.ColumnSpan="5"
-                                       Source="Images/DockPaneLargeEmpty.PNG"
+                                       Source="../Images/DockPaneLargeEmpty.PNG"
                                        Stretch="None" />
                                 <Border Name="PART_DocumentPaneFullDropTargetTop"
                                         Grid.Row="1"
                                         Grid.Column="2">
                                     <Image Margin="2"
-                                           Source="Images/DockDocumentTop.png"
+                                           Source="../Images/DockDocumentTop.png"
                                            Stretch="None" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneFullDropTargetRight"
                                         Grid.Row="2"
                                         Grid.Column="3">
                                     <Image Margin="2"
-                                           Source="Images/DockDocumentRight.png"
+                                           Source="../Images/DockDocumentRight.png"
                                            Stretch="None" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneFullDropTargetBottom"
                                         Grid.Row="3"
                                         Grid.Column="2">
                                     <Image Margin="2"
-                                           Source="Images/DockDocumentBottom.png"
+                                           Source="../Images/DockDocumentBottom.png"
                                            Stretch="None" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneFullDropTargetLeft"
                                         Grid.Row="2"
                                         Grid.Column="1">
                                     <Image Margin="2"
-                                           Source="Images/DockDocumentLeft.png"
+                                           Source="../Images/DockDocumentLeft.png"
                                            Stretch="None" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneFullDropTargetInto"
                                         Grid.Row="2"
                                         Grid.Column="2">
-                                    <Image Source="Images/DockDocumentInside.png" Stretch="None" />
+                                    <Image Source="../Images/DockDocumentInside.png" Stretch="None" />
                                 </Border>
 
                                 <Border Name="PART_DocumentPaneDropTargetTopAsAnchorablePane"
                                         Grid.Row="0"
                                         Grid.Column="2">
                                     <Image Margin="2"
-                                           Source="Images/DockDocumentAsAnchorableTop.png"
+                                           Source="../Images/DockDocumentAsAnchorableTop.png"
                                            Stretch="None" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetRightAsAnchorablePane"
                                         Grid.Row="2"
                                         Grid.Column="4">
                                     <Image Margin="2"
-                                           Source="Images/DockDocumentAsAnchorableRight.png"
+                                           Source="../Images/DockDocumentAsAnchorableRight.png"
                                            Stretch="None" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetBottomAsAnchorablePane"
                                         Grid.Row="4"
                                         Grid.Column="2">
                                     <Image Margin="2"
-                                           Source="Images/DockDocumentAsAnchorableBottom.png"
+                                           Source="../Images/DockDocumentAsAnchorableBottom.png"
                                            Stretch="None" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetLeftAsAnchorablePane"
                                         Grid.Row="2"
                                         Grid.Column="0">
                                     <Image Margin="2"
-                                           Source="Images/DockDocumentAsAnchorableLeft.png"
+                                           Source="../Images/DockDocumentAsAnchorableLeft.png"
                                            Stretch="None" />
                                 </Border>
 
@@ -1033,7 +1033,7 @@
                                        Converter={StaticResource BoolToVisibilityConverter}}">
             <MenuItem.Icon>
                 <Image Width="14"
-                       Source="/Images/VTabGroup.png"
+                       Source="../Images/VTabGroup.png"
                        Stretch="Uniform" />
             </MenuItem.Icon>
         </MenuItem>
@@ -1138,7 +1138,7 @@
                                     <Rectangle x:Name="PART_ImgPinClose"
                                                Width="13" Height="13">
                                         <Rectangle.OpacityMask>
-                                            <ImageBrush ImageSource="Images/PinClose.png" />
+                                            <ImageBrush ImageSource="../Images/PinClose.png" />
                                         </Rectangle.OpacityMask>
                                     </Rectangle>
                                 </Button>
@@ -1401,7 +1401,7 @@
                                                        Fill="{DynamicResource AvalonDockThemeVs2013DocumentWellTabButtonSelectedInactiveGlyph}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="Images/PinMenu.png" />
+                                                    <ImageBrush ImageSource="../Images/PinMenu.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </avalonDockControls:DropDownButton>
@@ -1423,7 +1423,7 @@
                                                        Fill="{DynamicResource AvalonDockThemeVs2013DocumentWellTabButtonSelectedInactiveGlyph}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="Images/PinMaximize.png" />
+                                                    <ImageBrush ImageSource="../Images/PinMaximize.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </Button>
@@ -1445,7 +1445,7 @@
                                                        Fill="{DynamicResource AvalonDockThemeVs2013DocumentWellTabButtonSelectedInactiveGlyph}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="Images/PinRestore.png" />
+                                                    <ImageBrush ImageSource="../Images/PinRestore.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </Button>
@@ -1468,7 +1468,7 @@
                                                        Fill="{DynamicResource AvalonDockThemeVs2013DocumentWellTabButtonSelectedInactiveGlyph}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="Images/PinClose.png" />
+                                                    <ImageBrush ImageSource="../Images/PinClose.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </Button>
@@ -1732,7 +1732,7 @@
                                                        Fill="{DynamicResource AvalonDockThemeVs2013DocumentWellTabButtonSelectedInactiveGlyph}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="Images/PinMenu.png" />
+                                                    <ImageBrush ImageSource="../Images/PinMenu.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </avalonDockControls:DropDownButton>
@@ -1756,7 +1756,7 @@
                                                        Fill="{DynamicResource AvalonDockThemeVs2013DocumentWellTabButtonSelectedInactiveGlyph}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="Images/PinMaximize.png" />
+                                                    <ImageBrush ImageSource="../Images/PinMaximize.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </Button>
@@ -1778,7 +1778,7 @@
                                                        Fill="{DynamicResource AvalonDockThemeVs2013DocumentWellTabButtonSelectedInactiveGlyph}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="Images/PinRestore.png" />
+                                                    <ImageBrush ImageSource="../Images/PinRestore.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </Button>
@@ -1801,7 +1801,7 @@
                                                        Fill="{DynamicResource AvalonDockThemeVs2013DocumentWellTabButtonSelectedInactiveGlyph}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="Images/PinClose.png" />
+                                                    <ImageBrush ImageSource="../Images/PinClose.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </Button>
@@ -2024,6 +2024,7 @@
         <Setter Property="FocusVisualStyle" Value="{StaticResource AvalonDockThemeVs2013NavigatorWindowListBoxItemFocusVisual}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource AvalonDockThemeVs2013NavigatorWindowForeground}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="5,0,5,0" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -2133,7 +2134,9 @@
                                                    VerticalAlignment="Center"
                                                    FontWeight="Bold"
                                                    Text="{Binding SelectedDocument.LayoutElement.Title, RelativeSource={RelativeSource TemplatedParent}}"
-                                                   TextTrimming="CharacterEllipsis" />
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Foreground="{DynamicResource AvalonDockThemeVs2013NavigatorWindowForeground}"
+                                                   />
                                     </Grid>
                                     <!--<TextBlock VerticalAlignment="Center"
                                                Text="{Binding SelectedDocument.LayoutElement.Description, RelativeSource={RelativeSource TemplatedParent}}"
@@ -2157,7 +2160,9 @@
                                             </Grid.RowDefinitions>
                                             <TextBlock Margin="0,3,0,4"
                                                        FontWeight="Bold"
-                                                       Text="Active Tool Windows" />
+                                                       Text="Active Tool Windows"
+                                                       Foreground="{DynamicResource AvalonDockThemeVs2013NavigatorWindowForeground}"
+                                                       />
                                             <ListBox Grid.Row="1"
                                                      MaxHeight="400"
                                                      Background="Transparent"
@@ -2177,7 +2182,8 @@
                                                             <TextBlock Grid.Column="1"
                                                                        Margin="4,0,0,0"
                                                                        Text="{Binding LayoutElement.Title}"
-                                                                       TextTrimming="CharacterEllipsis" />
+                                                                       TextTrimming="CharacterEllipsis"
+                                                                       />
                                                         </Grid>
                                                     </DataTemplate>
                                                 </ListBox.ItemTemplate>
@@ -2190,7 +2196,10 @@
                                             </Grid.RowDefinitions>
                                             <TextBlock Margin="0,3,0,4"
                                                        FontWeight="Bold"
-                                                       Text="Active Files" />
+                                                       Text="Active Files"
+                                                       Foreground="{DynamicResource AvalonDockThemeVs2013NavigatorWindowForeground}"
+                                                       />
+
                                             <ListBox Grid.Row="1"
                                                      MaxHeight="400"
                                                      Background="Transparent"
@@ -2225,7 +2234,10 @@
                                 </Border>
 
                                 <Grid Grid.Row="2" Margin="5">
-                                    <TextBlock VerticalAlignment="Center" Text="{Binding SelectedDocument.LayoutElement.ToolTip, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <TextBlock VerticalAlignment="Center"
+                                               Text="{Binding SelectedDocument.LayoutElement.ToolTip, RelativeSource={RelativeSource TemplatedParent}}"
+                                                Foreground="{DynamicResource AvalonDockThemeVs2013NavigatorWindowForeground}"
+                                               />
                                 </Grid>
                             </Grid>
                         </Border>

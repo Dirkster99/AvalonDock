@@ -14,9 +14,9 @@
 
   **********************************************************************/
 
-#pragma warning disable 0436
-[assembly: System.Reflection.AssemblyVersion( _XceedVersionInfo.Version )]
-#pragma warning restore 0436
+////#pragma warning disable 0436
+////[assembly: System.Reflection.AssemblyVersion( _XceedVersionInfo.Version )]
+////#pragma warning restore 0436
 
 internal static class _XceedVersionInfo
 {
