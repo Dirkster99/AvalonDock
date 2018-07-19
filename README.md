@@ -19,6 +19,8 @@ My editor [Edi](https://github.com/Dirkster99/Edi) is based on AvlonDock.
 This repository contains a feature added fork from:
 https://github.com/xceedsoftware/wpftoolkit
 
+Get the latest Debug build from [Comtinues Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts).
+
 # Feature Added - Dark and Light Theme Samples
 
 ## VS2013 Dark
@@ -44,10 +46,18 @@ https://github.com/xceedsoftware/wpftoolkit
 
 # Mile Stone History
 
+## Patch History for AvalonDock Version 3.3
+
+- (FIXED in 3.4) AvalonDock Bug after reloading layout <a href="https://github.com/Dirkster99/AvalonDock/wiki/(Fixed)-AvalonDock-Bug-after-reloading-layout">-&gt;</a>
+
+- (FIXED in 3.4) Save Tool Window to Bottom and Reload does not work <a href="https://github.com/Dirkster99/AvalonDock/wiki/AvalonDock-Bug2">-&gt;</a>
+
+- <a href="https://github.com/xceedsoftware/wpftoolkit/commit/24ecc09cf35e7095ad02d0beecfd5bafd83d0658">Commit Version 3.4</a>
+
 ## Patch History for AvalonDock Version 3.2
 
 - Fixing an old styling issue on the Document Context Menu which appears with
-  white backgounrd when styling for dark <a href="https://github.com/Dirkster99/AvalonDock/commit/105e9d9519b2a711500245f0d6d6c517fce98109">-&gt;</a> 
+  white background when styling for dark <a href="https://github.com/Dirkster99/AvalonDock/commit/105e9d9519b2a711500245f0d6d6c517fce98109">-&gt;</a> 
 
 - Applied fix to LayoutAnchorable drawn behind LayoutDocument since v3.1 <a href="https://github.com/Dirkster99/AvalonDock/commit/5a26edaef16063f01ca2d6a353a239ee84fa3c63">-&gt;</a>
 
