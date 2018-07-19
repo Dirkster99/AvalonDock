@@ -777,13 +777,18 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     private void _floatingWindows_CollectionChanged( object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e )
     {
+      bool bNotifyChildren = false;
+        
       if( e.OldItems != null && ( e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove ||
           e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace ) )
       {
         foreach( LayoutFloatingWindow element in e.OldItems )
         {
           if( element.Parent == this )
+          {
             element.Parent = null;
+            bNotifyChildren = true;
+          }
         }
       }
 
@@ -791,12 +796,37 @@ namespace Xceed.Wpf.AvalonDock.Layout
           e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace ) )
       {
         foreach( LayoutFloatingWindow element in e.NewItems )
+        {
           element.Parent = this;
+          bNotifyChildren = true;
+        }
+      }
+
+      // descendants of LayoutElement notify when their Children and ChildrenCount properties change
+      // https://github.com/xceedsoftware/wpftoolkit/issues/1313
+      //
+      if (bNotifyChildren == true &&
+          (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove ||
+           e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add
+         ))
+      {
+          RaisePropertyChanged("Children");
+          RaisePropertyChanged("ChildrenCount");
+      }
+      else
+      {
+        if (bNotifyChildren == true &&
+            e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace )
+        {
+          RaisePropertyChanged("Children");
+        }
       }
     }
 
     private void _hiddenAnchorables_CollectionChanged( object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e )
     {
+      bool bNotifyChildren = false;
+        
       if( e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove ||
           e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace )
       {
@@ -805,7 +835,10 @@ namespace Xceed.Wpf.AvalonDock.Layout
           foreach( LayoutAnchorable element in e.OldItems )
           {
             if( element.Parent == this )
+            {
               element.Parent = null;
+              bNotifyChildren = true;
+            }
           }
         }
       }
@@ -821,15 +854,34 @@ namespace Xceed.Wpf.AvalonDock.Layout
             {
               if( element.Parent != null )
                 element.Parent.RemoveChild( element );
+              
               element.Parent = this;
+              bNotifyChildren = true;
             }
 
           }
         }
       }
 
-
-
+      // descendants of LayoutElement notify when their Children and ChildrenCount properties change
+      // https://github.com/xceedsoftware/wpftoolkit/issues/1313
+      //
+      if (bNotifyChildren == true &&
+          (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove ||
+           e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add
+         ))
+      {
+          RaisePropertyChanged("Children");
+          RaisePropertyChanged("ChildrenCount");
+      }
+      else
+      {
+        if (bNotifyChildren == true &&
+            e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace )
+        {
+          RaisePropertyChanged("Children");
+        }
+      }
     }
 
     private void InternalSetActiveContent( LayoutContent currentValue, LayoutContent newActiveContent )
