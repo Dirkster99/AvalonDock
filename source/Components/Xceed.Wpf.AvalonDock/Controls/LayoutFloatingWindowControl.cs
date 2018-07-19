@@ -360,6 +360,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     internal void InternalClose()
     {
+      // Check before Close in InternalClose
+      // https://github.com/xceedsoftware/wpftoolkit/issues/1310
+      if( _internalCloseFlag )
+      {
+        return;
+      }
+
       _internalCloseFlag = true;
       Close();
     }
