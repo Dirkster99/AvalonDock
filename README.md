@@ -46,13 +46,33 @@ Get the latest Debug build from [Comtinues Integration](https://ci.appveyor.com/
 
 # Mile Stone History
 
+## Patch History for AvalonDock Version 3.4
+
+- <a href="https://github.com/xceedsoftware/wpftoolkit/commit/24ecc09cf35e7095ad02d0beecfd5bafd83d0658">Commit from xceedsoftware/wpftoolkit for Version 3.4</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/b6b8248cad226bc264855cdbd7e27b9c34303d71">Local Commit in master for Version 3.4</a>
+
+### Reapplied Fixes
+
+<b><a href="https://github.com/xceedsoftware/wpftoolkit/issues/1203">Fixed height of titles of floating windows #1203</a></b>
+
+- Turn Height into MinHeight <a href="https://github.com/Dirkster99/AvalonDock/commit/1c2163e03178ed1a0cc3fafc57d0119b3a238d4a">-&gt;</a>
+- Fix on UseLayoutRounding="True" <a href="https://github.com/Dirkster99/AvalonDock/commit/517ba40a63c7eaf080e1d95d65d28dd718fe4822">-&gt;</a>
+<a href="https://github.com/Dirkster99/AvalonDock/commit/b567265c48b54a3abe6352d4f29b8ca6289c3e54">Commit</a>
+
+<b><a href="https://github.com/xceedsoftware/wpftoolkit/pull/1311">System.InvalidOperationException when window docking #1311</a></b>
+   <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1310">Check before Close in InternalClose #1310</a>
+<a href="https://github.com/Dirkster99/AvalonDock/commit/ca7b02b76a430bb4b911d94f88c9136090f7690e">Commit</a>
+
+<b><a href="https://github.com/xceedsoftware/wpftoolkit/issues/1313">LayoutRoot doesn't notify change for Children or ChildrenCount #1313</a></b>
+<a href="https://github.com/Dirkster99/AvalonDock/commit/75b8b54a300c01dad731771e15cbce24d30b9012">Commit</a>
+
+- descendants of LayoutElement notify when their Children and ChildrenCount properties change
+
 ## Patch History for AvalonDock Version 3.3
 
 - (FIXED in 3.4) AvalonDock Bug after reloading layout <a href="https://github.com/Dirkster99/AvalonDock/wiki/(Fixed)-AvalonDock-Bug-after-reloading-layout">-&gt;</a>
 
 - (FIXED in 3.4) Save Tool Window to Bottom and Reload does not work <a href="https://github.com/Dirkster99/AvalonDock/wiki/AvalonDock-Bug2">-&gt;</a>
-
-- <a href="https://github.com/xceedsoftware/wpftoolkit/commit/24ecc09cf35e7095ad02d0beecfd5bafd83d0658">Commit Version 3.4</a>
 
 ## Patch History for AvalonDock Version 3.2
 
