@@ -417,8 +417,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
         var clientArea = Win32Helper.GetClientRect( windowHandle );
         var windowArea = Win32Helper.GetWindowRect( windowHandle );
 
-        Left = mousePosition.X - windowArea.Width / 2.0;
-        Top = mousePosition.Y - ( windowArea.Height - clientArea.Height ) / 2.0;
+        // BugFix Issue #6
+        // This code is executed when content (dicument or toolwindow) is dragged around
+        // Formula assumes dragged content has at least a width of 6 and a height of 6
+        // and always positions dragged conent 3 point in X and Y under mouse cursor
+        // (This could be improved by remembering the delta between mouse cursor and
+        //  content origin from when user started the drag operation)
+        Left = (mousePosition.X - (windowArea.Width - clientArea.Width) / 2.0) - 3;
+        Top = (mousePosition.Y - ( windowArea.Height - clientArea.Height ) / 2.0) - 3;
         _attachDrag = false;
 
         IntPtr lParam = new IntPtr( ( ( int )mousePosition.X & ( int )0xFFFF ) | ( ( ( int )mousePosition.Y ) << 16 ) );
