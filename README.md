@@ -19,6 +19,8 @@ My editor [Edi](https://github.com/Dirkster99/Edi) is based on AvlonDock.
 This repository contains a feature added fork from:
 https://github.com/xceedsoftware/wpftoolkit
 
+Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Wiki for more details</a>.
+
 Get the latest Debug build from [Comtinues Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts).
 
 # Feature Added - Dark and Light Theme Samples
