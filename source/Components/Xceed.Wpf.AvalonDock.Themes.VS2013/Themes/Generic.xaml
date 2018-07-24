@@ -2129,7 +2129,8 @@
                                                Visibility="{Binding SelectedDocument.LayoutElement.IconSource,
                                                                     RelativeSource={RelativeSource TemplatedParent},
                                                                     Converter={StaticResource BoolToVisibilityConverter}}" />
-                                        <TextBlock Grid.Column="1"
+                                        <TextBlock x:Name="selectedElementTitle"
+                                                   Grid.Column="1"
                                                    Margin="4,0,0,0"
                                                    VerticalAlignment="Center"
                                                    FontWeight="Bold"
@@ -2138,9 +2139,10 @@
                                                    Foreground="{DynamicResource AvalonDockThemeVs2013NavigatorWindowForeground}"
                                                    />
                                     </Grid>
-                                    <!--<TextBlock VerticalAlignment="Center"
-                                               Text="{Binding SelectedDocument.LayoutElement.Description, RelativeSource={RelativeSource TemplatedParent}}"
-                                               TextTrimming="CharacterEllipsis" />-->
+                                    <TextBlock x:Name="selectedElementDescription"
+                                               VerticalAlignment="Center"
+                                               Text="{Binding SelectedDocument.LayoutElement.Description}"
+                                               TextTrimming="CharacterEllipsis" />
                                 </Grid>
 
                                 <Border Grid.Row="1"
@@ -2163,7 +2165,8 @@
                                                        Text="Active Tool Windows"
                                                        Foreground="{DynamicResource AvalonDockThemeVs2013NavigatorWindowForeground}"
                                                        />
-                                            <ListBox Grid.Row="1"
+                                            <ListBox x:Name="PART_AnchorableListBox"
+                                                     Grid.Row="1"
                                                      MaxHeight="400"
                                                      Background="Transparent"
                                                      BorderThickness="0"
@@ -2200,7 +2203,8 @@
                                                        Foreground="{DynamicResource AvalonDockThemeVs2013NavigatorWindowForeground}"
                                                        />
 
-                                            <ListBox Grid.Row="1"
+                                            <ListBox x:Name="PART_DocumentListBox"
+                                                     Grid.Row="1"
                                                      MaxHeight="400"
                                                      Background="Transparent"
                                                      BorderThickness="0"
@@ -2242,6 +2246,20 @@
                             </Grid>
                         </Border>
                     </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger
+							Property="SelectedDocument"
+							Value="{x:Null}">
+                            <Setter
+								Property="Text"
+								Value="{Binding SelectedAnchorable.LayoutElement.Title}"
+								TargetName="selectedElementTitle" />
+                            <Setter
+								Property="Text"
+								Value="{x:Null}"
+								TargetName="selectedElementDescription" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

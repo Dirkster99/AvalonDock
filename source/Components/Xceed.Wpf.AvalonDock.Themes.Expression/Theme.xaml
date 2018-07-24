@@ -1300,9 +1300,18 @@
                                             Source="{Binding SelectedDocument.LayoutElement.IconSource, Converter={StaticResource NullToDoNothingConverter}}"
                                             Stretch="None"
                                             Visibility="{Binding SelectedDocument.LayoutElement.IconSource, Converter={StaticResource BoolToVisibilityConverter} }"/>
-                                        <TextBlock Text="{Binding SelectedDocument.LayoutElement.Title}" TextTrimming="CharacterEllipsis" Grid.Column="1" VerticalAlignment="Center" FontWeight="Bold" Margin="4,0,0,0"/>
+                                        <TextBlock x:Name="selectedElementTitle"
+                                                   Text="{Binding SelectedDocument.LayoutElement.Title}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Grid.Column="1"
+                                                   VerticalAlignment="Center"
+                                                   FontWeight="Bold"
+                                                   Margin="4,0,0,0"/>
                                     </Grid>
-                                    <TextBlock Text="{Binding SelectedDocument.LayoutElement.Description}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="selectedElementDescription"
+                                               Text="{Binding SelectedDocument.LayoutElement.Description}"
+                                               TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center"/>
                                 </Grid>
 
                                 <Border Grid.Row="1" 
@@ -1321,7 +1330,8 @@
                                                 <RowDefinition/>
                                             </Grid.RowDefinitions>
                                             <TextBlock Text="Active Tool Windows" FontWeight="Bold" Margin="0,3,0,4"/>
-                                            <ListBox Grid.Row="1" 
+                                            <ListBox x:Name="PART_AnchorableListBox"
+                                                     Grid.Row="1" 
                                                      ItemsSource="{Binding Anchorables}"
                                                      SelectedItem="{Binding SelectedAnchorable, Mode=TwoWay}" 
                                                      ItemContainerStyle="{StaticResource AvalonDock_Expression_NavigatorWindowListBoxItemStyle}"
@@ -1349,6 +1359,7 @@
                                             </Grid.RowDefinitions>
                                             <TextBlock Text="Active Files" FontWeight="Bold" Margin="0,3,0,4"/>
                                             <ListBox 
+                                                x:Name="PART_DocumentListBox"
                                                 Grid.Row="1" 
                                                 ItemsSource="{Binding Documents}" 
                                                 SelectedItem="{Binding SelectedDocument, Mode=TwoWay}" 
@@ -1384,6 +1395,20 @@
                             </Grid>
                         </Border>
                     </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger
+							Property="SelectedDocument"
+							Value="{x:Null}">
+                            <Setter
+								Property="Text"
+								Value="{Binding SelectedAnchorable.LayoutElement.Title}"
+								TargetName="selectedElementTitle" />
+                            <Setter
+								Property="Text"
+								Value="{x:Null}"
+								TargetName="selectedElementDescription" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
