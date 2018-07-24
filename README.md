@@ -19,7 +19,7 @@ My editor [Edi](https://github.com/Dirkster99/Edi) is based on AvlonDock.
 This repository contains a feature added fork from:
 https://github.com/xceedsoftware/wpftoolkit
 
-Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Wiki for more details</a>.
+Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Wiki for more details</a>. The repository also contains a Log4Net branch for debugging interactive issues with a close enough branch. There are also Log4Net demo executables in the 3.4.01 realease for additional debugging fun.
 
 Get the latest Debug build from [Comtinues Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts).
 
