@@ -2055,5 +2055,11 @@
 
   </Style>
 
+    <!--
+      Re-styling this in AvalonDock since the menu on the drop-down button for more documents is otherwise black
+      BugFix for Issue http://avalondock.codeplex.com/workitem/15743
+      -->
+    <Style TargetType="{x:Type avalonDockControls:ContextMenuEx}" BasedOn="{StaticResource {x:Type ContextMenu}}">
+    </Style>
 
 </ResourceDictionary>
