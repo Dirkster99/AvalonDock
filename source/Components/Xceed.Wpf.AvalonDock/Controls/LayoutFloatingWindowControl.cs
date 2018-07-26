@@ -58,14 +58,25 @@ namespace Xceed.Wpf.AvalonDock.Controls
       this.Loaded += new RoutedEventHandler( OnLoaded );
       this.Unloaded += new RoutedEventHandler( OnUnloaded );
       _model = model;
+
+      DragDelta = default(Point);
     }
 
     #endregion
 
     #region Properties
+    /// <summary>
+    /// Gets/Sets the X,Y delta between the elemnt being dragged and the
+    /// mouse position. The value of this property is used during the drag
+    /// cycle to position the dragged item under the mouse pointer.
+    /// 
+    /// Set this property on intialization to ensure that
+    /// the delta between mouse and control being dragged
+    /// remains constant.
+    /// </summary>
+    internal Point DragDelta { get; set; }
 
     #region Model
-
     public abstract ILayoutElement Model
     {
       get;
@@ -418,13 +429,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
         var windowArea = Win32Helper.GetWindowRect( windowHandle );
 
         // BugFix Issue #6
-        // This code is executed when content (dicument or toolwindow) is dragged around
-        // Formula assumes dragged content has at least a width of 6 and a height of 6
-        // and always positions dragged conent 3 point in X and Y under mouse cursor
-        // (This could be improved by remembering the delta between mouse cursor and
-        //  content origin from when user started the drag operation)
-        Left = (mousePosition.X - (windowArea.Width - clientArea.Width) / 2.0) - 3;
-        Top = (mousePosition.Y - ( windowArea.Height - clientArea.Height ) / 2.0) - 3;
+        // This code is initializes the drag when content (document or toolwindow) is dragged
+        // A second chance back up plan if DragDelta is not set
+        if (DragDelta == default(Point))
+            DragDelta = new Point(3, 3);
+                
+        Left = mousePosition.X - DragDelta.X;    // BugFix Issue #6
+        Top = mousePosition.Y - DragDelta.Y;
         _attachDrag = false;
 
         IntPtr lParam = new IntPtr( ( ( int )mousePosition.X & ( int )0xFFFF ) | ( ( ( int )mousePosition.Y ) << 16 ) );

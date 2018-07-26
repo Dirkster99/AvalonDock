@@ -2126,7 +2126,9 @@ namespace Xceed.Wpf.AvalonDock
       return _autohideArea;
     }
 
-    internal void StartDraggingFloatingWindowForContent( LayoutContent contentModel, bool startDrag = true )
+    internal void StartDraggingFloatingWindowForContent( LayoutContent contentModel,
+                                                         bool startDrag = true ,
+                                                         Point dragDelta = default(Point))
     {
       if( !contentModel.CanFloat )
         return;
@@ -2190,7 +2192,8 @@ namespace Xceed.Wpf.AvalonDock
           Width = fwWidth,
           Height = fwHeight,
           Left = contentModel.FloatingLeft,
-          Top = contentModel.FloatingTop
+          Top = contentModel.FloatingTop,
+          DragDelta = dragDelta             // Setup initial tool window drag delta
         };
       }
       else
@@ -2209,7 +2212,8 @@ namespace Xceed.Wpf.AvalonDock
           Width = fwWidth,
           Height = fwHeight,
           Left = contentModel.FloatingLeft,
-          Top = contentModel.FloatingTop
+          Top = contentModel.FloatingTop,
+          DragDelta = dragDelta           // Setup initial document window drag delta
         };
       }
 
@@ -2232,7 +2236,8 @@ namespace Xceed.Wpf.AvalonDock
       } ), DispatcherPriority.Send );
     }
 
-    internal void StartDraggingFloatingWindowForPane( LayoutAnchorablePane paneModel )
+    internal void StartDraggingFloatingWindowForPane( LayoutAnchorablePane paneModel,
+                                                      Point dragDelta)
     {
       if( paneModel.Children.Any( c => !c.CanFloat ) )
         return;
@@ -2304,7 +2309,8 @@ namespace Xceed.Wpf.AvalonDock
           fw as LayoutAnchorableFloatingWindow )
       {
         Width = fwWidth,
-        Height = fwHeight
+        Height = fwHeight,
+        DragDelta = dragDelta
       };
 
 
