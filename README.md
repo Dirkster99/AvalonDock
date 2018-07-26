@@ -72,6 +72,8 @@ Get the latest Debug build from [Comtinues Integration](https://ci.appveyor.com/
 
 - Fix for Issue <a href="https://github.com/Dirkster99/AvalonDock/issues/6">#6 Drag and Drop of Document or ToolWindow content does not always work on (scaled) 4K display</a>
 
+- Fix for Issue <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1360">#1360 Clear Bindings</a>
+
 ## Patch History for AvalonDock Version 3.3
 
 - (FIXED in 3.4) AvalonDock Bug after reloading layout <a href="https://github.com/Dirkster99/AvalonDock/wiki/(Fixed)-AvalonDock-Bug-after-reloading-layout">-&gt;</a>
