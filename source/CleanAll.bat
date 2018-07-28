@@ -6,9 +6,10 @@ ECHO.
 ECHO This script deletes all temporary build files in their
 ECHO corresponding BIN and OBJ Folder contained in the following projects
 ECHO.
-ECHO AvalonDock.MVVMTestApp
-ECHO AvalonDock.TestApp
-ECHO AvalonDock.WinFormsTestApp
+ECHO MLibTest
+ECHO MVVMTestApp
+ECHO TestApp
+ECHO WinFormsTestApp
 ECHO.
 ECHO Components\Xceed.Wpf.AvalonDock
 ECHO Components\Xceed.Wpf.AvalonDock.Themes.Expression
@@ -29,20 +30,25 @@ ECHO Removing vs settings folder with *.sou file
 ECHO.
 RMDIR /S /Q .vs
 
-ECHO Deleting BIN and OBJ Folders in AvalonDock.MVVMTestApp
+ECHO Deleting BIN and OBJ Folders in MLibTest
 ECHO.
-RMDIR /S /Q AvalonDock.MVVMTestApp\bin
-RMDIR /S /Q AvalonDock.MVVMTestApp\obj
+RMDIR /S /Q MLibTest\bin
+RMDIR /S /Q MLibTest\obj
 
-ECHO Deleting BIN and OBJ Folders in AvalonDock.TestApp
+ECHO Deleting BIN and OBJ Folders in MVVMTestApp
 ECHO.
-RMDIR /S /Q AvalonDock.TestApp\bin
-RMDIR /S /Q AvalonDock.TestApp\obj
+RMDIR /S /Q MVVMTestApp\bin
+RMDIR /S /Q MVVMTestApp\obj
 
-ECHO Deleting BIN and OBJ Folders in AvalonDock.WinFormsTestApp
+ECHO Deleting BIN and OBJ Folders in TestApp
 ECHO.
-RMDIR /S /Q AvalonDock.WinFormsTestApp\bin
-RMDIR /S /Q AvalonDock.WinFormsTestApp\obj
+RMDIR /S /Q TestApp\bin
+RMDIR /S /Q TestApp\obj
+
+ECHO Deleting BIN and OBJ Folders in WinFormsTestApp
+ECHO.
+RMDIR /S /Q WinFormsTestApp\bin
+RMDIR /S /Q WinFormsTestApp\obj
 
 
 ECHO Deleting BIN and OBJ Folders in Xceed.Wpf.AvalonDock

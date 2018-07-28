@@ -91,12 +91,13 @@ namespace AvalonDock.MVVMTestApp
         private void OnLoadLayout(object parameter)
         {
             var layoutSerializer = new XmlLayoutSerializer(dockManager);
-            //Here I've implemented the LayoutSerializationCallback just to show
-            // a way to feed layout desarialization with content loaded at runtime
-            //Actually I could in this case let AvalonDock to attach the contents
-            //from current layout using the content ids
-            //LayoutSerializationCallback should anyway be handled to attach contents
-            //not currently loaded
+
+            // Here I've implemented the LayoutSerializationCallback just to show
+            //  a way to feed layout desarialization with content loaded at runtime
+            // Actually I could in this case let AvalonDock to attach the contents
+            // from current layout using the content ids
+            // LayoutSerializationCallback should anyway be handled to attach contents
+            // not currently loaded
             layoutSerializer.LayoutSerializationCallback += (s, e) =>
                 {
                     //if (e.Model.ContentId == FileStatsViewModel.ToolContentId)
