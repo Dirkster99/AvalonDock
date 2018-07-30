@@ -102,6 +102,4 @@ Get the latest Debug build from [Comtinues Integration](https://ci.appveyor.com/
 https://github.com/Dirkster99/AvalonDock/commit/4bcb07f45e89e416257e668a209b238a26e5f414
 
 in this repository was taken from the last Edi build: 131594
-http://edi.codeplex.com/releases/view/131594
-
-from CodePlex
+<a href="http://edi.codeplex.com/releases/view/131594">from CodePlex</a>
