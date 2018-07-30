@@ -115,4 +115,10 @@
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
 
+
+    <!-- DockingBrushKeys -->
+    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DockingButtonForegroundBrushKey}"
+                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
+                     options:Freeze="true" />
+
 </ResourceDictionary>

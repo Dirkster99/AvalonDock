@@ -143,4 +143,20 @@
     <!-- Background of selected text in NAvigator Window (AccentColor) -->
     <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.NavigatorWindowSelectedBackground}" Color="#007ACC" options:Freeze="true" />
     <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.NavigatorWindowSelectedText}" Color="#FFFFFF" options:Freeze="true" />
+
+    <!-- DockingBrushKeys -->
+    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DockingButtonBackgroundBrushKey}"
+                     Color="#20000000" options:Freeze="true" />
+    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DockingButtonForegroundBrushKey}"
+                     Color="{DynamicResource {x:Static reskeys:ResourceKeys.ControlAccentColorKey}}" options:Freeze="true" />
+    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrusKey}"
+                     Color="White" options:Freeze="true" />
+
+
+    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}"
+                     Color="#40808080" options:Freeze="true" />
+    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}"
+                     Color="#20000000" options:Freeze="true" />
+
+
 </ResourceDictionary>

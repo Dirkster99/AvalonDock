@@ -157,6 +157,15 @@ namespace Xceed.Wpf.AvalonDock.Themes.VS2013.Themes
         // Background of selected text in Navigator Window (AccentColor)
         public static readonly ComponentResourceKey NavigatorWindowSelectedBackground = new ComponentResourceKey(typeof(ResourceKeys), "NavigatorWindowSelectedBackground");
         public static readonly ComponentResourceKey NavigatorWindowSelectedText = new ComponentResourceKey(typeof(ResourceKeys), "NavigatorWindowSelectedText");
+
+        #region DockingBrushKeys
+        public static readonly ComponentResourceKey DockingButtonBackgroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonBackgroundBrushKey");
+        public static readonly ComponentResourceKey DockingButtonForegroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonForegroundBrushKey");
+        public static readonly ComponentResourceKey DockingButtonForegroundArrowBrusKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonForegroundArrowBrusKey");
+
+        public static readonly ComponentResourceKey DockingButtonStarBorderBrushKey     = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonStarBorderBrushKey");
+        public static readonly ComponentResourceKey DockingButtonStarBackgroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonStarBackgroundBrushKey");
+        #endregion DockingBrushKeys
         #endregion Brush Keys
     }
 }

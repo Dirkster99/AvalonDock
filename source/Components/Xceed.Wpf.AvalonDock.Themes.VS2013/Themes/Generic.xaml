@@ -26,6 +26,10 @@
                     xmlns:shell="clr-namespace:Microsoft.Windows.Shell;assembly=Xceed.Wpf.AvalonDock"
                     xmlns:reskeys="clr-namespace:Xceed.Wpf.AvalonDock.Themes.VS2013.Themes"
                     >
+        <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/OverlayButtons.xaml" />
+        </ResourceDictionary.MergedDictionaries>
+
     <avalonDockConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     <avalonDockConverters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
     <avalonDockConverters:AnchorSideToOrientationConverter x:Key="AnchorSideToOrientationConverter" />
@@ -754,31 +758,65 @@
                               Stroke="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"
                               StrokeThickness="2" />
                         <Grid x:Name="PART_DockingManagerDropTargets">
-                            <Image x:Name="PART_DockingManagerDropTargetLeft"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Center"
-                                   Source="../Images/DockAnchorableLeft.PNG"
-                                   Stretch="None" />
-                            <Image x:Name="PART_DockingManagerDropTargetRight"
-                                   HorizontalAlignment="Right"
-                                   VerticalAlignment="Center"
-                                   Source="../Images/DockAnchorableRight.PNG"
-                                   Stretch="None" />
-                            <Image x:Name="PART_DockingManagerDropTargetBottom"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Bottom"
-                                   Source="../Images/DockAnchorableBottom.PNG"
-                                   Stretch="None" />
-                            <Image x:Name="PART_DockingManagerDropTargetTop"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Top"
-                                   Source="../Images/DockAnchorableTop.PNG"
-                                   Stretch="None" />
+                            <Button x:Name="PART_DockingManagerDropTargetLeft"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Width="50"
+                                    Height="50"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="0"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch"
+                                    Padding="0"
+                                    Content="{StaticResource DockAnchorableLeft}"
+                                />
+
+                            <Button x:Name="PART_DockingManagerDropTargetRight"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Width="50"
+                                    Height="50"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="0"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch"
+                                    Padding="0"
+                                    Content="{StaticResource DockAnchorableRight}"
+                                />
+
+                            <Button x:Name="PART_DockingManagerDropTargetBottom"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Bottom"
+                                    Width="50"
+                                    Height="50"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="0"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch"
+                                    Padding="0"
+                                    Content="{StaticResource DockAnchorableBottom}"
+                                />
+
+                            <Button x:Name="PART_DockingManagerDropTargetTop"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"
+                                    Width="50"
+                                    Height="50"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="0"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch"
+                                    Padding="0"
+                                    Content="{StaticResource DockAnchorableTop}"
+                                />
+
                         </Grid>
                         <Grid x:Name="PART_AnchorablePaneDropTargets">
-                            <Grid Width="112"
-                                  Height="112"
-                                  HorizontalAlignment="Center"
+                            <Grid HorizontalAlignment="Center"
                                   VerticalAlignment="Center">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition />
@@ -790,17 +828,54 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <Image Grid.RowSpan="3"
-                                       Grid.ColumnSpan="3"
-                                       Margin="0,0.5,0,-0.5"
-                                       Source="../Images/DockPaneEmpty.png"
-                                       Stretch="None" />
-                                <Border Name="PART_AnchorablePaneDropTargetTop"
+
+                                <!-- Gray Star Background -->
+                                <Grid Grid.RowSpan="3"
+                                      Grid.ColumnSpan="3">
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderThickness="0"
+                                            Grid.Column="1" Grid.Row="1" />
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                            BorderThickness="2,2,2,0"
+                                            Grid.Column="1" Grid.Row="0" />
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                            BorderThickness="2,2,0,2"
+                                            Grid.Column="0" Grid.Row="1" />
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                            BorderThickness="0,2,2,2"
+                                            Grid.Column="2" Grid.Row="1" />
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                            BorderThickness="2,0,2,2"
+                                            Grid.Column="1" Grid.Row="2" />
+                                </Grid>
+
+                                <!--Border Name="PART_AnchorablePaneDropTargetTop"
                                         Grid.Row="0"
                                         Grid.Column="1"
-                                        Margin="0,3.5,0, 0">
+                                        Margin="0,3.5,0, 0"
+                                        >
                                     <Image Source="../Images/DockDocumentAsAnchorableTop.png" Stretch="None" />
-                                </Border>
+                                </>
                                 <Border Name="PART_AnchorablePaneDropTargetRight"
                                         Grid.Row="1"
                                         Grid.Column="2"
@@ -824,13 +899,77 @@
                                         Grid.Column="1"
                                         Margin="0,0.5,0,0">
                                     <Image Source="../Images/DockDocumentInside.png" Stretch="None" />
-                                </Border>
+                                </Border -->
+                                <Button x:Name="PART_AnchorablePaneDropTargetTop"
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentAsAnchorableTop}"
+                                    />
+                                <Button x:Name="PART_AnchorablePaneDropTargetRight"
+                                        Grid.Row="1"
+                                        Grid.Column="2"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentAsAnchorableRight}"
+                                    />
+                                <Button x:Name="PART_AnchorablePaneDropTargetBottom"
+                                        Grid.Row="2"
+                                        Grid.Column="1"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentAsAnchorableBottom}"
+                                    />
+                                <Button x:Name="PART_AnchorablePaneDropTargetLeft"
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentAsAnchorableLeft}"
+                                    />
+                                <Button x:Name="PART_AnchorablePaneDropTargetInto"
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentInside}"
+                                    />
+
                             </Grid>
                         </Grid>
                         <Grid x:Name="PART_DocumentPaneDropTargets">
-                            <Grid Width="112"
-                                  Height="112"
-                                  HorizontalAlignment="Center"
+                            <Grid HorizontalAlignment="Center"
                                   VerticalAlignment="Center">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition />
@@ -842,46 +981,117 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <Image Grid.RowSpan="3"
-                                       Grid.ColumnSpan="3"
-                                       Source="../Images/DockPaneEmpty.PNG"
-                                       Stretch="None" />
-                                <Border Name="PART_DocumentPaneDropTargetTop"
+
+                                <!-- Gray Star Background -->
+                                <Grid Grid.RowSpan="3"
+                                      Grid.ColumnSpan="3">
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderThickness="0"
+                                            Grid.Column="1" Grid.Row="1" />
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                            BorderThickness="2,2,2,0"
+                                            Grid.Column="1" Grid.Row="0" />
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                            BorderThickness="2,2,0,2"
+                                            Grid.Column="0" Grid.Row="1" />
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                            BorderThickness="0,2,2,2"
+                                            Grid.Column="2" Grid.Row="1" />
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                            BorderThickness="2,0,2,2"
+                                            Grid.Column="1" Grid.Row="2" />
+                                </Grid>
+                                
+                                <Button x:Name="PART_DocumentPaneDropTargetTop"
                                         Grid.Row="0"
-                                        Grid.Column="1"
-                                        Margin="2">
-                                    <Image Source="../Images/DockDocumentTop.png" Stretch="None" />
-                                </Border>
-                                <Border Name="PART_DocumentPaneDropTargetRight"
+                                        Grid.Column="1"                                        
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentTop}"
+                                    />
+                                <Button x:Name="PART_DocumentPaneDropTargetRight"
                                         Grid.Row="1"
                                         Grid.Column="2"
-                                        Margin="2">
-                                    <Image Source="../Images/DockDocumentRight.png" Stretch="None" />
-                                </Border>
-                                <Border Name="PART_DocumentPaneDropTargetBottom"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentRight}"
+                                    />
+                                <Button x:Name="PART_DocumentPaneDropTargetBottom"
                                         Grid.Row="2"
                                         Grid.Column="1"
-                                        Margin="2">
-                                    <Image Source="../Images/DockDocumentBottom.png" Stretch="None" />
-                                </Border>
-                                <Border Name="PART_DocumentPaneDropTargetLeft"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentBottom}"
+                                    />
+                                <Button x:Name="PART_DocumentPaneDropTargetLeft"
                                         Grid.Row="1"
                                         Grid.Column="0"
-                                        Margin="2">
-                                    <Image Source="../Images/DockDocumentLeft.png" Stretch="None" />
-                                </Border>
-                                <Border Name="PART_DocumentPaneDropTargetInto"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentLeft}"
+                                    />
+                                <Button x:Name="PART_DocumentPaneDropTargetInto"
                                         Grid.Row="1"
-                                        Grid.Column="1">
-                                    <Image Source="../Images/DockDocumentInside.png" Stretch="None" />
-                                </Border>
+                                        Grid.Column="1"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentInside}"
+                                    />
                             </Grid>
                         </Grid>
 
                         <Grid x:Name="PART_DocumentPaneFullDropTargets">
-                            <Grid Width="184"
-                                  Height="184"
-                                  HorizontalAlignment="Center"
+                            <Grid HorizontalAlignment="Center"
                                   VerticalAlignment="Center">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition />
@@ -897,76 +1107,173 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <Image Grid.RowSpan="5"
-                                       Grid.ColumnSpan="5"
-                                       Source="../Images/DockPaneLargeEmpty.PNG"
-                                       Stretch="None" />
-                                <Border Name="PART_DocumentPaneFullDropTargetTop"
+
+                                <!-- Gray Star Background -->
+                                <Grid Grid.ColumnSpan="5"
+                                      Grid.RowSpan="5"
+                                      >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderThickness="0"
+                                            Grid.Column="2" Grid.Row="2" />
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                            BorderThickness="2,2,2,0"
+                                            Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" />
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                            BorderThickness="2,2,0,2"
+                                            Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" />
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                            BorderThickness="0,2,2,2"
+                                            Grid.Column="3" Grid.Row="2" Grid.ColumnSpan="2" />
+
+                                    <Border Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                            BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                            BorderThickness="2,0,2,2"
+                                            Grid.Column="2" Grid.Row="3" Grid.RowSpan="2" />
+                                </Grid>
+
+                                <Button x:Name="PART_DocumentPaneFullDropTargetTop"
                                         Grid.Row="1"
-                                        Grid.Column="2">
-                                    <Image Margin="2"
-                                           Source="../Images/DockDocumentTop.png"
-                                           Stretch="None" />
-                                </Border>
-                                <Border Name="PART_DocumentPaneFullDropTargetRight"
+                                        Grid.Column="2"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentTop}"
+                                    />
+                                <Button x:Name="PART_DocumentPaneFullDropTargetRight"
                                         Grid.Row="2"
-                                        Grid.Column="3">
-                                    <Image Margin="2"
-                                           Source="../Images/DockDocumentRight.png"
-                                           Stretch="None" />
-                                </Border>
-                                <Border Name="PART_DocumentPaneFullDropTargetBottom"
+                                        Grid.Column="3"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentRight}"
+                                    />
+                                <Button x:Name="PART_DocumentPaneFullDropTargetBottom"
                                         Grid.Row="3"
-                                        Grid.Column="2">
-                                    <Image Margin="2"
-                                           Source="../Images/DockDocumentBottom.png"
-                                           Stretch="None" />
-                                </Border>
-                                <Border Name="PART_DocumentPaneFullDropTargetLeft"
+                                        Grid.Column="2"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentBottom}"
+                                    />
+                                <Button x:Name="PART_DocumentPaneFullDropTargetLeft"
                                         Grid.Row="2"
-                                        Grid.Column="1">
-                                    <Image Margin="2"
-                                           Source="../Images/DockDocumentLeft.png"
-                                           Stretch="None" />
-                                </Border>
-                                <Border Name="PART_DocumentPaneFullDropTargetInto"
+                                        Grid.Column="1"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentLeft}"
+                                    />
+                                <Button x:Name="PART_DocumentPaneFullDropTargetInto"
                                         Grid.Row="2"
-                                        Grid.Column="2">
-                                    <Image Source="../Images/DockDocumentInside.png" Stretch="None" />
-                                </Border>
+                                        Grid.Column="2"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentInside}"
+                                    />
 
-                                <Border Name="PART_DocumentPaneDropTargetTopAsAnchorablePane"
+                                
+                                
+                                <Button x:Name="PART_DocumentPaneDropTargetTopAsAnchorablePane"
                                         Grid.Row="0"
-                                        Grid.Column="2">
-                                    <Image Margin="2"
-                                           Source="../Images/DockDocumentAsAnchorableTop.png"
-                                           Stretch="None" />
-                                </Border>
-                                <Border Name="PART_DocumentPaneDropTargetRightAsAnchorablePane"
+                                        Grid.Column="2"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentAsAnchorableTop}"
+                                    />
+                                <Button x:Name="PART_DocumentPaneDropTargetRightAsAnchorablePane"
                                         Grid.Row="2"
-                                        Grid.Column="4">
-                                    <Image Margin="2"
-                                           Source="../Images/DockDocumentAsAnchorableRight.png"
-                                           Stretch="None" />
-                                </Border>
-                                <Border Name="PART_DocumentPaneDropTargetBottomAsAnchorablePane"
+                                        Grid.Column="4"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentAsAnchorableRight}"
+                                    />
+                                <Button x:Name="PART_DocumentPaneDropTargetBottomAsAnchorablePane"
                                         Grid.Row="4"
-                                        Grid.Column="2">
-                                    <Image Margin="2"
-                                           Source="../Images/DockDocumentAsAnchorableBottom.png"
-                                           Stretch="None" />
-                                </Border>
-                                <Border Name="PART_DocumentPaneDropTargetLeftAsAnchorablePane"
+                                        Grid.Column="2"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentAsAnchorableBottom}"
+                                    />
+                                <Button x:Name="PART_DocumentPaneDropTargetLeftAsAnchorablePane"
                                         Grid.Row="2"
-                                        Grid.Column="0">
-                                    <Image Margin="2"
-                                           Source="../Images/DockDocumentAsAnchorableLeft.png"
-                                           Stretch="None" />
-                                </Border>
-
+                                        Grid.Column="0"
+                                        Width="50"
+                                        Height="50"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Content="{StaticResource DockDocumentAsAnchorableLeft}"
+                                    />
                             </Grid>
                         </Grid>
-
                     </Canvas>
                 </ControlTemplate>
             </Setter.Value>
