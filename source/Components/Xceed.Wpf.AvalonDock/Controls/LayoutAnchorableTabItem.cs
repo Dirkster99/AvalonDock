@@ -181,9 +181,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       base.OnMouseEnter( e );
 
-      if( _draggingItem != this &&
-          e.LeftButton == MouseButtonState.Pressed )
-      {
+            if (_draggingItem != null &&
+                _draggingItem != this &&                   // Fix #1354 https://github.com/xceedsoftware/wpftoolkit/issues/1354
+                e.LeftButton == MouseButtonState.Pressed)
+            {
         var model = Model;
         var container = model.Parent as ILayoutContainer;
         var containerPane = model.Parent as ILayoutPane;
