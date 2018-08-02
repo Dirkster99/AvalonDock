@@ -180,48 +180,6 @@
       <Name>Xceed.Wpf.AvalonDock</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Resource Include="ImagesDark\DockAnchorableBottom.png" />
-    <Resource Include="ImagesDark\DockAnchorableLeft.png" />
-    <Resource Include="ImagesDark\DockAnchorableRight.png" />
-    <Resource Include="ImagesDark\DockAnchorableTop.png" />
-    <Resource Include="ImagesDark\DockDocumentAsAnchorableBottom.png" />
-    <Resource Include="ImagesDark\DockDocumentAsAnchorableLeft.png" />
-    <Resource Include="ImagesDark\DockDocumentAsAnchorableRight.png" />
-    <Resource Include="ImagesDark\DockDocumentAsAnchorableTop.png" />
-    <Resource Include="ImagesDark\DockDocumentBottom.png" />
-    <Resource Include="ImagesDark\DockDocumentInside.png" />
-    <Resource Include="ImagesDark\DockDocumentLeft.png" />
-    <Resource Include="ImagesDark\DockDocumentRight.png" />
-    <Resource Include="ImagesDark\DockDocumentTop.png" />
-    <Resource Include="ImagesDark\DockPaneEmpty.png" />
-    <Resource Include="ImagesDark\DockPaneLargeEmpty.png" />
-    <Resource Include="ImagesDark\HTabGroup.png" />
-    <Resource Include="ImagesDark\Locked.png" />
-    <Resource Include="ImagesDark\PinAutoHide.png" />
-    <Resource Include="ImagesDark\PinAutoHide_Black.png" />
-    <Resource Include="ImagesDark\PinAutoHide_Dark.png" />
-    <Resource Include="ImagesDark\PinAutoHide_Light.png" />
-    <Resource Include="ImagesDark\PinClose.png" />
-    <Resource Include="ImagesDark\PinClose_Black.png" />
-    <Resource Include="ImagesDark\PinClose_Dark.png" />
-    <Resource Include="ImagesDark\PinClose_Light.png" />
-    <Resource Include="ImagesDark\PinDocMenu_Black.png" />
-    <Resource Include="ImagesDark\PinDocMenu_Dark.png" />
-    <Resource Include="ImagesDark\PinMaximize.png" />
-    <Resource Include="ImagesDark\PinMaximize_Black.png" />
-    <Resource Include="ImagesDark\PinMaximize_Dark.png" />
-    <Resource Include="ImagesDark\PinMaximize_Light.png" />
-    <Resource Include="ImagesDark\PinMenu.png" />
-    <Resource Include="ImagesDark\PinMenu_Black.png" />
-    <Resource Include="ImagesDark\PinMenu_Dark.png" />
-    <Resource Include="ImagesDark\PinMenu_Light.png" />
-    <Resource Include="ImagesDark\PinRestore.png" />
-    <Resource Include="ImagesDark\PinRestore_Black.png" />
-    <Resource Include="ImagesDark\PinRestore_Dark.png" />
-    <Resource Include="ImagesDark\PinRestore_Light.png" />
-    <Resource Include="ImagesDark\VTabGroup.png" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

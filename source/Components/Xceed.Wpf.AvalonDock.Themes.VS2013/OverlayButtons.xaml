@@ -10,8 +10,8 @@
     
     <!-- Defines the height and width of the docking indicator buttons that are shown when
          documents or tool windows are dragged -->
-    <sys:Double x:Key="{x:Static reskeys:ResourceKeys.DockingButtonWidthKey}">32</sys:Double>
-    <sys:Double x:Key="{x:Static reskeys:ResourceKeys.DockingButtonHeightKey}">32</sys:Double>
+    <sys:Double x:Key="{x:Static reskeys:ResourceKeys.DockingButtonWidthKey}">48</sys:Double>
+    <sys:Double x:Key="{x:Static reskeys:ResourceKeys.DockingButtonHeightKey}">48</sys:Double>
 
     <!-- Left Dock Button pointing left -->
     <Viewbox Stretch="Uniform" x:Key="DockAnchorableLeft" x:Shared="false">
