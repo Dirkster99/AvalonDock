@@ -754,15 +754,15 @@
                 <ControlTemplate TargetType="{x:Type avalonDockControls:OverlayWindow}">
                     <Canvas x:Name="PART_DropTargetsContainer" Opacity="0.9">
                         <Path x:Name="PART_PreviewBox"
-                              Fill="AliceBlue"
-                              Stroke="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"
+                              Fill="{DynamicResource {x:Static reskeys:ResourceKeys.PreviewBoxBackgroundBrushKey}}"
+                              Stroke="{DynamicResource {x:Static reskeys:ResourceKeys.PreviewBoxBorderBrushKey}}"
                               StrokeThickness="2" />
                         <Grid x:Name="PART_DockingManagerDropTargets">
-                            <Button x:Name="PART_DockingManagerDropTargetLeft"
+                            <ContentControl x:Name="PART_DockingManagerDropTargetLeft"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Center"
-                                    Width="50"
-                                    Height="50"
+                                    Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                    Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                     Background="Transparent"
                                     BorderBrush="Transparent"
                                     BorderThickness="0"
@@ -772,11 +772,11 @@
                                     Content="{StaticResource DockAnchorableLeft}"
                                 />
 
-                            <Button x:Name="PART_DockingManagerDropTargetRight"
+                            <ContentControl x:Name="PART_DockingManagerDropTargetRight"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Center"
-                                    Width="50"
-                                    Height="50"
+                                    Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                    Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                     Background="Transparent"
                                     BorderBrush="Transparent"
                                     BorderThickness="0"
@@ -786,11 +786,11 @@
                                     Content="{StaticResource DockAnchorableRight}"
                                 />
 
-                            <Button x:Name="PART_DockingManagerDropTargetBottom"
+                            <ContentControl x:Name="PART_DockingManagerDropTargetBottom"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Bottom"
-                                    Width="50"
-                                    Height="50"
+                                    Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                    Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                     Background="Transparent"
                                     BorderBrush="Transparent"
                                     BorderThickness="0"
@@ -800,11 +800,11 @@
                                     Content="{StaticResource DockAnchorableBottom}"
                                 />
 
-                            <Button x:Name="PART_DockingManagerDropTargetTop"
+                            <ContentControl x:Name="PART_DockingManagerDropTargetTop"
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Top"
-                                    Width="50"
-                                    Height="50"
+                                    Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                    Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                     Background="Transparent"
                                     BorderBrush="Transparent"
                                     BorderThickness="0"
@@ -869,42 +869,11 @@
                                             Grid.Column="1" Grid.Row="2" />
                                 </Grid>
 
-                                <!--Border Name="PART_AnchorablePaneDropTargetTop"
+                                <ContentControl x:Name="PART_AnchorablePaneDropTargetTop"
                                         Grid.Row="0"
                                         Grid.Column="1"
-                                        Margin="0,3.5,0, 0"
-                                        >
-                                    <Image Source="../Images/DockDocumentAsAnchorableTop.png" Stretch="None" />
-                                </>
-                                <Border Name="PART_AnchorablePaneDropTargetRight"
-                                        Grid.Row="1"
-                                        Grid.Column="2"
-                                        Margin="2">
-                                    <Image Source="../Images/DockDocumentAsAnchorableRight.png" Stretch="None" />
-                                </Border>
-                                <Border Name="PART_AnchorablePaneDropTargetBottom"
-                                        Grid.Row="2"
-                                        Grid.Column="1"
-                                        Margin="0,-0.5,0,0">
-                                    <Image Source="../Images/DockDocumentAsAnchorableBottom.png" Stretch="None" />
-                                </Border>
-                                <Border Name="PART_AnchorablePaneDropTargetLeft"
-                                        Grid.Row="1"
-                                        Grid.Column="0"
-                                        Margin="2">
-                                    <Image Source="../Images/DockDocumentAsAnchorableLeft.png" Stretch="None" />
-                                </Border>
-                                <Border Name="PART_AnchorablePaneDropTargetInto"
-                                        Grid.Row="1"
-                                        Grid.Column="1"
-                                        Margin="0,0.5,0,0">
-                                    <Image Source="../Images/DockDocumentInside.png" Stretch="None" />
-                                </Border -->
-                                <Button x:Name="PART_AnchorablePaneDropTargetTop"
-                                        Grid.Row="0"
-                                        Grid.Column="1"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -913,11 +882,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentAsAnchorableTop}"
                                     />
-                                <Button x:Name="PART_AnchorablePaneDropTargetRight"
+                                <ContentControl x:Name="PART_AnchorablePaneDropTargetRight"
                                         Grid.Row="1"
                                         Grid.Column="2"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -926,11 +895,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentAsAnchorableRight}"
                                     />
-                                <Button x:Name="PART_AnchorablePaneDropTargetBottom"
+                                <ContentControl x:Name="PART_AnchorablePaneDropTargetBottom"
                                         Grid.Row="2"
                                         Grid.Column="1"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -939,11 +908,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentAsAnchorableBottom}"
                                     />
-                                <Button x:Name="PART_AnchorablePaneDropTargetLeft"
+                                <ContentControl x:Name="PART_AnchorablePaneDropTargetLeft"
                                         Grid.Row="1"
                                         Grid.Column="0"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -952,11 +921,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentAsAnchorableLeft}"
                                     />
-                                <Button x:Name="PART_AnchorablePaneDropTargetInto"
+                                <ContentControl x:Name="PART_AnchorablePaneDropTargetInto"
                                         Grid.Row="1"
                                         Grid.Column="1"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1021,12 +990,12 @@
                                             BorderThickness="2,0,2,2"
                                             Grid.Column="1" Grid.Row="2" />
                                 </Grid>
-                                
-                                <Button x:Name="PART_DocumentPaneDropTargetTop"
+
+                                <ContentControl x:Name="PART_DocumentPaneDropTargetTop"
                                         Grid.Row="0"
                                         Grid.Column="1"                                        
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1035,11 +1004,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentTop}"
                                     />
-                                <Button x:Name="PART_DocumentPaneDropTargetRight"
+                                <ContentControl x:Name="PART_DocumentPaneDropTargetRight"
                                         Grid.Row="1"
                                         Grid.Column="2"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1048,11 +1017,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentRight}"
                                     />
-                                <Button x:Name="PART_DocumentPaneDropTargetBottom"
+                                <ContentControl x:Name="PART_DocumentPaneDropTargetBottom"
                                         Grid.Row="2"
                                         Grid.Column="1"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1061,11 +1030,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentBottom}"
                                     />
-                                <Button x:Name="PART_DocumentPaneDropTargetLeft"
+                                <ContentControl x:Name="PART_DocumentPaneDropTargetLeft"
                                         Grid.Row="1"
                                         Grid.Column="0"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1074,11 +1043,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentLeft}"
                                     />
-                                <Button x:Name="PART_DocumentPaneDropTargetInto"
+                                <ContentControl x:Name="PART_DocumentPaneDropTargetInto"
                                         Grid.Row="1"
                                         Grid.Column="1"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1152,11 +1121,11 @@
                                             Grid.Column="2" Grid.Row="3" Grid.RowSpan="2" />
                                 </Grid>
 
-                                <Button x:Name="PART_DocumentPaneFullDropTargetTop"
+                                <ContentControl x:Name="PART_DocumentPaneFullDropTargetTop"
                                         Grid.Row="1"
                                         Grid.Column="2"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1165,11 +1134,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentTop}"
                                     />
-                                <Button x:Name="PART_DocumentPaneFullDropTargetRight"
+                                <ContentControl x:Name="PART_DocumentPaneFullDropTargetRight"
                                         Grid.Row="2"
                                         Grid.Column="3"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1178,11 +1147,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentRight}"
                                     />
-                                <Button x:Name="PART_DocumentPaneFullDropTargetBottom"
+                                <ContentControl x:Name="PART_DocumentPaneFullDropTargetBottom"
                                         Grid.Row="3"
                                         Grid.Column="2"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1191,11 +1160,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentBottom}"
                                     />
-                                <Button x:Name="PART_DocumentPaneFullDropTargetLeft"
+                                <ContentControl x:Name="PART_DocumentPaneFullDropTargetLeft"
                                         Grid.Row="2"
                                         Grid.Column="1"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1204,11 +1173,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentLeft}"
                                     />
-                                <Button x:Name="PART_DocumentPaneFullDropTargetInto"
+                                <ContentControl x:Name="PART_DocumentPaneFullDropTargetInto"
                                         Grid.Row="2"
                                         Grid.Column="2"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1218,13 +1187,13 @@
                                         Content="{StaticResource DockDocumentInside}"
                                     />
 
-                                
-                                
-                                <Button x:Name="PART_DocumentPaneDropTargetTopAsAnchorablePane"
+
+
+                                <ContentControl x:Name="PART_DocumentPaneDropTargetTopAsAnchorablePane"
                                         Grid.Row="0"
                                         Grid.Column="2"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1233,11 +1202,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentAsAnchorableTop}"
                                     />
-                                <Button x:Name="PART_DocumentPaneDropTargetRightAsAnchorablePane"
+                                <ContentControl x:Name="PART_DocumentPaneDropTargetRightAsAnchorablePane"
                                         Grid.Row="2"
                                         Grid.Column="4"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1246,11 +1215,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentAsAnchorableRight}"
                                     />
-                                <Button x:Name="PART_DocumentPaneDropTargetBottomAsAnchorablePane"
+                                <ContentControl x:Name="PART_DocumentPaneDropTargetBottomAsAnchorablePane"
                                         Grid.Row="4"
                                         Grid.Column="2"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"
@@ -1259,11 +1228,11 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentAsAnchorableBottom}"
                                     />
-                                <Button x:Name="PART_DocumentPaneDropTargetLeftAsAnchorablePane"
+                                <ContentControl x:Name="PART_DocumentPaneDropTargetLeftAsAnchorablePane"
                                         Grid.Row="2"
                                         Grid.Column="0"
-                                        Width="50"
-                                        Height="50"
+                                        Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
+                                        Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
                                         Background="Transparent"
                                         BorderBrush="Transparent"
                                         BorderThickness="0"

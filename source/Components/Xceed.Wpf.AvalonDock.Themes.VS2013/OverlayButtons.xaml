@@ -1,7 +1,18 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:reskeys="clr-namespace:Xceed.Wpf.AvalonDock.Themes.VS2013.Themes"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     >
+
+    <!-- This file contains the resource definitions for the docking button indicators
+         which are shown when the user drags a document or tool window to place it
+         somewhere else -->
+    
+    <!-- Defines the height and width of the docking indicator buttons that are shown when
+         documents or tool windows are dragged -->
+    <sys:Double x:Key="{x:Static reskeys:ResourceKeys.DockingButtonWidthKey}">32</sys:Double>
+    <sys:Double x:Key="{x:Static reskeys:ResourceKeys.DockingButtonHeightKey}">32</sys:Double>
+
     <!-- Left Dock Button pointing left -->
     <Viewbox Stretch="Uniform" x:Key="DockAnchorableLeft" x:Shared="false">
         <Grid Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonBackgroundBrushKey}}">

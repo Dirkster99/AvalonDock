@@ -121,4 +121,12 @@
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
 
+    <!-- Preview Box is the highlighted rectangle that shows when a drop area in a window is indicated -->
+    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.PreviewBoxBorderBrushKey}"
+                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}" options:Freeze="true" />
+    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.PreviewBoxBackgroundBrushKey}"
+                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
+                     Opacity="0.5"
+                     options:Freeze="true" />
+
 </ResourceDictionary>

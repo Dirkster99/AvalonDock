@@ -159,12 +159,21 @@ namespace Xceed.Wpf.AvalonDock.Themes.VS2013.Themes
         public static readonly ComponentResourceKey NavigatorWindowSelectedText = new ComponentResourceKey(typeof(ResourceKeys), "NavigatorWindowSelectedText");
 
         #region DockingBrushKeys
+        // Defines the height and width of the docking indicator buttons that are shown when
+        // documents or tool windows are dragged
+        public static readonly ComponentResourceKey DockingButtonWidthKey  = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonWidthKey");
+        public static readonly ComponentResourceKey DockingButtonHeightKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonHeightKey");
+
         public static readonly ComponentResourceKey DockingButtonBackgroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonBackgroundBrushKey");
         public static readonly ComponentResourceKey DockingButtonForegroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonForegroundBrushKey");
         public static readonly ComponentResourceKey DockingButtonForegroundArrowBrusKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonForegroundArrowBrusKey");
 
         public static readonly ComponentResourceKey DockingButtonStarBorderBrushKey     = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonStarBorderBrushKey");
         public static readonly ComponentResourceKey DockingButtonStarBackgroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonStarBackgroundBrushKey");
+
+        // Preview Box is the highlighted rectangle that shows when a drop area in a window is indicated
+        public static readonly ComponentResourceKey PreviewBoxBorderBrushKey     = new ComponentResourceKey(typeof(ResourceKeys), "PreviewBoxBorderBrushKey");
+        public static readonly ComponentResourceKey PreviewBoxBackgroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "PreviewBoxBackgroundBrushKey");
         #endregion DockingBrushKeys
         #endregion Brush Keys
     }
