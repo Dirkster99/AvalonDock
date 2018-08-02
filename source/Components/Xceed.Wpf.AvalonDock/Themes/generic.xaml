@@ -805,7 +805,6 @@
                                 HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                                 Grid.Column="1"
                                 Grid.Row="1" />
-              <!---->
                         </Grid>
                     </Border>
                 </ControlTemplate>
