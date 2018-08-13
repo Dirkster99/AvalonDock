@@ -26,36 +26,34 @@ Get the latest Debug build from [Comtinues Integration](https://ci.appveyor.com/
 # Feature Added - Dark and Light Theme Samples
 
 Please review the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Project Wiki</a> to see more demo screenshots.
-All screenshots below are from the MLib based VS 2013 Darl/Light theme. Similar theming results should be possible with other theming libraries.
+All screenshots below are from the MLib based VS 2013 Dark/Light theme. Similar theming results should be possible with other theming libraries.
 
 <table width="100%">
    <tr>
+      <td>Description</td>
       <td>Dark</td>
       <td>Light</td>
    </tr>
    <tr>
-      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/DockDocument.png" width="50%"></td>
-      <td></td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/DockDocument.png" width="400"></td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Light/DockDocument.png" width="400"></td>
    </tr>
    <tr>
-      <td></td>
-      <td></td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/DockDocument_1.png" width="400"></td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Light/DockDocument_1.png" width="400"></td>
+
    </tr>
    <tr>
-      <td></td>
-      <td></td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/DockToolWindow.png" width="400"></td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Light/DockToolWindow.png" width="400"></td>
    </tr>
    <tr>
-      <td></td>
-      <td></td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/Document.png" width="400"></td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Light/Document.png" width="400"></td>
    </tr>
    <tr>
-      <td></td>
-      <td></td>
-   </tr>
-   <tr>
-      <td></td>
-      <td></td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/ToolWindow.png" width="400"></td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Light/ToolWindow.png" width="400"></td>
    </tr>
 </table>
 
