@@ -23,7 +23,7 @@ Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">
 
 Get the latest Debug build from [Continues Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts).
 
-# Feature Added - Dark and Light Theme Samples
+# Feature Added - Dark and Light VS 2013 Theme
 
 Please review the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Project Wiki</a> to see more demo screenshots.
 All screenshots below are from the <a href="https://github.com/Dirkster99/MLib">MLib</a> based VS 2013 Dark (Accent Color Gold)/Light (Accent Color Blue) theme on Windows 10. Similar theming results should be possible with other theming libraries since the implementation follow these <a href="https://www.codeproject.com/Articles/1236588/File-System-Controls-in-WPF-Version-III">guidelines</a>.
