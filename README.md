@@ -25,26 +25,39 @@ Get the latest Debug build from [Comtinues Integration](https://ci.appveyor.com/
 
 # Feature Added - Dark and Light Theme Samples
 
-## VS2013 Dark
-<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/VS2013_Dark.png">
+Please review the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Project Wiki</a> to see more demo screenshots.
+All screenshots below are from the MLib based VS 2013 Darl/Light theme. Similar theming results should be possible with other theming libraries.
 
-## VS2013
-<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/VS2013.png">
-
-## Metro
-<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/Metro.png">
-
-## ExpressionLight
-<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/ExpressionLight.png">
-
-## Expressiondark
-<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/Expressiondark.png">
-
-## Generic
-<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/Generic.png">
-
-## VS2010
-<img src="https://github.com/Dirkster99/Docu/blob/master/AvalonDock/Themes/VS2010.png">
+<table width="100%">
+   <tr>
+      <td>Dark</td>
+      <td>Light</td>
+   </tr>
+   <tr>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/DockDocument.png" width="50%"></td>
+      <td></td>
+   </tr>
+   <tr>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr>
+      <td></td>
+      <td></td>
+   </tr>
+   <tr>
+      <td></td>
+      <td></td>
+   </tr>
+</table>
 
 # Mile Stone History
 
