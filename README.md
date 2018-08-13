@@ -26,7 +26,7 @@ Get the latest Debug build from [Comtinues Integration](https://ci.appveyor.com/
 # Feature Added - Dark and Light Theme Samples
 
 Please review the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Project Wiki</a> to see more demo screenshots.
-All screenshots below are from the MLib based VS 2013 Dark/Light theme. Similar theming results should be possible with other theming libraries.
+All screenshots below are from the <a href="https://github.com/Dirkster99/MLib">MLib</a> based VS 2013 Dark/Light theme. Similar theming results should be possible with other theming libraries.
 
 <table width="100%">
    <tr>
