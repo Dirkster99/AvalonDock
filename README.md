@@ -28,6 +28,8 @@ Get the latest Debug build from [Continues Integration](https://ci.appveyor.com/
 Please review the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Project Wiki</a> to see more demo screenshots.
 All screenshots below are from the <a href="https://github.com/Dirkster99/MLib">MLib</a> based VS 2013 Dark (Accent Color Gold)/Light (Accent Color Blue) theme on Windows 10. Similar theming results should be possible with other theming libraries since the implementation follow these <a href="https://www.codeproject.com/Articles/1236588/File-System-Controls-in-WPF-Version-III">guidelines</a>.
 
+The Docking Buttons are defined in XAML, which enables us to color theme consistently with the Window 10 <b>Accent Color</b>.
+
 <table width="100%">
    <tr>
       <td>Description</td>
