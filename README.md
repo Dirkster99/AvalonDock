@@ -1,10 +1,9 @@
 ## Master Branch
-[![Build status](https://ci.appveyor.com/api/projects/status/kq2wyupx5hm7fok2?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock)
-[![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)[Continues Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts)
+[![Build status](https://ci.appveyor.com/api/projects/status/kq2wyupx5hm7fok2/branch/master?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock/branch/master)[![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)&nbsp;[Continues Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts)
 
 
 ## Log4Net Branch
-[![Build status](https://ci.appveyor.com/api/projects/status/bci7gpfvas2w32pr?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock-63n50)[Continues Integration](https://ci.appveyor.com/project/Dirkster99/avalondock-63n50/build/artifacts)
+[![Build status](https://ci.appveyor.com/api/projects/status/bci7gpfvas2w32pr?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock-63n50)&nbsp;[Continues Integration](https://ci.appveyor.com/project/Dirkster99/avalondock-63n50/build/artifacts)
 
 # AvalonDock
 
