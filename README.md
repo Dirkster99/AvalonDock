@@ -1,10 +1,10 @@
 ## Master Branch
 [![Build status](https://ci.appveyor.com/api/projects/status/kq2wyupx5hm7fok2?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock)
-[![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)
+[![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)[Continues Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts)
 
 
 ## Log4Net Branch
-[![Build status](https://ci.appveyor.com/api/projects/status/bci7gpfvas2w32pr?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock-63n50)
+[![Build status](https://ci.appveyor.com/api/projects/status/bci7gpfvas2w32pr?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock-63n50)[Continues Integration](https://ci.appveyor.com/project/Dirkster99/avalondock-63n50/build/artifacts)
 
 # AvalonDock
 
@@ -26,10 +26,6 @@ This repository contains a feature added fork from:
 https://github.com/xceedsoftware/wpftoolkit
 
 Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Wiki for more details</a>. The repository also contains a Log4Net branch for debugging interactive issues with a close enough branch. There are also Log4Net demo executables in the 3.4.01 realease for additional debugging fun.
-
-Get the latest Debug build from Continues Integration:
-- [master](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts)
-- [Log4Net Branch](https://ci.appveyor.com/project/Dirkster99/avalondock-63n50/build/artifacts)
 
 # Feature Added - Dark and Light VS 2013 Theme
 
