@@ -10,7 +10,7 @@
 My IDE called <a href="https://dirkster99.github.io/Edi/">Edi</a> is powered by this project.
 
 AvalonDock is a WPF Document and Tool Window layout container that is used to arrange documents
-and tool windows in similar ways than many well known IDEs, such as, Eclipse, Visual, Studio,
+and tool windows in similar ways than many well known IDEs, such as, Eclipse, Visual Studio,
 PhotoShop and so forth. Here are some CodeProject articles:
 
 * [AvalonDock [2.0] Tutorial Part 1 - Adding a Tool Window](https://www.codeproject.com/Articles/483507/AvalonDock-Tutorial-Part-Adding-a-Tool-Windo)
