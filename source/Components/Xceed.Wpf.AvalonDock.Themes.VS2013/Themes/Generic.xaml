@@ -753,10 +753,17 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type avalonDockControls:OverlayWindow}">
                     <Canvas x:Name="PART_DropTargetsContainer" Opacity="0.9">
+                        <!-- Drop target rectangle that is displayed before a document or tool window
+                             is dropped into a drop target location -->
                         <Path x:Name="PART_PreviewBox"
                               Fill="{DynamicResource {x:Static reskeys:ResourceKeys.PreviewBoxBackgroundBrushKey}}"
                               Stroke="{DynamicResource {x:Static reskeys:ResourceKeys.PreviewBoxBorderBrushKey}}"
                               StrokeThickness="2" />
+                        
+                        <!-- Outmost Outter 4 overlay buttons that are displayed at border of MainWindow
+                             when user drags tool window over another tool window or document and the
+                             AvalonDock air space contains additional document(s) and tool windows (s).
+                        -->
                         <Grid x:Name="PART_DockingManagerDropTargets">
                             <ContentControl x:Name="PART_DockingManagerDropTargetLeft"
                                     HorizontalAlignment="Left"
@@ -815,6 +822,9 @@
                                 />
 
                         </Grid>
+
+                        <!-- Is displayed as center cross with a max of 5 buttons when a toolwindow is
+                             dragged over another tool window -->
                         <Grid x:Name="PART_AnchorablePaneDropTargets">
                             <Grid HorizontalAlignment="Center"
                                   VerticalAlignment="Center">
@@ -869,6 +879,7 @@
                                             Grid.Column="1" Grid.Row="2" />
                                 </Grid>
 
+                                <!-- Inner 5 buttons of star shapped control -->
                                 <ContentControl x:Name="PART_AnchorablePaneDropTargetTop"
                                         Grid.Row="0"
                                         Grid.Column="1"
@@ -921,6 +932,7 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentAsAnchorableLeft}"
                                     />
+                                <!-- Center button of star shapped control -->
                                 <ContentControl x:Name="PART_AnchorablePaneDropTargetInto"
                                         Grid.Row="1"
                                         Grid.Column="1"
@@ -934,9 +946,10 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentInside}"
                                     />
-
                             </Grid>
                         </Grid>
+                        
+                        <!-- Is displayed as center cross with a max of 5 buttons when documents are dragged over the document container. -->
                         <Grid x:Name="PART_DocumentPaneDropTargets">
                             <Grid HorizontalAlignment="Center"
                                   VerticalAlignment="Center">
@@ -991,6 +1004,7 @@
                                             Grid.Column="1" Grid.Row="2" />
                                 </Grid>
 
+                                <!-- Inner 5 buttons of star shapped control -->
                                 <ContentControl x:Name="PART_DocumentPaneDropTargetTop"
                                         Grid.Row="0"
                                         Grid.Column="1"                                        
@@ -1043,6 +1057,7 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentLeft}"
                                     />
+                                <!-- Center button of star shapped control -->
                                 <ContentControl x:Name="PART_DocumentPaneDropTargetInto"
                                         Grid.Row="1"
                                         Grid.Column="1"
@@ -1059,6 +1074,7 @@
                             </Grid>
                         </Grid>
 
+                        <!-- Center star with a max of 9 buttons shown when tool window is dragged of document container -->
                         <Grid x:Name="PART_DocumentPaneFullDropTargets">
                             <Grid HorizontalAlignment="Center"
                                   VerticalAlignment="Center">
@@ -1121,6 +1137,7 @@
                                             Grid.Column="2" Grid.Row="3" Grid.RowSpan="2" />
                                 </Grid>
 
+                                <!-- Inner 5 buttons of star shapped control -->
                                 <ContentControl x:Name="PART_DocumentPaneFullDropTargetTop"
                                         Grid.Row="1"
                                         Grid.Column="2"
@@ -1173,6 +1190,7 @@
                                         Padding="0"
                                         Content="{StaticResource DockDocumentLeft}"
                                     />
+                                <!-- Center button of star shapped control -->
                                 <ContentControl x:Name="PART_DocumentPaneFullDropTargetInto"
                                         Grid.Row="2"
                                         Grid.Column="2"
@@ -1187,8 +1205,7 @@
                                         Content="{StaticResource DockDocumentInside}"
                                     />
 
-
-
+                                <!-- Outer 4 buttons of star shapped control -->
                                 <ContentControl x:Name="PART_DocumentPaneDropTargetTopAsAnchorablePane"
                                         Grid.Row="0"
                                         Grid.Column="2"
