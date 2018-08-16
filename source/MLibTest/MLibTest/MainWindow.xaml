@@ -7,6 +7,8 @@
         x:Name="mainWindow"
         xmlns:MWindow="clr-namespace:MWindowLib;assembly=MWindowLib"
         xmlns:demos="clr-namespace:MLibTest.Demos"
+        xmlns:demoviews="clr-namespace:MLibTest.Demos.Views"
+        
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid xmlns:bindLocal="clr-namespace:MLibTest.Demos"
@@ -63,7 +65,8 @@
                         </Style>
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
-                <MenuItem Header="Properties" IsChecked="{Binding AD_WorkSpace.FileStats.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+                <MenuItem Header="File Stats" IsChecked="{Binding AD_WorkSpace.FileStats.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+                <MenuItem Header="Color Picker" IsChecked="{Binding AD_WorkSpace.ColorPicker.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
             </MenuItem>
         </Menu>
 
@@ -86,7 +89,7 @@
                     </demos:PanesTemplateSelector.FileViewTemplate>
                     <demos:PanesTemplateSelector.FileStatsViewTemplate>
                         <DataTemplate>
-                            <Border Padding="5">
+                            <Border Padding="6">
                                 <StackPanel Orientation="Vertical">
                                     <TextBlock Text="{Binding FileSize}"/>
                                     <TextBlock Text="{Binding LastModified}"/>
@@ -95,12 +98,22 @@
                             </Border>
                         </DataTemplate>
                     </demos:PanesTemplateSelector.FileStatsViewTemplate>
+                    <demos:PanesTemplateSelector.ColorPickerViewTemplate>
+                        <DataTemplate>
+                            <Border Padding="6">
+                                <ScrollViewer>
+                                    <demoviews:ColorSelectionView />
+                                </ScrollViewer>
+                            </Border>
+                        </DataTemplate>
+                    </demos:PanesTemplateSelector.ColorPickerViewTemplate>
                 </demos:PanesTemplateSelector>
             </avalonDock:DockingManager.LayoutItemTemplateSelector>
 
             <avalonDock:DockingManager.LayoutItemContainerStyleSelector>
                 <demos:PanesStyleSelector>
                     <demos:PanesStyleSelector.ToolStyle>
+                        <!-- Define Style of a Tool Window View -->
                         <Style TargetType="{x:Type avalonDockControls:LayoutAnchorableItem}">
                             <Setter Property="Title" Value="{Binding Model.Title}"/>
                             <Setter Property="IconSource" Value="{Binding Model.IconSource}"/>
@@ -111,6 +124,7 @@
                         </Style>
                     </demos:PanesStyleSelector.ToolStyle>
                     <demos:PanesStyleSelector.FileStyle>
+                        <!-- Define Style of a Document View -->
                         <Style TargetType="{x:Type avalonDockControls:LayoutItem}">
                             <Setter Property="Title" Value="{Binding Model.Title}"/>
                             <Setter Property="ToolTip" Value="{Binding Model.FilePath}"/>

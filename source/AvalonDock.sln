@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MLibTest", "MLibTest\MLibTest.csproj", "{7FF2F70A-36A0-49FE-BE5B-1A1542516307}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MLibTest", "MLibTest\MLibTest\MLibTest.csproj", "{7FF2F70A-36A0-49FE-BE5B-1A1542516307}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{339BC0D5-2A54-40ED-9850-7ED65182E6E1}"
 EndProject
@@ -20,13 +20,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xceed.Wpf.AvalonDock.Themes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xceed.Wpf.AvalonDock.Themes.VS2013", "Components\Xceed.Wpf.AvalonDock.Themes.VS2013\Xceed.Wpf.AvalonDock.Themes.VS2013.csproj", "{BD7EEE0E-9432-4E76-BD82-793358E56BDF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MLibTest_Components", "MLibTest_Components", "{72045D3A-A982-4C69-8FB8-6B601363D7ED}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MLibTest_Components", "MLibTest\MLibTest_Components", "{72045D3A-A982-4C69-8FB8-6B601363D7ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceLocator", "MLibTest_Components\ServiceLocator\ServiceLocator.csproj", "{252126D1-E1D9-49C3-910B-FCF2266265EF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceLocator", "MLibTest\MLibTest_Components\ServiceLocator\ServiceLocator.csproj", "{252126D1-E1D9-49C3-910B-FCF2266265EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Settings", "MLibTest_Components\Settings\Settings\Settings.csproj", "{2807B493-CC2E-402E-901A-EB138698FEDC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Settings", "MLibTest\MLibTest_Components\Settings\Settings\Settings.csproj", "{2807B493-CC2E-402E-901A-EB138698FEDC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SettingsModel", "MLibTest_Components\Settings\SettingsModel\SettingsModel.csproj", "{9B0BA841-5A2F-4ED3-A908-253DBCA70E77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SettingsModel", "MLibTest\MLibTest_Components\Settings\SettingsModel\SettingsModel.csproj", "{9B0BA841-5A2F-4ED3-A908-253DBCA70E77}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsTestApp", "WinFormsTestApp\WinFormsTestApp.csproj", "{AB95D11D-7239-4F3D-88FB-278B7C8EB6DF}"
 EndProject

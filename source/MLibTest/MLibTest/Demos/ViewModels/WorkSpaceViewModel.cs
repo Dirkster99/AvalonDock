@@ -85,28 +85,65 @@
     }
     #endregion Helper Test Classes
 
+    /// <summary>
+    /// The WorkSpaceViewModel implements AvalonDock demo specific properties, events and methods.
+    /// </summary>
     internal class WorkSpaceViewModel : MLibTest.ViewModels.Base.ViewModelBase, IWorkSpaceViewModel
     {
         #region private fields
-        ObservableCollection<FileViewModel> _files = new ObservableCollection<FileViewModel>();
-        ReadOnlyObservableCollection<FileViewModel> _readonyFiles = null;
-        ToolViewModel[] _tools = null;
-        ICommand _openCommand = null;
-        ICommand _newCommand = null;
+        private ObservableCollection<FileViewModel> _files = new ObservableCollection<FileViewModel>();
+        private ReadOnlyObservableCollection<FileViewModel> _readonyFiles = null;
+        private ToolViewModel[] _tools = null;
 
-        FileStatsViewModel _fileStats = null;
+        private ICommand _openCommand = null;
+        private ICommand _newCommand = null;
+
+        private FileStatsViewModel _fileStats = null;
+        private ColorPickerViewModel _ColorPicker = null;
+
         private FileViewModel _activeDocument = null;
         #endregion private fields
 
         #region constructors
+        /// <summary>
+        /// Class constructor
+        /// </summary>
         public WorkSpaceViewModel()
         {
         }
         #endregion constructors
 
+        /// <summary>
+        /// Event is raised when AvalonDock (or the user) selects a new document.
+        /// </summary>
         public event EventHandler ActiveDocumentChanged;
 
         #region Properties
+        #region ActiveDocument
+        /// <summary>
+        /// Gets/Sets the currently active document.
+        /// </summary>
+        public FileViewModel ActiveDocument
+        {
+            get { return _activeDocument; }
+
+            set             // This can also be set by the user via the view
+            {
+                if (_activeDocument != value)
+                {
+                    _activeDocument = value;
+                    RaisePropertyChanged("ActiveDocument");
+
+                    if (ActiveDocumentChanged != null)
+                        ActiveDocumentChanged(this, EventArgs.Empty);
+                }
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// Gets a collection of all currently available documents
+        /// </summary>
         public ReadOnlyObservableCollection<FileViewModel> Files
         {
             get
@@ -118,16 +155,22 @@
             }
         }
 
+        /// <summary>
+        /// Gets an enumeration of all currently available tool window viewmodels.
+        /// </summary>
         public IEnumerable<ToolViewModel> Tools
         {
             get
             {
                 if (_tools == null)
-                    _tools = new ToolViewModel[] { FileStats };
+                    _tools = new ToolViewModel[] { FileStats, ColorPicker };
                 return _tools;
             }
         }
 
+        /// <summary>
+        /// Gets an instance of the file stats tool window viewmodels.
+        /// </summary>
         public FileStatsViewModel FileStats
         {
             get
@@ -139,6 +182,23 @@
             }
         }
 
+        /// <summary>
+        /// Gets an instance of the color picker tool window viewmodels.
+        /// </summary>
+        public ColorPickerViewModel ColorPicker
+        {
+            get
+            {
+                if (_ColorPicker == null)
+                    _ColorPicker = new ColorPickerViewModel(this as IWorkSpaceViewModel);
+
+                return _ColorPicker;
+            }
+        }
+
+        /// <summary>
+        /// Gets a open document command to open files from the file system.
+        /// </summary>
         public ICommand OpenCommand
         {
             get
@@ -151,6 +211,10 @@
                 return _openCommand;
             }
         }
+
+        /// <summary>
+        /// Gets a new document command to create new documents from scratch.
+        /// </summary>
         public ICommand NewCommand
         {
             get
@@ -166,7 +230,11 @@
         #endregion Properties
 
         #region methods
-
+        /// <summary>
+        /// Checks if a document can be closed and asks the user whether
+        /// to save before closing if the document appears to be dirty.
+        /// </summary>
+        /// <param name="fileToClose"></param>
         public void Close(FileViewModel fileToClose)
         {
             if (fileToClose.IsDirty)
@@ -174,6 +242,7 @@
                 var res = MessageBox.Show(string.Format("Save changes for file '{0}'?", fileToClose.FileName), "AvalonDock Test App", MessageBoxButton.YesNoCancel);
                 if (res == MessageBoxResult.Cancel)
                     return;
+
                 if (res == MessageBoxResult.Yes)
                 {
                     Save(fileToClose);
@@ -183,6 +252,11 @@
             _files.Remove(fileToClose);
         }
 
+        /// <summary>
+        /// Saves a document and resets the dirty flag.
+        /// </summary>
+        /// <param name="fileToSave"></param>
+        /// <param name="saveAsFlag"></param>
         public void Save(FileViewModel fileToSave, bool saveAsFlag = false)
         {
             if (fileToSave.FilePath == null || saveAsFlag)
@@ -197,6 +271,11 @@
         }
 
         #region OpenCommand
+        /// <summary>
+        /// Determines if application can currently open a document or not.
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
         private bool CanOpen(object parameter)
         {
             return true;
@@ -225,6 +304,11 @@
         #endregion  OpenCommand
 
         #region NewCommand
+        /// <summary>
+        /// Determines if application can currently create a new document or not.
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
         private bool CanNew(object parameter)
         {
             return true;
@@ -237,23 +321,6 @@
         }
 
         #endregion 
-
-        #region ActiveDocument
-        public FileViewModel ActiveDocument
-        {
-            get { return _activeDocument; }
-            set
-            {
-                if (_activeDocument != value)
-                {
-                    _activeDocument = value;
-                    RaisePropertyChanged("ActiveDocument");
-                    if (ActiveDocumentChanged != null)
-                        ActiveDocumentChanged(this, EventArgs.Empty);
-                }
-            }
-        }
-        #endregion
         #endregion methods
     }
 }

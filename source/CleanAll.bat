@@ -7,6 +7,8 @@ ECHO This script deletes all temporary build files in their
 ECHO corresponding BIN and OBJ Folder contained in the following projects
 ECHO.
 ECHO MLibTest
+ECHO MLibTest_Components
+ECHO.
 ECHO MVVMTestApp
 ECHO TestApp
 ECHO WinFormsTestApp
@@ -32,8 +34,19 @@ RMDIR /S /Q .vs
 
 ECHO Deleting BIN and OBJ Folders in MLibTest
 ECHO.
-RMDIR /S /Q MLibTest\bin
-RMDIR /S /Q MLibTest\obj
+RMDIR /S /Q MLibTest\MLibTest\bin
+RMDIR /S /Q MLibTest\MLibTest\obj
+
+ECHO Deleting BIN and OBJ Folders in MLibTest_Components
+ECHO.
+RMDIR /S /Q MLibTest\MLibTest_Components\ServiceLocator\bin
+RMDIR /S /Q MLibTest\MLibTest_Components\ServiceLocator\obj
+
+RMDIR /S /Q MLibTest\MLibTest_Components\Settings\Settings\bin
+RMDIR /S /Q MLibTest\MLibTest_Components\Settings\Settings\obj
+
+RMDIR /S /Q MLibTest\MLibTest_Components\Settings\SettingsModel\bin
+RMDIR /S /Q MLibTest\MLibTest_Components\Settings\SettingsModel\obj
 
 ECHO Deleting BIN and OBJ Folders in MVVMTestApp
 ECHO.

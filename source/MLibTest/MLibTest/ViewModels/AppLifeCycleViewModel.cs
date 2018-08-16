@@ -136,9 +136,10 @@
                 // so this is how it can be tested ...
                 appearance.AddThemeResources("Generic", new List<Uri>
                 {
-                     new Uri("/MLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
-                    ,new Uri("/MWindowLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
+                     new Uri("/MWindowLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
                     ,new Uri("/Xceed.Wpf.AvalonDock;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
+
+                    ,new Uri("/MLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
                     ,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
                 }, settings.Themes);
@@ -155,13 +156,14 @@
                 // so this is how it can be tested ...
                 appearance.AddThemeResources("VS 2013 Blue", new List<Uri>
                 {
-                     new Uri("/MLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
-                    ,new Uri("/MWindowLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
+                   new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/BlueBrushs.xaml", UriKind.RelativeOrAbsolute)
 
-                    ,new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
-                    ,new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/BlueBrushs.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/MLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/MWindowLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
 
-                    ,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/MLibTest;component/BindToMLib/AvalonDock_Dark_LightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
                 }, settings.Themes);
             }
@@ -175,12 +177,15 @@
                 // Add additional Dark and Light resources to those theme resources added above
                 appearance.AddThemeResources("VS 2013 Dark", new List<Uri>
                 {
-                   new Uri("/MLib;component/Themes/DarkTheme.xaml", UriKind.RelativeOrAbsolute)
-                  ,new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
+                   new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
                   ,new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/ColorPickerLib;component/Themes/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
+
+                  ,new Uri("/MLib;component/Themes/DarkTheme.xaml", UriKind.RelativeOrAbsolute)
                   ,new Uri("/MWindowLib;component/Themes/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
+
                   ,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
-                  , new Uri("/MLibTest;component/BindToMLib/AvalonDock_Dark_LightBrushs.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/MLibTest;component/BindToMLib/AvalonDock_Dark_LightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
                 }, settings.Themes);
             }
@@ -193,12 +198,15 @@
             {
                 appearance.AddThemeResources("VS 2013 Light", new List<Uri>
                 {
-                    new Uri("/MLib;component/Themes/LightTheme.xaml", UriKind.RelativeOrAbsolute)
-                  , new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
-                  , new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/LightBrushs.xaml", UriKind.RelativeOrAbsolute)
-                  , new Uri("/MWindowLib;component/Themes/LightBrushs.xaml", UriKind.RelativeOrAbsolute)
-                  , new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
-                  , new Uri("/MLibTest;component/BindToMLib/AvalonDock_Dark_LightBrushs.xaml", UriKind.RelativeOrAbsolute)
+                   new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/LightBrushs.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/ColorPickerLib;component/Themes/LightBrushs.xaml", UriKind.RelativeOrAbsolute)
+
+                  ,new Uri("/MLib;component/Themes/LightTheme.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/MWindowLib;component/Themes/LightBrushs.xaml", UriKind.RelativeOrAbsolute)
+
+                  ,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/MLibTest;component/BindToMLib/AvalonDock_Dark_LightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
                 }, settings.Themes);
             }
@@ -216,6 +224,7 @@
                 {
                      new Uri("/MLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
                     ,new Uri("/MWindowLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
+
                     ,new Uri("/Xceed.Wpf.AvalonDock.Themes.Metro;component/Theme.xaml", UriKind.RelativeOrAbsolute)
                     ,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
@@ -235,6 +244,7 @@
                 {
                      new Uri("/MLib;component/Themes/LightTheme.xaml", UriKind.RelativeOrAbsolute)
                     ,new Uri("/MWindowLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
+
                     ,new Uri("/Xceed.Wpf.AvalonDock.Themes.Expression;component/LightTheme.xaml", UriKind.RelativeOrAbsolute)
                     ,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
@@ -254,6 +264,7 @@
                 {
                      new Uri("/MLib;component/Themes/DarkTheme.xaml", UriKind.RelativeOrAbsolute)
                     ,new Uri("/MWindowLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
+
                     ,new Uri("/Xceed.Wpf.AvalonDock.Themes.Expression;component/DarkTheme.xaml", UriKind.RelativeOrAbsolute)
                     ,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
