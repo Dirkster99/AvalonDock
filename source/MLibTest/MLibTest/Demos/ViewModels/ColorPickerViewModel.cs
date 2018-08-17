@@ -25,6 +25,7 @@
 
         private IWorkSpaceViewModel _workSpaceViewModel = null;
 
+        private Color _SelectedBackgroundColor;
         private Color _SelectedAccentColor;
         #endregion fields
 
@@ -55,6 +56,22 @@
         #endregion constructors
 
         #region properties
+        /// <summary>
+        /// Gets/sets the currently selected accent color for the color picker in the tool window's view.
+        /// </summary>
+        public Color SelectedBackgroundColor
+        {
+            get { return _SelectedBackgroundColor; }
+            set
+            {
+                if (_SelectedBackgroundColor != value)
+                {
+                    _SelectedBackgroundColor = value;
+                    RaisePropertyChanged(() => SelectedBackgroundColor);
+                }
+            }
+        }
+
         /// <summary>
         /// Gets/sets the currently selected accent color for the color picker in the tool window's view.
         /// </summary>
@@ -103,6 +120,7 @@
         /// </summary>
         private void SetupToolDefaults()
         {
+            SelectedBackgroundColor = Color.FromArgb(255, 0, 0, 0);
             SelectedAccentColor = Color.FromArgb(128, 0, 180, 0);
         }
         #endregion methods
