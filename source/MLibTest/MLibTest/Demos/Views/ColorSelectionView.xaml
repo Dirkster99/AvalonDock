@@ -11,17 +11,6 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              >
     <UserControl.Resources>
-        <Style x:Key="controlInError" TargetType="xctk:ByteUpDown">
-            <Style.Triggers>
-                <Trigger Property="Validation.HasError"
-                     Value="true">
-                    <Setter Property="ToolTip"
-                            Value="{Binding RelativeSource={x:Static RelativeSource.Self},
-                            Path=(Validation.Errors).CurrentItem.ErrorContent}" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
         <ObjectDataProvider x:Key="ColorModeOptions" MethodName="GetValues"
                           ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
@@ -43,32 +32,34 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
+        <!-- Left Main Column -->
         <Grid Grid.Column="0" Margin="5">
             <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Sample Usage/Test driving Color Canvas Control -->
+            <controls:ColorCanvas x:Name="_colorCanvas"
+                                  SelectedColor="{Binding SelectedAccentColor}"
+                                  Grid.Row="0"
+                                  VerticalAlignment="Stretch"
+                                  HorizontalAlignment="Stretch" />
+        </Grid>
+
+        <!-- Right Main Column -->
+        <Grid Grid.Column="1"
+            Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <GroupBox Grid.Column="0"
-                       Grid.Row="0"
-                       Header="ColorCanvas Features"
-                       HorizontalAlignment="Stretch">
+            <GroupBox Grid.Row="0"
+                      Header="ColorCanvas Features"
+                      HorizontalAlignment="Stretch">
                 <Grid>
-                    <Grid.Resources>
-                        <Style x:Key="alignStyle" TargetType="{x:Type FrameworkElement}">
-                            <Setter Property="Margin" Value="5" />
-                        </Style>
-
-                        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource alignStyle}" />
-                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource alignStyle}" />
-                        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource alignStyle}" />
-                        <Style TargetType="{x:Type xctk:IntegerUpDown}" BasedOn="{StaticResource alignStyle}">
-                            <Setter Property="Width" Value="45" />
-                            <Setter Property="Minimum" Value="0" />
-                            <Setter Property="Maximum" Value="255" />
-                        </Style>
-                    </Grid.Resources>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -79,99 +70,73 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Row="0"
+                    <!-- StackPanel Grid.Row="0"
                                Grid.Column="0"
                                Grid.ColumnSpan="2"
                                HorizontalAlignment="Stretch"
-                               Orientation="Horizontal">
-                        <TextBlock Text="R:" />
-                        <xctk:ByteUpDown x:Name="_R"
-                                      Value="{Binding ElementName=_colorCanvas, Path=R, Mode=TwoWay}"
-                                      Minimum="0"
-                                      Maximum="255"
-                                      ParsingNumberStyle="Integer"
-                                      Style="{StaticResource controlInError}" />
-                        <TextBlock Text="G:" Margin="5" />
-                        <xctk:ByteUpDown x:Name="_G"
-                                      Value="{Binding ElementName=_colorCanvas, Path=G, Mode=TwoWay}"
-                                      Minimum="0"
-                                      Maximum="255"
-                                      ParsingNumberStyle="Integer"
-                                      Style="{StaticResource controlInError}" />
-                        <TextBlock Text="B:"
-                             Margin="5" />
-                        <xctk:ByteUpDown x:Name="_B"
-                                      Value="{Binding ElementName=_colorCanvas, Path=B, Mode=TwoWay}"
-                                      Minimum="0"
-                                      Maximum="255"
-                                      ParsingNumberStyle="Integer"
-                                      Style="{StaticResource controlInError}" />
-                        <TextBlock Text="A:"
-                             Margin="5" />
-                        <xctk:ByteUpDown x:Name="_A"
-                                      Value="{Binding ElementName=_colorCanvas, Path=A, Mode=TwoWay}"
-                                      Minimum="0"
-                                      Maximum="255"
-                                      ParsingNumberStyle="Integer"
-                                      Style="{StaticResource controlInError}" />
-                    </StackPanel>
+                               Orientation="Horizontal"
+                               xmlns:numUpDown="clr-namespace:NumericUpDownLib;assembly=NumericUpDownLib"
+                    >
+                        <TextBlock Text="R:"
+                                   VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <numUpDown:NumericUpDown
+                            x:Name="_R"
+                            Value="{Binding ElementName=_colorCanvas, Path=R, Mode=TwoWay}"
+                            MinValue="0"
+                            MaxValue="255"
+                            VerticalAlignment="Center" HorizontalAlignment="Center"
+                        />
+                        <TextBlock Text="G:" Margin="6"
+                                   VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <numUpDown:NumericUpDown
+                            x:Name="_G"
+                            Value="{Binding ElementName=_colorCanvas, Path=G, Mode=TwoWay}"
+                            MinValue="0"
+                            MaxValue="255"
+                            VerticalAlignment="Center" HorizontalAlignment="Center"
+                        />
+                        <TextBlock Text="B:" Margin="6"
+                                   VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <numUpDown:NumericUpDown
+                            x:Name="_B"
+                            Value="{Binding ElementName=_colorCanvas, Path=B, Mode=TwoWay}"
+                            MinValue="0"
+                            MaxValue="255"
+                            VerticalAlignment="Center" HorizontalAlignment="Center"
+                        />
+                        
+                        <TextBlock Text="A:" Margin="6"
+                                   VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <numUpDown:NumericUpDown
+                            x:Name="_A"
+                            Value="{Binding ElementName=_colorCanvas, Path=A, Mode=TwoWay}"
+                            MinValue="0"
+                            MaxValue="255"
+                            VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    </StackPanel -->
 
                     <TextBlock Grid.Column="0"
-                          Grid.Row="1"
-                          Text="UsingAlphaChannel: " />
+                               Grid.Row="1"
+                               Text="UsingAlphaChannel: " />
                     <CheckBox Grid.Column="1"
                          Grid.Row="1"
                          x:Name="_usingAlphaChannel"
                          IsChecked="{Binding ElementName=_colorCanvas, Path=UsingAlphaChannel, Mode=TwoWay}" />
                     <TextBlock Grid.Column="0"
-                          Grid.Row="2"
-                          Text="HexadecimalString: " />
+                               Grid.Row="2"
+                               Text="HexadecimalString: " />
                     <TextBox Grid.Column="1"
-                        Grid.Row="2"
-                        IsEnabled="False"
-                        Text="{Binding ElementName=_colorCanvas, Path=HexadecimalString}" />
+                             Grid.Row="2"
+                             IsEnabled="False"
+                             Text="{Binding ElementName=_colorCanvas, Path=HexadecimalString}" />
                 </Grid>
             </GroupBox>
 
-            <TextBlock Text="ColorCanvas Usage: "
-                    Grid.Row="1"
-                    Margin="0,10,0,0"
-                     />
-            <controls:ColorCanvas x:Name="_colorCanvas" SelectedColor="{Binding SelectedAccentColor}"
-                                   Grid.Row="2"
-                                   VerticalAlignment="Top"
-                                   HorizontalAlignment="Stretch" />
-        </Grid>
-
-        <Grid Grid.Column="1"
-            Margin="5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-
-            <GroupBox Grid.Column="0"
-                   Grid.Row="0"
-                   Header="ColorPicker Features"
-                   HorizontalAlignment="Stretch"
-                   Margin="10">
+            <GroupBox Grid.Row="1"
+                      Header="ColorPicker Features"
+                      HorizontalAlignment="Stretch"
+                      Margin="10">
                 <Grid>
-                    <Grid.Resources>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="Margin" Value="3" />
-                            <Setter Property="VerticalAlignment" Value="Center" />
-                        </Style>
-                        <Style TargetType="{x:Type TextBox}">
-                            <Setter Property="Margin" Value="3" />
-                        </Style>
-                        <Style TargetType="{x:Type CheckBox}">
-                            <Setter Property="Margin" Value="3" />
-                        </Style>
-                        <Style TargetType="{x:Type ComboBox}">
-                            <Setter Property="Margin" Value="3" />
-                        </Style>
-                    </Grid.Resources>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -198,10 +163,10 @@
                           Grid.Row="0"
                           Text="ColorMode:" />
                     <ComboBox Grid.Column="1"
-                         Grid.Row="0"
-                         ItemsSource="{Binding Source={StaticResource ColorModeOptions}}"
-                         SelectedItem="{Binding ElementName=_colorPicker, Path=ColorMode, Mode=TwoWay}"
-                         Height="22"/>
+                              Grid.Row="0"
+                              ItemsSource="{Binding Source={StaticResource ColorModeOptions}}"
+                              SelectedItem="{Binding ElementName=_colorPicker, Path=ColorMode, Mode=TwoWay}"
+                              />
                     <TextBlock Grid.Column="0"
                           Grid.Row="1"
                           Text="AvailableColorsHeader:" />
@@ -265,36 +230,35 @@
                          Content="UsingAlphaChannel"
                          IsChecked="{Binding ElementName=_colorPicker, Path=UsingAlphaChannel, Mode=TwoWay}" />
                     <TextBlock Grid.Column="0"
-                          Grid.Row="12"
-                          Text="AdvancedButtonHeader:" />
+                               Grid.Row="12"
+                               Text="AdvancedButtonHeader:" />
                     <TextBox Grid.Column="1"
-                        Grid.Row="12"
-                        Text="{Binding ElementName=_colorPicker, Path=AdvancedButtonHeader, Mode=TwoWay}" />
+                             Grid.Row="12"
+                             Text="{Binding ElementName=_colorPicker, Path=AdvancedButtonHeader, Mode=TwoWay}" />
                     <TextBlock Grid.Column="0"
-                          Grid.Row="13"
-                          Text="StandardButtonHeader:" />
+                               Grid.Row="13"
+                               Text="StandardButtonHeader:" />
                     <TextBox Grid.Column="1"
-                        Grid.Row="13"
-                        Text="{Binding ElementName=_colorPicker, Path=StandardButtonHeader, Mode=TwoWay}" />
+                             Grid.Row="13"
+                             Text="{Binding ElementName=_colorPicker, Path=StandardButtonHeader, Mode=TwoWay}" />
                     <TextBlock Grid.Column="0"
-                          Grid.Row="14"
-                          Text="SelectedColorText:" />
+                               Grid.Row="14"
+                               Text="SelectedColorText:" />
                     <TextBox Grid.Column="1"
-                        Grid.Row="14"
-                        IsEnabled="False"
-                        Text="{Binding ElementName=_colorPicker, Path=SelectedColorText}" />
+                             Grid.Row="14"
+                             IsEnabled="False"
+                             Text="{Binding ElementName=_colorPicker, Path=SelectedColorText}" />
                 </Grid>
             </GroupBox>
 
             <TextBlock Text="ColorPicker Usage: "
-                    Grid.Row="1"
+                       Grid.Row="2"
                      />
-            <!-- Style="{StaticResource Header}" -->
+
             <controls:ColorPicker x:Name="_colorPicker"
                                   ShowRecentColors="True"
-                                   Grid.Row="2"
-                                   VerticalAlignment="Top" />
+                                  Grid.Row="3"
+                                  VerticalAlignment="Top" />
         </Grid>
-
     </Grid>
 </UserControl>

@@ -180,12 +180,15 @@
                    new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
                   ,new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
                   ,new Uri("/ColorPickerLib;component/Themes/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/NumericUpDownLib;component/Themes/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
 
                   ,new Uri("/MLib;component/Themes/DarkTheme.xaml", UriKind.RelativeOrAbsolute)
                   ,new Uri("/MWindowLib;component/Themes/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
 
                   ,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
                   ,new Uri("/MLibTest;component/BindToMLib/AvalonDock_Dark_LightBrushs.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/MLibTest;component/BindToMLib/ColorPickerLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/MLibTest;component/BindToMLib/NumericUpDownLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
                 }, settings.Themes);
             }
@@ -201,12 +204,15 @@
                    new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
                   ,new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/LightBrushs.xaml", UriKind.RelativeOrAbsolute)
                   ,new Uri("/ColorPickerLib;component/Themes/LightBrushs.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/NumericUpDownLib;component/Themes/LightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
                   ,new Uri("/MLib;component/Themes/LightTheme.xaml", UriKind.RelativeOrAbsolute)
                   ,new Uri("/MWindowLib;component/Themes/LightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
                   ,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
                   ,new Uri("/MLibTest;component/BindToMLib/AvalonDock_Dark_LightBrushs.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/MLibTest;component/BindToMLib/ColorPickerLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
+                  ,new Uri("/MLibTest;component/BindToMLib/NumericUpDownLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
                 }, settings.Themes);
             }

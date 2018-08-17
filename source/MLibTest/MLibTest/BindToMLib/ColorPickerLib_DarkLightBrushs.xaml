@@ -1,0 +1,28 @@
+﻿<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:reskeys="clr-namespace:ColorPickerLib.Themes;assembly=ColorPickerLib"
+    xmlns:MLib_reskeys="clr-namespace:MLib.Themes;assembly=MLib"
+    >
+
+    <!-- Accent Color Brush Definition
+       - Look for references on ControlAccentBrushKey to find where this is being set in code -->
+    <Color x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
+           ResourceId=ControlAccentColorKey}">#FF1888b8</Color>
+
+    <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
+                     ResourceId=ControlAccentBrushKey}"
+                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}" />
+
+    <!-- Popup Border -->
+    <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
+                            ResourceId=PopUpOpenBorderBrushKey}"
+                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
+    />
+    
+    <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
+                            ResourceId=VerticalSLideThumbMouseOverBrushKey}"
+                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
+    />
+
+</ResourceDictionary>

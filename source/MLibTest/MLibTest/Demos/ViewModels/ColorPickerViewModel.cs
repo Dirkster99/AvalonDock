@@ -103,7 +103,7 @@
         /// </summary>
         private void SetupToolDefaults()
         {
-            SelectedAccentColor = Color.FromRgb(180, 0, 0);
+            SelectedAccentColor = Color.FromArgb(128, 0, 180, 0);
         }
         #endregion methods
     }
