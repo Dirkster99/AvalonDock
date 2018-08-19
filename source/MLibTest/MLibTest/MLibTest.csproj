@@ -34,8 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ColorPickerLib, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Dirkster.ColorPickerLib.1.3.0\lib\net4\ColorPickerLib.dll</HintPath>
+    <Reference Include="ColorPickerLib, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Dirkster.ColorPickerLib.1.4.0.1\lib\net4\ColorPickerLib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Dirkster.MWindowLib.1.0.4.2\lib\net452\Microsoft.Expression.Interactions.dll</HintPath>
@@ -50,7 +50,7 @@
       <HintPath>..\..\packages\Dirkster.MWindowLib.1.0.4.2\lib\net452\MWindowLib.dll</HintPath>
     </Reference>
     <Reference Include="NumericUpDownLib, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Dirkster.ColorPickerLib.1.3.0\lib\net4\NumericUpDownLib.dll</HintPath>
+      <HintPath>..\..\packages\Dirkster.ColorPickerLib.1.4.0.1\lib\net4\NumericUpDownLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

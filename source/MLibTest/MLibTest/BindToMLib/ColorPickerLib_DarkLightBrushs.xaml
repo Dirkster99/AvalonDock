@@ -14,12 +14,16 @@
                      ResourceId=ControlAccentBrushKey}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}" />
 
+    <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys}, ResourceId=ButtonFocusedOuterBorderKey}"
+                    Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
+                    />
+
     <!-- Popup Border -->
     <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
                             ResourceId=PopUpOpenBorderBrushKey}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
     />
-    
+
     <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
                             ResourceId=VerticalSLideThumbMouseOverBrushKey}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"

@@ -270,9 +270,13 @@
                 {
                      new Uri("/MLib;component/Themes/DarkTheme.xaml", UriKind.RelativeOrAbsolute)
                     ,new Uri("/MWindowLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
+                    ,new Uri("/ColorPickerLib;component/Themes/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
+                    ,new Uri("/NumericUpDownLib;component/Themes/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
 
                     ,new Uri("/Xceed.Wpf.AvalonDock.Themes.Expression;component/DarkTheme.xaml", UriKind.RelativeOrAbsolute)
                     ,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
+                    ,new Uri("/MLibTest;component/BindToMLib/ColorPickerLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
+                    ,new Uri("/MLibTest;component/BindToMLib/NumericUpDownLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
                 }, settings.Themes);
             }
