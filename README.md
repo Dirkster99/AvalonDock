@@ -7,6 +7,8 @@
 
 # AvalonDock
 
+Support this project by setting a STAR, reporting an issue, or even better, placing a pull request.
+
 My IDE called <a href="https://dirkster99.github.io/Edi/">Edi</a> is powered by this project.
 
 AvalonDock is a WPF Document and Tool Window layout container that is used to arrange documents
