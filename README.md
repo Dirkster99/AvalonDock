@@ -26,7 +26,7 @@ My editor [Edi](https://github.com/Dirkster99/Edi) is based on AvlonDock.
 This repository contains a feature added fork from:
 https://github.com/xceedsoftware/wpftoolkit
 
-Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Wiki for more details</a>. The repository also contains a Log4Net branch for debugging interactive issues with a close enough branch. There are also Log4Net demo executables in the 3.4.01 realease for additional debugging fun.
+Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Wiki for more details</a>. The repository also contains a Log4Net branch for debugging interactive issues with a close enough branch. There are also Log4Net demo executables in the 3.4.01 (or later) realease for additional debugging fun.
 
 # Feature Added - Dark and Light VS 2013 Theme
 
