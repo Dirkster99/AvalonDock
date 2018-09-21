@@ -76,7 +76,9 @@ The Docking Buttons are [defined in XAML](https://github.com/Dirkster99/AvalonDo
 - <a href="https://github.com/xceedsoftware/wpftoolkit/commit/24ecc09cf35e7095ad02d0beecfd5bafd83d0658">Commit from xceedsoftware/wpftoolkit for Version 3.4</a>
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/b6b8248cad226bc264855cdbd7e27b9c34303d71">Local Commit in master for Version 3.4</a>
 
-### Reapplied Fixes
+### Reapplied or New Fixes
+
+<b><a href="https://github.com/Dirkster99/AvalonDock/commit/79f3416ce520e74bba0371a0fb82c848fd3176c7">Fix for issue #1379 as suggested by RecursiveNerd</a></b>
 
 <b><a href="https://github.com/xceedsoftware/wpftoolkit/issues/1203">Fixed height of titles of floating windows #1203</a></b>
 
