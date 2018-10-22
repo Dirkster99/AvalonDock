@@ -118,66 +118,66 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Anchorable_AutoHide" xml:space="preserve">
-    <value>自动隐藏</value>
+    <value>Skrývat automaticky</value>
   </data>
   <data name="Anchorable_BtnAutoHide_Hint" xml:space="preserve">
-    <value>自动隐藏</value>
+    <value>Skrývat automaticky</value>
   </data>
   <data name="Anchorable_BtnClose_Hint" xml:space="preserve">
-    <value>隐藏</value>
+    <value>Skrýt</value>
   </data>
   <data name="Anchorable_CxMenu_Hint" xml:space="preserve">
-    <value>窗口位置</value>
+    <value>Pozice okna</value>
   </data>
   <data name="Anchorable_Dock" xml:space="preserve">
-    <value>停靠</value>
+    <value>Dokovat</value>
   </data>
   <data name="Anchorable_DockAsDocument" xml:space="preserve">
-    <value>停靠成标签式文档</value>
+    <value>Dokovat jako záložku</value>
   </data>
   <data name="Anchorable_Float" xml:space="preserve">
-    <value>漂浮</value>
+    <value>Změnit na plovoucí</value>
   </data>
   <data name="Anchorable_Hide" xml:space="preserve">
-    <value>隐藏</value>
+    <value>Skrýt</value>
   </data>
   <data name="Document_BtnPinned_Hint" xml:space="preserve">
-    <value>切换固定状态</value>
+    <value>Přepnout připnutí</value>
   </data>
   <data name="Document_Close" xml:space="preserve">
-    <value>关闭</value>
+    <value>Zavřít</value>
   </data>
   <data name="Document_CloseAll" xml:space="preserve">
-    <value>关闭所有</value>
+    <value>Zavřít vše</value>
   </data>
   <data name="Document_CloseAllButThis" xml:space="preserve">
-    <value>除此之外全部关闭</value>
+    <value>Zavřít vše kromě této záložky</value>
   </data>
   <data name="Document_CxMenu_Hint" xml:space="preserve">
-    <value>窗口位置</value>
+    <value>Pozice okna</value>
   </data>
   <data name="Document_DockAsDocument" xml:space="preserve">
-    <value>停靠成标签式文档</value>
+    <value>Dokovat jako záložku</value>
   </data>
   <data name="Document_Float" xml:space="preserve">
-    <value>漂浮</value>
+    <value>Změnit na plovoucí</value>
   </data>
   <data name="Document_MoveToNextTabGroup" xml:space="preserve">
-    <value>移到下一标签组</value>
+    <value>Přesunout do následující skupiny záložek</value>
   </data>
   <data name="Document_MoveToPreviousTabGroup" xml:space="preserve">
-    <value>移到上一标签组</value>
+    <value>Přesunout do předchozí skupiny záložek</value>
   </data>
   <data name="Document_NewHorizontalTabGroup" xml:space="preserve">
-    <value>新建水平标签组</value>
+    <value>Nová horizontální skupina záložek</value>
   </data>
   <data name="Document_NewVerticalTabGroup" xml:space="preserve">
-    <value>新建垂直标签组</value>
+    <value>Nová vertikální skupina záložek</value>
   </data>
   <data name="Window_Maximize" xml:space="preserve">
-    <value>最大化</value>
+    <value>Maximalizovat</value>
   </data>
   <data name="Window_Restore" xml:space="preserve">
-    <value>还原</value>
+    <value>Obnovit</value>
   </data>
 </root>
