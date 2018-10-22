@@ -28,8 +28,6 @@ PhotoShop and so forth. Here are some CodeProject articles:
 * [AvalonDock [2.0] Tutorial Part 4 - Integrating AvalonEdit Options](https://www.codeproject.com/Articles/570324/AvalonDock-Tutorial-Part-Integrating-AvalonE)
 * [AvalonDock [2.0] Tutorial Part 5 - Load/Save Layout with De-Referenced DockingManager](https://www.codeproject.com/Articles/719143/AvalonDock-Tutorial-Part-Load-Save-Layout)
 
-My editor [Edi](https://github.com/Dirkster99/Edi) is based on AvlonDock.
-
 This repository contains **additional bug fixes and a feature added** fork from:
 https://github.com/xceedsoftware/wpftoolkit
 
@@ -85,6 +83,12 @@ The Docking Buttons are [defined in XAML](https://github.com/Dirkster99/AvalonDo
 
 ### Reapplied or New Fixes
 
+<ul>
+<li><a href="https://github.com/xceedsoftware/wpftoolkit/pull/1396">Corrected localization in zh-Hans in Version 3.4.0.6</a><br/>
+<a href="https://github.com/xceedsoftware/wpftoolkit/pull/1383">Added Czech localization in Version 3.4.0.5</a><br/>
+<a href="https://github.com/Dirkster99/AvalonDock/commit/ef4d5c9e11470025ff7d5577cac1e32ef67c39bf">Commit @Dirkster99</a><br/>
+</li>
+</ul>
 <b><a href="https://github.com/Dirkster99/AvalonDock/commit/79f3416ce520e74bba0371a0fb82c848fd3176c7">Fix for issue #1379 as suggested by RecursiveNerd</a></b>
 
 <b><a href="https://github.com/xceedsoftware/wpftoolkit/issues/1203">Fixed height of titles of floating windows #1203</a></b>
