@@ -3,6 +3,10 @@
                     xmlns:reskeys="clr-namespace:Xceed.Wpf.AvalonDock.Themes.VS2013.Themes"
                     xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"                    
                     >
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/Menu/DarkBrushs.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+    
     <!-- Accent Keys -->
     <Color x:Key="{x:Static reskeys:ResourceKeys.ControlAccentColorKey}">#1ba1e2</Color>
 

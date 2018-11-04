@@ -28,6 +28,7 @@
                     >
         <ResourceDictionary.MergedDictionaries>
             <ResourceDictionary Source="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/OverlayButtons.xaml" />
+            <ResourceDictionary Source="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/Menu/MenuItem.xaml" />
         </ResourceDictionary.MergedDictionaries>
 
     <avalonDockConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
@@ -128,6 +129,15 @@
                                                                VerticalAlignment="Center"
                                                                Focusable="False"
                                                                Style="{StaticResource AvalonDockThemeVs2013ToolButtonStyle}">
+                                <avalonDockControls:DropDownButton.Resources>
+                                    <!--Selected color when the ComboBox is focused-->
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Yellow" />
+                                    <!--Selected color when the ComboBox is not focused-->
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Yellow" />
+
+                                    <!--selected text-->
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Yellow" />
+                                </avalonDockControls:DropDownButton.Resources>
                                 <avalonDockControls:DropDownButton.DropDownContextMenu>
                                     <avalonDockControls:ContextMenuEx ItemsSource="{Binding Model.ChildrenSorted, RelativeSource={RelativeSource TemplatedParent}}">
                                         <avalonDockControls:ContextMenuEx.ItemContainerStyle>
@@ -137,6 +147,11 @@
                                                 <Setter Property="IconTemplate" Value="{Binding Path=Root.Manager.IconContentTemplate}" />
                                                 <Setter Property="IconTemplateSelector" Value="{Binding Path=Root.Manager.IconContentTemplateSelector}" />
                                                 <Setter Property="Command" Value="{Binding Path=., Converter={StaticResource ActivateCommandLayoutItemFromLayoutModelConverter}}" />
+                                                
+                                                <!--
+                                                  Retemplate ControlTemplate of MenuItem to get rid of blue'ish highlighting colors on menu item
+                                                  https://stackoverflow.com/questions/34888636/change-background-color-of-menuitem-on-mouseover -->
+                                                <Setter Property="Template" Value="{StaticResource MLibMenuItem}" />
                                             </Style>
                                         </avalonDockControls:ContextMenuEx.ItemContainerStyle>
                                     </avalonDockControls:ContextMenuEx>
