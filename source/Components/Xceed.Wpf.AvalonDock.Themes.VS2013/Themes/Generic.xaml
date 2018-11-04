@@ -129,15 +129,6 @@
                                                                VerticalAlignment="Center"
                                                                Focusable="False"
                                                                Style="{StaticResource AvalonDockThemeVs2013ToolButtonStyle}">
-                                <avalonDockControls:DropDownButton.Resources>
-                                    <!--Selected color when the ComboBox is focused-->
-                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Yellow" />
-                                    <!--Selected color when the ComboBox is not focused-->
-                                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Yellow" />
-
-                                    <!--selected text-->
-                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Yellow" />
-                                </avalonDockControls:DropDownButton.Resources>
                                 <avalonDockControls:DropDownButton.DropDownContextMenu>
                                     <avalonDockControls:ContextMenuEx ItemsSource="{Binding Model.ChildrenSorted, RelativeSource={RelativeSource TemplatedParent}}">
                                         <avalonDockControls:ContextMenuEx.ItemContainerStyle>
