@@ -87,10 +87,10 @@ The Docking Buttons are [defined in XAML](https://github.com/Dirkster99/AvalonDo
 <li><a href="https://github.com/Dirkster99/AvalonDock/issues/9">Fixed Auto Hide Layoutanchorabeles to left, right, top, or bottom of DockingManager layout</a>&nbsp;<a href="https://github.com/Dirkster99/AvalonDock/commit/ece04af23ed04a5ad4d8f2277e96bc7c41042b2c">-&gt;</a></li>
 <li><a href="https://github.com/xceedsoftware/wpftoolkit/pull/1396">Corrected localization in zh-Hans in Version 3.4.0.6</a><br/>
 <a href="https://github.com/xceedsoftware/wpftoolkit/pull/1383">Added Czech localization in Version 3.4.0.5</a><br/>
-<a href="https://github.com/Dirkster99/AvalonDock/commit/ef4d5c9e11470025ff7d5577cac1e32ef67c39bf">Commit @Dirkster99</a><br/>
+<a href="https://github.com/Dirkster99/AvalonDock/commit/ef4d5c9e11470025ff7d5577cac1e32ef67c39bf">-&gt;</a><br/>
 </li>
+<li><b><a href="https://github.com/xceedsoftware/wpftoolkit/issues/1379">Fix for issue #1379 AvalonDockCrash in LayoutGridControl after Resize - ArgumentException as suggested by RecursiveNerd</a>&nbsp;<a href="https://github.com/Dirkster99/AvalonDock/commit/79f3416ce520e74bba0371a0fb82c848fd3176c7">-&gt;</a></b></li>
 </ul>
-<b><a href="https://github.com/Dirkster99/AvalonDock/commit/79f3416ce520e74bba0371a0fb82c848fd3176c7">Fix for issue #1379 as suggested by RecursiveNerd</a></b>
 
 <b><a href="https://github.com/xceedsoftware/wpftoolkit/issues/1203">Fixed height of titles of floating windows #1203</a></b>
 
