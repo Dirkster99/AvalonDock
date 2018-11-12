@@ -84,7 +84,7 @@ The Docking Buttons are [defined in XAML](https://github.com/Dirkster99/AvalonDo
 ### Reapplied or New Fixes
 
 <ul>
-<li><a href="https://github.com/Dirkster99/AvalonDock/issues/9">Fixed Auto Hide Layoutanchorabeles to left, right, top, or bottom of DockingManager layout</a><a href="https://github.com/Dirkster99/AvalonDock/commit/ece04af23ed04a5ad4d8f2277e96bc7c41042b2c">-&gt;</a><li>
+<li><a href="https://github.com/Dirkster99/AvalonDock/issues/9">Fixed Auto Hide Layoutanchorabeles to left, right, top, or bottom of DockingManager layout</a>&nbsp;<a href="https://github.com/Dirkster99/AvalonDock/commit/ece04af23ed04a5ad4d8f2277e96bc7c41042b2c">-&gt;</a></li>
 <li><a href="https://github.com/xceedsoftware/wpftoolkit/pull/1396">Corrected localization in zh-Hans in Version 3.4.0.6</a><br/>
 <a href="https://github.com/xceedsoftware/wpftoolkit/pull/1383">Added Czech localization in Version 3.4.0.5</a><br/>
 <a href="https://github.com/Dirkster99/AvalonDock/commit/ef4d5c9e11470025ff7d5577cac1e32ef67c39bf">Commit @Dirkster99</a><br/>
