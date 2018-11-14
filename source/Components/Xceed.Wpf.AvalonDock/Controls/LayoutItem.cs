@@ -89,20 +89,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       get
       {
-        if( _view == null )
+        if (_view == null)
         {
-          _view = new ContentPresenter();
+            _view = new ContentPresenter();
 
-          _view.SetBinding( ContentPresenter.ContentProperty, new Binding( "Content" ) { Source = LayoutElement } );
-          if( ( LayoutElement != null ) && ( LayoutElement.Root != null ) )
-          {
-            _view.SetBinding( ContentPresenter.ContentTemplateProperty, new Binding( "LayoutItemTemplate" ) { Source = LayoutElement.Root.Manager } );
-            _view.SetBinding( ContentPresenter.ContentTemplateSelectorProperty, new Binding( "LayoutItemTemplateSelector" ) { Source = LayoutElement.Root.Manager } );
-            if( LayoutElement.Root.Manager != null )
-            {
-              LayoutElement.Root.Manager.InternalAddLogicalChild( _view );
-            }
-          }
+            _view.SetBinding(ContentPresenter.ContentProperty, new Binding("Content") { Source = LayoutElement });
+            _view.SetBinding(ContentPresenter.ContentTemplateProperty, new Binding("LayoutItemTemplate") { Source = LayoutElement?.Root?.Manager });
+            _view.SetBinding(ContentPresenter.ContentTemplateSelectorProperty, new Binding("LayoutItemTemplateSelector") { Source = LayoutElement?.Root?.Manager });
+            LayoutElement?.Root?.Manager.InternalAddLogicalChild(_view);
         }
 
         return _view;
