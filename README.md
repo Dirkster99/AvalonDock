@@ -108,6 +108,8 @@ to also theme standard elements, such as, button and textblock etc.
 ### Reapplied or New Fixes
 
 <ul>
+<li><a href="https://github.com/xceedsoftware/wpftoolkit/issues/1424">Added resource file for AvalonDock for nl-BE</a>&nbsp;<a href="https://github.com/Dirkster99/AvalonDock/commit/6a796caa7270589cff9248e84cd8f60a03836f54">-&gt;</a></li>
+
 <li><a href="https://github.com/Dirkster99/AvalonDock/issues/9">Fixed Auto Hide Layoutanchorabeles to left, right, top, or bottom of DockingManager layout</a>&nbsp;<a href="https://github.com/Dirkster99/AvalonDock/commit/ece04af23ed04a5ad4d8f2277e96bc7c41042b2c">-&gt;</a></li>
 <li><a href="https://github.com/xceedsoftware/wpftoolkit/pull/1396">Corrected localization in zh-Hans in Version 3.4.0.6</a><br/>
 <a href="https://github.com/xceedsoftware/wpftoolkit/pull/1383">Added Czech localization in Version 3.4.0.5</a><br/>
