@@ -37,7 +37,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     private LayoutAnchorable _model;
     private HwndSource _internalHwndSource = null;
     private IntPtr parentWindowHandle;
-    private bool _internalHost_ContentRendered = false;
+    ////private bool _internalHost_ContentRendered = false;
     private ContentPresenter _internalHostPresenter = new ContentPresenter();
     private Grid _internalGrid = null;
     private AnchorSide _side;
