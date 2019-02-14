@@ -156,7 +156,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         Height = 0,
       } );
 
-      _internalHost_ContentRendered = false;
+////      _internalHost_ContentRendered = false;
       _internalHwndSource.ContentRendered += _internalHwndSource_ContentRendered;
       _internalHwndSource.RootVisual = _internalHostPresenter;
       AddLogicalChild( _internalHostPresenter );
@@ -280,7 +280,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private void _internalHwndSource_ContentRendered( object sender, EventArgs e )
     {
-      _internalHost_ContentRendered = true;
+////      _internalHost_ContentRendered = true;
     }
 
     private void _model_PropertyChanged( object sender, System.ComponentModel.PropertyChangedEventArgs e )
