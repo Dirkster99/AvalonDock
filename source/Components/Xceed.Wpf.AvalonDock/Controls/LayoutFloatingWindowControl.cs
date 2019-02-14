@@ -70,6 +70,16 @@ namespace Xceed.Wpf.AvalonDock.Controls
     #endregion
 
     #region Properties
+    /// <summary>
+    /// Gets/Sets the X,Y delta between the elemnt being dragged and the
+    /// mouse position. The value of this property is used during the drag
+    /// cycle to position the dragged item under the mouse pointer.
+    /// 
+    /// Set this property on intialization to ensure that
+    /// the delta between mouse and control being dragged
+    /// remains constant.
+    /// </summary>
+    internal Point DragDelta { get; set; }
 
     #region Model
 
@@ -454,8 +464,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
         var clientArea = Win32Helper.GetClientRect( windowHandle );
         var windowArea = Win32Helper.GetWindowRect( windowHandle );
 
-        Left = mousePosition.X - windowArea.Width / 2.0;
-        Top = mousePosition.Y - ( windowArea.Height - clientArea.Height ) / 2.0;
+        // BugFix Issue #6
+        // This code is initializes the drag when content (document or toolwindow) is dragged
+        // A second chance back up plan if DragDelta is not set
+        if (DragDelta == default(Point))
+            DragDelta = new Point(3, 3);
+                
+        Left = mousePosition.X - DragDelta.X;                 // BugFix Issue #6
+        Top = mousePosition.Y - DragDelta.Y;
         _attachDrag = false;
 
         IntPtr lParam = new IntPtr( ( ( int )mousePosition.X & ( int )0xFFFF ) | ( ( ( int )mousePosition.Y ) << 16 ) );
