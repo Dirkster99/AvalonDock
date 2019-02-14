@@ -3022,8 +3022,8 @@ namespace Xceed.Wpf.AvalonDock
 
       var layoutItem = new LayoutAnchorableItem();
       layoutItem.Attach( contentToAttach );
-      ApplyStyleToLayoutItem( layoutItem );
       _layoutItems.Add( layoutItem );
+      ApplyStyleToLayoutItem( layoutItem );
 
       if( contentToAttach != null &&
           contentToAttach.Content != null &&
@@ -3047,8 +3047,8 @@ namespace Xceed.Wpf.AvalonDock
 
       var layoutItem = new LayoutDocumentItem();
       layoutItem.Attach( contentToAttach );
-      ApplyStyleToLayoutItem( layoutItem );
       _layoutItems.Add( layoutItem );
+      ApplyStyleToLayoutItem( layoutItem );
 
       if( contentToAttach != null &&
           contentToAttach.Content != null &&
