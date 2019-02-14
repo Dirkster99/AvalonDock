@@ -166,6 +166,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         root.FloatingWindows.Remove( _model );
       }
 
+      SetBinding(VisibilityProperty, string.Empty);
+
       _model.PropertyChanged -= new System.ComponentModel.PropertyChangedEventHandler( _model_PropertyChanged );
     }
 
