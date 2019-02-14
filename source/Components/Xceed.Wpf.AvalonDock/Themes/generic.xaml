@@ -1011,10 +1011,10 @@
                                 BorderBrush="{TemplateBinding BorderBrush}">
                           <Grid Margin="3">
                             <Grid.RowDefinitions>
-                              <RowDefinition Height="16" />
+                              <RowDefinition Height="Auto" MinHeight="16" /><!-- https://github.com/xceedsoftware/wpftoolkit/issues/1203 -->
                               <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <Grid>
+                            <Grid UseLayoutRounding="True">
                               <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
@@ -1112,10 +1112,10 @@
                                 BorderBrush="{TemplateBinding BorderBrush}">
                           <Grid Margin="3">
                             <Grid.RowDefinitions>
-                              <RowDefinition Height="16" />
+                              <RowDefinition Height="Auto" MinHeight="16" /> <!-- https://github.com/xceedsoftware/wpftoolkit/issues/1203 -->
                               <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <Grid>
+                            <Grid UseLayoutRounding="True">
                               <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
@@ -1248,9 +1248,9 @@
                                 BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}">
                           <Grid Margin="5">
                             <Grid.RowDefinitions>
-                              <RowDefinition Height="54" />
+                              <RowDefinition MinHeight="54" />
                               <RowDefinition Height="*" />
-                              <RowDefinition Height="42" />
+                              <RowDefinition MinHeight="42" />
                             </Grid.RowDefinitions>
 
                             <Grid>
