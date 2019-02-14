@@ -259,6 +259,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="Properties\Resources.nl-BE.Designer.cs">
+      <DependentUpon>Resources.nl-BE.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Themes\DictionaryTheme.cs" />
     <Compile Include="Themes\GenericTheme.cs" />
     <Compile Include="Themes\Theme.cs" />
@@ -322,6 +327,11 @@
     <EmbeddedResource Include="Properties\Resources.cs-CZ.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.cs-CZ.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.nl-BE.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.nl-BE.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
