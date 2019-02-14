@@ -415,7 +415,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
         else
         {
-          prevChildModel.DockWidth = new GridLength( prevChildModel.DockWidth.Value + delta, GridUnitType.Pixel );
+          var width = ( prevChildModel.DockWidth.IsAuto ) ? prevChildActualSize.Width : prevChildModel.DockWidth.Value;
+          var resizedWidth = width + delta;
+          prevChildModel.DockWidth = new GridLength(double.IsNaN(resizedWidth) ?  width : resizedWidth, GridUnitType.Pixel );
         }
 
         if( nextChildModel.DockWidth.IsStar )
@@ -424,7 +426,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
         else
         {
-          nextChildModel.DockWidth = new GridLength( nextChildModel.DockWidth.Value - delta, GridUnitType.Pixel );
+          var width = ( nextChildModel.DockWidth.IsAuto ) ? nextChildActualSize.Width : nextChildModel.DockWidth.Value;
+          var resizedWidth = width - delta;
+          nextChildModel.DockWidth = new GridLength(double.IsNaN(resizedWidth) ? width : resizedWidth, GridUnitType.Pixel);
         }
       }
       else
@@ -435,7 +439,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
         else
         {
-          prevChildModel.DockHeight = new GridLength( prevChildModel.DockHeight.Value + delta, GridUnitType.Pixel );
+          var height = ( prevChildModel.DockHeight.IsAuto ) ? prevChildActualSize.Height : prevChildModel.DockHeight.Value;
+          var resizedHeight = height + delta;
+          prevChildModel.DockHeight = new GridLength(double.IsNaN(resizedHeight) ? height : resizedHeight, GridUnitType.Pixel );
         }
 
         if( nextChildModel.DockHeight.IsStar )
@@ -444,7 +450,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
         else
         {
-          nextChildModel.DockHeight = new GridLength( nextChildModel.DockHeight.Value - delta, GridUnitType.Pixel );
+          var height = ( nextChildModel.DockHeight.IsAuto ) ? nextChildActualSize.Height : nextChildModel.DockHeight.Value;
+          var resizedHeight = height - delta;
+          nextChildModel.DockHeight = new GridLength(double.IsNaN(resizedHeight) ? height : resizedHeight, GridUnitType.Pixel );
         }
       }
 
