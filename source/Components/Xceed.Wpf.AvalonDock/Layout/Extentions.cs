@@ -85,41 +85,34 @@ namespace Xceed.Wpf.AvalonDock.Layout
       return container is T || container is S;
     }
 
-        public static AnchorSide GetSide(this ILayoutElement element)
+    public static AnchorSide GetSide( this ILayoutElement element )
+    {
+      var parentContainer = element.Parent as ILayoutOrientableGroup;
+      if( parentContainer != null )
+      {
+        var layoutPanel = parentContainer as LayoutPanel;
+        if( layoutPanel == null )
         {
-            var parentContainer = element.Parent as ILayoutOrientableGroup;
-            if (parentContainer != null)
-            {
-                if (!parentContainer.ContainsChildOfType<LayoutDocumentPaneGroup, LayoutDocumentPane>())
-                    return GetSide(parentContainer);
-
-                foreach (var childElement in parentContainer.Children)
-                {
-                    if (childElement == element ||
-                        childElement.Descendents().Contains(element))
-                        return parentContainer.Orientation == System.Windows.Controls.Orientation.Horizontal ?
-                            AnchorSide.Left : AnchorSide.Top;
-
-                    var childElementAsContainer = childElement as ILayoutContainer;
-                    if (childElementAsContainer != null &&
-                        (childElementAsContainer.IsOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>() ||
-                         childElementAsContainer.ContainsChildOfType<LayoutDocumentPane, LayoutDocumentPaneGroup>()))
-                    {
-                        return parentContainer.Orientation == System.Windows.Controls.Orientation.Horizontal ?
-                            AnchorSide.Right : AnchorSide.Bottom;
-                    }
-                }
-            }
-
-            Debug.Fail("Unable to find the side for an element, possible layout problem!");
-            return AnchorSide.Right;
+          layoutPanel = parentContainer.FindParent<LayoutPanel>();
         }
 
-        #endregion
+        if( (layoutPanel != null) && ( layoutPanel.Children.Count > 0 ) )
+        {
+          if( layoutPanel.Orientation == System.Windows.Controls.Orientation.Horizontal )
+            return ( layoutPanel.Children[ 0 ].Equals(element) || layoutPanel.Children[ 0 ].Descendents().Contains( element ) ) ? AnchorSide.Left : AnchorSide.Right;
+          return ( layoutPanel.Children[ 0 ].Equals( element ) || layoutPanel.Children[ 0 ].Descendents().Contains( element ) ) ? AnchorSide.Top : AnchorSide.Bottom;
+        }
+      }
 
-        #region Internal Methods
+      Debug.Fail( "Unable to find the side for an element, possible layout problem!" );
+      return AnchorSide.Right;
+    }
 
-        internal static void KeepInsideNearestMonitor( this ILayoutElementForFloatingWindow paneInsideFloatingWindow )
+    #endregion
+
+    #region Internal Methods
+
+    internal static void KeepInsideNearestMonitor( this ILayoutElementForFloatingWindow paneInsideFloatingWindow )
     {
       Win32Helper.RECT r = new Win32Helper.RECT();
       r.Left = ( int )paneInsideFloatingWindow.FloatingLeft;

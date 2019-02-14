@@ -37,7 +37,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     private LayoutAnchorable _model;
     private HwndSource _internalHwndSource = null;
     private IntPtr parentWindowHandle;
-    private bool _internalHost_ContentRendered = false;
+    ////private bool _internalHost_ContentRendered = false;
     private ContentPresenter _internalHostPresenter = new ContentPresenter();
     private Grid _internalGrid = null;
     private AnchorSide _side;
@@ -156,22 +156,12 @@ namespace Xceed.Wpf.AvalonDock.Controls
         Height = 0,
       } );
 
-      _internalHost_ContentRendered = false;
+////      _internalHost_ContentRendered = false;
       _internalHwndSource.ContentRendered += _internalHwndSource_ContentRendered;
       _internalHwndSource.RootVisual = _internalHostPresenter;
       AddLogicalChild( _internalHostPresenter );
       Win32Helper.BringWindowToTop( _internalHwndSource.Handle );
       return new HandleRef( this, _internalHwndSource.Handle );
-    }
-
-    protected override IntPtr WndProc( IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled )
-    {
-      if( msg == Win32Helper.WM_WINDOWPOSCHANGING )
-      {
-        if( _internalHost_ContentRendered )
-          Win32Helper.SetWindowPos( _internalHwndSource.Handle, Win32Helper.HWND_TOP, 0, 0, 0, 0, Win32Helper.SetWindowPosFlags.IgnoreMove | Win32Helper.SetWindowPosFlags.IgnoreResize );
-      }
-      return base.WndProc( hwnd, msg, wParam, lParam, ref handled );
     }
 
     protected override void DestroyWindowCore( System.Runtime.InteropServices.HandleRef hwnd )
@@ -182,11 +172,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
         _internalHwndSource.Dispose();
         _internalHwndSource = null;
       }
-    }
-
-    public override void OnApplyTemplate()
-    {
-      base.OnApplyTemplate();
     }
 
     protected override bool HasFocusWithinCore()
@@ -243,6 +228,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       Visibility = System.Windows.Visibility.Visible;
       InvalidateMeasure();
       UpdateWindowPos();
+      Win32Helper.BringWindowToTop( _internalHwndSource.Handle );
     }
 
     internal void Hide()
@@ -294,7 +280,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private void _internalHwndSource_ContentRendered( object sender, EventArgs e )
     {
-      _internalHost_ContentRendered = true;
+////      _internalHost_ContentRendered = true;
     }
 
     private void _model_PropertyChanged( object sender, System.ComponentModel.PropertyChangedEventArgs e )

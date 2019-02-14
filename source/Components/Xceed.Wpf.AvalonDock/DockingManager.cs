@@ -1983,6 +1983,34 @@ namespace Xceed.Wpf.AvalonDock
       return _layoutItems.FirstOrDefault( item => item.LayoutElement == content );
     }
 
+    public LayoutFloatingWindowControl CreateFloatingWindow( LayoutContent contentModel, bool isContentImmutable )
+    {
+      LayoutFloatingWindowControl lfwc = null;
+
+      if( contentModel is LayoutAnchorable )
+      {
+        var parent = contentModel.Parent as ILayoutPane;
+        if( parent == null )
+        {
+          var pane = new LayoutAnchorablePane( contentModel as LayoutAnchorable )
+          {
+            FloatingTop = contentModel.FloatingTop,
+            FloatingLeft = contentModel.FloatingLeft,
+            FloatingWidth = contentModel.FloatingWidth,
+            FloatingHeight = contentModel.FloatingHeight
+          };
+          lfwc = this.CreateFloatingWindowForLayoutAnchorableWithoutParent( pane, isContentImmutable );
+        }
+      }
+
+      if( lfwc == null )
+      {
+        lfwc = this.CreateFloatingWindowCore( contentModel, isContentImmutable );
+      }
+
+      return lfwc;
+    }
+
     #endregion
 
     #region Internal Methods
@@ -2046,7 +2074,12 @@ namespace Xceed.Wpf.AvalonDock
         }
 
         newFW.ShowInTaskbar = false;
-        newFW.Show();
+
+        Dispatcher.BeginInvoke( new Action( () =>
+        {
+           newFW.Show();
+        } ), DispatcherPriority.Send );
+
         // Do not set the WindowState before showing or it will be lost
         if( paneForExtensions != null && paneForExtensions.IsMaximized )
         {
@@ -2126,208 +2159,28 @@ namespace Xceed.Wpf.AvalonDock
       return _autohideArea;
     }
 
-    internal void StartDraggingFloatingWindowForContent( LayoutContent contentModel,
-                                                         bool startDrag = true ,
-                                                         Point dragDelta = default(Point))
+    internal void StartDraggingFloatingWindowForContent( LayoutContent contentModel, bool startDrag = true )
     {
-      if( !contentModel.CanFloat )
-        return;
-      var contentModelAsAnchorable = contentModel as LayoutAnchorable;
-      if( contentModelAsAnchorable != null &&
-          contentModelAsAnchorable.IsAutoHidden )
-        contentModelAsAnchorable.ToggleAutoHide();
-
-      var parentPane = contentModel.Parent as ILayoutPane;
-      var parentPaneAsPositionableElement = contentModel.Parent as ILayoutPositionableElement;
-      var parentPaneAsWithActualSize = contentModel.Parent as ILayoutPositionableElementWithActualSize;
-      var contentModelParentChildrenIndex = parentPane.Children.ToList().IndexOf( contentModel );
-
-      if( contentModel.FindParent<LayoutFloatingWindow>() == null )
+      var fwc = this.CreateFloatingWindow( contentModel, false );
+      if( fwc != null )
       {
-        ( ( ILayoutPreviousContainer )contentModel ).PreviousContainer = parentPane;
-        contentModel.PreviousContainerIndex = contentModelParentChildrenIndex;
+        Dispatcher.BeginInvoke( new Action( () =>
+        {
+          if( startDrag )
+            fwc.AttachDrag();
+          fwc.Show();
+        } ), DispatcherPriority.Send );
       }
-
-      parentPane.RemoveChildAt( contentModelParentChildrenIndex );
-
-      double fwWidth = contentModel.FloatingWidth;
-      double fwHeight = contentModel.FloatingHeight;
-
-      if( fwWidth == 0.0 )
-        fwWidth = parentPaneAsPositionableElement.FloatingWidth;
-      if( fwHeight == 0.0 )
-        fwHeight = parentPaneAsPositionableElement.FloatingHeight;
-
-      if( fwWidth == 0.0 )
-        fwWidth = parentPaneAsWithActualSize.ActualWidth + 10;      //10 includes BorderThickness and Margins inside LayoutDocumentFloatingWindowControl.
-      if( fwHeight == 0.0 )
-        fwHeight = parentPaneAsWithActualSize.ActualHeight + 10;    //10 includes BorderThickness and Margins inside LayoutDocumentFloatingWindowControl.
-
-      LayoutFloatingWindow fw;
-      LayoutFloatingWindowControl fwc;
-      if( contentModel is LayoutAnchorable )
-      {
-        var anchorableContent = contentModel as LayoutAnchorable;
-        fw = new LayoutAnchorableFloatingWindow()
-        {
-          RootPanel = new LayoutAnchorablePaneGroup(
-                new LayoutAnchorablePane( anchorableContent )
-                {
-                  DockWidth = parentPaneAsPositionableElement.DockWidth,
-                  DockHeight = parentPaneAsPositionableElement.DockHeight,
-                  DockMinHeight = parentPaneAsPositionableElement.DockMinHeight,
-                  DockMinWidth = parentPaneAsPositionableElement.DockMinWidth,
-                  FloatingLeft = parentPaneAsPositionableElement.FloatingLeft,
-                  FloatingTop = parentPaneAsPositionableElement.FloatingTop,
-                  FloatingWidth = parentPaneAsPositionableElement.FloatingWidth,
-                  FloatingHeight = parentPaneAsPositionableElement.FloatingHeight,
-                } )
-        };
-
-        Layout.FloatingWindows.Add( fw );
-
-        fwc = new LayoutAnchorableFloatingWindowControl(
-            fw as LayoutAnchorableFloatingWindow )
-        {
-          Width = fwWidth,
-          Height = fwHeight,
-          Left = contentModel.FloatingLeft,
-          Top = contentModel.FloatingTop,
-          DragDelta = dragDelta             // Setup initial tool window drag delta
-        };
-      }
-      else
-      {
-        var anchorableDocument = contentModel as LayoutDocument;
-        fw = new LayoutDocumentFloatingWindow()
-        {
-          RootDocument = anchorableDocument
-        };
-
-        Layout.FloatingWindows.Add( fw );
-
-        fwc = new LayoutDocumentFloatingWindowControl(
-            fw as LayoutDocumentFloatingWindow )
-        {
-          Width = fwWidth,
-          Height = fwHeight,
-          Left = contentModel.FloatingLeft,
-          Top = contentModel.FloatingTop,
-          DragDelta = dragDelta           // Setup initial document window drag delta
-        };
-      }
-
-
-      //fwc.Owner = Window.GetWindow(this);
-      //fwc.SetParentToMainWindowOf(this);
-
-
-      _fwList.Add( fwc );
-
-      Layout.CollectGarbage();
-
-      UpdateLayout();
-
-      Dispatcher.BeginInvoke( new Action( () =>
-      {
-        if( startDrag )
-          fwc.AttachDrag();
-        fwc.Show();
-      } ), DispatcherPriority.Send );
     }
 
-    internal void StartDraggingFloatingWindowForPane( LayoutAnchorablePane paneModel,
-                                                      Point dragDelta)
+    internal void StartDraggingFloatingWindowForPane( LayoutAnchorablePane paneModel )
     {
-      if( paneModel.Children.Any( c => !c.CanFloat ) )
-        return;
-      var paneAsPositionableElement = paneModel as ILayoutPositionableElement;
-      var paneAsWithActualSize = paneModel as ILayoutPositionableElementWithActualSize;
-
-      double fwWidth = paneAsPositionableElement.FloatingWidth;
-      double fwHeight = paneAsPositionableElement.FloatingHeight;
-      double fwLeft = paneAsPositionableElement.FloatingLeft;
-      double fwTop = paneAsPositionableElement.FloatingTop;
-
-      if( fwWidth == 0.0 )
-        fwWidth = paneAsWithActualSize.ActualWidth + 10;       //10 includes BorderThickness and Margins inside LayoutAnchorableFloatingWindowControl.
-      if( fwHeight == 0.0 )
-        fwHeight = paneAsWithActualSize.ActualHeight + 10;   //10 includes BorderThickness and Margins inside LayoutAnchorableFloatingWindowControl.
-
-      var destPane = new LayoutAnchorablePane()
+      var fwc = this.CreateFloatingWindowForLayoutAnchorableWithoutParent( paneModel, false );
+      if( fwc != null )
       {
-        DockWidth = paneAsPositionableElement.DockWidth,
-        DockHeight = paneAsPositionableElement.DockHeight,
-        DockMinHeight = paneAsPositionableElement.DockMinHeight,
-        DockMinWidth = paneAsPositionableElement.DockMinWidth,
-        FloatingLeft = paneAsPositionableElement.FloatingLeft,
-        FloatingTop = paneAsPositionableElement.FloatingTop,
-        FloatingWidth = paneAsPositionableElement.FloatingWidth,
-        FloatingHeight = paneAsPositionableElement.FloatingHeight,
-      };
-
-      bool savePreviousContainer = paneModel.FindParent<LayoutFloatingWindow>() == null;
-      int currentSelectedContentIndex = paneModel.SelectedContentIndex;
-      while( paneModel.Children.Count > 0 )
-      {
-        var contentModel = paneModel.Children[ paneModel.Children.Count - 1 ] as LayoutAnchorable;
-
-        if( savePreviousContainer )
-        {
-          var contentModelAsPreviousContainer = contentModel as ILayoutPreviousContainer;
-          contentModelAsPreviousContainer.PreviousContainer = paneModel;
-          contentModel.PreviousContainerIndex = paneModel.Children.Count - 1;
-        }
-
-        paneModel.RemoveChildAt( paneModel.Children.Count - 1 );
-        destPane.Children.Insert( 0, contentModel );
+        fwc.AttachDrag();
+        fwc.Show();
       }
-
-      if( destPane.Children.Count > 0 )
-      {
-        destPane.SelectedContentIndex = currentSelectedContentIndex;
-      }
-
-
-      LayoutFloatingWindow fw;
-      LayoutFloatingWindowControl fwc;
-      fw = new LayoutAnchorableFloatingWindow()
-      {
-        RootPanel = new LayoutAnchorablePaneGroup(
-              destPane )
-        {
-          DockHeight = destPane.DockHeight,
-          DockWidth = destPane.DockWidth,
-          DockMinHeight = destPane.DockMinHeight,
-          DockMinWidth = destPane.DockMinWidth,
-        }
-      };
-
-      Layout.FloatingWindows.Add( fw );
-
-      fwc = new LayoutAnchorableFloatingWindowControl(
-          fw as LayoutAnchorableFloatingWindow )
-      {
-        Width = fwWidth,
-        Height = fwHeight,
-        DragDelta = dragDelta
-      };
-
-
-
-      //fwc.Owner = Window.GetWindow(this);
-      //fwc.SetParentToMainWindowOf(this);
-
-
-      _fwList.Add( fwc );
-
-      Layout.CollectGarbage();
-
-      InvalidateArrange();
-
-      fwc.AttachDrag();
-      fwc.Show();
-
     }
 
     internal IEnumerable<LayoutFloatingWindowControl> GetFloatingWindowsByZOrder()
@@ -2520,7 +2373,6 @@ namespace Xceed.Wpf.AvalonDock
 
     private void DockingManager_Unloaded( object sender, RoutedEventArgs e )
     {
-
       if( !DesignerProperties.GetIsInDesignMode( this ) )
       {
         if( _autoHideWindowManager != null )
@@ -2529,7 +2381,9 @@ namespace Xceed.Wpf.AvalonDock
         }
 
         if( AutoHideWindow != null )
+        {
           AutoHideWindow.Dispose();
+        }
 
         foreach( var fw in _fwList.ToArray() )
         {
@@ -2538,6 +2392,7 @@ namespace Xceed.Wpf.AvalonDock
           fw.KeepContentVisibleOnClose = true;
           fw.Close();
         }
+         _fwList.Clear();
 
         DestroyOverlayWindow();
         FocusElementManager.FinalizeFocusManagement( this );
@@ -2552,7 +2407,9 @@ namespace Xceed.Wpf.AvalonDock
         _autoHideWindowManager = new AutoHideWindowManager( this );
 
       if( AutoHideWindow != null )
+      {
         AutoHideWindow.Dispose();
+      }
 
       SetAutoHideWindow( new LayoutAutoHideWindowControl() );
     }
@@ -3165,8 +3022,8 @@ namespace Xceed.Wpf.AvalonDock
 
       var layoutItem = new LayoutAnchorableItem();
       layoutItem.Attach( contentToAttach );
-      _layoutItems.Add( layoutItem );           // #1430
-      ApplyStyleToLayoutItem( layoutItem );    // #1430
+      _layoutItems.Add( layoutItem );
+      ApplyStyleToLayoutItem( layoutItem );
 
       if( contentToAttach != null &&
           contentToAttach.Content != null &&
@@ -3190,8 +3047,8 @@ namespace Xceed.Wpf.AvalonDock
 
       var layoutItem = new LayoutDocumentItem();
       layoutItem.Attach( contentToAttach );
-      _layoutItems.Add( layoutItem );          // #1430
-      ApplyStyleToLayoutItem( layoutItem );   // #1430
+      _layoutItems.Add( layoutItem );
+      ApplyStyleToLayoutItem( layoutItem );
 
       if( contentToAttach != null &&
           contentToAttach.Content != null &&
@@ -3215,6 +3072,199 @@ namespace Xceed.Wpf.AvalonDock
 
       _navigatorWindow.ShowDialog();
       _navigatorWindow = null;
+    }
+
+    private LayoutFloatingWindowControl CreateFloatingWindowForLayoutAnchorableWithoutParent( LayoutAnchorablePane paneModel, bool isContentImmutable )
+    {
+      if( paneModel.Children.Any( c => !c.CanFloat ) )
+        return null;
+      var paneAsPositionableElement = paneModel as ILayoutPositionableElement;
+      var paneAsWithActualSize = paneModel as ILayoutPositionableElementWithActualSize;
+
+      double fwWidth = paneAsPositionableElement.FloatingWidth;
+      double fwHeight = paneAsPositionableElement.FloatingHeight;
+      double fwLeft = paneAsPositionableElement.FloatingLeft;
+      double fwTop = paneAsPositionableElement.FloatingTop;
+
+      if( fwWidth == 0.0 )
+        fwWidth = paneAsWithActualSize.ActualWidth + 10;       //10 includes BorderThickness and Margins inside LayoutAnchorableFloatingWindowControl.
+      if( fwHeight == 0.0 )
+        fwHeight = paneAsWithActualSize.ActualHeight + 10;   //10 includes BorderThickness and Margins inside LayoutAnchorableFloatingWindowControl.
+
+      var destPane = new LayoutAnchorablePane()
+      {
+        DockWidth = paneAsPositionableElement.DockWidth,
+        DockHeight = paneAsPositionableElement.DockHeight,
+        DockMinHeight = paneAsPositionableElement.DockMinHeight,
+        DockMinWidth = paneAsPositionableElement.DockMinWidth,
+        FloatingLeft = paneAsPositionableElement.FloatingLeft,
+        FloatingTop = paneAsPositionableElement.FloatingTop,
+        FloatingWidth = paneAsPositionableElement.FloatingWidth,
+        FloatingHeight = paneAsPositionableElement.FloatingHeight,
+      };
+
+      bool savePreviousContainer = paneModel.FindParent<LayoutFloatingWindow>() == null;
+      int currentSelectedContentIndex = paneModel.SelectedContentIndex;
+      while( paneModel.Children.Count > 0 )
+      {
+        var contentModel = paneModel.Children[ paneModel.Children.Count - 1 ] as LayoutAnchorable;
+
+        if( savePreviousContainer )
+        {
+          var contentModelAsPreviousContainer = contentModel as ILayoutPreviousContainer;
+          contentModelAsPreviousContainer.PreviousContainer = paneModel;
+          contentModel.PreviousContainerIndex = paneModel.Children.Count - 1;
+        }
+
+        paneModel.RemoveChildAt( paneModel.Children.Count - 1 );
+        destPane.Children.Insert( 0, contentModel );
+      }
+
+      if( destPane.Children.Count > 0 )
+      {
+        destPane.SelectedContentIndex = currentSelectedContentIndex;
+      }
+
+
+      LayoutFloatingWindow fw;
+      LayoutFloatingWindowControl fwc;
+      fw = new LayoutAnchorableFloatingWindow()
+      {
+        RootPanel = new LayoutAnchorablePaneGroup(
+              destPane )
+        {
+          DockHeight = destPane.DockHeight,
+          DockWidth = destPane.DockWidth,
+          DockMinHeight = destPane.DockMinHeight,
+          DockMinWidth = destPane.DockMinWidth,
+        }
+      };
+
+      Layout.FloatingWindows.Add( fw );
+
+      fwc = new LayoutAnchorableFloatingWindowControl(
+          fw as LayoutAnchorableFloatingWindow, isContentImmutable )
+      {
+        Width = fwWidth,
+        Height = fwHeight,
+        Top = fwTop,
+        Left = fwLeft
+      };
+
+
+
+      //fwc.Owner = Window.GetWindow(this);
+      //fwc.SetParentToMainWindowOf(this);
+
+
+      _fwList.Add( fwc );
+
+      Layout.CollectGarbage();
+
+      InvalidateArrange();
+
+      return fwc;
+    }
+
+    private LayoutFloatingWindowControl CreateFloatingWindowCore( LayoutContent contentModel, bool isContentImmutable )
+    {
+      if( !contentModel.CanFloat )
+        return null;
+      var contentModelAsAnchorable = contentModel as LayoutAnchorable;
+      if( contentModelAsAnchorable != null &&
+          contentModelAsAnchorable.IsAutoHidden )
+        contentModelAsAnchorable.ToggleAutoHide();
+
+      var parentPane = contentModel.Parent as ILayoutPane;
+      var parentPaneAsPositionableElement = contentModel.Parent as ILayoutPositionableElement;
+      var parentPaneAsWithActualSize = contentModel.Parent as ILayoutPositionableElementWithActualSize;
+      var contentModelParentChildrenIndex = parentPane.Children.ToList().IndexOf( contentModel );
+
+      if( contentModel.FindParent<LayoutFloatingWindow>() == null )
+      {
+        ( (ILayoutPreviousContainer)contentModel ).PreviousContainer = parentPane;
+        contentModel.PreviousContainerIndex = contentModelParentChildrenIndex;
+      }
+
+      parentPane.RemoveChildAt( contentModelParentChildrenIndex );
+
+      double fwWidth = contentModel.FloatingWidth;
+      double fwHeight = contentModel.FloatingHeight;
+
+      if( fwWidth == 0.0 )
+        fwWidth = parentPaneAsPositionableElement.FloatingWidth;
+      if( fwHeight == 0.0 )
+        fwHeight = parentPaneAsPositionableElement.FloatingHeight;
+
+      if( fwWidth == 0.0 )
+        fwWidth = parentPaneAsWithActualSize.ActualWidth + 10;      //10 includes BorderThickness and Margins inside LayoutDocumentFloatingWindowControl.
+      if( fwHeight == 0.0 )
+        fwHeight = parentPaneAsWithActualSize.ActualHeight + 10;    //10 includes BorderThickness and Margins inside LayoutDocumentFloatingWindowControl.
+
+      LayoutFloatingWindow fw;
+      LayoutFloatingWindowControl fwc;
+      if( contentModel is LayoutAnchorable )
+      {
+        var anchorableContent = contentModel as LayoutAnchorable;
+        fw = new LayoutAnchorableFloatingWindow()
+        {
+          RootPanel = new LayoutAnchorablePaneGroup(
+                new LayoutAnchorablePane( anchorableContent )
+                {
+                  DockWidth = parentPaneAsPositionableElement.DockWidth,
+                  DockHeight = parentPaneAsPositionableElement.DockHeight,
+                  DockMinHeight = parentPaneAsPositionableElement.DockMinHeight,
+                  DockMinWidth = parentPaneAsPositionableElement.DockMinWidth,
+                  FloatingLeft = parentPaneAsPositionableElement.FloatingLeft,
+                  FloatingTop = parentPaneAsPositionableElement.FloatingTop,
+                  FloatingWidth = parentPaneAsPositionableElement.FloatingWidth,
+                  FloatingHeight = parentPaneAsPositionableElement.FloatingHeight,
+                } )
+        };
+
+        Layout.FloatingWindows.Add( fw );
+
+        fwc = new LayoutAnchorableFloatingWindowControl(
+            fw as LayoutAnchorableFloatingWindow, isContentImmutable )
+        {
+          Width = fwWidth,
+          Height = fwHeight,
+          Left = contentModel.FloatingLeft,
+          Top = contentModel.FloatingTop
+        };
+      }
+      else
+      {
+        var anchorableDocument = contentModel as LayoutDocument;
+        fw = new LayoutDocumentFloatingWindow()
+        {
+          RootDocument = anchorableDocument
+        };
+
+        Layout.FloatingWindows.Add( fw );
+
+        fwc = new LayoutDocumentFloatingWindowControl(
+            fw as LayoutDocumentFloatingWindow, isContentImmutable )
+        {
+          Width = fwWidth,
+          Height = fwHeight,
+          Left = contentModel.FloatingLeft,
+          Top = contentModel.FloatingTop
+        };
+      }
+
+
+      //fwc.Owner = Window.GetWindow(this);
+      //fwc.SetParentToMainWindowOf(this);
+
+
+      _fwList.Add( fwc );
+
+      Layout.CollectGarbage();
+
+      UpdateLayout();
+
+      return fwc;
     }
 
     #endregion

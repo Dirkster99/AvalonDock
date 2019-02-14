@@ -28,7 +28,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private bool _isMouseDown = false;
     private static LayoutAnchorableTabItem _draggingItem = null;
-    private static bool _cancelMouseLeave = false;
 
     #endregion
 
@@ -147,10 +146,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
         _isMouseDown = false;
         _draggingItem = null;
       }
-      else
-      {
-        _cancelMouseLeave = false;
-      }
     }
 
     protected override void OnMouseLeftButtonUp( System.Windows.Input.MouseButtonEventArgs e )
@@ -168,23 +163,20 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       if( _isMouseDown && e.LeftButton == MouseButtonState.Pressed )
       {
-        // drag the item if the mouse leave is not canceled.
-        // Mouse leave should be canceled when selecting a new tab to prevent automatic undock when Panel size is Auto.
-        _draggingItem = !_cancelMouseLeave ? this : null;
+        _draggingItem = this;
       }
 
       _isMouseDown = false;
-      _cancelMouseLeave = false;
     }
 
     protected override void OnMouseEnter( MouseEventArgs e )
     {
       base.OnMouseEnter( e );
 
-            if (_draggingItem != null &&
-                _draggingItem != this &&                   // Fix #1354 https://github.com/xceedsoftware/wpftoolkit/issues/1354
-                e.LeftButton == MouseButtonState.Pressed)
-            {
+      if( _draggingItem != null
+          && _draggingItem != this
+          && e.LeftButton == MouseButtonState.Pressed )
+      {
         var model = Model;
         var container = model.Parent as ILayoutContainer;
         var containerPane = model.Parent as ILayoutPane;
@@ -222,11 +214,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       _draggingItem = null;
     }
-    internal static void CancelMouseLeave()
-    {
-      _cancelMouseLeave = true;
-    }
 
-  #endregion
-}
+    #endregion
+  }
 }

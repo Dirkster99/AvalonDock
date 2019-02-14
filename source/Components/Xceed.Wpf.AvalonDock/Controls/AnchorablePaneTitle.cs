@@ -153,20 +153,23 @@ namespace Xceed.Wpf.AvalonDock.Controls
           var paneModel = pane.Model as LayoutAnchorablePane;
           var manager = paneModel.Root.Manager;
 
-          // Get psotion of this visual on screen
-          var pos = this.PointToScreen(new Point(0, 0));
-          
-          // Transform screen point to WPF device independent point
-          PresentationSource source = PresentationSource.FromVisual(this);
-          Point targetPoints = source.CompositionTarget.TransformFromDevice.Transform(pos);
-          
-          // Log current delta between mouse and visual for use in drag cycle  
-          var mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
-          
-          Point dragDelta = new Point(mousePosition.X - targetPoints.X,
-          mousePosition.Y - targetPoints.Y);
-          
-          manager.StartDraggingFloatingWindowForPane( paneModel, dragDelta );
+          manager.StartDraggingFloatingWindowForPane( paneModel );
+        }
+        else
+        {
+          var model = this.Model;
+          if( model != null )
+          {
+            var root = model.Root;
+            if( root != null )
+            {
+              var manager = root.Manager;
+              if( manager != null )
+              {
+                manager.StartDraggingFloatingWindowForContent( model );
+              }
+            }
+          }
         }
       }
 
