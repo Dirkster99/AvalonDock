@@ -229,11 +229,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.it.resx</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Resources.nl-BE.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.nl-BE.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Resources.pt-BR.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -264,17 +259,10 @@
     <Compile Include="Themes\Theme.cs" />
     <Compile Include="Win32Helper.cs" />
     <Compile Include="WindowHelper.cs" />
-    <EmbeddedResource Include="Properties\Resources.cs-CZ.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.hu.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.hu.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.nl-BE.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.nl-BE.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

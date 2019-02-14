@@ -95,13 +95,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       _model.ChildrenTreeChanged += ( s, args ) =>
           {
-              if (args.Change != ChildrenTreeChange.DirectChildrenChanged)
-                  return;
-
-              if ( _asyncRefreshCalled.HasValue &&
-                   _asyncRefreshCalled.Value == args.Change )
+            if( _asyncRefreshCalled.HasValue &&
+                      _asyncRefreshCalled.Value == args.Change )
               return;
-
             _asyncRefreshCalled = args.Change;
             Dispatcher.BeginInvoke( new Action( () =>
                   {
@@ -419,9 +415,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
         else
         {
-          var width = ( prevChildModel.DockWidth.IsAuto ) ? prevChildActualSize.Width : prevChildModel.DockWidth.Value;
-          var resizedWidth = width + delta;
-          prevChildModel.DockWidth = new GridLength(double.IsNaN(resizedWidth) ?  width : resizedWidth, GridUnitType.Pixel );
+          prevChildModel.DockWidth = new GridLength( prevChildModel.DockWidth.Value + delta, GridUnitType.Pixel );
         }
 
         if( nextChildModel.DockWidth.IsStar )
@@ -430,9 +424,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
         else
         {
-          var width = ( nextChildModel.DockWidth.IsAuto ) ? nextChildActualSize.Width : nextChildModel.DockWidth.Value;
-          var resizedWidth = width - delta;
-          nextChildModel.DockWidth = new GridLength(double.IsNaN(resizedWidth) ? width : resizedWidth, GridUnitType.Pixel);
+          nextChildModel.DockWidth = new GridLength( nextChildModel.DockWidth.Value - delta, GridUnitType.Pixel );
         }
       }
       else
@@ -443,9 +435,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
         else
         {
-          var height = ( prevChildModel.DockHeight.IsAuto ) ? prevChildActualSize.Height : prevChildModel.DockHeight.Value;
-          var resizedHeight = height + delta;
-          prevChildModel.DockHeight = new GridLength(double.IsNaN(resizedHeight) ? height : resizedHeight, GridUnitType.Pixel );
+          prevChildModel.DockHeight = new GridLength( prevChildModel.DockHeight.Value + delta, GridUnitType.Pixel );
         }
 
         if( nextChildModel.DockHeight.IsStar )
@@ -454,9 +444,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
         else
         {
-          var height = ( nextChildModel.DockHeight.IsAuto ) ? nextChildActualSize.Height : nextChildModel.DockHeight.Value;
-          var resizedHeight = height - delta;
-          nextChildModel.DockHeight = new GridLength(double.IsNaN(resizedHeight) ? height : resizedHeight, GridUnitType.Pixel );
+          nextChildModel.DockHeight = new GridLength( nextChildModel.DockHeight.Value - delta, GridUnitType.Pixel );
         }
       }
 

@@ -41,6 +41,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     private HwndSourceHook _hwndSrcHook;
     private DragService _dragService = null;
     private bool _internalCloseFlag = false;
+    private bool _isClosing = false;
 
     #endregion
 
@@ -58,28 +59,49 @@ namespace Xceed.Wpf.AvalonDock.Controls
       this.Loaded += new RoutedEventHandler( OnLoaded );
       this.Unloaded += new RoutedEventHandler( OnUnloaded );
       _model = model;
+    }
 
-      DragDelta = default(Point);
+    protected LayoutFloatingWindowControl( ILayoutElement model, bool isContentImmutable )
+      : this( model )
+    {
+      this.IsContentImmutable = isContentImmutable;
     }
 
     #endregion
 
     #region Properties
-    /// <summary>
-    /// Gets/Sets the X,Y delta between the elemnt being dragged and the
-    /// mouse position. The value of this property is used during the drag
-    /// cycle to position the dragged item under the mouse pointer.
-    /// 
-    /// Set this property on intialization to ensure that
-    /// the delta between mouse and control being dragged
-    /// remains constant.
-    /// </summary>
-    internal Point DragDelta { get; set; }
 
     #region Model
+
     public abstract ILayoutElement Model
     {
       get;
+    }
+
+    #endregion
+
+    #region IsContentImmutable
+
+    /// <summary>
+    /// IsContentImmutable Dependency Property
+    /// </summary>
+    public static readonly DependencyProperty IsContentImmutableProperty = DependencyProperty.Register( "IsContentImmutable", typeof( bool ), typeof( LayoutFloatingWindowControl ),
+              new FrameworkPropertyMetadata( (bool)false ) );
+
+    /// <summary>
+    /// Gets/sets the IsContentImmutable property.  This dependency property 
+    /// indicates if the content can be modified.
+    /// </summary>
+    public bool IsContentImmutable
+    {
+      get
+      {
+        return (bool)GetValue( IsContentImmutableProperty );
+      }
+      private set
+      {
+        SetValue( IsContentImmutableProperty, value );
+      }
     }
 
     #endregion
@@ -313,7 +335,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       switch( msg )
       {
         case Win32Helper.WM_ACTIVATE:
-          if( ( ( int )wParam & 0xFFFF ) == Win32Helper.WA_INACTIVE )
+          if( ( (int)wParam & 0xFFFF ) == Win32Helper.WA_INACTIVE )
           {
             if( lParam == this.GetParentWindowHandle() )
             {
@@ -356,7 +378,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
           }
           break;
         case Win32Helper.WM_SYSCOMMAND:
-          int command = ( int )wParam & 0xFFF0;
+          int command = (int)wParam & 0xFFF0;
           if( command == Win32Helper.SC_MAXIMIZE || command == Win32Helper.SC_RESTORE )
           {
             UpdateMaximizedState( command == Win32Helper.SC_MAXIMIZE );
@@ -371,15 +393,12 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     internal void InternalClose()
     {
-      // Check before Close in InternalClose
-      // https://github.com/xceedsoftware/wpftoolkit/issues/1310
-      if( _internalCloseFlag )
-      {
-        return;
-      }
-
       _internalCloseFlag = true;
-      Close();
+      if( !_isClosing )
+      {
+        _isClosing = true;
+        this.Close();
+      }
     }
 
     #endregion
@@ -388,7 +407,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private static object CoerceContentValue( DependencyObject sender, object content )
     {
-      return new FloatingWindowContentHost( sender as LayoutFloatingWindowControl ) { Content = content as UIElement };
+      var lfwc = sender as LayoutFloatingWindowControl;
+      if( lfwc != null )
+      {
+        if( lfwc.IsLoaded && lfwc.IsContentImmutable )
+          return lfwc.Content;
+        return new FloatingWindowContentHost( sender as LayoutFloatingWindowControl ) { Content = content as UIElement };
+      }
+      return null;
     }
 
     private void OnLoaded( object sender, RoutedEventArgs e )
@@ -425,15 +451,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         IntPtr windowHandle = new WindowInteropHelper( this ).Handle;
         var mousePosition = this.PointToScreenDPI( Mouse.GetPosition( this ) );
+        var clientArea = Win32Helper.GetClientRect( windowHandle );
+        var windowArea = Win32Helper.GetWindowRect( windowHandle );
 
-        // BugFix Issue #6
-        // This code is initializes the drag when content (document or toolwindow) is dragged
-        // A second chance back up plan if DragDelta is not set
-        if (DragDelta == default(Point))
-            DragDelta = new Point(3, 3);
-                
-        Left = mousePosition.X - DragDelta.X;    // BugFix Issue #6
-        Top = mousePosition.Y - DragDelta.Y;
+        Left = mousePosition.X - windowArea.Width / 2.0;
+        Top = mousePosition.Y - ( windowArea.Height - clientArea.Height ) / 2.0;
         _attachDrag = false;
 
         IntPtr lParam = new IntPtr( ( ( int )mousePosition.X & ( int )0xFFFF ) | ( ( ( int )mousePosition.Y ) << 16 ) );
@@ -497,6 +519,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         _owner = owner;
         var manager = _owner.Model.Root.Manager;
+
+        var binding = new Binding( "SizeToContent" ) { Source = _owner };
+        BindingOperations.SetBinding( this, FloatingWindowContentHost.SizeToContentProperty, binding );
       }
 
       #endregion
@@ -544,16 +569,72 @@ namespace Xceed.Wpf.AvalonDock.Controls
       /// </summary>
       private static void OnContentChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
       {
-        ( ( FloatingWindowContentHost )d ).OnContentChanged( e );
+        ( ( FloatingWindowContentHost )d ).OnContentChanged( (UIElement)e.OldValue, (UIElement)e.NewValue );
       }
 
       /// <summary>
       /// Provides derived classes an opportunity to handle changes to the Content property.
       /// </summary>
-      protected virtual void OnContentChanged( DependencyPropertyChangedEventArgs e )
+      protected virtual void OnContentChanged( UIElement oldValue, UIElement newValue )
       {
         if( _rootPresenter != null )
           _rootPresenter.Child = Content;
+
+        var oldContent = oldValue as FrameworkElement;
+        if( oldContent != null )
+        {
+          oldContent.SizeChanged -= this.Content_SizeChanged;
+        }
+
+        var newContent = newValue as FrameworkElement;
+        if( newContent != null )
+        {
+          newContent.SizeChanged += this.Content_SizeChanged;
+        }
+      }
+
+      #endregion
+
+      #region SizeToContent
+
+      /// <summary>
+      /// SizeToContent Dependency Property
+      /// </summary>
+      public static readonly DependencyProperty SizeToContentProperty = DependencyProperty.Register( "SizeToContent", typeof( SizeToContent ), typeof( FloatingWindowContentHost ),
+              new FrameworkPropertyMetadata( SizeToContent.Manual, new PropertyChangedCallback( OnSizeToContentChanged ) ) );
+
+      /// <summary>
+      /// Gets or sets the SizeToContent property. 
+      /// </summary>
+      public SizeToContent SizeToContent
+      {
+        get
+        {
+          return (SizeToContent)GetValue( SizeToContentProperty );
+        }
+        set
+        {
+          SetValue( SizeToContentProperty, value );
+        }
+      }
+
+      /// <summary>
+      /// Handles changes to the SizeToContent property.
+      /// </summary>
+      private static void OnSizeToContentChanged( DependencyObject d, DependencyPropertyChangedEventArgs e )
+      {
+        ( (FloatingWindowContentHost)d ).OnSizeToContentChanged( (SizeToContent)e.OldValue, (SizeToContent)e.NewValue );
+      }
+
+      /// <summary>
+      /// Provides derived classes an opportunity to handle changes to the SizeToContent property.
+      /// </summary>
+      protected virtual void OnSizeToContentChanged( SizeToContent oldValue, SizeToContent newValue )
+      {
+        if( _wpfContentHost != null )
+        {
+          _wpfContentHost.SizeToContent = newValue;
+        }
       }
 
       #endregion
@@ -575,7 +656,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         _rootPresenter = new Border() { Child = new AdornerDecorator() { Child = Content }, Focusable = true };
         _rootPresenter.SetBinding( Border.BackgroundProperty, new Binding( "Background" ) { Source = _owner } );
         _wpfContentHost.RootVisual = _rootPresenter;
-        _wpfContentHost.SizeToContent = SizeToContent.Manual;
+
         _manager = _owner.Model.Root.Manager;
         _manager.InternalAddLogicalChild( _rootPresenter );
 
@@ -599,6 +680,16 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
         Content.Measure( constraint );
         return Content.DesiredSize;
+      }
+
+      #endregion
+
+      #region Event Handlers
+
+      private void Content_SizeChanged( object sender, SizeChangedEventArgs e )
+      {
+        this.InvalidateMeasure();
+        this.InvalidateArrange();
       }
 
       #endregion
