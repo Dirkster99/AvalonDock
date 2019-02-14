@@ -10,7 +10,7 @@
 
 # AvalonDock
 
-Support this project by setting a STAR, reporting an issue, or even better, placing a pull request.
+Support this project with a :star: to show others where the good stuff is, -report an issue, or even better, place a pull request.
 
 My IDE called <a href="https://dirkster99.github.io/Edi/">Edi</a> is powered by this project.
 
