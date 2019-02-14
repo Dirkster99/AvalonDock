@@ -1,4 +1,3 @@
-|                                                                                                                                                         | Project                           |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
 | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.svg)](http://nuget.org/packages/Dirkster.AvalonDock)                                      | AvalonDock                        |
 | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Expression.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Expression)  | AvalonDock.Themes.Expression      |
@@ -7,10 +6,6 @@
 
 ## Master Branch
 [![Build status](https://ci.appveyor.com/api/projects/status/kq2wyupx5hm7fok2/branch/master?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock/branch/master)[![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)&nbsp;[Continues Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts)
-
-
-## Log4Net Branch
-[![Build status](https://ci.appveyor.com/api/projects/status/bci7gpfvas2w32pr?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock-63n50)&nbsp;[Continues Integration](https://ci.appveyor.com/project/Dirkster99/avalondock-63n50/build/artifacts)
 
 # AvalonDock
 
@@ -99,6 +94,94 @@ These definitions do not theme all controls used within this library. You should
 to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
+
+## Patch History for AvalonDock Version 3.5
+
+### Increased to Version 3.5.1
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/8cb6565db294ed3fcb2ac502172f059d740f013d">@Dirkster99</a>
+
+### Fixed Close Button Position in Generic Theme
+- <a href="https://github.com/xceedsoftware/wpftoolkit/pull/1184/files">#1184</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/11709c6cbfc190e920fc62302b5922d666dbac29">@Dirkster99</a>
+
+### DockingManager: ModelChange event happens before new LayoutDocumentItem is added
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1430">#1430</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/6d23da0ce95236ee77e53238cf60e679a3c8fb0e">@Dirkster99</a>
+
+### Added resource file for AvalonDock for nl-BE
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1424">#1424</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/70995417714f37d84659854245f0caad8e3c6d39">@Dirkster99</a>
+
+### Fixed Crash while loading FLOATING DOCUMENT
+
+Fixed Crash while loading (Deserialize) a layout with FLOATING DOCUMENT window.
+
+NullReferenceException in LayoutDocumentFloatingWindowControl.OnInitialized:
+Initialization in 2nd constructor was missing:
+   _model = model;
+   UpdateThemeResources();
+   
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1442">Issue/Resolution is similar to #1442</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/66fb84bfc1a99ec95d643245a3ecc0006b39f7ed">@Dirkster99</a>
+
+### Removed unused private field in LayoutAutoHideWindowControl
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/c4b60646fc0e2beb166f682a1f0e9b8e0532ec8d">@Dirkster99</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/1304e0c4fad40f2d057858712c3c5be86bf46509">@Dirkster99</a>
+
+### Prevent crash from setting negative size
+- <a href="https://github.com/RecursiveNerd/wpftoolkit/commit/38d36f236727cf48ab0e82e9794e1f927d059695">RecursiveNerd/wpftoolkit</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/19a07008cfeb352bba8bf371305e6be83541806d">@Dirkster99</a>
+
+### Fix for issue #1379 as suggested by RecursiveNerd
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1379">#1379</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/f8be3fa041904b2cb9e55299a4497b288b145d00">@Dirkster99</a>
+
+### Update zh-Hans translation #1383
+- <a href="https://github.com/xceedsoftware/wpftoolkit/pull/1383/files">#1383</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/f8167d3ab094f65454e702347d50ac5cd1427da2">@Dirkster99</a>
+
+### AvalonDock czech localization #1396
+- <a href="https://github.com/xceedsoftware/wpftoolkit/pull/1396/files">#1396</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/c67e8583b596d7deacd0bda79f2448a47b5fc6d7">@Dirkster99</a>
+
+### AvalonDock fixed misspelling when serializing DockMinWidth/DockMinHeight
+- <a href="https://github.com/xceedsoftware/wpftoolkit/pull/1212">#1212</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/9230aad671817ef6e48e6b5dc59a98a583fe1bed">@Dirkster99</a>
+
+### Clear Bindings #1360
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1360">#1360</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/33655c686faeded1f4bef8d22da8960a2a101b50">@Dirkster99</a>
+
+### Theming ContextMenuEx in Metro
+Re-styling this in AvalonDock since the menu on the drop-down button for more documents is otherwise black
+- <a href="http://avalondock.codeplex.com/workitem/15743">http://avalondock.codeplex.com/workitem/15743</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/fd2186e31e34fa2c62dee7d0bd356f86c8f4729a">@Dirkster99</a>
+
+### Drag and Drop on (scaled) 4K display
+Drag and Drop of Document or ToolWindow content does not always work on (scaled) 4K display
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1357">#1357</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/issues/6">#6</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/86edf83d4232638eb0f5827f4b554dca7990f914">@Dirkster99</a>
+
+### Crash Loading (Deserialized) Floating Tool Window Layout
+
+Fixed Crash while loading (Deserialize) a layout from FLOATING tool window.
+NullReferenceException in LayoutAnchorableFloatingWindowControl.OnInitialized
+
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1442">#1442</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/4e3b39470228fd8d36cb069eccdc71256ff8b359">@Dirkster99</a>
+
+### LayoutRoot doesn't notify change for Children or ChildrenCount #1313
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1313">#1313</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/d65e9a9019867b1019810329727c154cc20b4c90">@Dirkster99</a>
+
+### Fixed height of titles of floating windows #1203
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1203">#1203</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/5c22b1ea18a7b5b25b6a9cb328a1b4210474cbea">@Dirkster99</a>
+
+### Initial AvalonDock Version 3.5
+- <a href="https://github.com/xceedsoftware/wpftoolkit/tree/73b2e988dea6ea2e64bb11e8783b6bde66219ee1">Taken from this commit</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/89823735ab60ab90a84c6cae7c594e9ee7fe858c">@Dirkster99</a>
 
 ## Patch History for AvalonDock Version 3.4
 
