@@ -4,6 +4,11 @@
     using System;
     using System.Windows.Media.Imaging;
     using System.Windows.Media;
+    using System.Windows.Input;
+    using MLibTest.ViewModels.Base;
+    using MLib.Interfaces;
+    using System.Windows;
+    using Settings.Interfaces;
 
     /// <summary>
     /// Implements the viewmodel that drives the view a Color Picker tool window.
@@ -27,6 +32,7 @@
 
         private Color _SelectedBackgroundColor;
         private Color _SelectedAccentColor;
+        private ICommand _ResetAccentColorCommand;
         #endregion fields
 
         #region constructors
@@ -85,6 +91,58 @@
                     _SelectedAccentColor = value;
                     RaisePropertyChanged(() => SelectedAccentColor);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets a command to reset the currently selected accent color
+        /// and reloads all current resources to make sure that the
+        /// accent is changed consistently.
+        /// </summary>
+        public ICommand ResetAccentColorCommand
+        {
+            get
+            {
+                if (_ResetAccentColorCommand == null)
+                {
+                    _ResetAccentColorCommand = new RelayCommand<object>((p) =>
+                    {
+                        if ((p is Color) == false)
+                            return;
+
+                        Color accentColor = (Color)p;
+
+                        var appearance = GetService<IAppearanceManager>();
+                        var settings = GetService<ISettingsManager>(); // add the default themes
+
+                        // 1) You could use this if you where using MLib only
+                        // appearance.SetAccentColor(accentColor);
+
+                        // 2) But you should use this if you use MLib with additional libraries
+                        //    with additional accent colors to be synchronized at run-time
+                        appearance.SetTheme(settings.Themes
+                                            , appearance.ThemeName
+                                            , accentColor);
+
+                        // 3 You could also use something like this to change accent color
+                        // If you were using your own Theming Framework or MUI, Mahapps etc
+                        //
+////                        Application.Current.Resources[MWindowLib.Themes.ResourceKeys.ControlAccentColorKey] = accentColor;
+////                        Application.Current.Resources[MWindowLib.Themes.ResourceKeys.ControlAccentBrushKey] = new SolidColorBrush(accentColor);
+////
+////                        Application.Current.Resources[MLib.Themes.ResourceKeys.ControlAccentColorKey] = accentColor;
+////                        Application.Current.Resources[MLib.Themes.ResourceKeys.ControlAccentBrushKey] = new SolidColorBrush(accentColor);
+////
+////                        Application.Current.Resources[Xceed.Wpf.AvalonDock.Themes.VS2013.Themes.ResourceKeys.ControlAccentColorKey] = accentColor;
+////                        Application.Current.Resources[Xceed.Wpf.AvalonDock.Themes.VS2013.Themes.ResourceKeys.ControlAccentBrushKey] = new SolidColorBrush(accentColor);
+////
+////                        Application.Current.Resources[NumericUpDownLib.Themes.ResourceKeys.ControlAccentColorKey] = accentColor;
+////                        Application.Current.Resources[NumericUpDownLib.Themes.ResourceKeys.ControlAccentBrushKey] = new SolidColorBrush(accentColor);
+
+                    });
+                }
+
+                return _ResetAccentColorCommand;
             }
         }
 

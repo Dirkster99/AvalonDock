@@ -34,6 +34,12 @@
                                   HorizontalAlignment="Stretch"
                                   Margin="0"
                                   />
+            
+            <Button Content="OK"
+                    Command="{Binding ResetAccentColorCommand}"
+                    CommandParameter="{Binding ElementName=_colorCanvas, Path=SelectedColor}"
+                    HorizontalAlignment="Left"
+                    />
         </StackPanel>
     </Grid>
 </UserControl>

@@ -87,7 +87,7 @@
     <Compile Include="Demos\ViewModels\ColorPickerViewModel.cs" />
     <Compile Include="Demos\ViewModels\Interfaces\IWorkSpaceViewModel.cs" />
     <Compile Include="Demos\ViewModels\WorkSpaceViewModel.cs" />
-    <Compile Include="Demos\Views\ColorSelectionView.xaml.cs">
+    <Compile Include="Demos\ViewModels\Views\ColorSelectionView.xaml.cs">
       <DependentUpon>ColorSelectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\AppCore.cs" />
@@ -116,7 +116,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Demos\Views\ColorSelectionView.xaml">
+    <Page Include="Demos\ViewModels\Views\ColorSelectionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
