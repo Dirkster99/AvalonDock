@@ -98,6 +98,11 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
+### Fixed Issue about PanesTemplateSelector being ignored
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1440">#1440</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/fe18e81e9449962ce5e34e7b421f9f016eb4eb84">@Dirkster99</a>
+Also Increased to Version 3.5.2.
+
 ### Increased to Version 3.5.1
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/8cb6565db294ed3fcb2ac502172f059d740f013d">@Dirkster99</a>
 
