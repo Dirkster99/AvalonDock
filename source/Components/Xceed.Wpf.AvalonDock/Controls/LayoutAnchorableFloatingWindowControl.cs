@@ -55,12 +55,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     }
 
     internal LayoutAnchorableFloatingWindowControl( LayoutAnchorableFloatingWindow model)
-        : base( model, false )
+        : this( model, false )
     {
-      _model = model;
-      HideWindowCommand = new RelayCommand( ( p ) => OnExecuteHideWindowCommand( p ), ( p ) => CanExecuteHideWindowCommand( p ) );
-      CloseWindowCommand = new RelayCommand( ( p ) => OnExecuteCloseWindowCommand( p ), ( p ) => CanExecuteCloseWindowCommand( p ) );
-      UpdateThemeResources();
     }
 
     #endregion
