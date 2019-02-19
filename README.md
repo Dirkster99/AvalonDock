@@ -128,7 +128,7 @@ Initialization in 2nd constructor was missing:
    UpdateThemeResources();
    
 - <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1442">Issue/Resolution is similar to #1442</a>
-- <a href="https://github.com/Dirkster99/AvalonDock/commit/66fb84bfc1a99ec95d643245a3ecc0006b39f7ed">@Dirkster99</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/f966d6ced92e658cd50e5505c38f869ebae00fba">@Dirkster99</a>
 
 ### Removed unused private field in LayoutAutoHideWindowControl
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/c4b60646fc0e2beb166f682a1f0e9b8e0532ec8d">@Dirkster99</a>
@@ -175,7 +175,7 @@ Fixed Crash while loading (Deserialize) a layout from FLOATING tool window.
 NullReferenceException in LayoutAnchorableFloatingWindowControl.OnInitialized
 
 - <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1442">#1442</a>
-- <a href="https://github.com/Dirkster99/AvalonDock/commit/4e3b39470228fd8d36cb069eccdc71256ff8b359">@Dirkster99</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/f966d6ced92e658cd50e5505c38f869ebae00fba">@Dirkster99</a>
 
 ### LayoutRoot doesn't notify change for Children or ChildrenCount #1313
 - <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1313">#1313</a>
