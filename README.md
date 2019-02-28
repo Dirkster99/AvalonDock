@@ -128,7 +128,7 @@ Initialization in 2nd constructor was missing:
    UpdateThemeResources();
    
 - <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1442">Issue/Resolution is similar to #1442</a>
-- <a href="https://github.com/Dirkster99/AvalonDock/commit/66fb84bfc1a99ec95d643245a3ecc0006b39f7ed">@Dirkster99</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/f966d6ced92e658cd50e5505c38f869ebae00fba">@Dirkster99</a>
 
 ### Removed unused private field in LayoutAutoHideWindowControl
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/c4b60646fc0e2beb166f682a1f0e9b8e0532ec8d">@Dirkster99</a>
@@ -175,7 +175,7 @@ Fixed Crash while loading (Deserialize) a layout from FLOATING tool window.
 NullReferenceException in LayoutAnchorableFloatingWindowControl.OnInitialized
 
 - <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1442">#1442</a>
-- <a href="https://github.com/Dirkster99/AvalonDock/commit/4e3b39470228fd8d36cb069eccdc71256ff8b359">@Dirkster99</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/f966d6ced92e658cd50e5505c38f869ebae00fba">@Dirkster99</a>
 
 ### LayoutRoot doesn't notify change for Children or ChildrenCount #1313
 - <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1313">#1313</a>
@@ -189,71 +189,4 @@ NullReferenceException in LayoutAnchorableFloatingWindowControl.OnInitialized
 - <a href="https://github.com/xceedsoftware/wpftoolkit/tree/73b2e988dea6ea2e64bb11e8783b6bde66219ee1">Taken from this commit</a>
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/89823735ab60ab90a84c6cae7c594e9ee7fe858c">@Dirkster99</a>
 
-## Patch History for AvalonDock Version 3.4
-
-- <a href="https://github.com/xceedsoftware/wpftoolkit/commit/24ecc09cf35e7095ad02d0beecfd5bafd83d0658">Commit from xceedsoftware/wpftoolkit for Version 3.4</a>
-- <a href="https://github.com/Dirkster99/AvalonDock/commit/b6b8248cad226bc264855cdbd7e27b9c34303d71">Local Commit in master for Version 3.4</a>
-
-### Reapplied or New Fixes
-
-<ul>
-<li><a href="https://github.com/Dirkster99/AvalonDock/issues/11">DockingManager: ModelChange event happens before new LayoutDocumentItem is added</a>&nbsp;<a href="https://github.com/Dirkster99/AvalonDock/commit/e00b6ca88b0dbe8a7ab1803d0d700fde8ee51f8a">-&gt;</a></li>
-
-<li><a href="https://github.com/xceedsoftware/wpftoolkit/issues/1424">Added resource file for AvalonDock for nl-BE</a>&nbsp;<a href="https://github.com/Dirkster99/AvalonDock/commit/6a796caa7270589cff9248e84cd8f60a03836f54">-&gt;</a></li>
-
-<li><a href="https://github.com/Dirkster99/AvalonDock/issues/9">Fixed Auto Hide Layoutanchorabeles to left, right, top, or bottom of DockingManager layout</a>&nbsp;<a href="https://github.com/Dirkster99/AvalonDock/commit/ece04af23ed04a5ad4d8f2277e96bc7c41042b2c">-&gt;</a></li>
-<li><a href="https://github.com/xceedsoftware/wpftoolkit/pull/1396">Corrected localization in zh-Hans in Version 3.4.0.6</a><br/>
-<a href="https://github.com/xceedsoftware/wpftoolkit/pull/1383">Added Czech localization in Version 3.4.0.5</a><br/>
-<a href="https://github.com/Dirkster99/AvalonDock/commit/ef4d5c9e11470025ff7d5577cac1e32ef67c39bf">-&gt;</a><br/>
-</li>
-<li><b><a href="https://github.com/xceedsoftware/wpftoolkit/issues/1379">Fix for issue #1379 AvalonDockCrash in LayoutGridControl after Resize - ArgumentException as suggested by RecursiveNerd</a>&nbsp;<a href="https://github.com/Dirkster99/AvalonDock/commit/79f3416ce520e74bba0371a0fb82c848fd3176c7">-&gt;</a></b></li>
-</ul>
-
-<b><a href="https://github.com/xceedsoftware/wpftoolkit/issues/1203">Fixed height of titles of floating windows #1203</a></b>
-
-- Turn Height into MinHeight <a href="https://github.com/Dirkster99/AvalonDock/commit/1c2163e03178ed1a0cc3fafc57d0119b3a238d4a">-&gt;</a>
-- Fix on UseLayoutRounding="True" <a href="https://github.com/Dirkster99/AvalonDock/commit/517ba40a63c7eaf080e1d95d65d28dd718fe4822">-&gt;</a>
-<a href="https://github.com/Dirkster99/AvalonDock/commit/b567265c48b54a3abe6352d4f29b8ca6289c3e54">Commit</a>
-
-<b><a href="https://github.com/xceedsoftware/wpftoolkit/pull/1311">System.InvalidOperationException when window docking #1311</a></b>
-   <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1310">Check before Close in InternalClose #1310</a>
-<a href="https://github.com/Dirkster99/AvalonDock/commit/ca7b02b76a430bb4b911d94f88c9136090f7690e">Commit</a>
-
-<b><a href="https://github.com/xceedsoftware/wpftoolkit/issues/1313">LayoutRoot doesn't notify change for Children or ChildrenCount #1313</a></b>
-<a href="https://github.com/Dirkster99/AvalonDock/commit/75b8b54a300c01dad731771e15cbce24d30b9012">Commit</a>
-
-- descendants of LayoutElement notify when their Children and ChildrenCount properties change
-
-- Fix for Issue <a href="https://github.com/Dirkster99/AvalonDock/issues/6">#6 Drag and Drop of Document or ToolWindow content does not always work on (scaled) 4K display</a>
-
-- Fix for Issue <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1360">#1360 Clear Bindings</a>
-
-## Patch History for AvalonDock Version 3.3
-
-- (FIXED in 3.4) AvalonDock Bug after reloading layout <a href="https://github.com/Dirkster99/AvalonDock/wiki/(Fixed)-AvalonDock-Bug-after-reloading-layout">-&gt;</a>
-
-- (FIXED in 3.4) Save Tool Window to Bottom and Reload does not work <a href="https://github.com/Dirkster99/AvalonDock/wiki/AvalonDock-Bug2">-&gt;</a>
-
-## Patch History for AvalonDock Version 3.2
-
-- Fixing an old styling issue on the Document Context Menu which appears with
-  white background when styling for dark <a href="https://github.com/Dirkster99/AvalonDock/commit/105e9d9519b2a711500245f0d6d6c517fce98109">-&gt;</a> 
-
-- Applied fix to LayoutAnchorable drawn behind LayoutDocument since v3.1 <a href="https://github.com/Dirkster99/AvalonDock/commit/5a26edaef16063f01ca2d6a353a239ee84fa3c63">-&gt;</a>
-
-- Fixed Close Button Position in Generic Theme <a href="https://github.com/Dirkster99/AvalonDock/commit/fa81b3f9f7e043a3dca3fa1007c23b8d4f229675">-&gt;</a>
-
-- Turned Height in MinHeight <a href="https://github.com/Dirkster99/AvalonDock/commit/1c2163e03178ed1a0cc3fafc57d0119b3a238d4a">-&gt;</a>
-
-- Added fix on UseLayoutRounding="True" <a href="https://github.com/Dirkster99/AvalonDock/commit/517ba40a63c7eaf080e1d95d65d28dd718fe4822">-&gt;</a>
-
-- Correct Build Configs for Any CPU, x86, x64 <a href="https://github.com/Dirkster99/AvalonDock/commit/282fdf296745ad4ccbd1986d938ffea9efe0aa9c">-&gt;</a>
-
-- Fixed DocManager.Layout Properties null after Layout load:
-  LeftSide, TopSide, BottomSide, RightSide null bug after loading layout <a href="https://github.com/Dirkster99/AvalonDock/commit/06b9682c1d5cfb9e895f63fdbc2ae6e9532dfc53">-&gt;</a>
-
-# Initial Commit
-https://github.com/Dirkster99/AvalonDock/commit/4bcb07f45e89e416257e668a209b238a26e5f414
-
-in this repository was taken from the last Edi build: 131594
-<a href="http://edi.codeplex.com/releases/view/131594">from CodePlex</a>
+Please review the <a href="https://github.com/Dirkster99/AvalonDock/wiki/Patch-History">Patch History</a> page for more information on patches for previously released versions of AvalonDock.
