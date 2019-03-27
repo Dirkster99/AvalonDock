@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -10,8 +10,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AvalonDock.TestApp</RootNamespace>
     <AssemblyName>AvalonDock.TestApp</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -25,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -34,6 +36,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +46,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
@@ -52,6 +56,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -61,6 +66,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -70,8 +76,15 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MaterialDesignColors, Version=1.1.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignColors.1.1.3\lib\net45\MaterialDesignColors.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=2.5.0.1205, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.2.5.0.1205\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -135,10 +148,34 @@
     <Resource Include="Images\alarm-clock-blue.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock.Themes.Aero\Xceed.Wpf.AvalonDock.Themes.Aero.csproj">
+      <Project>{ba72cce0-a9fb-4995-b496-7fec5c87b85b}</Project>
+      <Name>Xceed.Wpf.AvalonDock.Themes.Aero</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock.Themes.Expression\Xceed.Wpf.AvalonDock.Themes.Expression.csproj">
+      <Project>{488dd8f7-9d3c-4f53-bd1f-84a095d9bc10}</Project>
+      <Name>Xceed.Wpf.AvalonDock.Themes.Expression</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock.Themes.Metro\Xceed.Wpf.AvalonDock.Themes.Metro.csproj">
+      <Project>{89286eb4-b4a1-418c-839a-067b00f442d8}</Project>
+      <Name>Xceed.Wpf.AvalonDock.Themes.Metro</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock.Themes.VS2010\Xceed.Wpf.AvalonDock.Themes.VS2010.csproj">
+      <Project>{b3fc3e21-5f2d-4581-aea2-59f671cffc21}</Project>
+      <Name>Xceed.Wpf.AvalonDock.Themes.VS2010</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock.Themes.VS2013\Xceed.Wpf.AvalonDock.Themes.VS2013.csproj">
+      <Project>{bd7eee0e-9432-4e76-bd82-793358e56bdf}</Project>
+      <Name>Xceed.Wpf.AvalonDock.Themes.VS2013</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.csproj">
       <Project>{db81988f-e0f2-45a0-a1fd-8c37f3d35244}</Project>
       <Name>Xceed.Wpf.AvalonDock</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

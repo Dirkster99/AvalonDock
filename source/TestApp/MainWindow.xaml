@@ -12,7 +12,21 @@
 
    Stay informed: follow @datagrid on Twitter or Like facebook.com/datagrids
 
-  **********************************************************************************-->
+  **********************************************************************************
+    
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+    
+  
+    
+    
+    -->
 
 <Window x:Class="AvalonDock.TestApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -20,7 +34,14 @@
         xmlns:avalonDock="http://schemas.xceed.com/wpf/xaml/avalondock"
         xmlns:local="clr-namespace:AvalonDock.TestApp"
         xmlns:winformsIntegration="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
-        
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         
         Title="MainWindow" Height="350" Width="525"
@@ -64,9 +85,9 @@
         </Menu>
 
         <avalonDock:DockingManager Grid.Row="1" x:Name="dockManager" AllowMixedOrientation="True" DocumentClosing="dockManager_DocumentClosing">
-            <!-- avalonDock:DockingManager.Theme>
-                <avalonDock:Vs2013DarkTheme/>
-            </avalonDock:DockingManager.Theme -->
+            <avalonDock:DockingManager.Theme>
+                <avalonDock:VS2010Theme />
+            </avalonDock:DockingManager.Theme>
             <avalonDock:DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">

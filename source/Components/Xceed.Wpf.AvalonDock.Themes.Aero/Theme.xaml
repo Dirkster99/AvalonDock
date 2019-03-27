@@ -38,7 +38,100 @@
   <avalonDockConverters:LayoutItemFromLayoutModelConverter x:Key="LayoutItemFromLayoutModelConverter" />
   <avalonDockConverters:ActivateCommandLayoutItemFromLayoutModelConverter x:Key="ActivateCommandLayoutItemFromLayoutModelConverter" />
   <avalonDockConverters:AnchorableContextMenuHideVisibilityConverter x:Key="AnchorableContextMenuHideVisibilityConverter" />
-
+    <Style x:Key="OldButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+                        <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="#FF3399FF"/>
+                            <Setter Property="Background" TargetName="Bd" Value="#FFC2E0FF"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="#FF3399FF"/>
+                            <Setter Property="Background" TargetName="Bd" Value="#FFC2E0FF"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="#FF3399FF"/>
+                            <Setter Property="Background" TargetName="Bd" Value="#FF99CCFF"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="OldToggleButtonStyle" TargetType="{x:Type ToggleButton}">
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ToggleButton}">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+                        <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="BorderBrush" Value="#FF3399FF"/>
+                            <Setter Property="Background" Value="#FFE6F0FA"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="#FF3399FF"/>
+                            <Setter Property="Background" Value="#FFC2E0FF"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="#FF3399FF"/>
+                            <Setter Property="Background" Value="#FFC2E0FF"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                                <Condition Property="IsChecked" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="BorderBrush" Value="#FF3399FF"/>
+                            <Setter Property="Background" Value="#FF99CCFF"/>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsKeyboardFocused" Value="True"/>
+                                <Condition Property="IsChecked" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="BorderBrush" Value="#FF3399FF"/>
+                            <Setter Property="Background" Value="#FF99CCFF"/>
+                        </MultiTrigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="BorderBrush" Value="#FF3399FF"/>
+                            <Setter Property="Background" Value="#FF99CCFF"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
   <!--DocumentPaneControlStyle-->
   <Style x:Key="AvalonDock_ThemeAero_DocumentPaneControlStyle"
          TargetType="{x:Type avalonDockControls:LayoutDocumentPaneControl}">
@@ -74,7 +167,7 @@
                                                        Grid.Row="0"
                                                        KeyboardNavigation.TabIndex="1" />
               <avalonDockControls:DropDownButton x:Name="MenuDropDownButton"
-                                                 Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
+                                                 Style="{StaticResource OldToggleButtonStyle}"
                                                  Focusable="False"
                                                  VerticalAlignment="Center"
                                                  Grid.Column="1">
@@ -473,7 +566,7 @@
 
               <avalonDockControls:DropDownButton x:Name="MenuDropDownButton"
                                                  VerticalAlignment="Center"
-                                                 Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
+                                                 Style="{StaticResource OldToggleButtonStyle}"
                                                  Focusable="False"
                                                  Grid.Column="1"
                                                  Padding="-1"
@@ -489,7 +582,7 @@
                       Grid.Column="2"
                       Focusable="False"
                       Padding="-1"
-                      Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                      Style="{StaticResource OldButtonStyle}"
                       VerticalAlignment="Center"
                       HorizontalAlignment="Center"
                       Command="{Binding Path=LayoutItem.AutoHideCommand, RelativeSource={RelativeSource TemplatedParent}}"
@@ -503,7 +596,7 @@
                       Grid.Column="3"
                       Focusable="False"
                       Padding="-1"
-                      Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                      Style="{StaticResource OldButtonStyle}"
                       VerticalAlignment="Center"
                       HorizontalAlignment="Center"
                       Command="{Binding Path=LayoutItem.HideCommand, RelativeSource={RelativeSource TemplatedParent}}"
@@ -1170,7 +1263,7 @@
                                   ContentTemplateSelector="{Binding DocumentHeaderTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}" />
                 <!-- Close button should be moved out to the container style -->
                 <Button x:Name="DocumentCloseButton"
-                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                        Style="{StaticResource OldButtonStyle}"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
                         Grid.Column="2"
@@ -1341,7 +1434,7 @@
 
                     <avalonDockControls:DropDownButton x:Name="ContextMenuDropdownButton"
                                                        shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                                                       Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
+                                                       Style="{StaticResource OldToggleButtonStyle}"
                                                        Focusable="False"
                                                        Grid.Column="1"
                                                        VerticalAlignment="Center"
@@ -1361,8 +1454,9 @@
                     <Button x:Name="PART_PinMaximize"
                             shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Focusable="False"
+                            Padding="0"
                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}"
-                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                            Style="{StaticResource OldButtonStyle}"
                             Command="{x:Static shell:SystemCommands.MaximizeWindowCommand}"
                             CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
@@ -1376,8 +1470,9 @@
                     <Button x:Name="PART_PinRestore"
                             shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Focusable="False"
+                            Padding="0"
                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
-                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                            Style="{StaticResource OldButtonStyle}"
                             Command="{x:Static shell:SystemCommands.RestoreWindowCommand}"
                             CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
@@ -1391,7 +1486,7 @@
                     <Button x:Name="PART_PinClose"
                             shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Focusable="False"
-                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                            Style="{StaticResource OldButtonStyle}"
                             Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                             Command="{Binding Path=RootDocumentLayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
                             ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
@@ -1522,7 +1617,7 @@
                     <avalonDockControls:DropDownButton x:Name="SinglePaneContextMenu"
                                                        shell:WindowChrome.IsHitTestVisibleInChrome="True"
                                                        Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                       Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
+                                                       Style="{StaticResource OldToggleButtonStyle}"
                                                        Focusable="False"
                                                        Grid.Column="1"
                                                        VerticalAlignment="Center"
@@ -1542,8 +1637,9 @@
                     <Button x:Name="PART_PinMaximize"
                             shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Focusable="False"
+                            Padding="0"
                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}"
-                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                            Style="{StaticResource OldButtonStyle}"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             VerticalContentAlignment="Center"
@@ -1561,8 +1657,9 @@
                     <Button x:Name="PART_PinRestore"
                             shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Focusable="False"
+                            Padding="0"
                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
-                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                            Style="{StaticResource OldButtonStyle}"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             Command="{x:Static shell:SystemCommands.RestoreWindowCommand}"
@@ -1578,7 +1675,8 @@
                     <Button x:Name="PART_PinClose"
                             shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Focusable="False"
-                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                            Padding="0"
+                            Style="{StaticResource OldButtonStyle}"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
