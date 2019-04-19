@@ -100,6 +100,11 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
+### Fixed Crash on IsSelected Document Property
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1481">#1481</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/fabbd218beaa996a3176d39b698ce1990bdd9254">@Dirkster99</a>
+Also Increased to Version 3.5.3.
+
 ### Fixed Issue about PanesTemplateSelector being ignored
 - <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1440">#1440</a>
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/fe18e81e9449962ce5e34e7b421f9f016eb4eb84">@Dirkster99</a>
