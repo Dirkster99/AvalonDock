@@ -511,13 +511,15 @@ namespace Xceed.Wpf.AvalonDock.Layout
           //removes any empty anchor group
           foreach( var emptyPaneGroup in this.Descendents().OfType<LayoutAnchorGroup>().Where( p => p.ChildrenCount == 0 ) )
           {
-            var parentGroup = emptyPaneGroup.Parent as ILayoutContainer;
-            parentGroup.RemoveChild( emptyPaneGroup );
-            exitFlag = false;
-            break;
+            if (!this.Descendents().OfType<ILayoutPreviousContainer>().Any(c => c.PreviousContainer == emptyPaneGroup))
+            {
+              var parentGroup = emptyPaneGroup.Parent as ILayoutContainer;
+              parentGroup.RemoveChild( emptyPaneGroup );
+              exitFlag = false;
+              break;
+            }
           }
         }
-
       }
       while( !exitFlag );
       #endregion
