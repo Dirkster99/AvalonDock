@@ -178,8 +178,16 @@ namespace Xceed.Wpf.AvalonDock
 
         foreach( var fw in _fwList )
         {
-          //fw.Owner = Window.GetWindow(this);
-          //fw.SetParentToMainWindowOf(this);
+          if (fw.Model is LayoutAnchorableFloatingWindow window && window.RootPanel.IsMaximized)
+          {
+           fw.WindowState = WindowState.Normal;
+           fw.Show();
+           fw.WindowState = WindowState.Maximized;
+          }
+          else
+           fw.Show();
+           //fw.Owner = Window.GetWindow(this);
+           //fw.SetParentToMainWindowOf(this);
         }
       }
 
@@ -2075,10 +2083,10 @@ namespace Xceed.Wpf.AvalonDock
 
         newFW.ShowInTaskbar = false;
 
-        Dispatcher.BeginInvoke( new Action( () =>
-        {
-           newFW.Show();
-        } ), DispatcherPriority.Send );
+        //Dispatcher.BeginInvoke( new Action( () =>
+        //{
+        //   newFW.Show();
+        //} ), DispatcherPriority.Send );
 
         // Do not set the WindowState before showing or it will be lost
         if( paneForExtensions != null && paneForExtensions.IsMaximized )
