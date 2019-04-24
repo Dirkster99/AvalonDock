@@ -178,11 +178,18 @@ namespace Xceed.Wpf.AvalonDock
 
         foreach( var fw in _fwList )
         {
-          //fw.Owner = Window.GetWindow(this);
-          //fw.SetParentToMainWindowOf(this);
+          if (fw.Model is LayoutAnchorableFloatingWindow window && window.RootPanel.IsMaximized)
+          {
+           fw.WindowState = WindowState.Normal;
+           fw.Show();
+           fw.WindowState = WindowState.Maximized;
+          }
+          else
+           fw.Show();
+           //fw.Owner = Window.GetWindow(this);
+           //fw.SetParentToMainWindowOf(this);
         }
       }
-
 
       if( newLayout != null )
       {
