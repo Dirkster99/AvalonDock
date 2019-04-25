@@ -178,7 +178,8 @@ namespace Xceed.Wpf.AvalonDock
 
         foreach( var fw in _fwList )
         {
-          if (fw.Model is LayoutAnchorableFloatingWindow window && window.RootPanel.IsMaximized)
+          var window = fw.Model as LayoutAnchorableFloatingWindow;
+          if (window != null && window.RootPanel.IsMaximized)
           {
            fw.WindowState = WindowState.Normal;
            fw.Show();

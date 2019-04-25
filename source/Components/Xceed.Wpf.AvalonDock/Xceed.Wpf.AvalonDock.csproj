@@ -158,6 +158,7 @@
     <Compile Include="Layout\ILayoutControl.cs" />
     <Compile Include="Layout\ILayoutDocumentPane.cs" />
     <Compile Include="Layout\ILayoutElement.cs" />
+    <Compile Include="Layout\ILayoutElementForFloatingWindowExtension.cs" />
     <Compile Include="Layout\ILayoutElementWithVisibility.cs" />
     <Compile Include="Layout\ILayoutGroup.cs" />
     <Compile Include="Layout\ILayoutOrientableElement.cs" />
