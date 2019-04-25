@@ -134,7 +134,7 @@ Initialization in 2nd constructor was missing:
    _model = model;
    UpdateThemeResources();
    
-- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1442">Issue/Resolution is similar to #1442</a>
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1442">Issue/Resolution is similar to #1442</a>, <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1448">#1448</a>
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/f966d6ced92e658cd50e5505c38f869ebae00fba">@Dirkster99</a>
 
 ### Removed unused private field in LayoutAutoHideWindowControl
