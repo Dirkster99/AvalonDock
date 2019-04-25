@@ -2,6 +2,7 @@
 {
     using System;
     using System.Runtime.InteropServices;
+    using System.Windows;
 
     /// <summary>
     /// SetWindowPlacement won't correct placement for WPF tool windows
@@ -35,7 +36,7 @@
             public int cbSize;
             internal RECT rcMonitor;
             internal RECT rcWork;
-            public uint dwFlags;
+            private uint dwFlags;
         }
 
         [DllImport("user32.dll")]
@@ -54,6 +55,25 @@
             normalPosition.Bottom = normalPosition.Top + (int)paneInsideFloatingWindow.FloatingHeight;
             normalPosition.Right = normalPosition.Left + (int)paneInsideFloatingWindow.FloatingWidth;
 
+            // Are we using only one monitor?
+            if (SystemParameters.PrimaryScreenWidth == SystemParameters.VirtualScreenWidth &&
+                SystemParameters.PrimaryScreenHeight == SystemParameters.VirtualScreenHeight)
+            {
+                RECT primaryscreen = new RECT(0,0, (int)SystemParameters.PrimaryScreenWidth, (int)SystemParameters.PrimaryScreenHeight);
+
+                if (!RectanglesIntersect(normalPosition, primaryscreen))
+                {
+                    normalPosition = PlaceOnScreen(primaryscreen, normalPosition);
+
+                    paneInsideFloatingWindow.FloatingLeft = normalPosition.Left;
+                    paneInsideFloatingWindow.FloatingTop = normalPosition.Top;
+                    paneInsideFloatingWindow.FloatingHeight = normalPosition.Bottom - normalPosition.Top;
+                    paneInsideFloatingWindow.FloatingWidth = normalPosition.Right - normalPosition.Left;
+                }
+
+                return;
+            }
+
             IntPtr closestMonitorPtr = MonitorFromRect(ref normalPosition, MONITOR_DEFAULTTONEAREST);
             MONITORINFO closestMonitorInfo = new MONITORINFO();
             closestMonitorInfo.cbSize = Marshal.SizeOf(typeof(MONITORINFO));
@@ -62,6 +82,11 @@
             if (getInfoSucceeded && !RectanglesIntersect(normalPosition, closestMonitorInfo.rcMonitor))
             {
                 normalPosition = PlaceOnScreen(closestMonitorInfo.rcMonitor, normalPosition);
+
+                paneInsideFloatingWindow.FloatingLeft = normalPosition.Left;
+                paneInsideFloatingWindow.FloatingTop = normalPosition.Top;
+                paneInsideFloatingWindow.FloatingHeight = normalPosition.Bottom - normalPosition.Top;
+                paneInsideFloatingWindow.FloatingWidth = normalPosition.Right - normalPosition.Left;
             }
         }
 
