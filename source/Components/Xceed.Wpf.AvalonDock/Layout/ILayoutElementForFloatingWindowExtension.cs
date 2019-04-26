@@ -1,6 +1,5 @@
 ﻿namespace Xceed.Wpf.AvalonDock.Layout
 {
-    using System;
     using System.Runtime.InteropServices;
     using System.Windows;
 
@@ -12,7 +11,6 @@
     public static class ILayoutElementForFloatingWindowExtension
     {
         // RECT structure required by WINDOWPLACEMENT structure
-        [Serializable]
         [StructLayout(LayoutKind.Sequential)]
         internal struct RECT
         {
@@ -29,23 +27,6 @@
                 this.Bottom = bottom;
             }
         }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MONITORINFO
-        {
-            public int cbSize;
-            internal RECT rcMonitor;
-            internal RECT rcWork;
-            private uint dwFlags;
-        }
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr MonitorFromRect([In] ref RECT lprc, uint dwFlags);
-
-        [DllImport("user32.dll")]
-        private static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
-
-        private const uint MONITOR_DEFAULTTONEAREST = 0x00000002;
 
         internal static void KeepInsideNearestMonitor(this ILayoutElementForFloatingWindow paneInsideFloatingWindow)
         {
@@ -73,23 +54,31 @@
 
                 return;
             }
-
-            IntPtr closestMonitorPtr = MonitorFromRect(ref normalPosition, MONITOR_DEFAULTTONEAREST);
-            MONITORINFO closestMonitorInfo = new MONITORINFO();
-            closestMonitorInfo.cbSize = Marshal.SizeOf(typeof(MONITORINFO));
-            bool getInfoSucceeded = GetMonitorInfo(closestMonitorPtr, ref closestMonitorInfo);
-
-            if (getInfoSucceeded && !RectanglesIntersect(normalPosition, closestMonitorInfo.rcMonitor))
+            else
             {
-                normalPosition = PlaceOnScreen(closestMonitorInfo.rcMonitor, normalPosition);
+                RECT primaryscreen = new RECT(0, 0, (int)SystemParameters.VirtualScreenWidth, (int)SystemParameters.VirtualScreenHeight);
 
-                paneInsideFloatingWindow.FloatingLeft = normalPosition.Left;
-                paneInsideFloatingWindow.FloatingTop = normalPosition.Top;
-                paneInsideFloatingWindow.FloatingHeight = normalPosition.Bottom - normalPosition.Top;
-                paneInsideFloatingWindow.FloatingWidth = normalPosition.Right - normalPosition.Left;
+                if (!RectanglesIntersect(normalPosition, primaryscreen))
+                {
+                    normalPosition = PlaceOnScreen(primaryscreen, normalPosition);
+
+                    paneInsideFloatingWindow.FloatingLeft = normalPosition.Left;
+                    paneInsideFloatingWindow.FloatingTop = normalPosition.Top;
+                    paneInsideFloatingWindow.FloatingHeight = normalPosition.Bottom - normalPosition.Top;
+                    paneInsideFloatingWindow.FloatingWidth = normalPosition.Right - normalPosition.Left;
+                }
+
+                return;
             }
         }
 
+        /// <summary>
+        /// Determine whether <paramref name="a"/> and <paramref name="b"/>
+        /// have an intersection or not.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         private static bool RectanglesIntersect(RECT a, RECT b)
         {
             if (a.Left > b.Right || a.Right < b.Left)
@@ -105,6 +94,13 @@
             return true;
         }
 
+        /// <summary>
+        /// Determine the place where <paramref name="windowRect"/> should be placed
+        /// inside the <paramref name="monitorRect"/>.
+        /// </summary>
+        /// <param name="monitorRect"></param>
+        /// <param name="windowRect"></param>
+        /// <returns></returns>
         private static RECT PlaceOnScreen(RECT monitorRect, RECT windowRect)
         {
             int monitorWidth = monitorRect.Right - monitorRect.Left;
