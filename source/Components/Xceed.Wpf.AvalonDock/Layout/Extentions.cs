@@ -112,7 +112,14 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     #region Internal Methods
 
-    internal static void KeepInsideNearestMonitor( this ILayoutElementForFloatingWindow paneInsideFloatingWindow )
+    /// <summary>
+    /// Removed with Issue 20 since Win32 definition seems to be buggy here
+    /// (GetMonitorInfo always returns false on rectangle returned from Win32Helper.MonitorFromRect())
+    /// 
+    /// <see cref="ILayoutElementForFloatingWindowExtension"/> for replacement candidate.
+    /// </summary>
+    /// <param name="paneInsideFloatingWindow"></param>
+    internal static void KeepInsideNearestMonitor_Issue20( this ILayoutElementForFloatingWindow paneInsideFloatingWindow )
     {
       Win32Helper.RECT r = new Win32Helper.RECT();
       r.Left = ( int )paneInsideFloatingWindow.FloatingLeft;
