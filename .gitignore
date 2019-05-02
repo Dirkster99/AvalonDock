@@ -21,3 +21,6 @@ tmp/
 /packages/
 /source/.vs/
 /source/packages/
+/source/UnitTest/Xceed.Wpf.AvalonDock.Test/TestResults/0591701e-c0ff-4179-aa2b-4bf67c4b2a32
+*.user
+*.coverage
