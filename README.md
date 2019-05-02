@@ -104,6 +104,24 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
+### Fixes in Version 3.5.4
+
+1) BugFix Hidden anchorable cannot be shown again (Issue [#19](https://github.com/Dirkster99/AvalonDock/issues/19))
+   - Plus start of Test Automation Client (thanx to [cswangrf](https://github.com/cswangrf))
+   - <a href="https://github.com/Dirkster99/AvalonDock/commit/c1e5893827493c7b82cd0ae7f4d1395a0a5056f1">@Dirkster99</a>
+
+2) <a href="https://github.com/Dirkster99/AvalonDock/wiki/CanDockAsTabbedDocument">CanDockAsTabbedDocument</a> (Added drag & drop support of LayoutAnchorable)
+   (Issue [#18](https://github.com/Dirkster99/AvalonDock/issues/18))
+   - <a href="https://github.com/Dirkster99/AvalonDock/commit/c1e5893827493c7b82cd0ae7f4d1395a0a5056f1">@Dirkster99</a>
+
+3) Improved support for <a href="https://github.com/Dirkster99/AvalonDock/wiki/LayoutAnchorableFloatingWindow">LayoutAnchorableFloatingWindow</a> (floating tool window) on 2nd screen (Issue [#20](https://github.com/Dirkster99/AvalonDock/issues/20))
+   - Added Reload of floating LayoutAnchable when maximized on 2nd screen
+   - Added repositioning of floating LayoutAnchable when:
+     - 2nd Monitor is not available or
+     - changed resolution puts floating LayoutAnchable out of bounds
+   - (thanx to [madenaras](https://github.com/madenaras))
+   - <a href="https://github.com/Dirkster99/AvalonDock/commit/3522efc2c15d6521440e80936fcfcf4ad383fd19">@Dirkster99</a>
+
 ### Fixed Crash on IsSelected Document Property
 - <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1481">#1481</a>
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/fabbd218beaa996a3176d39b698ce1990bdd9254">@Dirkster99</a>
