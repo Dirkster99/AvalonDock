@@ -51,11 +51,7 @@
   </DataCollectionRunSettings>
 
   <!-- Parameters used by tests at runtime -->
-  <TestRunParameters>
-    <Parameter name="webAppUrl" value="http://localhost" />
-    <Parameter name="webAppUserName" value="Admin" />
-    <Parameter name="webAppPassword" value="Password" />
-  </TestRunParameters>
+  <TestRunParameters />
 
   <!-- Adapter Specific sections -->
 

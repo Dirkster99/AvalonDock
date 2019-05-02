@@ -2,6 +2,7 @@
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
+    using System.Diagnostics;
     using System.Linq;
     using System.Threading;
     using System.Windows;
@@ -43,6 +44,7 @@
         [AssemblyInitialize]
         public static void ApplicationInitialize(TestContext testContext)
         {
+            Debug.WriteLine("AssemblyInitialize");
             TestHost.Initialize();
         }
 
@@ -52,6 +54,7 @@
             GC.Collect();
             Dispatcher.ExitAllFrames();
             Application.Current.Dispatcher.Invoke(Application.Current.Shutdown);
+            Debug.WriteLine("AssemblyCleanup");
         }
     }
 }

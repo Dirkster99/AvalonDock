@@ -6,15 +6,15 @@ namespace Xceed.Wpf.AvalonDock.Test.TestHelpers
 
     public static class WindowHelpers
     {
-        public static Task<T> CreateInvisibleWindowAsync<T>(Action<T> changeAddiotionalProperties = null) where T : Window, new()
+        public static Task<T> CreateInvisibleWindowAsync<T>(Action<T> changeAdditionalProperties = null) where T : Window, new()
         {
-            var window = new T
+            var window = new T()
             {
-                Visibility = Visibility.Hidden, 
+                Visibility = Visibility.Hidden,
                 ShowInTaskbar = false
             };
 
-            changeAddiotionalProperties?.Invoke(window);
+            changeAdditionalProperties?.Invoke(window);
 
             var completionSource = new TaskCompletionSource<T>();
 
