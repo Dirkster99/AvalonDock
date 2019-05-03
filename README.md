@@ -122,6 +122,8 @@ to also theme standard elements, such as, button and textblock etc.
    - (thanx to [madenaras](https://github.com/madenaras))
    - <a href="https://github.com/Dirkster99/AvalonDock/commit/3522efc2c15d6521440e80936fcfcf4ad383fd19">@Dirkster99</a>
 
+4) Added zh-Hant localization (thanx to [nuthrash](https://github.com/nuthrash)
+
 ### Fixed Crash on IsSelected Document Property
 - <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1481">#1481</a>
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/fabbd218beaa996a3176d39b698ce1990bdd9254">@Dirkster99</a>
