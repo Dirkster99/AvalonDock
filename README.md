@@ -122,7 +122,7 @@ to also theme standard elements, such as, button and textblock etc.
    - (thanx to [madenaras](https://github.com/madenaras))
    - <a href="https://github.com/Dirkster99/AvalonDock/commit/3522efc2c15d6521440e80936fcfcf4ad383fd19">@Dirkster99</a>
 
-4) Added zh-Hant localization (thanx to [nuthrash](https://github.com/nuthrash)
+4) Added [zh-Hant](https://github.com/Dirkster99/AvalonDock/wiki/Localization) localization (thanx to [nuthrash](https://github.com/nuthrash)
 
 ### Fixed Crash on IsSelected Document Property
 - <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1481">#1481</a>
@@ -146,6 +146,7 @@ Also Increased to Version 3.5.2.
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/6d23da0ce95236ee77e53238cf60e679a3c8fb0e">@Dirkster99</a>
 
 ### Added resource file for AvalonDock for nl-BE
+- [nl-BE](https://github.com/Dirkster99/AvalonDock/wiki/Localization)
 - <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1424">#1424</a>
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/70995417714f37d84659854245f0caad8e3c6d39">@Dirkster99</a>
 
