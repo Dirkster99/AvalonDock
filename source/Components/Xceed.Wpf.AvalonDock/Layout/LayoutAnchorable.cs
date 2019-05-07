@@ -770,7 +770,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
       {
         // Go back to using previous parent
         Parent = PreviousContainer;
-        PreviousContainer = null;
+////        PreviousContainer = null;
       }
 
       var parentPane = Parent as ILayoutElementWithVisibility;
