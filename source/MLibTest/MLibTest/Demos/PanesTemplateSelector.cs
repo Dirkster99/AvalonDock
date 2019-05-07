@@ -4,6 +4,7 @@
     using System.Windows;
     using Xceed.Wpf.AvalonDock.Layout;
     using AvalonDock.MVVMTestApp;
+    using AvalonDock.Tools;
 
     /// <summary>
     /// Implements a <see ref="DataTemplateSelector"/> for AvalonDock's documents and toolwindows.
@@ -35,6 +36,8 @@
         /// </summary>
         public DataTemplate ColorPickerViewTemplate { get; set; }
 
+        public DataTemplate Tooln_ViewTemplate { get; set; }
+
         /// <summary>
         /// Determines the matching view for a specific given type of viewmodel.
         /// </summary>
@@ -53,6 +56,9 @@
 
             if (item is ColorPickerViewModel)
                 return ColorPickerViewTemplate;
+
+            if (item is Tool1_ViewModel || item is Tool2_ViewModel || item is Tool3_ViewModel)
+                return Tooln_ViewTemplate;
 
             return base.SelectTemplate(item, container);
         }

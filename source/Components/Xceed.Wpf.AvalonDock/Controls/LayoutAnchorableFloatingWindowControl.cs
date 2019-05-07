@@ -324,6 +324,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         var anchorableLayoutItem = manager.GetLayoutItemFromModel( anchorable ) as LayoutAnchorableItem;
         anchorableLayoutItem.HideCommand.Execute( parameter );
       }
+
+      Hide(); // Bring toolwindows inside hidden FloatingWindow back requires restart of app
     }
     #endregion
 

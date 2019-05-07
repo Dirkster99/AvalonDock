@@ -1,4 +1,4 @@
-﻿namespace AvalonDock.MVVMTestApp
+﻿namespace AvalonDock.Tools
 {
     using MLibTest.Demos.ViewModels.Interfaces;
     using System;
@@ -7,26 +7,24 @@
     using System.Windows.Input;
     using MLibTest.ViewModels.Base;
     using MLib.Interfaces;
-    using System.Windows;
     using Settings.Interfaces;
+    using AvalonDock.MVVMTestApp;
 
     /// <summary>
-    /// Implements the viewmodel that drives the view a Color Picker tool window.
-    ///
-    /// https://github.com/Dirkster99/ColorPickerLib
+    /// Implements the viewmodel that drives a sample tool window view.
     /// </summary>
-    internal class ColorPickerViewModel : ToolViewModel
+    internal class Tool2_ViewModel : ToolViewModel
     {
         #region fields
         /// <summary>
         /// Identifies the <see ref="ContentId"/> of this tool window.
         /// </summary>
-        public const string ToolContentId = "ColorPickerTool";
+        public const string ToolContentId = "Tool2_Tool";
 
         /// <summary>
         /// Identifies the caption string used for this tool window.
         /// </summary>
-        public const string ToolTitle = "Color Picker";
+        public const string ToolTitle = "Tool 2";
 
         private IWorkSpaceViewModel _workSpaceViewModel = null;
 
@@ -41,7 +39,7 @@
         /// </summary>
         /// <param name="workSpaceViewModel">Is the link to the application's viewmodel
         /// to enable (event based) communication between this viewmodel and the application.</param>
-        public ColorPickerViewModel(IWorkSpaceViewModel workSpaceViewModel)
+        public Tool2_ViewModel(IWorkSpaceViewModel workSpaceViewModel)
             : base(ToolTitle)
         {
             _workSpaceViewModel = workSpaceViewModel;
@@ -53,7 +51,7 @@
         /// <summary>
         /// Hidden default class constructor
         /// </summary>
-        protected ColorPickerViewModel()
+        protected Tool2_ViewModel()
           : base(ToolTitle)
         {
             SetupADToolDefaults();

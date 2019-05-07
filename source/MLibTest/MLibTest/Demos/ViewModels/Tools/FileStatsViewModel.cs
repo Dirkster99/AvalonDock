@@ -1,5 +1,6 @@
-﻿namespace AvalonDock.MVVMTestApp
+﻿namespace AvalonDock.Tools
 {
+    using AvalonDock.MVVMTestApp;
     using MLibTest.Demos.ViewModels.Interfaces;
     using System;
     using System.IO;
