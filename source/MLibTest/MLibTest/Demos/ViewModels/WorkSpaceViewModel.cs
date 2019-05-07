@@ -1,6 +1,7 @@
 ﻿namespace MLibTest.Demos.ViewModels
 {
     using AvalonDock.MVVMTestApp;
+    using AvalonDock.Tools;
     using Microsoft.Win32;
     using MLibTest.Demos.ViewModels.Interfaces;
     using MLibTest.ViewModels.Base;
@@ -100,6 +101,9 @@
 
         private FileStatsViewModel _fileStats = null;
         private ColorPickerViewModel _ColorPicker = null;
+        private Tool1_ViewModel _Tool1;
+        private Tool2_ViewModel _Tool2;
+        private Tool3_ViewModel _Tool3;
 
         private FileViewModel _activeDocument = null;
         #endregion private fields
@@ -163,7 +167,7 @@
             get
             {
                 if (_tools == null)
-                    _tools = new ToolViewModel[] { FileStats, ColorPicker };
+                    _tools = new ToolViewModel[] { FileStats, ColorPicker, Tool1, Tool2, Tool3 };
                 return _tools;
             }
         }
@@ -193,6 +197,48 @@
                     _ColorPicker = new ColorPickerViewModel(this as IWorkSpaceViewModel);
 
                 return _ColorPicker;
+            }
+        }
+
+        /// <summary>
+        /// Gets an instance of the tool1 tool window viewmodel.
+        /// </summary>
+        public Tool1_ViewModel Tool1
+        {
+            get
+            {
+                if (_Tool1 == null)
+                    _Tool1 = new Tool1_ViewModel(this as IWorkSpaceViewModel);
+
+                return _Tool1;
+            }
+        }
+
+        /// <summary>
+        /// Gets an instance of the tool2 tool window viewmodel.
+        /// </summary>
+        public Tool2_ViewModel Tool2
+        {
+            get
+            {
+                if (_Tool2 == null)
+                    _Tool2 = new Tool2_ViewModel(this as IWorkSpaceViewModel);
+
+                return _Tool2;
+            }
+        }
+
+        /// <summary>
+        /// Gets an instance of the tool3 tool window viewmodel.
+        /// </summary>
+        public Tool3_ViewModel Tool3
+        {
+            get
+            {
+                if (_Tool3 == null)
+                    _Tool3 = new Tool3_ViewModel(this as IWorkSpaceViewModel);
+
+                return _Tool3;
             }
         }
 

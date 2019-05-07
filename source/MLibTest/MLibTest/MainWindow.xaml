@@ -67,6 +67,9 @@
                 </MenuItem>
                 <MenuItem Header="File Stats" IsChecked="{Binding AD_WorkSpace.FileStats.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
                 <MenuItem Header="Color Picker" IsChecked="{Binding AD_WorkSpace.ColorPicker.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+                <MenuItem Header="Tool1" IsChecked="{Binding AD_WorkSpace.Tool1.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+                <MenuItem Header="Tool2" IsChecked="{Binding AD_WorkSpace.Tool2.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+                <MenuItem Header="Tool3" IsChecked="{Binding AD_WorkSpace.Tool3.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
             </MenuItem>
         </Menu>
 
@@ -107,6 +110,15 @@
                             </Border>
                         </DataTemplate>
                     </demos:PanesTemplateSelector.ColorPickerViewTemplate>
+                    <demos:PanesTemplateSelector.Tooln_ViewTemplate>
+                        <DataTemplate>
+                            <Border Padding="6">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="I am a ToolWindow test implementation"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </demos:PanesTemplateSelector.Tooln_ViewTemplate>
                 </demos:PanesTemplateSelector>
             </avalonDock:DockingManager.LayoutItemTemplateSelector>
 
