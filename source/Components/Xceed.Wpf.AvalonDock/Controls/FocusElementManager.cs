@@ -54,8 +54,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
         //_windowHandler.Activate += new EventHandler<WindowActivateEventArgs>(WindowActivating);
         _windowHandler.Attach();
 
-        if( Application.Current != null )
-          Application.Current.Exit += new ExitEventHandler( Current_Exit );
+                if (Application.Current != null)
+                    //Application.Current.Exit += new ExitEventHandler( Current_Exit );
+                    Application.Current.Dispatcher.Invoke(new Action(() => Application.Current.Exit += new ExitEventHandler(Current_Exit)));
       }
 
       manager.PreviewGotKeyboardFocus += new KeyboardFocusChangedEventHandler( manager_PreviewGotKeyboardFocus );

@@ -65,7 +65,7 @@ namespace AvalonDock.WinFormsTestApp
 
         private void menuItemVS2010_Click(object sender, EventArgs e)
         {
-            _dockingManager.Theme = new Xceed.Wpf.AvalonDock.Themes.Vs2013BlueTheme();
+            _dockingManager.Theme = new Xceed.Wpf.AvalonDock.Themes.VS2010Theme();
             this.SetChecked(menuItemVS2010);
         }
 
@@ -114,6 +114,12 @@ namespace AvalonDock.WinFormsTestApp
             menuItemMetro.Checked = false;
 
             toCheck.Checked = true;
+        }
+
+        private void menuItemAero_Click(object sender, EventArgs e)
+        {
+            _dockingManager.Theme = new Xceed.Wpf.AvalonDock.Themes.AeroTheme();
+            this.SetChecked(menuItemAero);
         }
     }
 }

@@ -8,11 +8,12 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>MLibTest</RootNamespace>
     <AssemblyName>MLibTest</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -49,8 +50,8 @@
     <Reference Include="MWindowLib, Version=1.0.4.2, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Dirkster.MWindowLib.1.0.4.2\lib\net452\MWindowLib.dll</HintPath>
     </Reference>
-    <Reference Include="NumericUpDownLib, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Dirkster.ColorPickerLib.1.5.1\lib\net4\NumericUpDownLib.dll</HintPath>
+    <Reference Include="NumericUpDownLib, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Dirkster.NumericUpDownLib.2.3.0\lib\net4\NumericUpDownLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -80,12 +81,15 @@
     <Compile Include="Demos\LayoutInitializer.cs" />
     <Compile Include="Demos\PanesStyleSelector.cs" />
     <Compile Include="Demos\PanesTemplateSelector.cs" />
-    <Compile Include="Demos\ViewModels\AD\FileStatsViewModel.cs" />
     <Compile Include="Demos\ViewModels\AD\FileViewModel.cs" />
     <Compile Include="Demos\ViewModels\AD\PaneViewModel.cs" />
     <Compile Include="Demos\ViewModels\AD\ToolViewModel.cs" />
-    <Compile Include="Demos\ViewModels\ColorPickerViewModel.cs" />
     <Compile Include="Demos\ViewModels\Interfaces\IWorkSpaceViewModel.cs" />
+    <Compile Include="Demos\ViewModels\Tools\ColorPickerViewModel.cs" />
+    <Compile Include="Demos\ViewModels\Tools\FileStatsViewModel.cs" />
+    <Compile Include="Demos\ViewModels\Tools\Tool1_ViewModel.cs" />
+    <Compile Include="Demos\ViewModels\Tools\Tool2_ViewModel.cs" />
+    <Compile Include="Demos\ViewModels\Tools\Tool3_ViewModel.cs" />
     <Compile Include="Demos\ViewModels\WorkSpaceViewModel.cs" />
     <Compile Include="Demos\ViewModels\Views\ColorSelectionView.xaml.cs">
       <DependentUpon>ColorSelectionView.xaml</DependentUpon>

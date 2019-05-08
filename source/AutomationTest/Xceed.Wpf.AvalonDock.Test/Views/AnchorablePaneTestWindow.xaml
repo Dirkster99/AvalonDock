@@ -1,0 +1,38 @@
+<Window x:Class="Xceed.Wpf.AvalonDock.Test.views.AnchorablePaneTestWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+        Height="600" Width="800">
+    <xcad:DockingManager x:Name="dockingManager" AllowMixedOrientation="True">
+        <xcad:LayoutRoot>
+            <xcad:LayoutPanel Orientation="Horizontal">
+                <xcad:LayoutDocumentPaneGroup>
+                    <xcad:LayoutDocumentPane>
+                        <xcad:LayoutDocument Title="Screen1">
+                            <StackPanel>
+                                <Label Content="Screen1" />
+                                <Button Click="Hide_Click">Hide Screen3</Button>
+                                <Button Click="Close_Click">Close Screen2</Button>
+                                <Button Click="Show_Click">Show Screen3</Button>
+                            </StackPanel>
+                        </xcad:LayoutDocument>
+                    </xcad:LayoutDocumentPane>
+                </xcad:LayoutDocumentPaneGroup>
+                <xcad:LayoutAnchorablePane DockWidth="200">
+                    <xcad:LayoutAnchorable x:Name="Screen2" Title="Screen2">
+                        <Label Content="Screen2" />
+                    </xcad:LayoutAnchorable>
+                </xcad:LayoutAnchorablePane>
+            </xcad:LayoutPanel>
+            <xcad:LayoutRoot.LeftSide>
+                <xcad:LayoutAnchorSide>
+                    <xcad:LayoutAnchorGroup>
+                        <xcad:LayoutAnchorable x:Name="Screen3" Title="Screen3">
+                            <Label Content="Screen3" />
+                        </xcad:LayoutAnchorable>
+                    </xcad:LayoutAnchorGroup>
+                </xcad:LayoutAnchorSide>
+            </xcad:LayoutRoot.LeftSide>
+        </xcad:LayoutRoot>
+    </xcad:DockingManager>
+</Window>

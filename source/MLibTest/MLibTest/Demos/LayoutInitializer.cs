@@ -5,7 +5,9 @@
 
     class LayoutInitializer : ILayoutUpdateStrategy
     {
-        public bool BeforeInsertAnchorable(LayoutRoot layout, LayoutAnchorable anchorableToShow, ILayoutContainer destinationContainer)
+        public bool BeforeInsertAnchorable(LayoutRoot layout,
+                                           LayoutAnchorable anchorableToShow,
+                                           ILayoutContainer destinationContainer)
         {
             // AD wants to add the anchorable into destinationContainer
             // just for test provide a new anchorablepane 
@@ -18,6 +20,8 @@
             var toolsPane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(d => d.Name == "ToolsPane");
             if (toolsPane != null)
             {
+                // do not allow this as Tabbed Document
+                anchorableToShow.CanDockAsTabbedDocument = false;
                 toolsPane.Children.Add(anchorableToShow);
                 return true;
             }

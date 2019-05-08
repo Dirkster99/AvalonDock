@@ -1,9 +1,11 @@
 |  | Project |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
 | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.svg)](http://nuget.org/packages/Dirkster.AvalonDock)                                      | AvalonDock                        |
+| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Aero.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Aero)              | AvalonDock.Themes.Aero            |
 | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Expression.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Expression)  | AvalonDock.Themes.Expression      |
 | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Metro.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Metro)            | AvalonDock.Themes.Metro           |
-| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2013.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013)          | Dirkster.AvalonDock.Themes.VS2013 |
+| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2010.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010)          | Dirkster.AvalonDock.Themes.VS2010 |
+| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2013.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013)          | [Dirkster.AvalonDock.Themes.VS2013](https://github.com/Dirkster99/AvalonDock/wiki/WPF-VS-2013-Dark-Light-Demo-Client) |
 
 ## Master Branch
 [![Build status](https://ci.appveyor.com/api/projects/status/kq2wyupx5hm7fok2/branch/master?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock/branch/master)[![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)&nbsp;[Continues Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts)
@@ -12,7 +14,11 @@
 
 Support this project with a :star: -report an issue, or even better, place a pull request :mailbox: :blush:
 
-My IDE called <a href="https://dirkster99.github.io/Edi/">Edi</a> is powered by this project.
+My projects:
+- <a href="https://dirkster99.github.io/Edi/">Edi</a> and
+- <a href="https://github.com/Dirkster99/Aehnlich">Aehnlich</a>
+
+are powered by this project.
 
 AvalonDock is a WPF Document and Tool Window layout container that is used to arrange documents
 and tool windows in similar ways than many well known IDEs, such as, Eclipse, Visual Studio,
@@ -98,6 +104,31 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
+### Fixes in Version 3.5.4
+
+1) BugFix Hidden anchorable cannot be shown again (Issue [#19](https://github.com/Dirkster99/AvalonDock/issues/19))
+   - Plus start of Test Automation Client (thanx to [cswangrf](https://github.com/cswangrf))
+   - <a href="https://github.com/Dirkster99/AvalonDock/commit/c1e5893827493c7b82cd0ae7f4d1395a0a5056f1">@Dirkster99</a>
+
+2) <a href="https://github.com/Dirkster99/AvalonDock/wiki/CanDockAsTabbedDocument">CanDockAsTabbedDocument</a> (Added drag & drop support of LayoutAnchorable)
+   (Issue [#18](https://github.com/Dirkster99/AvalonDock/issues/18))
+   - <a href="https://github.com/Dirkster99/AvalonDock/commit/c1e5893827493c7b82cd0ae7f4d1395a0a5056f1">@Dirkster99</a>
+
+3) Improved support for <a href="https://github.com/Dirkster99/AvalonDock/wiki/LayoutAnchorableFloatingWindow">LayoutAnchorableFloatingWindow</a> (floating tool window) on 2nd screen (Issue [#20](https://github.com/Dirkster99/AvalonDock/issues/20))
+   - Added Reload of floating LayoutAnchable when maximized on 2nd screen
+   - Added repositioning of floating LayoutAnchable when:
+     - 2nd Monitor is not available or
+     - changed resolution puts floating LayoutAnchable out of bounds
+   - (thanx to [madenaras](https://github.com/madenaras))
+   - <a href="https://github.com/Dirkster99/AvalonDock/commit/3522efc2c15d6521440e80936fcfcf4ad383fd19">@Dirkster99</a>
+
+4) Added [zh-Hant](https://github.com/Dirkster99/AvalonDock/wiki/Localization) localization (thanx to [nuthrash](https://github.com/nuthrash)
+
+### Fixed Crash on IsSelected Document Property
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1481">#1481</a>
+- <a href="https://github.com/Dirkster99/AvalonDock/commit/fabbd218beaa996a3176d39b698ce1990bdd9254">@Dirkster99</a>
+Also Increased to Version 3.5.3.
+
 ### Fixed Issue about PanesTemplateSelector being ignored
 - <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1440">#1440</a>
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/fe18e81e9449962ce5e34e7b421f9f016eb4eb84">@Dirkster99</a>
@@ -115,6 +146,7 @@ Also Increased to Version 3.5.2.
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/6d23da0ce95236ee77e53238cf60e679a3c8fb0e">@Dirkster99</a>
 
 ### Added resource file for AvalonDock for nl-BE
+- [nl-BE](https://github.com/Dirkster99/AvalonDock/wiki/Localization)
 - <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1424">#1424</a>
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/70995417714f37d84659854245f0caad8e3c6d39">@Dirkster99</a>
 
@@ -127,7 +159,7 @@ Initialization in 2nd constructor was missing:
    _model = model;
    UpdateThemeResources();
    
-- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1442">Issue/Resolution is similar to #1442</a>
+- <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1442">Issue/Resolution is similar to #1442</a>, <a href="https://github.com/xceedsoftware/wpftoolkit/issues/1448">#1448</a>
 - <a href="https://github.com/Dirkster99/AvalonDock/commit/f966d6ced92e658cd50e5505c38f869ebae00fba">@Dirkster99</a>
 
 ### Removed unused private field in LayoutAutoHideWindowControl

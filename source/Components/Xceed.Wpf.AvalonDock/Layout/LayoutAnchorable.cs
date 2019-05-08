@@ -456,6 +456,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
           previousContainerAsLayoutGroup.InsertChildAt( PreviousContainerIndex, this );
         else
           previousContainerAsLayoutGroup.InsertChildAt( previousContainerAsLayoutGroup.ChildrenCount, this );
+
+        Parent = previousContainerAsLayoutGroup;
         IsSelected = true;
         IsActive = true;
       }

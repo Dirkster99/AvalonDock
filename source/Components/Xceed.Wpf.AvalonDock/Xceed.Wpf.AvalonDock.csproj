@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -158,6 +158,7 @@
     <Compile Include="Layout\ILayoutControl.cs" />
     <Compile Include="Layout\ILayoutDocumentPane.cs" />
     <Compile Include="Layout\ILayoutElement.cs" />
+    <Compile Include="Layout\ILayoutElementForFloatingWindowExtension.cs" />
     <Compile Include="Layout\ILayoutElementWithVisibility.cs" />
     <Compile Include="Layout\ILayoutGroup.cs" />
     <Compile Include="Layout\ILayoutOrientableElement.cs" />
@@ -264,6 +265,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="Properties\Resources.zh-Hant.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.zh-Hant.resx</DependentUpon>
+    </Compile>
     <Compile Include="Themes\DictionaryTheme.cs" />
     <Compile Include="Themes\GenericTheme.cs" />
     <Compile Include="Themes\Theme.cs" />
@@ -333,6 +339,11 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.nl-BE.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.zh-Hant.resx">
+      <SubType>Designer</SubType>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.zh-Hant.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

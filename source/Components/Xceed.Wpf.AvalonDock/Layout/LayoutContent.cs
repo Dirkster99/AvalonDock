@@ -857,6 +857,32 @@ namespace Xceed.Wpf.AvalonDock.Layout
     {
       var root = Root;
       var parentAsContainer = Parent as ILayoutContainer;
+
+      if (this.PreviousContainer == null)
+      {
+        var parentAsGroup = Parent as ILayoutGroup;
+        PreviousContainer = parentAsContainer;
+        PreviousContainerIndex = parentAsGroup.IndexOfChild( this );
+
+        if (parentAsGroup is ILayoutPaneSerializable)
+        {
+          PreviousContainerId = (parentAsGroup as ILayoutPaneSerializable).Id;
+          
+          // This parentAsGroup will be removed in the GarbageCollection below
+          if (parentAsGroup.Children.Count() == 1 && parentAsGroup.Parent != null)
+          {
+            Parent = Root.Manager.Layout;
+            PreviousContainer = parentAsGroup.Parent;
+            PreviousContainerIndex = -1;
+
+            if (parentAsGroup.Parent is ILayoutPaneSerializable)
+              PreviousContainerId = (parentAsGroup.Parent as ILayoutPaneSerializable).Id;
+            else
+              PreviousContainerId = null;
+          }
+        }
+      }
+      
       parentAsContainer.RemoveChild( this );
       if( root != null )
         root.CollectGarbage();
