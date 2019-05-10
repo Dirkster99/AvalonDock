@@ -2080,6 +2080,21 @@ namespace Xceed.Wpf.AvalonDock
           newFW.Width = paneForExtensions.FloatingWidth;
           newFW.Height = paneForExtensions.FloatingHeight;
         }
+        else
+        {
+          // Floating Window can also contain only Pane Groups at its base (issue #27) so we check for that
+          // and make sure the window is position back to where it was before (or the nearest monitor)
+          var panegroup = modelFW.RootPanel.Children.OfType<LayoutAnchorablePaneGroup>().FirstOrDefault();
+          if (panegroup != null)
+          {
+            panegroup.KeepInsideNearestMonitor();  // Check position is valid in current setup
+
+            newFW.Left = panegroup.FloatingLeft;   // Position the window to previous or nearest valid position
+            newFW.Top = panegroup.FloatingTop;
+            newFW.Width = panegroup.FloatingWidth;
+            newFW.Height = panegroup.FloatingHeight;
+          }
+        }
 
         newFW.ShowInTaskbar = false;
 
