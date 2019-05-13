@@ -765,6 +765,14 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     private void UpdateParentVisibility()
     {
+      // Element is Hidden since it has no parent but a previous parent
+      if (this.PreviousContainer != null && Parent == null)
+      {
+        // Go back to using previous parent
+        Parent = PreviousContainer;
+////        PreviousContainer = null;
+      }
+
       var parentPane = Parent as ILayoutElementWithVisibility;
       if( parentPane != null )
         parentPane.ComputeVisibility();

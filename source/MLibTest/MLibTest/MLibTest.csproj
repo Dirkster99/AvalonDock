@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -81,9 +81,14 @@
     <Compile Include="Demos\LayoutInitializer.cs" />
     <Compile Include="Demos\PanesStyleSelector.cs" />
     <Compile Include="Demos\PanesTemplateSelector.cs" />
+    <Compile Include="Demos\ViewModels\Tools\Tool2_ViewModel.cs" />
+    <Compile Include="Demos\ViewModels\Tools\Tool3_ViewModel.cs" />
+    <Compile Include="Demos\ViewModels\Tools\Tool1_ViewModel.cs" />
+    <Compile Include="Demos\ViewModels\Tools\FileStatsViewModel.cs" />
     <Compile Include="Demos\ViewModels\AD\FileViewModel.cs" />
     <Compile Include="Demos\ViewModels\AD\PaneViewModel.cs" />
     <Compile Include="Demos\ViewModels\AD\ToolViewModel.cs" />
+    <Compile Include="Demos\ViewModels\Tools\ColorPickerViewModel.cs" />
     <Compile Include="Demos\ViewModels\Interfaces\IWorkSpaceViewModel.cs" />
     <Compile Include="Demos\ViewModels\Tools\ColorPickerViewModel.cs" />
     <Compile Include="Demos\ViewModels\Tools\FileStatsViewModel.cs" />
@@ -193,5 +198,6 @@
   <ItemGroup>
     <Resource Include="Demos\Images\property-blue.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -2069,16 +2069,18 @@ namespace Xceed.Wpf.AvalonDock
         };
         newFW.SetParentToMainWindowOf( this );
 
-        var paneForExtensions = modelFW.RootPanel.Children.OfType<LayoutAnchorablePane>().FirstOrDefault();
-        if( paneForExtensions != null )
+        // Floating Window can also contain only Pane Groups at its base (issue #27) so we check for
+        // RootPanel (which is a LayoutAnchorablePaneGroup) and make sure the window is positioned back
+        // in current (or nearest) monitor
+        var panegroup = modelFW.RootPanel;
+        if (panegroup != null)
         {
-          //ensure that floating window position is inside current (or nearest) monitor
-          paneForExtensions.KeepInsideNearestMonitor();
+          panegroup.KeepInsideNearestMonitor();  // Check position is valid in current setup
 
-          newFW.Left = paneForExtensions.FloatingLeft;
-          newFW.Top = paneForExtensions.FloatingTop;
-          newFW.Width = paneForExtensions.FloatingWidth;
-          newFW.Height = paneForExtensions.FloatingHeight;
+          newFW.Left = panegroup.FloatingLeft;   // Position the window to previous or nearest valid position
+          newFW.Top = panegroup.FloatingTop;
+          newFW.Width = panegroup.FloatingWidth;
+          newFW.Height = panegroup.FloatingHeight;
         }
 
         newFW.ShowInTaskbar = false;
@@ -2088,11 +2090,11 @@ namespace Xceed.Wpf.AvalonDock
            newFW.Show();
         } ), DispatcherPriority.Send );
 
-        // Do not set the WindowState before showing or it will be lost
-        if( paneForExtensions != null && paneForExtensions.IsMaximized )
+        if( panegroup != null && panegroup.IsMaximized )
         {
           newFW.WindowState = WindowState.Maximized;
         }
+
         return newFW;
       }
 
