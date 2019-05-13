@@ -101,6 +101,9 @@
 
         private FileStatsViewModel _fileStats = null;
         private ColorPickerViewModel _ColorPicker = null;
+        private Tool1_ViewModel _Tool1;
+        private Tool2_ViewModel _Tool2;
+        private Tool3_ViewModel _Tool3;
 
         private FileViewModel _activeDocument = null;
         private Tool1_ViewModel _Tool1;
@@ -168,6 +171,7 @@
             {
                 if (_tools == null)
                     _tools = new ToolViewModel[] { FileStats, ColorPicker, _Tool1, _Tool2, _Tool3 };
+
                 return _tools;
             }
         }

@@ -39,6 +39,11 @@
         public DataTemplate Tooln_ViewTemplate { get; set; }
 
         /// <summary>
+        /// Gets a template for simple testing tool windows.
+        /// </summary>
+        public DataTemplate Tooln_ViewTemplate { get; set; }
+
+        /// <summary>
         /// Determines the matching view for a specific given type of viewmodel.
         /// </summary>
         /// <param name="item">Identifies the viewmodel object for which we require an associated view.</param>
