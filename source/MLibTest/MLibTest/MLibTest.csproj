@@ -84,17 +84,12 @@
     <Compile Include="Demos\ViewModels\Tools\Tool2_ViewModel.cs" />
     <Compile Include="Demos\ViewModels\Tools\Tool3_ViewModel.cs" />
     <Compile Include="Demos\ViewModels\Tools\Tool1_ViewModel.cs" />
-    <Compile Include="Demos\ViewModels\Tools\FileStatsViewModel.cs" />
     <Compile Include="Demos\ViewModels\AD\FileViewModel.cs" />
     <Compile Include="Demos\ViewModels\AD\PaneViewModel.cs" />
     <Compile Include="Demos\ViewModels\AD\ToolViewModel.cs" />
-    <Compile Include="Demos\ViewModels\Tools\ColorPickerViewModel.cs" />
     <Compile Include="Demos\ViewModels\Interfaces\IWorkSpaceViewModel.cs" />
     <Compile Include="Demos\ViewModels\Tools\ColorPickerViewModel.cs" />
     <Compile Include="Demos\ViewModels\Tools\FileStatsViewModel.cs" />
-    <Compile Include="Demos\ViewModels\Tools\Tool1_ViewModel.cs" />
-    <Compile Include="Demos\ViewModels\Tools\Tool2_ViewModel.cs" />
-    <Compile Include="Demos\ViewModels\Tools\Tool3_ViewModel.cs" />
     <Compile Include="Demos\ViewModels\WorkSpaceViewModel.cs" />
     <Compile Include="Demos\ViewModels\Views\ColorSelectionView.xaml.cs">
       <DependentUpon>ColorSelectionView.xaml</DependentUpon>

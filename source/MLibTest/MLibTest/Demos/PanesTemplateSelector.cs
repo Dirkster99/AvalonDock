@@ -36,8 +36,6 @@
         /// </summary>
         public DataTemplate ColorPickerViewTemplate { get; set; }
 
-        public DataTemplate Tooln_ViewTemplate { get; set; }
-
         /// <summary>
         /// Gets a template for simple testing tool windows.
         /// </summary>

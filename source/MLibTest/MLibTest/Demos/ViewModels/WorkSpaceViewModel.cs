@@ -106,9 +106,6 @@
         private Tool3_ViewModel _Tool3;
 
         private FileViewModel _activeDocument = null;
-        private Tool1_ViewModel _Tool1;
-        private Tool2_ViewModel _Tool2;
-        private Tool3_ViewModel _Tool3;
         #endregion private fields
 
         #region constructors
