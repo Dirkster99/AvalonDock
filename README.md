@@ -100,6 +100,13 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
+### Fixes in Version 3.5.5
+
+1) Improved 2nd Monitor display with maximized Layoutanchorable (toolwindow) and mutliple docked toolwindows inside (thanks to [mbullock976](https://github.com/mbullock976) for testing [Issues #27](https://github.com/Dirkster99/AvalonDock/issues/27))
+
+2) Bug fix on crash with FloatingLayoutanchorable (floating toolwindow) for [Issues #28](https://github.com/Dirkster99/AvalonDock/issues/28)
+  - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/31)
+
 ### Fixes in Version 3.5.4
 
 1) BugFix Hidden anchorable cannot be shown again (Issue [#19](https://github.com/Dirkster99/AvalonDock/issues/19))
