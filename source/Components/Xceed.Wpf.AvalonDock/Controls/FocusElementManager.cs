@@ -143,7 +143,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private static void Current_Exit( object sender, ExitEventArgs e )
     {
-      Application.Current.Exit -= new ExitEventHandler( Current_Exit );
+      if (Application.Current != null)
+         Application.Current.Exit -= new ExitEventHandler(Current_Exit);
+
       if( _windowHandler != null )
       {
         _windowHandler.FocusChanged -= new EventHandler<FocusChangeEventArgs>( WindowFocusChanging );
