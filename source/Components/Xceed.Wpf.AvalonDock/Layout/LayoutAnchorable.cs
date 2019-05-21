@@ -413,7 +413,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
       RaisePropertyChanging( "IsHidden" );
       RaisePropertyChanging( "IsVisible" );
-      //if (Parent is ILayoutPane)
+      if (Parent is ILayoutGroup)
       {
         var parentAsGroup = Parent as ILayoutGroup;
         PreviousContainer = parentAsGroup;
