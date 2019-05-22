@@ -105,7 +105,10 @@ to also theme standard elements, such as, button and textblock etc.
 1) Check in LayoutAnchorable Hide method to avoid null reference exception (thanx to [gpetrou](https://github.com/gpetrou)) 
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/32)
 
-2) Issue solved: Use [localized](https://github.com/Dirkster99/AvalonDock/wiki/Localization) resource instead of constant string in [VS 2013 Theme](https://github.com/Dirkster99/AvalonDock/wiki/WPF-VS-2013-Dark-Light-Demo-Client) (thanx to [RohanTPillai](https://github.com/RohanTPillai))
+2) Check if current application is not null in FocusElementManager (thanx to [gpetrou](https://github.com/gpetrou)) 
+   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/33)
+
+3) Issue solved: Use [localized](https://github.com/Dirkster99/AvalonDock/wiki/Localization) resource instead of constant string in [VS 2013 Theme](https://github.com/Dirkster99/AvalonDock/wiki/WPF-VS-2013-Dark-Light-Demo-Client) (thanx to [RohanTPillai](https://github.com/RohanTPillai))
 
 ### Fixes in Version 3.5.5
 
