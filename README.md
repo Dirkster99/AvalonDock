@@ -100,10 +100,13 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
-## Fixes in Master branch (no version available, yet)
+## Fixes in Master branch (no released version available, yet)
 
 1) Check in LayoutAnchorable Hide method to avoid null reference exception (thanx to [gpetrou](https://github.com/gpetrou)) 
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/32)
+
+2) Issue solved: Use [localized](https://github.com/Dirkster99/AvalonDock/wiki/Localization) resource instead of constant string in [VS 2013 Theme](https://github.com/Dirkster99/AvalonDock/wiki/WPF-VS-2013-Dark-Light-Demo-Client)
+
 ### Fixes in Version 3.5.5
 
 1) Improved 2nd Monitor display with maximized Layoutanchorable (toolwindow) and mutliple docked toolwindows inside (thanks to [mbullock976](https://github.com/mbullock976) for testing [Issues #27](https://github.com/Dirkster99/AvalonDock/issues/27))
