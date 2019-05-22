@@ -1317,7 +1317,7 @@
                                        Mode=OneWay,
                                        Converter={StaticResource BoolToVisibilityConverter}}" />
         <MenuItem Command="{Binding Path=CloseAllButThisCommand}" Header="{x:Static avalonDockProperties:Resources.Document_CloseAllButThis}" />
-        <MenuItem Command="{Binding Path=CloseAllCommand}" Header="Document CloseAll" />
+        <MenuItem Command="{Binding Path=CloseAllCommand}" Header="{x:Static avalonDockProperties:Resources.Document_CloseAll}" />
         <MenuItem Command="{Binding Path=FloatCommand}" Header="{x:Static avalonDockProperties:Resources.Document_Float}" />
         <MenuItem Command="{Binding Path=DockAsDocumentCommand}" Header="{x:Static avalonDockProperties:Resources.Document_DockAsDocument}" />
         <MenuItem Command="{Binding Path=NewHorizontalTabGroupCommand}"
