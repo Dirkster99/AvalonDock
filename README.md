@@ -100,7 +100,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
-## Fixes in Master branch (no released version available, yet)
+## Fixes in Version 3.5.6
 
 1) Check in LayoutAnchorable Hide method to avoid null reference exception (thanx to [gpetrou](https://github.com/gpetrou)) 
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/32)
