@@ -162,7 +162,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         root.FloatingWindows.Remove( _model );
       }
 
-      SetBinding(VisibilityProperty, string.Empty);
+      // We have to clear binding instead of creating a new empty binding.
+      BindingOperations.ClearBinding(_model, VisibilityProperty);
 
       _model.PropertyChanged -= new System.ComponentModel.PropertyChangedEventHandler( _model_PropertyChanged );
     }
