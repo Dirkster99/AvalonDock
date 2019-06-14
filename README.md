@@ -105,6 +105,9 @@ to also theme standard elements, such as, button and textblock etc.
 1) Fix Visibility issues in LayoutFloatingWindowControl (thanx to [scdmitryvodich](https://github.com/scdmitryvodich)) 
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/36)
 
+2) Fixed sizing behavior of anchorable panels (thanx to [scdmitryvodich](https://github.com/scdmitryvodich)) 
+   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/37)
+
 ## Fixes in Version 3.5.6
 
 1) Check in LayoutAnchorable Hide method to avoid null reference exception (thanx to [gpetrou](https://github.com/gpetrou)) 
