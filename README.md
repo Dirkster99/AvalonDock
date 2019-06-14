@@ -100,13 +100,13 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
-## In master but not in Release, yet
+## Fixes in Version 3.5.7
 
 1) Fix Visibility issues in LayoutFloatingWindowControl (thanx to [scdmitryvodich](https://github.com/scdmitryvodich)) 
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/36)
 
 2) Fixed sizing behavior of anchorable panels (thanx to [scdmitryvodich](https://github.com/scdmitryvodich)) 
-   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/37)  
+   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/37) [Issue 37](https://github.com/Dirkster99/AvalonDock/issues/37)  
   [@dirkster](https://github.com/Dirkster99/AvalonDock/commit/ee4c8c9a5d25a54562089469754094f21af6cd34)
   
 ## Fixes in Version 3.5.6
