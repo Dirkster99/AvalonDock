@@ -2389,10 +2389,17 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
+    /// <summary>
+    /// Method executes when the <see cref="DockingManager"/> control has changed its height and/or width.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
-      double width = ActualWidth - GridSplitterWidth - RightSidePanel.ActualWidth - LeftSidePanel.ActualWidth;
-      double height = ActualHeight - GridSplitterHeight - TopSidePanel.ActualHeight - BottomSidePanel.ActualHeight;
+      // Lets make sure this always remains non-negative to avoid crach in layout system
+      double width = Math.Max(ActualWidth - GridSplitterWidth - RightSidePanel.ActualWidth - LeftSidePanel.ActualWidth, 0);
+      double height = Math.Max(ActualHeight - GridSplitterHeight - TopSidePanel.ActualHeight - BottomSidePanel.ActualHeight, 0);
+
       LayoutRootPanel.AdjustFixedChildrenPanelSizes(new Size(width, height));
     }
 
