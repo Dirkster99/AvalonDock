@@ -190,6 +190,10 @@ namespace Xceed.Wpf.AvalonDock
            //fw.Owner = Window.GetWindow(this);
            //fw.SetParentToMainWindowOf(this);
         }
+
+        // In order to prevent resource leaks, unsubscribe from SizeChanged event for case when user call loading of Layout Settigns.
+        SizeChanged -= OnSizeChanged;
+        SizeChanged += OnSizeChanged;
       }
 
       if( newLayout != null )
@@ -2366,6 +2370,10 @@ namespace Xceed.Wpf.AvalonDock
           TopSidePanel = CreateUIElementForModel( Layout.TopSide ) as LayoutAnchorSideControl;
           RightSidePanel = CreateUIElementForModel( Layout.RightSide ) as LayoutAnchorSideControl;
           BottomSidePanel = CreateUIElementForModel( Layout.BottomSide ) as LayoutAnchorSideControl;
+
+          // In order to prevent resource leaks, unsubscribe from SizeChanged event for case when we have no stored Layout settings.
+          SizeChanged -= OnSizeChanged;
+          SizeChanged += OnSizeChanged;
         }
 
         SetupAutoHideWindow();
@@ -2381,8 +2389,17 @@ namespace Xceed.Wpf.AvalonDock
       }
     }
 
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+      double width = ActualWidth - GridSplitterWidth - RightSidePanel.ActualWidth - LeftSidePanel.ActualWidth;
+      double height = ActualHeight - GridSplitterHeight - TopSidePanel.ActualHeight - BottomSidePanel.ActualHeight;
+      LayoutRootPanel.AdjustFixedChildrenPanelSizes(new Size(width, height));
+    }
+
     private void DockingManager_Unloaded( object sender, RoutedEventArgs e )
     {
+      SizeChanged -= OnSizeChanged;
+
       if( !DesignerProperties.GetIsInDesignMode( this ) )
       {
         if( _autoHideWindowManager != null )

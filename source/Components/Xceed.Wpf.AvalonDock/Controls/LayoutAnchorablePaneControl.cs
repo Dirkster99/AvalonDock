@@ -47,7 +47,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
       SetBinding( ItemsSourceProperty, new Binding( "Model.Children" ) { Source = this } );
       SetBinding( FlowDirectionProperty, new Binding( "Model.Root.Manager.FlowDirection" ) { Source = this } );
 
-      this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
+      // Handle SizeChanged event instead of LayoutUpdated. It will exlude fluctuations of Actual size values.
+      // this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
+      this.SizeChanged += OnSizeChanged;
     }
 
     #endregion
@@ -95,11 +97,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region Private Methods
 
-    private void OnLayoutUpdated( object sender, EventArgs e )
+    private void OnSizeChanged( object sender, SizeChangedEventArgs e)
     {
-      var modelWithAtcualSize = _model as ILayoutPositionableElementWithActualSize;
-      modelWithAtcualSize.ActualWidth = ActualWidth;
-      modelWithAtcualSize.ActualHeight = ActualHeight;
+      var modelWithActualSize = _model as ILayoutPositionableElementWithActualSize;
+      modelWithActualSize.ActualWidth = ActualWidth;
+      modelWithActualSize.ActualHeight = ActualHeight;
     }
 
     #endregion

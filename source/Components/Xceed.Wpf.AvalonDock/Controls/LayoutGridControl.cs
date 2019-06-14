@@ -15,6 +15,7 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows;
@@ -25,7 +26,7 @@ using System.Windows.Threading;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-  public abstract class LayoutGridControl<T> : Grid, ILayoutControl where T : class, ILayoutPanelElement
+  public abstract class LayoutGridControl<T> : Grid, ILayoutControl, IAdjustableSizeLayout where T : class, ILayoutPanelElement
   {
     #region Members
 
@@ -55,6 +56,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       _orientation = orientation;
 
       FlowDirection = System.Windows.FlowDirection.LeftToRight;
+      Unloaded += OnUnloaded;
     }
 
     #endregion
@@ -106,7 +108,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
                   } ), DispatcherPriority.Normal, null );
           };
 
-      this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
+      this.SizeChanged +=  OnSizeChanged;
     }
 
     #endregion
@@ -125,7 +127,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #region Private Methods
 
-    private void OnLayoutUpdated( object sender, EventArgs e )
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
       var modelWithAtcualSize = _model as ILayoutPositionableElementWithActualSize;
       modelWithAtcualSize.ActualWidth = ActualWidth;
@@ -136,6 +138,15 @@ namespace Xceed.Wpf.AvalonDock.Controls
         _initialized = true;
         UpdateChildren();
       }
+
+      AdjustFixedChildrenPanelSizes();
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+      // In order to prevent resource leaks, unsubscribe from SizeChanged events.
+      SizeChanged -= OnSizeChanged;
+      Unloaded -= OnUnloaded;
     }
 
     private void UpdateChildren()
@@ -459,26 +470,161 @@ namespace Xceed.Wpf.AvalonDock.Controls
       HideResizerOverlayWindow();
     }
 
+    public virtual void AdjustFixedChildrenPanelSizes(Size? parentSize = null)
+    {
+      List<FrameworkElement> visibleChildren = GetVisibleChildren();
+      if (visibleChildren.Count == 0)
+      {
+        return;
+      }
+
+      List<ILayoutPositionableElementWithActualSize> layoutChildrenModels = visibleChildren.OfType<ILayoutControl>()
+        .Select(child => child.Model)
+        .OfType<ILayoutPositionableElementWithActualSize>()
+        .ToList();
+            
+      List<LayoutGridResizerControl> splitterChildren = visibleChildren.OfType<LayoutGridResizerControl>().ToList();
+      List<ILayoutPositionableElementWithActualSize> fixedPanels;
+      List<ILayoutPositionableElementWithActualSize> relativePanels;
+
+      // Get current available size of panel.
+      Size availableSize = parentSize ?? new Size(ActualWidth, ActualHeight);
+
+      // Calculate minimum required size and current size of children.
+      Size minimumSize = new Size(0, 0);
+      Size currentSize = new Size(0, 0);
+      Size preferredMinimumSize = new Size(0, 0);
+      if (Orientation == Orientation.Vertical)
+      {
+        fixedPanels = layoutChildrenModels.Where(child => child.DockHeight.IsAbsolute).ToList();
+        relativePanels = layoutChildrenModels.Where(child => !child.DockHeight.IsAbsolute).ToList();
+        minimumSize.Width += layoutChildrenModels.Max(child => child.DockMinWidth);
+        minimumSize.Height += layoutChildrenModels.Sum(child => child.DockMinHeight);
+        minimumSize.Height += splitterChildren.Sum(child => child.ActualHeight);
+        currentSize.Width += layoutChildrenModels.Max(child => child.ActualWidth);
+        currentSize.Height += layoutChildrenModels.Sum(child => child.ActualHeight);
+        currentSize.Height += splitterChildren.Sum(child => child.ActualHeight);
+        preferredMinimumSize.Width += layoutChildrenModels.Max(child => child.DockMinWidth);
+        preferredMinimumSize.Height += minimumSize.Height + fixedPanels.Sum(child => child.FixedDockHeight) - fixedPanels.Sum(child => child.DockMinHeight);
+      }
+      else
+      {
+        fixedPanels = layoutChildrenModels.Where(child => child.DockWidth.IsAbsolute).ToList();
+        relativePanels = layoutChildrenModels.Where(child => !child.DockWidth.IsAbsolute).ToList();
+        minimumSize.Width += layoutChildrenModels.Sum(child => child.DockMinWidth);
+        minimumSize.Height += layoutChildrenModels.Max(child => child.DockMinHeight);
+        minimumSize.Width += splitterChildren.Sum(child => child.ActualWidth);
+        currentSize.Width += layoutChildrenModels.Sum(child => child.ActualWidth);
+        currentSize.Height += layoutChildrenModels.Max(child => child.ActualHeight);
+        currentSize.Width += splitterChildren.Sum(child => child.ActualWidth);
+        preferredMinimumSize.Height += layoutChildrenModels.Max(child => child.DockMinHeight);
+        preferredMinimumSize.Width += minimumSize.Width + fixedPanels.Sum(child => child.FixedDockWidth) - fixedPanels.Sum(child => child.DockMinWidth);
+      }
+
+      // Apply corrected sizes for fixed panels.
+      if (Orientation == Orientation.Vertical)
+      {
+        double delta = availableSize.Height - currentSize.Height;
+        double relativeDelta = relativePanels.Sum(child => child.ActualHeight - child.DockMinHeight);
+        delta += relativeDelta;
+        foreach (var fixedChild in fixedPanels)
+        {
+          if (minimumSize.Height >= availableSize.Height)
+          {
+            fixedChild.ResizableAbsoluteDockHeight = fixedChild.DockMinHeight;
+          }
+          else if (preferredMinimumSize.Height <= availableSize.Height)
+          {
+            fixedChild.ResizableAbsoluteDockHeight = fixedChild.FixedDockHeight;
+          }
+          else if (relativePanels.All(child => Math.Abs(child.ActualHeight - child.DockMinHeight) <= 1))
+          {
+            int indexOfChild = fixedPanels.IndexOf(fixedChild);
+            double fixedHeightLeft = fixedPanels.Where(child => fixedPanels.IndexOf(child) >= indexOfChild)
+              .Sum(child => child.FixedDockHeight);
+            double panelFraction = fixedChild.FixedDockHeight / (fixedHeightLeft > 0 ? fixedHeightLeft : 1);
+            double childActualHeight = fixedChild.ActualHeight;
+            double heightToSet = Math.Max(Math.Round(delta * panelFraction + fixedChild.ActualHeight), fixedChild.DockMinHeight);
+            fixedChild.ResizableAbsoluteDockHeight = heightToSet;
+            delta -= heightToSet - childActualHeight;
+          }
+        }
+      }
+      else
+      {
+        double delta = availableSize.Width - currentSize.Width;
+        double relativeDelta = relativePanels.Sum(child => child.ActualWidth - child.DockMinWidth);
+        delta += relativeDelta;
+        foreach (var fixedChild in fixedPanels)
+        {
+          if (minimumSize.Width >= availableSize.Width)
+          {
+            fixedChild.ResizableAbsoluteDockWidth = fixedChild.DockMinWidth;
+          }
+          else if (preferredMinimumSize.Width <= availableSize.Width)
+          {
+            fixedChild.ResizableAbsoluteDockWidth = fixedChild.FixedDockWidth;
+          }
+          else
+          {
+            int indexOfChild = fixedPanels.IndexOf(fixedChild);
+            double fixedWidthLeft = fixedPanels.Where(child => fixedPanels.IndexOf(child) >= indexOfChild)
+              .Sum(child => child.FixedDockWidth);
+            double panelFraction = fixedChild.FixedDockWidth / (fixedWidthLeft > 0 ? fixedWidthLeft : 1);
+            double childActualWidth = fixedChild.ActualWidth;
+            double widthToSet = Math.Max(Math.Round(delta * panelFraction + fixedChild.ActualWidth), fixedChild.DockMinWidth);
+            fixedChild.ResizableAbsoluteDockWidth = widthToSet;
+            delta -= widthToSet - childActualWidth;
+          }
+        }
+      }
+
+      foreach (IAdjustableSizeLayout child in InternalChildren.OfType<IAdjustableSizeLayout>())
+      {
+        child.AdjustFixedChildrenPanelSizes(availableSize);
+      }
+    }
+
     private FrameworkElement GetNextVisibleChild( int index )
     {
-      for( int i = index + 1; i < InternalChildren.Count; i++ )
+      for (int i = index + 1; i < InternalChildren.Count; i++)
       {
-        if( InternalChildren[ i ] is LayoutGridResizerControl )
+        if (InternalChildren[i] is LayoutGridResizerControl)
           continue;
 
-        if( Orientation == System.Windows.Controls.Orientation.Horizontal )
+        if (IsChildVisible(i))
         {
-          if( ColumnDefinitions[ i ].Width.IsStar || ColumnDefinitions[ i ].Width.Value > 0 )
-            return InternalChildren[ i ] as FrameworkElement;
-        }
-        else
-        {
-          if( RowDefinitions[ i ].Height.IsStar || RowDefinitions[ i ].Height.Value > 0 )
-            return InternalChildren[ i ] as FrameworkElement;
+          return InternalChildren[i] as FrameworkElement;
         }
       }
 
       return null;
+    }
+
+    private List<FrameworkElement> GetVisibleChildren()
+    {
+      List<FrameworkElement> visibleChildren = new List<FrameworkElement>();
+      for (int i = 0; i < InternalChildren.Count; i++)
+      {
+        if (IsChildVisible(i) && InternalChildren[i] is FrameworkElement)
+        {
+          visibleChildren.Add(InternalChildren[i] as FrameworkElement);
+        }
+      }
+
+      return visibleChildren;
+    }
+
+    private bool IsChildVisible(int index)
+    {
+      if( Orientation == Orientation.Horizontal )
+      {
+        return ColumnDefinitions[index].Width.IsStar || ColumnDefinitions[index].Width.Value > 0;
+      }
+      else
+      {
+        return RowDefinitions[ index ].Height.IsStar || RowDefinitions[ index ].Height.Value > 0;
+      }
     }
 
     private void ShowResizerOverlayWindow( LayoutGridResizerControl splitter )

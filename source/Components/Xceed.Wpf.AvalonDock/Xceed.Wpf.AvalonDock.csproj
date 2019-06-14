@@ -156,6 +156,7 @@
     <Compile Include="Layout\ILayoutContainer.cs" />
     <Compile Include="Layout\ILayoutContentSelector.cs" />
     <Compile Include="Layout\ILayoutControl.cs" />
+    <Compile Include="Layout\IAdjustableSizeLayout.cs" />
     <Compile Include="Layout\ILayoutDocumentPane.cs" />
     <Compile Include="Layout\ILayoutElement.cs" />
     <Compile Include="Layout\ILayoutElementForFloatingWindowExtension.cs" />

@@ -21,7 +21,7 @@ using System.Globalization;
 namespace Xceed.Wpf.AvalonDock.Layout
 {
   [Serializable]
-  public abstract class LayoutPositionableGroup<T> : LayoutGroup<T>, ILayoutPositionableElement, ILayoutPositionableElementWithActualSize where T : class, ILayoutElement
+  public abstract class LayoutPositionableGroup<T> : LayoutGroup<T>, ILayoutPositionableElementWithActualSize where T : class, ILayoutElement
   {
     #region Members
 
@@ -46,17 +46,50 @@ namespace Xceed.Wpf.AvalonDock.Layout
     {
       get
       {
-        return _dockWidth;
+        return _dockWidth.IsAbsolute && _resizableAbsoluteDockWidth < _dockWidth.Value && _resizableAbsoluteDockWidth.HasValue
+          ? new GridLength(_resizableAbsoluteDockWidth.Value)
+          : _dockWidth;
       }
       set
       {
-        if( DockWidth != value && value.Value > 0)
+        if(_dockWidth != value && value.Value > 0)
         {
+          if (value.IsAbsolute)
+          {
+            _resizableAbsoluteDockWidth = value.Value;
+          }
+
           RaisePropertyChanging( "DockWidth" );
           _dockWidth = value;
           RaisePropertyChanged( "DockWidth" );
 
           OnDockWidthChanged();
+        }
+      }
+    }
+
+    public double FixedDockWidth => _dockWidth.IsAbsolute && _dockWidth.Value >= _dockMinWidth ? _dockWidth.Value : _dockMinWidth;
+    
+    private double? _resizableAbsoluteDockWidth;
+
+    public double ResizableAbsoluteDockWidth
+    {
+      get { return _resizableAbsoluteDockWidth ?? 0; }
+      set
+      {
+        if (_dockWidth.IsAbsolute)
+        {
+          if (value <= _dockWidth.Value && value > 0)
+          {
+            RaisePropertyChanging("DockWidth");
+            _resizableAbsoluteDockWidth = value;
+            RaisePropertyChanged("DockWidth");
+            OnDockWidthChanged();
+          }
+          else if(value > _dockWidth.Value && _resizableAbsoluteDockWidth <_dockWidth.Value)
+          {
+            _resizableAbsoluteDockWidth = _dockWidth.Value;
+          }
         }
       }
     }
@@ -70,17 +103,54 @@ namespace Xceed.Wpf.AvalonDock.Layout
     {
       get
       {
-        return _dockHeight;
+        return _dockHeight.IsAbsolute && _resizableAbsoluteDockHeight < _dockHeight.Value && _resizableAbsoluteDockHeight.HasValue
+          ? new GridLength(_resizableAbsoluteDockHeight.Value)
+          : _dockHeight;
       }
       set
       {
-        if( DockHeight != value && value.Value > 0)
+        if( _dockHeight != value && value.Value > 0)
         {
+          if (value.IsAbsolute)
+          {
+            _resizableAbsoluteDockHeight = value.Value;
+          }
+
           RaisePropertyChanging( "DockHeight" );
           _dockHeight = value;
           RaisePropertyChanged( "DockHeight" );
 
           OnDockHeightChanged();
+        }
+      }
+    }
+
+    public double FixedDockHeight => _dockHeight.IsAbsolute && _dockHeight.Value >= _dockMinHeight ? _dockHeight.Value : _dockMinHeight;
+
+    private double? _resizableAbsoluteDockHeight;
+      
+    public double ResizableAbsoluteDockHeight
+    {
+      get { return _resizableAbsoluteDockHeight ?? 0; }
+      set
+      {
+        if (_dockHeight.IsAbsolute)
+        {
+          if (value < _dockHeight.Value && value > 0)
+          {
+            RaisePropertyChanging("DockHeight");
+            _resizableAbsoluteDockHeight = value;
+            RaisePropertyChanged("DockHeight");
+            OnDockHeightChanged();
+          }
+          else if(value > _dockHeight.Value && _resizableAbsoluteDockHeight <_dockHeight.Value)
+          {
+            _resizableAbsoluteDockHeight = _dockHeight.Value;
+          }
+          else if(value == 0)
+          {
+            _resizableAbsoluteDockHeight = DockMinHeight;
+          }
         }
       }
     }
@@ -335,9 +405,9 @@ namespace Xceed.Wpf.AvalonDock.Layout
     public override void WriteXml( System.Xml.XmlWriter writer )
     {
       if( DockWidth.Value != 1.0 || !DockWidth.IsStar )
-        writer.WriteAttributeString( "DockWidth", _gridLengthConverter.ConvertToInvariantString( DockWidth ) );
+        writer.WriteAttributeString( "DockWidth", _gridLengthConverter.ConvertToInvariantString( DockWidth.IsAbsolute ? new GridLength(FixedDockWidth) : DockWidth ) );
       if( DockHeight.Value != 1.0 || !DockHeight.IsStar )
-        writer.WriteAttributeString( "DockHeight", _gridLengthConverter.ConvertToInvariantString( DockHeight ) );
+        writer.WriteAttributeString( "DockHeight", _gridLengthConverter.ConvertToInvariantString(DockHeight.IsAbsolute ? new GridLength(FixedDockHeight) : DockHeight ) );
 
       if( DockMinWidth != 25.0 )
         writer.WriteAttributeString( "DockMinWidth", DockMinWidth.ToString( CultureInfo.InvariantCulture ) );
