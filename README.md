@@ -99,6 +99,11 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
+## In Master branch but not released, yet
+
+1) Added 'ca-ES' localization. Updated 'es' localization. (thanx to [xnaval](https://github.com/xnaval)  
+   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/40)
+
 ## Fixes in Version 3.5.7
 
 1) Fix Visibility issues in LayoutFloatingWindowControl (thanx to [scdmitryvodich](https://github.com/scdmitryvodich)) 
