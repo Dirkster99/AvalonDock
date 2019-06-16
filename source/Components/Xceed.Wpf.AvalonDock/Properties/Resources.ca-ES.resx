@@ -118,64 +118,64 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Anchorable_AutoHide" xml:space="preserve">
-    <value>Esconder automáticamente</value>
+    <value>Amagar automàticament</value>
   </data>
   <data name="Anchorable_BtnAutoHide_Hint" xml:space="preserve">
-    <value>Esconder automáticamente</value>
+    <value>Amagar automàticament</value>
   </data>
   <data name="Anchorable_BtnClose_Hint" xml:space="preserve">
-    <value>Esconder</value>
+    <value>Amagar</value>
   </data>
   <data name="Anchorable_CxMenu_Hint" xml:space="preserve">
-    <value>Posición de la ventana </value>
+    <value>Posició de la finestra</value>
   </data>
   <data name="Anchorable_Dock" xml:space="preserve">
-    <value>Anclar</value>
+    <value>Ancorar</value>
   </data>
   <data name="Anchorable_DockAsDocument" xml:space="preserve">
-    <value>Anclar como documento en ficha</value>
+    <value>Ancorar com document en fitxa</value>
   </data>
   <data name="Anchorable_Float" xml:space="preserve">
-    <value>Ventana flotante</value>
+    <value>Finestra flotant</value>
   </data>
   <data name="Anchorable_Hide" xml:space="preserve">
-    <value>Esconder</value>
+    <value>Amagar</value>
   </data>
   <data name="Document_BtnPinned_Hint" xml:space="preserve">
-    <value>Cambiar el estado del pin</value>
+    <value>Canviar l'estat del pin</value>
   </data>
   <data name="Document_Close" xml:space="preserve">
-    <value>Cerrar</value>
+    <value>Tancar</value>
   </data>
   <data name="Document_CloseAll" xml:space="preserve">
-    <value>Cerrar todo</value>
+    <value>Tancar-ho tot</value>
   </data>
   <data name="Document_CloseAllButThis" xml:space="preserve">
-    <value>Cerrar todo excepto este</value>
+    <value>Tancar-ho tot excepte aquest</value>
   </data>
   <data name="Document_CxMenu_Hint" xml:space="preserve">
-    <value>Posición de la ventana</value>
+    <value>Posició de la finestra</value>
   </data>
   <data name="Document_DockAsDocument" xml:space="preserve">
-    <value>Anclar como documento en ficha</value>
+    <value>Ancorar com a document en fitxa</value>
   </data>
   <data name="Document_Float" xml:space="preserve">
-    <value>Ventana flotante</value>
+    <value>Finestra flotant</value>
   </data>
   <data name="Document_MoveToNextTabGroup" xml:space="preserve">
-    <value>Mover al siguiente grupo de fichas</value>
+    <value>Moure al següent grup de fitxes</value>
   </data>
   <data name="Document_MoveToPreviousTabGroup" xml:space="preserve">
-    <value>Mover al anterior grupo de fichas </value>
+    <value>Moure a l'anterior grup de fitxes</value>
   </data>
   <data name="Document_NewHorizontalTabGroup" xml:space="preserve">
-    <value>Nuevo grupo de fichas horizontal</value>
+    <value>Nou grup de fitxes horitzontal</value>
   </data>
   <data name="Document_NewVerticalTabGroup" xml:space="preserve">
-    <value>Nuevo grupo de fichas vertical</value>
+    <value>Nou grup de fitxes vertical</value>
   </data>
   <data name="Window_Maximize" xml:space="preserve">
-    <value>Maximizar</value>
+    <value>Maximitzar</value>
   </data>
   <data name="Window_Restore" xml:space="preserve">
     <value>Restaurar</value>
