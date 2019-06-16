@@ -101,9 +101,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## In Master branch but not released, yet
 
-1) Added [ca-es localization](https://github.com/Dirkster99/AvalonDock/wiki/Localization).  
-   Updated [es localization](https://github.com/Dirkster99/AvalonDock/wiki/Localization).  
-   (thanx to [xnaval](https://github.com/xnaval))  
+1) Added [ca-es localization](https://github.com/Dirkster99/AvalonDock/wiki/Localization). Updated [es localization](https://github.com/Dirkster99/AvalonDock/wiki/Localization). (thanx to [xnaval](https://github.com/xnaval))  
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/40)
 
 ## Fixes in Version 3.5.7
