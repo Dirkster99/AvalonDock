@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows;
@@ -53,10 +54,18 @@ namespace Xceed.Wpf.AvalonDock.Controls
         _windowHandler.FocusChanged += new EventHandler<FocusChangeEventArgs>( WindowFocusChanging );
         //_windowHandler.Activate += new EventHandler<WindowActivateEventArgs>(WindowActivating);
         _windowHandler.Attach();
+        if (Application.Current != null)
+        {
+          //Application.Current.Exit += new ExitEventHandler( Current_Exit );
+          //Application.Current.Dispatcher.Invoke(new Action(() => Application.Current.Exit += new ExitEventHandler(Current_Exit)));
 
-                if (Application.Current != null)
-                    //Application.Current.Exit += new ExitEventHandler( Current_Exit );
-                    Application.Current.Dispatcher.Invoke(new Action(() => Application.Current.Exit += new ExitEventHandler(Current_Exit)));
+          // For resolve issue "System.InvalidOperationException: Cannot perform this operation while dispatcher processing is suspended." make async subscribing instead of sync subscribing.
+          Action subscribeToExitAction = new Action(() => Application.Current.Exit += new ExitEventHandler(Current_Exit));
+          int disableProcessingCount = (int?)typeof(Dispatcher).GetField("_disableProcessingCount", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(Dispatcher.CurrentDispatcher) ?? 0;
+          var dispatcherResult = disableProcessingCount == 0
+              ? Application.Current.Dispatcher.Invoke(subscribeToExitAction)
+              : Application.Current.Dispatcher.BeginInvoke(subscribeToExitAction);
+        }
       }
 
       manager.PreviewGotKeyboardFocus += new KeyboardFocusChangedEventHandler( manager_PreviewGotKeyboardFocus );
