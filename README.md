@@ -108,7 +108,7 @@ to also theme standard elements, such as, button and textblock etc.
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/44)
 
 3) Adding support for Japanes, Korean, and Polish  
-  - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/45)
+   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/45)
 
 ## Fixes in Version 3.5.7
 
