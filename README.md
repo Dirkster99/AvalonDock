@@ -107,6 +107,9 @@ to also theme standard elements, such as, button and textblock etc.
 2) Fix Visibility issue on closing LayoutFloatingWindowControl (thanx to [scdmitryvodich](https://github.com/scdmitryvodich))  
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/44)
 
+3) Adding support for Japanes, Korean, and Polish  
+  - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/45)
+
 ## Fixes in Version 3.5.7
 
 1) Fix Visibility issues in LayoutFloatingWindowControl (thanx to [scdmitryvodich](https://github.com/scdmitryvodich)) 
