@@ -104,6 +104,9 @@ to also theme standard elements, such as, button and textblock etc.
 1) Added [ca-es localization](https://github.com/Dirkster99/AvalonDock/wiki/Localization). Updated [es localization](https://github.com/Dirkster99/AvalonDock/wiki/Localization). (thanx to [xnaval](https://github.com/xnaval))  
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/40)
 
+2) Fix Visibility issue on closing LayoutFloatingWindowControl (thanx to [scdmitryvodich](https://github.com/scdmitryvodich))  
+   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/44)
+
 ## Fixes in Version 3.5.7
 
 1) Fix Visibility issues in LayoutFloatingWindowControl (thanx to [scdmitryvodich](https://github.com/scdmitryvodich)) 
