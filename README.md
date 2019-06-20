@@ -110,6 +110,9 @@ to also theme standard elements, such as, button and textblock etc.
 3) Adding support for Japanes, Korean, and Polish  
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/45)
 
+4) #42 Fix Dispatcher Suspend Exception issue (thanx to [vkotenev-sc](https://github.com/vkotenev-sc) [scdmitryvodich](https://github.com/scdmitryvodich))  
+   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/43)
+
 ## Fixes in Version 3.5.7
 
 1) Fix Visibility issues in LayoutFloatingWindowControl (thanx to [scdmitryvodich](https://github.com/scdmitryvodich)) 
