@@ -58,13 +58,22 @@ namespace Xceed.Wpf.AvalonDock.Controls
         {
           //Application.Current.Exit += new ExitEventHandler( Current_Exit );
           //Application.Current.Dispatcher.Invoke(new Action(() => Application.Current.Exit += new ExitEventHandler(Current_Exit)));
-
-          // For resolve issue "System.InvalidOperationException: Cannot perform this operation while dispatcher processing is suspended." make async subscribing instead of sync subscribing.
+          var disp = Application.Current.Dispatcher;
           Action subscribeToExitAction = new Action(() => Application.Current.Exit += new ExitEventHandler(Current_Exit));
-          int disableProcessingCount = (int?)typeof(Dispatcher).GetField("_disableProcessingCount", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(Dispatcher.CurrentDispatcher) ?? 0;
-          var dispatcherResult = disableProcessingCount == 0
-              ? Application.Current.Dispatcher.Invoke(subscribeToExitAction)
-              : Application.Current.Dispatcher.BeginInvoke(subscribeToExitAction);
+          if (disp.CheckAccess())
+          {
+           // if we are already on the dispatcher thread we don't need to call Invoke/BeginInvoke
+           subscribeToExitAction();
+          }
+          else
+          {
+            // For resolve issue "System.InvalidOperationException: Cannot perform this operation while dispatcher processing is suspended." make async subscribing instead of sync subscribing.
+            int disableProcessingCount = (int?)typeof(Dispatcher).GetField("_disableProcessingCount", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(disp) ?? 0;
+
+            var dispatcherResult = disableProcessingCount == 0
+            ? disp.Invoke(subscribeToExitAction)
+            : disp.BeginInvoke(subscribeToExitAction);
+          }
         }
       }
 
