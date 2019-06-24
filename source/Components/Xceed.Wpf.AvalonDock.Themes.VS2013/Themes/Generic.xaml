@@ -151,7 +151,7 @@
                                            Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellOverflowButtonDefaultGlyph}}"
                                            Width="12" Height="12">
                                     <Rectangle.OpacityMask>
-                                        <ImageBrush ImageSource="../Images/PinDocMenu.png" />
+                                        <ImageBrush ImageSource="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Images/PinDocMenu.png" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
                             </avalonDockControls:DropDownButton>
@@ -532,7 +532,7 @@
                                            Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
                                            Width="13" Height="13">
                                     <Rectangle.OpacityMask>
-                                        <ImageBrush ImageSource="../Images/PinMenu.png" />
+                                        <ImageBrush ImageSource="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Images/PinMenu.png" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
                             </avalonDockControls:DropDownButton>
@@ -554,7 +554,7 @@
                                            Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
                                            Width="13" Height="13">
                                     <Rectangle.OpacityMask>
-                                        <ImageBrush ImageSource="../Images/PinAutoHide.png" />
+                                        <ImageBrush ImageSource="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Images/PinAutoHide.png" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
                             </Button>
@@ -575,7 +575,7 @@
                                            Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
                                            Width="13" Height="13">
                                     <Rectangle.OpacityMask>
-                                        <ImageBrush ImageSource="../Images/PinClose.png" />
+                                        <ImageBrush ImageSource="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Images/PinClose.png" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
                             </Button>
@@ -1328,7 +1328,7 @@
                                        Converter={StaticResource BoolToVisibilityConverter}}">
             <MenuItem.Icon>
                 <Image Width="14"
-                       Source="/Images\HTabGroup.png"
+                       Source="../Images/HTabGroup.png"
                        Stretch="Uniform" />
             </MenuItem.Icon>
         </MenuItem>
@@ -1446,7 +1446,7 @@
                                     <Rectangle x:Name="PART_ImgPinClose"
                                                Width="13" Height="13">
                                         <Rectangle.OpacityMask>
-                                            <ImageBrush ImageSource="../Images/PinClose.png" />
+                                            <ImageBrush ImageSource="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Images/PinClose.png" />
                                         </Rectangle.OpacityMask>
                                     </Rectangle>
                                 </Button>
@@ -1709,7 +1709,7 @@
                                                        Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="../Images/PinMenu.png" />
+                                                    <ImageBrush ImageSource="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Images/PinMenu.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </avalonDockControls:DropDownButton>
@@ -1731,7 +1731,7 @@
                                                        Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="../Images/PinMaximize.png" />
+                                                    <ImageBrush ImageSource="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Images/PinMaximize.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </Button>
@@ -1753,7 +1753,7 @@
                                                        Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="../Images/PinRestore.png" />
+                                                    <ImageBrush ImageSource="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Images/PinRestore.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </Button>
@@ -1776,7 +1776,7 @@
                                                        Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="../Images/PinClose.png" />
+                                                    <ImageBrush ImageSource="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Images/PinClose.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </Button>
@@ -2040,7 +2040,7 @@
                                                        Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="../Images/PinMenu.png" />
+                                                    <ImageBrush ImageSource="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Images/PinMenu.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </avalonDockControls:DropDownButton>
@@ -2064,7 +2064,7 @@
                                                        Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="../Images/PinMaximize.png" />
+                                                    <ImageBrush ImageSource="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Images/PinMaximize.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </Button>
@@ -2086,7 +2086,7 @@
                                                        Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="../Images/PinRestore.png" />
+                                                    <ImageBrush ImageSource="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Images/PinRestore.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </Button>
@@ -2109,7 +2109,7 @@
                                                        Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
                                                        Width="13" Height="13">
                                                 <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="../Images/PinClose.png" />
+                                                    <ImageBrush ImageSource="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Images/PinClose.png" />
                                                 </Rectangle.OpacityMask>
                                             </Rectangle>
                                         </Button>

@@ -46,7 +46,9 @@
         {
             try
             {
-                if (System.IO.File.Exists(@".\AvalonDock.Layout.config") == false)
+                string path = System.IO.Path.GetFullPath(@".\AvalonDock.Layout.config");
+
+                if (System.IO.File.Exists(path) == false)
                     return;
 
                 var layoutSerializer = new XmlLayoutSerializer(dockManager);
@@ -64,7 +66,8 @@
                     //    File.Exists(e.Model.ContentId))
                     //    e.Content = Workspace.This.Open(e.Model.ContentId);
                 };
-                layoutSerializer.Deserialize(@".\AvalonDock.Layout.config");
+
+                layoutSerializer.Deserialize(path);
             }
             catch (System.Exception exception)
             {

@@ -28,7 +28,7 @@ using System;
 
 [assembly: AssemblyCompany("Open Source")]
 [assembly: AssemblyProduct( "Xceed - AvalonDock" )]
-[assembly: AssemblyCopyright("Copyright © 2018")]
+[assembly: AssemblyCopyright("Copyright © 2018-2019")]
 
 
 
@@ -64,6 +64,6 @@ using System;
 [assembly: AssemblyDelaySign( false )]
 ////[assembly: AssemblyKeyFile( @"..\..\sn.snk" )]
 [assembly: AssemblyKeyName( "" )]
-[assembly: AssemblyVersion("1.0.3.0")]
-[assembly: AssemblyFileVersion("1.0.3.0")]
+[assembly: AssemblyVersion("1.0.4.0")]
+[assembly: AssemblyFileVersion("1.0.4.0")]
 #pragma warning restore 1699
