@@ -110,8 +110,11 @@ to also theme standard elements, such as, button and textblock etc.
 3) Adding support for Japanes, Korean, and Polish  
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/45)
 
-4) #42 Fix Dispatcher Suspend Exception issue (thanx to [vkotenev-sc](https://github.com/vkotenev-sc), [scdmitryvodich](https://github.com/scdmitryvodich))  
-   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/43)
+4) [#42](https://github.com/Dirkster99/AvalonDock/issues/42) Fix Dispatcher Suspend Exception issue (thanx to [vkotenev-sc](https://github.com/vkotenev-sc), [scdmitryvodich](https://github.com/scdmitryvodich))  
+   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/43)  
+  
+    [#46](https://github.com/Dirkster99/AvalonDock/pull/46) Check if we are not on the UI thread before doing Dispatcher.Invoke (thanx to  [dgosbell](https://github.com/dgosbell), [vkotenev-sc](https://github.com/vkotenev-sc))
+   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/46) (related to [#42](https://github.com/Dirkster99/AvalonDock/issues/42)) 
 
 ## Fixes in Version 3.5.7
 
