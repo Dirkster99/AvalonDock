@@ -1,8 +1,10 @@
 ﻿namespace MLibTest
 {
+    using MLibTest.Models;
     using MLibTest.ViewModels.Base;
     using Settings.UserProfile;
     using System.Diagnostics;
+    using System.IO;
     using System.Windows;
     using System.Windows.Input;
     using Xceed.Wpf.AvalonDock.Layout.Serialization;
@@ -30,7 +32,7 @@
             {
                 if (_loadLayoutCommand == null)
                 {
-                    _loadLayoutCommand = new RelayCommand<object>((p) => OnLoadLayout(p), (p) => CanLoadLayout(p));
+                    _loadLayoutCommand = new RelayCommand<object>((p) => OnLoadLayoutAsync(p), (p) => CanLoadLayout(p));
                 }
 
                 return _loadLayoutCommand;
@@ -42,36 +44,60 @@
             return System.IO.File.Exists(@".\AvalonDock.Layout.config");
         }
 
-        internal void OnLoadLayout(object parameter = null)
+        internal void OnLayoutLoaded_Event(object sender, LayoutLoadedEventArgs layoutLoadedEvent)
         {
-            try
+            var result = layoutLoadedEvent.Result;
+
+            if (result.LoadwasSuccesful == true)
             {
-                string path = System.IO.Path.GetFullPath(@".\AvalonDock.Layout.config");
-
-                if (System.IO.File.Exists(path) == false)
-                    return;
-
-                var layoutSerializer = new XmlLayoutSerializer(dockManager);
-                //Here I've implemented the LayoutSerializationCallback just to show
-                // a way to feed layout desarialization with content loaded at runtime
-                //Actually I could in this case let AvalonDock to attach the contents
-                //from current layout using the content ids
-                //LayoutSerializationCallback should anyway be handled to attach contents
-                //not currently loaded
-                layoutSerializer.LayoutSerializationCallback += (s, e) =>
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    //if (e.Model.ContentId == FileStatsViewModel.ToolContentId)
-                    //    e.Content = Workspace.This.FileStats;
-                    //else if (!string.IsNullOrWhiteSpace(e.Model.ContentId) &&
-                    //    File.Exists(e.Model.ContentId))
-                    //    e.Content = Workspace.This.Open(e.Model.ContentId);
-                };
+                    try
+                    {
+                        var stringLayoutSerializer = new XmlLayoutSerializer(dockManager);
+                        //Here I've implemented the LayoutSerializationCallback just to show
+                        // a way to feed layout desarialization with content loaded at runtime
+                        //Actually I could in this case let AvalonDock to attach the contents
+                        //from current layout using the content ids
+                        //LayoutSerializationCallback should anyway be handled to attach contents
+                        //not currently loaded
 
-                layoutSerializer.Deserialize(path);
+                        stringLayoutSerializer.LayoutSerializationCallback += (s, e) =>
+                        {
+                            //if (e.Model.ContentId == FileStatsViewModel.ToolContentId)
+                            //    e.Content = Workspace.This.FileStats;
+                            //else if (!string.IsNullOrWhiteSpace(e.Model.ContentId) &&
+                            //    File.Exists(e.Model.ContentId))
+                            //    e.Content = Workspace.This.Open(e.Model.ContentId);
+                        };
+
+                        using (var reader = new StringReader(result.XmlContent))   // Read Xml Data from string
+                        {
+                            stringLayoutSerializer.Deserialize(reader);
+                        }
+                    }
+                    catch (System.Exception exception)
+                    {
+                        Debug.WriteLine(exception);
+                    }
+                    finally
+                    {
+                        dockManager.Visibility = Visibility.Visible;
+                    }
+                }, System.Windows.Threading.DispatcherPriority.Background);
             }
-            catch (System.Exception exception)
+        }
+
+        internal async void OnLoadLayoutAsync(object parameter = null)
+        {
+            App myApp = (App)Application.Current;
+
+            LayoutLoaderResult LoaderResult = await myApp.GetLayoutString(OnLayoutLoaded_Event);
+
+            if (LoaderResult != null)
             {
-                Debug.WriteLine(exception);
+                this.OnLayoutLoaded_Event(null, new LayoutLoadedEventArgs(LoaderResult));
+                return;
             }
         }
 

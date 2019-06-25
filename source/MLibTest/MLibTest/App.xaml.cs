@@ -10,6 +10,7 @@
     using System.Diagnostics;
     using System.Globalization;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
 
     /// <summary>
@@ -20,6 +21,12 @@
         #region fields
         private ViewModels.AppViewModel _appVM = null;
         private MainWindow _mainWindow = null;
+
+        internal LayoutLoaderResult LayoutLoaded { get; private set; }
+
+        private SemaphoreSlim _LayoutSemaphore;
+
+        internal EventHandler<LayoutLoadedEventArgs> LayoutLoadedEvent;
         #endregion fields
 
         #region constructors
@@ -28,11 +35,40 @@
             // Create service model to ensure available services
             ServiceInjector.InjectServices();
         }
+
+        public App()
+        {
+            _LayoutSemaphore = new SemaphoreSlim(1, 1);
+        }
         #endregion constructors
 
         #region methods
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            try
+            {
+                Task.Factory.StartNew<LayoutLoaderResult>(() => LoadAvalonDockLayoutToString()).ContinueWith
+                    (async r =>
+                    {
+                        await this._LayoutSemaphore.WaitAsync();
+                        try
+                        {
+                            this.LayoutLoaded = r.Result;
+
+                            // Send an event if MainWindow is already successfull constructed and waiting for Xml Layout
+                            LayoutLoadedEvent?.Invoke(this, new LayoutLoadedEventArgs(r.Result));
+                        }
+                        finally
+                        {
+                            this._LayoutSemaphore.Release();
+                        }
+                    });
+            }
+            catch (Exception exc)
+            {
+                this.LayoutLoaded = new LayoutLoaderResult(null, false, exc);
+            }
+
             try
             {
                 // Set shutdown mode here (and reset further below) to enable showing custom dialogs (messageboxes)
@@ -141,7 +177,7 @@
                 Debug.WriteLine(exp);
             }
 
-            _mainWindow.OnLoadLayout();
+            _mainWindow.OnLoadLayoutAsync();
 
         /***
             try
@@ -263,6 +299,45 @@
             catch (Exception exp)
             {
                 Debug.WriteLine(exp);
+            }
+        }
+
+        private LayoutLoaderResult LoadAvalonDockLayoutToString()
+        {
+            string path = System.IO.Path.GetFullPath(@".\AvalonDock.Layout.config");
+
+            if (System.IO.File.Exists(path) == false)
+                return null;
+
+            try
+            {
+                //Thread.Sleep(2000);
+                return new LayoutLoaderResult(System.IO.File.ReadAllText(path), true, null);
+            }
+            catch (Exception exc)
+            {
+                return new LayoutLoaderResult(null, false, exc);
+            }
+        }
+
+        internal async Task<LayoutLoaderResult> GetLayoutString(EventHandler<LayoutLoadedEventArgs> loadEventHandler)
+        {
+            await this._LayoutSemaphore.WaitAsync();
+            try
+            {
+                if (this.LayoutLoaded != null)
+                    return this.LayoutLoaded;
+                else
+                {
+                    // Attach event to return result later
+                    LayoutLoadedEvent += loadEventHandler;
+
+                    return null;
+                }
+            }
+            finally
+            {
+                this._LayoutSemaphore.Release();
             }
         }
 

@@ -78,7 +78,9 @@
                                    AnchorablesSource="{Binding Tools}" 
                                    DocumentsSource="{Binding Files}"
                                    ActiveContent="{Binding ActiveDocument, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
-                                   Grid.Row="1">
+                                   Grid.Row="1"
+                                   Visibility="Hidden"
+                                   >
             <!-- avalonDock:DockingManager.Theme>
                 <avalonDock:Vs2013LightTheme/>
             </avalonDock:DockingManager.Theme -->
