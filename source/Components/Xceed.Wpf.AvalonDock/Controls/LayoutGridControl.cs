@@ -539,10 +539,21 @@ namespace Xceed.Wpf.AvalonDock.Controls
           }
           else if (relativePanels.All(child => Math.Abs(child.ActualHeight - child.DockMinHeight) <= 1))
           {
+            double panelFraction;
             int indexOfChild = fixedPanels.IndexOf(fixedChild);
-            double fixedHeightLeft = fixedPanels.Where(child => fixedPanels.IndexOf(child) >= indexOfChild)
-              .Sum(child => child.FixedDockHeight);
-            double panelFraction = fixedChild.FixedDockHeight / (fixedHeightLeft > 0 ? fixedHeightLeft : 1);
+            if (delta < 0)
+            {
+              double availableHeightLeft = fixedPanels.Where(child => fixedPanels.IndexOf(child) >= indexOfChild)
+                .Sum(child => child.ActualHeight - child.DockMinHeight);
+              panelFraction = (fixedChild.ActualHeight - fixedChild.DockMinHeight) / (availableHeightLeft > 0 ? availableHeightLeft : 1);
+            }
+            else
+            {
+              double fixedHeightLeft = fixedPanels.Where(child => fixedPanels.IndexOf(child) >= indexOfChild)
+                .Sum(child => child.FixedDockHeight);
+              panelFraction = fixedChild.FixedDockHeight / (fixedHeightLeft > 0 ? fixedHeightLeft : 1);
+            }
+
             double childActualHeight = fixedChild.ActualHeight;
             double heightToSet = Math.Max(Math.Round(delta * panelFraction + fixedChild.ActualHeight), fixedChild.DockMinHeight);
             fixedChild.ResizableAbsoluteDockHeight = heightToSet;
@@ -567,10 +578,21 @@ namespace Xceed.Wpf.AvalonDock.Controls
           }
           else
           {
+            double panelFraction;
             int indexOfChild = fixedPanels.IndexOf(fixedChild);
-            double fixedWidthLeft = fixedPanels.Where(child => fixedPanels.IndexOf(child) >= indexOfChild)
-              .Sum(child => child.FixedDockWidth);
-            double panelFraction = fixedChild.FixedDockWidth / (fixedWidthLeft > 0 ? fixedWidthLeft : 1);
+            if (delta < 0)
+            {
+              double availableWidthLeft = fixedPanels.Where(child => fixedPanels.IndexOf(child) >= indexOfChild)
+                .Sum(child => child.ActualWidth - child.DockMinWidth);
+              panelFraction = (fixedChild.ActualWidth - fixedChild.DockMinWidth) / (availableWidthLeft > 0 ? availableWidthLeft : 1);
+            }
+            else
+            {
+              double fixedWidthLeft = fixedPanels.Where(child => fixedPanels.IndexOf(child) >= indexOfChild)
+                .Sum(child => child.FixedDockWidth);
+              panelFraction = fixedChild.FixedDockWidth / (fixedWidthLeft > 0 ? fixedWidthLeft : 1);
+            }
+
             double childActualWidth = fixedChild.ActualWidth;
             double widthToSet = Math.Max(Math.Round(delta * panelFraction + fixedChild.ActualWidth), fixedChild.DockMinWidth);
             fixedChild.ResizableAbsoluteDockWidth = widthToSet;
