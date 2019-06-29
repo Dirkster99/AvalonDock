@@ -39,6 +39,13 @@
         /// <param name="fileToSave"></param>
         /// <param name="saveAsFlag"></param>
         void Save(FileViewModel fileToSave, bool saveAsFlag = false);
+
+        /// <summary>
+        /// Open a file and return its content in a viewmodel.
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
+        FileViewModel Open(string filepath);
         #endregion methods
     }
 }

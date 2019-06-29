@@ -1,10 +1,13 @@
 ﻿namespace MLibTest
 {
+    using AvalonDock.Tools;
     using MLibTest.Models;
+    using MLibTest.ViewModels;
     using MLibTest.ViewModels.Base;
     using Settings.UserProfile;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Windows;
     using System.Windows.Input;
     using Xceed.Wpf.AvalonDock.Layout.Serialization;
@@ -46,13 +49,16 @@
 
         internal void OnLayoutLoaded_Event(object sender, LayoutLoadedEventArgs layoutLoadedEvent)
         {
-            var result = layoutLoadedEvent.Result;
-
-            if (result.LoadwasSuccesful == true)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                Application.Current.Dispatcher.Invoke(() =>
+                try
                 {
-                    try
+                    // Process the finally block since we have nothing to do here
+                    if (layoutLoadedEvent == null)
+                        return;
+
+                    var result = layoutLoadedEvent.Result;
+                    if (result.LoadwasSuccesful == true)
                     {
                         var stringLayoutSerializer = new XmlLayoutSerializer(dockManager);
                         //Here I've implemented the LayoutSerializationCallback just to show
@@ -64,11 +70,38 @@
 
                         stringLayoutSerializer.LayoutSerializationCallback += (s, e) =>
                         {
-                            //if (e.Model.ContentId == FileStatsViewModel.ToolContentId)
-                            //    e.Content = Workspace.This.FileStats;
-                            //else if (!string.IsNullOrWhiteSpace(e.Model.ContentId) &&
-                            //    File.Exists(e.Model.ContentId))
-                            //    e.Content = Workspace.This.Open(e.Model.ContentId);
+                            try
+                            {
+                                var workSpace = (DataContext as AppViewModel).AD_WorkSpace;
+
+                                if (workSpace == null || string.IsNullOrEmpty(e.Model.ContentId))
+                                {
+                                    e.Cancel = true;
+                                    return;
+                                }
+
+                                // Is this a tool window layout ? Then, get its viewmodel and connect it to the view
+                                var tool = workSpace.Tools.FirstOrDefault(i => i.ContentId == e.Model.ContentId);
+                                if (tool != null)
+                                {
+                                    e.Content = tool;
+                                    return;
+                                }
+
+                                // Its not a tool window -> So, this could rever to a document then
+                                if (!string.IsNullOrWhiteSpace(e.Model.ContentId)  && File.Exists(e.Model.ContentId))
+                                {
+                                    e.Content = workSpace.Open(e.Model.ContentId);
+                                    return;
+                                }
+
+                                // Not something we could recognize -> So, we won't handle it beyond this point
+                                e.Cancel = true;
+                            }
+                            catch (System.Exception exc)
+                            {
+                                Debug.WriteLine(exc.StackTrace);
+                            }
                         };
 
                         using (var reader = new StringReader(result.XmlContent))   // Read Xml Data from string
@@ -76,16 +109,17 @@
                             stringLayoutSerializer.Deserialize(reader);
                         }
                     }
-                    catch (System.Exception exception)
-                    {
-                        Debug.WriteLine(exception);
-                    }
-                    finally
-                    {
-                        dockManager.Visibility = Visibility.Visible;
-                    }
-                }, System.Windows.Threading.DispatcherPriority.Background);
-            }
+                }
+                catch (System.Exception exception)
+                {
+                    Debug.WriteLine(exception);
+                }
+                finally
+                {
+                    dockManager.Visibility = Visibility.Visible;
+                }
+            },
+            System.Windows.Threading.DispatcherPriority.Background);
         }
 
         internal async void OnLoadLayoutAsync(object parameter = null)
@@ -94,11 +128,8 @@
 
             LayoutLoaderResult LoaderResult = await myApp.GetLayoutString(OnLayoutLoaded_Event);
 
-            if (LoaderResult != null)
-            {
-                this.OnLayoutLoaded_Event(null, new LayoutLoadedEventArgs(LoaderResult));
-                return;
-            }
+            // Call this even with null to ensure standard initialization takes place
+            this.OnLayoutLoaded_Event(null, (LoaderResult == null ? null: new LayoutLoadedEventArgs(LoaderResult)));
         }
 
         #endregion 

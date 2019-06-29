@@ -88,8 +88,13 @@
                 <demos:PanesTemplateSelector>
                     <demos:PanesTemplateSelector.FileViewTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}"
-                                     BorderThickness="0" />
+                            <Grid>
+                                <TextBox
+                                    Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}"
+                                    TextWrapping="Wrap"
+                                    AcceptsReturn="True"
+                                    BorderThickness="0" />
+                            </Grid>
                         </DataTemplate>
                     </demos:PanesTemplateSelector.FileViewTemplate>
                     <demos:PanesTemplateSelector.FileStatsViewTemplate>
