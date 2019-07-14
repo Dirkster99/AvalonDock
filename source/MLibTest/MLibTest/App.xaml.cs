@@ -10,6 +10,7 @@
     using System.Diagnostics;
     using System.Globalization;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
 
     /// <summary>
@@ -28,11 +29,20 @@
             // Create service model to ensure available services
             ServiceInjector.InjectServices();
         }
+
+        public App()
+        {
+            LayoutLoaded = new LayoutLoader(@".\AvalonDock.Layout.config");
+        }
         #endregion constructors
+
+        internal LayoutLoader LayoutLoaded { get; }
 
         #region methods
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            LayoutLoaded.LoadLayout();
+
             try
             {
                 // Set shutdown mode here (and reset further below) to enable showing custom dialogs (messageboxes)
@@ -141,7 +151,8 @@
                 Debug.WriteLine(exp);
             }
 
-            _mainWindow.OnLoadLayout();
+            // Load and layout AvalonDock elements when MainWindow has loaded
+            _mainWindow.OnLoadLayoutAsync();
 
         /***
             try
@@ -264,6 +275,29 @@
             {
                 Debug.WriteLine(exp);
             }
+        }
+
+        private LayoutLoaderResult LoadAvalonDockLayoutToString()
+        {
+            string path = System.IO.Path.GetFullPath(@".\AvalonDock.Layout.config");
+
+            if (System.IO.File.Exists(path) == false)
+                return null;
+
+            try
+            {
+                //Thread.Sleep(2000);
+                return new LayoutLoaderResult(System.IO.File.ReadAllText(path), true, null);
+            }
+            catch (Exception exc)
+            {
+                return new LayoutLoaderResult(null, false, exc);
+            }
+        }
+
+        internal async Task<LayoutLoaderResult> GetLayoutString(EventHandler<LayoutLoadedEventArgs> loadEventHandler)
+        {
+            return await LayoutLoaded.GetLayoutString(loadEventHandler);
         }
 
         /// <summary>

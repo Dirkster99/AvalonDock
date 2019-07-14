@@ -338,6 +338,11 @@
             }
         }
 
+        /// <summary>
+        /// Open a file and return its content in a viewmodel.
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
         public FileViewModel Open(string filepath)
         {
             var fileViewModel = _files.FirstOrDefault(fm => fm.FilePath == filepath);
@@ -346,6 +351,7 @@
 
             fileViewModel = new FileViewModel(filepath, this as IWorkSpaceViewModel);
             _files.Add(fileViewModel);
+
             return fileViewModel;
         }
         #endregion  OpenCommand

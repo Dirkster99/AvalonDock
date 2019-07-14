@@ -8,9 +8,25 @@
 
     internal class FileViewModel : PaneViewModel
     {
+        #region fields
         private static ImageSourceConverter ISC = new ImageSourceConverter();
         private IWorkSpaceViewModel _workSpaceViewModel = null;
 
+        private string _textContent = string.Empty;
+        private string _filePath = null;
+        private bool _isDirty = false;
+
+        ICommand _closeCommand = null;
+        ICommand _saveAsCommand = null;
+        ICommand _saveCommand = null;
+        #endregion fields
+
+        #region ctors
+        /// <summary>
+        /// Class constructor
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="workSpaceViewModel"></param>
         public FileViewModel(string filePath, IWorkSpaceViewModel workSpaceViewModel)
             : this(workSpaceViewModel)
         {
@@ -21,15 +37,19 @@
             IconSource = ISC.ConvertFromInvariantString(@"pack://application:,,/Demos/Images/document.png") as ImageSource;
         }
 
+        /// <summary>
+        /// class constructor
+        /// </summary>
+        /// <param name="workSpaceViewModel"></param>
         public FileViewModel(IWorkSpaceViewModel workSpaceViewModel)
         {
             _workSpaceViewModel = workSpaceViewModel;
-            IsDirty = true;
+            IsDirty = false;
             Title = FileName;
         }
+        #endregion ctors
 
-        #region FilePath
-        private string _filePath = null;
+        #region Properties
         public string FilePath
         {
             get { return _filePath; }
@@ -50,23 +70,19 @@
                 }
             }
         }
-        #endregion
-
 
         public string FileName
         {
-            get 
+            get
             {
                 if (FilePath == null)
                     return "Noname" + (IsDirty ? "*" : "");
 
-                return System.IO.Path.GetFileName(FilePath) + (IsDirty ? "*" : ""); 
+                return System.IO.Path.GetFileName(FilePath) + (IsDirty ? "*" : "");
             }
         }
 
         #region TextContent
-
-        private string _textContent = string.Empty;
         public string TextContent
         {
             get { return _textContent; }
@@ -83,9 +99,6 @@
 
         #endregion
 
-        #region IsDirty
-
-        private bool _isDirty = false;
         public bool IsDirty
         {
             get { return _isDirty; }
@@ -100,10 +113,6 @@
             }
         }
 
-        #endregion
-
-        #region SaveCommand
-        ICommand _saveCommand = null;
         public ICommand SaveCommand
         {
             get
@@ -117,20 +126,6 @@
             }
         }
 
-        private bool CanSave(object parameter)
-        {
-            return IsDirty;
-        }
-
-        private void OnSave(object parameter)
-        {
-            _workSpaceViewModel.Save(this, false);
-        }
-
-        #endregion
-
-        #region SaveAsCommand
-        ICommand _saveAsCommand = null;
         public ICommand SaveAsCommand
         {
             get
@@ -144,20 +139,7 @@
             }
         }
 
-        private bool CanSaveAs(object parameter)
-        {
-            return IsDirty;
-        }
-
-        private void OnSaveAs(object parameter)
-        {
-            _workSpaceViewModel.Save(this, true);
-        }
-
-        #endregion
-
         #region CloseCommand
-        ICommand _closeCommand = null;
         public ICommand CloseCommand
         {
             get
@@ -170,7 +152,10 @@
                 return _closeCommand;
             }
         }
+        #endregion
+        #endregion Properties
 
+        #region methods
         private bool CanClose()
         {
             return true;
@@ -180,6 +165,26 @@
         {
             _workSpaceViewModel.Close(this);
         }
-        #endregion
+
+        private bool CanSave(object parameter)
+        {
+            return IsDirty;
+        }
+
+        private void OnSave(object parameter)
+        {
+            _workSpaceViewModel.Save(this, false);
+        }
+
+        private bool CanSaveAs(object parameter)
+        {
+            return IsDirty;
+        }
+
+        private void OnSaveAs(object parameter)
+        {
+            _workSpaceViewModel.Save(this, true);
+        }
+        #endregion methods
     }
 }

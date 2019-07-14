@@ -78,7 +78,9 @@
                                    AnchorablesSource="{Binding Tools}" 
                                    DocumentsSource="{Binding Files}"
                                    ActiveContent="{Binding ActiveDocument, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
-                                   Grid.Row="1">
+                                   Grid.Row="1"
+                                   Visibility="Hidden"
+                                   >
             <!-- avalonDock:DockingManager.Theme>
                 <avalonDock:Vs2013LightTheme/>
             </avalonDock:DockingManager.Theme -->
@@ -86,8 +88,13 @@
                 <demos:PanesTemplateSelector>
                     <demos:PanesTemplateSelector.FileViewTemplate>
                         <DataTemplate>
-                            <TextBox Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}"
-                                     BorderThickness="0" />
+                            <Grid>
+                                <TextBox
+                                    Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}"
+                                    TextWrapping="Wrap"
+                                    AcceptsReturn="True"
+                                    BorderThickness="0" />
+                            </Grid>
                         </DataTemplate>
                     </demos:PanesTemplateSelector.FileViewTemplate>
                     <demos:PanesTemplateSelector.FileStatsViewTemplate>
