@@ -35,7 +35,9 @@
             {
                 if (_loadLayoutCommand == null)
                 {
-                    _loadLayoutCommand = new RelayCommand<object>((p) => OnLoadLayoutAsync(p), (p) => CanLoadLayout(p));
+                    _loadLayoutCommand = new RelayCommand<object>(
+                        (p) => OnLoadLayoutAsync(p),
+                        (p) => CanLoadLayout(p));
                 }
 
                 return _loadLayoutCommand;
@@ -44,7 +46,9 @@
 
         private bool CanLoadLayout(object parameter)
         {
-            return System.IO.File.Exists(@".\AvalonDock.Layout.config");
+            App myApp = (App)Application.Current;
+
+            return myApp.LayoutLoaded.CanLoadLayout();
         }
 
         internal void OnLayoutLoaded_Event(object sender, LayoutLoadedEventArgs layoutLoadedEvent)
@@ -116,6 +120,7 @@
                 }
                 finally
                 {
+                    // Make sure AvalonDock control is visible at the end of restoring layout
                     dockManager.Visibility = Visibility.Visible;
                 }
             },

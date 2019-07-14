@@ -21,12 +21,6 @@
         #region fields
         private ViewModels.AppViewModel _appVM = null;
         private MainWindow _mainWindow = null;
-
-        internal LayoutLoaderResult LayoutLoaded { get; private set; }
-
-        private SemaphoreSlim _LayoutSemaphore;
-
-        internal EventHandler<LayoutLoadedEventArgs> LayoutLoadedEvent;
         #endregion fields
 
         #region constructors
@@ -38,36 +32,16 @@
 
         public App()
         {
-            _LayoutSemaphore = new SemaphoreSlim(1, 1);
+            LayoutLoaded = new LayoutLoader(@".\AvalonDock.Layout.config");
         }
         #endregion constructors
+
+        internal LayoutLoader LayoutLoaded { get; }
 
         #region methods
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            try
-            {
-                Task.Factory.StartNew<LayoutLoaderResult>(() => LoadAvalonDockLayoutToString()).ContinueWith
-                    (async r =>
-                    {
-                        await this._LayoutSemaphore.WaitAsync();
-                        try
-                        {
-                            this.LayoutLoaded = r.Result;
-
-                            // Send an event if MainWindow is already successfull constructed and waiting for Xml Layout
-                            LayoutLoadedEvent?.Invoke(this, new LayoutLoadedEventArgs(r.Result));
-                        }
-                        finally
-                        {
-                            this._LayoutSemaphore.Release();
-                        }
-                    });
-            }
-            catch (Exception exc)
-            {
-                this.LayoutLoaded = new LayoutLoaderResult(null, false, exc);
-            }
+            LayoutLoaded.LoadLayout();
 
             try
             {
@@ -177,6 +151,7 @@
                 Debug.WriteLine(exp);
             }
 
+            // Load and layout AvalonDock elements when MainWindow has loaded
             _mainWindow.OnLoadLayoutAsync();
 
         /***
@@ -322,23 +297,7 @@
 
         internal async Task<LayoutLoaderResult> GetLayoutString(EventHandler<LayoutLoadedEventArgs> loadEventHandler)
         {
-            await this._LayoutSemaphore.WaitAsync();
-            try
-            {
-                if (this.LayoutLoaded != null)
-                    return this.LayoutLoaded;
-                else
-                {
-                    // Attach event to return result later
-                    LayoutLoadedEvent += loadEventHandler;
-
-                    return null;
-                }
-            }
-            finally
-            {
-                this._LayoutSemaphore.Release();
-            }
+            return await LayoutLoaded.GetLayoutString(loadEventHandler);
         }
 
         /// <summary>

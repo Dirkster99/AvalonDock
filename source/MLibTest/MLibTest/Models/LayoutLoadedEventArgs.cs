@@ -3,7 +3,7 @@ namespace MLibTest.Models
     using System;
 
     /// <summary>
-    /// Implements a simple event that is invoked when a layout is loaded.
+    /// Implements an event that is invoked when a layout is loaded.
     /// </summary>
     internal class LayoutLoadedEventArgs : EventArgs
     {

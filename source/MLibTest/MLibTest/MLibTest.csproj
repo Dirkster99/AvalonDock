@@ -96,6 +96,7 @@
     </Compile>
     <Compile Include="Models\AppCore.cs" />
     <Compile Include="Models\LayoutLoadedEventArgs.cs" />
+    <Compile Include="Models\LayoutLoader.cs" />
     <Compile Include="Models\LayoutLoaderResult.cs" />
     <Compile Include="Models\SettingDefaults.cs" />
     <Compile Include="ServiceInjector.cs" />
