@@ -2425,7 +2425,7 @@ namespace Xceed.Wpf.AvalonDock
           fw.SetParentWindowToNull();
           fw.KeepContentVisibleOnClose = true;
           // To avoid calling Close method multiple times.
-          fw.InternalClose();
+          fw.InternalClose(true);
         }
          _fwList.Clear();
 
