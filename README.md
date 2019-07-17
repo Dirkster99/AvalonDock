@@ -101,6 +101,9 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## In Master branch but not released, yet
 
+1) Samll breaking change in [Dirkster.AvalonDock.Themes.VS2013](https://github.com/Dirkster99/AvalonDock/wiki/WPF-VS-2013-Dark-Light-Demo-Client), Renamed DockingButtonForegroundArrowBrusKey to DockingButtonForegroundArrowBrushKey (thanx to [VNNCC](https://github.com/VNNCC))  
+  - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/52)
+
 ## Fixes in Version 3.5.8
 
 1) Added [ca-es localization](https://github.com/Dirkster99/AvalonDock/wiki/Localization). Updated [es localization](https://github.com/Dirkster99/AvalonDock/wiki/Localization). (thanx to [xnaval](https://github.com/xnaval))  
