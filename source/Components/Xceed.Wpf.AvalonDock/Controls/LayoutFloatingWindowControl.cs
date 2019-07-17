@@ -403,9 +403,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
       return IntPtr.Zero;
     }
 
-    internal void InternalClose()
+    internal void InternalClose(bool closeInitiatedByUser = false)
     {
-      _internalCloseFlag = true;
+      _internalCloseFlag = !closeInitiatedByUser;
       if( !_isClosing )
       {
         _isClosing = true;
