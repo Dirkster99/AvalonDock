@@ -47,7 +47,7 @@
                         <DrawingBrush.Drawing>
                             <DrawingGroup>
                                 <DrawingGroup.Children>
-                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrusKey}}"
+                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrushKey}}"
                                                      Geometry="F1M1,15L8,1 15,15z" />
                                 </DrawingGroup.Children>
                             </DrawingGroup>
@@ -92,7 +92,7 @@
                         <DrawingBrush.Drawing>
                             <DrawingGroup>
                                 <DrawingGroup.Children>
-                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrusKey}}"
+                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrushKey}}"
                                                      Geometry="F1M1,15L8,1 15,15z" />
                                 </DrawingGroup.Children>
                             </DrawingGroup>
@@ -135,7 +135,7 @@
                         <DrawingBrush.Drawing>
                             <DrawingGroup>
                                 <DrawingGroup.Children>
-                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrusKey}}"
+                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrushKey}}"
                                                      Geometry="F1M1,15L8,1 15,15z" />
                                 </DrawingGroup.Children>
                             </DrawingGroup>
@@ -181,7 +181,7 @@
                         <DrawingBrush.Drawing>
                             <DrawingGroup>
                                 <DrawingGroup.Children>
-                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrusKey}}"
+                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrushKey}}"
                                                      Geometry="F1M1,15L8,1 15,15z" />
                                 </DrawingGroup.Children>
                             </DrawingGroup>
@@ -340,7 +340,7 @@
                         <DrawingBrush.Drawing>
                             <DrawingGroup>
                                 <DrawingGroup.Children>
-                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrusKey}}"
+                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrushKey}}"
                                                      Geometry="F1M1,15L8,1 15,15z" />
                                 </DrawingGroup.Children>
                             </DrawingGroup>
@@ -385,7 +385,7 @@
                         <DrawingBrush.Drawing>
                             <DrawingGroup>
                                 <DrawingGroup.Children>
-                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrusKey}}"
+                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrushKey}}"
                                                      Geometry="F1M1,15L8,1 15,15z" />
                                 </DrawingGroup.Children>
                             </DrawingGroup>
@@ -431,7 +431,7 @@
                         <DrawingBrush.Drawing>
                             <DrawingGroup>
                                 <DrawingGroup.Children>
-                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrusKey}}"
+                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrushKey}}"
                                                      Geometry="F1M1,15L8,1 15,15z" />
                                 </DrawingGroup.Children>
                             </DrawingGroup>
@@ -476,7 +476,7 @@
                         <DrawingBrush.Drawing>
                             <DrawingGroup>
                                 <DrawingGroup.Children>
-                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrusKey}}"
+                                    <GeometryDrawing Brush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrushKey}}"
                                                      Geometry="F1M1,15L8,1 15,15z" />
                                 </DrawingGroup.Children>
                             </DrawingGroup>

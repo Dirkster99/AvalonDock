@@ -166,7 +166,7 @@ namespace Xceed.Wpf.AvalonDock.Themes.VS2013.Themes
 
         public static readonly ComponentResourceKey DockingButtonBackgroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonBackgroundBrushKey");
         public static readonly ComponentResourceKey DockingButtonForegroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonForegroundBrushKey");
-        public static readonly ComponentResourceKey DockingButtonForegroundArrowBrusKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonForegroundArrowBrusKey");
+        public static readonly ComponentResourceKey DockingButtonForegroundArrowBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonForegroundArrowBrushKey");
 
         public static readonly ComponentResourceKey DockingButtonStarBorderBrushKey     = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonStarBorderBrushKey");
         public static readonly ComponentResourceKey DockingButtonStarBackgroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonStarBackgroundBrushKey");

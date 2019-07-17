@@ -157,7 +157,7 @@
                      Color="#20000000" options:Freeze="true" />
     <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DockingButtonForegroundBrushKey}"
                      Color="{DynamicResource {x:Static reskeys:ResourceKeys.ControlAccentColorKey}}" options:Freeze="true" />
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrusKey}"
+    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrushKey}"
                      Color="Black" options:Freeze="true" />
 
 
