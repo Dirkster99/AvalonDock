@@ -109,6 +109,9 @@ to also theme standard elements, such as, button and textblock etc.
 1) Added [ca-es localization](https://github.com/Dirkster99/AvalonDock/wiki/Localization). Updated [es localization](https://github.com/Dirkster99/AvalonDock/wiki/Localization). (thanx to [xnaval](https://github.com/xnaval))  
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/40)
 
+2) Fix on FloatingWindow visibility when loading/unloading DockingManager control (thanx to [scdmitryvodich](https://github.com/scdmitryvodich))  
+   - [@dirkster #51](https://github.com/Dirkster99/AvalonDock/pull/51) related to [#36](https://github.com/Dirkster99/AvalonDock/pull/36)
+
 2) Fix Visibility issue on closing LayoutFloatingWindowControl (thanx to [scdmitryvodich](https://github.com/scdmitryvodich))  
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/44)
 
@@ -124,7 +127,7 @@ to also theme standard elements, such as, button and textblock etc.
 ## Fixes in Version 3.5.7
 
 1) Fix Visibility issues in LayoutFloatingWindowControl (thanx to [scdmitryvodich](https://github.com/scdmitryvodich)) 
-   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/36)
+   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/36) see also [#51](https://github.com/Dirkster99/AvalonDock/pull/51) in later version
 
 2) Fixed sizing behavior of anchorable panels (thanx to [scdmitryvodich](https://github.com/scdmitryvodich)) 
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/37) [Issue 37](https://github.com/Dirkster99/AvalonDock/issues/37)  
