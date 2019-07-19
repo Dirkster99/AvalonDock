@@ -16,16 +16,15 @@
     internal class AppViewModel : Base.ViewModelBase, IDisposable
     {
         #region private fields
-        private bool mDisposed = false;
-        private AppLifeCycleViewModel _AppLifeCycle = null;
-
         private bool _isInitialized = false;       // application should be initialized through one method ONLY!
         private object _lockObject = new object(); // thread lock semaphore
 
         private ICommand _ThemeSelectionChangedCommand = null;
-        private ThemeViewModel _AppTheme = null;
 
-        private IWorkSpaceViewModel _AD_WorkSpace = null;
+        private AppLifeCycleViewModel _AppLifeCycle = null;
+        private ThemeViewModel _AppTheme = null;
+        private readonly IWorkSpaceViewModel _AD_WorkSpace = null;
+        private bool _Disposed = false;
         #endregion private fields
 
         #region constructors
@@ -36,7 +35,6 @@
             : this()
         {
             _AppLifeCycle = lifecycle;
-            _AD_WorkSpace = new WorkSpaceViewModel();
         }
 
         /// <summary>
@@ -44,6 +42,7 @@
         /// </summary>
         protected AppViewModel()
         {
+            _AD_WorkSpace = new WorkSpaceViewModel();
             _AppTheme = new ThemeViewModel();
         }
         #endregion constructors
@@ -54,6 +53,11 @@
             get
             {
                 return _AppLifeCycle;
+            }
+
+            internal set
+            {
+                _AppLifeCycle = value;
             }
         }
 
@@ -75,7 +79,7 @@
                 {
                     _ThemeSelectionChangedCommand = new RelayCommand<object>((p) =>
                     {
-                        if (this.mDisposed == true)
+                        if (this._Disposed == true)
                             return;
 
                         object[] paramets = p as object[];
@@ -215,7 +219,6 @@
             this.AppTheme.ApplyTheme(Application.Current.MainWindow, themeDisplayName);
         }
 
-
         /// <summary>
         /// Standard dispose method of the <seealso cref="IDisposable" /> interface.
         /// </summary>
@@ -230,7 +233,7 @@
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
-            if (mDisposed == false)
+            if (_Disposed == false)
             {
                 if (disposing == true)
                 {
@@ -242,7 +245,7 @@
                 // if we add them, they need to be released here.
             }
 
-            mDisposed = true;
+            _Disposed = true;
 
             //// If it is available, make the call to the
             //// base class's Dispose(Boolean) method

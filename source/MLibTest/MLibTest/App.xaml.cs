@@ -10,7 +10,6 @@
     using System.Diagnostics;
     using System.Globalization;
     using System.Threading;
-    using System.Threading.Tasks;
     using System.Windows;
 
     /// <summary>
@@ -19,8 +18,8 @@
     public partial class App : Application
     {
         #region fields
-        private ViewModels.AppViewModel _appVM = null;
-        private MainWindow _mainWindow = null;
+        private readonly ViewModels.AppViewModel _appVM;
+        private readonly MainWindow _mainWindow;
         #endregion fields
 
         #region constructors
@@ -30,45 +29,46 @@
             ServiceInjector.InjectServices();
         }
 
+        /// <summary>
+        /// Class constructor
+        /// </summary>
         public App()
         {
+            _mainWindow = new MainWindow();
+            _appVM = new ViewModels.AppViewModel(new AppLifeCycleViewModel());
             LayoutLoaded = new LayoutLoader(@".\AvalonDock.Layout.config");
         }
         #endregion constructors
 
-        internal LayoutLoader LayoutLoaded { get; }
+        /// <summary>
+        /// Gets an object that loads the AvalonDock Xml layout string
+        /// in an aysnchronous background task.
+        /// </summary>
+        internal LayoutLoader LayoutLoaded { get; set; }
 
         #region methods
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             LayoutLoaded.LoadLayout();
 
-            try
-            {
-                // Set shutdown mode here (and reset further below) to enable showing custom dialogs (messageboxes)
-                // durring start-up without shutting down application when the custom dialogs (messagebox) closes
-                ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown;
-            }
-            catch
-            {
-            }
+            // Set shutdown mode here (and reset further below) to enable showing custom dialogs (messageboxes)
+            // durring start-up without shutting down application when the custom dialogs (messagebox) closes
+            ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown;
 
             var settings = GetService<ISettingsManager>(); // add the default themes
             var appearance = GetService<IAppearanceManager>();
-            AppLifeCycleViewModel lifeCycle = null;
 
             try
             {
-                lifeCycle = new AppLifeCycleViewModel();
-                lifeCycle.LoadConfigOnAppStartup(settings, appearance);
+                // Construct Application ViewModel and mainWindow
+                _appVM.AppLifeCycle.LoadConfigOnAppStartup(settings, appearance);
 
                 appearance.SetTheme(settings.Themes
                                     , settings.Options.GetOptionValue<string>("Appearance", "ThemeDisplayName")
                                     , ThemeViewModel.GetCurrentAccentColor(settings));
 
-                // Construct Application ViewMOdel and mainWindow
-                _appVM = new ViewModels.AppViewModel(lifeCycle);
                 _appVM.SetSessionData(settings.SessionData);
+                _appVM.AppTheme.InitThemes(settings);
 
                 // Customize services specific items for this application
                 // Program message box service for Modern UI (Metro Light and Dark)
@@ -102,14 +102,9 @@
             var defaultTheme = settings.Options.GetOptionValue<string>("Appearance", "ThemeDisplayName");
             _appVM.InitForMainWindow(appearance, defaultTheme);
 
-            Application.Current.MainWindow = _mainWindow = new MainWindow();
-            MainWindow.DataContext = _appVM;
-
-            AppCore.CreateAppDataFolder();
-
             if (MainWindow != null && _appVM != null)
             {
-                ConstructMainWindowSession(_appVM, _mainWindow);
+                ConstructMainWindowSession(_appVM, _mainWindow, settings);
 
                 // and show it to the user ...
                 MainWindow.Loaded += MainWindow_Loaded;
@@ -127,12 +122,14 @@
                         dispose.Dispose();
 
                     _mainWindow.DataContext = null;
-                    _appVM = null;
-                    _mainWindow = null;
+                    // _appVM = null;     readonly property
+                    //_mainWindow = null; readonly property
                 };
 
                 MainWindow.Show();
             }
+
+            AppCore.CreateAppDataFolder();
         }
 
         /// <summary>
@@ -153,25 +150,6 @@
 
             // Load and layout AvalonDock elements when MainWindow has loaded
             _mainWindow.OnLoadLayoutAsync();
-
-        /***
-            try
-            {
-                Application.Current.MainWindow = mMainWin = new MainWindow();
-                ShutdownMode = System.Windows.ShutdownMode.OnLastWindowClose;
-                AppCore.CreateAppDataFolder();
-                if (mMainWin != null && app != null)
-                {
-                    mMainWin.Closing += OnClosing;
-                    ConstructMainWindowSession(app, mMainWin);
-                    mMainWin.Show();
-                }
-            }
-            catch (Exception exp)
-            {
-                Logger.Error(exp);
-            }
-        ***/
         }
 
         /// <summary>
@@ -179,11 +157,14 @@
         /// </summary>
         /// <param name="workSpace"></param>
         /// <param name="win"></param>
-        private void ConstructMainWindowSession(AppViewModel workSpace, IViewSize win)
+        private void ConstructMainWindowSession(AppViewModel workSpace,
+                                                IViewSize win,
+                                                ISettingsManager settings)
         {
             try
             {
-                var settings = GetService<ISettingsManager>();
+                Application.Current.MainWindow = _mainWindow;
+                _mainWindow.DataContext = _appVM;
 
                 // Establish command binding to accept user input via commanding framework
                 // workSpace.InitCommandBinding(win);
@@ -275,29 +256,6 @@
             {
                 Debug.WriteLine(exp);
             }
-        }
-
-        private LayoutLoaderResult LoadAvalonDockLayoutToString()
-        {
-            string path = System.IO.Path.GetFullPath(@".\AvalonDock.Layout.config");
-
-            if (System.IO.File.Exists(path) == false)
-                return null;
-
-            try
-            {
-                //Thread.Sleep(2000);
-                return new LayoutLoaderResult(System.IO.File.ReadAllText(path), true, null);
-            }
-            catch (Exception exc)
-            {
-                return new LayoutLoaderResult(null, false, exc);
-            }
-        }
-
-        internal async Task<LayoutLoaderResult> GetLayoutString(EventHandler<LayoutLoadedEventArgs> loadEventHandler)
-        {
-            return await LayoutLoaded.GetLayoutString(loadEventHandler);
         }
 
         /// <summary>

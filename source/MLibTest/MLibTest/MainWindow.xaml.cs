@@ -1,6 +1,5 @@
 ﻿namespace MLibTest
 {
-    using AvalonDock.Tools;
     using MLibTest.Models;
     using MLibTest.ViewModels;
     using MLibTest.ViewModels.Base;
@@ -23,11 +22,17 @@
         ICommand _saveLayoutCommand = null;
         #endregion fields
 
+        #region ctors
+        /// <summary>
+        /// Class constructor
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
         }
+        #endregion ctors
 
+        #region methods
         #region LoadLayoutCommand
         public ICommand LoadLayoutCommand
         {
@@ -131,7 +136,7 @@
         {
             App myApp = (App)Application.Current;
 
-            LayoutLoaderResult LoaderResult = await myApp.GetLayoutString(OnLayoutLoaded_Event);
+            LayoutLoaderResult LoaderResult = await myApp.LayoutLoaded.GetLayoutString(OnLayoutLoaded_Event);
 
             // Call this even with null to ensure standard initialization takes place
             this.OnLayoutLoaded_Event(null, (LoaderResult == null ? null: new LayoutLoadedEventArgs(LoaderResult)));
@@ -168,8 +173,13 @@
 
         private void OnDumpToConsole(object sender, RoutedEventArgs e)
         {
-            // Uncomment when TRACE is activated on AvalonDock project
-            //dockManager.Layout.ConsoleDump(0);
+            // Check Define TRACE constant
+            // in build Tab of MLibTest project and AvalonDock project
+            // to generate trace in output window
+#if TRACE
+    dockManager.Layout.ConsoleDump(0);
+#endif
         }
+        #endregion methods
     }
 }

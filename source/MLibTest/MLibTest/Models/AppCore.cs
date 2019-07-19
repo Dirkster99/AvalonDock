@@ -55,14 +55,14 @@
         {
             get
             {
-                return "MDemo";
+                return "MLibTest";
             }
         }
         public static string Application_Title
         {
             get
             {
-                return "MDemo";
+                return "MLibTest";
             }
         }
 

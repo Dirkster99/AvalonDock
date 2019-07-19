@@ -8,7 +8,7 @@ namespace MLibTest.Models
     /// Implements base methods and events for loading an AvalonDock layout
     /// in a background thread.
     /// </summary>
-    internal class LayoutLoader
+    internal class LayoutLoader : IDisposable
     {
         #region fields
         private SemaphoreSlim _LayoutSemaphore;
@@ -41,6 +41,7 @@ namespace MLibTest.Models
         /// was successfully loaded.
         /// </summary>
         public EventHandler<LayoutLoadedEventArgs> LayoutLoadedEvent;
+        private bool _Disposed;
         #endregion events
 
         #region methods
@@ -80,6 +81,42 @@ namespace MLibTest.Models
                 this._LayoutLoaded = new LayoutLoaderResult(null, false, exc);
             }
         }
+
+        #region IDisposable
+
+        /// <summary>
+        /// Standard dispose method of the <seealso cref="IDisposable" /> interface.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        /// <summary>
+        /// Source: http://www.codeproject.com/Articles/15360/Implementing-IDisposable-and-the-Dispose-Pattern-P
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_Disposed == false)
+            {
+                if (disposing == true)
+                {
+                    // Dispose of the curently displayed content
+                    _LayoutSemaphore.Dispose();
+                }
+
+                // There are no unmanaged resources to release, but
+                // if we add them, they need to be released here.
+            }
+
+            _Disposed = true;
+
+            //// If it is available, make the call to the
+            //// base class's Dispose(Boolean) method
+            ////base.Dispose(disposing);
+        }
+        #endregion IDisposable
 
         /// <summary>
         /// Loads the layout object queried via <see cref="LoadLayout"/> method or

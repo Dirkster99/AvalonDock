@@ -14,7 +14,7 @@
     internal class ThemeViewModel : Base.ViewModelBase
     {
         #region private fields
-        private readonly ThemeDefinitionViewModel _DefaultTheme = null;
+        private ThemeDefinitionViewModel _DefaultTheme = null;
         private Dictionary<string, ThemeDefinitionViewModel> _ListOfThemes = null;
         private ThemeDefinitionViewModel _SelectedTheme = null;
         private bool _IsEnabled = true;
@@ -26,26 +26,8 @@
         /// </summary>
         public ThemeViewModel()
         {
-            var settings = GetService<ISettingsManager>(); // add the default themes
 
             _ListOfThemes = new Dictionary<string, ThemeDefinitionViewModel>();
-
-            foreach (var item in settings.Themes.GetThemeInfos())
-            {
-                var list = new List<string>();
-                foreach (var subitem in item.ThemeSources)
-                    list.Add(subitem.ToString());
-
-                _ListOfThemes.Add(item.DisplayName, new ThemeDefinitionViewModel(new ThemeDefinition(item.DisplayName, list)));
-            }
-
-            // Lets make sure there is a default
-            var defaultTheme = GetService<IAppearanceManager>().GetDefaultTheme().DisplayName;
-            _ListOfThemes.TryGetValue(defaultTheme, out _DefaultTheme);
-
-            // and something sensible is selected
-            _SelectedTheme = _DefaultTheme;
-            _SelectedTheme.IsSelected = true;
         }
         #endregion constructors
 
@@ -177,6 +159,31 @@
                 AccentColor = settings.Options.GetOptionValue<Color>("Appearance", "AccentColor");
 
             return AccentColor;
+        }
+
+        internal void InitThemes(ISettingsManager settings)
+        {
+            var themes = settings.Themes.GetThemeInfos();
+
+            if (themes != null)
+            {
+                foreach (var item in themes)
+                {
+                    var list = new List<string>();
+                    foreach (var subitem in item.ThemeSources)
+                        list.Add(subitem.ToString());
+
+                    _ListOfThemes.Add(item.DisplayName, new ThemeDefinitionViewModel(new ThemeDefinition(item.DisplayName, list)));
+                }
+
+                // Lets make sure there is a default
+                var defaultTheme = GetService<IAppearanceManager>().GetDefaultTheme().DisplayName;
+                _ListOfThemes.TryGetValue(defaultTheme, out _DefaultTheme);
+
+                // and something sensible is selected
+                _SelectedTheme = _DefaultTheme;
+                _SelectedTheme.IsSelected = true;
+            }
         }
         #endregion methods
     }
