@@ -48,10 +48,15 @@ namespace Xceed.Wpf.AvalonDock.Layout
       set;
     }
 
+    double CalculatedDockMinWidth();
+
     double DockMinWidth
     {
       get; set;
     }
+
+    double CalculatedDockMinHeight();
+
     double DockMinHeight
     {
       get; set;

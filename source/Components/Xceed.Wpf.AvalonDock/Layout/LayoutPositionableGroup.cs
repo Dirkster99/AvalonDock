@@ -15,8 +15,11 @@
   ***********************************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Globalization;
+using System.Linq;
+using System.Windows.Controls;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
@@ -207,6 +210,25 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     #endregion
 
+    #region CalculatedDockMinWidth
+
+    public double CalculatedDockMinWidth()
+    {
+      double childrenDockMinWidth = 0.0;
+      List<ILayoutPositionableElement> visibleChildren = Children.OfType<ILayoutPositionableElement>().Where(child => child.IsVisible).ToList();
+      ILayoutOrientableGroup orientableGroup = this as ILayoutOrientableGroup;
+      if (orientableGroup != null && visibleChildren.Any())
+      {
+        childrenDockMinWidth = orientableGroup.Orientation == Orientation.Vertical
+          ? visibleChildren.Max(child => child.CalculatedDockMinWidth())
+          : visibleChildren.Sum(child => child.CalculatedDockMinWidth() + ((Root?.Manager?.GridSplitterWidth ?? 0) * (visibleChildren.Count - 1)));
+      }
+
+      return Math.Max(this._dockMinWidth, childrenDockMinWidth);
+    }
+
+    #endregion
+
     #region DockMinWidth
 
     private double _dockMinWidth = 25.0;
@@ -226,6 +248,25 @@ namespace Xceed.Wpf.AvalonDock.Layout
           RaisePropertyChanged( "DockMinWidth" );
         }
       }
+    }
+
+    #endregion
+
+    #region CalculatedDockMinHeight
+
+    public double CalculatedDockMinHeight()
+    {
+      double childrenDockMinHeight = 0.0;
+      List<ILayoutPositionableElement> visibleChildren = Children.OfType<ILayoutPositionableElement>().Where(child => child.IsVisible).ToList();
+      ILayoutOrientableGroup orientableGroup = this as ILayoutOrientableGroup;  
+      if (orientableGroup != null && visibleChildren.Any())
+      {
+        childrenDockMinHeight = orientableGroup.Orientation == Orientation.Vertical
+          ? visibleChildren.Sum(child => child.CalculatedDockMinHeight() + ((Root?.Manager?.GridSplitterHeight ?? 0) * (visibleChildren.Count - 1)))
+          : visibleChildren.Max(child => child.CalculatedDockMinHeight());
+      }
+
+      return Math.Max(this._dockMinHeight, childrenDockMinHeight);
     }
 
     #endregion
