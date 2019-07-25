@@ -68,11 +68,11 @@ namespace Xceed.Wpf.AvalonDock.Controls
             else if( childPositionableModel != null && childPositionableModel.DockWidth.IsStar )
             {
               var childPositionableModelWidthActualSize = childPositionableModel as ILayoutPositionableElementWithActualSize;
-
-              var widthToSet = Math.Max( childPositionableModelWidthActualSize.ActualWidth, childPositionableModel.DockMinWidth );
+              var childDockMinWidth = childPositionableModel.CalculatedDockMinWidth();
+              var widthToSet = Math.Max( childPositionableModelWidthActualSize.ActualWidth, childDockMinWidth );
 
               widthToSet = Math.Min( widthToSet, ActualWidth / 2.0 );
-              widthToSet = Math.Max( widthToSet, childPositionableModel.DockMinWidth );
+              widthToSet = Math.Max( widthToSet, childDockMinWidth );
 
               childPositionableModel.DockWidth = new GridLength(
                   widthToSet,
@@ -110,10 +110,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
             else if( childPositionableModel != null && childPositionableModel.DockHeight.IsStar )
             {
               var childPositionableModelWidthActualSize = childPositionableModel as ILayoutPositionableElementWithActualSize;
-
-              var heightToSet = Math.Max( childPositionableModelWidthActualSize.ActualHeight, childPositionableModel.DockMinHeight );
+              var childDockMinHeight = childPositionableModel.CalculatedDockMinHeight();
+              var heightToSet = Math.Max( childPositionableModelWidthActualSize.ActualHeight, childDockMinHeight );
               heightToSet = Math.Min( heightToSet, ActualHeight / 2.0 );
-              heightToSet = Math.Max( heightToSet, childPositionableModel.DockMinHeight );
+              heightToSet = Math.Max( heightToSet, childDockMinHeight );
 
               childPositionableModel.DockHeight = new GridLength( heightToSet, GridUnitType.Pixel );
             }

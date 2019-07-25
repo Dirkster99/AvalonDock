@@ -259,7 +259,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
           ColumnDefinitions.Add( new ColumnDefinition()
           {
             Width = childModel.IsVisible ? childModel.DockWidth : new GridLength( 0.0, GridUnitType.Pixel ),
-            MinWidth = childModel.IsVisible ? childModel.DockMinWidth : 0.0
+            MinWidth = childModel.IsVisible ? childModel.CalculatedDockMinWidth() : 0.0
           } );
           Grid.SetColumn( InternalChildren[ iChild ], iColumn );
 
@@ -298,7 +298,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
           RowDefinitions.Add( new RowDefinition()
           {
             Height = childModel.IsVisible ? childModel.DockHeight : new GridLength( 0.0, GridUnitType.Pixel ),
-            MinHeight = childModel.IsVisible ? childModel.DockMinHeight : 0.0
+            MinHeight = childModel.IsVisible ? childModel.CalculatedDockMinHeight() : 0.0
           } );
           Grid.SetRow( InternalChildren[ iChild ], iRow );
 
@@ -498,54 +498,54 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         fixedPanels = layoutChildrenModels.Where(child => child.DockHeight.IsAbsolute).ToList();
         relativePanels = layoutChildrenModels.Where(child => !child.DockHeight.IsAbsolute).ToList();
-        minimumSize.Width += layoutChildrenModels.Max(child => child.DockMinWidth);
-        minimumSize.Height += layoutChildrenModels.Sum(child => child.DockMinHeight);
+        minimumSize.Width += layoutChildrenModels.Max(child => child.CalculatedDockMinWidth());
+        minimumSize.Height += layoutChildrenModels.Sum(child => child.CalculatedDockMinHeight());
         minimumSize.Height += splitterChildren.Sum(child => child.ActualHeight);
         currentSize.Width += layoutChildrenModels.Max(child => child.ActualWidth);
         currentSize.Height += layoutChildrenModels.Sum(child => child.ActualHeight);
         currentSize.Height += splitterChildren.Sum(child => child.ActualHeight);
-        preferredMinimumSize.Width += layoutChildrenModels.Max(child => child.DockMinWidth);
-        preferredMinimumSize.Height += minimumSize.Height + fixedPanels.Sum(child => child.FixedDockHeight) - fixedPanels.Sum(child => child.DockMinHeight);
+        preferredMinimumSize.Width += layoutChildrenModels.Max(child => child.CalculatedDockMinWidth());
+        preferredMinimumSize.Height += minimumSize.Height + fixedPanels.Sum(child => child.FixedDockHeight) - fixedPanels.Sum(child => child.CalculatedDockMinHeight());
       }
       else
       {
         fixedPanels = layoutChildrenModels.Where(child => child.DockWidth.IsAbsolute).ToList();
         relativePanels = layoutChildrenModels.Where(child => !child.DockWidth.IsAbsolute).ToList();
-        minimumSize.Width += layoutChildrenModels.Sum(child => child.DockMinWidth);
-        minimumSize.Height += layoutChildrenModels.Max(child => child.DockMinHeight);
+        minimumSize.Width += layoutChildrenModels.Sum(child => child.CalculatedDockMinWidth());
+        minimumSize.Height += layoutChildrenModels.Max(child => child.CalculatedDockMinHeight());
         minimumSize.Width += splitterChildren.Sum(child => child.ActualWidth);
         currentSize.Width += layoutChildrenModels.Sum(child => child.ActualWidth);
         currentSize.Height += layoutChildrenModels.Max(child => child.ActualHeight);
         currentSize.Width += splitterChildren.Sum(child => child.ActualWidth);
-        preferredMinimumSize.Height += layoutChildrenModels.Max(child => child.DockMinHeight);
-        preferredMinimumSize.Width += minimumSize.Width + fixedPanels.Sum(child => child.FixedDockWidth) - fixedPanels.Sum(child => child.DockMinWidth);
+        preferredMinimumSize.Height += layoutChildrenModels.Max(child => child.CalculatedDockMinHeight());
+        preferredMinimumSize.Width += minimumSize.Width + fixedPanels.Sum(child => child.FixedDockWidth) - fixedPanels.Sum(child => child.CalculatedDockMinWidth());
       }
 
       // Apply corrected sizes for fixed panels.
       if (Orientation == Orientation.Vertical)
       {
         double delta = availableSize.Height - currentSize.Height;
-        double relativeDelta = relativePanels.Sum(child => child.ActualHeight - child.DockMinHeight);
+        double relativeDelta = relativePanels.Sum(child => child.ActualHeight - child.CalculatedDockMinHeight());
         delta += relativeDelta;
         foreach (var fixedChild in fixedPanels)
         {
           if (minimumSize.Height >= availableSize.Height)
           {
-            fixedChild.ResizableAbsoluteDockHeight = fixedChild.DockMinHeight;
+            fixedChild.ResizableAbsoluteDockHeight = fixedChild.CalculatedDockMinHeight();
           }
           else if (preferredMinimumSize.Height <= availableSize.Height)
           {
             fixedChild.ResizableAbsoluteDockHeight = fixedChild.FixedDockHeight;
           }
-          else if (relativePanels.All(child => Math.Abs(child.ActualHeight - child.DockMinHeight) <= 1))
+          else if (relativePanels.All(child => Math.Abs(child.ActualHeight - child.CalculatedDockMinHeight()) <= 1))
           {
             double panelFraction;
             int indexOfChild = fixedPanels.IndexOf(fixedChild);
             if (delta < 0)
             {
               double availableHeightLeft = fixedPanels.Where(child => fixedPanels.IndexOf(child) >= indexOfChild)
-                .Sum(child => child.ActualHeight - child.DockMinHeight);
-              panelFraction = (fixedChild.ActualHeight - fixedChild.DockMinHeight) / (availableHeightLeft > 0 ? availableHeightLeft : 1);
+                .Sum(child => child.ActualHeight - child.CalculatedDockMinHeight());
+              panelFraction = (fixedChild.ActualHeight - fixedChild.CalculatedDockMinHeight()) / (availableHeightLeft > 0 ? availableHeightLeft : 1);
             }
             else
             {
@@ -555,7 +555,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
             }
 
             double childActualHeight = fixedChild.ActualHeight;
-            double heightToSet = Math.Max(Math.Round(delta * panelFraction + fixedChild.ActualHeight), fixedChild.DockMinHeight);
+            double heightToSet = Math.Max(Math.Round(delta * panelFraction + fixedChild.ActualHeight), fixedChild.CalculatedDockMinHeight());
             fixedChild.ResizableAbsoluteDockHeight = heightToSet;
             delta -= heightToSet - childActualHeight;
           }
@@ -564,13 +564,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
       else
       {
         double delta = availableSize.Width - currentSize.Width;
-        double relativeDelta = relativePanels.Sum(child => child.ActualWidth - child.DockMinWidth);
+        double relativeDelta = relativePanels.Sum(child => child.ActualWidth - child.CalculatedDockMinWidth());
         delta += relativeDelta;
         foreach (var fixedChild in fixedPanels)
         {
           if (minimumSize.Width >= availableSize.Width)
           {
-            fixedChild.ResizableAbsoluteDockWidth = fixedChild.DockMinWidth;
+            fixedChild.ResizableAbsoluteDockWidth = fixedChild.CalculatedDockMinWidth();
           }
           else if (preferredMinimumSize.Width <= availableSize.Width)
           {
@@ -583,8 +583,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
             if (delta < 0)
             {
               double availableWidthLeft = fixedPanels.Where(child => fixedPanels.IndexOf(child) >= indexOfChild)
-                .Sum(child => child.ActualWidth - child.DockMinWidth);
-              panelFraction = (fixedChild.ActualWidth - fixedChild.DockMinWidth) / (availableWidthLeft > 0 ? availableWidthLeft : 1);
+                .Sum(child => child.ActualWidth - child.CalculatedDockMinWidth());
+              panelFraction = (fixedChild.ActualWidth - fixedChild.CalculatedDockMinWidth()) / (availableWidthLeft > 0 ? availableWidthLeft : 1);
             }
             else
             {
@@ -594,7 +594,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
             }
 
             double childActualWidth = fixedChild.ActualWidth;
-            double widthToSet = Math.Max(Math.Round(delta * panelFraction + fixedChild.ActualWidth), fixedChild.DockMinWidth);
+            double widthToSet = Math.Max(Math.Round(delta * panelFraction + fixedChild.ActualWidth), fixedChild.CalculatedDockMinWidth());
             fixedChild.ResizableAbsoluteDockWidth = widthToSet;
             delta -= widthToSet - childActualWidth;
           }
@@ -675,23 +675,23 @@ namespace Xceed.Wpf.AvalonDock.Controls
       if( Orientation == System.Windows.Controls.Orientation.Horizontal )
       {
         actualSize = new Size(
-            prevChildActualSize.Width - prevChildModel.DockMinWidth + splitter.ActualWidth + nextChildActualSize.Width - nextChildModel.DockMinWidth,
+            prevChildActualSize.Width - prevChildModel.CalculatedDockMinWidth() + splitter.ActualWidth + nextChildActualSize.Width - nextChildModel.CalculatedDockMinWidth(),
             nextChildActualSize.Height );
 
         _resizerGhost.Width = splitter.ActualWidth;
         _resizerGhost.Height = actualSize.Height;
-        ptTopLeftScreen.Offset( prevChildModel.DockMinWidth, 0.0 );
+        ptTopLeftScreen.Offset( prevChildModel.CalculatedDockMinWidth(), 0.0 );
       }
       else
       {
         actualSize = new Size(
             prevChildActualSize.Width,
-            prevChildActualSize.Height - prevChildModel.DockMinHeight + splitter.ActualHeight + nextChildActualSize.Height - nextChildModel.DockMinHeight );
+            prevChildActualSize.Height - prevChildModel.CalculatedDockMinHeight() + splitter.ActualHeight + nextChildActualSize.Height - nextChildModel.CalculatedDockMinHeight() );
 
         _resizerGhost.Height = splitter.ActualHeight;
         _resizerGhost.Width = actualSize.Width;
 
-        ptTopLeftScreen.Offset( 0.0, prevChildModel.DockMinHeight );
+        ptTopLeftScreen.Offset( 0.0, prevChildModel.CalculatedDockMinHeight() );
       }
 
       _initialStartPoint = splitter.PointToScreenDPIWithoutFlowDirection( new Point() ) - ptTopLeftScreen;
