@@ -101,6 +101,11 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## In Master branch but not released, yet
 
+1) Made calculating of DockMinSize for panel based on children DockMinSize  
+   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/54)
+
+## Fixes in Version 3.5.9
+
 1) Small breaking change in [Dirkster.AvalonDock.Themes.VS2013](https://github.com/Dirkster99/AvalonDock/wiki/WPF-VS-2013-Dark-Light-Demo-Client), Renamed DockingButtonForegroundArrowBrusKey to DockingButtonForegroundArrowBrushKey (thanx to [VNNCC](https://github.com/VNNCC))  
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/52)
 
