@@ -101,7 +101,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## In Master branch but not released, yet
 
-1) Made calculating of DockMinSize for panel based on children DockMinSize  
+1) Made calculating of DockMinSize for panel based on children DockMinSize (thanx to [scdmitryvodich](https://github.com/scdmitryvodich))  
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/54)
 
 ## Fixes in Version 3.5.9
