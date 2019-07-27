@@ -869,7 +869,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
           PreviousContainerId = (parentAsGroup as ILayoutPaneSerializable).Id;
           
           // This parentAsGroup will be removed in the GarbageCollection below
-          if (parentAsGroup.Children.Count() == 1 && parentAsGroup.Parent != null)
+          if (parentAsGroup.Children.Count() == 1 && parentAsGroup.Parent != null && Root.Manager != null)
           {
             Parent = Root.Manager.Layout;
             PreviousContainer = parentAsGroup.Parent;

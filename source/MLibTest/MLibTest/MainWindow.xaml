@@ -142,6 +142,7 @@
                                     <Setter Property="ContentId" Value="{Binding Model.ContentId}"/>
                                     <Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}"/>
                                     <Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}"/>
+                                    <Setter Property="CanHide" Value="True" />
                                 </Style>
                             </demos:PanesStyleSelector.ToolStyle>
                             <demos:PanesStyleSelector.FileStyle>

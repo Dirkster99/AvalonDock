@@ -170,10 +170,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void OnClosing( System.ComponentModel.CancelEventArgs e )
     {
-      if( CloseInitiatedByUser && !KeepContentVisibleOnClose )
+      bool CanHide = HideWindowCommand.CanExecute(null);
+
+      if( CloseInitiatedByUser && !KeepContentVisibleOnClose && !CanHide)
       {
         e.Cancel = true;
-        _model.Descendents().OfType<LayoutAnchorable>().ToArray().ForEach<LayoutAnchorable>( ( a ) => a.Hide() );
+
+        if (CanHide == true)
+            _model.Descendents().OfType<LayoutAnchorable>().ToArray().ForEach<LayoutAnchorable>( ( a ) => a.Hide() );
       }
 
       base.OnClosing( e );

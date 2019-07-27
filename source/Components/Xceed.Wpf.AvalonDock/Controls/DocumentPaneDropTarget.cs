@@ -222,7 +222,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
               i = previousIndex;
             }
             sourceModel.IsActive = false;
-            paneModel.Children.Insert( i, sourceModel );
+            paneModel.Children.Insert( System.Math.Min(paneModel.Children.Count, i), sourceModel );
             sourceModel.IsActive = true;
           }
           break;

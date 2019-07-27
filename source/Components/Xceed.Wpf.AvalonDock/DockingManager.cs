@@ -2210,7 +2210,7 @@ namespace Xceed.Wpf.AvalonDock
       while( currentHandle != IntPtr.Zero )
       {
         LayoutFloatingWindowControl ctrl = _fwList.FirstOrDefault( fw => new WindowInteropHelper( fw ).Handle == currentHandle );
-        if( ctrl != null && ctrl.Model.Root.Manager == this )
+        if( ctrl != null && ctrl.Model.Root != null && ctrl.Model.Root.Manager == this )
           yield return ctrl;
 
         currentHandle = Win32Helper.GetWindow( currentHandle, ( uint )Win32Helper.GetWindow_Cmd.GW_HWNDNEXT );
