@@ -99,10 +99,17 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
-## In Master branch but not released, yet
+## Fixes in Version 3.5.10 
 
 1) Made calculating of DockMinSize for panel based on children DockMinSize (thanx to [scdmitryvodich](https://github.com/scdmitryvodich))  
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/54)
+
+2) Fixing [Issue 53  Can hide LayoutAnchorable using Alt+F4 when CanHide is false](https://github.com/Dirkster99/AvalonDock/issues/53)  
+    - Including:  
+      - Fix 2 in #53 NullReferenceException
+      - Fix 3 in #53 System.ArgumentOutOfRangeException
+
+3) Fixing [Issue #38 and #47](https://github.com/Dirkster99/AvalonDock/issues/47)
 
 ## Fixes in Version 3.5.9
 
