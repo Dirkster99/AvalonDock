@@ -43,7 +43,7 @@
                 if (_isVisible != value)
                 {
                     _isVisible = value;
-                    RaisePropertyChanged("IsVisible");
+                    RaisePropertyChanged(() => IsVisible);
                 }
             }
         }

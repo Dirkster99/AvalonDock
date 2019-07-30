@@ -8,6 +8,7 @@
         xmlns:MWindow="clr-namespace:MWindowLib;assembly=MWindowLib"
         xmlns:demos="clr-namespace:MLibTest.Demos"
         xmlns:demoviews="clr-namespace:MLibTest.Demos.Views"
+        xmlns:advConv="clr-namespace:Xceed.Wpf.AvalonDock.Converters;assembly=Xceed.Wpf.AvalonDock"
         
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
@@ -21,7 +22,7 @@
         >
         <Grid.Resources>
             <conv:ActiveDocumentConverter x:Key="ActiveDocumentConverter"/>
-            <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <advConv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -65,11 +66,11 @@
                         </Style>
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
-                <MenuItem Header="File Stats" IsChecked="{Binding AD_WorkSpace.FileStats.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
-                <MenuItem Header="Color Picker" IsChecked="{Binding AD_WorkSpace.ColorPicker.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
-                <MenuItem Header="Tool1" IsChecked="{Binding AD_WorkSpace.Tool1.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
-                <MenuItem Header="Tool2" IsChecked="{Binding AD_WorkSpace.Tool2.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
-                <MenuItem Header="Tool3" IsChecked="{Binding AD_WorkSpace.Tool3.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+                <MenuItem Header="File Stats" IsChecked="{Binding AD_WorkSpace.FileStats.IsVisible, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsCheckable="True"/>
+                <MenuItem Header="Color Picker" IsChecked="{Binding AD_WorkSpace.ColorPicker.IsVisible, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsCheckable="True"/>
+                <MenuItem Header="Tool1" IsChecked="{Binding AD_WorkSpace.Tool1.IsVisible, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsCheckable="True"/>
+                <MenuItem Header="Tool2" IsChecked="{Binding AD_WorkSpace.Tool2.IsVisible, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsCheckable="True"/>
+                <MenuItem Header="Tool3" IsChecked="{Binding AD_WorkSpace.Tool3.IsVisible, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsCheckable="True"/>
             </MenuItem>
         </Menu>
 
@@ -138,7 +139,7 @@
                                 <Style TargetType="{x:Type avalonDockControls:LayoutAnchorableItem}">
                                     <Setter Property="Title" Value="{Binding Model.Title}"/>
                                     <Setter Property="IconSource" Value="{Binding Model.IconSource}"/>
-                                    <Setter Property="Visibility" Value="{Binding Model.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}"/>
+                                    <Setter Property="Visibility" Value="{Binding Model.IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}"/>
                                     <Setter Property="ContentId" Value="{Binding Model.ContentId}"/>
                                     <Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}"/>
                                     <Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}"/>
