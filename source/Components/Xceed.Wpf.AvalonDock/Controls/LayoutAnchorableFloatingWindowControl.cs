@@ -52,6 +52,23 @@ namespace Xceed.Wpf.AvalonDock.Controls
       HideWindowCommand = new RelayCommand( ( p ) => OnExecuteHideWindowCommand( p ), ( p ) => CanExecuteHideWindowCommand( p ) );
       CloseWindowCommand = new RelayCommand( ( p ) => OnExecuteCloseWindowCommand( p ), ( p ) => CanExecuteCloseWindowCommand( p ) );
       UpdateThemeResources();
+      MinWidth = _model.RootPanel.CalculatedDockMinWidth();
+      MinHeight = _model.RootPanel.CalculatedDockMinHeight();
+      
+      LayoutRoot root = _model.Root as LayoutRoot;
+      if (root != null)
+      {
+        root.Updated += OnRootUpdated;
+      }
+    }
+
+    private void OnRootUpdated(object sender, EventArgs e)
+    {
+      if (_model?.RootPanel != null)
+      {
+        MinWidth = _model.RootPanel.CalculatedDockMinWidth();
+        MinHeight = _model.RootPanel.CalculatedDockMinHeight();
+      }
     }
 
     internal LayoutAnchorableFloatingWindowControl( LayoutAnchorableFloatingWindow model)
@@ -146,6 +163,12 @@ namespace Xceed.Wpf.AvalonDock.Controls
       var root = Model.Root;
       if( root != null )
       {
+        LayoutRoot layoutRoot = root as LayoutRoot;
+        if (layoutRoot != null)
+        {
+          layoutRoot.Updated -= OnRootUpdated;
+        }
+
         root.Manager.RemoveFloatingWindow( this );
         root.CollectGarbage();
       }
@@ -228,10 +251,23 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private void _model_PropertyChanged( object sender, System.ComponentModel.PropertyChangedEventArgs e )
     {
-      if( e.PropertyName == "RootPanel" &&
-          _model.RootPanel == null )
+      switch (e.PropertyName)
       {
-        InternalClose();
+        case "RootPanel":
+          if (_model.RootPanel == null)
+          {
+            InternalClose();
+          }
+
+          break;
+
+        case "IsVisible":
+          if (_model.IsVisible != IsVisible)
+          {
+            Visibility = _model.IsVisible ? Visibility.Visible : Visibility.Hidden;
+          }
+
+          break;
       }
     }
 
