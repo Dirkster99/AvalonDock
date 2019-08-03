@@ -27,6 +27,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="16"/>
         </Grid.RowDefinitions>
 
         <Menu>
@@ -52,7 +53,7 @@
                 <MenuItem Header="Themes"
                                   ItemsSource="{Binding AppTheme.ListOfThemes}"
                                   IsEnabled="{Binding AppTheme.IsEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                  DisplayMemberPath="Model.Name"
+                                  DisplayMemberPath="Model.DisplayName"
                               >
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
