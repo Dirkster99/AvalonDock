@@ -8,13 +8,15 @@
 
 ## Master Branch
 [![Build status](https://ci.appveyor.com/api/projects/status/kq2wyupx5hm7fok2/branch/master?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock/branch/master)[![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)&nbsp;[Continues Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts)
-  <a href="https://github.com/Dirkster99/AvalonDock/issues">
+
+<a href="https://github.com/Dirkster99/AvalonDock/issues">
     <img src="https://img.shields.io/github/issues-raw/Dirkster99/AvalonDock.svg?style=flat-square">
   </a>
   <a href="https://github.com/Dirkster99/AvalonDock/issues">
     <img src="https://img.shields.io/github/issues-closed-raw/Dirkster99/AvalonDock.svg?style=flat-square">
-  </a>
-  <a href="https://github.com/Dirkster99/AvalonDock/issues">
+  </a><br/>
+
+<a href="https://github.com/Dirkster99/AvalonDock/issues">
     <img src="https://img.shields.io/github/issues-pr-raw/Dirkster99/AvalonDock.svg?style=flat-square">
   </a>
   <a href="https://github.com/Dirkster99/AvalonDock/issues">
