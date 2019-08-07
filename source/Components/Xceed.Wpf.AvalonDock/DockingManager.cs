@@ -43,6 +43,7 @@ namespace Xceed.Wpf.AvalonDock
     private AutoHideWindowManager _autoHideWindowManager;
     private FrameworkElement _autohideArea;
     private List<LayoutFloatingWindowControl> _fwList = new List<LayoutFloatingWindowControl>();
+    private List<LayoutFloatingWindowControl> _fwHiddenList = new List<LayoutFloatingWindowControl>();
     private OverlayWindow _overlayWindow = null;
     private List<IDropArea> _areas = null;
     private bool _insideInternalSetActiveContent = false;
@@ -2378,6 +2379,19 @@ namespace Xceed.Wpf.AvalonDock
 
         SetupAutoHideWindow();
 
+        foreach( var fwc in _fwHiddenList )
+        {
+          fwc.EnableBindings();
+          if( fwc.KeepContentVisibleOnClose )
+          {
+            fwc.Show();
+            fwc.KeepContentVisibleOnClose = false;
+          }
+
+           _fwList.Add( fwc );
+        }
+        _fwHiddenList.Clear();
+
         //load windows not already loaded!
         foreach( var fw in Layout.FloatingWindows.Where( fw => !_fwList.Any( fwc => fwc.Model == fw ) ) )
           _fwList.Add( CreateUIElementForModel( fw ) as LayoutFloatingWindowControl );
@@ -2421,13 +2435,25 @@ namespace Xceed.Wpf.AvalonDock
 
         foreach( var fw in _fwList.ToArray() )
         {
-          //fw.Owner = null;
-          fw.SetParentWindowToNull();
-          fw.KeepContentVisibleOnClose = true;
-          // To avoid calling Close method multiple times.
-          fw.InternalClose(true);
+          ////fw.Owner = null;
+          //fw.SetParentWindowToNull();
+          //fw.KeepContentVisibleOnClose = true;
+          //// To avoid calling Close method multiple times.
+          //fw.InternalClose(true);
+
+          // Unloaded can occure not only after closing of the application, but after switching between tabs.
+          // For such case it's better to hide the floating windows instead of closing it.
+          // We clear bindings on visibility during the owner is unloaded.
+          if( fw.IsVisible )
+          {
+            fw.KeepContentVisibleOnClose = true;
+            fw.Hide();
+          }
+          fw.DisableBindings();
+          _fwHiddenList.Add( fw );
         }
-         _fwList.Clear();
+
+        _fwList.Clear();
 
         DestroyOverlayWindow();
         FocusElementManager.FinalizeFocusManagement( this );

@@ -531,6 +531,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     #endregion
 
+    public virtual void EnableBindings()
+    {
+    }
+
+    public virtual void DisableBindings()
+    {
+    }
+
     #region Internal Classes
 
     protected internal class FloatingWindowContentHost : HwndHost

@@ -51,6 +51,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       _model = model;
       HideWindowCommand = new RelayCommand( ( p ) => OnExecuteHideWindowCommand( p ), ( p ) => CanExecuteHideWindowCommand( p ) );
       CloseWindowCommand = new RelayCommand( ( p ) => OnExecuteCloseWindowCommand( p ), ( p ) => CanExecuteCloseWindowCommand( p ) );
+      Activated += LayoutAnchorableFloatingWindowControl_Activated;
       UpdateThemeResources();
       MinWidth = _model.RootPanel.CalculatedDockMinWidth();
       MinHeight = _model.RootPanel.CalculatedDockMinHeight();
@@ -68,6 +69,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         MinWidth = _model.RootPanel.CalculatedDockMinWidth();
         MinHeight = _model.RootPanel.CalculatedDockMinHeight();
+      }
+    }
+
+    private void LayoutAnchorableFloatingWindowControl_Activated( object sender, EventArgs e )
+    {
+      // Issue similar to: http://avalondock.codeplex.com/workitem/15036
+      var visibilityBinding = GetBindingExpression( VisibilityProperty );
+
+      if ( visibilityBinding == null && Visibility == Visibility.Visible )
+      {
+        SetVisibilityBinding();
       }
     }
 
@@ -147,9 +159,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
       IsVisibleChanged += ( s, args ) =>
       {
         var visibilityBinding = GetBindingExpression( VisibilityProperty );
-        if( IsVisible && ( visibilityBinding == null ) )
+        if( visibilityBinding == null && IsVisible )
         {
-          SetBinding( VisibilityProperty, new Binding( "IsVisible" ) { Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden } );
+          SetVisibilityBinding();
         }
       };
 
@@ -213,7 +225,12 @@ namespace Xceed.Wpf.AvalonDock.Controls
         case Win32Helper.WM_NCLBUTTONDOWN: //Left button down on title -> start dragging over docking manager
           if( wParam.ToInt32() == Win32Helper.HT_CAPTION )
           {
-            _model.Descendents().OfType<LayoutAnchorablePane>().First( p => p.ChildrenCount > 0 && p.SelectedContent != null ).SelectedContent.IsActive = true;
+            var anchorablePane = _model.Descendents().OfType<LayoutAnchorablePane>()
+                .FirstOrDefault( p => p.ChildrenCount > 0 && p.SelectedContent != null );
+            if( anchorablePane != null )
+            {
+              anchorablePane.SelectedContent.IsActive = true;
+            }
             handled = true;
           }
           break;
@@ -306,6 +323,59 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
 
       return false;
+    }
+
+    private void SetVisibilityBinding()
+    {
+      SetBinding(
+        VisibilityProperty,
+        new Binding("IsVisible")
+        {
+          Source = _model,
+          Converter = new BoolToVisibilityConverter(),
+          Mode = BindingMode.OneWay,
+          ConverterParameter = Visibility.Hidden
+        }
+      );
+    }
+
+    #endregion
+
+    #region Public Methods
+
+    public override void EnableBindings()
+    {
+      _model.PropertyChanged += _model_PropertyChanged;
+      SetVisibilityBinding();
+      var root = Model.Root;
+      if( root != null )
+      {
+        LayoutRoot layoutRoot = root as LayoutRoot;
+        if ( layoutRoot != null )
+        {
+          layoutRoot.Updated += OnRootUpdated;
+        }
+      }
+
+      base.EnableBindings();
+    }
+
+    public override void DisableBindings()
+    {
+      var root = Model.Root;
+      if( root != null )
+      {
+        LayoutRoot layoutRoot = root as LayoutRoot;
+        if( layoutRoot != null )
+        {
+          layoutRoot.Updated -= OnRootUpdated;
+        }
+      }
+
+      BindingOperations.ClearBinding( _model, VisibilityProperty );
+      _model.PropertyChanged -= _model_PropertyChanged;
+
+      base.DisableBindings();
     }
 
     #endregion
