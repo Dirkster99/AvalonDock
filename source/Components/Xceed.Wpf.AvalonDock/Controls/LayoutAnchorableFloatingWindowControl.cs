@@ -201,6 +201,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
       BindingOperations.ClearBinding(_model, VisibilityProperty);
 
       _model.PropertyChanged -= new System.ComponentModel.PropertyChangedEventHandler( _model_PropertyChanged );
+
+      Activated -= LayoutAnchorableFloatingWindowControl_Activated;
     }
 
     protected override void OnClosing( System.ComponentModel.CancelEventArgs e )
@@ -329,7 +331,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       SetBinding(
         VisibilityProperty,
-        new Binding("IsVisible")
+        new Binding( "IsVisible" )
         {
           Source = _model,
           Converter = new BoolToVisibilityConverter(),
