@@ -118,6 +118,8 @@ to also theme standard elements, such as, button and textblock etc.
 1) The minimum sizes of LayoutAnchorablePane children is based on DockMinSizes (DockMinWidth, DockMinHeight) (thanx to [scdmitryvodich](https://github.com/scdmitryvodich))  
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/58)
 
+2) [#60 Fix visibility bindings of undocked panels in specific cases](https://github.com/Dirkster99/AvalonDock/pull/60) (thanx to [scdmitryvodich](https://github.com/scdmitryvodich))
+
 ## Fixes in Version 3.5.10 
 
 1) Made calculating of DockMinSize for panel based on children DockMinSize (thanx to [scdmitryvodich](https://github.com/scdmitryvodich))  
