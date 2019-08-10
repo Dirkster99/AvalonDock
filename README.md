@@ -113,7 +113,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
-## Fixes in Master not yet released
+## Fixes in Version 3.5.11
 
 1) The minimum sizes of LayoutAnchorablePane children is based on DockMinSizes (DockMinWidth, DockMinHeight) (thanx to [scdmitryvodich](https://github.com/scdmitryvodich))  
    - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/58)
