@@ -310,8 +310,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
       }
 
-      var manager = _model.Root.Manager;
-      if( manager.Theme != null )
+      var manager = _model.Root?.Manager;
+      if( manager?.Theme != null )
       {
         if( manager.Theme is DictionaryTheme )
         {
@@ -530,6 +530,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
     }
 
     #endregion
+
+    public virtual void EnableBindings()
+    {
+    }
+
+    public virtual void DisableBindings()
+    {
+    }
 
     #region Internal Classes
 

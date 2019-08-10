@@ -641,12 +641,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       if( Orientation == Orientation.Horizontal )
       {
-        return ColumnDefinitions[index].Width.IsStar || ColumnDefinitions[index].Width.Value > 0;
+        if ( index < ColumnDefinitions.Count )
+        {
+          return ColumnDefinitions[ index ].Width.IsStar || ColumnDefinitions[ index ].Width.Value > 0;
+        }
       }
-      else
+      else if( index < RowDefinitions.Count )
       {
         return RowDefinitions[ index ].Height.IsStar || RowDefinitions[ index ].Height.Value > 0;
       }
+
+      return false;
     }
 
     private void ShowResizerOverlayWindow( LayoutGridResizerControl splitter )

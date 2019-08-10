@@ -419,7 +419,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
         PreviousContainer = parentAsGroup;
         PreviousContainerIndex = parentAsGroup.IndexOfChild( this );
       }
-      Root.Hidden.Add( this );
+      Root?.Hidden?.Add( this );
       RaisePropertyChanged( "IsVisible" );
       RaisePropertyChanged( "IsHidden" );
       NotifyIsVisibleChanged();

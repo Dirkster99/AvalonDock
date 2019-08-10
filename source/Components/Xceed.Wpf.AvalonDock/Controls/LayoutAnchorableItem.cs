@@ -32,6 +32,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     private ICommand _defaultAutoHideCommand;
     private ICommand _defaultDockCommand;
     private ReentrantFlag _visibilityReentrantFlag = new ReentrantFlag();
+    private ReentrantFlag _anchorableVisibilityReentrantFlag = new ReentrantFlag();
 
     #endregion
 
@@ -377,9 +378,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       if( _anchorable != null && _anchorable.Root != null )
       {
-        if( _visibilityReentrantFlag.CanEnter )
+        if( _anchorableVisibilityReentrantFlag.CanEnter )
         {
-          using( _visibilityReentrantFlag.Enter() )
+          using( _anchorableVisibilityReentrantFlag.Enter() )
           {
             if( _anchorable.IsVisible )
               Visibility = Visibility.Visible;
@@ -389,12 +390,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
         }
       }
     }
-
-
-
-
-
-
 
     #endregion
   }
