@@ -166,7 +166,7 @@
                     <avalonDockLayout:LayoutRoot>
                         <avalonDockLayout:LayoutPanel Orientation="Vertical">
                             <avalonDockLayout:LayoutDocumentPane/>
-                            <avalonDockLayout:LayoutAnchorablePane Name="ToolsPane" DockHeight="150">
+                            <avalonDockLayout:LayoutAnchorablePane Name="ToolsPane" DockHeight="150" DockMinWidth="250">
                             </avalonDockLayout:LayoutAnchorablePane>
                         </avalonDockLayout:LayoutPanel>
                     </avalonDockLayout:LayoutRoot>

@@ -26,11 +26,11 @@ using System;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("https://github.com/Dirkster99/AvalonDock")]
-[assembly: AssemblyDescription( "This assembly implements the Xceed.Wpf.AvalonDock namespace, a docking layout system for the Windows Presentation Framework." )]
+[assembly: AssemblyDescription("This assembly implements a docking layout system for WPF.")]
 
-[assembly: AssemblyCompany( "Xceed Software Inc." )]
-[assembly: AssemblyProduct( "Xceed Toolkit for WPF - AvalonDock" )]
-[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2017" )]
+[assembly: AssemblyCompany("Open Source")]
+[assembly: AssemblyProduct("Dirkster.AvalonDock")]
+[assembly: AssemblyCopyright("2017-2019")]
 [assembly: AssemblyCulture( "" )]
 
 

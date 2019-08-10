@@ -25,12 +25,12 @@ using System;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Xceed Extended WPF Toolkit - AvalonDock Expression Theme" )]
+[assembly: AssemblyTitle("AvalonDock Expression Theme - https://github.com/Dirkster99/AvalonDock")]
 [assembly: AssemblyDescription( "This assembly implements the Expression Theme for AvalonDock layout system." )]
 
-[assembly: AssemblyCompany( "Xceed Software Inc." )]
-[assembly: AssemblyProduct( "Xceed Extended WPF Toolkit - AvalonDock" )]
-[assembly: AssemblyCopyright( "Copyright (C) Xceed Software Inc. 2007-2013" )]
+[assembly: AssemblyCompany("Open Source")]
+[assembly: AssemblyProduct("Dirkster.AvalonDock.Themes.Expression")]
+[assembly: AssemblyCopyright("Copyright © 2017-2019")]
 
 
 

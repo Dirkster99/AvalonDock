@@ -24,7 +24,7 @@ internal static class _XceedVersionInfo
   public const string BaseVersion = "3.5";
   [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields" )]
   public const string Version = BaseVersion + 
-  ".10.0";
+  ".11.0";
   [System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields" )]
   public const string PublicKeyToken = "ba83ff368b7563c6";
 
