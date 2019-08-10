@@ -27,7 +27,7 @@
 
 Support this project with a :star: -report an issue, or even better, place a pull request :mailbox: :blush:
 
-My projects <a href="https://dirkster99.github.io/Edi/">Edi</a> and <a href="https://github.com/Dirkster99/Aehnlich">Aehnlich</a> are powered by this project.
+My projects <a href="https://dirkster99.github.io/Edi/">Edi</a> and <a href="https://github.com/Dirkster99/Aehnlich">Aehnlich</a> and [many others](https://github.com/search?q=dirkster.avalondock&type=Code) (open source or commercial) are powered by this project.
 
 AvalonDock is a WPF Document and Tool Window layout container that is used to arrange documents
 and tool windows in similar ways than many well known IDEs, such as, Eclipse, Visual Studio,
