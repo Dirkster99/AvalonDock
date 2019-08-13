@@ -257,8 +257,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
           if( this.SelectedDocument != null )
           {
             // Jump to next LayoutDocument
+            // if we are on the last LayoutDocument and we have Anchorables we jump over to the Anchorables list
+            // if there are no Anchorables we call SelectNextDocument which has logic in it to loop back to the top of the list
             var docIndex = this.Documents.IndexOf<LayoutDocumentItem>( this.SelectedDocument );
-            if( docIndex < (this.Documents.Length - 1) )
+            if( docIndex < (this.Documents.Length - 1) || this.Anchorables.Count() == 0)
             {
               this.SelectNextDocument();
               shouldHandle = true;
@@ -288,8 +290,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
           if( this.SelectedAnchorable != null )
           {
             // Jump to next LayoutAnchorable
+            // if we are on the last LayoutAnchorable and we have one or more LayoutDocuments we jump over to the Documents list
+            // if there are no Documents we call SelectNextAnchorable which has logic in it to loop back to the top of the list
             var anchorableIndex = this.Anchorables.ToArray().IndexOf<LayoutAnchorableItem>( this.SelectedAnchorable );
-            if( anchorableIndex < (this.Anchorables.Count() - 1) )
+            if( anchorableIndex < (this.Anchorables.Count() - 1) || this.Documents.Count() == 0)
             {
               this.SelectNextAnchorable();
               shouldHandle = true;
