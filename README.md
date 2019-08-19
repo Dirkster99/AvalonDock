@@ -113,10 +113,13 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
+## In master banch but not in any release, yet
+
+1) [#61 Repeatedly pressing Ctrl-Tab gets stuck at the bottom of the list of LayoutItems](https://github.com/Dirkster99/AvalonDock/pull/61) (thanx to [Darren Gosbell](https://github.com/dgosbell))
+
 ## Fixes in Version 3.5.11
 
-1) The minimum sizes of LayoutAnchorablePane children is based on DockMinSizes (DockMinWidth, DockMinHeight) (thanx to [scdmitryvodich](https://github.com/scdmitryvodich))  
-   - [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/58)
+1) [#58 The minimum sizes of LayoutAnchorablePane children is based on DockMinSizes (DockMinWidth, DockMinHeight)](https://github.com/Dirkster99/AvalonDock/pull/58) (thanx to [scdmitryvodich](https://github.com/scdmitryvodich))  
 
 2) [#60 Fix visibility bindings of undocked panels in specific cases](https://github.com/Dirkster99/AvalonDock/pull/60) (thanx to [scdmitryvodich](https://github.com/scdmitryvodich))
 
