@@ -24,7 +24,7 @@
   </a>
   
 # AvalonDock
-
+Building the project requires at least **VS 2019**.
 Support this project with a :star: -report an issue, or even better, place a pull request :mailbox: :blush:
 
 My projects <a href="https://dirkster99.github.io/Edi/">Edi</a>, <a href="https://github.com/Dirkster99/Aehnlich">Aehnlich</a>, and [many others](https://github.com/search?p=4&q=%22dirkster.avalondock%22&type=Code) (open source or commercial) are powered by this project.
