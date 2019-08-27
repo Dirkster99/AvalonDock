@@ -43,9 +43,9 @@ https://github.com/xceedsoftware/wpftoolkit
 
 Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Wiki for more details</a>.
 
-# Fixed WPFToolkit Open Source Version
+# Stable WPF Toolkit Open Source Version
 
-There is also an open source repository https://github.com/dotnetprojects/WpfExtendedToolkit if you are looking for a fixed and stable version of all other (other than AvalonDock) components from the WPFToolKit.
+There is also an open source repository https://github.com/dotnetprojects/WpfExtendedToolkit with a fixed and stable version of all other (other than AvalonDock) components from the WPFToolKit.
 
 # Feature Added - Dark and Light VS 2013 Theme
 
