@@ -70,9 +70,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
             // For resolve issue "System.InvalidOperationException: Cannot perform this operation while dispatcher processing is suspended." make async subscribing instead of sync subscribing.
             int disableProcessingCount = (int?)typeof(Dispatcher).GetField("_disableProcessingCount", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(disp) ?? 0;
 
-            var dispatcherResult = disableProcessingCount == 0
-            ? disp.Invoke(subscribeToExitAction)
-            : disp.BeginInvoke(subscribeToExitAction);
+            if (disableProcessingCount == 0)
+              disp.Invoke(subscribeToExitAction);
+            else
+              disp.BeginInvoke(subscribeToExitAction);
           }
         }
       }
