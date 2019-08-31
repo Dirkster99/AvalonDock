@@ -1,13 +1,33 @@
-version: 1.0.{build}
+version: 3.5.{build}
+
 branches:
   only:
   - master
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}' 
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+  
 configuration: Release
+
 platform: Any CPU
+
+image: Visual Studio 2019 Preview
+
+install:
+  - cmd: choco install dotnetcore-sdk --pre
+  
 before_build:
-- cmd: nuget restore source/AvalonDock.sln
+  - cmd: nuget restore source/AvalonDock.sln
+
 build:
   verbosity: minimal
+  
 artifacts:
 - path: source\MVVMTestApp\bin\Release
   name: MVVMTestApp
@@ -29,3 +49,11 @@ artifacts:
   name: Xceed.Wpf.AvalonDock.Themes.Metro
 - path: source\Components\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\Release
   name: Xceed.Wpf.AvalonDock.Themes.VS2010
+- path: '**\bin\$(configuration)\DotNetProjects.*.nupkg'
+  
+#uncomment to publish to NuGet
+#deploy:
+#  provider: NuGet
+#  api_key:
+#    secure: xxxxx
+#  artifact: /.*\.nupkg/

@@ -4,8 +4,17 @@
         <TargetFrameworks>netcoreapp3.0;net4</TargetFrameworks>
         <UseWPF>true</UseWPF>
         <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <SignAssembly>true</SignAssembly>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>1.0.0</Version>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <FileVersion>1.0.0.0</FileVersion>
+        <Company>Open Source</Company>
+        <Product>Dirkster.AvalonDock</Product>
+        <Copyright>2017-2019</Copyright>
+        <Description>This assembly implements a docking layout system for WPF.</Description>
+        <PackageProjectUrl>https://github.com/Dirkster99/AvalonDock</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Dirkster99/AvalonDock</RepositoryUrl>
     </PropertyGroup>
     <ItemGroup>
         <Resource Include="**\*.png" />
