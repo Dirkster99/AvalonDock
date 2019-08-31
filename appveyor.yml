@@ -49,7 +49,7 @@ artifacts:
   name: Xceed.Wpf.AvalonDock.Themes.Metro
 - path: source\Components\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\Release
   name: Xceed.Wpf.AvalonDock.Themes.VS2010
-- path: '**\bin\$(configuration)\DotNetProjects.*.nupkg'
+- path: '**\bin\$(configuration)\Xceed.Wpf.AvalonDock.*.nupkg'
   
 #uncomment to publish to NuGet
 #deploy:
