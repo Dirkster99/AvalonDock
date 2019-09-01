@@ -118,9 +118,11 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
-## In master banch but not in any release, yet
+## Fixes in Version 3.5.12
 
 1) [#61 Repeatedly pressing Ctrl-Tab gets stuck at the bottom of the list of LayoutItems](https://github.com/Dirkster99/AvalonDock/pull/61) (thanx to [Darren Gosbell](https://github.com/dgosbell))
+
+2) [#65 Support NetCore 3 based on Preview 8](https://github.com/Dirkster99/AvalonDock/pull/65) (thanx to [Jochen Kühner](https://github.com/jogibear9988))
 
 ## Fixes in Version 3.5.11
 
