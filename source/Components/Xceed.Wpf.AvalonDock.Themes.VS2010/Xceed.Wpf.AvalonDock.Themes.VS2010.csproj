@@ -15,6 +15,8 @@
         <Description>This assembly implements a docking layout system for WPF.</Description>
         <PackageProjectUrl>https://github.com/Dirkster99/AvalonDock</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Dirkster99/AvalonDock</RepositoryUrl>
+        <PackageId>Dirkster.AvalonDock.Themes.VS2010</PackageId>
+        <Authors>https://github.com/Dirkster99/AvalonDock</Authors>
     </PropertyGroup>
     <ItemGroup>
         <Resource Include="**\*.png" />
