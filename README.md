@@ -45,6 +45,16 @@ https://github.com/xceedsoftware/wpftoolkit
 
 Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Wiki for more details</a>.
 
+
+## Building AvalonDock from Source
+
+This project supports multitargeting frameworks (NetCore 3 and .Net 4). This means that any commit before
+[Merge pull request #65 from jogibear9988/master ](https://github.com/Dirkster99/AvalonDock/commit/d85b297bf32bc16f01bd3f898a1ee2acc9e2f71c)
+should build with Visual Studio 2017 Comunity or higher.
+
+The commit [Merge pull request #65 from jogibear9988/master ](https://github.com/Dirkster99/AvalonDock/commit/d85b297bf32bc16f01bd3f898a1ee2acc9e2f71c)
+and any commit after requires **VS 2019 Community** and **NetCore 3 Preview 8 (or later)** for a succesful build from source.
+
 # Stable WPF Toolkit Open Source Version
 
 There is also an open source repository https://github.com/dotnetprojects/WpfExtendedToolkit with a fixed and stable version of all other (other than AvalonDock) components from the WPFToolKit.
