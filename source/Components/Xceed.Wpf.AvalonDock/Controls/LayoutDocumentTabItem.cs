@@ -157,21 +157,22 @@ namespace Xceed.Wpf.AvalonDock.Controls
     protected override void OnMouseMove( System.Windows.Input.MouseEventArgs e )
     {
       base.OnMouseMove( e );
-
+      bool allowDrag = false;
       if( _isMouseDown )
       {
         Point ptMouseMove = e.GetPosition( this );
-
+        this.CaptureMouse();
         if( Math.Abs( ptMouseMove.X - _mouseDownPoint.X ) > SystemParameters.MinimumHorizontalDragDistance ||
             Math.Abs( ptMouseMove.Y - _mouseDownPoint.Y ) > SystemParameters.MinimumVerticalDragDistance )
         {
           this.UpdateDragDetails();
-          this.CaptureMouse();
+          
           _isMouseDown = false;
+          allowDrag = true;
         }
       }
 
-      if( this.IsMouseCaptured )
+      if( this.IsMouseCaptured && allowDrag)
       {
         var mousePosInScreenCoord = this.PointToScreenDPI( e.GetPosition( this ) );
         if( !_parentDocumentTabPanelScreenArea.Contains( mousePosInScreenCoord ) )
@@ -204,10 +205,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void OnMouseLeftButtonUp( System.Windows.Input.MouseButtonEventArgs e )
     {
-      if( IsMouseCaptured )
-        ReleaseMouseCapture();
       _isMouseDown = false;
-
+      if ( IsMouseCaptured )
+        ReleaseMouseCapture();
       base.OnMouseLeftButtonUp( e );
     }
 
