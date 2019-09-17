@@ -12,13 +12,9 @@
     public class LayoutAnchorableFloatingWindowControlTest : AutomationTestBase
     {
         [TestMethod]
-        public void CloseWithHiddenFloatingWindowsTest()
+        public async Task CloseWithHiddenFloatingWindowsTest()
         {
-            TestHost.SwitchToAppThread();
-            Task<LayoutAnchorableFloatingWindowControlTestWindow> taskResult = WindowHelpers.CreateInvisibleWindowAsync<LayoutAnchorableFloatingWindowControlTestWindow>();
-            taskResult.Wait();
-
-            LayoutAnchorableFloatingWindowControlTestWindow window = taskResult.Result;
+            LayoutAnchorableFloatingWindowControlTestWindow window = await WindowHelpers.CreateInvisibleWindowAsync<LayoutAnchorableFloatingWindowControlTestWindow>();
             window.Window1.Float();
             Assert.IsTrue(window.Window1.IsFloating);
             var layoutSerializer = new XmlLayoutSerializer(window.dockingManager);
