@@ -147,6 +147,13 @@ namespace Xceed.Wpf.AvalonDock
 
       _fwList.Clear();
 
+      foreach (var fwc in _fwHiddenList.ToArray())
+      {
+         fwc.InternalClose();
+      }
+
+      _fwHiddenList.Clear();
+
       DetachDocumentsSource( oldLayout, DocumentsSource );
       DetachAnchorablesSource( oldLayout, AnchorablesSource );
 
@@ -177,7 +184,7 @@ namespace Xceed.Wpf.AvalonDock
             _fwList.Add( CreateUIElementForModel( fw ) as LayoutFloatingWindowControl );
         }
 
-        foreach( var fw in _fwList )
+        foreach( var fw in _fwList.ToArray())
         {
           var window = fw.Model as LayoutAnchorableFloatingWindow;
           if (window != null && window.RootPanel.IsMaximized)
