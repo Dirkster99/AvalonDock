@@ -128,6 +128,10 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
+## Fixes in Master branch but not yet released
+
+1) [#75 74 The old NullReferenceException comes back](https://github.com/Dirkster99/AvalonDock/pull/75) (thanx to [ppalazkov](https://github.com/ppalazkov) and [scorixear](https://github.com/scorixear))
+
 ## Fixes in Version 3.5.12
 
 1) [#61 Repeatedly pressing Ctrl-Tab gets stuck at the bottom of the list of LayoutItems](https://github.com/Dirkster99/AvalonDock/pull/61) (thanx to [Darren Gosbell](https://github.com/dgosbell))
