@@ -1,0 +1,38 @@
+﻿<Window x:Class="Xceed.Wpf.AvalonDock.Test.Views.LayoutAnchorableFloatingWindowControlTestWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+        Title="Exception Window" Height="800" Width="1200">
+    <Grid>
+        <TabControl x:Name="tabControl" SelectedIndex="0">
+            <TabItem Header="Tab 1">
+                <xcad:DockingManager x:Name="dockingManager" AllowMixedOrientation="True">
+                    <xcad:LayoutRoot>
+                        <xcad:LayoutPanel Orientation="Horizontal">
+                            <xcad:LayoutAnchorablePaneGroup Orientation="Vertical" DockWidth="40*">
+                                <xcad:LayoutAnchorablePane>
+                                    <xcad:LayoutAnchorable x:Name="Window1" ContentId="Window1" Title="Window 1" CanHide="False" CanAutoHide="False" CanFloat="True">
+                                        <Grid></Grid>
+                                    </xcad:LayoutAnchorable>
+                                </xcad:LayoutAnchorablePane>
+                                <xcad:LayoutAnchorablePane>
+                                    <xcad:LayoutAnchorable x:Name="Window2" ContentId="Window2" Title="Window 2" CanAutoHide="False" CanHide="True" CanClose="True">
+                                        <Grid></Grid>
+                                    </xcad:LayoutAnchorable>
+                                </xcad:LayoutAnchorablePane>
+                            </xcad:LayoutAnchorablePaneGroup>
+                            <xcad:LayoutAnchorablePane DockWidth="60*">
+                                <xcad:LayoutAnchorable ContentId="Window3" Title="Window 3" CanHide="True" CanAutoHide="False" CanClose="True">
+                                    <Grid></Grid>
+                                </xcad:LayoutAnchorable>
+                            </xcad:LayoutAnchorablePane>
+                        </xcad:LayoutPanel>
+                    </xcad:LayoutRoot>
+                </xcad:DockingManager>
+            </TabItem>
+            <TabItem Header="Tab 2"/>
+            <xcad:DockingManager x:Name="dockingManager2" AllowMixedOrientation="True">
+            </xcad:DockingManager>
+        </TabControl>
+    </Grid>
+</Window>
