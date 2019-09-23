@@ -6,6 +6,8 @@
 | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2010.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010)          | Dirkster.AvalonDock.Themes.VS2010 |
 | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2013.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013)          | [Dirkster.AvalonDock.Themes.VS2013](https://github.com/Dirkster99/AvalonDock/wiki/WPF-VS-2013-Dark-Light-Demo-Client) |
 
+![Net4](https://badgen.net/badge/Framework/.Net&nbsp;4/blue) ![NetCore3](https://badgen.net/badge/Framework/NetCore&nbsp;3/blue)
+
 ## Master Branch
 [![Build status](https://ci.appveyor.com/api/projects/status/kq2wyupx5hm7fok2/branch/master?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock/branch/master)[![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)&nbsp;[Continues Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts)
 
@@ -42,6 +44,16 @@ This repository contains **additional bug fixes and a feature added** fork from:
 https://github.com/xceedsoftware/wpftoolkit
 
 Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Wiki for more details</a>.
+
+
+## Building AvalonDock from Source
+
+This project supports multitargeting frameworks (NetCore 3 and .Net 4). This means that any commit before
+[Merge pull request #65 from jogibear9988/master ](https://github.com/Dirkster99/AvalonDock/commit/d85b297bf32bc16f01bd3f898a1ee2acc9e2f71c)
+should build with Visual Studio 2017 Comunity or higher.
+
+The commit [Merge pull request #65 from jogibear9988/master ](https://github.com/Dirkster99/AvalonDock/commit/d85b297bf32bc16f01bd3f898a1ee2acc9e2f71c)
+and any commit after requires **VS 2019 Community** and **NetCore 3 Preview 8 (or later)** for a succesful build from source.
 
 # Stable WPF Toolkit Open Source Version
 
@@ -116,9 +128,15 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
-## In master banch but not in any release, yet
+## Fixes in Master branch but not yet released
+
+1) [#75 74 The old NullReferenceException comes back](https://github.com/Dirkster99/AvalonDock/pull/75) (thanx to [ppalazkov](https://github.com/ppalazkov) and [scorixear](https://github.com/scorixear))
+
+## Fixes in Version 3.5.12
 
 1) [#61 Repeatedly pressing Ctrl-Tab gets stuck at the bottom of the list of LayoutItems](https://github.com/Dirkster99/AvalonDock/pull/61) (thanx to [Darren Gosbell](https://github.com/dgosbell))
+
+2) [#65 Support NetCore 3 based on Preview 8](https://github.com/Dirkster99/AvalonDock/pull/65) (thanx to [Jochen Kühner](https://github.com/jogibear9988))
 
 ## Fixes in Version 3.5.11
 
