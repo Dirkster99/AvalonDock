@@ -1,59 +1,54 @@
 version: 3.5.{build}
 
 branches:
+
   only:
   - master
 
-#dotnet_csproj:
-#  patch: true
-#  file: '**\*.csproj'
-#  version: '{version}'
-#  package_version: '{version}' 
-#  assembly_version: '{version}'
-#  file_version: '{version}'
-#  informational_version: '{version}'
-  
+image: Visual Studio 2019 Preview
+
 configuration: Release
 
 platform: Any CPU
 
-image: Visual Studio 2019 Preview
-
-install:
-  - cmd: choco install dotnetcore-sdk --pre
-  
 before_build:
-  - cmd: nuget restore source/AvalonDock.sln
+
+- cmd: nuget restore source/AvalonDock.sln
 
 build:
+
   verbosity: minimal
-  
+
+test: off
+
 artifacts:
+
 - path: source\MVVMTestApp\bin\Release
   name: MVVMTestApp
+
 - path: source\TestApp\bin\Release
   name: TestApp
+
 - path: source\WinFormsTestApp\bin\Release
   name: WinFormsTestApp
+
 - path: source\MLibTest\MLibTest\bin\Release
   name: MLibTest
+
 - path: source\Components\Xceed.Wpf.AvalonDock\bin\Release
-  name: Dirkster.AvalonDock
+  name: Xceed.Wpf.AvalonDock
+
 - path: source\Components\Xceed.Wpf.AvalonDock.Themes.VS2013\bin\Release
-  name: Dirkster.AvalonDock.Themes.VS2013
+  name: Xceed.Wpf.AvalonDock.Themes.VS2013
+
 - path: source\Components\Xceed.Wpf.AvalonDock.Themes.Aero\bin\Release
-  name: Dirkster.AvalonDock.Themes.Aero
+  name: Xceed.Wpf.AvalonDock.Themes.Aero
+
 - path: source\Components\Xceed.Wpf.AvalonDock.Themes.Expression\bin\Release
-  name: Dirkster.AvalonDock.Themes.Expression
+  name: Xceed.Wpf.AvalonDock.Themes.Expression
+
 - path: source\Components\Xceed.Wpf.AvalonDock.Themes.Metro\bin\Release
-  name: Dirkster.AvalonDock.Themes.Metro
+  name: Xceed.Wpf.AvalonDock.Themes.Metro
+
 - path: source\Components\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\Release
-  name: Dirkster.AvalonDock.Themes.VS2010
-- path: '**\bin\$(configuration)\Xceed.Wpf.AvalonDock.*.nupkg'
-  
-#uncomment to publish to NuGet
-#deploy:
-#  provider: NuGet
-#  api_key:
-#    secure: xxxxx
-#  artifact: /.*\.nupkg/
+  name: Xceed.Wpf.AvalonDock.Themes.VS2010
