@@ -71,6 +71,11 @@ namespace Xceed.Wpf.AvalonDock.Layout
     {
       get;
     }
+
+    bool ForceFixedDockSize 
+    { 
+      get; 
+    }
   }
 
 
