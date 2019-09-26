@@ -132,6 +132,8 @@ to also theme standard elements, such as, button and textblock etc.
 
 1) [#75 74 The old NullReferenceException comes back](https://github.com/Dirkster99/AvalonDock/pull/75) (thanx to [ppalazkov](https://github.com/ppalazkov) and [scorixear](https://github.com/scorixear))
 
+2) [#72 Better experience draging documents arround](https://github.com/Dirkster99/AvalonDock/pull/72) (thanx to [jogibear9988](https://github.com/jogibear9988))
+
 ## Fixes in Version 3.5.12
 
 1) [#61 Repeatedly pressing Ctrl-Tab gets stuck at the bottom of the list of LayoutItems](https://github.com/Dirkster99/AvalonDock/pull/61) (thanx to [Darren Gosbell](https://github.com/dgosbell))
