@@ -34,6 +34,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     private DocumentPaneTabPanel _parentDocumentTabPanel;
     private bool _isMouseDown = false;
     private Point _mouseDownPoint;
+    private bool _allowDrag = false;
 
     #endregion
 
@@ -141,6 +142,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       base.OnMouseLeftButtonDown( e );
 
+      _allowDrag = false;
       Model.IsActive = true;
 
       var layoutDocument = Model as LayoutDocument;
@@ -157,21 +159,22 @@ namespace Xceed.Wpf.AvalonDock.Controls
     protected override void OnMouseMove( System.Windows.Input.MouseEventArgs e )
     {
       base.OnMouseMove( e );
-
+      
       if( _isMouseDown )
       {
         Point ptMouseMove = e.GetPosition( this );
-
+        this.CaptureMouse();
         if( Math.Abs( ptMouseMove.X - _mouseDownPoint.X ) > SystemParameters.MinimumHorizontalDragDistance ||
             Math.Abs( ptMouseMove.Y - _mouseDownPoint.Y ) > SystemParameters.MinimumVerticalDragDistance )
         {
           this.UpdateDragDetails();
-          this.CaptureMouse();
+          
           _isMouseDown = false;
+          _allowDrag = true;
         }
       }
 
-      if( this.IsMouseCaptured )
+      if( this.IsMouseCaptured && _allowDrag)
       {
         var mousePosInScreenCoord = this.PointToScreenDPI( e.GetPosition( this ) );
         if( !_parentDocumentTabPanelScreenArea.Contains( mousePosInScreenCoord ) )
@@ -204,10 +207,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void OnMouseLeftButtonUp( System.Windows.Input.MouseButtonEventArgs e )
     {
-      if( IsMouseCaptured )
-        ReleaseMouseCapture();
       _isMouseDown = false;
-
+      _allowDrag = false;
+      if ( IsMouseCaptured )
+        ReleaseMouseCapture();
       base.OnMouseLeftButtonUp( e );
     }
 
