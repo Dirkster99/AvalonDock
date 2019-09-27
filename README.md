@@ -128,7 +128,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Patch History for AvalonDock Version 3.5
 
-## Fixes in Master branch but not yet released
+## Fixes in Version 3.5.13
 
 1) [#75 74 The old NullReferenceException comes back](https://github.com/Dirkster99/AvalonDock/pull/75) (thanx to [ppalazkov](https://github.com/ppalazkov) and [scorixear](https://github.com/scorixear))
 
