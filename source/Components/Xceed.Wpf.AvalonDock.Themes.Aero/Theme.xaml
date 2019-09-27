@@ -1266,15 +1266,23 @@
                       Background="{DynamicResource {x:Static avalonDockAero:AeroColors.BaseColor16Key}}">
                 <avalonDockControls:AnchorablePaneTitle Model="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}" />
               </Border>
+
+              <!--
+               Added ContentTemplate and ContentTemplateSelector 
+               https://github.com/xceedsoftware/wpftoolkit/issues/1525
+              -->
               <ContentPresenter Grid.Row="1"
                                 FlowDirection="{TemplateBinding FlowDirection}"
-                                Content="{Binding LayoutItem.View, RelativeSource={RelativeSource TemplatedParent}}" />
+                                Content="{Binding LayoutItem.View, RelativeSource={RelativeSource TemplatedParent}}"
+                                ContentTemplate="{Binding LayoutItem.View.ContentTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                ContentTemplateSelector="{Binding LayoutItem.View.ContentTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"
+                              />
 
               <!--<ContentPresenter 
-                                Content="{Binding Model.Content, RelativeSource={RelativeSource TemplatedParent}}" 
-                                ContentTemplate="{Binding LayoutItemTemplate, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
-                                ContentTemplateSelector="{Binding LayoutItemTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
-                                Grid.Row="1"/>-->
+                Content="{Binding Model.Content, RelativeSource={RelativeSource TemplatedParent}}" 
+                ContentTemplate="{Binding LayoutItemTemplate, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
+                ContentTemplateSelector="{Binding LayoutItemTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
+                Grid.Row="1"/>-->
             </Grid>
           </Border>
           <ControlTemplate.Triggers>

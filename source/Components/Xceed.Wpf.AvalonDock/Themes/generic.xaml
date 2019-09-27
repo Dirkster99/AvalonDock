@@ -954,9 +954,16 @@
                             <avalonDockControls:AnchorablePaneTitle Model="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}" />
                           </Border>
 
+                          <!--
+                            Added ContentTemplate and ContentTemplateSelector 
+                            https://github.com/xceedsoftware/wpftoolkit/issues/1525
+                          -->
                           <ContentPresenter Grid.Row="1"
                                             FlowDirection="{TemplateBinding FlowDirection}"
-                                            Content="{Binding LayoutItem.View, RelativeSource={RelativeSource TemplatedParent}}" />
+                                            Content="{Binding LayoutItem.View, RelativeSource={RelativeSource TemplatedParent}}"
+                                            ContentTemplate="{Binding LayoutItem.View.ContentTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                            ContentTemplateSelector="{Binding LayoutItem.View.ContentTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"
+                                            />
 
                           <!--<ContentPresenter 
                                 FlowDirection="{TemplateBinding FlowDirection}"
