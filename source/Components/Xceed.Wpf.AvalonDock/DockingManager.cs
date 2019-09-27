@@ -2399,9 +2399,10 @@ namespace Xceed.Wpf.AvalonDock
         }
         _fwHiddenList.Clear();
 
-        //load windows not already loaded!
-        foreach( var fw in Layout.FloatingWindows.Where( fw => !_fwList.Any( fwc => fwc.Model == fw ) ) )
-          _fwList.Add( CreateUIElementForModel( fw ) as LayoutFloatingWindowControl );
+        // load floating windows not already loaded! (issue #59)
+        List<LayoutFloatingWindow> items = new List<LayoutFloatingWindow>(Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)));
+        foreach (var fw in items)
+          _fwList.Add(CreateUIElementForModel(fw) as LayoutFloatingWindowControl);
 
         //create the overlaywindow if it's possible
         if( IsVisible )
@@ -2976,7 +2977,9 @@ namespace Xceed.Wpf.AvalonDock
 
     private void InternalSetActiveContent( object contentObject )
     {
-      var layoutContent = Layout.Descendents().OfType<LayoutContent>().FirstOrDefault( lc => lc == contentObject || lc.Content == contentObject );
+      // BugFix for first issue in #59
+      List<LayoutContent> list = Layout.Descendents().OfType<LayoutContent>().ToList();
+      var layoutContent = list.FirstOrDefault( lc => lc == contentObject || lc.Content == contentObject );
       _insideInternalSetActiveContent = true;
       Layout.ActiveContent = layoutContent;
       _insideInternalSetActiveContent = false;
