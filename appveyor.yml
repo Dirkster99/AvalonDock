@@ -36,19 +36,19 @@ artifacts:
   name: MLibTest
 
 - path: source\Components\Xceed.Wpf.AvalonDock\bin\Release
-  name: Xceed.Wpf.AvalonDock
+  name: Dirkster.AvalonDock
 
 - path: source\Components\Xceed.Wpf.AvalonDock.Themes.VS2013\bin\Release
-  name: Xceed.Wpf.AvalonDock.Themes.VS2013
+  name: Dirkster.AvalonDock.Themes.VS2013
 
 - path: source\Components\Xceed.Wpf.AvalonDock.Themes.Aero\bin\Release
-  name: Xceed.Wpf.AvalonDock.Themes.Aero
+  name: Dirkster.AvalonDock.Themes.Aero
 
 - path: source\Components\Xceed.Wpf.AvalonDock.Themes.Expression\bin\Release
-  name: Xceed.Wpf.AvalonDock.Themes.Expression
+  name: Dirkster.AvalonDock.Themes.Expression
 
 - path: source\Components\Xceed.Wpf.AvalonDock.Themes.Metro\bin\Release
-  name: Xceed.Wpf.AvalonDock.Themes.Metro
+  name: Dirkster.AvalonDock.Themes.Metro
 
 - path: source\Components\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\Release
-  name: Xceed.Wpf.AvalonDock.Themes.VS2010
+  name: Dirkster.AvalonDock.Themes.VS2010
