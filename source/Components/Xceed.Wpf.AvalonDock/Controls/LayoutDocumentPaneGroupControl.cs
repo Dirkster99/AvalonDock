@@ -48,7 +48,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         for( int i = 0; i < _model.Children.Count; i++ )
         {
           var childModel = _model.Children[ i ] as ILayoutPositionableElement;
-          if( childModel.ForceFixedDockSize && !childModel.DockWidth.IsStar )
+          if( !childModel.DockWidth.IsStar )
           {
             childModel.DockWidth = new GridLength( 1.0, GridUnitType.Star );
           }
@@ -59,7 +59,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
         for( int i = 0; i < _model.Children.Count; i++ )
         {
           var childModel = _model.Children[ i ] as ILayoutPositionableElement;
-          if( childModel.ForceFixedDockSize && !childModel.DockHeight.IsStar )
+          if( !childModel.DockHeight.IsStar )
           {
             childModel.DockHeight = new GridLength( 1.0, GridUnitType.Star );
           }
