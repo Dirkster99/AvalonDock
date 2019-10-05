@@ -30,6 +30,7 @@ using System.Collections.Specialized;
 using System.Windows.Data;
 using System.Windows.Threading;
 using Xceed.Wpf.AvalonDock.Themes;
+using System.Diagnostics;
 
 namespace Xceed.Wpf.AvalonDock
 {
@@ -2207,12 +2208,20 @@ namespace Xceed.Wpf.AvalonDock
 
     internal IEnumerable<LayoutFloatingWindowControl> GetFloatingWindowsByZOrder()
     {
+      IntPtr windowParentHanlde;
       var parentWindow = Window.GetWindow( this );
+      if( parentWindow != null )
+      {
+        windowParentHanlde = new WindowInteropHelper( parentWindow ).Handle;
+      }
+      else
+      {
+        var mainProcess = Process.GetCurrentProcess();
+        if( mainProcess == null )
+          yield break;
 
-      if( parentWindow == null )
-        yield break;
-
-      IntPtr windowParentHanlde = new WindowInteropHelper( parentWindow ).Handle;
+        windowParentHanlde = mainProcess.MainWindowHandle;
+      }
 
       IntPtr currentHandle = Win32Helper.GetWindow( windowParentHanlde, ( uint )Win32Helper.GetWindow_Cmd.GW_HWNDFIRST );
       while( currentHandle != IntPtr.Zero )
