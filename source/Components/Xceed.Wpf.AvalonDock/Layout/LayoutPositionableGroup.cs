@@ -232,6 +232,12 @@ namespace Xceed.Wpf.AvalonDock.Layout
     #region DockMinWidth
 
     private double _dockMinWidth = 25.0;
+    /// <summary>
+    /// Defines the smallest available width that can be applied to a deriving element.
+    /// 
+    /// The system ensures the minimum width by blocking/limiting <see cref="GridSplitter"/>
+    /// movement when the user resizes a deriving element or resizes the main window.
+    /// </summary>
     public double DockMinWidth
     {
       get
@@ -274,6 +280,12 @@ namespace Xceed.Wpf.AvalonDock.Layout
     #region DockMinHeight
 
     private double _dockMinHeight = 25.0;
+    /// <summary>
+    /// Defines the smallest available height that can be applied to a deriving element.
+    /// 
+    /// The system ensures the minimum height by blocking/limiting <see cref="GridSplitter"/>
+    /// movement when the user resizes a deriving element or resizes the main window.
+    /// </summary>
     public double DockMinHeight
     {
       get
