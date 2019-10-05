@@ -2047,26 +2047,26 @@ namespace Xceed.Wpf.AvalonDock
       if( model is LayoutAnchorSide )
       {
         var templateModelView = new LayoutAnchorSideControl( model as LayoutAnchorSide );
-        templateModelView.SetBinding( LayoutAnchorSideControl.TemplateProperty, new Binding( "AnchorSideTemplate" ) { Source = this } );
+        templateModelView.SetBinding( LayoutAnchorSideControl.TemplateProperty, new Binding( DockingManager.AnchorSideTemplateProperty.Name) { Source = this } );
         return templateModelView;
       }
       if( model is LayoutAnchorGroup )
       {
         var templateModelView = new LayoutAnchorGroupControl( model as LayoutAnchorGroup );
-        templateModelView.SetBinding( LayoutAnchorGroupControl.TemplateProperty, new Binding( "AnchorGroupTemplate" ) { Source = this } );
+        templateModelView.SetBinding( LayoutAnchorGroupControl.TemplateProperty, new Binding( DockingManager.AnchorGroupTemplateProperty.Name) { Source = this } );
         return templateModelView;
       }
 
       if( model is LayoutDocumentPane )
       {
         var templateModelView = new LayoutDocumentPaneControl( model as LayoutDocumentPane );
-        templateModelView.SetBinding( LayoutDocumentPaneControl.StyleProperty, new Binding( "DocumentPaneControlStyle" ) { Source = this } );
+        templateModelView.SetBinding( LayoutDocumentPaneControl.StyleProperty, new Binding( DockingManager.DocumentPaneControlStyleProperty.Name) { Source = this } );
         return templateModelView;
       }
       if( model is LayoutAnchorablePane )
       {
         var templateModelView = new LayoutAnchorablePaneControl( model as LayoutAnchorablePane );
-        templateModelView.SetBinding( LayoutAnchorablePaneControl.StyleProperty, new Binding( "AnchorablePaneControlStyle" ) { Source = this } );
+        templateModelView.SetBinding( LayoutAnchorablePaneControl.StyleProperty, new Binding( DockingManager.AnchorablePaneControlStyleProperty.Name ) { Source = this } );
         return templateModelView;
       }
 
