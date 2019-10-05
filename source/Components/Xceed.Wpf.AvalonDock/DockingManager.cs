@@ -2331,8 +2331,6 @@ namespace Xceed.Wpf.AvalonDock
       {
         if( Layout.ActiveContent != null )
         {
-          //Debug.WriteLine(new StackTrace().ToString());
-
           //set focus on active element only after a layout pass is completed
           //it's possible that it is not yet visible in the visual tree
           //if (_setFocusAsyncOperation == null)
@@ -2346,12 +2344,9 @@ namespace Xceed.Wpf.AvalonDock
           //}
         }
 
-        //if (!_insideInternalSetActiveContent)
-        //    ActiveContent = Layout.ActiveContent != null ?
-        //        Layout.ActiveContent.Content : null;
-        if( !_insideInternalSetActiveContent && ( Layout.ActiveContent != null ) )
+        if( !_insideInternalSetActiveContent )
         {
-          this.ActiveContent = Layout.ActiveContent.Content;
+          this.ActiveContent = ( Layout.ActiveContent != null ) ? Layout.ActiveContent.Content : null;
         }
       }
     }
