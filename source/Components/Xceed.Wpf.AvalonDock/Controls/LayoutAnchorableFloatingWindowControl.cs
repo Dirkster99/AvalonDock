@@ -156,14 +156,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       //SetBinding(VisibilityProperty, new Binding("IsVisible") { Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden });
 
       //Issue: http://avalondock.codeplex.com/workitem/15036
-      IsVisibleChanged += ( s, args ) =>
-      {
-        var visibilityBinding = GetBindingExpression( VisibilityProperty );
-        if( visibilityBinding == null && IsVisible )
-        {
-          SetVisibilityBinding();
-        }
-      };
+      IsVisibleChanged += this.LayoutAnchorableFloatingWindowControl_IsVisibleChanged;
 
       SetBinding( SingleContentLayoutItemProperty, new Binding( "Model.SinglePane.SelectedContent" ) { Source = this, Converter = new LayoutItemFromLayoutModelConverter() } );
 
@@ -201,8 +194,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
       BindingOperations.ClearBinding(_model, VisibilityProperty);
 
       _model.PropertyChanged -= new System.ComponentModel.PropertyChangedEventHandler( _model_PropertyChanged );
-
       Activated -= LayoutAnchorableFloatingWindowControl_Activated;
+      IsVisibleChanged -= this.LayoutAnchorableFloatingWindowControl_IsVisibleChanged;
+      BindingOperations.ClearBinding( this, VisibilityProperty );
+      BindingOperations.ClearBinding( this, SingleContentLayoutItemProperty );
     }
 
     protected override void OnClosing( System.ComponentModel.CancelEventArgs e )
@@ -380,7 +375,18 @@ namespace Xceed.Wpf.AvalonDock.Controls
       base.DisableBindings();
     }
 
-    #endregion
+        #endregion
+
+    #region Event Handlers
+    private void LayoutAnchorableFloatingWindowControl_IsVisibleChanged( object sender, DependencyPropertyChangedEventArgs e )
+    {
+      var visibilityBinding = GetBindingExpression( VisibilityProperty );
+      if( IsVisible && ( visibilityBinding == null ) )
+      {
+        SetBinding( VisibilityProperty, new Binding( "IsVisible" ) { Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden } );
+      }
+    }
+    #endregion Event Handlers
 
     #region Commands
 
