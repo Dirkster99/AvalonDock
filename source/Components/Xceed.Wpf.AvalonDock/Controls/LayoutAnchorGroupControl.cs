@@ -19,6 +19,7 @@ using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using Xceed.Wpf.AvalonDock.Layout;
 using System.Windows;
+using System.Windows.Data;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
@@ -75,7 +76,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
       var manager = _model.Root.Manager;
       foreach( var childModel in _model.Children )
       {
-        _childViews.Add( new LayoutAnchorControl( childModel ) { Template = manager.AnchorTemplate } );
+        var lac = new LayoutAnchorControl( childModel );
+        lac.SetBinding( LayoutAnchorControl.TemplateProperty, new Binding( DockingManager.AnchorTemplateProperty.Name ) { Source = manager } );
+        _childViews.Add( lac );
       }
     }
 
@@ -105,7 +108,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
           int insertIndex = e.NewStartingIndex;
           foreach( LayoutAnchorable childModel in e.NewItems )
           {
-            _childViews.Insert( insertIndex++, new LayoutAnchorControl( childModel ) { Template = manager.AnchorTemplate } );
+            var lac = new LayoutAnchorControl( childModel );
+            lac.SetBinding( LayoutAnchorControl.TemplateProperty, new Binding( DockingManager.AnchorTemplateProperty.Name ) { Source = manager } );
+            _childViews.Insert( insertIndex++, lac );
           }
         }
       }
