@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -201,13 +201,13 @@
       <Project>{db81988f-e0f2-45a0-a1fd-8c37f3d35244}</Project>
       <Name>Xceed.Wpf.AvalonDock</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MLibTest_Components\ServiceLocator\ServiceLocator.csproj">
-      <Project>{252126d1-e1d9-49c3-910b-fcf2266265ef}</Project>
-      <Name>ServiceLocator</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MLibTest_Components\Settings\SettingsModel\SettingsModel.csproj">
-      <Project>{9b0ba841-5a2f-4ed3-a908-253dbca70e77}</Project>
+      <Project>{8a6923bd-563b-4258-b4e6-ad651bbf1962}</Project>
       <Name>SettingsModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MLibTest_Components\ServiceLocator\ServiceLocator.csproj">
+      <Project>{38f7f15d-2f13-49e4-b4e6-b9552072afcd}</Project>
+      <Name>ServiceLocator</Name>
     </ProjectReference>
     <ProjectReference Include="..\MLibTest_Components\Settings\Settings\Settings.csproj">
       <Project>{2807b493-cc2e-402e-901a-eb138698fedc}</Project>
