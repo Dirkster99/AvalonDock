@@ -1377,7 +1377,7 @@
                     BorderThickness="{TemplateBinding BorderThickness}">
               <Grid>
                 <Grid.RowDefinitions>
-                  <RowDefinition Height="24" />
+                  <RowDefinition MinHeight="24" Height="Auto" /><!-- https://github.com/xceedsoftware/wpftoolkit/issues/1203 -->
                   <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -1393,7 +1393,8 @@
                 <Border x:Name="Header"
                         Padding="2,0,2,0"
                         Grid.Column="1">
-                  <Grid>
+                  <Grid
+                      UseLayoutRounding="True">
                     <Grid.ColumnDefinitions>
                       <ColumnDefinition Width="*" />
                       <ColumnDefinition Width="Auto" />
@@ -1564,14 +1565,15 @@
                     BorderBrush="{TemplateBinding BorderBrush}">
               <Grid>
                 <Grid.RowDefinitions>
-                  <RowDefinition Height="24" />
+                  <RowDefinition MinHeight="24" Height="Auto" /><!-- https://github.com/xceedsoftware/wpftoolkit/issues/1203 -->
                   <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Border x:Name="Header"
                         Padding="2,0,2,0"
                         TextElement.Foreground="{DynamicResource AvalonDock_ThemeMetro_BaseColor2}"
                         Background="{TemplateBinding Background}">
-                  <Grid>
+                  <Grid
+                      UseLayoutRounding="True">
                     <Grid.ColumnDefinitions>
                       <ColumnDefinition Width="*" />
                       <ColumnDefinition Width="Auto" />
