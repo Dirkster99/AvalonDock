@@ -19,6 +19,9 @@
     <Authors>https://github.com/Dirkster99/AvalonDock</Authors>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.0|AnyCPU'">
+    <DefineConstants />
+  </PropertyGroup>
 
   <ItemGroup>
     <Resource Include="**\*.png" />
@@ -28,4 +31,8 @@
   <ItemGroup>
     <None Include="LICENSE.txt" Pack="true" PackagePath="" />
   </ItemGroup>
+
+  <!--PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>-->
 </Project>
