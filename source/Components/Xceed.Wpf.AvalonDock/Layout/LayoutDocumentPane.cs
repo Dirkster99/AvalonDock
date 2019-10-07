@@ -152,17 +152,27 @@ namespace Xceed.Wpf.AvalonDock.Layout
     {
       if( this.SelectedContentIndex >= this.ChildrenCount )
         this.SelectedContentIndex = this.Children.Count - 1;
-      if( this.SelectedContentIndex == -1 && this.ChildrenCount > 0 )
+      if( this.SelectedContentIndex == -1 )
       {
-        if( this.Root == null )
+        if( this.ChildrenCount > 0 )
         {
-          this.SetNextSelectedIndex();
+          if( this.Root == null )
+          {
+            this.SetNextSelectedIndex();
+          }
+          else
+          {
+            var childrenToSelect = this.Children.OrderByDescending( c => c.LastActivationTimeStamp.GetValueOrDefault() ).First();
+            this.SelectedContentIndex = this.Children.IndexOf( childrenToSelect );
+            childrenToSelect.IsActive = true;
+          }
         }
         else
         {
-          var childrenToSelect = this.Children.OrderByDescending( c => c.LastActivationTimeStamp.GetValueOrDefault() ).First();
-          this.SelectedContentIndex = this.Children.IndexOf( childrenToSelect );
-          childrenToSelect.IsActive = true;
+          if( this.Root != null )
+          {
+            this.Root.ActiveContent = null;
+          }
         }
       }
 
