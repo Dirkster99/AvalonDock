@@ -1,20 +1,4 @@
-﻿<!--***********************************************************************************
-
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the New BSD
-   License (BSD) as published at http://avalondock.codeplex.com/license 
-
-   For more features, controls, and fast professional support,
-   pick up AvalonDock in Extended WPF Toolkit Plus at http://xceed.com/wpf_toolkit
-
-   Stay informed: follow @datagrid on Twitter or Like facebook.com/datagrids
-
-  **********************************************************************************-->
-
-<Window x:Class="AvalonDock.MVVMTestApp.MainWindow"
+﻿<Window x:Class="AvalonDock.MVVMTestApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:avalonDock="clr-namespace:Xceed.Wpf.AvalonDock;assembly=Xceed.Wpf.AvalonDock"
@@ -24,7 +8,7 @@
         xmlns:local="clr-namespace:AvalonDock.MVVMTestApp"
         xmlns:conv="clr-namespace:AvalonDock.MVVMTestApp.Converters"
         x:Name="mainWindow"
-        Title="MainWindow" Height="350" Width="525"
+        Title="MVVMTestApp" Height="350" Width="525"
         UseLayoutRounding="True">
     <Window.Resources>
         <conv:ActiveDocumentConverter x:Key="ActiveDocumentConverter"/>
