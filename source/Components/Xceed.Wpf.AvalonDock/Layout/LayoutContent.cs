@@ -93,11 +93,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
           if( this.ContentId == null )
           {
-            var contentAsControl = _content as FrameworkElement;
-            if( contentAsControl != null && !string.IsNullOrWhiteSpace( contentAsControl.Name ) )
-            {
-              this.SetCurrentValue( LayoutContent.ContentIdProperty, contentAsControl.Name );
-            }
+            SetContentIdFromContent();
           }
         }
       }
@@ -112,7 +108,13 @@ namespace Xceed.Wpf.AvalonDock.Layout
     {
       get
       {
-        return (string)GetValue( ContentIdProperty );
+        string value = (string)GetValue(ContentIdProperty);
+        if (!string.IsNullOrWhiteSpace(value)) return value;
+
+        // #83 - if Content.Name is empty at setting content and will be set later, ContentId will stay null.
+        SetContentIdFromContent();
+
+        return (string)GetValue(ContentIdProperty);
       }
       set
       {
@@ -136,6 +138,16 @@ namespace Xceed.Wpf.AvalonDock.Layout
         this.RaisePropertyChanged( "ContentId" );
       }
     }
+
+    private void SetContentIdFromContent()
+    {
+      var contentAsControl = _content as FrameworkElement;
+      if (!string.IsNullOrWhiteSpace(contentAsControl?.Name))
+      {
+        this.SetCurrentValue(LayoutContent.ContentIdProperty, contentAsControl.Name);
+      }
+    }
+
     #endregion ContentId
 
     #region IsSelected
