@@ -167,7 +167,7 @@
                         <avalonDockLayout:LayoutPanel Orientation="Vertical">
                             <avalonDockLayout:LayoutDocumentPane/>
                             <!-- Use DockMinWidth="250" to limit the size of a LayoutAnchorable -->
-                            <avalonDockLayout:LayoutAnchorablePane Name="ToolsPane" DockHeight="150">
+                            <avalonDockLayout:LayoutAnchorablePane Name="ToolsPane" DockMinWidth="250" DockHeight="150">
                             </avalonDockLayout:LayoutAnchorablePane>
                         </avalonDockLayout:LayoutPanel>
                     </avalonDockLayout:LayoutRoot>
