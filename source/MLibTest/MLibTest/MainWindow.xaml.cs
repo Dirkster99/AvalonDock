@@ -1,10 +1,12 @@
 ﻿namespace MLibTest
 {
     using MLibTest.Models;
+    using MLibTest.ViewModels;
     using MLibTest.ViewModels.Base;
     using Settings.UserProfile;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Windows;
     using System.Windows.Input;
     using Xceed.Wpf.AvalonDock.Layout.Serialization;
@@ -75,41 +77,41 @@
                         //LayoutSerializationCallback should anyway be handled to attach contents
                         //not currently loaded
 
-////                        stringLayoutSerializer.LayoutSerializationCallback += (s, e) =>
-////                        {
-////                            try
-////                            {
-////                                var workSpace = (DataContext as AppViewModel).AD_WorkSpace;
-////
-////                                if (workSpace == null || string.IsNullOrEmpty(e.Model.ContentId))
-////                                {
-////                                    e.Cancel = true;
-////                                    return;
-////                                }
-////
-////                                // Is this a tool window layout ? Then, get its viewmodel and connect it to the view
-////                                var tool = workSpace.Tools.FirstOrDefault(i => i.ContentId == e.Model.ContentId);
-////                                if (tool != null)
-////                                {
-////                                    e.Content = tool;
-////                                    return;
-////                                }
-////
-////                                // Its not a tool window -> So, this could rever to a document then
-////                                if (!string.IsNullOrWhiteSpace(e.Model.ContentId)  && File.Exists(e.Model.ContentId))
-////                                {
-////                                    e.Content = workSpace.Open(e.Model.ContentId);
-////                                    return;
-////                                }
-////
-////                                // Not something we could recognize -> So, we won't handle it beyond this point
-////                                e.Cancel = true;
-////                            }
-////                            catch (System.Exception exc)
-////                            {
-////                                Debug.WriteLine(exc.StackTrace);
-////                            }
-////                        };
+                        stringLayoutSerializer.LayoutSerializationCallback += (s, e) =>
+                        {
+                            try
+                            {
+                                var workSpace = (DataContext as AppViewModel).AD_WorkSpace;
+
+                                if (workSpace == null || string.IsNullOrEmpty(e.Model.ContentId))
+                                {
+                                    e.Cancel = true;
+                                    return;
+                                }
+
+                                // Is this a tool window layout ? Then, get its viewmodel and connect it to the view
+                                var tool = workSpace.Tools.FirstOrDefault(i => i.ContentId == e.Model.ContentId);
+                                if (tool != null)
+                                {
+                                    e.Content = tool;
+                                    return;
+                                }
+
+                                // Its not a tool window -> So, this could rever to a document then
+                                if (!string.IsNullOrWhiteSpace(e.Model.ContentId)  && File.Exists(e.Model.ContentId))
+                                {
+                                    e.Content = workSpace.Open(e.Model.ContentId);
+                                    return;
+                                }
+
+                                // Not something we could recognize -> So, we won't handle it beyond this point
+                                e.Cancel = true;
+                            }
+                            catch (System.Exception exc)
+                            {
+                                Debug.WriteLine(exc.StackTrace);
+                            }
+                        };
 
                         using (var reader = new StringReader(result.XmlContent))   // Read Xml Data from string
                         {
