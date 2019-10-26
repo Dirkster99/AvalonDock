@@ -126,6 +126,10 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
+## In MAster but not released, yet
+
+- [#81 Fixed issue with docked pane becomes not visible (overlapped)](https://github.com/Dirkster99/AvalonDock/pull/82) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
+
 ## Patch History for AvalonDock Version 3.6
 
 - selecting a new LayoutAnchorableTabPanel from an auto sized width panel, will no longer undock the LayoutAnchorableTabPanel [@dirkster99](https://github.com/Dirkster99/AvalonDock/commit/8dfde7b011b30f4f9576cf414eb87090e4544aeb)
