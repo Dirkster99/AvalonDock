@@ -128,7 +128,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## In MAster but not released, yet
 
-- [#81 Fixed issue with docked pane becomes not visible (overlapped)](https://github.com/Dirkster99/AvalonDock/pull/82) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
+- [Fixed issue #81 with docked pane becomes not visible (overlapped)](https://github.com/Dirkster99/AvalonDock/pull/82) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
 - [Fixed issue #83 with LayoutDocument disappearance](https://github.com/Dirkster99/AvalonDock/pull/84) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
