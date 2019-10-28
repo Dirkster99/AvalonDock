@@ -48,6 +48,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
       SetBinding( ItemsSourceProperty, new Binding( "Model.Children" ) { Source = this } );
       SetBinding( FlowDirectionProperty, new Binding( "Model.Root.Manager.FlowDirection" ) { Source = this } );
 
+      model.PropertyChanged += (o, e) =>
+      {
+	      if (e.PropertyName == nameof(model.SelectedContentIndex))
+	      {
+		      SelectedIndex = _model.SelectedContentIndex;
+	      }
+      };
+
       // Handle SizeChanged event instead of LayoutUpdated. It will exlude fluctuations of Actual size values.
       // this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
       this.SizeChanged += OnSizeChanged;
