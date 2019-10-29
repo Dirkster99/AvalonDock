@@ -97,6 +97,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       _model.ChildrenTreeChanged += ( s, args ) =>
           {
+            if( args.Change != ChildrenTreeChange.DirectChildrenChanged )
+              return;
             if( _asyncRefreshCalled.HasValue &&
                       _asyncRefreshCalled.Value == args.Change )
               return;
@@ -605,6 +607,10 @@ namespace Xceed.Wpf.AvalonDock.Controls
       {
         child.AdjustFixedChildrenPanelSizes(availableSize);
       }
+
+      // #81 - Make parents update their children up the tree. Otherwise, they will not be redrawn.
+      if (parentSize == null)
+        _model.RaiseChildrenTreeChanged();
     }
 
     private FrameworkElement GetNextVisibleChild( int index )

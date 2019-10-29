@@ -1674,7 +1674,7 @@
                                 BorderThickness="1">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="24" />
+                                    <RowDefinition MinHeight="24" Height="Auto" /><!-- https://github.com/xceedsoftware/wpftoolkit/issues/1203 -->
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
 
@@ -1682,7 +1682,8 @@
                                         Padding="2,0,2,0"
                                         Background="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabSelectedInactiveBackground}}"
                                         TextElement.Foreground="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabSelectedInactiveText}}">
-                                    <Grid>
+                                    <Grid
+                                        UseLayoutRounding="True">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
@@ -1999,14 +2000,15 @@
                                 BorderThickness="1">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="24" />
+                                    <RowDefinition MinHeight="24" Height="Auto" /><!-- https://github.com/xceedsoftware/wpftoolkit/issues/1203 -->
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
                                 <Border x:Name="Header"
                                         Background="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionInactiveBackground}}"
                                         Padding="2,0,2,0"
                                         TextElement.Foreground="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionInactiveText}}">
-                                    <Grid>
+                                    <Grid
+                                        UseLayoutRounding="True">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />

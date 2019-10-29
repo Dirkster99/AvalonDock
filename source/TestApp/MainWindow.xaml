@@ -77,7 +77,7 @@
             </avalonDock:DockingManager.DocumentHeaderTemplate>
             <avalonDock:LayoutRoot PropertyChanged="OnLayoutRootPropertyChanged">
                 <avalonDock:LayoutPanel Orientation="Horizontal">
-                    <avalonDock:LayoutAnchorablePane DockWidth="100">
+                    <avalonDock:LayoutAnchorablePane DockWidth="50">
                         <avalonDock:LayoutAnchorable x:Name="WinFormsWindow"  ContentId="WinFormsWindow" Title="WinForms Window" ToolTip="My WinForms Tool" CanHide="False" CanClose="False" >
                             <winformsIntegration:WindowsFormsHost x:Name="winFormsHost" Background="White"/>
                         </avalonDock:LayoutAnchorable>
@@ -95,7 +95,7 @@
                             </avalonDock:LayoutDocument>
                         </avalonDock:LayoutDocumentPane>
                     </avalonDock:LayoutDocumentPaneGroup>
-                    <avalonDock:LayoutAnchorablePaneGroup DockWidth="150">
+                    <avalonDock:LayoutAnchorablePaneGroup DockWidth="50">
                         <avalonDock:LayoutAnchorablePane>
                             <avalonDock:LayoutAnchorable ContentId="toolWindow1" Title="Tool Window 1" Hiding="OnToolWindow1Hiding">
                                 <StackPanel>

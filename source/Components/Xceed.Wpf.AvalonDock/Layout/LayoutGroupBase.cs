@@ -38,6 +38,14 @@ namespace Xceed.Wpf.AvalonDock.Layout
         parentGroup.NotifyChildrenTreeChanged( ChildrenTreeChange.TreeChanged );
     }
 
+    internal void RaiseChildrenTreeChanged()
+    {
+      OnChildrenTreeChanged(ChildrenTreeChange.DirectChildrenChanged);
+      var parentGroup = Parent as LayoutGroupBase;
+      if (parentGroup != null)
+        parentGroup.RaiseChildrenTreeChanged();
+    }
+
     protected virtual void OnChildrenTreeChanged( ChildrenTreeChange change )
     {
       if( ChildrenTreeChanged != null )

@@ -37,7 +37,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
     private LayoutAnchorable _model;
     private HwndSource _internalHwndSource = null;
     private IntPtr parentWindowHandle;
-    ////private bool _internalHost_ContentRendered = false;
     private ContentPresenter _internalHostPresenter = new ContentPresenter();
     private Grid _internalGrid = null;
     private AnchorSide _side;
@@ -156,8 +155,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
         Height = 0,
       } );
 
-////      _internalHost_ContentRendered = false;
-      _internalHwndSource.ContentRendered += _internalHwndSource_ContentRendered;
       _internalHwndSource.RootVisual = _internalHostPresenter;
       AddLogicalChild( _internalHostPresenter );
       Win32Helper.BringWindowToTop( _internalHwndSource.Handle );
@@ -168,7 +165,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       if( _internalHwndSource != null )
       {
-        _internalHwndSource.ContentRendered -= _internalHwndSource_ContentRendered;
         _internalHwndSource.Dispose();
         _internalHwndSource = null;
       }
@@ -277,12 +273,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
     #endregion
 
     #region Private Methods
-
-    private void _internalHwndSource_ContentRendered( object sender, EventArgs e )
-    {
-////      _internalHost_ContentRendered = true;
-    }
-
     private void _model_PropertyChanged( object sender, System.ComponentModel.PropertyChangedEventArgs e )
     {
       if( e.PropertyName == "IsAutoHidden" )

@@ -22,6 +22,7 @@ using System.Windows;
 using System.Globalization;
 using System.Windows.Media;
 using System.ComponentModel;
+using Xceed.Wpf.AvalonDock.Controls;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
@@ -89,38 +90,65 @@ namespace Xceed.Wpf.AvalonDock.Layout
           RaisePropertyChanging( "Content" );
           _content = value;
           RaisePropertyChanged( "Content" );
+
+          if( this.ContentId == null )
+          {
+            SetContentIdFromContent();
+          }
         }
       }
     }
-
     #endregion
 
     #region ContentId
 
-    private string _contentId = null;
+    public static readonly DependencyProperty ContentIdProperty = DependencyProperty.Register( "ContentId", typeof( string ), typeof( LayoutContent ), new UIPropertyMetadata( null, OnContentIdPropertyChanged ) );
+
     public string ContentId
     {
       get
       {
-        if( _contentId == null )
-        {
-          var contentAsControl = _content as FrameworkElement;
-          if( contentAsControl != null && !string.IsNullOrWhiteSpace( contentAsControl.Name ) )
-            return contentAsControl.Name;
-        }
-        return _contentId;
+        string value = (string)GetValue(ContentIdProperty);
+        if (!string.IsNullOrWhiteSpace(value)) return value;
+
+        // #83 - if Content.Name is empty at setting content and will be set later, ContentId will stay null.
+        SetContentIdFromContent();
+
+        return (string)GetValue(ContentIdProperty);
       }
       set
       {
-        if( _contentId != value )
-        {
-          _contentId = value;
-          RaisePropertyChanged( "ContentId" );
-        }
+        SetValue( ContentIdProperty, value );
       }
     }
 
-    #endregion
+    private static void OnContentIdPropertyChanged( DependencyObject obj, DependencyPropertyChangedEventArgs args )
+    {
+      var layoutContent = obj as LayoutContent;
+      if( layoutContent != null )
+      {
+        layoutContent.OnContentIdPropertyChanged( (string)args.OldValue, (string)args.NewValue );
+      }
+    }
+
+    private void OnContentIdPropertyChanged( string oldValue, string newValue )
+    {
+      if( oldValue != newValue )
+      {
+        this.RaisePropertyChanged( "ContentId" );
+      }
+    }
+
+    private void SetContentIdFromContent()
+    {
+      var contentAsControl = _content as FrameworkElement;
+      if (!string.IsNullOrWhiteSpace(contentAsControl?.Name))
+      {
+        this.SetCurrentValue(LayoutContent.ContentIdProperty, contentAsControl.Name);
+      }
+    }
+
+    #endregion ContentId
 
     #region IsSelected
 
@@ -143,6 +171,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
             parentSelector.SelectedContentIndex = _isSelected ? parentSelector.IndexOf( this ) : -1;
           OnIsSelectedChanged( oldValue, value );
           RaisePropertyChanged( "IsSelected" );
+          LayoutAnchorableTabItem.CancelMouseLeave();
         }
       }
     }

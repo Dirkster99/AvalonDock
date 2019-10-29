@@ -1,23 +1,9 @@
-﻿/************************************************************************
-
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the New BSD
-   License (BSD) as published at http://avalondock.codeplex.com/license 
-
-   For more features, controls, and fast professional support,
-   pick up AvalonDock in Extended WPF Toolkit Plus at http://xceed.com/wpf_toolkit
-
-   Stay informed: follow @datagrid on Twitter or Like facebook.com/datagrids
-
-  **********************************************************************/
-
-namespace AvalonDock.WinFormsTestApp
+﻿namespace AvalonDock.WinFormsTestApp
 {
     using System;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Windows.Forms;
     using Xceed.Wpf.AvalonDock;
     using Xceed.Wpf.AvalonDock.Layout;
@@ -51,9 +37,18 @@ namespace AvalonDock.WinFormsTestApp
 
                 };
 
-            serializer.Deserialize(
-                new System.IO.StringReader(
-                AvalonDock.WinFormsTestApp.Properties.Settings.Default.DefaultLayout));
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "WinFormsTestApp.DefaultLayout.xml";
+
+            string result = string.Empty;
+
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                result = reader.ReadToEnd();
+            }
+
+            serializer.Deserialize(new System.IO.StringReader(result));
 
             LayoutDocument doc = new LayoutDocument() { Title = "test" };
             _dockingManager.Layout.Descendents().OfType<LayoutDocumentPane>().First().Children.Add(doc);

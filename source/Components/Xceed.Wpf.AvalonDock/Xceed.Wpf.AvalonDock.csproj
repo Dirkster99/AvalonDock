@@ -6,9 +6,9 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.5.13</Version>
-    <AssemblyVersion>3.5.13.0</AssemblyVersion>
-    <FileVersion>3.5.13.0</FileVersion>
+    <Version>3.6.00</Version>
+    <AssemblyVersion>3.6.00</AssemblyVersion>
+    <FileVersion>3.6.00</FileVersion>
     <Company>Open Source</Company>
     <Product>Dirkster.AvalonDock</Product>
     <Copyright>2017-2019</Copyright>
@@ -19,6 +19,9 @@
     <Authors>https://github.com/Dirkster99/AvalonDock</Authors>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.0|AnyCPU'">
+    <DefineConstants />
+  </PropertyGroup>
 
   <ItemGroup>
     <Resource Include="**\*.png" />
@@ -28,4 +31,8 @@
   <ItemGroup>
     <None Include="LICENSE.txt" Pack="true" PackagePath="" />
   </ItemGroup>
+
+  <!--PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>-->
 </Project>
