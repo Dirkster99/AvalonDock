@@ -126,11 +126,13 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## In MAster but not released, yet
+## In Master but not released, yet
 
 - [Fixed issue #81 with docked pane becomes not visible (overlapped)](https://github.com/Dirkster99/AvalonDock/pull/82) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
 - [Fixed issue #83 with LayoutDocument disappearance](https://github.com/Dirkster99/AvalonDock/pull/84) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
+
+- [Fixed InvalidOperationException when deserializing layout](https://github.com/Dirkster99/AvalonDock/issues/59) [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/86)
 
 ## Patch History for AvalonDock Version 3.6
 
