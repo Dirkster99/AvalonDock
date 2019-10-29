@@ -1028,12 +1028,17 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                               </Grid.ColumnDefinitions>
-                              <ContentPresenter Content="{Binding Model.RootDocument, RelativeSource={RelativeSource TemplatedParent}}"
-                                                ContentTemplate="{Binding Model.Root.Manager.DocumentTitleTemplate, RelativeSource={RelativeSource TemplatedParent}}"
-                                                ContentTemplateSelector="{Binding Model.Root.Manager.DocumentTitleTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}" />
-
-
-                              <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
+	                            <Border
+		                            Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}">
+		                            <avalonDockControls:DropDownControlArea 
+			                            DropDownContextMenu="{Binding Model.Root.Manager.DocumentContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
+			                            DropDownContextMenuDataContext="{Binding Path=SingleContentLayoutItem, RelativeSource={RelativeSource TemplatedParent}}">
+			                            <ContentPresenter Content="{Binding Model.SinglePane.SelectedContent, RelativeSource={RelativeSource TemplatedParent}}" 
+			                                              ContentTemplate="{Binding Model.Root.Manager.DocumentTitleTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+			                                              ContentTemplateSelector="{Binding Model.Root.Manager.DocumentTitleTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"/>
+		                            </avalonDockControls:DropDownControlArea>
+	                            </Border>
+	                            <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
                                       Focusable="False"
                                       Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}"
                                       Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
@@ -1057,16 +1062,18 @@
                                 </Image>
                               </Button>
 
+										 <!--
                               <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
                                       Focusable="False"
                                       Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                      Command="{Binding Path=RootDocumentLayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                      Command="{Binding Path=SingleContentLayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                       ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
                                       Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                                       Grid.Column="3">
                                 <Image Source="/Xceed.Wpf.AvalonDock;component/Themes/Generic/Images/PinClose.png">
                                 </Image>
                               </Button>
+										 -->
                             </Grid>
                             <ContentPresenter Content="{TemplateBinding Content}"
                                               Grid.Row="1" />
@@ -1080,12 +1087,14 @@
                                   Value="3"
                                   TargetName="WindowBorder" />
                         </Trigger>
-                        <DataTrigger Binding="{Binding Model.RootDocument.IsActive, RelativeSource={RelativeSource Self}}"
+								 <!--
+						<DataTrigger Binding="{Binding Model.RootDocument.IsActive, RelativeSource={RelativeSource Self}}"
                                      Value="True">
                           <Setter TargetName="WindowBorder"
                                   Property="BorderBrush"
                                   Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
                         </DataTrigger>
+								 -->
                       </ControlTemplate.Triggers>
                     </ControlTemplate>
                   </Setter.Value>

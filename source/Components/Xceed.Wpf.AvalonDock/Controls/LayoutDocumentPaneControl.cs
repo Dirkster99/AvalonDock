@@ -27,7 +27,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
   {
     #region Members
 
-    private List<object> _logicalChildren = new List<object>();
     private LayoutDocumentPane _model;
 
     #endregion
@@ -47,14 +46,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
       _model = model;
       SetBinding( ItemsSourceProperty, new Binding( "Model.Children" ) { Source = this } );
       SetBinding( FlowDirectionProperty, new Binding( "Model.Root.Manager.FlowDirection" ) { Source = this } );
-
-      model.PropertyChanged += (o, e) =>
-      {
-	      if (e.PropertyName == nameof(model.SelectedContentIndex))
-	      {
-		      SelectedIndex = _model.SelectedContentIndex;
-	      }
-      };
 
       // Handle SizeChanged event instead of LayoutUpdated. It will exlude fluctuations of Actual size values.
       // this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
@@ -76,22 +67,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
     #endregion
 
     #region Overrides
-
-    protected override System.Collections.IEnumerator LogicalChildren
-    {
-      get
-      {
-        return _logicalChildren.GetEnumerator();
-      }
-    }
-
-    protected override void OnSelectionChanged( SelectionChangedEventArgs e )
-    {
-      base.OnSelectionChanged( e );
-
-      if( _model.SelectedContent != null )
-        _model.SelectedContent.IsActive = true;
-    }
 
     protected override void OnMouseLeftButtonDown( System.Windows.Input.MouseButtonEventArgs e )
     {

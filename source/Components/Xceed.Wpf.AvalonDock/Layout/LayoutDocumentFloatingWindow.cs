@@ -18,14 +18,15 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Markup;
 using System.Diagnostics;
+using System.Linq;
 using System.Xml.Serialization;
 using System.Xml;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-  [ContentProperty( "RootDocument" )]
+  [ContentProperty( "RootPanel" )]
   [Serializable]
-  public class LayoutDocumentFloatingWindow : LayoutFloatingWindow
+  public class LayoutDocumentFloatingWindow : LayoutFloatingWindow, ILayoutElementWithVisibility
   {
     #region Constructors
 
@@ -37,73 +38,141 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
     #region Properties
 
-    #region RootDocument
+    #region RootPanel
 
-    private LayoutDocument _rootDocument = null;
-    public LayoutDocument RootDocument
+    private LayoutDocumentPaneGroup _rootPanel = null;
+    public LayoutDocumentPaneGroup RootPanel
     {
       get
       {
-        return _rootDocument;
+        return _rootPanel;
       }
       set
       {
-        if( _rootDocument != value )
+        if( _rootPanel != value )
         {
-          RaisePropertyChanging( "RootDocument" );
-          _rootDocument = value;
-          if( _rootDocument != null )
-            _rootDocument.Parent = this;
-          RaisePropertyChanged( "RootDocument" );
+	        if (_rootPanel != null)
+		        _rootPanel.ChildrenTreeChanged -= new EventHandler<ChildrenTreeChangedEventArgs>(_rootPanel_ChildrenTreeChanged);
 
-          if( RootDocumentChanged != null )
-            RootDocumentChanged( this, EventArgs.Empty );
+	        _rootPanel = value;
+	        if (_rootPanel != null)
+		        _rootPanel.Parent = this;
+
+	        if (_rootPanel != null)
+		        _rootPanel.ChildrenTreeChanged += new EventHandler<ChildrenTreeChangedEventArgs>(_rootPanel_ChildrenTreeChanged);
+
+	        RaisePropertyChanged("RootPanel");
+	        RaisePropertyChanged("IsSinglePane");
+	        RaisePropertyChanged("SinglePane");
+	        RaisePropertyChanged("Children");
+	        RaisePropertyChanged("ChildrenCount");
+	        ((ILayoutElementWithVisibility)this).ComputeVisibility();
         }
       }
     }
 
-    #endregion
-
-    #endregion
-
-    #region Overrides
-
-    public override IEnumerable<ILayoutElement> Children
+    void _rootPanel_ChildrenTreeChanged(object sender, ChildrenTreeChangedEventArgs e)
     {
-      get
-      {
-        if( RootDocument == null )
-          yield break;
+	    RaisePropertyChanged("IsSinglePane");
+	    RaisePropertyChanged("SinglePane");
 
-        yield return RootDocument;
-      }
+    }
+
+    public bool IsSinglePane
+    {
+	    get
+	    {
+		    return RootPanel != null && RootPanel.Descendents().OfType<ILayoutDocumentPane>().Where(p => p.IsVisible).Count() == 1;
+	    }
+    }
+
+    public ILayoutDocumentPane SinglePane
+    {
+	    get
+	    {
+		    if (!IsSinglePane)
+			    return null;
+
+		    var singlePane = RootPanel.Descendents().OfType<LayoutDocumentPane>().Single(p => p.IsVisible);
+		    //singlePane.UpdateIsDirectlyHostedInFloatingWindow();
+		    return singlePane;
+	    }
+    }
+
+		#endregion
+
+		public override IEnumerable<ILayoutElement> Children
+    {
+	    get
+	    {
+		    if (ChildrenCount == 1)
+			    yield return RootPanel;
+
+		    yield break;
+	    }
     }
 
     public override void RemoveChild( ILayoutElement element )
     {
-      Debug.Assert( element == RootDocument && element != null );
-      RootDocument = null;
+      Debug.Assert( element == RootPanel && element != null );
+      RootPanel = null;
     }
 
     public override void ReplaceChild( ILayoutElement oldElement, ILayoutElement newElement )
     {
-      Debug.Assert( oldElement == RootDocument && oldElement != null );
-      RootDocument = newElement as LayoutDocument;
+      Debug.Assert( oldElement == RootPanel && oldElement != null );
+      RootPanel = newElement as LayoutDocumentPaneGroup;
     }
 
     public override int ChildrenCount
     {
-      get
-      {
-        return RootDocument != null ? 1 : 0;
-      }
+	    get
+	    {
+		    if (RootPanel == null)
+			    return 0;
+		    return 1;
+	    }
     }
+
+    #region IsVisible
+    [NonSerialized]
+    private bool _isVisible = true;
+
+    [XmlIgnore]
+    public bool IsVisible
+    {
+	    get { return _isVisible; }
+	    private set
+	    {
+		    if (_isVisible != value)
+		    {
+			    RaisePropertyChanging("IsVisible");
+			    _isVisible = value;
+			    RaisePropertyChanged("IsVisible");
+			    if (IsVisibleChanged != null)
+				    IsVisibleChanged(this, EventArgs.Empty);
+		    }
+	    }
+    }
+
+    public event EventHandler IsVisibleChanged;
+
+    #endregion
+
+    void ILayoutElementWithVisibility.ComputeVisibility()
+    {
+	    if (RootPanel != null)
+		    IsVisible = RootPanel.IsVisible;
+	    else
+		    IsVisible = false;
+    }
+
 
     public override bool IsValid
     {
       get
       {
-        return RootDocument != null;
+        return RootPanel != null;
       }
     }
 
@@ -147,7 +216,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
           serializer = new XmlSerializer( type );
         }
 
-        RootDocument = ( LayoutDocument )serializer.Deserialize( reader );
+        RootPanel = ( LayoutDocumentPaneGroup )serializer.Deserialize( reader );
       }
 
       reader.ReadEndElement();
@@ -159,16 +228,11 @@ namespace Xceed.Wpf.AvalonDock.Layout
           System.Diagnostics.Trace.Write( new string( ' ', tab * 4 ) );
           System.Diagnostics.Trace.WriteLine( "FloatingDocumentWindow()" );
 
-          RootDocument.ConsoleDump(tab + 1);
+          RootPanel.ConsoleDump(tab + 1);
         }
 #endif
 
     #endregion
 
-    #region Events
-
-    public event EventHandler RootDocumentChanged;
-
-    #endregion
   }
 }

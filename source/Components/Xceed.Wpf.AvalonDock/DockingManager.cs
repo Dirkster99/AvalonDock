@@ -2122,7 +2122,7 @@ namespace Xceed.Wpf.AvalonDock
         };
         newFW.SetParentToMainWindowOf( this );
 
-        var paneForExtensions = modelFW.RootDocument;
+        var paneForExtensions = modelFW.RootPanel;
         if( paneForExtensions != null )
         {
           //ensure that floating window position is inside current (or nearest) monitor
@@ -3310,7 +3310,18 @@ namespace Xceed.Wpf.AvalonDock
         var anchorableDocument = contentModel as LayoutDocument;
         fw = new LayoutDocumentFloatingWindow()
         {
-          RootDocument = anchorableDocument
+	        RootPanel = new LayoutDocumentPaneGroup(
+		        new LayoutDocumentPane(anchorableDocument)
+		        {
+			        DockWidth = parentPaneAsPositionableElement.DockWidth,
+			        DockHeight = parentPaneAsPositionableElement.DockHeight,
+			        DockMinHeight = parentPaneAsPositionableElement.DockMinHeight,
+			        DockMinWidth = parentPaneAsPositionableElement.DockMinWidth,
+			        FloatingLeft = parentPaneAsPositionableElement.FloatingLeft,
+			        FloatingTop = parentPaneAsPositionableElement.FloatingTop,
+			        FloatingWidth = parentPaneAsPositionableElement.FloatingWidth,
+			        FloatingHeight = parentPaneAsPositionableElement.FloatingHeight,
+		        })
         };
 
         Layout.FloatingWindows.Add( fw );
@@ -3325,11 +3336,9 @@ namespace Xceed.Wpf.AvalonDock
         };
       }
 
-
       //fwc.Owner = Window.GetWindow(this);
       //fwc.SetParentToMainWindowOf(this);
-
-
+		
       _fwList.Add( fwc );
 
       Layout.CollectGarbage();
