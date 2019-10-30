@@ -46,6 +46,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       _model = model;
       HideWindowCommand = new RelayCommand((p) => OnExecuteHideWindowCommand(p), (p) => CanExecuteHideWindowCommand(p));
+      CloseWindowCommand = new RelayCommand( ( p ) => OnExecuteCloseWindowCommand( p ), ( p ) => CanExecuteCloseWindowCommand( p ) );
+      Closed += (sender, args) => { Owner?.Focus(); };
       UpdateThemeResources();
     }
 
@@ -53,18 +55,6 @@ namespace Xceed.Wpf.AvalonDock.Controls
         : this(model, false )
     {
     }
-
-    #endregion
-
-    #region Properties
-
-    //public LayoutItem RootDocumentLayoutItem
-    //{
-    //  get
-    //  {
-    //    return _model.Root.Manager.GetLayoutItemFromModel( _model.RootPanel );
-    //  }
-    //}
 
     #endregion
 
@@ -90,7 +80,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     /// <summary>
     /// Gets or sets the SingleContentLayoutItem property.  This dependency property 
-    /// indicates the layout item of the selected content when is shown a single anchorable pane.
+    /// indicates the layout item of the selected content when is shown a single document pane.
     /// </summary>
     public LayoutItem SingleContentLayoutItem
     {
@@ -99,7 +89,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     }
 
     /// <summary>
-    /// Handles changes to the SingleContentLayoutItem property.
+    /// Handles changes to the <see cref="SingleContentLayoutItem"/> property.
     /// </summary>
     private static void OnSingleContentLayoutItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
@@ -107,7 +97,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
     }
 
     /// <summary>
-    /// Provides derived classes an opportunity to handle changes to the SingleContentLayoutItem property.
+    /// Provides derived classes an opportunity to handle changes to the <see cref="SingleContentLayoutItem"/> property.
     /// </summary>
     protected virtual void OnSingleContentLayoutItemChanged(DependencyPropertyChangedEventArgs e)
     {
@@ -192,7 +182,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     private void RootPanelOnChildrenCollectionChanged(object sender, EventArgs e)
     {
-	    if( _model.RootPanel.Children.Count == 0)
+	    if( _model.RootPanel == null ||_model.RootPanel.Children.Count == 0)
 	    {
 		    InternalClose();
 	    }
@@ -356,6 +346,52 @@ namespace Xceed.Wpf.AvalonDock.Controls
 		}
 		#endregion
 
+		#region CloseWindowCommand
+		public ICommand CloseWindowCommand
+		{
+			get;
+			private set;
+		}
+
+		private bool CanExecuteCloseWindowCommand( object parameter )
+		{
+			var manager = Model?.Root?.Manager;
+			if( manager == null )
+				return false;
+
+			var canExecute = false;
+			foreach( var document in this.Model.Descendents().OfType<LayoutDocument>().ToArray() )
+			{
+				if( !document.CanClose )
+				{
+					canExecute = false;
+					break;
+				}
+
+				if( !(manager.GetLayoutItemFromModel( document ) is LayoutDocumentItem documentLayoutItem) ||
+				    documentLayoutItem.CloseCommand == null ||
+				    !documentLayoutItem.CloseCommand.CanExecute( parameter ) )
+				{
+					canExecute = false;
+					break;
+				}
+				canExecute = true;
+			}
+
+			return canExecute;
+		}
+
+		private void OnExecuteCloseWindowCommand( object parameter )
+		{
+			var manager = Model.Root.Manager;
+			foreach( var document in this.Model.Descendents().OfType<LayoutDocument>().ToArray() )
+			{
+				var documentLayoutItem = manager.GetLayoutItemFromModel( document ) as LayoutDocumentItem;
+				documentLayoutItem?.CloseCommand.Execute(parameter);
+			}
+		}
+
+		#endregion
 
     #endregion
   }
