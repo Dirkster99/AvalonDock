@@ -134,6 +134,8 @@ to also theme standard elements, such as, button and textblock etc.
 
 - [Fixed InvalidOperationException when deserializing layout](https://github.com/Dirkster99/AvalonDock/issues/59) [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/86)
 
+- [Fixed LayoutRoot implementation of IXmlSerializable.ReadXml to read the end element](https://github.com/Dirkster99/AvalonDock/issues/88) thanx to [prmartinuk](https://github.com/prmartinuk)
+
 ## Patch History for AvalonDock Version 3.6
 
 - selecting a new LayoutAnchorableTabPanel from an auto sized width panel, will no longer undock the LayoutAnchorableTabPanel [@dirkster99](https://github.com/Dirkster99/AvalonDock/commit/8dfde7b011b30f4f9576cf414eb87090e4544aeb)
