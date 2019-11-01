@@ -6,9 +6,9 @@
     <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.6.00</Version>
-    <AssemblyVersion>3.6.00</AssemblyVersion>
-    <FileVersion>3.6.00</FileVersion>
+    <Version>3.6.01</Version>
+    <AssemblyVersion>3.6.01</AssemblyVersion>
+    <FileVersion>3.6.01</FileVersion>
     <Company>Open Source</Company>
     <Product>Dirkster.AvalonDock</Product>
     <Copyright>2017-2019</Copyright>
