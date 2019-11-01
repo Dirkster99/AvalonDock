@@ -126,7 +126,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## In Master but not released, yet
+## Patch History for AvalonDock 3.6.1
 
 - [Fixed issue #81 with docked pane becomes not visible (overlapped)](https://github.com/Dirkster99/AvalonDock/pull/82) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
