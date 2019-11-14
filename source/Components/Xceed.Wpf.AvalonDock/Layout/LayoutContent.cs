@@ -935,6 +935,11 @@ namespace Xceed.Wpf.AvalonDock.Layout
     {
     }
 
+    void ILayoutElementForFloatingWindow.RaiseFloatingPropertiesUpdated()
+    {
+      FloatingPropertiesUpdated?.Invoke(this, EventArgs.Empty);
+    }
+
     #endregion
 
     #region Events
@@ -952,6 +957,11 @@ namespace Xceed.Wpf.AvalonDock.Layout
     /// IsHidden property is set to true.
     /// Hanlde the Hiding event for the LayoutAnchorable to cancel the hide operation.</remarks>
     public event EventHandler<CancelEventArgs> Closing;
+
+    /// <summary>
+    /// Event fired when floating properties were updated.
+    /// </summary>
+    public event EventHandler FloatingPropertiesUpdated;
 
     #endregion
   }

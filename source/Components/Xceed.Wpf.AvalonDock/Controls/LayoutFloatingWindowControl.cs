@@ -60,6 +60,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
       this.Loaded += new RoutedEventHandler( OnLoaded );
       this.Unloaded += new RoutedEventHandler( OnUnloaded );
       Closing += OnClosing;
+      SizeChanged += OnSizeChanged;
       _model = model;
     }
 
@@ -253,7 +254,9 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
     protected override void OnClosed( EventArgs e )
     {
-      if( Content != null )
+      SizeChanged -= OnSizeChanged;
+
+      if ( Content != null )
       {
         var host = Content as FloatingWindowContentHost;
         host.Dispose();
@@ -468,6 +471,17 @@ namespace Xceed.Wpf.AvalonDock.Controls
       }
     }
 
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+      foreach (var posElement in Model.Descendents().OfType<ILayoutElementForFloatingWindow>())
+      {
+        posElement.FloatingWidth = ActualWidth;
+        posElement.FloatingHeight = ActualHeight;
+
+        posElement.RaiseFloatingPropertiesUpdated();
+      }
+    }
+
     private void OnActivated( object sender, EventArgs e )
     {
       this.Activated -= new EventHandler( OnActivated );
@@ -502,6 +516,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
         posElement.FloatingTop = Top;
         posElement.FloatingWidth = Width;
         posElement.FloatingHeight = Height;
+
+        posElement.RaiseFloatingPropertiesUpdated();
       }
     }
 

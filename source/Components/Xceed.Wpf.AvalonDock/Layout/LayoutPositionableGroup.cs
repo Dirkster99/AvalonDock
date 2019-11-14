@@ -520,6 +520,20 @@ namespace Xceed.Wpf.AvalonDock.Layout
     {
     }
 
-    #endregion  
+    void ILayoutElementForFloatingWindow.RaiseFloatingPropertiesUpdated()
+    {
+      FloatingPropertiesUpdated?.Invoke(this, EventArgs.Empty);
+    }
+
+    #endregion
+
+    #region Events.
+
+    /// <summary>
+    /// Event fired when floating properties were updated.
+    /// </summary>
+    public event EventHandler FloatingPropertiesUpdated;
+
+    #endregion
   }
 }
