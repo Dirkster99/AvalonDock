@@ -195,7 +195,13 @@ namespace Xceed.Wpf.AvalonDock.Controls
           return;
 
         var childrenList = container.Children.ToList();
-        containerPane.MoveChild( childrenList.IndexOf( _draggingItem.Model ), childrenList.IndexOf( model ) );
+
+        // Hotfix to avoid crash caused by a likely threading issue Back in the containerPane.
+        var oldIndex = childrenList.IndexOf( _draggingItem.Model ); 
+                var newIndex = childrenList.IndexOf( model );
+        
+        if (newIndex < containerPane.ChildrenCount && oldIndex > -1)
+          containerPane.MoveChild( oldIndex, newIndex );
       }
     }
 
