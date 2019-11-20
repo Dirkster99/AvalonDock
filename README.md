@@ -129,6 +129,8 @@ to also theme standard elements, such as, button and textblock etc.
 ## In Master branch, but not release, yet
 - [Fixed issue #92 Always update floating properties](https://github.com/Dirkster99/AvalonDock/issues/92) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
+- [Fixed issue #95 AvalonDock: Autohidden Anchorable appears totally invisible after dragging](https://github.com/Dirkster99/AvalonDock/issues/95)
+
 ## Patch History for AvalonDock 3.6.1
 
 - [Fixed issue #81 with docked pane becomes not visible (overlapped)](https://github.com/Dirkster99/AvalonDock/pull/82) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
