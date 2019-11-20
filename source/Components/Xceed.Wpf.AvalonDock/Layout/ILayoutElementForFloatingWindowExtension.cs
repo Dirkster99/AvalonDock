@@ -50,6 +50,8 @@
                     paneInsideFloatingWindow.FloatingTop = normalPosition.Top;
                     paneInsideFloatingWindow.FloatingHeight = normalPosition.Bottom - normalPosition.Top;
                     paneInsideFloatingWindow.FloatingWidth = normalPosition.Right - normalPosition.Left;
+                    
+                    paneInsideFloatingWindow.RaiseFloatingPropertiesUpdated();
                 }
 
                 return;
@@ -66,6 +68,8 @@
                     paneInsideFloatingWindow.FloatingTop = normalPosition.Top;
                     paneInsideFloatingWindow.FloatingHeight = normalPosition.Bottom - normalPosition.Top;
                     paneInsideFloatingWindow.FloatingWidth = normalPosition.Right - normalPosition.Left;
+                    
+                    paneInsideFloatingWindow.RaiseFloatingPropertiesUpdated();
                 }
 
                 return;

@@ -88,6 +88,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
   internal interface ILayoutElementForFloatingWindow
   {
+    void RaiseFloatingPropertiesUpdated();
+
     double FloatingWidth
     {
       get; set;
