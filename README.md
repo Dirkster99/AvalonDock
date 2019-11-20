@@ -126,6 +126,9 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
+## In Master branch, but not release, yet
+- [Fixed issue #92 Always update floating properties](https://github.com/Dirkster99/AvalonDock/issues/92) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
+
 ## Patch History for AvalonDock 3.6.1
 
 - [Fixed issue #81 with docked pane becomes not visible (overlapped)](https://github.com/Dirkster99/AvalonDock/pull/82) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
