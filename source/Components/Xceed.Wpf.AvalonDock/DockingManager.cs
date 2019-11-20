@@ -2184,6 +2184,13 @@ namespace Xceed.Wpf.AvalonDock
 
     internal void StartDraggingFloatingWindowForContent( LayoutContent contentModel, bool startDrag = true )
     {
+      // Ensure window can float only if corresponding property is set accordingly
+      if(contentModel == null)
+        return;
+
+      if(contentModel.CanFloat == false)
+        return;
+
       var fwc = this.CreateFloatingWindow( contentModel, false );
       if( fwc != null )
       {
