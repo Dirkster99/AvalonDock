@@ -131,6 +131,8 @@ to also theme standard elements, such as, button and textblock etc.
 
 - [Fixed issue #95 AvalonDock: Autohidden Anchorable appears totally invisible after dragging](https://github.com/Dirkster99/AvalonDock/issues/95)
 
+- [System.ArgumentOutOfRangeException in LayoutAnchorableTabItem.OnMouseEnter line](https://github.com/Dirkster99/AvalonDock/issues/90) Thanx to [sharpSteff](https://github.com/sharpSteff)
+
 ## Patch History for AvalonDock 3.6.1
 
 - [Fixed issue #81 with docked pane becomes not visible (overlapped)](https://github.com/Dirkster99/AvalonDock/pull/82) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
