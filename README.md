@@ -126,7 +126,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## In Master branch, but not release, yet
+## Patch History for AvalonDock 3.6.2
 - [Fixed issue #92 Always update floating properties](https://github.com/Dirkster99/AvalonDock/issues/92) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
 - [Fixed issue #95 AvalonDock: Autohidden Anchorable appears totally invisible after dragging](https://github.com/Dirkster99/AvalonDock/issues/95)
