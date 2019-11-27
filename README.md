@@ -40,11 +40,12 @@ PhotoShop and so forth. Here are some CodeProject articles:
 * [AvalonDock [2.0] Tutorial Part 4 - Integrating AvalonEdit Options](https://www.codeproject.com/Articles/570324/AvalonDock-Tutorial-Part-Integrating-AvalonE)
 * [AvalonDock [2.0] Tutorial Part 5 - Load/Save Layout with De-Referenced DockingManager](https://www.codeproject.com/Articles/719143/AvalonDock-Tutorial-Part-Load-Save-Layout)
 
-This repository contains **additional bug fixes and a feature added** fork from:
-https://github.com/xceedsoftware/wpftoolkit
+This repository contains **additional bug fixes and a feature added** fork for:
+[xceedsoftware/wpftoolkit](https://github.com/xceedsoftware/wpftoolkit) version **3.2-3.6**.
+
+There is also an open source repository https://github.com/dotnetprojects/WpfExtendedToolkit with a fixed and stable version of all other (other than AvalonDock) components from the WPFToolKit.
 
 Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Wiki for more details</a>.
-
 
 ## Building AvalonDock from Source
 
@@ -54,10 +55,6 @@ should build with Visual Studio 2017 Comunity or higher.
 
 The commit [Merge pull request #65 from jogibear9988/master ](https://github.com/Dirkster99/AvalonDock/commit/d85b297bf32bc16f01bd3f898a1ee2acc9e2f71c)
 and any commit after requires **VS 2019 Community** and **NetCore 3 Preview 8 (or later)** for a succesful build from source.
-
-# Stable WPF Toolkit Open Source Version
-
-There is also an open source repository https://github.com/dotnetprojects/WpfExtendedToolkit with a fixed and stable version of all other (other than AvalonDock) components from the WPFToolKit.
 
 # Feature Added - Dark and Light VS 2013 Theme
 
