@@ -23,97 +23,97 @@ using Xceed.Wpf.AvalonDock.Layout;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-  public class LayoutDocumentPaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
-  {
-    #region Members
+	public class LayoutDocumentPaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
+	{
+		#region Members
 
-    private List<object> _logicalChildren = new List<object>();
-    private LayoutDocumentPane _model;
+		private List<object> _logicalChildren = new List<object>();
+		private LayoutDocumentPane _model;
 
-    #endregion
+		#endregion
 
-    #region Constructors
+		#region Constructors
 
-    static LayoutDocumentPaneControl()
-    {
-      FocusableProperty.OverrideMetadata( typeof( LayoutDocumentPaneControl ), new FrameworkPropertyMetadata( false ) );
-    }
+		static LayoutDocumentPaneControl()
+		{
+			FocusableProperty.OverrideMetadata(typeof(LayoutDocumentPaneControl), new FrameworkPropertyMetadata(false));
+		}
 
-    internal LayoutDocumentPaneControl( LayoutDocumentPane model )
-    {
-      if( model == null )
-        throw new ArgumentNullException( "model" );
+		internal LayoutDocumentPaneControl(LayoutDocumentPane model)
+		{
+			if (model == null)
+				throw new ArgumentNullException("model");
 
-      _model = model;
-      SetBinding( ItemsSourceProperty, new Binding( "Model.Children" ) { Source = this } );
-      SetBinding( FlowDirectionProperty, new Binding( "Model.Root.Manager.FlowDirection" ) { Source = this } );
+			_model = model;
+			SetBinding(ItemsSourceProperty, new Binding("Model.Children") { Source = this });
+			SetBinding(FlowDirectionProperty, new Binding("Model.Root.Manager.FlowDirection") { Source = this });
 
-      // Handle SizeChanged event instead of LayoutUpdated. It will exlude fluctuations of Actual size values.
-      // this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
-      this.SizeChanged += OnSizeChanged;
-    }
+			// Handle SizeChanged event instead of LayoutUpdated. It will exlude fluctuations of Actual size values.
+			// this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
+			this.SizeChanged += OnSizeChanged;
+		}
 
-    #endregion
+		#endregion
 
-    #region Properties
+		#region Properties
 
-    public ILayoutElement Model
-    {
-      get
-      {
-        return _model;
-      }
-    }
+		public ILayoutElement Model
+		{
+			get
+			{
+				return _model;
+			}
+		}
 
-    #endregion
+		#endregion
 
-    #region Overrides
+		#region Overrides
 
-    protected override System.Collections.IEnumerator LogicalChildren
-    {
-      get
-      {
-        return _logicalChildren.GetEnumerator();
-      }
-    }
+		protected override System.Collections.IEnumerator LogicalChildren
+		{
+			get
+			{
+				return _logicalChildren.GetEnumerator();
+			}
+		}
 
-    protected override void OnSelectionChanged( SelectionChangedEventArgs e )
-    {
-      base.OnSelectionChanged( e );
+		protected override void OnSelectionChanged(SelectionChangedEventArgs e)
+		{
+			base.OnSelectionChanged(e);
 
-      if( _model.SelectedContent != null )
-        _model.SelectedContent.IsActive = true;
-    }
+			if (_model.SelectedContent != null)
+				_model.SelectedContent.IsActive = true;
+		}
 
-    protected override void OnMouseLeftButtonDown( System.Windows.Input.MouseButtonEventArgs e )
-    {
-      base.OnMouseLeftButtonDown( e );
+		protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
+		{
+			base.OnMouseLeftButtonDown(e);
 
-      if( !e.Handled && _model.SelectedContent != null )
-        _model.SelectedContent.IsActive = true;
-    }
+			if (!e.Handled && _model.SelectedContent != null)
+				_model.SelectedContent.IsActive = true;
+		}
 
-    protected override void OnMouseRightButtonDown( System.Windows.Input.MouseButtonEventArgs e )
-    {
-      base.OnMouseRightButtonDown( e );
+		protected override void OnMouseRightButtonDown(System.Windows.Input.MouseButtonEventArgs e)
+		{
+			base.OnMouseRightButtonDown(e);
 
-      if( !e.Handled && _model.SelectedContent != null )
-        _model.SelectedContent.IsActive = true;
+			if (!e.Handled && _model.SelectedContent != null)
+				_model.SelectedContent.IsActive = true;
 
-    }
+		}
 
 
-    #endregion
+		#endregion
 
-    #region Private Methods
+		#region Private Methods
 
-    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
-    {
-      var modelWithAtcualSize = _model as ILayoutPositionableElementWithActualSize;
-      modelWithAtcualSize.ActualWidth = ActualWidth;
-      modelWithAtcualSize.ActualHeight = ActualHeight;
-    }
+		private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			var modelWithAtcualSize = _model as ILayoutPositionableElementWithActualSize;
+			modelWithAtcualSize.ActualWidth = ActualWidth;
+			modelWithAtcualSize.ActualHeight = ActualHeight;
+		}
 
-    #endregion
-  }
+		#endregion
+	}
 }

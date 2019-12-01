@@ -18,26 +18,26 @@ using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-  public class DockingManagerOverlayArea : OverlayArea
-  {
-    #region Members
+	public class DockingManagerOverlayArea : OverlayArea
+	{
+		#region Members
 
-    private DockingManager _manager;
+		private DockingManager _manager;
 
-    #endregion
+		#endregion
 
-    #region Constructors
+		#region Constructors
 
-    internal DockingManagerOverlayArea( IOverlayWindow overlayWindow, DockingManager manager )
-        : base( overlayWindow )
-    {
-      _manager = manager;
+		internal DockingManagerOverlayArea(IOverlayWindow overlayWindow, DockingManager manager)
+			: base(overlayWindow)
+		{
+			_manager = manager;
 
-      base.SetScreenDetectionArea( new Rect(
-          _manager.PointToScreenDPI( new Point() ),
-          _manager.TransformActualSizeToAncestor() ) );
-    }
+			base.SetScreenDetectionArea(new Rect(
+				_manager.PointToScreenDPI(new Point()),
+				_manager.TransformActualSizeToAncestor()));
+		}
 
-    #endregion
-  }
+		#endregion
+	}
 }

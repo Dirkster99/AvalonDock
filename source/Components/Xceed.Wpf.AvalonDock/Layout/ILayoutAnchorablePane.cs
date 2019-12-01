@@ -17,7 +17,7 @@
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-  public interface ILayoutAnchorablePane : ILayoutPanelElement, ILayoutPane
-  {
-  }
+	public interface ILayoutAnchorablePane : ILayoutPanelElement, ILayoutPane
+	{
+	}
 }

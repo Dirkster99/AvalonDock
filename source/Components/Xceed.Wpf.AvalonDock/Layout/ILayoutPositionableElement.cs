@@ -18,97 +18,97 @@ using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-  internal interface ILayoutPositionableElement : ILayoutElement, ILayoutElementForFloatingWindow
-  {
-    GridLength DockWidth
-    {
-      get;
-      set;
-    }
+	internal interface ILayoutPositionableElement : ILayoutElement, ILayoutElementForFloatingWindow
+	{
+		GridLength DockWidth
+		{
+			get;
+			set;
+		}
 
-    double FixedDockWidth { get; }
+		double FixedDockWidth { get; }
 
-    double ResizableAbsoluteDockWidth
-    {
-      get; 
-      set;
-    }
+		double ResizableAbsoluteDockWidth
+		{
+			get;
+			set;
+		}
 
-    GridLength DockHeight
-    {
-      get;
-      set;
-    }
+		GridLength DockHeight
+		{
+			get;
+			set;
+		}
 
-    double FixedDockHeight { get; }
+		double FixedDockHeight { get; }
 
-    double ResizableAbsoluteDockHeight
-    {
-      get; 
-      set;
-    }
+		double ResizableAbsoluteDockHeight
+		{
+			get;
+			set;
+		}
 
-    double CalculatedDockMinWidth();
+		double CalculatedDockMinWidth();
 
-    double DockMinWidth
-    {
-      get; set;
-    }
+		double DockMinWidth
+		{
+			get; set;
+		}
 
-    double CalculatedDockMinHeight();
+		double CalculatedDockMinHeight();
 
-    double DockMinHeight
-    {
-      get; set;
-    }
+		double DockMinHeight
+		{
+			get; set;
+		}
 
-    bool AllowDuplicateContent
-    {
-      get; set;
-    }
+		bool AllowDuplicateContent
+		{
+			get; set;
+		}
 
-    bool IsVisible
-    {
-      get;
-    }
-  }
+		bool IsVisible
+		{
+			get;
+		}
+	}
 
 
-  internal interface ILayoutPositionableElementWithActualSize : ILayoutPositionableElement
-  {
-    double ActualWidth
-    {
-      get; set;
-    }
-    double ActualHeight
-    {
-      get; set;
-    }
-  }
+	internal interface ILayoutPositionableElementWithActualSize : ILayoutPositionableElement
+	{
+		double ActualWidth
+		{
+			get; set;
+		}
+		double ActualHeight
+		{
+			get; set;
+		}
+	}
 
-  internal interface ILayoutElementForFloatingWindow
-  {
-    void RaiseFloatingPropertiesUpdated();
+	internal interface ILayoutElementForFloatingWindow
+	{
+		void RaiseFloatingPropertiesUpdated();
 
-    double FloatingWidth
-    {
-      get; set;
-    }
-    double FloatingHeight
-    {
-      get; set;
-    }
-    double FloatingLeft
-    {
-      get; set;
-    }
-    double FloatingTop
-    {
-      get; set;
-    }
-    bool IsMaximized
-    {
-      get; set;
-    }
-  }
+		double FloatingWidth
+		{
+			get; set;
+		}
+		double FloatingHeight
+		{
+			get; set;
+		}
+		double FloatingLeft
+		{
+			get; set;
+		}
+		double FloatingTop
+		{
+			get; set;
+		}
+		bool IsMaximized
+		{
+			get; set;
+		}
+	}
 }

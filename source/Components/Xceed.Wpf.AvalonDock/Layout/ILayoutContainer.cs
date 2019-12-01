@@ -18,28 +18,28 @@ using System.Collections.Generic;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-  public interface ILayoutContainer : ILayoutElement
-  {
-    #region Properties
+	public interface ILayoutContainer : ILayoutElement
+	{
+		#region Properties
 
-    IEnumerable<ILayoutElement> Children
-    {
-      get;
-    }
+		IEnumerable<ILayoutElement> Children
+		{
+			get;
+		}
 
-    int ChildrenCount
-    {
-      get;
-    }
+		int ChildrenCount
+		{
+			get;
+		}
 
-    #endregion
+		#endregion
 
-    #region Methods
+		#region Methods
 
-    void RemoveChild( ILayoutElement element );
+		void RemoveChild(ILayoutElement element);
 
-    void ReplaceChild( ILayoutElement oldElement, ILayoutElement newElement );
+		void ReplaceChild(ILayoutElement oldElement, ILayoutElement newElement);
 
-    #endregion    
-  }
+		#endregion
+	}
 }

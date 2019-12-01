@@ -16,16 +16,16 @@
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-  interface ILayoutPreviousContainer
-  {
-    ILayoutContainer PreviousContainer
-    {
-      get; set;
-    }
+	interface ILayoutPreviousContainer
+	{
+		ILayoutContainer PreviousContainer
+		{
+			get; set;
+		}
 
-    string PreviousContainerId
-    {
-      get; set;
-    }
-  }
+		string PreviousContainerId
+		{
+			get; set;
+		}
+	}
 }

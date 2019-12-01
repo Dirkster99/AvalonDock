@@ -15,19 +15,16 @@
   **********************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Xceed.Wpf.AvalonDock.Themes
 {
-    public class ExpressionDarkTheme : Theme
-    {
-        public override Uri GetResourceUri()
-        {
-            return new Uri(
-                "/Xceed.Wpf.AvalonDock.Themes.Expression;component/DarkTheme.xaml",
-                UriKind.Relative);
-        }
-    }
+	public class ExpressionDarkTheme : Theme
+	{
+		public override Uri GetResourceUri()
+		{
+			return new Uri(
+				"/Xceed.Wpf.AvalonDock.Themes.Expression;component/DarkTheme.xaml",
+				UriKind.Relative);
+		}
+	}
 }

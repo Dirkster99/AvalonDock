@@ -19,17 +19,17 @@ using Xceed.Wpf.AvalonDock.Layout;
 
 namespace Xceed.Wpf.AvalonDock
 {
-  public class DocumentClosingEventArgs : CancelEventArgs
-  {
-    public DocumentClosingEventArgs( LayoutDocument document )
-    {
-      Document = document;
-    }
+	public class DocumentClosingEventArgs : CancelEventArgs
+	{
+		public DocumentClosingEventArgs(LayoutDocument document)
+		{
+			Document = document;
+		}
 
-    public LayoutDocument Document
-    {
-      get;
-      private set;
-    }
-  }
+		public LayoutDocument Document
+		{
+			get;
+			private set;
+		}
+	}
 }

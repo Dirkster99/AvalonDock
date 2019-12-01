@@ -18,25 +18,25 @@ using System;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-  internal class WindowActivateEventArgs : EventArgs
-  {
-    #region Constructors
+	internal class WindowActivateEventArgs : EventArgs
+	{
+		#region Constructors
 
-    public WindowActivateEventArgs( IntPtr hwndActivating )
-    {
-      HwndActivating = hwndActivating;
-    }
+		public WindowActivateEventArgs(IntPtr hwndActivating)
+		{
+			HwndActivating = hwndActivating;
+		}
 
-    #endregion
+		#endregion
 
-    #region Properties
+		#region Properties
 
-    public IntPtr HwndActivating
-    {
-      get;
-      private set;
-    }
+		public IntPtr HwndActivating
+		{
+			get;
+			private set;
+		}
 
-    #endregion
-  }
+		#endregion
+	}
 }

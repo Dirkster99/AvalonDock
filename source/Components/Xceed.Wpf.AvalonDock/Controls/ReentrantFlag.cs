@@ -18,54 +18,54 @@ using System;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-  internal class ReentrantFlag
-  {
-    #region Members
+	internal class ReentrantFlag
+	{
+		#region Members
 
-    private bool _flag = false;
+		private bool _flag = false;
 
-    #endregion
+		#endregion
 
-    #region Properties
+		#region Properties
 
-    public bool CanEnter
-    {
-      get
-      {
-        return !_flag;
-      }
-    }
+		public bool CanEnter
+		{
+			get
+			{
+				return !_flag;
+			}
+		}
 
-    #endregion
+		#endregion
 
-    #region Public Methods
+		#region Public Methods
 
-    public _ReentrantFlagHandler Enter()
-    {
-      if( _flag )
-        throw new InvalidOperationException();
-      return new _ReentrantFlagHandler( this );
-    }
+		public _ReentrantFlagHandler Enter()
+		{
+			if (_flag)
+				throw new InvalidOperationException();
+			return new _ReentrantFlagHandler(this);
+		}
 
-    #endregion
+		#endregion
 
-    #region Internal Classes
+		#region Internal Classes
 
-    public class _ReentrantFlagHandler : IDisposable
-    {
-      private ReentrantFlag _owner;
-      public _ReentrantFlagHandler( ReentrantFlag owner )
-      {
-        _owner = owner;
-        _owner._flag = true;
-      }
+		public class _ReentrantFlagHandler : IDisposable
+		{
+			private ReentrantFlag _owner;
+			public _ReentrantFlagHandler(ReentrantFlag owner)
+			{
+				_owner = owner;
+				_owner._flag = true;
+			}
 
-      public void Dispose()
-      {
-        _owner._flag = false;
-      }
-    }
+			public void Dispose()
+			{
+				_owner._flag = false;
+			}
+		}
 
-    #endregion
-  }
+		#endregion
+	}
 }

@@ -22,91 +22,91 @@ using Xceed.Wpf.AvalonDock.Layout;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-  public class LayoutAnchorablePaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
-  {
-    #region Members
+	public class LayoutAnchorablePaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
+	{
+		#region Members
 
-    private LayoutAnchorablePane _model;
+		private LayoutAnchorablePane _model;
 
-    #endregion
+		#endregion
 
-    #region Constructors
+		#region Constructors
 
-    static LayoutAnchorablePaneControl()
-    {
-      FocusableProperty.OverrideMetadata( typeof( LayoutAnchorablePaneControl ), new FrameworkPropertyMetadata( false ) );
-    }
+		static LayoutAnchorablePaneControl()
+		{
+			FocusableProperty.OverrideMetadata(typeof(LayoutAnchorablePaneControl), new FrameworkPropertyMetadata(false));
+		}
 
-    public LayoutAnchorablePaneControl( LayoutAnchorablePane model )
-    {
-      if( model == null )
-        throw new ArgumentNullException( "model" );
+		public LayoutAnchorablePaneControl(LayoutAnchorablePane model)
+		{
+			if (model == null)
+				throw new ArgumentNullException("model");
 
-      _model = model;
+			_model = model;
 
-      SetBinding( ItemsSourceProperty, new Binding( "Model.Children" ) { Source = this } );
-      SetBinding( FlowDirectionProperty, new Binding( "Model.Root.Manager.FlowDirection" ) { Source = this } );
+			SetBinding(ItemsSourceProperty, new Binding("Model.Children") { Source = this });
+			SetBinding(FlowDirectionProperty, new Binding("Model.Root.Manager.FlowDirection") { Source = this });
 
-      // Handle SizeChanged event instead of LayoutUpdated. It will exlude fluctuations of Actual size values.
-      // this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
-      this.SizeChanged += OnSizeChanged;
-    }
+			// Handle SizeChanged event instead of LayoutUpdated. It will exlude fluctuations of Actual size values.
+			// this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
+			this.SizeChanged += OnSizeChanged;
+		}
 
-    #endregion
+		#endregion
 
-    #region Properties
+		#region Properties
 
-    public ILayoutElement Model
-    {
-      get
-      {
-        return _model;
-      }
-    }
+		public ILayoutElement Model
+		{
+			get
+			{
+				return _model;
+			}
+		}
 
-    #endregion
+		#endregion
 
-    #region Overrides
+		#region Overrides
 
-    protected override void OnGotKeyboardFocus( System.Windows.Input.KeyboardFocusChangedEventArgs e )
-    {
-      if( ( _model != null ) && ( _model.SelectedContent != null ) )
-      {
-        _model.SelectedContent.IsActive = true;
-      }
+		protected override void OnGotKeyboardFocus(System.Windows.Input.KeyboardFocusChangedEventArgs e)
+		{
+			if ((_model != null) && (_model.SelectedContent != null))
+			{
+				_model.SelectedContent.IsActive = true;
+			}
 
-      base.OnGotKeyboardFocus( e );
-    }
+			base.OnGotKeyboardFocus(e);
+		}
 
-    protected override void OnMouseLeftButtonDown( System.Windows.Input.MouseButtonEventArgs e )
-    {
-      base.OnMouseLeftButtonDown( e );
+		protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
+		{
+			base.OnMouseLeftButtonDown(e);
 
-      if( !e.Handled && (_model != null) && _model.SelectedContent != null )
-        _model.SelectedContent.IsActive = true;
-    }
+			if (!e.Handled && (_model != null) && _model.SelectedContent != null)
+				_model.SelectedContent.IsActive = true;
+		}
 
-    protected override void OnMouseRightButtonDown( System.Windows.Input.MouseButtonEventArgs e )
-    {
-      base.OnMouseRightButtonDown( e );
+		protected override void OnMouseRightButtonDown(System.Windows.Input.MouseButtonEventArgs e)
+		{
+			base.OnMouseRightButtonDown(e);
 
-      if( !e.Handled && (_model != null) && _model.SelectedContent != null )
-        _model.SelectedContent.IsActive = true;
+			if (!e.Handled && (_model != null) && _model.SelectedContent != null)
+				_model.SelectedContent.IsActive = true;
 
-    }
+		}
 
 
-    #endregion
+		#endregion
 
-    #region Private Methods
+		#region Private Methods
 
-    private void OnSizeChanged( object sender, SizeChangedEventArgs e)
-    {
-      var modelWithActualSize = _model as ILayoutPositionableElementWithActualSize;
-      modelWithActualSize.ActualWidth = ActualWidth;
-      modelWithActualSize.ActualHeight = ActualHeight;
-    }
+		private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			var modelWithActualSize = _model as ILayoutPositionableElementWithActualSize;
+			modelWithActualSize.ActualWidth = ActualWidth;
+			modelWithActualSize.ActualHeight = ActualHeight;
+		}
 
-    #endregion
-  }
+		#endregion
+	}
 }

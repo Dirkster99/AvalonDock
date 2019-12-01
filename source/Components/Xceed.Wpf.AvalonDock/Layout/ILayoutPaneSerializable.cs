@@ -17,11 +17,11 @@
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-  interface ILayoutPaneSerializable
-  {
-    string Id
-    {
-      get; set;
-    }
-  }
+	interface ILayoutPaneSerializable
+	{
+		string Id
+		{
+			get; set;
+		}
+	}
 }

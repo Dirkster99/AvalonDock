@@ -19,34 +19,34 @@ using System.Windows.Data;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-  public class ContextMenuEx : ContextMenu
-  {
-    #region Constructors
+	public class ContextMenuEx : ContextMenu
+	{
+		#region Constructors
 
-    static ContextMenuEx()
-    {
-    }
+		static ContextMenuEx()
+		{
+		}
 
-    public ContextMenuEx()
-    {
-    }
+		public ContextMenuEx()
+		{
+		}
 
-    #endregion
+		#endregion
 
-    #region Overrides
+		#region Overrides
 
-    protected override System.Windows.DependencyObject GetContainerForItemOverride()
-    {
-      return new MenuItemEx();
-    }
+		protected override System.Windows.DependencyObject GetContainerForItemOverride()
+		{
+			return new MenuItemEx();
+		}
 
-    protected override void OnOpened( System.Windows.RoutedEventArgs e )
-    {
-      BindingOperations.GetBindingExpression( this, ItemsSourceProperty ).UpdateTarget();
+		protected override void OnOpened(System.Windows.RoutedEventArgs e)
+		{
+			BindingOperations.GetBindingExpression(this, ItemsSourceProperty).UpdateTarget();
 
-      base.OnOpened( e );
-    }
+			base.OnOpened(e);
+		}
 
-    #endregion
-  }
+		#endregion
+	}
 }

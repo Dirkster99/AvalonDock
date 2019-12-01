@@ -10,36 +10,36 @@
              xmlns:controls="clr-namespace:ColorPickerLib.Controls;assembly=ColorPickerLib"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              >
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
 
-        <StackPanel Margin="3" Grid.Row="0" Orientation="Vertical">
-            <Label Content="Background:"/>
-            <controls:ColorPicker ShowRecentColors="True"
+		<StackPanel Margin="3" Grid.Row="0" Orientation="Vertical">
+			<Label Content="Background:"/>
+			<controls:ColorPicker ShowRecentColors="True"
                                   SelectedColor="{Binding SelectedBackgroundColor}"
                                   VerticalAlignment="Top"
                                   Margin="0"
                                   />
-        </StackPanel>
+		</StackPanel>
 
-        <!-- Sample Usage/Test driving Color Canvas Control -->
-        <StackPanel Margin="6,6,3,3" Grid.Row="1" Orientation="Vertical">
-            <Label Content="Accent Color:"/>
-            <controls:ColorCanvas x:Name="_colorCanvas"
+		<!-- Sample Usage/Test driving Color Canvas Control -->
+		<StackPanel Margin="6,6,3,3" Grid.Row="1" Orientation="Vertical">
+			<Label Content="Accent Color:"/>
+			<controls:ColorCanvas x:Name="_colorCanvas"
                                   SelectedColor="{Binding SelectedAccentColor}"
                                   VerticalAlignment="Stretch"
                                   HorizontalAlignment="Stretch"
                                   Margin="0"
                                   />
-            
-            <Button Content="OK"
+
+			<Button Content="OK"
                     Command="{Binding ResetAccentColorCommand}"
                     CommandParameter="{Binding ElementName=_colorCanvas, Path=SelectedColor}"
                     HorizontalAlignment="Left"
                     />
-        </StackPanel>
-    </Grid>
+		</StackPanel>
+	</Grid>
 </UserControl>

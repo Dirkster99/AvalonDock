@@ -22,71 +22,71 @@ using System.Xml;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-  [Serializable]
-  public abstract class LayoutFloatingWindow : LayoutElement, ILayoutContainer, IXmlSerializable
-  {
-    #region Constructors
+	[Serializable]
+	public abstract class LayoutFloatingWindow : LayoutElement, ILayoutContainer, IXmlSerializable
+	{
+		#region Constructors
 
-    public LayoutFloatingWindow()
-    {
-    }
+		public LayoutFloatingWindow()
+		{
+		}
 
-    #endregion
+		#endregion
 
-    #region Properties
+		#region Properties
 
-    #region Children
+		#region Children
 
-    public abstract IEnumerable<ILayoutElement> Children
-    {
-      get;
-    }
+		public abstract IEnumerable<ILayoutElement> Children
+		{
+			get;
+		}
 
-    #endregion
+		#endregion
 
-    #region ChildrenCount
+		#region ChildrenCount
 
-    public abstract int ChildrenCount
-    {
-      get;
-    }
+		public abstract int ChildrenCount
+		{
+			get;
+		}
 
-    #endregion
+		#endregion
 
-    #region IsValid
+		#region IsValid
 
-    public abstract bool IsValid
-    {
-      get;
-    }
+		public abstract bool IsValid
+		{
+			get;
+		}
 
-    #endregion
+		#endregion
 
-    #endregion
+		#endregion
 
-    #region Public Methods
+		#region Public Methods
 
-    public abstract void RemoveChild( ILayoutElement element );
+		public abstract void RemoveChild(ILayoutElement element);
 
-    public abstract void ReplaceChild( ILayoutElement oldElement, ILayoutElement newElement );
+		public abstract void ReplaceChild(ILayoutElement oldElement, ILayoutElement newElement);
 
-    public XmlSchema GetSchema()
-    {
-      return null;
-    }
+		public XmlSchema GetSchema()
+		{
+			return null;
+		}
 
-    public abstract void ReadXml( XmlReader reader );
+		public abstract void ReadXml(XmlReader reader);
 
-    public virtual void WriteXml( XmlWriter writer )
-    {
-      foreach( var child in Children )
-      {
-        var type = child.GetType();
-        var serializer = new XmlSerializer( type );
-        serializer.Serialize( writer, child );
-      }
-    }
+		public virtual void WriteXml(XmlWriter writer)
+		{
+			foreach (var child in Children)
+			{
+				var type = child.GetType();
+				var serializer = new XmlSerializer(type);
+				serializer.Serialize(writer, child);
+			}
+		}
 
-    #endregion
-  }
+		#endregion
+	}
 }

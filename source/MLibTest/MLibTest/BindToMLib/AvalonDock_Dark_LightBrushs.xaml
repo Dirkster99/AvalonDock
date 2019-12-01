@@ -1,134 +1,135 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+﻿<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                      
-                    xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
-                    xmlns:reskeys="clr-namespace:Xceed.Wpf.AvalonDock.Themes.VS2013.Themes;assembly=Xceed.Wpf.AvalonDock.Themes.VS2013"
+    xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+    xmlns:reskeys="clr-namespace:Xceed.Wpf.AvalonDock.Themes.VS2013.Themes;assembly=Xceed.Wpf.AvalonDock.Themes.VS2013"
                     
-                    xmlns:MLib_reskeys="clr-namespace:MLib.Themes;assembly=MLib"
-                    >
+    xmlns:MLib_reskeys="clr-namespace:MLib.Themes;assembly=MLib"
+    >
 
-    <!--AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.AutoHideTabHoveredText}"
-                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
-                     options:Freeze="true" />
-
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.AutoHideTabHoveredBorder}"
+	<!--AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.AutoHideTabHoveredText}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
 
-    <!-- Document Well : Overflow Button -->
-    <!--AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellOverflowButtonHoveredGlyph}"
-                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
-                     options:Freeze="true" />
-    <!--AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellOverflowButtonPressedBackground}"
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.AutoHideTabHoveredBorder}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
 
-    <!-- Document Well : Tab -->
-    <!-- Selected Document Highlight Header Top color (AccentColor) -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabSelectedActiveBackground}"
+	<!-- Document Well : Overflow Button -->
+	<!--AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellOverflowButtonHoveredGlyph}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
-    <!--AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabUnselectedHoveredBackground}"
+	<!--AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellOverflowButtonPressedBackground}"
+                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
+                     options:Freeze="true" />
+
+	<!-- Document Well : Tab -->
+	<!-- Selected Document Highlight Header Top color (AccentColor) -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabSelectedActiveBackground}"
+                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
+                     options:Freeze="true" />
+	<!--AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabUnselectedHoveredBackground}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      Opacity="0.5"
                      options:Freeze="true" />
 
-    <!-- Document Well : Tab : Button -->
-    <!-- AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveHoveredBackground}"
+	<!-- Document Well : Tab : Button -->
+	<!-- AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveHoveredBackground}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
-    <!-- AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveHoveredBorder}"
+	<!-- AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveHoveredBorder}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
-    <!-- AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActivePressedBackground}"
+	<!-- AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActivePressedBackground}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
-    <!-- AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActivePressedBorder}"
-                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
-                     options:Freeze="true" />
-
-
-    <!-- Tool Window : Caption -->
-    <!-- Background of selected toolwindow (AccentColor) -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionActiveBackground}"
+	<!-- AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActivePressedBorder}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
 
-    <!-- AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonHoveredBackground}"
-                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
-                     options:Freeze="true" />
-    <!-- AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonHoveredBorder}"
-                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
-                     options:Freeze="true" />
-    <!-- AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonPressedBackground}"
-                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
-                     options:Freeze="true" />
-    <!-- AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonPressedBorder}"
+
+	<!-- Tool Window : Caption -->
+	<!-- Background of selected toolwindow (AccentColor) -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionActiveBackground}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
 
-    <!-- AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredBackground}"
+	<!-- AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonHoveredBackground}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
-    <!-- AccentColor -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredBorder}"
+	<!-- AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonHoveredBorder}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
-
-    <!-- (AccentColor) -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedBackground}"
+	<!-- AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonPressedBackground}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
-    <!-- (AccentColor) -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedBorder}"
-                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
-                     options:Freeze="true" />
-
-    <!-- (AccentColor) -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredBackground}"
+	<!-- AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonPressedBorder}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
 
-    <!-- Background of selected text in NAvigator Window (AccentColor) -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.NavigatorWindowSelectedBackground}"
+	<!-- AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredBackground}"
+                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
+                     options:Freeze="true" />
+	<!-- AccentColor -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredBorder}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
 
-    <!-- Tool Window : Tab -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowTabSelectedActiveText}"
+	<!-- (AccentColor) -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedBackground}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowTabSelectedInactiveText}"
+	<!-- (AccentColor) -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedBorder}"
+                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
+                     options:Freeze="true" />
+
+	<!-- (AccentColor) -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredBackground}"
+                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
+                     options:Freeze="true" />
+
+	<!-- Background of selected text in NAvigator Window (AccentColor) -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.NavigatorWindowSelectedBackground}"
+                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
+                     options:Freeze="true" />
+
+	<!-- Tool Window : Tab -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowTabSelectedActiveText}"
+                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
+                     options:Freeze="true" />
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowTabSelectedInactiveText}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      Opacity=".75"
                      options:Freeze="true" />
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowTabUnselectedHoveredText}"
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.ToolWindowTabUnselectedHoveredText}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
 
 
-    <!-- DockingBrushKeys -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DockingButtonForegroundBrushKey}"
+	<!-- DockingBrushKeys -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.DockingButtonForegroundBrushKey}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      options:Freeze="true" />
 
-    <!-- Preview Box is the highlighted rectangle that shows when a drop area in a window is indicated -->
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.PreviewBoxBorderBrushKey}"
+	<!-- Preview Box is the highlighted rectangle that shows when a drop area in a window is indicated -->
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.PreviewBoxBorderBrushKey}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}" options:Freeze="true" />
-    <SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.PreviewBoxBackgroundBrushKey}"
+	<SolidColorBrush x:Key="{x:Static reskeys:ResourceKeys.PreviewBoxBackgroundBrushKey}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                      Opacity="0.5"
                      options:Freeze="true" />
