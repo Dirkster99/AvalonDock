@@ -5,26 +5,26 @@
     xmlns:MLib_reskeys="clr-namespace:MLib.Themes;assembly=MLib"
     >
 
-    <!-- Accent Color Brush Definition
+	<!-- Accent Color Brush Definition
        - Look for references on ControlAccentBrushKey to find where this is being set in code -->
-    <Color x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
+	<Color x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
            ResourceId=ControlAccentColorKey}">#FF1888b8</Color>
 
-    <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
+	<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
                      ResourceId=ControlAccentBrushKey}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}" />
 
-    <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys}, ResourceId=ButtonFocusedOuterBorderKey}"
+	<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys}, ResourceId=ButtonFocusedOuterBorderKey}"
                     Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
                     />
 
-    <!-- Popup Border -->
-    <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
+	<!-- Popup Border -->
+	<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
                             ResourceId=PopUpOpenBorderBrushKey}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
     />
 
-    <SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
+	<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
                             ResourceId=VerticalSLideThumbMouseOverBrushKey}"
                      Color="{DynamicResource {x:Static MLib_reskeys:ResourceKeys.ControlAccentColorKey}}"
     />

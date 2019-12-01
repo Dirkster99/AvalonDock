@@ -16,7 +16,7 @@
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-  public interface ILayoutDocumentPane : ILayoutPanelElement, ILayoutPane
-  {
-  }
+	public interface ILayoutDocumentPane : ILayoutPanelElement, ILayoutPane
+	{
+	}
 }

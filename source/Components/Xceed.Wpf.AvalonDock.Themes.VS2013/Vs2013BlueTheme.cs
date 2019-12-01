@@ -18,13 +18,13 @@ using System;
 
 namespace Xceed.Wpf.AvalonDock.Themes
 {
-    public class Vs2013BlueTheme : Theme
-    {
-        public override Uri GetResourceUri()
-        {
-            return new Uri(
-                "/Xceed.Wpf.AvalonDock.Themes.VS2013;component/BlueTheme.xaml", 
-                UriKind.Relative);  
-        }
-    }
+	public class Vs2013BlueTheme : Theme
+	{
+		public override Uri GetResourceUri()
+		{
+			return new Uri(
+				"/Xceed.Wpf.AvalonDock.Themes.VS2013;component/BlueTheme.xaml",
+				UriKind.Relative);
+		}
+	}
 }

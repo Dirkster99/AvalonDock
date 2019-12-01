@@ -16,8 +16,8 @@
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-  public interface ILayoutElementWithVisibility
-  {
-    void ComputeVisibility();
-  }
+	public interface ILayoutElementWithVisibility
+	{
+		void ComputeVisibility();
+	}
 }

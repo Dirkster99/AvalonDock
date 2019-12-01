@@ -21,19 +21,19 @@ using System.Windows.Controls;
 
 namespace Xceed.Wpf.AvalonDock.Converters
 {
-  public class UriSourceToBitmapImageConverter : IValueConverter
-  {
-    public object Convert( object value, Type targetType, object parameter, System.Globalization.CultureInfo culture )
-    {
-      if( value == null )
-        return Binding.DoNothing;
-      //return (Uri)value;
-      return new Image() { Source = new BitmapImage( ( Uri )value ) };
-    }
+	public class UriSourceToBitmapImageConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+		{
+			if (value == null)
+				return Binding.DoNothing;
+			//return (Uri)value;
+			return new Image() { Source = new BitmapImage((Uri)value) };
+		}
 
-    public object ConvertBack( object value, Type targetType, object parameter, System.Globalization.CultureInfo culture )
-    {
-      throw new NotImplementedException();
-    }
-  }
+		public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }

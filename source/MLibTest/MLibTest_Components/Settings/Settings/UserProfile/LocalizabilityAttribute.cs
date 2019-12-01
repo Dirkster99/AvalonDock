@@ -1,8 +1,8 @@
-﻿using System;
-
-namespace Settings.UserProfile
+﻿namespace Settings.UserProfile
 {
-    internal class LocalizabilityAttribute : Attribute
-    {
-    }
+	using System;
+
+	internal class LocalizabilityAttribute : Attribute
+	{
+	}
 }

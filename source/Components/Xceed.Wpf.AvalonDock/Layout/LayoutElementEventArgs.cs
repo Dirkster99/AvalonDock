@@ -18,25 +18,25 @@ using System;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-  public class LayoutElementEventArgs : EventArgs
-  {
-    #region Constructors
+	public class LayoutElementEventArgs : EventArgs
+	{
+		#region Constructors
 
-    public LayoutElementEventArgs( LayoutElement element )
-    {
-      Element = element;
-    }
+		public LayoutElementEventArgs(LayoutElement element)
+		{
+			Element = element;
+		}
 
-    #endregion
+		#endregion
 
-    #region Properties
+		#region Properties
 
-    public LayoutElement Element
-    {
-      get;
-      private set;
-    }
+		public LayoutElement Element
+		{
+			get;
+			private set;
+		}
 
-    #endregion
-  }
+		#endregion
+	}
 }

@@ -20,106 +20,106 @@ using System.Xml.Serialization;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-  [ContentProperty( "Children" )]
-  [Serializable]
-  public class LayoutAnchorGroup : LayoutGroup<LayoutAnchorable>, ILayoutPreviousContainer, ILayoutPaneSerializable
-  {
-    #region Constructors
+	[ContentProperty("Children")]
+	[Serializable]
+	public class LayoutAnchorGroup : LayoutGroup<LayoutAnchorable>, ILayoutPreviousContainer, ILayoutPaneSerializable
+	{
+		#region Constructors
 
-    public LayoutAnchorGroup()
-    {
-    }
+		public LayoutAnchorGroup()
+		{
+		}
 
-    #endregion
+		#endregion
 
-    #region Overrides
+		#region Overrides
 
-    protected override bool GetVisibility()
-    {
-      return Children.Count > 0;
-    }
+		protected override bool GetVisibility()
+		{
+			return Children.Count > 0;
+		}
 
-    public override void WriteXml( System.Xml.XmlWriter writer )
-    {
-      if( _id != null )
-        writer.WriteAttributeString( "Id", _id );
-      if( _previousContainer != null )
-      {
-        var paneSerializable = _previousContainer as ILayoutPaneSerializable;
-        if( paneSerializable != null )
-        {
-          writer.WriteAttributeString( "PreviousContainerId", paneSerializable.Id );
-        }
-      }
+		public override void WriteXml(System.Xml.XmlWriter writer)
+		{
+			if (_id != null)
+				writer.WriteAttributeString("Id", _id);
+			if (_previousContainer != null)
+			{
+				var paneSerializable = _previousContainer as ILayoutPaneSerializable;
+				if (paneSerializable != null)
+				{
+					writer.WriteAttributeString("PreviousContainerId", paneSerializable.Id);
+				}
+			}
 
-      base.WriteXml( writer );
-    }
+			base.WriteXml(writer);
+		}
 
-    public override void ReadXml( System.Xml.XmlReader reader )
-    {
-      if( reader.MoveToAttribute( "Id" ) )
-        _id = reader.Value;
-      if( reader.MoveToAttribute( "PreviousContainerId" ) )
-        ( ( ILayoutPreviousContainer )this ).PreviousContainerId = reader.Value;
+		public override void ReadXml(System.Xml.XmlReader reader)
+		{
+			if (reader.MoveToAttribute("Id"))
+				_id = reader.Value;
+			if (reader.MoveToAttribute("PreviousContainerId"))
+				((ILayoutPreviousContainer)this).PreviousContainerId = reader.Value;
 
 
-      base.ReadXml( reader );
-    }
+			base.ReadXml(reader);
+		}
 
-    #endregion
+		#endregion
 
-    #region ILayoutPreviousContainer Interface
+		#region ILayoutPreviousContainer Interface
 
-    #region PreviousContainer
+		#region PreviousContainer
 
-    [field: NonSerialized]
-    private ILayoutContainer _previousContainer = null;
-    [XmlIgnore]
-    ILayoutContainer ILayoutPreviousContainer.PreviousContainer
-    {
-      get
-      {
-        return _previousContainer;
-      }
-      set
-      {
-        if( _previousContainer != value )
-        {
-          _previousContainer = value;
-          RaisePropertyChanged( "PreviousContainer" );
-          var paneSerializable = _previousContainer as ILayoutPaneSerializable;
-          if( paneSerializable != null &&
-              paneSerializable.Id == null )
-            paneSerializable.Id = Guid.NewGuid().ToString();
-        }
-      }
-    }
+		[field: NonSerialized]
+		private ILayoutContainer _previousContainer = null;
+		[XmlIgnore]
+		ILayoutContainer ILayoutPreviousContainer.PreviousContainer
+		{
+			get
+			{
+				return _previousContainer;
+			}
+			set
+			{
+				if (_previousContainer != value)
+				{
+					_previousContainer = value;
+					RaisePropertyChanged("PreviousContainer");
+					var paneSerializable = _previousContainer as ILayoutPaneSerializable;
+					if (paneSerializable != null &&
+						paneSerializable.Id == null)
+						paneSerializable.Id = Guid.NewGuid().ToString();
+				}
+			}
+		}
 
-    #endregion
+		#endregion
 
-    string ILayoutPreviousContainer.PreviousContainerId
-    {
-      get;
-      set;
-    }
+		string ILayoutPreviousContainer.PreviousContainerId
+		{
+			get;
+			set;
+		}
 
-    #endregion
+		#endregion
 
-    #region ILayoutPaneSerializable Interface
+		#region ILayoutPaneSerializable Interface
 
-    string _id;
-    string ILayoutPaneSerializable.Id
-    {
-      get
-      {
-        return _id;
-      }
-      set
-      {
-        _id = value;
-      }
-    }
+		string _id;
+		string ILayoutPaneSerializable.Id
+		{
+			get
+			{
+				return _id;
+			}
+			set
+			{
+				_id = value;
+			}
+		}
 
-    #endregion
-  }
+		#endregion
+	}
 }

@@ -19,51 +19,51 @@ using System.Xml.Serialization;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-  [Serializable]
-  public abstract class LayoutGroupBase : LayoutElement
-  {
-    #region Internal Methods
+	[Serializable]
+	public abstract class LayoutGroupBase : LayoutElement
+	{
+		#region Internal Methods
 
-    protected virtual void OnChildrenCollectionChanged()
-    {
-      if( ChildrenCollectionChanged != null )
-        ChildrenCollectionChanged( this, EventArgs.Empty );
-    }
+		protected virtual void OnChildrenCollectionChanged()
+		{
+			if (ChildrenCollectionChanged != null)
+				ChildrenCollectionChanged(this, EventArgs.Empty);
+		}
 
-    protected void NotifyChildrenTreeChanged( ChildrenTreeChange change )
-    {
-      OnChildrenTreeChanged( change );
-      var parentGroup = Parent as LayoutGroupBase;
-      if( parentGroup != null )
-        parentGroup.NotifyChildrenTreeChanged( ChildrenTreeChange.TreeChanged );
-    }
+		protected void NotifyChildrenTreeChanged(ChildrenTreeChange change)
+		{
+			OnChildrenTreeChanged(change);
+			var parentGroup = Parent as LayoutGroupBase;
+			if (parentGroup != null)
+				parentGroup.NotifyChildrenTreeChanged(ChildrenTreeChange.TreeChanged);
+		}
 
-    internal void RaiseChildrenTreeChanged()
-    {
-      OnChildrenTreeChanged(ChildrenTreeChange.DirectChildrenChanged);
-      var parentGroup = Parent as LayoutGroupBase;
-      if (parentGroup != null)
-        parentGroup.RaiseChildrenTreeChanged();
-    }
+		internal void RaiseChildrenTreeChanged()
+		{
+			OnChildrenTreeChanged(ChildrenTreeChange.DirectChildrenChanged);
+			var parentGroup = Parent as LayoutGroupBase;
+			if (parentGroup != null)
+				parentGroup.RaiseChildrenTreeChanged();
+		}
 
-    protected virtual void OnChildrenTreeChanged( ChildrenTreeChange change )
-    {
-      if( ChildrenTreeChanged != null )
-        ChildrenTreeChanged( this, new ChildrenTreeChangedEventArgs( change ) );
-    }
+		protected virtual void OnChildrenTreeChanged(ChildrenTreeChange change)
+		{
+			if (ChildrenTreeChanged != null)
+				ChildrenTreeChanged(this, new ChildrenTreeChangedEventArgs(change));
+		}
 
-    #endregion
+		#endregion
 
-    #region Events
+		#region Events
 
-    [field: NonSerialized]
-    [field: XmlIgnore]
-    public event EventHandler ChildrenCollectionChanged;
+		[field: NonSerialized]
+		[field: XmlIgnore]
+		public event EventHandler ChildrenCollectionChanged;
 
-    [field: NonSerialized]
-    [field: XmlIgnore]
-    public event EventHandler<ChildrenTreeChangedEventArgs> ChildrenTreeChanged;
+		[field: NonSerialized]
+		[field: XmlIgnore]
+		public event EventHandler<ChildrenTreeChangedEventArgs> ChildrenTreeChanged;
 
-    #endregion
-  }
+		#endregion
+	}
 }

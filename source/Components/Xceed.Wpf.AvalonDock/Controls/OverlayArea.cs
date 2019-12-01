@@ -18,43 +18,43 @@ using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Controls
 {
-  public abstract class OverlayArea : IOverlayWindowArea
-  {
-    #region Members
+	public abstract class OverlayArea : IOverlayWindowArea
+	{
+		#region Members
 
-    private IOverlayWindow _overlayWindow;
-    private Rect? _screenDetectionArea;
+		private IOverlayWindow _overlayWindow;
+		private Rect? _screenDetectionArea;
 
-    #endregion
+		#endregion
 
-    #region Constructors
+		#region Constructors
 
-    internal OverlayArea( IOverlayWindow overlayWindow )
-    {
-      _overlayWindow = overlayWindow;
-    }
+		internal OverlayArea(IOverlayWindow overlayWindow)
+		{
+			_overlayWindow = overlayWindow;
+		}
 
-    #endregion
+		#endregion
 
-    #region Internal Methods
+		#region Internal Methods
 
-    protected void SetScreenDetectionArea( Rect rect )
-    {
-      _screenDetectionArea = rect;
-    }
+		protected void SetScreenDetectionArea(Rect rect)
+		{
+			_screenDetectionArea = rect;
+		}
 
-    #endregion
+		#endregion
 
-    #region IOverlayWindowArea
+		#region IOverlayWindowArea
 
-    Rect IOverlayWindowArea.ScreenDetectionArea
-    {
-      get
-      {
-        return _screenDetectionArea.Value;
-      }
-    }
+		Rect IOverlayWindowArea.ScreenDetectionArea
+		{
+			get
+			{
+				return _screenDetectionArea.Value;
+			}
+		}
 
-    #endregion
-  }
+		#endregion
+	}
 }

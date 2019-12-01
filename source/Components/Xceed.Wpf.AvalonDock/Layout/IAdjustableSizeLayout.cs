@@ -18,8 +18,8 @@ using System.Windows;
 
 namespace Xceed.Wpf.AvalonDock.Layout
 {
-  public interface IAdjustableSizeLayout
-  {
-    void AdjustFixedChildrenPanelSizes(Size? parentSize = null);
-  }
+	public interface IAdjustableSizeLayout
+	{
+		void AdjustFixedChildrenPanelSizes(Size? parentSize = null);
+	}
 }
