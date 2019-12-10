@@ -195,7 +195,17 @@ namespace Xceed.Wpf.AvalonDock
 						fw.WindowState = WindowState.Maximized;
 					}
 					else
-						fw.Show();
+					{
+						if (fw.Content != null || (fw.Model as LayoutAnchorableFloatingWindow)?.IsVisible == true)
+						{
+							fw.Show();
+						}
+						else
+						{
+							fw.Hide();
+						}
+					}
+
 					//fw.Owner = Window.GetWindow(this);
 					//fw.SetParentToMainWindowOf(this);
 				}
@@ -2100,8 +2110,15 @@ namespace Xceed.Wpf.AvalonDock
 
 				Dispatcher.BeginInvoke(new Action(() =>
 			  {
-				  newFW.Show();
-			  }), DispatcherPriority.Send);
+					if (newFW.Content != null || (newFW.Model as LayoutAnchorableFloatingWindow)?.IsVisible == true)
+					{
+						newFW.Show();
+					}
+					else
+					{
+						newFW.Hide();
+					}
+				}), DispatcherPriority.Send);
 
 				if (panegroup != null && panegroup.IsMaximized)
 				{

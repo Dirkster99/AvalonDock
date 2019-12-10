@@ -61,6 +61,8 @@ namespace Xceed.Wpf.AvalonDock.Controls
 			{
 				root.Updated += OnRootUpdated;
 			}
+
+			_model.IsVisibleChanged += _model_IsVisibleChanged;
 		}
 
 		private void OnRootUpdated(object sender, EventArgs e)
@@ -194,6 +196,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 			BindingOperations.ClearBinding(_model, VisibilityProperty);
 
 			_model.PropertyChanged -= new System.ComponentModel.PropertyChangedEventHandler(_model_PropertyChanged);
+			_model.IsVisibleChanged -= _model_IsVisibleChanged;
 			Activated -= LayoutAnchorableFloatingWindowControl_Activated;
 			IsVisibleChanged -= this.LayoutAnchorableFloatingWindowControl_IsVisibleChanged;
 			BindingOperations.ClearBinding(this, VisibilityProperty);
@@ -282,6 +285,14 @@ namespace Xceed.Wpf.AvalonDock.Controls
 					}
 
 					break;
+			}
+		}
+
+		private void _model_IsVisibleChanged(object sender, EventArgs e)
+		{
+			if (!this.IsVisible && _model.IsVisible)
+			{
+				this.Show();
 			}
 		}
 
