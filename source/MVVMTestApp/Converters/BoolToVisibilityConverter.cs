@@ -25,9 +25,12 @@
 		/// <returns></returns>
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			var back = ((value is Visibility) && (((Visibility)value) == Visibility.Visible));
-
-			return back;
+			bool IsInverted = parameter == null ? false : (bool)parameter;
+			bool IsVisible = value == null ? false : (bool)value;
+			if (IsVisible)
+				return IsInverted ? Visibility.Hidden : Visibility.Visible;
+			else
+				return IsInverted ? Visibility.Visible : Visibility.Hidden;
 		}
 
 		/// <summary>
@@ -41,25 +44,10 @@
 		/// <returns></returns>
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			var flag = false;
-			if (value is bool)
-			{
-				flag = (bool)value;
-			}
-			else if (value is bool?)
-			{
-				var nullable = (bool?)value;
-				flag = nullable.GetValueOrDefault();
-			}
+			Visibility visiblility = value == null ? Visibility.Hidden : (Visibility)value;
+			bool IsInverted = parameter == null ? false : (bool)parameter;
 
-			if (flag)
-			{
-				return Visibility.Visible;
-			}
-			else
-			{
-				return Visibility.Collapsed;
-			}
+			return (visiblility == Visibility.Visible) != IsInverted;
 		}
 	}
 }

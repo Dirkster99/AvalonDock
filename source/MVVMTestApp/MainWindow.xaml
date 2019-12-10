@@ -5,6 +5,7 @@
         xmlns:avalonDockControls="clr-namespace:Xceed.Wpf.AvalonDock.Controls;assembly=Xceed.Wpf.AvalonDock"
         xmlns:avalonDockLayout="clr-namespace:Xceed.Wpf.AvalonDock.Layout;assembly=Xceed.Wpf.AvalonDock"
 
+		xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         xmlns:local="clr-namespace:AvalonDock.MVVMTestApp"
         xmlns:conv="clr-namespace:AvalonDock.MVVMTestApp.Converters"
         x:Name="mainWindow"
@@ -12,7 +13,9 @@
         UseLayoutRounding="True">
     <Window.Resources>
         <conv:ActiveDocumentConverter x:Key="ActiveDocumentConverter"/>
-        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+		<sys:Boolean x:Key="TRUE">True</sys:Boolean>
+		<sys:Boolean x:Key="FALSE">False</sys:Boolean>
+		<conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -75,8 +78,8 @@
                         <Style TargetType="{x:Type avalonDockControls:LayoutAnchorableItem}">
                             <Setter Property="Title" Value="{Binding Model.Title}"/>
                             <Setter Property="IconSource" Value="{Binding Model.IconSource}"/>
-                            <Setter Property="Visibility" Value="{Binding Model.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}"/>
-                            <Setter Property="ContentId" Value="{Binding Model.ContentId}"/>
+							<Setter Property="Visibility" Value="{Binding Model.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={StaticResource FALSE}}"/>
+							<Setter Property="ContentId" Value="{Binding Model.ContentId}"/>
                             <Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}"/>
                             <Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}"/>
                         </Style>
