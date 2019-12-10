@@ -16,7 +16,4 @@
     <ItemGroup>
       <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.csproj" />
     </ItemGroup>
-    <ItemGroup>
-      <Reference Include="WindowsFormsIntegration" />
-    </ItemGroup>
 </Project>
