@@ -123,6 +123,10 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
+## In Master branch but not yet released
+
+- [Resolve #98 with floating window without a content #99](https://github.com/Dirkster99/AvalonDock/pull/99) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
+
 ## Patch History for AvalonDock 3.6.2
 - [Fixed issue #92 Always update floating properties](https://github.com/Dirkster99/AvalonDock/issues/92) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
