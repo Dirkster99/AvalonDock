@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.Themes
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutomationTest", "AutomationTest", "{20876020-CC7D-46BD-9B80-E4F01FC0FD31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvalonDockTest", "AutomationTest\Xceed.Wpf.AvalonDock.Test\AvalonDockTest.csproj", "{FE4E16A2-876A-4356-9974-8A89C50B2A5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvalonDockTest", "AutomationTest\AvalonDockTest\AvalonDockTest.csproj", "{FE4E16A2-876A-4356-9974-8A89C50B2A5A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceLocator", "MLibTest\MLibTest_Components\ServiceLocator\ServiceLocator.csproj", "{38F7F15D-2F13-49E4-B4E6-B9552072AFCD}"
 EndProject
