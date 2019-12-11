@@ -19,7 +19,7 @@ using System.Windows.Data;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 
-namespace Xceed.Wpf.AvalonDock.Converters
+namespace AvalonDock.Converters
 {
 	public class UriSourceToBitmapImageConverter : IValueConverter
 	{

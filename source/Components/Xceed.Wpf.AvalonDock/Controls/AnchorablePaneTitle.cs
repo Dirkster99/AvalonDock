@@ -18,9 +18,9 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Input;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public class AnchorablePaneTitle : Control
 	{

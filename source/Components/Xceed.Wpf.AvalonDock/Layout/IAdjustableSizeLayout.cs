@@ -16,7 +16,7 @@
 
 using System.Windows;
 
-namespace Xceed.Wpf.AvalonDock.Layout
+namespace AvalonDock.Layout
 {
 	public interface IAdjustableSizeLayout
 	{

@@ -19,10 +19,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 using System.Windows.Threading;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	internal abstract class DropTarget<T> : DropTargetBase, IDropTarget where T : FrameworkElement
 	{

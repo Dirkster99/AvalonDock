@@ -14,7 +14,7 @@
 
   ***********************************************************************************/
 
-namespace Xceed.Wpf.AvalonDock.Layout
+namespace AvalonDock.Layout
 {
 	interface ILayoutPreviousContainer
 	{

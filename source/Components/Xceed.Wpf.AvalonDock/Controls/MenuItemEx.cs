@@ -17,7 +17,7 @@
 using System.Windows.Controls;
 using System.Windows;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public class MenuItemEx : MenuItem
 	{

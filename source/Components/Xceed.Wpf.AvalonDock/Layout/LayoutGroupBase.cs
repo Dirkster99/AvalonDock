@@ -17,7 +17,7 @@
 using System;
 using System.Xml.Serialization;
 
-namespace Xceed.Wpf.AvalonDock.Layout
+namespace AvalonDock.Layout
 {
 	[Serializable]
 	public abstract class LayoutGroupBase : LayoutElement

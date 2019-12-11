@@ -18,7 +18,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public class DropDownButton : ToggleButton
 	{

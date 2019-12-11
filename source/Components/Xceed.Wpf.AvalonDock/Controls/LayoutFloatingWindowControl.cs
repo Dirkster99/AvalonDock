@@ -24,11 +24,11 @@ using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 using System.Windows.Documents;
-using Xceed.Wpf.AvalonDock.Themes;
+using AvalonDock.Themes;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public abstract class LayoutFloatingWindowControl : Window, ILayoutControl
 	{

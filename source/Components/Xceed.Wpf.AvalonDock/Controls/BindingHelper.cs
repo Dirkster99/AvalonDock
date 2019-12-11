@@ -20,7 +20,7 @@ using System.ComponentModel;
 using System.Windows.Data;
 using System.Windows.Threading;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	internal class BindingHelper
 	{

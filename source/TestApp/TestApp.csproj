@@ -14,6 +14,6 @@
         <Resource Include="**\*.png" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.csproj" />
+      <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock\AvalonDock.csproj" />
     </ItemGroup>
 </Project>

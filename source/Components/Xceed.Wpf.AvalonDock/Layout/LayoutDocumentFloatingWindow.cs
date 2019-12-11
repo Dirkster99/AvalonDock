@@ -21,7 +21,7 @@ using System.Diagnostics;
 using System.Xml.Serialization;
 using System.Xml;
 
-namespace Xceed.Wpf.AvalonDock.Layout
+namespace AvalonDock.Layout
 {
 	[ContentProperty("RootDocument")]
 	[Serializable]

@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 
-namespace Xceed.Wpf.AvalonDock
+namespace AvalonDock
 {
 	internal static class Extensions
 	{

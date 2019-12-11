@@ -16,9 +16,9 @@
 
 using System;
 using System.Windows.Threading;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	internal class AutoHideWindowManager
 	{

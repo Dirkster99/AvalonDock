@@ -17,7 +17,7 @@
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public class ContextMenuEx : ContextMenu
 	{

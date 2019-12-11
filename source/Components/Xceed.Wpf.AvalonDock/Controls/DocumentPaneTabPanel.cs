@@ -18,9 +18,9 @@ using System;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public class DocumentPaneTabPanel : Panel
 	{

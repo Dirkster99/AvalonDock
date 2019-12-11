@@ -17,7 +17,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	internal class FullWeakDictionary<K, V> where K : class
 	{

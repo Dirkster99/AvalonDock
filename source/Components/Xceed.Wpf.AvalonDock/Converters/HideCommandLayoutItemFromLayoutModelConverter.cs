@@ -16,10 +16,10 @@
 
 using System;
 using System.Windows.Data;
-using Xceed.Wpf.AvalonDock.Layout;
-using Xceed.Wpf.AvalonDock.Controls;
+using AvalonDock.Layout;
+using AvalonDock.Controls;
 
-namespace Xceed.Wpf.AvalonDock.Converters
+namespace AvalonDock.Converters
 {
 	public class HideCommandLayoutItemFromLayoutModelConverter : IValueConverter
 	{

@@ -17,9 +17,9 @@
 using System;
 using System.Windows.Data;
 using System.Windows.Controls;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 
-namespace Xceed.Wpf.AvalonDock.Converters
+namespace AvalonDock.Converters
 {
 	[ValueConversion(typeof(AnchorSide), typeof(Orientation))]
 	public class AnchorSideToOrientationConverter : IValueConverter

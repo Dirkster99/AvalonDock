@@ -17,11 +17,11 @@
 using System.Linq;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public class LayoutAnchorGroupControl : Control, ILayoutControl
 	{

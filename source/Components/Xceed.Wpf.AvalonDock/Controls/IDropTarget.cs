@@ -16,9 +16,9 @@
 
 using System.Windows;
 using System.Windows.Media;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	internal interface IDropTarget
 	{

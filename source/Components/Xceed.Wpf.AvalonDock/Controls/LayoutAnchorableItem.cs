@@ -15,13 +15,13 @@
   ***********************************************************************************/
 
 using System;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 using System.Windows.Input;
 using System.Windows;
-using Xceed.Wpf.AvalonDock.Commands;
+using AvalonDock.Commands;
 using System.Windows.Data;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public class LayoutAnchorableItem : LayoutItem
 	{

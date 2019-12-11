@@ -16,9 +16,9 @@
 
 using System;
 using System.Windows.Data;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 
-namespace Xceed.Wpf.AvalonDock.Converters
+namespace AvalonDock.Converters
 {
 	public class LayoutItemFromLayoutModelConverter : IValueConverter
 	{

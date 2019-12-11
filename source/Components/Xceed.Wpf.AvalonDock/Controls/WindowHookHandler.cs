@@ -16,7 +16,7 @@
 
 using System;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	internal class FocusChangeEventArgs : EventArgs
 	{

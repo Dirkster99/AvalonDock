@@ -14,10 +14,10 @@
 
   ***********************************************************************************/
 
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 using System.Windows;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public class LayoutDocumentItem : LayoutItem
 	{

@@ -18,7 +18,7 @@ using System;
 using System.Windows.Controls;
 using System.Windows.Markup;
 
-namespace Xceed.Wpf.AvalonDock.Layout
+namespace AvalonDock.Layout
 {
 	[ContentProperty("Children")]
 	[Serializable]

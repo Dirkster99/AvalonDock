@@ -16,7 +16,7 @@
 
 using System.Windows;
 
-namespace Xceed.Wpf.AvalonDock.Layout
+namespace AvalonDock.Layout
 {
 	internal interface ILayoutPositionableElement : ILayoutElement, ILayoutElementForFloatingWindow
 	{

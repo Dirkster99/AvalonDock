@@ -21,11 +21,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 using System.Diagnostics;
 using System.IO;
-using Xceed.Wpf.AvalonDock.Layout.Serialization;
-using Xceed.Wpf.AvalonDock;
+using AvalonDock.Layout.Serialization;
+using AvalonDock;
 
 namespace TestApp
 {

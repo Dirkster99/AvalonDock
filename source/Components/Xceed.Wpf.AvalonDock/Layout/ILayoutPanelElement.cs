@@ -15,7 +15,7 @@
   ***********************************************************************************/
 
 
-namespace Xceed.Wpf.AvalonDock.Layout
+namespace AvalonDock.Layout
 {
 	public interface ILayoutPanelElement : ILayoutElement
 	{

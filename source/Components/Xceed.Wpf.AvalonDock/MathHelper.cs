@@ -16,7 +16,7 @@
 
 using System;
 
-namespace Xceed.Wpf.AvalonDock
+namespace AvalonDock
 {
 	internal static class MathHelper
 	{

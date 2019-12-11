@@ -17,7 +17,7 @@
 using System.Collections.Generic;
 using System.Windows;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	internal interface IOverlayWindowHost
 	{

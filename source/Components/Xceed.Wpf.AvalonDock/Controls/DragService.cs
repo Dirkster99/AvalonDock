@@ -17,9 +17,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	internal class DragService
 	{

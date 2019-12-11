@@ -20,7 +20,7 @@ using System.Linq;
 using System.Collections.ObjectModel;
 using System.Xml.Serialization;
 
-namespace Xceed.Wpf.AvalonDock.Layout
+namespace AvalonDock.Layout
 {
 	[Serializable]
 	public abstract class LayoutGroup<T> : LayoutGroupBase, ILayoutContainer, ILayoutGroup, IXmlSerializable where T : class, ILayoutElement

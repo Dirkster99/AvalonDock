@@ -18,7 +18,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 
-namespace Xceed.Wpf.AvalonDock.Layout
+namespace AvalonDock.Layout
 {
 	[Serializable]
 	public class LayoutDocument : LayoutContent

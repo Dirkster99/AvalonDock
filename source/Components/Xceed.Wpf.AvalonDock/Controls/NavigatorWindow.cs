@@ -17,11 +17,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using Xceed.Wpf.AvalonDock.Layout;
-using Xceed.Wpf.AvalonDock.Themes;
+using AvalonDock.Layout;
+using AvalonDock.Themes;
 using System.Windows.Controls;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	[TemplatePart(Name = PART_AnchorableListBox, Type = typeof(ListBox))]
 	[TemplatePart(Name = PART_DocumentListBox, Type = typeof(ListBox))]

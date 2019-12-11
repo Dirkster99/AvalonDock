@@ -16,7 +16,7 @@
 
 using System.Windows;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public abstract class OverlayArea : IOverlayWindowArea
 	{

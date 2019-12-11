@@ -46,10 +46,10 @@ using System;
 )]
 
 [assembly: XmlnsPrefix( "http://schemas.xceed.com/wpf/xaml/avalondock", "xcad" )]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/avalondock", "Xceed.Wpf.AvalonDock" )]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/avalondock", "Xceed.Wpf.AvalonDock.Controls" )]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/avalondock", "Xceed.Wpf.AvalonDock.Converters" )]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/avalondock", "Xceed.Wpf.AvalonDock.Layout" )]
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/avalondock", "Xceed.Wpf.AvalonDock.Themes" )]
+[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/avalondock", "AvalonDock" )]
+[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/avalondock", "AvalonDock.Controls" )]
+[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/avalondock", "AvalonDock.Converters" )]
+[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/avalondock", "AvalonDock.Layout" )]
+[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/avalondock", "AvalonDock.Themes" )]
 
 

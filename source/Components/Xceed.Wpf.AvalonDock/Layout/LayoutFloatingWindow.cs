@@ -20,7 +20,7 @@ using System.Xml.Serialization;
 using System.Xml.Schema;
 using System.Xml;
 
-namespace Xceed.Wpf.AvalonDock.Layout
+namespace AvalonDock.Layout
 {
 	[Serializable]
 	public abstract class LayoutFloatingWindow : LayoutElement, ILayoutContainer, IXmlSerializable

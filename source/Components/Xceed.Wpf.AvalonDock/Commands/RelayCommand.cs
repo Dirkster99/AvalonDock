@@ -17,7 +17,7 @@
 using System;
 using System.Windows.Input;
 
-namespace Xceed.Wpf.AvalonDock.Commands
+namespace AvalonDock.Commands
 {
 	internal class RelayCommand : ICommand
 	{

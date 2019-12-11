@@ -18,7 +18,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 
-namespace Xceed.Wpf.AvalonDock
+namespace AvalonDock
 {
 	internal static class Win32Helper
 	{

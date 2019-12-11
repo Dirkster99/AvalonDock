@@ -19,7 +19,7 @@ using System.Windows;
 using System.ComponentModel;
 using System.Xml.Serialization;
 
-namespace Xceed.Wpf.AvalonDock.Layout
+namespace AvalonDock.Layout
 {
 	[Serializable]
 	public abstract class LayoutElement : DependencyObject, ILayoutElement

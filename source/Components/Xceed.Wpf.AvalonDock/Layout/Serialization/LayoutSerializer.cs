@@ -17,7 +17,7 @@
 using System;
 using System.Linq;
 
-namespace Xceed.Wpf.AvalonDock.Layout.Serialization
+namespace AvalonDock.Layout.Serialization
 {
 	public abstract class LayoutSerializer
 	{

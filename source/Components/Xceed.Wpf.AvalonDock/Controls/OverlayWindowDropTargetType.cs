@@ -14,7 +14,7 @@
 
   ***********************************************************************************/
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public enum OverlayWindowDropTargetType
 	{

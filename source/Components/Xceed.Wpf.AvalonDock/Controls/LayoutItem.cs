@@ -17,14 +17,14 @@
 using System;
 using System.Linq;
 using System.Windows;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 using System.Windows.Input;
-using Xceed.Wpf.AvalonDock.Commands;
+using AvalonDock.Commands;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Controls;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public abstract class LayoutItem : FrameworkElement
 	{

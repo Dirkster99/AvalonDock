@@ -20,13 +20,13 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using Xceed.Wpf.AvalonDock.Layout;
-using Xceed.Wpf.AvalonDock.Converters;
+using AvalonDock.Layout;
+using AvalonDock.Converters;
 using System.Windows.Controls.Primitives;
-using Xceed.Wpf.AvalonDock.Commands;
+using AvalonDock.Commands;
 using Microsoft.Windows.Shell;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public class LayoutAnchorableFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
 	{
@@ -252,7 +252,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 			return base.FilterMessage(hwnd, msg, wParam, lParam, ref handled);
 		}
 
-		internal override void UpdateThemeResources(Xceed.Wpf.AvalonDock.Themes.Theme oldTheme = null)
+		internal override void UpdateThemeResources(AvalonDock.Themes.Theme oldTheme = null)
 		{
 			base.UpdateThemeResources(oldTheme);
 

@@ -5,9 +5,9 @@ using System.Windows.Data;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Xceed.Wpf.AvalonDock.Controls;
-using Xceed.Wpf.AvalonDock.Converters;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Controls;
+using AvalonDock.Converters;
+using AvalonDock.Layout;
 
 namespace AvalonDockTest
 {

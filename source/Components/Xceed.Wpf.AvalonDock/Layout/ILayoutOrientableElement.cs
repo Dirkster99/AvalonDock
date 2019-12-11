@@ -16,7 +16,7 @@
 
 using System.Windows.Controls;
 
-namespace Xceed.Wpf.AvalonDock.Layout
+namespace AvalonDock.Layout
 {
 	public interface ILayoutOrientableGroup : ILayoutGroup
 	{

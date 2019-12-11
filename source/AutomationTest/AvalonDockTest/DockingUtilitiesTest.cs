@@ -5,7 +5,7 @@
 
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-	using Xceed.Wpf.AvalonDock.Layout;
+	using AvalonDock.Layout;
 
 	[TestClass]
 	public sealed class DockingUtilitiesTest

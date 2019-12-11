@@ -19,7 +19,7 @@ using System.Windows.Media;
 using System.Windows;
 using System.Windows.Interop;
 
-namespace Xceed.Wpf.AvalonDock
+namespace AvalonDock
 {
 	static class WindowHelper
 	{

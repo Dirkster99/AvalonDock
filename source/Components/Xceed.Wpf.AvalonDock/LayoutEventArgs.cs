@@ -15,9 +15,9 @@
   ***********************************************************************************/
 
 using System;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 
-namespace Xceed.Wpf.AvalonDock
+namespace AvalonDock
 {
 	class LayoutEventArgs : EventArgs
 	{

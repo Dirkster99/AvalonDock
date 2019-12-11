@@ -16,7 +16,7 @@
 
 using System.Collections.Generic;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	internal interface IOverlayWindow
 	{

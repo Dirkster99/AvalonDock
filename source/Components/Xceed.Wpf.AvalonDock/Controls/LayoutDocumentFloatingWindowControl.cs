@@ -15,12 +15,12 @@
   ***********************************************************************************/
 
 using System;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using Microsoft.Windows.Shell;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	public class LayoutDocumentFloatingWindowControl : LayoutFloatingWindowControl
 	{

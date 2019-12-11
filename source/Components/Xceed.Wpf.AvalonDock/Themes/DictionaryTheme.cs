@@ -17,7 +17,7 @@
 using System;
 using System.Windows;
 
-namespace Xceed.Wpf.AvalonDock.Themes
+namespace AvalonDock.Themes
 {
 	public abstract class DictionaryTheme : Theme
 	{

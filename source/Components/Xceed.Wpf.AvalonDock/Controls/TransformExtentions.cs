@@ -17,7 +17,7 @@
 using System.Windows;
 using System.Windows.Media;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	internal static class TransformExtensions
 	{

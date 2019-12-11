@@ -22,17 +22,17 @@ using System.Windows;
 using System.Windows.Markup;
 using System.ComponentModel;
 using System.Windows.Interop;
-using Xceed.Wpf.AvalonDock.Layout;
-using Xceed.Wpf.AvalonDock.Controls;
+using AvalonDock.Layout;
+using AvalonDock.Controls;
 using System.Windows.Input;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Windows.Data;
 using System.Windows.Threading;
-using Xceed.Wpf.AvalonDock.Themes;
+using AvalonDock.Themes;
 using System.Diagnostics;
 
-namespace Xceed.Wpf.AvalonDock
+namespace AvalonDock
 {
 	[ContentProperty("Layout")]
 	[TemplatePart(Name = "PART_AutoHideArea")]

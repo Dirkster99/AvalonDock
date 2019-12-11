@@ -17,7 +17,7 @@
 using System;
 using System.Windows.Data;
 
-namespace Xceed.Wpf.AvalonDock.Converters
+namespace AvalonDock.Converters
 {
 	public class NullToDoNothingConverter : IValueConverter
 	{

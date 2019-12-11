@@ -22,9 +22,9 @@ using System.Windows;
 using System.Globalization;
 using System.Windows.Media;
 using System.ComponentModel;
-using Xceed.Wpf.AvalonDock.Controls;
+using AvalonDock.Controls;
 
-namespace Xceed.Wpf.AvalonDock.Layout
+namespace AvalonDock.Layout
 {
 	[ContentProperty("Content")]
 	[Serializable]

@@ -22,11 +22,11 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows;
 using System.Diagnostics;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock.Layout;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace Xceed.Wpf.AvalonDock.Controls
+namespace AvalonDock.Controls
 {
 	internal static class FocusElementManager
 	{

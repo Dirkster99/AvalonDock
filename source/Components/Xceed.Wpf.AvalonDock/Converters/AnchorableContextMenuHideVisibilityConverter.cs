@@ -20,7 +20,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Xceed.Wpf.AvalonDock.Converters
+namespace AvalonDock.Converters
 {
 	public class AnchorableContextMenuHideVisibilityConverter : IMultiValueConverter
 	{

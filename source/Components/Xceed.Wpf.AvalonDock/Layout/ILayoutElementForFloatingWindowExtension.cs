@@ -1,4 +1,4 @@
-﻿namespace Xceed.Wpf.AvalonDock.Layout
+﻿namespace AvalonDock.Layout
 {
 	using System.Runtime.InteropServices;
 	using System.Windows;
