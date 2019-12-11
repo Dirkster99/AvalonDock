@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace Xceed.Wpf.AvalonDock.Test.views
+namespace AvalonDockTest.views
 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml

@@ -1,4 +1,4 @@
-namespace Xceed.Wpf.AvalonDock.Test.TestHelpers
+namespace AvalonDockTest.TestHelpers
 {
 	using System;
 	using System.Threading.Tasks;

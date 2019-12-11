@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Xceed.Wpf.AvalonDock.Test.Views
+namespace AvalonDockTest.Views
 {
 	/// <summary>
 	/// Interaction logic for LayoutAnchorableFloatingWindowControlTestWindow.xaml

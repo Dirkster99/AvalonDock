@@ -1,10 +1,10 @@
-﻿namespace Xceed.Wpf.AvalonDock.Test
+﻿namespace AvalonDockTest
 {
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 	using System.Threading.Tasks;
 	using Xceed.Wpf.AvalonDock.Layout;
-	using Xceed.Wpf.AvalonDock.Test.TestHelpers;
-	using Xceed.Wpf.AvalonDock.Test.views;
+	using AvalonDockTest.TestHelpers;
+	using AvalonDockTest.views;
 
 	[TestClass]
 	public class AnchorablePaneTest : AutomationTestBase

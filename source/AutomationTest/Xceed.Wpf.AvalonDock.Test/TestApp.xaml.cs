@@ -1,4 +1,4 @@
-﻿namespace Xceed.Wpf.AvalonDock.Test
+﻿namespace AvalonDockTest
 {
     using System.Windows;
 

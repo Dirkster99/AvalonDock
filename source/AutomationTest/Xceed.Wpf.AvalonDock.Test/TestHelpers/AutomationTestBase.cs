@@ -1,4 +1,4 @@
-﻿namespace Xceed.Wpf.AvalonDock.Test.TestHelpers
+﻿namespace AvalonDockTest.TestHelpers
 {
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 	using System;

@@ -9,7 +9,7 @@ using Xceed.Wpf.AvalonDock.Controls;
 using Xceed.Wpf.AvalonDock.Converters;
 using Xceed.Wpf.AvalonDock.Layout;
 
-namespace Xceed.Wpf.AvalonDock.Test
+namespace AvalonDockTest
 {
 	[TestClass]
 	public sealed class LayoutAnchorableTest

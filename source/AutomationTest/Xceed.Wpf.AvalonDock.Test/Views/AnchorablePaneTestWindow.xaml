@@ -1,4 +1,4 @@
-<Window x:Class="Xceed.Wpf.AvalonDock.Test.views.AnchorablePaneTestWindow"
+<Window x:Class="AvalonDockTest.views.AnchorablePaneTestWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"

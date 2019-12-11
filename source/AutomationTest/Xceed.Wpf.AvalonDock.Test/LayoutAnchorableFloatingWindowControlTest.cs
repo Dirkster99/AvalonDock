@@ -1,12 +1,12 @@
-﻿namespace Xceed.Wpf.AvalonDock.Test
+﻿namespace AvalonDockTest
 {
 	using System.Threading.Tasks;
 
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 	using Xceed.Wpf.AvalonDock.Layout.Serialization;
-	using Xceed.Wpf.AvalonDock.Test.TestHelpers;
-	using Xceed.Wpf.AvalonDock.Test.Views;
+	using AvalonDockTest.TestHelpers;
+	using AvalonDockTest.Views;
 
 	[TestClass]
 	public class LayoutAnchorableFloatingWindowControlTest : AutomationTestBase
