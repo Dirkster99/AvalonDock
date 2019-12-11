@@ -44,7 +44,7 @@ using System;
                                               // app, or any theme specific resource dictionaries)
 )]
 
-[assembly: XmlnsPrefix("https://github.com/Dirkster99/AvalonDock", "xcad")]
+[assembly: XmlnsPrefix("https://github.com/Dirkster99/AvalonDock", "avalondock")]
 [assembly: XmlnsDefinition("https://github.com/Dirkster99/AvalonDock", "AvalonDock")]
 [assembly: XmlnsDefinition("https://github.com/Dirkster99/AvalonDock", "AvalonDock.Controls")]
 [assembly: XmlnsDefinition("https://github.com/Dirkster99/AvalonDock", "AvalonDock.Converters")]
