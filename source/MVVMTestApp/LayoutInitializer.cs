@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using Xceed.Wpf.AvalonDock.Layout;
-
-namespace AvalonDock.MVVMTestApp
+﻿namespace AvalonDock.MVVMTestApp
 {
+	using System.Linq;
+	using AvalonDock.Layout;
+
 	class LayoutInitializer : ILayoutUpdateStrategy
 	{
 		public bool BeforeInsertAnchorable(LayoutRoot layout, LayoutAnchorable anchorableToShow, ILayoutContainer destinationContainer)

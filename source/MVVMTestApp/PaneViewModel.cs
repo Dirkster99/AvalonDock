@@ -1,7 +1,7 @@
-﻿using System.Windows.Media;
-
-namespace AvalonDock.MVVMTestApp
+﻿namespace AvalonDock.MVVMTestApp
 {
+	using System.Windows.Media;
+
 	class PaneViewModel : ViewModelBase
 	{
 		public PaneViewModel()

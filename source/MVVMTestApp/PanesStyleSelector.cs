@@ -1,8 +1,8 @@
-﻿using System.Windows.Controls;
-using System.Windows;
-
-namespace AvalonDock.MVVMTestApp
+﻿namespace AvalonDock.MVVMTestApp
 {
+	using System.Windows.Controls;
+	using System.Windows;
+
 	class PanesStyleSelector : StyleSelector
 	{
 		public Style ToolStyle

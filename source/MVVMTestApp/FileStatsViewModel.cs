@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Windows.Media.Imaging;
-using System.Windows.Media;
-
-namespace AvalonDock.MVVMTestApp
+﻿namespace AvalonDock.MVVMTestApp
 {
+	using System;
+	using System.IO;
+	using System.Windows.Media.Imaging;
+
 	class FileStatsViewModel : ToolViewModel
 	{
 		public FileStatsViewModel()

@@ -1,9 +1,9 @@
 ﻿using System.Windows.Controls;
 using System.Windows;
-using Xceed.Wpf.AvalonDock.Layout;
-
 namespace AvalonDock.MVVMTestApp
 {
+	using AvalonDock.Layout;
+
 	class PanesTemplateSelector : DataTemplateSelector
 	{
 		public PanesTemplateSelector()
