@@ -1,4 +1,4 @@
-namespace Xceed.Wpf.AvalonDock.Themes.VS2013.Themes
+namespace AvalonDock.Themes.VS2013.Themes
 {
 	using System.Windows;
 

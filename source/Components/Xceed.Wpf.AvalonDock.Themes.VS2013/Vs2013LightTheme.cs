@@ -16,14 +16,14 @@
 
 using System;
 
-namespace Xceed.Wpf.AvalonDock.Themes
+namespace AvalonDock.Themes
 {
 	public class Vs2013LightTheme : Theme
 	{
 		public override Uri GetResourceUri()
 		{
 			return new Uri(
-				"/Xceed.Wpf.AvalonDock.Themes.VS2013;component/LightTheme.xaml",
+				"/AvalonDock.Themes.VS2013;component/LightTheme.xaml",
 				UriKind.Relative);
 		}
 	}

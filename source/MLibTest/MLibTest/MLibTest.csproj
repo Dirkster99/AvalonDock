@@ -25,8 +25,8 @@
 
   <ItemGroup>
     <!--ProjectReference Include="..\..\Components\Xceed.Wpf.AvalonDock.Themes.Expression\Xceed.Wpf.AvalonDock.Themes.Expression.csproj" />
-    <ProjectReference Include="..\..\Components\Xceed.Wpf.AvalonDock.Themes.Metro\Xceed.Wpf.AvalonDock.Themes.Metro.csproj" />
-    <ProjectReference Include="..\..\Components\Xceed.Wpf.AvalonDock.Themes.VS2013\Xceed.Wpf.AvalonDock.Themes.VS2013.csproj" /-->
+    <ProjectReference Include="..\..\Components\Xceed.Wpf.AvalonDock.Themes.Metro\Xceed.Wpf.AvalonDock.Themes.Metro.csproj" /-->
+    <ProjectReference Include="..\..\Components\Xceed.Wpf.AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj" />
     <ProjectReference Include="..\..\Components\Xceed.Wpf.AvalonDock\AvalonDock.csproj" />
     <ProjectReference Include="..\..\MLibTest\MLibTest_Components\ServiceLocator\ServiceLocator.csproj" />
     <ProjectReference Include="..\..\MLibTest\MLibTest_Components\Settings\SettingsModel\SettingsModel.csproj" />

@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.Themes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.Themes.Metro", "Components\Xceed.Wpf.AvalonDock.Themes.Metro\Xceed.Wpf.AvalonDock.Themes.Metro.csproj", "{89286EB4-B4A1-418C-839A-067B00F442D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.Themes.VS2013", "Components\Xceed.Wpf.AvalonDock.Themes.VS2013\Xceed.Wpf.AvalonDock.Themes.VS2013.csproj", "{BD7EEE0E-9432-4E76-BD82-793358E56BDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvalonDock.Themes.VS2013", "Components\Xceed.Wpf.AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj", "{BD7EEE0E-9432-4E76-BD82-793358E56BDF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MLibTest_Components", "MLibTest_Components", "{72045D3A-A982-4C69-8FB8-6B601363D7ED}"
 EndProject

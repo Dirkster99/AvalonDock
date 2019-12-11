@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:reskeys="clr-namespace:Xceed.Wpf.AvalonDock.Themes.VS2013.Themes"
+                    xmlns:reskeys="clr-namespace:AvalonDock.Themes.VS2013.Themes"
                     xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"                    
                     >
 

@@ -1,4 +1,4 @@
-﻿namespace Xceed.Wpf.AvalonDock.Themes.VS2013.Themes.Menu
+﻿namespace AvalonDock.Themes.VS2013.Themes.Menu
 {
     using System.Windows;
 

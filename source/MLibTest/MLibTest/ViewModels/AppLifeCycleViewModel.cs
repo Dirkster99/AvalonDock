@@ -120,9 +120,9 @@
 		{
 			settings.Themes.RemoveAllThemeInfos();
 			settings.Themes.AddThemeInfo("Generic", new List<Uri> { });
-////			settings.Themes.AddThemeInfo("VS 2013 Blue", new List<Uri> { });
-////			settings.Themes.AddThemeInfo("VS 2013 Dark", new List<Uri> { });
-////			settings.Themes.AddThemeInfo("VS 2013 Light", new List<Uri> { });
+			settings.Themes.AddThemeInfo("VS 2013 Blue", new List<Uri> { });
+			settings.Themes.AddThemeInfo("VS 2013 Dark", new List<Uri> { });
+			settings.Themes.AddThemeInfo("VS 2013 Light", new List<Uri> { });
 ////
 ////			settings.Themes.AddThemeInfo("Metro", new List<Uri> { });
 ////
@@ -148,7 +148,7 @@
 			{
 				Debug.WriteLine(exp);
 			}
-/***
+
 			try
 			{
 				// Adding Generic theme (which is really based on Light theme in MLib)
@@ -156,8 +156,8 @@
 				// so this is how it can be tested ...
 				appearance.AddThemeResources("VS 2013 Blue", new List<Uri>
 				{
-				   new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
-				  ,new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/BlueBrushs.xaml", UriKind.RelativeOrAbsolute)
+				   new Uri("/AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
+				  ,new Uri("/AvalonDock.Themes.VS2013;component/BlueBrushs.xaml", UriKind.RelativeOrAbsolute)
 
 				  ,new Uri("/MLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
 				  ,new Uri("/MWindowLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
@@ -177,8 +177,8 @@
 				// Add additional Dark and Light resources to those theme resources added above
 				appearance.AddThemeResources("VS 2013 Dark", new List<Uri>
 				{
-				   new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
-				  ,new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
+				   new Uri("/AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
+				  ,new Uri("/AvalonDock.Themes.VS2013;component/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
 				  ,new Uri("/ColorPickerLib;component/Themes/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
 				  ,new Uri("/NumericUpDownLib;component/Themes/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
 
@@ -201,8 +201,8 @@
 			{
 				appearance.AddThemeResources("VS 2013 Light", new List<Uri>
 				{
-				   new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
-				  ,new Uri("/Xceed.Wpf.AvalonDock.Themes.VS2013;component/LightBrushs.xaml", UriKind.RelativeOrAbsolute)
+				   new Uri("/AvalonDock.Themes.VS2013;component/Themes/generic.xaml", UriKind.RelativeOrAbsolute)
+				  ,new Uri("/AvalonDock.Themes.VS2013;component/LightBrushs.xaml", UriKind.RelativeOrAbsolute)
 				  ,new Uri("/ColorPickerLib;component/Themes/LightBrushs.xaml", UriKind.RelativeOrAbsolute)
 				  ,new Uri("/NumericUpDownLib;component/Themes/LightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
@@ -220,7 +220,7 @@
 			{
 				Debug.WriteLine(exp);
 			}
-
+/***
 			try
 			{
 				// Adding Generic theme (which is really based on Light theme in MLib)
@@ -286,8 +286,7 @@
 			}
 ***/
 
-////			appearance.SetDefaultTheme(settings.Themes, "VS 2013 Dark");
-			appearance.SetDefaultTheme(settings.Themes, "Generic");
+			appearance.SetDefaultTheme(settings.Themes, "VS 2013 Dark");
 
 			try
 			{
