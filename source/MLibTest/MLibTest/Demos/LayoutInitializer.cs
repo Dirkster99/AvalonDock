@@ -1,7 +1,7 @@
 ﻿namespace MLibTest.Demos
 {
 	using System.Linq;
-	using Xceed.Wpf.AvalonDock.Layout;
+	using AvalonDock.Layout;
 
 	class LayoutInitializer : ILayoutUpdateStrategy
 	{

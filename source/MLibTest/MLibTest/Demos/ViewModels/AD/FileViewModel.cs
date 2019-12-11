@@ -1,4 +1,4 @@
-﻿namespace AvalonDock.MVVMTestApp
+﻿namespace MLibTest.Demos.ViewModels.AD
 {
 	using MLibTest.Demos.ViewModels.Interfaces;
 	using MLibTest.ViewModels.Base;

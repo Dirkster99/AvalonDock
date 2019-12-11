@@ -8,7 +8,7 @@
 	using MLibTest.ViewModels.Base;
 	using MLib.Interfaces;
 	using Settings.Interfaces;
-	using AvalonDock.MVVMTestApp;
+	using MLibTest.Demos.ViewModels.AD;
 
 	/// <summary>
 	/// Implements the viewmodel that drives the view a Color Picker tool window.
