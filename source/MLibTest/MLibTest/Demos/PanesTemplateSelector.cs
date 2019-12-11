@@ -2,9 +2,9 @@
 {
 	using System.Windows.Controls;
 	using System.Windows;
-	using Xceed.Wpf.AvalonDock.Layout;
-	using AvalonDock.MVVMTestApp;
+	using AvalonDock.Layout;
 	using AvalonDock.Tools;
+	using MLibTest.Demos.ViewModels.AD;
 
 	/// <summary>
 	/// Implements a <see ref="DataTemplateSelector"/> for AvalonDock's documents and toolwindows.

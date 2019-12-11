@@ -13,12 +13,12 @@ ECHO MVVMTestApp
 ECHO TestApp
 ECHO WinFormsTestApp
 ECHO.
-ECHO Components\Xceed.Wpf.AvalonDock
-ECHO Components\Xceed.Wpf.AvalonDock.Themes.Aero
-ECHO Components\Xceed.Wpf.AvalonDock.Themes.Expression
-ECHO Components\Xceed.Wpf.AvalonDock.Themes.VS2013
-ECHO Components\Xceed.Wpf.AvalonDock.Themes.VS2010
-ECHO Components\Xceed.Wpf.AvalonDock.Themes.Metro
+ECHO Components\AvalonDock
+ECHO Components\AvalonDock.Themes.Aero
+ECHO Components\AvalonDock.Themes.Expression
+ECHO Components\AvalonDock.Themes.VS2013
+ECHO Components\AvalonDock.Themes.VS2010
+ECHO Components\AvalonDock.Themes.Metro
 ECHO.
 ECHO.
 REM Ask the user if hes really sure to continue beyond this point XXXXXXXX
@@ -65,36 +65,36 @@ ECHO.
 RMDIR /S /Q WinFormsTestApp\bin
 RMDIR /S /Q WinFormsTestApp\obj
 
-ECHO Deleting BIN and OBJ Folders in Xceed.Wpf.AvalonDock.Themes.Aero
+ECHO Deleting BIN and OBJ Folders in AvalonDock.Themes.Aero
 ECHO.
-RMDIR /S /Q Components\Xceed.Wpf.AvalonDock.Themes.Aero\bin
-RMDIR /S /Q Components\Xceed.Wpf.AvalonDock.Themes.Aero\obj
+RMDIR /S /Q Components\AvalonDock.Themes.Aero\bin
+RMDIR /S /Q Components\AvalonDock.Themes.Aero\obj
 
-ECHO Deleting BIN and OBJ Folders in Xceed.Wpf.AvalonDock
+ECHO Deleting BIN and OBJ Folders in AvalonDock
 ECHO.
-RMDIR /S /Q Components\Xceed.Wpf.AvalonDock\bin
-RMDIR /S /Q Components\Xceed.Wpf.AvalonDock\obj
+RMDIR /S /Q Components\AvalonDock\bin
+RMDIR /S /Q Components\AvalonDock\obj
 
-ECHO Deleting BIN and OBJ Folders in Xceed.Wpf.AvalonDock.Themes.Expression
+ECHO Deleting BIN and OBJ Folders in AvalonDock.Themes.Expression
 
 ECHO.
-RMDIR /S /Q Components\Xceed.Wpf.AvalonDock.Themes.Expression\bin
-RMDIR /S /Q Components\Xceed.Wpf.AvalonDock.Themes.Expression\obj
+RMDIR /S /Q Components\AvalonDock.Themes.Expression\bin
+RMDIR /S /Q Components\AvalonDock.Themes.Expression\obj
 
-ECHO Deleting BIN and OBJ Folders in Xceed.Wpf.AvalonDock.Themes.VS2010
+ECHO Deleting BIN and OBJ Folders in AvalonDock.Themes.VS2010
 ECHO.
-RMDIR /S /Q Components\Xceed.Wpf.AvalonDock.Themes.VS2010\bin
-RMDIR /S /Q Components\Xceed.Wpf.AvalonDock.Themes.VS2010\obj
+RMDIR /S /Q Components\AvalonDock.Themes.VS2010\bin
+RMDIR /S /Q Components\AvalonDock.Themes.VS2010\obj
 
-ECHO Deleting BIN and OBJ Folders in Xceed.Wpf.AvalonDock.Themes.VS2013
+ECHO Deleting BIN and OBJ Folders in AvalonDock.Themes.VS2013
 ECHO.
-RMDIR /S /Q Components\Xceed.Wpf.AvalonDock.Themes.VS2013\bin
-RMDIR /S /Q Components\Xceed.Wpf.AvalonDock.Themes.VS2013\obj
+RMDIR /S /Q Components\AvalonDock.Themes.VS2013\bin
+RMDIR /S /Q Components\AvalonDock.Themes.VS2013\obj
 
-ECHO Deleting BIN and OBJ Folders in Xceed.Wpf.AvalonDock.Themes.Metro
+ECHO Deleting BIN and OBJ Folders in AvalonDock.Themes.Metro
 ECHO.
-RMDIR /S /Q Components\Xceed.Wpf.AvalonDock.Themes.Metro\bin
-RMDIR /S /Q Components\Xceed.Wpf.AvalonDock.Themes.Metro\obj
+RMDIR /S /Q Components\AvalonDock.Themes.Metro\bin
+RMDIR /S /Q Components\AvalonDock.Themes.Metro\obj
 
 
 

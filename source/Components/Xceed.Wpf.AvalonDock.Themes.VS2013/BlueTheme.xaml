@@ -1,8 +1,0 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    >
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/BlueBrushs.xaml" />
-        <ResourceDictionary Source="/Xceed.Wpf.AvalonDock.Themes.VS2013;component/Themes/Generic.xaml" />
-    </ResourceDictionary.MergedDictionaries>
-
-</ResourceDictionary>

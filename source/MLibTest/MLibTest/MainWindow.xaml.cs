@@ -9,7 +9,7 @@
 	using System.Linq;
 	using System.Windows;
 	using System.Windows.Input;
-	using Xceed.Wpf.AvalonDock.Layout.Serialization;
+	using AvalonDock.Layout.Serialization;
 
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml

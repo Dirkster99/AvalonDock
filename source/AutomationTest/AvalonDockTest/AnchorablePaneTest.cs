@@ -2,7 +2,7 @@
 {
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 	using System.Threading.Tasks;
-	using Xceed.Wpf.AvalonDock.Layout;
+	using AvalonDock.Layout;
 	using AvalonDockTest.TestHelpers;
 	using AvalonDockTest.views;
 

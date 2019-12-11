@@ -1,9 +1,9 @@
-﻿using System.IO;
-using System.Windows.Input;
-using System.Windows.Media;
-
-namespace AvalonDock.MVVMTestApp
+﻿namespace AvalonDock.MVVMTestApp
 {
+	using System.IO;
+	using System.Windows.Input;
+	using System.Windows.Media;
+
 	class FileViewModel : PaneViewModel
 	{
 		static ImageSourceConverter ISC = new ImageSourceConverter();

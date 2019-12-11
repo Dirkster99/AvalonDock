@@ -1,6 +1,6 @@
 ﻿namespace MLibTest.Demos.Demos.Converters
 {
-	using AvalonDock.MVVMTestApp;
+	using MLibTest.Demos.ViewModels.AD;
 	using System;
 	using System.Windows.Data;
 

@@ -2,7 +2,7 @@
 {
 	using System.Windows.Controls;
 	using System.Windows;
-	using AvalonDock.MVVMTestApp;
+	using MLibTest.Demos.ViewModels.AD;
 
 	class PanesStyleSelector : StyleSelector
 	{

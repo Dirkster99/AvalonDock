@@ -8,16 +8,16 @@
         xmlns:MWindow="clr-namespace:MWindowLib;assembly=MWindowLib"
         xmlns:demos="clr-namespace:MLibTest.Demos"
         xmlns:demoviews="clr-namespace:MLibTest.Demos.Views"
-        xmlns:advConv="clr-namespace:Xceed.Wpf.AvalonDock.Converters;assembly=Xceed.Wpf.AvalonDock"
+        xmlns:advConv="clr-namespace:AvalonDock.Converters;assembly=AvalonDock"
         
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
 	<Grid xmlns:bindLocal="clr-namespace:MLibTest.Demos"
           xmlns:ThemeBehav="clr-namespace:MLib.Behaviors;assembly=MLib"
           
-          xmlns:avalonDock="clr-namespace:Xceed.Wpf.AvalonDock;assembly=Xceed.Wpf.AvalonDock"
-          xmlns:avalonDockControls="clr-namespace:Xceed.Wpf.AvalonDock.Controls;assembly=Xceed.Wpf.AvalonDock"
-          xmlns:avalonDockLayout="clr-namespace:Xceed.Wpf.AvalonDock.Layout;assembly=Xceed.Wpf.AvalonDock"
+          xmlns:avalonDock="clr-namespace:AvalonDock;assembly=AvalonDock"
+          xmlns:avalonDockControls="clr-namespace:AvalonDock.Controls;assembly=AvalonDock"
+          xmlns:avalonDockLayout="clr-namespace:AvalonDock.Layout;assembly=AvalonDock"
           xmlns:conv="clr-namespace:MLibTest.Demos.Demos.Converters"
         >
 		<Grid.Resources>

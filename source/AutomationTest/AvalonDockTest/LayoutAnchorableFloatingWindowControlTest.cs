@@ -4,7 +4,7 @@
 
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-	using Xceed.Wpf.AvalonDock.Layout.Serialization;
+	using AvalonDock.Layout.Serialization;
 	using AvalonDockTest.TestHelpers;
 	using AvalonDockTest.Views;
 

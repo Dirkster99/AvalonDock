@@ -5,10 +5,10 @@
     using System.Linq;
     using System.Reflection;
     using System.Windows.Forms;
-    using Xceed.Wpf.AvalonDock;
-    using Xceed.Wpf.AvalonDock.Layout;
-    using Xceed.Wpf.AvalonDock.Layout.Serialization;
-    using Xceed.Wpf.AvalonDock.Themes;
+    using AvalonDock;
+    using AvalonDock.Layout;
+    using AvalonDock.Layout.Serialization;
+    using AvalonDock.Themes;
 
     public partial class FormMain : Form
     {
@@ -60,43 +60,43 @@
 
         private void menuItemVS2010_Click(object sender, EventArgs e)
         {
-            _dockingManager.Theme = new Xceed.Wpf.AvalonDock.Themes.VS2010Theme();
+            _dockingManager.Theme = new AvalonDock.Themes.VS2010Theme();
             this.SetChecked(menuItemVS2010);
         }
 
         private void menuItemMetro_Click(object sender, EventArgs e)
         {
-            _dockingManager.Theme = new Xceed.Wpf.AvalonDock.Themes.MetroTheme();
+            _dockingManager.Theme = new AvalonDock.Themes.MetroTheme();
             this.SetChecked(menuItemMetro);
         }
 
         private void menuItemGeneric_Click(object sender, EventArgs e)
         {
-            _dockingManager.Theme = new Xceed.Wpf.AvalonDock.Themes.GenericTheme();
+            _dockingManager.Theme = new AvalonDock.Themes.GenericTheme();
             this.SetChecked(menuItemGeneric);
         }
 
         private void menuItemExpressionDark_Click(object sender, EventArgs e)
         {
-            _dockingManager.Theme = new Xceed.Wpf.AvalonDock.Themes.ExpressionDarkTheme();
+            _dockingManager.Theme = new AvalonDock.Themes.ExpressionDarkTheme();
             this.SetChecked(menuItemExpressionDark);
         }
 
         private void menuItemExpressionLight_Click(object sender, EventArgs e)
         {
-            _dockingManager.Theme = new Xceed.Wpf.AvalonDock.Themes.ExpressionLightTheme();
+            _dockingManager.Theme = new AvalonDock.Themes.ExpressionLightTheme();
             this.SetChecked(menuItemExpressionLight);
         }
 
         private void vS2013ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            _dockingManager.Theme = new Xceed.Wpf.AvalonDock.Themes.Vs2013LightTheme();
+            _dockingManager.Theme = new AvalonDock.Themes.Vs2013LightTheme();
             this.SetChecked(menuItemVs2013);
         }
 
         private void menuItemAero_Vs2013Dark(object sender, EventArgs e)
         {
-            _dockingManager.Theme = new Xceed.Wpf.AvalonDock.Themes.Vs2013DarkTheme();
+            _dockingManager.Theme = new AvalonDock.Themes.Vs2013DarkTheme();
             this.SetChecked(menuItemVS2013Dark);
         }
 
@@ -113,7 +113,7 @@
 
         private void menuItemAero_Click(object sender, EventArgs e)
         {
-            _dockingManager.Theme = new Xceed.Wpf.AvalonDock.Themes.AeroTheme();
+            _dockingManager.Theme = new AvalonDock.Themes.AeroTheme();
             this.SetChecked(menuItemAero);
         }
     }

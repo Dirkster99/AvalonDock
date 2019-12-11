@@ -1,9 +1,9 @@
 ﻿namespace MLibTest.Demos.ViewModels
 {
-	using AvalonDock.MVVMTestApp;
 	using AvalonDock.Tools;
 	using Microsoft.Win32;
-	using MLibTest.Demos.ViewModels.Interfaces;
+    using MLibTest.Demos.ViewModels.AD;
+    using MLibTest.Demos.ViewModels.Interfaces;
 	using MLibTest.ViewModels.Base;
 	using MWindowInterfacesLib.MsgBox.Enums;
 	using System;

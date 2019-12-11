@@ -1,4 +1,4 @@
-﻿namespace AvalonDock.MVVMTestApp
+﻿namespace MLibTest.Demos.ViewModels.AD
 {
 	internal class ToolViewModel : PaneViewModel
 	{

@@ -1,6 +1,6 @@
 ﻿namespace MLibTest.Demos.ViewModels.Interfaces
 {
-	using AvalonDock.MVVMTestApp;
+	using MLibTest.Demos.ViewModels.AD;
 	using System;
 	using System.Collections.Generic;
 
