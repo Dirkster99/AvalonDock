@@ -24,7 +24,7 @@ using System.Windows.Interop;
 using System.Windows.Input;
 using System.Diagnostics;
 
-namespace AvalonDock.TestApp
+namespace TestApp
 {
     /// <summary>
     /// Interaction logic for App.xaml

@@ -27,7 +27,7 @@ using System.IO;
 using Xceed.Wpf.AvalonDock.Layout.Serialization;
 using Xceed.Wpf.AvalonDock;
 
-namespace AvalonDock.TestApp
+namespace TestApp
 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml

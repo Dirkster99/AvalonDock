@@ -17,12 +17,12 @@
 -->
 
 <Window
-	x:Class="AvalonDock.TestApp.MainWindow"
+	x:Class="TestApp.MainWindow"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:avalonDock="http://schemas.xceed.com/wpf/xaml/avalondock"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:local="clr-namespace:AvalonDock.TestApp"
+	xmlns:local="clr-namespace:TestApp"
 	xmlns:winformsIntegration="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
 	Title="MainWindow"
 	Width="525"
@@ -100,7 +100,7 @@
 							<avalonDock:LayoutDocument
 								Title="Document 1"
 								ContentId="document1"
-								IconSource="/AvalonDock.TestApp;component/Images/alarm-clock-blue.png">
+								IconSource="/TestApp;component/Images/alarm-clock-blue.png">
 								<StackPanel>
 									<TextBox Text="Document 1 Content" />
 									<Button Click="AddTwoDocuments_click" Content="Click to add 2 documents" />
@@ -135,7 +135,7 @@
 							<avalonDock:LayoutAnchorable
 								Title="AutoHide1 Content"
 								ContentId="AutoHide1Content"
-								IconSource="/AvalonDock.TestApp;component/Images/address-book--pencil.png">
+								IconSource="/TestApp;component/Images/address-book--pencil.png">
 								<TextBox Text="{Binding TestTimer, Mode=OneWay, StringFormat='AutoHide Attached to Timer ->\{0\}'}" />
 							</avalonDock:LayoutAnchorable>
 							<avalonDock:LayoutAnchorable Title="AutoHide2 Content" ContentId="AutoHide2Content">

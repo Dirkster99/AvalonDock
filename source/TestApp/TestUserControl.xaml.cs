@@ -17,7 +17,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace AvalonDock.TestApp
+namespace TestApp
 {
 	/// <summary>
 	/// Interaction logic for TestUserControl.xaml

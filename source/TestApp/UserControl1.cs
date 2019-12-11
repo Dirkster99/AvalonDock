@@ -23,7 +23,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace AvalonDock.TestApp
+namespace TestApp
 {
     public partial class UserControl1 : UserControl
     {

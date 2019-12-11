@@ -14,7 +14,7 @@
 
   **********************************************************************/
 
-namespace AvalonDock.TestApp
+namespace TestApp
 {
     partial class UserControl1
     {
