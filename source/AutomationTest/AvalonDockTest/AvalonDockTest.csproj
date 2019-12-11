@@ -95,7 +95,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Components\Xceed.Wpf.AvalonDock\AvalonDock.csproj">
+    <ProjectReference Include="..\..\Components\AvalonDock\AvalonDock.csproj">
       <Project>{db81988f-e0f2-45a0-a1fd-8c37f3d35244}</Project>
       <Name>AvalonDock</Name>
     </ProjectReference>

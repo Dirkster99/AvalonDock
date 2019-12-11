@@ -30,6 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Xceed.Wpf.AvalonDock\AvalonDock.csproj" />
+    <ProjectReference Include="..\AvalonDock\AvalonDock.csproj" />
   </ItemGroup>
 </Project>

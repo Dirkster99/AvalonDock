@@ -15,11 +15,11 @@
     <Description>This assembly implements a docking layout system for WPF.</Description>
     <PackageProjectUrl>https://github.com/Dirkster99/AvalonDock</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Dirkster99/AvalonDock</RepositoryUrl>
-    <PackageId>Dirkster.AvalonDock.Themes.VS2013</PackageId>
+    <PackageId>Dirkster.AvalonDock.Themes.Metro</PackageId>
     <Authors>https://github.com/Dirkster99/AvalonDock</Authors>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <Resource Include="**\*.png" />
   </ItemGroup>
@@ -30,6 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Xceed.Wpf.AvalonDock\AvalonDock.csproj" />
+    <ProjectReference Include="..\AvalonDock\AvalonDock.csproj" />
   </ItemGroup>
 </Project>
