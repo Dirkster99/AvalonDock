@@ -48,4 +48,4 @@ using System;
 )]
 
 
-[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/avalondock", "Xceed.Wpf.AvalonDock.Themes" )]
+[assembly: XmlnsDefinition( "http://schemas.xceed.com/wpf/xaml/avalondock", "AvalonDock.Themes" )]

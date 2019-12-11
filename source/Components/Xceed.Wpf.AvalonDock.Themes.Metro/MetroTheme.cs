@@ -16,14 +16,14 @@
 
 using System;
 
-namespace Xceed.Wpf.AvalonDock.Themes
+namespace AvalonDock.Themes
 {
 	public class MetroTheme : Theme
 	{
 		public override Uri GetResourceUri()
 		{
 			return new Uri(
-				"/Xceed.Wpf.AvalonDock.Themes.Metro;component/Theme.xaml",
+				"/AvalonDock.Themes.Metro;component/Theme.xaml",
 				UriKind.Relative);
 		}
 	}

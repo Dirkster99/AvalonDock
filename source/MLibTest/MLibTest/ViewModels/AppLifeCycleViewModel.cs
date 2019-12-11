@@ -123,8 +123,8 @@
 			settings.Themes.AddThemeInfo("VS 2013 Blue", new List<Uri> { });
 			settings.Themes.AddThemeInfo("VS 2013 Dark", new List<Uri> { });
 			settings.Themes.AddThemeInfo("VS 2013 Light", new List<Uri> { });
-////
-////			settings.Themes.AddThemeInfo("Metro", new List<Uri> { });
+
+			settings.Themes.AddThemeInfo("Metro", new List<Uri> { });
 ////
 ////			settings.Themes.AddThemeInfo("Expression Dark", new List<Uri> { });
 ////			settings.Themes.AddThemeInfo("Expression Light", new List<Uri> { });
@@ -220,7 +220,7 @@
 			{
 				Debug.WriteLine(exp);
 			}
-/***
+
 			try
 			{
 				// Adding Generic theme (which is really based on Light theme in MLib)
@@ -231,7 +231,7 @@
 					 new Uri("/MLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
 					,new Uri("/MWindowLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
 
-					,new Uri("/Xceed.Wpf.AvalonDock.Themes.Metro;component/Theme.xaml", UriKind.RelativeOrAbsolute)
+					,new Uri("/AvalonDock.Themes.Metro;component/Theme.xaml", UriKind.RelativeOrAbsolute)
 					,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
 				}, settings.Themes);
@@ -240,7 +240,7 @@
 			{
 				Debug.WriteLine(exp);
 			}
-
+/***
 			try
 			{
 				// Adding Generic theme (which is really based on Light theme in MLib)
