@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!--ProjectReference Include="..\..\Components\Xceed.Wpf.AvalonDock.Themes.Expression\Xceed.Wpf.AvalonDock.Themes.Expression.csproj" /-->
+    <ProjectReference Include="..\..\Components\Xceed.Wpf.AvalonDock.Themes.Expression\AvalonDock.Themes.Expression.csproj" />
     <ProjectReference Include="..\..\Components\Xceed.Wpf.AvalonDock.Themes.Metro\AvalonDock.Themes.Metro.csproj" />
     <ProjectReference Include="..\..\Components\Xceed.Wpf.AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj" />
     <ProjectReference Include="..\..\Components\Xceed.Wpf.AvalonDock\AvalonDock.csproj" />

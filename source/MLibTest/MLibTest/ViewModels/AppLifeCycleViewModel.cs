@@ -125,9 +125,9 @@
 			settings.Themes.AddThemeInfo("VS 2013 Light", new List<Uri> { });
 
 			settings.Themes.AddThemeInfo("Metro", new List<Uri> { });
-////
-////			settings.Themes.AddThemeInfo("Expression Dark", new List<Uri> { });
-////			settings.Themes.AddThemeInfo("Expression Light", new List<Uri> { });
+
+			settings.Themes.AddThemeInfo("Expression Dark", new List<Uri> { });
+			settings.Themes.AddThemeInfo("Expression Light", new List<Uri> { });
 
 			try
 			{
@@ -240,7 +240,7 @@
 			{
 				Debug.WriteLine(exp);
 			}
-/***
+
 			try
 			{
 				// Adding Generic theme (which is really based on Light theme in MLib)
@@ -251,7 +251,7 @@
 					 new Uri("/MLib;component/Themes/LightTheme.xaml", UriKind.RelativeOrAbsolute)
 					,new Uri("/MWindowLib;component/Themes/Generic.xaml", UriKind.RelativeOrAbsolute)
 
-					,new Uri("/Xceed.Wpf.AvalonDock.Themes.Expression;component/LightTheme.xaml", UriKind.RelativeOrAbsolute)
+					,new Uri("/AvalonDock.Themes.Expression;component/LightTheme.xaml", UriKind.RelativeOrAbsolute)
 					,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
 
 				}, settings.Themes);
@@ -273,7 +273,7 @@
 					,new Uri("/ColorPickerLib;component/Themes/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
 					,new Uri("/NumericUpDownLib;component/Themes/DarkBrushs.xaml", UriKind.RelativeOrAbsolute)
 
-					,new Uri("/Xceed.Wpf.AvalonDock.Themes.Expression;component/DarkTheme.xaml", UriKind.RelativeOrAbsolute)
+					,new Uri("/AvalonDock.Themes.Expression;component/DarkTheme.xaml", UriKind.RelativeOrAbsolute)
 					,new Uri("/MLibTest;component/BindToMLib/MWindowLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
 					,new Uri("/MLibTest;component/BindToMLib/ColorPickerLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
 					,new Uri("/MLibTest;component/BindToMLib/NumericUpDownLib_DarkLightBrushs.xaml", UriKind.RelativeOrAbsolute)
@@ -284,7 +284,6 @@
 			{
 				Debug.WriteLine(exp);
 			}
-***/
 
 			appearance.SetDefaultTheme(settings.Themes, "VS 2013 Dark");
 

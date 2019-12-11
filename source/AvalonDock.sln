@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AvalonDock", "AvalonDock", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvalonDock", "Components\Xceed.Wpf.AvalonDock\AvalonDock.csproj", "{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.Themes.Expression", "Components\Xceed.Wpf.AvalonDock.Themes.Expression\Xceed.Wpf.AvalonDock.Themes.Expression.csproj", "{488DD8F7-9D3C-4F53-BD1F-84A095D9BC10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvalonDock.Themes.Expression", "Components\Xceed.Wpf.AvalonDock.Themes.Expression\AvalonDock.Themes.Expression.csproj", "{488DD8F7-9D3C-4F53-BD1F-84A095D9BC10}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvalonDock.Themes.Metro", "Components\Xceed.Wpf.AvalonDock.Themes.Metro\AvalonDock.Themes.Metro.csproj", "{89286EB4-B4A1-418C-839A-067B00F442D8}"
 EndProject
