@@ -16,14 +16,14 @@
 
 using System;
 
-namespace Xceed.Wpf.AvalonDock.Themes
+namespace AvalonDock.Themes
 {
 	public class AeroTheme : Theme
 	{
 		public override Uri GetResourceUri()
 		{
 			return new Uri(
-				"/Xceed.Wpf.AvalonDock.Themes.Aero;component/Theme.xaml",
+				"/AvalonDock.Themes.Aero;component/Theme.xaml",
 				UriKind.Relative);
 		}
 	}

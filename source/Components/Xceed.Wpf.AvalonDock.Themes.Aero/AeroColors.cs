@@ -16,7 +16,7 @@
 
 using System.Windows;
 
-namespace Xceed.Wpf.AvalonDock.Themes
+namespace AvalonDock.Themes
 {
 	public static class AeroColors
 	{
