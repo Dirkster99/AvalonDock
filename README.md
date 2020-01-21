@@ -124,7 +124,9 @@ to also theme standard elements, such as, button and textblock etc.
 - [Resolve #98 with floating window without a content #99](https://github.com/Dirkster99/AvalonDock/pull/99) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
 - Changed coding style to using TABS as indentation
-- [Changed namespaces to AvalonDock (as authored originally in version 2.0 ans earlier)](https://github.com/Dirkster99/AvalonDock/pull/102)
+- [Changed namespaces to AvalonDock (as authored originally in version 2.0 and earlier)](https://github.com/Dirkster99/AvalonDock/pull/102)
+
+- [Fix #101 and new fix for #81 with docked pane becomes not visible.](https://github.com/Dirkster99/AvalonDock/issues/101) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
 ## Patch History for AvalonDock 3.6.2
 - [Fixed issue #92 Always update floating properties](https://github.com/Dirkster99/AvalonDock/issues/92) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
