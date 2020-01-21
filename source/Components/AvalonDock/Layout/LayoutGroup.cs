@@ -268,7 +268,17 @@ namespace AvalonDock.Layout
 
 			ComputeVisibility();
 			OnChildrenCollectionChanged();
-			NotifyChildrenTreeChanged(ChildrenTreeChange.DirectChildrenChanged);
+
+			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+			{
+				// #81 - Make parents update their children up the tree. Otherwise, they will not be redrawn.
+				RaiseChildrenTreeChanged();
+			}
+			else
+			{
+				NotifyChildrenTreeChanged(ChildrenTreeChange.DirectChildrenChanged);
+			}
+
 			RaisePropertyChanged("ChildrenCount");
 		}
 
