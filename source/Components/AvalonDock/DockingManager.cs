@@ -77,6 +77,22 @@ namespace AvalonDock
 
 		#region Properties
 
+		// Make autohide delay a configurable property
+        public static readonly DependencyProperty AutoHideDelayProperty = DependencyProperty.Register("AutoHideDelay", typeof(int), typeof(DockingManager),
+            new FrameworkPropertyMetadata(1500));
+
+        public int AutoHideDelay 
+        {
+            get 
+            {
+                return (int)GetValue(AutoHideDelayProperty);
+            }
+            set 
+            {
+				SetValue(AutoHideDelayProperty, value);
+            }
+        }
+
 		#region Layout
 
 		/// <summary>
