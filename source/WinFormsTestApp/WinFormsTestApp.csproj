@@ -13,12 +13,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock.Themes.Aero\Xceed.Wpf.AvalonDock.Themes.Aero.csproj" />
-    <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock.Themes.Expression\Xceed.Wpf.AvalonDock.Themes.Expression.csproj" />
-    <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock.Themes.Metro\Xceed.Wpf.AvalonDock.Themes.Metro.csproj" />
-    <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock.Themes.VS2010\Xceed.Wpf.AvalonDock.Themes.VS2010.csproj" />
-    <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock.Themes.VS2013\Xceed.Wpf.AvalonDock.Themes.VS2013.csproj" />
-    <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.csproj" />
+    <ProjectReference Include="..\Components\AvalonDock.Themes.Aero\AvalonDock.Themes.Aero.csproj" />
+    <ProjectReference Include="..\Components\AvalonDock.Themes.Expression\AvalonDock.Themes.Expression.csproj" />
+    <ProjectReference Include="..\Components\AvalonDock.Themes.Metro\AvalonDock.Themes.Metro.csproj" />
+    <ProjectReference Include="..\Components\AvalonDock.Themes.VS2010\AvalonDock.Themes.VS2010.csproj" />
+    <ProjectReference Include="..\Components\AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj" />
+    <ProjectReference Include="..\Components\AvalonDock\AvalonDock.csproj" />
   </ItemGroup>
 
   <ItemGroup>

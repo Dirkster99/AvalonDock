@@ -1,31 +1,31 @@
-﻿using System.Windows.Controls;
-using System.Windows;
-
-namespace AvalonDock.MVVMTestApp
+﻿namespace AvalonDock.MVVMTestApp
 {
-    class PanesStyleSelector : StyleSelector
-    {
-        public Style ToolStyle
-        {
-            get;
-            set;
-        }
+	using System.Windows.Controls;
+	using System.Windows;
 
-        public Style FileStyle
-        {
-            get;
-            set;
-        }
+	class PanesStyleSelector : StyleSelector
+	{
+		public Style ToolStyle
+		{
+			get;
+			set;
+		}
 
-        public override System.Windows.Style SelectStyle(object item, System.Windows.DependencyObject container)
-        {
-            if (item is ToolViewModel)
-                return ToolStyle;
+		public Style FileStyle
+		{
+			get;
+			set;
+		}
 
-            if (item is FileViewModel)
-                return FileStyle;
+		public override System.Windows.Style SelectStyle(object item, System.Windows.DependencyObject container)
+		{
+			if (item is ToolViewModel)
+				return ToolStyle;
 
-            return base.SelectStyle(item, container);
-        }
-    }
+			if (item is FileViewModel)
+				return FileStyle;
+
+			return base.SelectStyle(item, container);
+		}
+	}
 }

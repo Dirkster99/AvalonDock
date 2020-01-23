@@ -8,7 +8,7 @@
     using MLibTest.ViewModels.Base;
     using MLib.Interfaces;
     using Settings.Interfaces;
-    using AvalonDock.MVVMTestApp;
+    using MLibTest.Demos.ViewModels.AD;
 
     /// <summary>
     /// Implements the viewmodel that drives the view a Color Picker tool window.
@@ -127,17 +127,17 @@
                         // 3 You could also use something like this to change accent color
                         // If you were using your own Theming Framework or MUI, Mahapps etc
                         //
-////                        Application.Current.Resources[MWindowLib.Themes.ResourceKeys.ControlAccentColorKey] = accentColor;
-////                        Application.Current.Resources[MWindowLib.Themes.ResourceKeys.ControlAccentBrushKey] = new SolidColorBrush(accentColor);
-////
-////                        Application.Current.Resources[MLib.Themes.ResourceKeys.ControlAccentColorKey] = accentColor;
-////                        Application.Current.Resources[MLib.Themes.ResourceKeys.ControlAccentBrushKey] = new SolidColorBrush(accentColor);
-////
-////                        Application.Current.Resources[Xceed.Wpf.AvalonDock.Themes.VS2013.Themes.ResourceKeys.ControlAccentColorKey] = accentColor;
-////                        Application.Current.Resources[Xceed.Wpf.AvalonDock.Themes.VS2013.Themes.ResourceKeys.ControlAccentBrushKey] = new SolidColorBrush(accentColor);
-////
-////                        Application.Current.Resources[NumericUpDownLib.Themes.ResourceKeys.ControlAccentColorKey] = accentColor;
-////                        Application.Current.Resources[NumericUpDownLib.Themes.ResourceKeys.ControlAccentBrushKey] = new SolidColorBrush(accentColor);
+                        ////                        Application.Current.Resources[MWindowLib.Themes.ResourceKeys.ControlAccentColorKey] = accentColor;
+                        ////                        Application.Current.Resources[MWindowLib.Themes.ResourceKeys.ControlAccentBrushKey] = new SolidColorBrush(accentColor);
+                        ////
+                        ////                        Application.Current.Resources[MLib.Themes.ResourceKeys.ControlAccentColorKey] = accentColor;
+                        ////                        Application.Current.Resources[MLib.Themes.ResourceKeys.ControlAccentBrushKey] = new SolidColorBrush(accentColor);
+                        ////
+                        ////                        Application.Current.Resources[AvalonDock.Themes.VS2013.Themes.ResourceKeys.ControlAccentColorKey] = accentColor;
+                        ////                        Application.Current.Resources[AvalonDock.Themes.VS2013.Themes.ResourceKeys.ControlAccentBrushKey] = new SolidColorBrush(accentColor);
+                        ////
+                        ////                        Application.Current.Resources[NumericUpDownLib.Themes.ResourceKeys.ControlAccentColorKey] = accentColor;
+                        ////                        Application.Current.Resources[NumericUpDownLib.Themes.ResourceKeys.ControlAccentBrushKey] = new SolidColorBrush(accentColor);
 
                     });
                 }

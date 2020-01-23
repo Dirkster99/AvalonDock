@@ -8,25 +8,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Projects", "Test Proje
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AvalonDock", "AvalonDock", "{B0EB64E3-2C25-46CC-BBB6-E38EF2584177}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock", "Components\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.csproj", "{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvalonDock", "Components\AvalonDock\AvalonDock.csproj", "{DB81988F-E0F2-45A0-A1FD-8C37F3D35244}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.Themes.Expression", "Components\Xceed.Wpf.AvalonDock.Themes.Expression\Xceed.Wpf.AvalonDock.Themes.Expression.csproj", "{488DD8F7-9D3C-4F53-BD1F-84A095D9BC10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvalonDock.Themes.Expression", "Components\AvalonDock.Themes.Expression\AvalonDock.Themes.Expression.csproj", "{488DD8F7-9D3C-4F53-BD1F-84A095D9BC10}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.Themes.Metro", "Components\Xceed.Wpf.AvalonDock.Themes.Metro\Xceed.Wpf.AvalonDock.Themes.Metro.csproj", "{89286EB4-B4A1-418C-839A-067B00F442D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvalonDock.Themes.Metro", "Components\AvalonDock.Themes.Metro\AvalonDock.Themes.Metro.csproj", "{89286EB4-B4A1-418C-839A-067B00F442D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.Themes.VS2013", "Components\Xceed.Wpf.AvalonDock.Themes.VS2013\Xceed.Wpf.AvalonDock.Themes.VS2013.csproj", "{BD7EEE0E-9432-4E76-BD82-793358E56BDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvalonDock.Themes.VS2013", "Components\AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj", "{BD7EEE0E-9432-4E76-BD82-793358E56BDF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MLibTest_Components", "MLibTest_Components", "{72045D3A-A982-4C69-8FB8-6B601363D7ED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Settings", "MLibTest\MLibTest_Components\Settings\Settings\Settings.csproj", "{2807B493-CC2E-402E-901A-EB138698FEDC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.Themes.VS2010", "Components\Xceed.Wpf.AvalonDock.Themes.VS2010\Xceed.Wpf.AvalonDock.Themes.VS2010.csproj", "{B3FC3E21-5F2D-4581-AEA2-59F671CFFC21}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvalonDock.Themes.VS2010", "Components\AvalonDock.Themes.VS2010\AvalonDock.Themes.VS2010.csproj", "{B3FC3E21-5F2D-4581-AEA2-59F671CFFC21}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xceed.Wpf.AvalonDock.Themes.Aero", "Components\Xceed.Wpf.AvalonDock.Themes.Aero\Xceed.Wpf.AvalonDock.Themes.Aero.csproj", "{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvalonDock.Themes.Aero", "Components\AvalonDock.Themes.Aero\AvalonDock.Themes.Aero.csproj", "{BA72CCE0-A9FB-4995-B496-7FEC5C87B85B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutomationTest", "AutomationTest", "{20876020-CC7D-46BD-9B80-E4F01FC0FD31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xceed.Wpf.AvalonDock.Test", "AutomationTest\Xceed.Wpf.AvalonDock.Test\Xceed.Wpf.AvalonDock.Test.csproj", "{FE4E16A2-876A-4356-9974-8A89C50B2A5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvalonDockTest", "AutomationTest\AvalonDockTest\AvalonDockTest.csproj", "{FE4E16A2-876A-4356-9974-8A89C50B2A5A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceLocator", "MLibTest\MLibTest_Components\ServiceLocator\ServiceLocator.csproj", "{38F7F15D-2F13-49E4-B4E6-B9552072AFCD}"
 EndProject
@@ -36,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MLibTest", "MLibTest\MLibTe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVVMTestApp", "MVVMTestApp\MVVMTestApp.csproj", "{3B75DEA1-F1B2-403C-AB74-C108EDB45EF2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsTestApp", "WinFormsTestApp\WinFormsTestApp.csproj", "{2433B8AF-0788-4C86-8FDD-E3BCB62E2157}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsTestApp", "WinFormsTestApp\WinFormsTestApp.csproj", "{2433B8AF-0788-4C86-8FDD-E3BCB62E2157}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

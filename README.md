@@ -40,24 +40,17 @@ PhotoShop and so forth. Here are some CodeProject articles:
 * [AvalonDock [2.0] Tutorial Part 4 - Integrating AvalonEdit Options](https://www.codeproject.com/Articles/570324/AvalonDock-Tutorial-Part-Integrating-AvalonE)
 * [AvalonDock [2.0] Tutorial Part 5 - Load/Save Layout with De-Referenced DockingManager](https://www.codeproject.com/Articles/719143/AvalonDock-Tutorial-Part-Load-Save-Layout)
 
-This repository contains **additional bug fixes and a feature added** fork from:
-https://github.com/xceedsoftware/wpftoolkit
+This repository contains **additional bug fixes and a feature added** fork for:
+xceedsoftware/wpftoolkit version **3.2-3.6**. But most importantly, the usage of this AvalonDock project remains free for both, comercial and open source users.
+
+There is also an open source repository https://github.com/dotnetprojects/WpfExtendedToolkit with a fixed and stable version of all other (other than AvalonDock) components from the WPFToolKit.
 
 Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">Wiki for more details</a>.
 
-
 ## Building AvalonDock from Source
 
-This project supports multitargeting frameworks (NetCore 3 and .Net 4). This means that any commit before
-[Merge pull request #65 from jogibear9988/master ](https://github.com/Dirkster99/AvalonDock/commit/d85b297bf32bc16f01bd3f898a1ee2acc9e2f71c)
-should build with Visual Studio 2017 Comunity or higher.
-
-The commit [Merge pull request #65 from jogibear9988/master ](https://github.com/Dirkster99/AvalonDock/commit/d85b297bf32bc16f01bd3f898a1ee2acc9e2f71c)
-and any commit after requires **VS 2019 Community** and **NetCore 3 Preview 8 (or later)** for a succesful build from source.
-
-# Stable WPF Toolkit Open Source Version
-
-There is also an open source repository https://github.com/dotnetprojects/WpfExtendedToolkit with a fixed and stable version of all other (other than AvalonDock) components from the WPFToolKit.
+This project supports multitargeting frameworks (NetCore 3 and .Net 4). This means that it requires
+Visual Studio Community 2019 or better to build.
 
 # Feature Added - Dark and Light VS 2013 Theme
 
@@ -126,11 +119,31 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## In MAster but not released, yet
+## In Master branch but not yet released
+
+- [Resolve #98 with floating window without a content #99](https://github.com/Dirkster99/AvalonDock/pull/99) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
+
+- Changed coding style to using TABS as indentation
+- [Changed namespaces to AvalonDock (as authored originally in version 2.0 and earlier)](https://github.com/Dirkster99/AvalonDock/pull/102)
+
+- [Fix #101 and new fix for #81 with docked pane becomes not visible.](https://github.com/Dirkster99/AvalonDock/issues/101) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
+
+## Patch History for AvalonDock 3.6.2
+- [Fixed issue #92 Always update floating properties](https://github.com/Dirkster99/AvalonDock/issues/92) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
+
+- [Fixed issue #95 AvalonDock: Autohidden Anchorable appears totally invisible after dragging](https://github.com/Dirkster99/AvalonDock/issues/95)
+
+- [System.ArgumentOutOfRangeException in LayoutAnchorableTabItem.OnMouseEnter line](https://github.com/Dirkster99/AvalonDock/issues/90) Thanx to [sharpSteff](https://github.com/sharpSteff)
+
+## Patch History for AvalonDock 3.6.1
 
 - [Fixed issue #81 with docked pane becomes not visible (overlapped)](https://github.com/Dirkster99/AvalonDock/pull/82) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
 - [Fixed issue #83 with LayoutDocument disappearance](https://github.com/Dirkster99/AvalonDock/pull/84) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
+
+- [Fixed InvalidOperationException when deserializing layout](https://github.com/Dirkster99/AvalonDock/issues/59) [@dirkster](https://github.com/Dirkster99/AvalonDock/pull/86)
+
+- [Fixed LayoutRoot implementation of IXmlSerializable.ReadXml to read the end element](https://github.com/Dirkster99/AvalonDock/issues/88) thanx to [prmartinuk](https://github.com/prmartinuk)
 
 ## Patch History for AvalonDock Version 3.6
 

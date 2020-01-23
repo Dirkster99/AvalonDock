@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
     <PropertyGroup>
-        <RootNamespace>AvalonDock.TestApp</RootNamespace>
+        <RootNamespace>TestApp</RootNamespace>
         <TargetFrameworks>netcoreapp3.0;net40</TargetFrameworks>
         <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
@@ -8,15 +8,12 @@
         <OutputType>WinExe</OutputType>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <StartupObject />
-        <AssemblyName>AvalonDock.TestApp</AssemblyName>
+        <AssemblyName>TestApp</AssemblyName>
        </PropertyGroup>
     <ItemGroup>
         <Resource Include="**\*.png" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\Components\Xceed.Wpf.AvalonDock\Xceed.Wpf.AvalonDock.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <Reference Include="WindowsFormsIntegration" />
+      <ProjectReference Include="..\Components\AvalonDock\AvalonDock.csproj" />
     </ItemGroup>
 </Project>

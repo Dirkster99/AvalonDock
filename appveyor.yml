@@ -1,11 +1,11 @@
-version: 3.5.{build}
+version: 4.0.{build}
 
 branches:
 
   only:
   - master
 
-image: Visual Studio 2019 Preview
+image: Visual Studio 2019
 
 configuration: Release
 
@@ -35,20 +35,20 @@ artifacts:
 - path: source\MLibTest\MLibTest\bin\Release
   name: MLibTest
 
-- path: source\Components\Xceed.Wpf.AvalonDock\bin\Release
+- path: source\Components\AvalonDock\bin\Release
   name: Dirkster.AvalonDock
 
-- path: source\Components\Xceed.Wpf.AvalonDock.Themes.VS2013\bin\Release
+- path: source\Components\AvalonDock.Themes.VS2013\bin\Release
   name: Dirkster.AvalonDock.Themes.VS2013
 
-- path: source\Components\Xceed.Wpf.AvalonDock.Themes.Aero\bin\Release
+- path: source\Components\AvalonDock.Themes.Aero\bin\Release
   name: Dirkster.AvalonDock.Themes.Aero
 
-- path: source\Components\Xceed.Wpf.AvalonDock.Themes.Expression\bin\Release
+- path: source\Components\AvalonDock.Themes.Expression\bin\Release
   name: Dirkster.AvalonDock.Themes.Expression
 
-- path: source\Components\Xceed.Wpf.AvalonDock.Themes.Metro\bin\Release
+- path: source\Components\AvalonDock.Themes.Metro\bin\Release
   name: Dirkster.AvalonDock.Themes.Metro
 
-- path: source\Components\Xceed.Wpf.AvalonDock.Themes.VS2010\bin\Release
+- path: source\Components\AvalonDock.Themes.VS2010\bin\Release
   name: Dirkster.AvalonDock.Themes.VS2010
