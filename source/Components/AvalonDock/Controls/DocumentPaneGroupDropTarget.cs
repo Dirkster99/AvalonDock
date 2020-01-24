@@ -44,8 +44,8 @@ namespace AvalonDock.Controls
 					#region DropTargetType.DocumentPaneGroupDockInside
 					{
 						var paneGroupModel = targetModel as LayoutDocumentPaneGroup;
-						var paneModel = paneGroupModel.Children[0] as LayoutDocumentPane;
-						var sourceModel = floatingWindow.RootDocument;
+						var paneModel = paneGroupModel as LayoutDocumentPaneGroup;
+						var sourceModel = floatingWindow.RootPanel as LayoutDocumentPaneGroup;
 
 						paneModel.Children.Insert(0, sourceModel);
 					}
