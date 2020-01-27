@@ -20,7 +20,6 @@ namespace AvalonDock.Controls
 	{
 		#region Members
 
-		private List<object> _logicalChildren = new List<object>();
 		private LayoutDocumentPane _model;
 
 		#endregion
@@ -61,22 +60,6 @@ namespace AvalonDock.Controls
 		#endregion
 
 		#region Overrides
-
-		protected override System.Collections.IEnumerator LogicalChildren
-		{
-			get
-			{
-				return _logicalChildren.GetEnumerator();
-			}
-		}
-
-		protected override void OnSelectionChanged(SelectionChangedEventArgs e)
-		{
-			base.OnSelectionChanged(e);
-
-			if (_model.SelectedContent != null)
-				_model.SelectedContent.IsActive = true;
-		}
 
 		protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
 		{

@@ -891,7 +891,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <ContentPresenter Content="{Binding Model.RootDocument, RelativeSource={RelativeSource TemplatedParent}}" 
+										<ContentPresenter Content="{Binding Model.SinglePane.SelectedContent, RelativeSource={RelativeSource TemplatedParent}}" 
                                                   ContentTemplate="{Binding Model.Root.Manager.DocumentTitleTemplate, RelativeSource={RelativeSource TemplatedParent}}"
                                                   ContentTemplateSelector="{Binding Model.Root.Manager.DocumentTitleTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"/>
 
@@ -907,7 +907,7 @@
                                             VerticalContentAlignment="Center"
                                             HorizontalContentAlignment="Center"
                                             DropDownContextMenu="{Binding Model.Root.Manager.DocumentContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
-                                            DropDownContextMenuDataContext="{Binding Path=RootDocumentLayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
+                                            DropDownContextMenuDataContext="{Binding Path=SingleContentLayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Document_CxMenu_Hint}">
                                             <Image x:Name="PART_ImgPinMenu" Stretch="None" Source="/AvalonDock.Themes.Expression;component/Images/PinMenu.png" Width="13"/>
                                         </avalonDockControls:DropDownButton>
@@ -944,7 +944,7 @@
                                             Focusable="False"
                                             Style="{StaticResource AvalonDock_Expression_ButtonStyle}"
                                             Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                                            Command="{Binding Path=RootDocumentLayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                            Command="{Binding Path=SingleContentLayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
                                             Grid.Column="3">
                                             <Image x:Name="PART_ImgPinClose" Source="/AvalonDock.Themes.Expression;component/Images/PinClose.png" Width="13" />

@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Markup;
+using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
@@ -102,20 +103,6 @@ namespace AvalonDock.Layout
 
 		#endregion
 
-		#region ChildrenSorted
-
-		public IEnumerable<LayoutContent> ChildrenSorted
-		{
-			get
-			{
-				var listSorted = this.Children.ToList();
-				listSorted.Sort();
-				return listSorted;
-			}
-		}
-
-		#endregion
-
 		#endregion
 
 		#region Overrides
@@ -143,41 +130,49 @@ namespace AvalonDock.Layout
 
 		protected override void OnChildrenCollectionChanged()
 		{
-			if (this.SelectedContentIndex >= this.ChildrenCount)
-				this.SelectedContentIndex = this.Children.Count - 1;
-			if (this.SelectedContentIndex == -1)
+			AutoFixSelectedContent();
+			for (int i = 0; i < Children.Count; i++)
 			{
-				if (this.ChildrenCount > 0)
+				if (Children[i].IsSelected)
 				{
-					if (this.Root == null)
-					{
-						this.SetNextSelectedIndex();
-					}
-					else
-					{
-						var childrenToSelect = this.Children.OrderByDescending(c => c.LastActivationTimeStamp.GetValueOrDefault()).First();
-						this.SelectedContentIndex = this.Children.IndexOf(childrenToSelect);
-						childrenToSelect.IsActive = true;
-					}
-				}
-				else
-				{
-					if (this.Root != null)
-					{
-						this.Root.ActiveContent = null;
-					}
+					SelectedContentIndex = i;
+					break;
 				}
 			}
 
+			RaisePropertyChanged("CanClose");
+			RaisePropertyChanged("CanHide");
+			RaisePropertyChanged("IsDirectlyHostedInFloatingWindow");
 			base.OnChildrenCollectionChanged();
 
-			RaisePropertyChanged("ChildrenSorted");
+			RaisePropertyChanged( "ChildrenSorted" );
 		}
 
-		protected override void OnIsVisibleChanged()
+		[XmlIgnore]
+		bool _autoFixSelectedContent = true;
+		void AutoFixSelectedContent()
 		{
-			this.UpdateParentVisibility();
-			base.OnIsVisibleChanged();
+			if (_autoFixSelectedContent)
+			{
+				if (SelectedContentIndex >= ChildrenCount)
+					SelectedContentIndex = Children.Count - 1;
+
+				if (SelectedContentIndex == -1 && ChildrenCount > 0)
+					SetNextSelectedIndex();
+			}
+		}
+
+		public bool IsDirectlyHostedInFloatingWindow
+		{
+			get
+			{
+				var parentFloatingWindow = this.FindParent<LayoutDocumentFloatingWindow>();
+				if (parentFloatingWindow != null)
+					return parentFloatingWindow.IsSinglePane;
+
+				return false;
+				//return Parent != null && Parent.ChildrenCount == 1 && Parent.Parent is LayoutFloatingWindow;
+			}
 		}
 
 		public override void WriteXml(System.Xml.XmlWriter writer)
@@ -219,7 +214,10 @@ namespace AvalonDock.Layout
 
 		public int IndexOf(LayoutContent content)
 		{
-			return Children.IndexOf(content);
+			var documentChild = content as LayoutDocument;
+			if (documentChild == null)
+				return -1;
+			return Children.IndexOf(documentChild);
 		}
 
 		#endregion
@@ -243,12 +241,49 @@ namespace AvalonDock.Layout
 
 		#region Private Methods
 
-		private void UpdateParentVisibility()
+		internal void UpdateIsDirectlyHostedInFloatingWindow()
 		{
-			var parentPane = this.Parent as ILayoutElementWithVisibility;
-			if (parentPane != null)
-				parentPane.ComputeVisibility();
+			RaisePropertyChanged("IsDirectlyHostedInFloatingWindow");
 		}
+
+		public bool IsHostedInFloatingWindow
+		{
+			get
+			{
+				return this.FindParent<LayoutFloatingWindow>() != null;
+			}
+		}
+		
+		public IEnumerable<LayoutContent> ChildrenSorted
+		{
+			get
+			{
+				var listSorted = Children.ToList();
+				listSorted.Sort();
+				return listSorted;
+			}
+		}
+		
+		protected override void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
+		{
+			var oldGroup = oldValue as ILayoutGroup;
+			if (oldGroup != null)
+				oldGroup.ChildrenCollectionChanged -= new EventHandler(OnParentChildrenCollectionChanged);
+
+			RaisePropertyChanged("IsDirectlyHostedInFloatingWindow");
+
+			var newGroup = newValue as ILayoutGroup;
+			if (newGroup != null)
+				newGroup.ChildrenCollectionChanged += new EventHandler(OnParentChildrenCollectionChanged);
+
+			base.OnParentChanged(oldValue, newValue);
+		}
+
+		void OnParentChildrenCollectionChanged(object sender, EventArgs e)
+		{
+			RaisePropertyChanged("IsDirectlyHostedInFloatingWindow");
+		}
+
 
 		#endregion
 

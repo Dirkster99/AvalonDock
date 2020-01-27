@@ -1680,7 +1680,7 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <ContentPresenter Content="{Binding Model.RootDocument,
+										<ContentPresenter Content="{Binding Model.SinglePane.SelectedContent,
                                                                             RelativeSource={RelativeSource TemplatedParent}}"
                                                           ContentTemplate="{Binding Model.Root.Manager.DocumentTitleTemplate,
                                                                                     RelativeSource={RelativeSource TemplatedParent}}"
@@ -1696,7 +1696,7 @@
                                                                            VerticalContentAlignment="Center"
                                                                            DropDownContextMenu="{Binding Model.Root.Manager.DocumentContextMenu,
                                                                                                          RelativeSource={RelativeSource TemplatedParent}}"
-                                                                           DropDownContextMenuDataContext="{Binding Path=RootDocumentLayoutItem,
+                                                                           DropDownContextMenuDataContext="{Binding Path=SingleContentLayoutItem,
                                                                                                                     RelativeSource={RelativeSource TemplatedParent}}"
                                                                            Focusable="False"
                                                                            Style="{StaticResource AvalonDockThemeVs2013ToolButtonStyle}"
@@ -1759,7 +1759,7 @@
                                                 Grid.Column="3"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
-                                                Command="{Binding Path=RootDocumentLayoutItem.CloseCommand,
+                                                Command="{Binding Path=SingleContentLayoutItem.CloseCommand,
                                                                   RelativeSource={RelativeSource TemplatedParent}}"
                                                 Focusable="False"
                                                 Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"

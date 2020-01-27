@@ -482,6 +482,21 @@ namespace AvalonDock.Layout
 						exitFlag = false;
 						break;
 					}
+					foreach (var emptyPaneGroup in this.Descendents().OfType<LayoutDocumentPane>().Where(p => p.ChildrenCount == 0))
+					{
+						var parentGroup = emptyPaneGroup.Parent as ILayoutContainer;
+						if (!(parentGroup.Parent is LayoutDocumentFloatingWindow)) continue;
+						var index = RootPanel.IndexOfChild(this.Descendents().OfType<LayoutDocumentPaneGroup>().First());
+						parentGroup.RemoveChild(emptyPaneGroup);
+						if (!this.Descendents().OfType<LayoutDocumentPane>().Any())
+						{
+							// Now the last Pane container is deleted, at least one is required for documents to be added.
+							// We did not want to keep an empty window floating, but add a new one to the main window
+							RootPanel.Children.Insert(index < 0 ? 0 : index, emptyPaneGroup);
+						}
+						exitFlag = false;
+						break;
+					}
 				}
 
 				if (!exitFlag)

@@ -253,11 +253,6 @@ namespace AvalonDock.Controls
 
 		public override System.Windows.Media.Geometry GetPreviewPath(OverlayWindow overlayWindow, LayoutFloatingWindow floatingWindowModel)
 		{
-			//var anchorablePaneDropTarget = target as AnchorablePaneDropTarget;
-			var anchorableFloatingWindowModel = floatingWindowModel as LayoutAnchorableFloatingWindow;
-			var layoutAnchorablePane = anchorableFloatingWindowModel.RootPanel as ILayoutPositionableElement;
-			var layoutAnchorablePaneWithActualSize = anchorableFloatingWindowModel.RootPanel as ILayoutPositionableElementWithActualSize;
-
 			switch (Type)
 			{
 				case DropTargetType.AnchorablePaneDockBottom:

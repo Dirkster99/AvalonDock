@@ -186,6 +186,7 @@ namespace AvalonDock.Controls
 		private void GetOverlayWindowHosts()
 		{
 			_overlayWindowHosts.AddRange(_manager.GetFloatingWindowsByZOrder().OfType<LayoutAnchorableFloatingWindowControl>().Where(fw => fw != _floatingWindow && fw.IsVisible));
+			_overlayWindowHosts.AddRange(_manager.GetFloatingWindowsByZOrder().OfType<LayoutDocumentFloatingWindowControl>().Where(fw => fw != _floatingWindow && fw.IsVisible));
 			_overlayWindowHosts.Add(_manager);
 		}
 

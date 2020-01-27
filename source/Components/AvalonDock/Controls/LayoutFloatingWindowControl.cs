@@ -483,8 +483,6 @@ namespace AvalonDock.Controls
 			{
 				IntPtr windowHandle = new WindowInteropHelper(this).Handle;
 				var mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
-				var clientArea = Win32Helper.GetClientRect(windowHandle);
-				var windowArea = Win32Helper.GetWindowRect(windowHandle);
 
 				// BugFix Issue #6
 				// This code is initializes the drag when content (document or toolwindow) is dragged
