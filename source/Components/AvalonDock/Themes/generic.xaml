@@ -1019,7 +1019,6 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
                               </Grid.ColumnDefinitions>
 	                            <Border
 		                            Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -1038,7 +1037,7 @@
                                       Command="{x:Static shell:SystemCommands.MaximizeWindowCommand}"
                                       CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                       ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
-                                      Grid.Column="2">
+                                      Grid.Column="1">
                                 <Image Source="/AvalonDock;component/Themes/Generic/Images/PinMaximize.png">
                                 </Image>
                               </Button>
@@ -1050,18 +1049,18 @@
                                       Command="{x:Static shell:SystemCommands.RestoreWindowCommand}"
                                       CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                       ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
-                                      Grid.Column="2">
+                                      Grid.Column="1">
                                 <Image Source="/AvalonDock;component/Themes/Generic/Images/PinRestore.png">
                                 </Image>
                               </Button>
 
-										<Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
+							  <Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
                                       Focusable="False"
                                       Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                       Command="{Binding Path=CloseWindowCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                       ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
                                       Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                                      Grid.Column="3">
+                                      Grid.Column="2">
                                 <Image Source="/AvalonDock;component/Themes/Generic/Images/PinClose.png">
                                 </Image>
                               </Button>
