@@ -41,7 +41,7 @@ PhotoShop and so forth. Here are some CodeProject articles:
 * [AvalonDock [2.0] Tutorial Part 5 - Load/Save Layout with De-Referenced DockingManager](https://www.codeproject.com/Articles/719143/AvalonDock-Tutorial-Part-Load-Save-Layout)
 
 This repository contains **additional bug fixes and a feature added** fork for:
-xceedsoftware/wpftoolkit version **3.2-3.6**. But most importantly, the usage of this AvalonDock project remains free for both, comercial and open source users.
+xceedsoftware/wpftoolkit version **3.2-3.6**. Version 4.0 and later are developed indepentently, which is why this library (version 4.0 and later) uses the namespaces and library names that were used in AvalonDock 2.0 and earlier versions. But most importantly, the usage of this AvalonDock project remains free for both, commercial and open source users.
 
 There is also an open source repository https://github.com/dotnetprojects/WpfExtendedToolkit with a fixed and stable version of all other (other than AvalonDock) components from the WPFToolKit.
 
@@ -124,9 +124,11 @@ to also theme standard elements, such as, button and textblock etc.
 - [Resolve #98 with floating window without a content #99](https://github.com/Dirkster99/AvalonDock/pull/99) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
 - Changed coding style to using TABS as indentation
-- [Changed namespaces to AvalonDock (as authored originally in version 2.0 and earlier)](https://github.com/Dirkster99/AvalonDock/pull/102)
+- **Breaking Change** [Changed namespaces to AvalonDock (as authored originally in version 2.0 and earlier)](https://github.com/Dirkster99/AvalonDock/pull/102) See also [Issue #108](https://github.com/Dirkster99/AvalonDock/issues/108)
 
 - [Fix #101 and new fix for #81 with docked pane becomes not visible.](https://github.com/Dirkster99/AvalonDock/issues/101) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
+
+- [Feature added: allow documents to be docked in a floating window](https://github.com/Dirkster99/AvalonDock/pull/107) Thanx to [amolf-se](https://github.com/amolf-se) [https://github.com/mkonijnenburg](mkonijnenburg) @ [http://www.amolf.nl](http://www.amolf.nl)
 
 ## Patch History for AvalonDock 3.6.2
 - [Fixed issue #92 Always update floating properties](https://github.com/Dirkster99/AvalonDock/issues/92) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
