@@ -1678,7 +1678,6 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 										<ContentPresenter Content="{Binding Model.SinglePane.SelectedContent,
                                                                             RelativeSource={RelativeSource TemplatedParent}}"
@@ -1687,34 +1686,10 @@
                                                           ContentTemplateSelector="{Binding Model.Root.Manager.DocumentTitleTemplateSelector,
                                                                                             RelativeSource={RelativeSource TemplatedParent}}" />
 
-
-                                        <avalonDockControls:DropDownButton x:Name="ContextMenuDropdownButton"
-                                                                           Grid.Column="1"
-                                                                           HorizontalAlignment="Center"
-                                                                           VerticalAlignment="Center"
-                                                                           HorizontalContentAlignment="Center"
-                                                                           VerticalContentAlignment="Center"
-                                                                           DropDownContextMenu="{Binding Model.Root.Manager.DocumentContextMenu,
-                                                                                                         RelativeSource={RelativeSource TemplatedParent}}"
-                                                                           DropDownContextMenuDataContext="{Binding Path=SingleContentLayoutItem,
-                                                                                                                    RelativeSource={RelativeSource TemplatedParent}}"
-                                                                           Focusable="False"
-                                                                           Style="{StaticResource AvalonDockThemeVs2013ToolButtonStyle}"
-                                                                           ToolTip="{x:Static avalonDockProperties:Resources.Document_CxMenu_Hint}"
-                                                                           shell:WindowChrome.IsHitTestVisibleInChrome="True">
-                                            <Rectangle x:Name="PART_ImgPinMenu"
-                                                       Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
-                                                       Width="13" Height="13">
-                                                <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="/AvalonDock.Themes.VS2013;component/Images/PinMenu.png" />
-                                                </Rectangle.OpacityMask>
-                                            </Rectangle>
-                                        </avalonDockControls:DropDownButton>
-
                                         <Button x:Name="PART_PinMaximize"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
-                                                Grid.Column="2"
+                                                Grid.Column="1"
                                                 Command="{x:Static shell:SystemCommands.MaximizeWindowCommand}"
                                                 CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                                 Focusable="False"
@@ -1736,7 +1711,7 @@
                                         <Button x:Name="PART_PinRestore"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
-                                                Grid.Column="2"
+                                                Grid.Column="1"
                                                 Command="{x:Static shell:SystemCommands.RestoreWindowCommand}"
                                                 CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                                 Focusable="False"
@@ -1756,11 +1731,10 @@
                                         </Button>
 
                                         <Button x:Name="PART_PinClose"
-                                                Grid.Column="3"
+                                                Grid.Column="2"
                                                 HorizontalAlignment="Center"
                                                 VerticalAlignment="Center"
-                                                Command="{Binding Path=SingleContentLayoutItem.CloseCommand,
-                                                                  RelativeSource={RelativeSource TemplatedParent}}"
+                                                Command="{Binding Path=CloseWindowCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                                 Focusable="False"
                                                 Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                                 ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
@@ -1794,14 +1768,14 @@
                         </DataTrigger>
 
                         <!-- Document Well : Tab : Button / Selected, inactive, hovered -->
-                        <MultiDataTrigger>
+                        <!--MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding IsMouseOver, ElementName=ContextMenuDropdownButton}" Value="True" />
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="ContextMenuDropdownButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveHoveredBackground}}" />
                             <Setter TargetName="ContextMenuDropdownButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveHoveredBorder}}" />
                             <Setter TargetName="PART_ImgPinMenu" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveHoveredGlyph}}" />
-                        </MultiDataTrigger>
+                        </MultiDataTrigger-->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding IsMouseOver, ElementName=PART_PinMaximize}" Value="True" />
@@ -1828,22 +1802,22 @@
                         </MultiDataTrigger>
 
                         <!-- Document Well : Tab : Button / Selected, inactive, pressed -->
-                        <MultiDataTrigger>
+                        <!--MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding IsMouseCaptured, ElementName=ContextMenuDropdownButton}" Value="True" />
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="ContextMenuDropdownButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactivePressedBackground}}" />
                             <Setter TargetName="ContextMenuDropdownButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactivePressedBorder}}" />
                             <Setter TargetName="PART_ImgPinMenu" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactivePressedGlyph}}" />
-                        </MultiDataTrigger>
-                        <MultiDataTrigger>
+                        </MultiDataTrigger-->
+                        <!--MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding IsChecked, ElementName=ContextMenuDropdownButton}" Value="True" />
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="ContextMenuDropdownButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactivePressedBackground}}" />
                             <Setter TargetName="ContextMenuDropdownButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactivePressedBorder}}" />
                             <Setter TargetName="PART_ImgPinMenu" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactivePressedGlyph}}" />
-                        </MultiDataTrigger>
+                        </MultiDataTrigger-->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding IsMouseCaptured, ElementName=PART_PinMaximize}" Value="True" />
@@ -1871,14 +1845,14 @@
 
                         <!-- Document Well : Tab : Button / Selected, active -->
                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.RootDocument.IsActive}" Value="true">
-                            <Setter TargetName="PART_ImgPinMenu" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveGlyph}}" />
+                            <!--Setter TargetName="PART_ImgPinMenu" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveGlyph}}" /-->
                             <Setter TargetName="PART_ImgPinMaximize" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveGlyph}}" />
                             <Setter TargetName="PART_ImgPinRestore" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveGlyph}}" />
                             <Setter TargetName="PART_ImgPinClose" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveGlyph}}" />
                         </DataTrigger>
 
                         <!-- Document Well : Tab : Button / Selected, active, hovered -->
-                        <MultiDataTrigger>
+                        <!--MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.RootDocument.IsActive}" Value="true" />
                                 <Condition Binding="{Binding IsMouseOver, ElementName=ContextMenuDropdownButton}" Value="True" />
@@ -1886,7 +1860,7 @@
                             <Setter TargetName="ContextMenuDropdownButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveHoveredBackground}}" />
                             <Setter TargetName="ContextMenuDropdownButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveHoveredBorder}}" />
                             <Setter TargetName="PART_ImgPinMenu" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveHoveredGlyph}}" />
-                        </MultiDataTrigger>
+                        </MultiDataTrigger-->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.RootDocument.IsActive}" Value="true" />
@@ -1916,7 +1890,7 @@
                         </MultiDataTrigger>
 
                         <!-- Document Well : Tab : Button / Selected, active, pressed -->
-                        <MultiDataTrigger>
+                        <!--MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.RootDocument.IsActive}" Value="true" />
                                 <Condition Binding="{Binding IsMouseCaptured, ElementName=ContextMenuDropdownButton}" Value="True" />
@@ -1924,8 +1898,8 @@
                             <Setter TargetName="ContextMenuDropdownButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActivePressedBackground}}" />
                             <Setter TargetName="ContextMenuDropdownButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActivePressedBorder}}" />
                             <Setter TargetName="PART_ImgPinMenu" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActivePressedGlyph}}" />
-                        </MultiDataTrigger>
-                        <MultiDataTrigger>
+                        </MultiDataTrigger-->
+                        <!--MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.RootDocument.IsActive}" Value="true" />
                                 <Condition Binding="{Binding IsChecked, ElementName=ContextMenuDropdownButton}" Value="True" />
@@ -1933,7 +1907,7 @@
                             <Setter TargetName="ContextMenuDropdownButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActivePressedBackground}}" />
                             <Setter TargetName="ContextMenuDropdownButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActivePressedBorder}}" />
                             <Setter TargetName="PART_ImgPinMenu" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActivePressedGlyph}}" />
-                        </MultiDataTrigger>
+                        </MultiDataTrigger-->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.RootDocument.IsActive}" Value="true" />
