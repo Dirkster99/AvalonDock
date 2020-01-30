@@ -1148,8 +1148,8 @@ namespace AvalonDock
 		internal void InternalAddLogicalChild(object element)
 		{
 #if DEBUG
-      if( _logicalChildren.Select( ch => ch.GetValueOrDefault<object>() ).Contains( element ) )
-        new InvalidOperationException();
+			if (_logicalChildren.Select(ch => ch.GetValueOrDefault<object>()).Contains(element))
+				new InvalidOperationException();
 #endif
 			if (_logicalChildren.Select(ch => ch.GetValueOrDefault<object>()).Contains(element))
 				return;
@@ -1560,7 +1560,7 @@ namespace AvalonDock
 				else
 				{
 					var resourceDictionaryToRemove =
-					   resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
+						resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
 					if (resourceDictionaryToRemove != null)
 						resources.MergedDictionaries.Remove(
 							resourceDictionaryToRemove);
@@ -2103,15 +2103,15 @@ namespace AvalonDock
 
 				Dispatcher.BeginInvoke(new Action(() =>
 			  {
-					if (newFW.Content != null || (newFW.Model as LayoutAnchorableFloatingWindow)?.IsVisible == true)
-					{
-						newFW.Show();
-					}
-					else
-					{
-						newFW.Hide();
-					}
-				}), DispatcherPriority.Send);
+				  if (newFW.Content != null || (newFW.Model as LayoutAnchorableFloatingWindow)?.IsVisible == true)
+				  {
+					  newFW.Show();
+				  }
+				  else
+				  {
+					  newFW.Hide();
+				  }
+			  }), DispatcherPriority.Send);
 
 				if (panegroup != null && panegroup.IsMaximized)
 				{
@@ -2201,30 +2201,15 @@ namespace AvalonDock
 			if (contentModel.CanFloat == false)
 				return;
 
-			LayoutFloatingWindowControl fwc = null;
-
-			// For last document re-use floating window
-			if (contentModel.Parent.ChildrenCount == 1)
-			{
-				foreach (var fw in _fwList)
-				foreach (var layoutElement in ((LayoutDocumentFloatingWindow)fw.Model).Children)
-				foreach (var pane in ((LayoutDocumentPaneGroup)layoutElement).Children)
-				foreach (var layoutDoc in ((LayoutDocumentPane)pane).Children)
-					if (layoutDoc == contentModel)
-						fwc = fw;
-			}
-
-			var show = fwc == null; // Do not show already visible floating window
-			if (fwc == null)
-				fwc = this.CreateFloatingWindow(contentModel, false);
+			LayoutFloatingWindowControl fwc = this.CreateFloatingWindow(contentModel, false);
 
 			if (fwc != null)
 			{
 				Dispatcher.BeginInvoke(new Action(() =>
 				{
 					// Activate only inactive document
-					if (startDrag) fwc.AttachDrag(); 
-					if (show) fwc.Show();
+					if (startDrag) fwc.AttachDrag();
+					fwc.Show();
 				}), DispatcherPriority.Send);
 			}
 		}
@@ -2241,11 +2226,11 @@ namespace AvalonDock
 
 		internal IEnumerable<LayoutFloatingWindowControl> GetFloatingWindowsByZOrder()
 		{
-			IntPtr windowParentHanlde;
+			IntPtr windowParentHandle;
 			var parentWindow = Window.GetWindow(this);
 			if (parentWindow != null)
 			{
-				windowParentHanlde = new WindowInteropHelper(parentWindow).Handle;
+				windowParentHandle = new WindowInteropHelper(parentWindow).Handle;
 			}
 			else
 			{
@@ -2253,10 +2238,10 @@ namespace AvalonDock
 				if (mainProcess == null)
 					yield break;
 
-				windowParentHanlde = mainProcess.MainWindowHandle;
+				windowParentHandle = mainProcess.MainWindowHandle;
 			}
 
-			IntPtr currentHandle = Win32Helper.GetWindow(windowParentHanlde, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDFIRST);
+			IntPtr currentHandle = Win32Helper.GetWindow(windowParentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDFIRST);
 			while (currentHandle != IntPtr.Zero)
 			{
 				LayoutFloatingWindowControl ctrl = _fwList.FirstOrDefault(fw => new WindowInteropHelper(fw).Handle == currentHandle);
@@ -3071,8 +3056,8 @@ namespace AvalonDock
 					  itemToRemove.Model != null &&
 					  itemToRemove.Model is UIElement)
 				  {
-				  //((ILogicalChildrenContainer)this).InternalRemoveLogicalChild(itemToRemove.Model as UIElement);
-			  }
+					  //((ILogicalChildrenContainer)this).InternalRemoveLogicalChild(itemToRemove.Model as UIElement);
+				  }
 
 				  itemToRemove.Detach();
 				  _layoutItems.Remove(itemToRemove);
