@@ -2201,7 +2201,22 @@ namespace AvalonDock
 			if (contentModel.CanFloat == false)
 				return;
 
-			LayoutFloatingWindowControl fwc = this.CreateFloatingWindow(contentModel, false);
+			LayoutFloatingWindowControl fwc = null;
+
+			// For last document re-use floating window
+			if (contentModel.Parent.ChildrenCount == 1)
+			{
+				foreach (var fw in _fwList)
+				foreach (var layoutElement in ((LayoutDocumentFloatingWindow)fw.Model).Children)
+				foreach (var pane in ((LayoutDocumentPaneGroup)layoutElement).Children)
+				foreach (var layoutDoc in ((LayoutDocumentPane)pane).Children)
+					if (layoutDoc == contentModel)
+						fwc = fw;
+			}
+
+			var show = fwc == null; // Do not show already visible floating window
+			if (fwc == null)
+				fwc = this.CreateFloatingWindow(contentModel, false);
 
 			if (fwc != null)
 			{
