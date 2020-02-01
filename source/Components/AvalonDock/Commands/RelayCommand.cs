@@ -12,22 +12,36 @@ using System.Windows.Input;
 
 namespace AvalonDock.Commands
 {
+	/// <summary>
+	/// A command whose sole purpose is to  relay its functionality to other
+	/// objects by invoking delegates.
+	/// The default return value for the CanExecute method is 'true'.
+	/// 
+	/// Source: http://www.codeproject.com/Articles/31837/Creating-an-Internationalized-Wizard-in-WPF
+	/// </summary>
 	internal class RelayCommand : ICommand
 	{
 		#region Fields
-
 		private readonly Action<object> _execute;
 		private readonly Predicate<object> _canExecute;
-
 		#endregion // Fields
 
 		#region Constructors
-
+		/// <summary>
+		/// Class constructor from <see cref="Action{T}"/> parameter.
+		/// </summary>
+		/// <param name="execute"></param>
 		public RelayCommand(Action<object> execute)
 			: this(execute, null)
 		{
 		}
 
+		/// <summary>
+		/// Class constructor from <see cref="Action{T}"/> parameter plus
+		/// canExecute predicate to decide whether command should currently
+		/// be available or not.
+		/// </summary>
+		/// <param name="execute"></param>
 		public RelayCommand(Action<object> execute, Predicate<object> canExecute)
 		{
 			if (execute == null)
@@ -39,12 +53,9 @@ namespace AvalonDock.Commands
 		#endregion // Constructors
 
 		#region ICommand Members
-
-		public bool CanExecute(object parameter)
-		{
-			return _canExecute == null ? true : _canExecute(parameter);
-		}
-
+		/// <summary>
+		/// Eventhandler to re-evaluate whether this command can execute or not
+		/// </summary>
 		public event EventHandler CanExecuteChanged
 		{
 			add
@@ -57,6 +68,20 @@ namespace AvalonDock.Commands
 			}
 		}
 
+		/// <summary>
+		/// Determine whether this pre-requisites to execute this command is given or not.
+		/// </summary>
+		/// <param name="parameter"></param>
+		/// <returns></returns>
+		public bool CanExecute(object parameter)
+		{
+			return _canExecute == null ? true : _canExecute(parameter);
+		}
+
+		/// <summary>
+		/// Execute the command method managed in this class.
+		/// </summary>
+		/// <param name="parameter"></param>
 		public void Execute(object parameter)
 		{
 			_execute(parameter);

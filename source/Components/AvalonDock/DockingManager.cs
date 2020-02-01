@@ -27,12 +27,17 @@ using System.Diagnostics;
 
 namespace AvalonDock
 {
+	/// <summary>
+	/// The DockingManager is the custom control at the root of the visual tree.
+	/// This control is the core control of AvalonDock.
+	/// It contains core dependency properties, events, and methods to customize and
+	/// manage many aspects of the docking framework.
+	/// </summary>
 	[ContentProperty("Layout")]
 	[TemplatePart(Name = "PART_AutoHideArea")]
 	public class DockingManager : Control, IOverlayWindowHost//, ILogicalChildrenContainer
 	{
-		#region Members
-
+		#region fields
 		private ResourceDictionary currentThemeResourceDictionary; // = null
 		private AutoHideWindowManager _autoHideWindowManager;
 		private FrameworkElement _autohideArea;
@@ -48,11 +53,12 @@ namespace AvalonDock
 
 		internal bool SuspendDocumentsSourceBinding = false;
 		internal bool SuspendAnchorablesSourceBinding = false;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
-
+		/// <summary>
+		/// Static class constructor to support WPF property control registration.
+		/// </summary>
 		static DockingManager()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(DockingManager), new FrameworkPropertyMetadata(typeof(DockingManager)));
@@ -60,7 +66,9 @@ namespace AvalonDock
 			HwndSource.DefaultAcquireHwndFocusInMenuMode = false;
 		}
 
-
+		/// <summary>
+		/// Class constructor.
+		/// </summary>
 		public DockingManager()
 		{
 
