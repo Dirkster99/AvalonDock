@@ -12,10 +12,17 @@ using System.Windows;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// This interface is implemented by a class that can display an <see cref="IOverlayWindow"/>,
+	/// which in turn is used to arrange the docking layout of a document or tool window in AvalonDock.
+	/// </summary>
 	internal interface IOverlayWindowHost
 	{
 		#region Properties
-
+		/// <summary>
+		/// Gets the DockingManager control that should be invoked to do the actual docking
+		/// if docking into this <see cref="IOverlayWindowHost"/> should be performed.
+		/// </summary>
 		DockingManager Manager
 		{
 			get;
@@ -24,13 +31,37 @@ namespace AvalonDock.Controls
 		#endregion
 
 		#region Methods
-
+		/// <summary>
+		/// Determines whether the given screen coordinates are part of the <see cref="IOverlayWindowHost"/>
+		/// window or not.
+		/// </summary>
+		/// <param name="dragPoint"></param>
+		/// <returns></returns>
 		bool HitTest(Point dragPoint);
 
+		/// <summary>
+		/// Is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>
+		/// to actually show the <see cref="IOverlayWindow"/> for a given <see cref="LayoutFloatingWindowControl"/>
+		/// on an <see cref="IOverlayWindowHost"/> (where the <see cref="IOverlayWindowHost"/> is the drop target
+		/// and the <see cref="LayoutFloatingWindowControl"/> the dragged item).
+		/// </summary>
+		/// <param name="draggingWindow"></param>
+		/// <returns></returns>
 		IOverlayWindow ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow);
 
+		/// <summary>
+		/// Is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>
+		/// to hide the <see cref="IOverlayWindow"/> for this <see cref="IOverlayWindowHost"/>.
+		/// </summary>
 		void HideOverlayWindow();
 
+		/// <summary>
+		/// Is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>
+		/// to enumerate and show all overlay buttons in an <see cref="IOverlayWindow"/> when the
+		/// floating window is dragged over an <see cref="IOverlayWindowHost"/>.
+		/// </summary>
+		/// <param name="draggingWindow"></param>
+		/// <returns></returns>
 		IEnumerable<IDropArea> GetDropAreas(LayoutFloatingWindowControl draggingWindow);
 
 		#endregion

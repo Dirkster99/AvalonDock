@@ -34,8 +34,9 @@ namespace AvalonDock.Controls
 		/// <summary>
 		/// This method is invoked by the AvalonDock framework, if the mouse enters (hovers over)
 		/// the control that implements the <see cref="IOverlayWindow"/> interface. The implementing
-		/// control can use this point in time to decide whether dropping the dragged control should
-		/// be enabled and show or hide the corresponding drop target buttons.
+		/// control can use this point in time to decide whether dropping the dragged
+		/// <see cref="LayoutFloatingWindowControl"/> should be enabled and whether to show or hide
+		/// the corresponding drop target buttons.
 		/// </summary>
 		/// <param name="floatingWindow"></param>
 		void DragEnter(LayoutFloatingWindowControl floatingWindow);
@@ -44,7 +45,8 @@ namespace AvalonDock.Controls
 		/// This method is invoked by the AvalonDock framework, if the mouse leaves (does no longer hover over)
 		/// the control that implements the <see cref="IOverlayWindow"/> interface. The implementing
 		/// control can use this point in time to hide the corresponding drop target buttons and free
-		/// resources that may have been allocated to show and support a drop operation of the <paramref name="floatingWindow"/>.
+		/// resources that may have been allocated to show and support a drop operation of the
+		/// dragged <see cref="LayoutFloatingWindowControl"/> .
 		/// </summary>
 		/// <param name="floatingWindow"></param>
 		void DragLeave(LayoutFloatingWindowControl floatingWindow);
