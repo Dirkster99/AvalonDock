@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows.Markup;
 using System.Xml.Serialization;
 using System.Xml;
@@ -445,12 +446,13 @@ namespace AvalonDock.Layout
 						contentReferencingEmptyPane.PreviousContainerIndex = -1;
 					}
 
-					//...if this pane is the only documentpane present in the layout than skip it
+					//...if this pane is the only documentpane present in the layout of the main window (not floating) than skip it
 					if (emptyPane is LayoutDocumentPane &&
-						this.Descendents().OfType<LayoutDocumentPane>().Count(c => c != emptyPane) == 0)
+					    emptyPane.FindParent<LayoutDocumentFloatingWindow>() == null &&
+					    this.Descendents().OfType<LayoutDocumentPane>().Count(c => c != emptyPane && c.FindParent<LayoutDocumentFloatingWindow>() == null) == 0)
 						continue;
 
-					//...if this empty panes is not referenced by anyone, than removes it from its parent container
+					//...if this empty pane is not referenced by anyone, than removes it from its parent container
 					if (!this.Descendents().OfType<ILayoutPreviousContainer>().Any(c => c.PreviousContainer == emptyPane))
 					{
 						var parentGroup = emptyPane.Parent as ILayoutContainer;
@@ -463,10 +465,10 @@ namespace AvalonDock.Layout
 				if (!exitFlag)
 				{
 					//removes any empty anchorable pane group
-					foreach (var emptyPaneGroup in this.Descendents().OfType<LayoutAnchorablePaneGroup>().Where(p => p.ChildrenCount == 0))
+					foreach (var emptyLayoutAnchorablePaneGroup in this.Descendents().OfType<LayoutAnchorablePaneGroup>().Where(p => p.ChildrenCount == 0))
 					{
-						var parentGroup = emptyPaneGroup.Parent as ILayoutContainer;
-						parentGroup.RemoveChild(emptyPaneGroup);
+						var parentGroup = emptyLayoutAnchorablePaneGroup.Parent as ILayoutContainer;
+						parentGroup.RemoveChild(emptyLayoutAnchorablePaneGroup);
 						exitFlag = false;
 						break;
 					}
@@ -475,24 +477,24 @@ namespace AvalonDock.Layout
 				if (!exitFlag)
 				{
 					//removes any empty layout panel
-					foreach (var emptyPaneGroup in this.Descendents().OfType<LayoutPanel>().Where(p => p.ChildrenCount == 0))
+					foreach (var emptyLayoutPanel in this.Descendents().OfType<LayoutPanel>().Where(p => p.ChildrenCount == 0))
 					{
-						var parentGroup = emptyPaneGroup.Parent as ILayoutContainer;
-						parentGroup.RemoveChild(emptyPaneGroup);
+						var parentGroup = emptyLayoutPanel.Parent as ILayoutContainer;
+						parentGroup.RemoveChild(emptyLayoutPanel);
 						exitFlag = false;
 						break;
 					}
-					foreach (var emptyPaneGroup in this.Descendents().OfType<LayoutDocumentPane>().Where(p => p.ChildrenCount == 0))
+					foreach (var emptyLayoutDocumentPane in this.Descendents().OfType<LayoutDocumentPane>().Where(p => p.ChildrenCount == 0))
 					{
-						var parentGroup = emptyPaneGroup.Parent as ILayoutContainer;
+						var parentGroup = emptyLayoutDocumentPane.Parent as ILayoutContainer;
 						if (!(parentGroup.Parent is LayoutDocumentFloatingWindow)) continue;
 						var index = RootPanel.IndexOfChild(this.Descendents().OfType<LayoutDocumentPaneGroup>().First());
-						parentGroup.RemoveChild(emptyPaneGroup);
+						parentGroup.RemoveChild(emptyLayoutDocumentPane);
 						if (!this.Descendents().OfType<LayoutDocumentPane>().Any())
 						{
 							// Now the last Pane container is deleted, at least one is required for documents to be added.
 							// We did not want to keep an empty window floating, but add a new one to the main window
-							RootPanel.Children.Insert(index < 0 ? 0 : index, emptyPaneGroup);
+							RootPanel.Children.Insert(index < 0 ? 0 : index, emptyLayoutDocumentPane);
 						}
 						exitFlag = false;
 						break;
@@ -502,10 +504,10 @@ namespace AvalonDock.Layout
 				if (!exitFlag)
 				{
 					//removes any empty floating window
-					foreach (var emptyPaneGroup in this.Descendents().OfType<LayoutFloatingWindow>().Where(p => p.ChildrenCount == 0))
+					foreach (var emptyLayoutFloatingWindow in this.Descendents().OfType<LayoutFloatingWindow>().Where(p => p.ChildrenCount == 0))
 					{
-						var parentGroup = emptyPaneGroup.Parent as ILayoutContainer;
-						parentGroup.RemoveChild(emptyPaneGroup);
+						var parentGroup = emptyLayoutFloatingWindow.Parent as ILayoutContainer;
+						parentGroup.RemoveChild(emptyLayoutFloatingWindow);
 						exitFlag = false;
 						break;
 					}
@@ -514,12 +516,12 @@ namespace AvalonDock.Layout
 				if (!exitFlag)
 				{
 					//removes any empty anchor group
-					foreach (var emptyPaneGroup in this.Descendents().OfType<LayoutAnchorGroup>().Where(p => p.ChildrenCount == 0))
+					foreach (var emptyLayoutAnchorGroup in this.Descendents().OfType<LayoutAnchorGroup>().Where(p => p.ChildrenCount == 0))
 					{
-						if (!this.Descendents().OfType<ILayoutPreviousContainer>().Any(c => c.PreviousContainer == emptyPaneGroup))
+						if (!this.Descendents().OfType<ILayoutPreviousContainer>().Any(c => c.PreviousContainer == emptyLayoutAnchorGroup))
 						{
-							var parentGroup = emptyPaneGroup.Parent as ILayoutContainer;
-							parentGroup.RemoveChild(emptyPaneGroup);
+							var parentGroup = emptyLayoutAnchorGroup.Parent as ILayoutContainer;
+							parentGroup.RemoveChild(emptyLayoutAnchorGroup);
 							exitFlag = false;
 							break;
 						}
@@ -551,9 +553,6 @@ namespace AvalonDock.Layout
 
 			}
 			while (!exitFlag);
-
-
-
 			#endregion
 
 			#region collapse single child document pane groups
@@ -578,9 +577,6 @@ namespace AvalonDock.Layout
 
 			}
 			while (!exitFlag);
-
-
-
 			#endregion
 
 			//do
@@ -611,8 +607,9 @@ namespace AvalonDock.Layout
 			UpdateActiveContentProperty();
 			#endregion
 #if DEBUG
-      System.Diagnostics.Debug.Assert(
-          !this.Descendents().OfType<LayoutAnchorablePane>().Any( a => a.ChildrenCount == 0 && a.IsVisible ) );
+			System.Diagnostics.Debug.Assert(
+				 !this.Descendents().OfType<LayoutAnchorablePane>().Any(a => a.ChildrenCount == 0 && a.IsVisible));
+			//DumpTree();
 #if TRACE
             RootPanel.ConsoleDump(4);
 #endif
@@ -880,7 +877,7 @@ namespace AvalonDock.Layout
 			if (bNotifyChildren == true &&
 				(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove ||
 				 e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add
-			   ))
+				))
 			{
 				RaisePropertyChanged("Children");
 				RaisePropertyChanged("ChildrenCount");
@@ -1121,6 +1118,30 @@ namespace AvalonDock.Layout
 		public event EventHandler Updated;
 		public event EventHandler<LayoutElementEventArgs> ElementAdded;
 		public event EventHandler<LayoutElementEventArgs> ElementRemoved;
+
+		#endregion
+
+		#region Diagnostic tools
+
+#if DEBUG
+		public void DumpTree()
+		{
+			void DumpElement(ILayoutElement element, int level, int childID)
+			{
+				var indent = new string(' ', 3 * level++);
+				Debug.Write($"{indent} {childID:D2} 0x{element.GetHashCode():X8} {element.GetType().Name} Parent:0x{element.Parent?.GetHashCode()??0:X8} Root:0x{element.Root?.GetHashCode()??0:X8}");
+				var containerElement = element as ILayoutContainer;
+				if(containerElement != null) Debug.Write($" Children:{containerElement.ChildrenCount}");
+				Debug.WriteLine("");
+				if (containerElement == null) return;
+
+				var nrChild = 0;
+				foreach (var child in containerElement.Children) DumpElement(child, level, nrChild++);
+			}
+
+			DumpElement(this, 0,0);
+		}
+#endif
 
 		#endregion
 	}
