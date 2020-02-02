@@ -39,13 +39,13 @@ namespace AvalonDock.Controls
 		#region Methods
 		/// <summary>
 		/// Gets a <see cref="Geometry"/> that is used to highlight/preview the docking position
-		/// of this drop target for a <paramref name="floatingWindow"/> being docked inside a
+		/// of this drop target for a <paramref name="floatingWindowModel"/> being docked inside an
 		/// <paramref name="overlayWindow"/>.
 		/// </summary>
 		/// <param name="overlayWindow"></param>
-		/// <param name="floatingWindow"></param>
-		/// <returns></returns>
-		Geometry GetPreviewPath(OverlayWindow overlayWindow, LayoutFloatingWindow floatingWindow);
+		/// <param name="floatingWindowModel"></param>
+		/// <returns>The geometry of the preview/highlighting WPF figure path.</returns>
+		Geometry GetPreviewPath(OverlayWindow overlayWindow, LayoutFloatingWindow floatingWindowModel);
 
 		/// <summary>
 		/// Determines whether the <paramref name="dragPoint"/> is part of this drop target or not.
