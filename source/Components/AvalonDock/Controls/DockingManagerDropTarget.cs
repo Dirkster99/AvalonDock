@@ -17,11 +17,9 @@ namespace AvalonDock.Controls
 {
 	internal class DockingManagerDropTarget : DropTarget<DockingManager>
 	{
-		#region Members
-
+		#region fields
 		private DockingManager _manager;
-
-		#endregion
+		#endregion  fields
 
 		#region Constructors
 

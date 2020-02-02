@@ -17,14 +17,13 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public abstract class LayoutElement : DependencyObject, ILayoutElement
 	{
-		#region Members
-
+		#region fields
 		[NonSerialized]
 		private ILayoutContainer _parent = null;
+
 		[NonSerialized]
 		private ILayoutRoot _root = null;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

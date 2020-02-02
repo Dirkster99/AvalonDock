@@ -18,16 +18,14 @@ namespace AvalonDock.Controls
 {
 	public class LayoutAnchorableItem : LayoutItem
 	{
-		#region Members
-
+		#region fields
 		private LayoutAnchorable _anchorable;
 		private ICommand _defaultHideCommand;
 		private ICommand _defaultAutoHideCommand;
 		private ICommand _defaultDockCommand;
 		private ReentrantFlag _visibilityReentrantFlag = new ReentrantFlag();
 		private ReentrantFlag _anchorableVisibilityReentrantFlag = new ReentrantFlag();
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

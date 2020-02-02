@@ -20,8 +20,7 @@ namespace AvalonDock.Controls
 	[TemplatePart(Name = PART_DocumentListBox, Type = typeof(ListBox))]
 	public class NavigatorWindow : Window
 	{
-		#region Members
-
+		#region fields
 		private const string PART_AnchorableListBox = "PART_AnchorableListBox";
 		private const string PART_DocumentListBox = "PART_DocumentListBox";
 
@@ -32,8 +31,7 @@ namespace AvalonDock.Controls
 		private ListBox _documentListBox;
 		private bool _internalSetSelectedDocument = false;
 		private bool _internalSetSelectedAnchorable = false;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

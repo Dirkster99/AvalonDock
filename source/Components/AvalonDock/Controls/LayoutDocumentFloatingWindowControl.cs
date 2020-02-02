@@ -21,11 +21,9 @@ namespace AvalonDock.Controls
 {
 	public class LayoutDocumentFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
 	{
-		#region Members
-
+		#region fields
 		private LayoutDocumentFloatingWindow _model;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

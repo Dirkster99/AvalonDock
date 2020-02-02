@@ -13,11 +13,9 @@ namespace AvalonDock.Controls
 {
 	internal class ReentrantFlag
 	{
-		#region Members
-
+		#region fields
 		private bool _flag = false;
-
-		#endregion
+		#endregion fields
 
 		#region Properties
 

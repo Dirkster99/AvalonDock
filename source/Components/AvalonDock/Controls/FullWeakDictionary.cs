@@ -14,12 +14,10 @@ namespace AvalonDock.Controls
 {
 	internal class FullWeakDictionary<K, V> where K : class
 	{
-		#region Members
-
+		#region fields
 		private List<WeakReference> _keys = new List<WeakReference>();
 		private List<WeakReference> _values = new List<WeakReference>();
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

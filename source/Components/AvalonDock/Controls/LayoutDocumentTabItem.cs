@@ -19,8 +19,7 @@ namespace AvalonDock.Controls
 {
 	public class LayoutDocumentTabItem : Control
 	{
-		#region Members
-
+		#region fields
 		private List<Rect> _otherTabsScreenArea = null;
 		private List<TabItem> _otherTabs = null;
 		private Rect _parentDocumentTabPanelScreenArea;
@@ -28,8 +27,7 @@ namespace AvalonDock.Controls
 		private bool _isMouseDown = false;
 		private Point _mouseDownPoint;
 		private bool _allowDrag = false;
-
-		#endregion
+		#endregion fields
 
 		#region Contructors
 

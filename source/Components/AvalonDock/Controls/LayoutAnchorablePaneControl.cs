@@ -17,11 +17,9 @@ namespace AvalonDock.Controls
 {
 	public class LayoutAnchorablePaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
 	{
-		#region Members
-
+		#region fields
 		private LayoutAnchorablePane _model;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

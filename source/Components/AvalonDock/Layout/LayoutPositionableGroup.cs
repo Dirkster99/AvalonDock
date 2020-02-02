@@ -19,11 +19,9 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public abstract class LayoutPositionableGroup<T> : LayoutGroup<T>, ILayoutPositionableElementWithActualSize where T : class, ILayoutElement
 	{
-		#region Members
-
+		#region fields
 		private static GridLengthConverter _gridLengthConverter = new GridLengthConverter();
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

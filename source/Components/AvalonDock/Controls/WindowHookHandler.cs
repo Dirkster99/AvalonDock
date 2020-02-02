@@ -41,13 +41,11 @@ namespace AvalonDock.Controls
 
 	internal class WindowHookHandler
 	{
-		#region Members
-
+		#region fields
 		private IntPtr _windowHook;
 		private Win32Helper.HookProc _hookProc;
 		private ReentrantFlag _insideActivateEvent = new ReentrantFlag();
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

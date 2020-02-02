@@ -13,11 +13,9 @@ namespace AvalonDock.Controls
 {
 	public class DocumentPaneControlOverlayArea : OverlayArea
 	{
-		#region Members
-
+		#region fields
 		private LayoutDocumentPaneControl _documentPaneControl;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

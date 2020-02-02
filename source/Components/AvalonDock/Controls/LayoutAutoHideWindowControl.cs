@@ -22,8 +22,7 @@ namespace AvalonDock.Controls
 {
 	public class LayoutAutoHideWindowControl : HwndHost, ILayoutControl
 	{
-		#region Members
-
+		#region fields
 		internal LayoutAnchorableControl _internalHost = null;
 
 		private LayoutAnchorControl _anchor;
@@ -38,8 +37,7 @@ namespace AvalonDock.Controls
 		private Border _resizerGhost = null;
 		private Window _resizerWindowHost = null;
 		private Vector _initialStartPoint;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

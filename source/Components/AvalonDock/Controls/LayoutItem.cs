@@ -21,8 +21,7 @@ namespace AvalonDock.Controls
 {
 	public abstract class LayoutItem : FrameworkElement
 	{
-		#region Members
-
+		#region fields
 		private ICommand _defaultCloseCommand;
 		private ICommand _defaultFloatCommand;
 		private ICommand _defaultDockAsDocumentCommand;
@@ -36,8 +35,7 @@ namespace AvalonDock.Controls
 		private ContentPresenter _view = null;
 		private ReentrantFlag _isSelectedReentrantFlag = new ReentrantFlag();
 		private ReentrantFlag _isActiveReentrantFlag = new ReentrantFlag();
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

@@ -14,11 +14,9 @@ namespace AvalonDock.Controls
 {
 	public class LayoutDocumentItem : LayoutItem
 	{
-		#region Members
-
+		#region fields
 		private LayoutDocument _document;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

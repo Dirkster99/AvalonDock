@@ -17,13 +17,11 @@ namespace AvalonDock.Controls
 {
 	public class LayoutAnchorableTabItem : Control
 	{
-		#region Members
-
+		#region fields
 		private bool _isMouseDown = false;
 		private static LayoutAnchorableTabItem _draggingItem = null;
 		private static bool _cancelMouseLeave = false;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

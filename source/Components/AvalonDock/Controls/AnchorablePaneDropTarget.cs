@@ -16,12 +16,10 @@ namespace AvalonDock.Controls
 {
 	internal class AnchorablePaneDropTarget : DropTarget<LayoutAnchorablePaneControl>
 	{
-		#region Members
-
+		#region fields
 		private LayoutAnchorablePaneControl _targetPane;
-		int _tabIndex = -1;
-
-		#endregion
+		private int _tabIndex = -1;
+		#endregion fields
 
 		#region Constructors
 

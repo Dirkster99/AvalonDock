@@ -13,13 +13,11 @@ namespace AvalonDock.Controls
 {
 	public class OverlayWindowDropTarget : IOverlayWindowDropTarget
 	{
-		#region Members
-
+		#region fields
 		private IOverlayWindowArea _overlayArea;
 		private Rect _screenDetectionArea;
 		private OverlayWindowDropTargetType _type;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

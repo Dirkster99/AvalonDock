@@ -19,8 +19,7 @@ namespace AvalonDock.Controls
 {
 	public class OverlayWindow : Window, IOverlayWindow
 	{
-		#region Members
-
+		#region fields
 		private ResourceDictionary currentThemeResourceDictionary; // = null
 		private Canvas _mainCanvasPanel;
 		private Grid _gridDockingManagerDropTargets;
@@ -60,8 +59,7 @@ namespace AvalonDock.Controls
 		private IOverlayWindowHost _host;
 		private LayoutFloatingWindowControl _floatingWindow = null;
 		private List<IDropArea> _visibleAreas = new List<IDropArea>();
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

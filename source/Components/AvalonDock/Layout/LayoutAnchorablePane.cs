@@ -18,14 +18,13 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutAnchorablePane : LayoutPositionableGroup<LayoutAnchorable>, ILayoutAnchorablePane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable
 	{
-		#region Members
-
+		#region fields
 		private int _selectedIndex = -1;
+
 		[XmlIgnore]
 		private bool _autoFixSelectedContent = true;
 		private string _name = null;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

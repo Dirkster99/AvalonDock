@@ -15,11 +15,9 @@ namespace AvalonDock.Controls
 {
 	public class LayoutAnchorablePaneGroupControl : LayoutGridControl<ILayoutAnchorablePane>, ILayoutControl
 	{
-		#region Members
-
+		#region fields
 		private LayoutAnchorablePaneGroup _model;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

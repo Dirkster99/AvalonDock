@@ -23,13 +23,11 @@ namespace AvalonDock.Controls
 {
 	public class LayoutAnchorableFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
 	{
-		#region Members
-
+		#region fields
 		private LayoutAnchorableFloatingWindow _model;
 		private OverlayWindow _overlayWindow = null;
 		private List<IDropArea> _dropAreas = null;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

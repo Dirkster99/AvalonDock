@@ -13,12 +13,10 @@ namespace AvalonDock.Controls
 {
 	public abstract class OverlayArea : IOverlayWindowArea
 	{
-		#region Members
-
+		#region fields
 		private IOverlayWindow _overlayWindow;
 		private Rect? _screenDetectionArea;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

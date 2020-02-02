@@ -13,11 +13,9 @@ namespace AvalonDock.Controls
 {
 	public class AnchorablePaneControlOverlayArea : OverlayArea
 	{
-		#region Members
-
+		#region fields
 		private LayoutAnchorablePaneControl _anchorablePaneControl;
-
-		#endregion
+		#endregion fields
 
 		#region constructors
 

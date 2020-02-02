@@ -16,11 +16,9 @@ namespace AvalonDock.Controls
 {
 	public class LayoutPanelControl : LayoutGridControl<ILayoutPanelElement>, ILayoutControl
 	{
-		#region Members
-
+		#region fields
 		private LayoutPanel _model;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

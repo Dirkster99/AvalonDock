@@ -26,11 +26,9 @@ namespace AvalonDock.Controls
 
 		#endregion
 
-		#region Members
-
+		#region fields
 		private LayoutDocumentPaneGroupControl _targetPane;
-
-		#endregion
+		#endregion fields
 
 		#region Overrides
 

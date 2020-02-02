@@ -21,8 +21,7 @@ namespace AvalonDock.Controls
 {
 	public abstract class LayoutGridControl<T> : Grid, ILayoutControl, IAdjustableSizeLayout where T : class, ILayoutPanelElement
 	{
-		#region Members
-
+		#region fields
 		private LayoutPositionableGroup<T> _model;
 		private Orientation _orientation;
 		private bool _initialized;
@@ -31,8 +30,7 @@ namespace AvalonDock.Controls
 		private Border _resizerGhost = null;
 		private Window _resizerWindowHost = null;
 		private Vector _initialStartPoint;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

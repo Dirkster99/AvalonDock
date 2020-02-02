@@ -21,13 +21,12 @@ namespace AvalonDock.Layout
 	[ContentProperty("RootPanel")]
 	public class LayoutAnchorableFloatingWindow : LayoutFloatingWindow, ILayoutElementWithVisibility
 	{
-		#region Members
-
+		#region fields
 		private LayoutAnchorablePaneGroup _rootPanel = null;
+
 		[NonSerialized]
 		private bool _isVisible = true;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

@@ -20,8 +20,7 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutAnchorable : LayoutContent
 	{
-		#region Members
-
+		#region fields
 		private double _autohideWidth = 0.0;
 		private double _autohideMinWidth = 100.0;
 		private double _autohideHeight = 0.0;
@@ -30,8 +29,7 @@ namespace AvalonDock.Layout
 		private bool _canAutoHide = true;
 		private bool _canDockAsTabbedDocument = true;
 		private bool _canCloseValueBeforeInternalSet;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

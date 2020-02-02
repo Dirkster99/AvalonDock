@@ -25,8 +25,7 @@ namespace AvalonDock.Controls
 {
 	public abstract class LayoutFloatingWindowControl : Window, ILayoutControl
 	{
-		#region Members
-
+		#region fields
 		private ResourceDictionary currentThemeResourceDictionary; // = null
 		private bool _isInternalChange; //false
 		private ILayoutElement _model;
@@ -36,8 +35,7 @@ namespace AvalonDock.Controls
 		private DragService _dragService = null;
 		private bool _internalCloseFlag = false;
 		private bool _isClosing = false;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 
@@ -550,14 +548,12 @@ namespace AvalonDock.Controls
 
 		protected internal class FloatingWindowContentHost : HwndHost
 		{
-			#region Members
-
+			#region fields
 			private LayoutFloatingWindowControl _owner;
 			private HwndSource _wpfContentHost = null;
 			private Border _rootPresenter = null;
 			private DockingManager _manager = null;
-
-			#endregion
+			#endregion fields
 
 			#region Constructors
 

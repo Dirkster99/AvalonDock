@@ -17,11 +17,9 @@ namespace AvalonDock.Controls
 {
 	public class AnchorablePaneTitle : Control
 	{
-		#region Members
-
+		#region fields
 		private bool _isMouseDown = false;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

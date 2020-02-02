@@ -19,13 +19,11 @@ namespace AvalonDock.Controls
 {
 	internal abstract class DropTarget<T> : DropTargetBase, IDropTarget where T : FrameworkElement
 	{
-		#region Members
-
+		#region fields
 		private Rect[] _detectionRect;
 		private T _targetElement;
 		private DropTargetType _type;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

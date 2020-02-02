@@ -15,13 +15,11 @@ namespace AvalonDock.Controls
 {
 	internal class AutoHideWindowManager
 	{
-		#region Members
-
+		#region fields
 		private DockingManager _manager;
 		private WeakReference _currentAutohiddenAnchor = null;
 		private DispatcherTimer _closeTimer = null;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

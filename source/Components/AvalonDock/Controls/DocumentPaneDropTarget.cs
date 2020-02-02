@@ -16,12 +16,10 @@ namespace AvalonDock.Controls
 {
 	internal class DocumentPaneDropTarget : DropTarget<LayoutDocumentPaneControl>
 	{
-		#region Members
-
+		#region fields
 		private LayoutDocumentPaneControl _targetPane;
 		private int _tabIndex = -1;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

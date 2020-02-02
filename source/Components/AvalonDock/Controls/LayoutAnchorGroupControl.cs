@@ -18,12 +18,10 @@ namespace AvalonDock.Controls
 {
 	public class LayoutAnchorGroupControl : Control, ILayoutControl
 	{
-		#region Members
-
+		#region fields
 		private ObservableCollection<LayoutAnchorControl> _childViews = new ObservableCollection<LayoutAnchorControl>();
 		private LayoutAnchorGroup _model;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

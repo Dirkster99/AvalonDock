@@ -17,12 +17,10 @@ namespace AvalonDock.Controls
 {
 	public class LayoutAnchorControl : Control, ILayoutControl
 	{
-		#region Members
-
+		#region fields
 		private LayoutAnchorable _model;
 		private DispatcherTimer _openUpTimer = null;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

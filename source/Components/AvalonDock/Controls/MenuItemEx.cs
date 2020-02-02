@@ -14,11 +14,9 @@ namespace AvalonDock.Controls
 {
 	public class MenuItemEx : MenuItem
 	{
-		#region Members
-
+		#region fields
 		private bool _reentrantFlag = false;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 

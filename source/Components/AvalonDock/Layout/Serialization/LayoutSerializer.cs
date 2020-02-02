@@ -14,13 +14,11 @@ namespace AvalonDock.Layout.Serialization
 {
 	public abstract class LayoutSerializer
 	{
-		#region Members
-
+		#region fields
 		private DockingManager _manager;
 		private LayoutAnchorable[] _previousAnchorables = null;
 		private LayoutDocument[] _previousDocuments = null;
-
-		#endregion
+		#endregion fields
 
 		#region Constructors
 
