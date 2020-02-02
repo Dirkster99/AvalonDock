@@ -32,9 +32,10 @@ namespace AvalonDock.Controls
 		IEnumerable<IDropTarget> GetTargets();
 
 		/// <summary>
-		/// This method is invoked by the AvalonDock framework, if the mouse enters (hovers over)
+		/// This method is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>,
+		/// if the mouse enters (hovers over)
 		/// the control that implements the <see cref="IOverlayWindow"/> interface. The implementing
-		/// control can use this point in time to decide whether dropping the dragged
+		/// control can use this method call to decide whether dropping the dragged
 		/// <see cref="LayoutFloatingWindowControl"/> should be enabled and whether to show or hide
 		/// the corresponding drop target buttons.
 		/// </summary>
@@ -42,7 +43,8 @@ namespace AvalonDock.Controls
 		void DragEnter(LayoutFloatingWindowControl floatingWindow);
 
 		/// <summary>
-		/// This method is invoked by the AvalonDock framework, if the mouse leaves (does no longer hover over)
+		/// This method is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>,
+		/// if the mouse leaves (does no longer hover over)
 		/// the control that implements the <see cref="IOverlayWindow"/> interface. The implementing
 		/// control can use this point in time to hide the corresponding drop target buttons and free
 		/// resources that may have been allocated to show and support a drop operation of the
@@ -51,15 +53,72 @@ namespace AvalonDock.Controls
 		/// <param name="floatingWindow"></param>
 		void DragLeave(LayoutFloatingWindowControl floatingWindow);
 
-
+		/// <summary>
+		/// This method is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>,
+		/// if the mouse enters a drop area (which can be a part of a FrameworkElement that implements
+		/// the <see cref="IOverlayWindow"/> interface.
+		/// 
+		/// A drop area can contain multiple drop targets (eg.: the DockingManager contains SidePanels
+		/// (top, bottom, left, right) and each of them is an individual drop target.
+		/// 
+		/// The implementing control can use this method call to decide whether the drop area should
+		/// be enabled as such and whether there are any drop targets that are available as a specific
+		/// docking position.
+		/// </summary>
+		/// <param name="area"></param>
 		void DragEnter(IDropArea area);
 
+		/// <summary>
+		/// This method is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>,
+		/// if the mouse leaves a drop area (which can be a part of a FrameworkElement that implements
+		/// the <see cref="IOverlayWindow"/> interface.
+		/// 
+		/// A drop area can contain multiple drop targets (eg.: the DockingManager contains SidePanels
+		/// (top, bottom, left, right) and each of them is an individual drop target.
+		/// 
+		/// The implementing control can use this method call to disable the drop area and hide
+		/// its drop targets (<see cref="IDropTarget"/>) that may have been available as a specific
+		/// docking position.
+		/// </summary>
+		/// <param name="area"></param>
 		void DragLeave(IDropArea area);
 
+		/// <summary>
+		/// This method is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>,
+		/// if the mouse enters a drop target (which is typically a part of a <see cref="IDropArea"/>).
+		/// 
+		/// A drop target is an individual/specific docking position
+		/// where a user can drop an item to dock it.
+		/// 
+		/// The implementing control can use this method call to show a preview (Highlighting PreviewBox Geometry)
+		/// of the final docking position while the user hovers the mouse of a drop target (drop target button).
+		/// </summary>
+		/// <param name="target"></param>
 		void DragEnter(IDropTarget target);
 
+		/// <summary>
+		/// This method is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>,
+		/// if the mouse leaves a drop target (which is typically a part of a <see cref="IDropArea"/>).
+		/// 
+		/// A drop target is an individual/specific docking position
+		/// where a user can drop an item to dock it.
+		/// 
+		/// The implementing control can use this method call to hide a preview (Highlighting PreviewBox Geometry)
+		/// of the final docking position while the drags the mouse away from a drop target (drop target button).
+		/// </summary>
+		/// <param name="target"></param>
 		void DragLeave(IDropTarget target);
 
+		/// <summary>
+		/// This method is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>,
+		/// if a drag & drop operation is completed to display the <see cref="LayoutFloatingWindowControl"/> in a
+		/// new docking position.
+		/// 
+		/// The implementing control can use this method call to:
+		/// - hide available drop areas and their current drop targets preview (Highlighting PreviewBox Geometry)
+		/// - and re-positioning the dragged control to complete the new docking position.
+		/// </summary>
+		/// <param name="target"></param>
 		void DragDrop(IDropTarget target);
 	}
 }
