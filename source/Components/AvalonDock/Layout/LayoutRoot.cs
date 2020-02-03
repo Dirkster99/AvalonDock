@@ -677,8 +677,9 @@ namespace AvalonDock.Layout
 				this.Hidden.Add((LayoutAnchorable)hiddenObject);
 			}
 
-			//Read the closing end element of LayoutRoot 
-			reader.ReadEndElement();
+			//Read the closing end element of LayoutRoot
+			if (reader.NodeType != XmlNodeType.None)
+				reader.ReadEndElement();
 		}
 
 		public void WriteXml(XmlWriter writer)
@@ -1038,7 +1039,8 @@ namespace AvalonDock.Layout
 				}
 			}
 
-			reader.ReadEndElement();
+			if (reader.NodeType != XmlNodeType.None)
+				reader.ReadEndElement();
 
 			return resultList;
 		}
@@ -1051,9 +1053,10 @@ namespace AvalonDock.Layout
 			}
 
 			if (reader.NodeType == XmlNodeType.EndElement)
-			{
 				return null;
-			}
+
+			if (reader.NodeType == XmlNodeType.None)
+				return null;
 
 			XmlSerializer serializer;
 			switch (reader.LocalName)
