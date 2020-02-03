@@ -81,9 +81,9 @@ namespace AvalonDock
 			this.Unloaded += new RoutedEventHandler(DockingManager_Unloaded);
 		}
 
-		#endregion
+		#endregion Constructors
 
-		#region Properties
+		#region Public Properties
 
 		#region Layout
 
@@ -1948,7 +1948,7 @@ namespace AvalonDock
 
 		#endregion
 
-		#endregion
+		#endregion Public Properties
 
 		#region Private Properties
 
@@ -1960,7 +1960,7 @@ namespace AvalonDock
 			}
 		}
 
-		#endregion
+		#endregion Private Properties
 
 		#region Overrides
 
@@ -2001,7 +2001,7 @@ namespace AvalonDock
 			base.OnPreviewKeyDown(e);
 		}
 
-		#endregion
+		#endregion Overrides
 
 		#region Public Methods
 
@@ -2043,10 +2043,18 @@ namespace AvalonDock
 			return lfwc;
 		}
 
-		#endregion
+		#endregion Public Methods
 
 		#region Internal Methods
-
+		/// <summary>
+		/// Nethod is invoked to create the actual visible UI element from a given layout model. It is invoked when:
+		/// 
+		/// 1. New UI items are created and layed out or
+		/// 2. Layout is deserialized, and the previous UI items are restored to the screen
+		///    (using the model whos information was serialized to XML).
+		/// </summary>
+		/// <param name="model"></param>
+		/// <returns></returns>
 		internal UIElement CreateUIElementForModel(ILayoutElement model)
 		{
 			if (model is LayoutPanel)
@@ -2200,6 +2208,12 @@ namespace AvalonDock
 			return _autohideArea;
 		}
 
+		/// <summary>
+		/// Executes when the user starts to drag a <see cref="LayoutDocument"/> or
+		/// <see cref="LayoutAnchorable"/> by dragging its TabItem Header.
+		/// </summary>
+		/// <param name="contentModel"></param>
+		/// <param name="startDrag"></param>
 		internal void StartDraggingFloatingWindowForContent(LayoutContent contentModel, bool startDrag = true)
 		{
 			// Ensure window can float only if corresponding property is set accordingly
@@ -2237,6 +2251,11 @@ namespace AvalonDock
 			}
 		}
 
+		/// <summary>
+		/// Executes when the user starts to drag a docked <see cref="LayoutAnchorable"/> (tool window)
+		/// by dragging its title bar (top header of a tool window).
+		/// </summary>
+		/// <param name="paneModel"></param>
 		internal void StartDraggingFloatingWindowForPane(LayoutAnchorablePane paneModel)
 		{
 			var fwc = this.CreateFloatingWindowForLayoutAnchorableWithoutParent(paneModel, false);
@@ -2342,7 +2361,13 @@ namespace AvalonDock
 			_anchorable.ToggleAutoHide();
 		}
 
-
+		/// <summary>
+		/// Method executes when the user clicks the Float button in the context menu of an <see cref="LayoutAnchorable"/>.
+		/// 
+		/// This removes the content from the docked <see cref="LayoutAnchorable"/> and inserts it into a
+		/// draggable <see cref="LayoutFloatingWindowControl"/>.
+		/// </summary>
+		/// <param name="contentToFloat"></param>
 		internal void _ExecuteFloatCommand(LayoutContent contentToFloat)
 		{
 			contentToFloat.Float();
@@ -2363,7 +2388,7 @@ namespace AvalonDock
 			content.IsActive = true;
 		}
 
-		#endregion
+		#endregion Internal Methods
 
 		#region Private Methods
 
@@ -3394,7 +3419,7 @@ namespace AvalonDock
 			return fwc;
 		}
 
-		#endregion
+		#endregion Private Methods
 
 		#region Events
 
@@ -3419,9 +3444,12 @@ namespace AvalonDock
 		/// </summary>
 		public event EventHandler<DocumentClosedEventArgs> DocumentClosed;
 
+		/// <summary>
+		/// Event is raised when ActiveContent changes.
+		/// </summary>
 		public event EventHandler ActiveContentChanged;
 
-		#endregion
+		#endregion Events
 
 		#region IOverlayWindowHost Interface
 
@@ -3571,6 +3599,6 @@ namespace AvalonDock
 				}
 			}
 		}
-		#endregion
+		#endregion IOverlayWindowHost Interface
 	}
 }

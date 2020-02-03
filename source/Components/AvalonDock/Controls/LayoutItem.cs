@@ -485,8 +485,8 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata(null, new PropertyChangedCallback(OnFloatCommandChanged), new CoerceValueCallback(CoerceFloatCommandValue)));
 
 		/// <summary>
-		/// Gets or sets the FloatCommand property.  This dependency property 
-		/// indicates the command to execute when user click the float button.
+		/// Gets or sets the FloatCommand property.
+		/// This dependency property indicates the command to execute when user click the float button.
 		/// </summary>
 		/// <remarks>By default this command move the anchorable inside new floating window.</remarks>
 		public ICommand FloatCommand
@@ -529,15 +529,19 @@ namespace AvalonDock.Controls
 			return LayoutElement != null && LayoutElement.CanFloat && LayoutElement.FindParent<LayoutFloatingWindow>() == null;
 		}
 
+		/// <summary>
+		/// Executes to float the content of this LayoutItem in a seperate <see cref="LayoutFloatingWindowControl"/>.
+		/// </summary>
+		/// <param name="parameter"></param>
 		private void ExecuteFloatCommand(object parameter)
 		{
 			LayoutElement.Root.Manager._ExecuteFloatCommand(LayoutElement);
 		}
 
-		protected virtual void Float()
-		{
-
-		}
+////		protected virtual void Float()
+////		{
+////
+////		}
 
 		#endregion
 

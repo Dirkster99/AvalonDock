@@ -8,7 +8,6 @@
  ************************************************************************/
 
 using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,6 +15,10 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements the document container control with the
+	/// TabItem Header (<see cref="LayoutDocumentTabItem"/>) that contains the document title.
+	/// </summary>
 	public class LayoutDocumentPaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
 	{
 		#region fields
@@ -23,12 +26,18 @@ namespace AvalonDock.Controls
 		#endregion fields
 
 		#region Constructors
-
+		/// <summary>
+		/// Static class constructor to register WPF style keys.
+		/// </summary>
 		static LayoutDocumentPaneControl()
 		{
 			FocusableProperty.OverrideMetadata(typeof(LayoutDocumentPaneControl), new FrameworkPropertyMetadata(false));
 		}
 
+		/// <summary>
+		/// Class constructor from model parameter.
+		/// </summary>
+		/// <param name="model"></param>
 		internal LayoutDocumentPaneControl(LayoutDocumentPane model)
 		{
 			if (model == null)
@@ -42,8 +51,7 @@ namespace AvalonDock.Controls
 			// this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
 			this.SizeChanged += OnSizeChanged;
 		}
-
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -55,7 +63,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -76,8 +84,7 @@ namespace AvalonDock.Controls
 
 		}
 
-
-		#endregion
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -88,6 +95,6 @@ namespace AvalonDock.Controls
 			modelWithAtcualSize.ActualHeight = ActualHeight;
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }
