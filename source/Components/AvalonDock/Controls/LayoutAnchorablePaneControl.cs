@@ -15,6 +15,10 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Provides a control to display multible (or just one) LayoutAnchorable(s).
+	/// See also <seealso cref="AnchorablePaneTabPanel"/>.
+	/// </summary>
 	public class LayoutAnchorablePaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
 	{
 		#region fields
