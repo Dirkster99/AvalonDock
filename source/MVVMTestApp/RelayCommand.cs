@@ -5,12 +5,12 @@ namespace AvalonDock.MVVMTestApp
 {
 	internal class RelayCommand : ICommand
 	{
-		#region Fields
+		#region fields
 
 		readonly Action<object> _execute;
 		readonly Predicate<object> _canExecute;
 
-		#endregion // Fields
+		#endregion fields
 
 		#region Constructors
 
@@ -27,7 +27,7 @@ namespace AvalonDock.MVVMTestApp
 			_execute = execute;
 			_canExecute = canExecute;
 		}
-		#endregion // Constructors
+		#endregion Constructors
 
 		#region ICommand Members
 
@@ -47,6 +47,6 @@ namespace AvalonDock.MVVMTestApp
 			_execute(parameter);
 		}
 
-		#endregion // ICommand Members
+		#endregion ICommand Members
 	}
 }

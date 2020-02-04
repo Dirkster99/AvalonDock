@@ -64,7 +64,7 @@ namespace AvalonDock.Layout
 			((LayoutContent)obj).RaisePropertyChanged(LayoutContent.TitleProperty.Name);
 		}
 
-		#endregion //Title
+		#endregion Title
 
 		#region Content
 		[NonSerialized]

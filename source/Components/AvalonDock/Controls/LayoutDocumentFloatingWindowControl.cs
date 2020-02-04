@@ -19,6 +19,11 @@ using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements a floating window control that can host other controls
+	/// (<see cref="LayoutAnchorableControl"/>, <see cref="LayoutDocumentControl"/>)
+	/// and be dragged (independently of the <see cref="DockingManager"/>) around the screen.
+	/// </summary>
 	public class LayoutDocumentFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
 	{
 		#region fields

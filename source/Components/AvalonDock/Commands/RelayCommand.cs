@@ -21,10 +21,10 @@ namespace AvalonDock.Commands
 	/// </summary>
 	internal class RelayCommand : ICommand
 	{
-		#region Fields
+		#region fields
 		private readonly Action<object> _execute;
 		private readonly Predicate<object> _canExecute;
-		#endregion // Fields
+		#endregion fields
 
 		#region Constructors
 		/// <summary>
@@ -50,7 +50,7 @@ namespace AvalonDock.Commands
 			_execute = execute;
 			_canExecute = canExecute;
 		}
-		#endregion // Constructors
+		#endregion Constructors
 
 		#region ICommand Members
 		/// <summary>
@@ -87,6 +87,6 @@ namespace AvalonDock.Commands
 			_execute(parameter);
 		}
 
-		#endregion // ICommand Members
+		#endregion ICommand Members
 	}
 }

@@ -329,7 +329,7 @@ namespace Standard
 			}
 		}
 
-		#endregion
+		#endregion IStream Members
 
 		#region IDisposable Members
 

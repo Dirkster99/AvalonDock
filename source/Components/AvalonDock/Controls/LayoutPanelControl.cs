@@ -14,6 +14,10 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements a <see cref="Grid"/> based panel base class
+	/// that hosts a <see cref="LayoutPanel"/> as its model.
+	/// </summary>
 	public class LayoutPanelControl : LayoutGridControl<ILayoutPanelElement>, ILayoutControl
 	{
 		#region fields

@@ -15,6 +15,11 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements the TabItem Header that is displayed when the <see cref="LayoutAnchorablePaneControl"/>
+	/// shows more than 1 <see cref="LayoutAnchorableControl"/>. This TabItem is displayed at the bottom
+	/// of a <see cref="LayoutAnchorablePaneControl"/>.
+	/// </summary>
 	public class LayoutAnchorableTabItem : Control
 	{
 		#region fields

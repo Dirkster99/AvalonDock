@@ -13,6 +13,9 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements the inner part of tool window.
+	/// </summary>
 	public class LayoutAnchorableControl : Control
 	{
 		#region Constructors

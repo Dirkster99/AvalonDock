@@ -20,6 +20,11 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements a control that contains a <see cref="LayoutAnchorableControl"/>.
+	/// The <see cref="LayoutAutoHideWindowControl"/> pops out of a side panel
+	/// when the user clicks on a <see cref="LayoutAnchorControl"/> of a particular anchored item.
+	/// </summary>
 	public class LayoutAutoHideWindowControl : HwndHost, ILayoutControl
 	{
 		#region fields
@@ -53,7 +58,7 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 

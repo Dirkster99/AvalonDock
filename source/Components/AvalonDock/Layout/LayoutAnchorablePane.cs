@@ -37,7 +37,7 @@ namespace AvalonDock.Layout
 			Children.Add(anchorable);
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -145,7 +145,7 @@ namespace AvalonDock.Layout
 
 		#endregion
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -234,7 +234,7 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion
+		#endregion Overrides
 
 		#region Public Methods
 
@@ -247,6 +247,11 @@ namespace AvalonDock.Layout
 			return Children.IndexOf(anchorableChild);
 		}
 
+		/// <summary>
+		/// Gets whether the model hosts only 1 <see cref="LayoutAnchorable"/> (True)
+		/// or whether there are more than one <see cref="LayoutAnchorable"/>s below
+		/// this model pane.
+		/// </summary>
 		public bool IsDirectlyHostedInFloatingWindow
 		{
 			get
@@ -260,7 +265,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion Public Methods
 
 		#region Internal Methods
 
@@ -282,7 +287,7 @@ namespace AvalonDock.Layout
 			RaisePropertyChanged("IsDirectlyHostedInFloatingWindow");
 		}
 
-		#endregion
+		#endregion Internal Methods
 
 		#region Private Methods
 
@@ -303,7 +308,7 @@ namespace AvalonDock.Layout
 			RaisePropertyChanged("IsDirectlyHostedInFloatingWindow");
 		}
 
-		#endregion
+		#endregion Private Methods
 
 		#region ILayoutPaneSerializable Interface
 
@@ -321,6 +326,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion ILayoutPaneSerializable Interface
 	}
 }

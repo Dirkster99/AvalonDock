@@ -16,6 +16,10 @@ using System.Windows.Controls;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements a floating window for navigating between documents and toolwindows in AvalonDock.
+	/// The floating navigator window can be invoked with CTRL+TAB.
+	/// </summary>
 	[TemplatePart(Name = PART_AnchorableListBox, Type = typeof(ListBox))]
 	[TemplatePart(Name = PART_DocumentListBox, Type = typeof(ListBox))]
 	public class NavigatorWindow : Window

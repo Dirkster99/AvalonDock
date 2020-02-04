@@ -968,15 +968,17 @@
                       </Border>
                       <ControlTemplate.Triggers>
                         <MultiDataTrigger>
+					      <!-- Hide the title if the control is directly hosted in floating window
+							   The floating window control will show the title if there is only one control to host
+							   without any other LayoutAnchorableControl
+							-->
                           <MultiDataTrigger.Conditions>
                             <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.IsFloating}"
                                        Value="True" />
                             <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.Parent.IsDirectlyHostedInFloatingWindow}"
                                        Value="True" />
                           </MultiDataTrigger.Conditions>
-                          <Setter Property="Visibility"
-                                  Value="Collapsed"
-                                  TargetName="Header" />
+                          <Setter Property="Visibility" Value="Collapsed" TargetName="Header" />
                         </MultiDataTrigger>
                       </ControlTemplate.Triggers>
                     </ControlTemplate>

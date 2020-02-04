@@ -17,6 +17,10 @@ using AvalonDock.Themes;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements <see cref="IOverlayWindow"/> and is used to visualize floating
+	/// docking target buttons in several areas of AvalonDock.
+	/// </summary>
 	public class OverlayWindow : Window, IOverlayWindow
 	{
 		#region fields

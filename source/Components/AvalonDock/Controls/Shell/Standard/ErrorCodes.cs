@@ -339,7 +339,7 @@ namespace Standard
 			return (int)(error & 0xFFFF);
 		}
 
-		#region Object class override members
+		#region Overrides
 
 		/// <summary>
 		/// Get a string representation of this HRESULT.
@@ -408,7 +408,7 @@ namespace Standard
 			return _value.GetHashCode();
 		}
 
-		#endregion
+		#endregion Overrides
 
 		public static bool operator ==(HRESULT hrLeft, HRESULT hrRight)
 		{

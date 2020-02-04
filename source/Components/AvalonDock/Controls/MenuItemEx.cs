@@ -12,6 +12,10 @@ using System.Windows;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements a <see cref="MenuItem"/> extension that is used to display
+	/// menu items in the <see cref="ContextMenuEx"/> of the <see cref="LayoutDocumentPaneControl"/>.
+	/// </summary>
 	public class MenuItemEx : MenuItem
 	{
 		#region fields

@@ -15,6 +15,10 @@ using System.Windows.Threading;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements a control that is displayed when a <see cref="LayoutAnchorableControl"/>
+	/// is in AutoHide mode (which can be applied via context menu drop entry or click on the Pin symbol.
+	/// </summary>
 	public class LayoutAnchorControl : Control, ILayoutControl
 	{
 		#region fields

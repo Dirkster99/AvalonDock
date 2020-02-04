@@ -27,14 +27,6 @@ namespace AvalonDock.Controls
 		private ReentrantFlag _anchorableVisibilityReentrantFlag = new ReentrantFlag();
 		#endregion fields
 
-		#region Constructors
-
-		internal LayoutAnchorableItem()
-		{
-		}
-
-		#endregion
-
 		#region Properties
 
 		#region HideCommand
@@ -271,7 +263,7 @@ namespace AvalonDock.Controls
 
 		#endregion
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -361,7 +353,7 @@ namespace AvalonDock.Controls
 			base.OnVisibilityChanged();
 		}
 
-		#endregion
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -382,6 +374,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

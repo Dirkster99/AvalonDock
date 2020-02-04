@@ -21,6 +21,9 @@ using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Class visualizes floating LayoutAnchorables (toolwindows) in AvalonDock.
+	/// </summary>
 	public class LayoutAnchorableFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
 	{
 		#region fields

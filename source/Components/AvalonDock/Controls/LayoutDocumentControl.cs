@@ -15,6 +15,10 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements the content part of the document control.
+	/// It hosts a <see cref="LayoutDocument"/> as its <see cref="Model"/>.
+	/// </summary>
 	public class LayoutDocumentControl : Control
 	{
 		#region Constructors
@@ -38,8 +42,8 @@ namespace AvalonDock.Controls
 		  new FrameworkPropertyMetadata(null, OnModelChanged));
 
 		/// <summary>
-		/// Gets or sets the Model property.  This dependency property 
-		/// indicates the model attached to this view.
+		/// Gets or sets the Model property.
+		/// This dependency property indicates the model attached to this view.
 		/// </summary>
 		public LayoutContent Model
 		{

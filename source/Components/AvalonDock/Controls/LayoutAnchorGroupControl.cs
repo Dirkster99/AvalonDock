@@ -16,6 +16,10 @@ using System.Windows.Data;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// This control displays multiple <see cref="LayoutAnchorControl"/>s along the
+	/// top, bottom, left, or right side of the <see cref="DockingManager"/>.
+	/// </summary>
 	public class LayoutAnchorGroupControl : Control, ILayoutControl
 	{
 		#region fields

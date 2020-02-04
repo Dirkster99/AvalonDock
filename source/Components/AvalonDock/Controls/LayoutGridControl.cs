@@ -19,6 +19,12 @@ using System.Windows.Threading;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// The abstract LayoutGridControl<T> class (and its inheriting classes) are used to layout non-floating
+	/// windows and documents in AvalonDock. This contains a definition of size proportion per item and
+	/// includes user interactions with Grid Splitter elements to resize UI items in an interactive way.
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	public abstract class LayoutGridControl<T> : Grid, ILayoutControl, IAdjustableSizeLayout where T : class, ILayoutPanelElement
 	{
 		#region fields

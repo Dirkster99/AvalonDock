@@ -13,6 +13,12 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements a group control that hosts a <see cref="LayoutDocumentPaneGroup"/> model.
+	/// 
+	/// This Grid based control can host multiple other controls in its Children collection
+	/// (<see cref="LayoutAnchorableControl"/>, <see cref="LayoutDocumentControl"/> etc).
+	/// </summary>
 	public class LayoutDocumentPaneGroupControl : LayoutGridControl<ILayoutDocumentPane>, ILayoutControl
 	{
 		#region fields

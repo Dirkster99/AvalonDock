@@ -15,10 +15,10 @@
 	/// </summary>
 	internal class RelayCommand<T> : ICommand
 	{
-		#region Fields
+		#region fields
 		private readonly Action<T> mExecute = null;
 		private readonly Predicate<T> mCanExecute = null;
-		#endregion // Fields
+		#endregion fields
 
 		#region Constructors
 		/// <summary>
@@ -44,7 +44,7 @@
 			this.mCanExecute = canExecute;
 		}
 
-		#endregion // Constructors
+		#endregion Constructors
 
 		#region events
 		/// <summary>

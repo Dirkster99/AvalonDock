@@ -23,6 +23,12 @@ using AvalonDock.Themes;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements an abstraction layer for floating windows that can host other controls
+	/// (eg. documents and/or LayoutAnchorable).
+	/// 
+	/// A floating window can be dragged around independently of the <see cref="DockingManager"/>.
+	/// </summary>
 	public abstract class LayoutFloatingWindowControl : Window, ILayoutControl
 	{
 		#region fields

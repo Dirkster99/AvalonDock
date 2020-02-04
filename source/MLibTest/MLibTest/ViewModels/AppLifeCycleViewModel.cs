@@ -486,7 +486,7 @@
 		{
 			DialogCloseResult = null;
 		}
-		#endregion // RequestClose [event]
+		#endregion RequestClose [event]
 		#endregion StartUp/ShutDown
 		#endregion methods
 	}

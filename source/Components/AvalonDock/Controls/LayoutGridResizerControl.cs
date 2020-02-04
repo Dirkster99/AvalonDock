@@ -13,6 +13,11 @@ using System.Windows.Media;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements a control like GridSplitter that can be used to resize areas
+	/// horizontally or vertically (only one of these but never both)
+	/// in a grid layout.
+	/// </summary>
 	public class LayoutGridResizerControl : Thumb
 	{
 		#region Constructors
@@ -28,7 +33,7 @@ namespace AvalonDock.Controls
 			IsHitTestVisibleProperty.OverrideMetadata(typeof(LayoutGridResizerControl), new FrameworkPropertyMetadata(true, null));
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -41,8 +46,8 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata((Brush)Brushes.Black));
 
 		/// <summary>
-		/// Gets or sets the BackgroundWhileDragging property.  This dependency property 
-		/// indicates ....
+		/// Gets or sets the BackgroundWhileDragging property.
+		/// This dependency property indicates the background while the control is being dragged.
 		/// </summary>
 		public Brush BackgroundWhileDragging
 		{
@@ -56,7 +61,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion BackgroundWhileDragging
 
 		#region OpacityWhileDragging
 
@@ -67,8 +72,8 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata((double)0.5));
 
 		/// <summary>
-		/// Gets or sets the OpacityWhileDragging property.  This dependency property 
-		/// indicates ....
+		/// Gets or sets the OpacityWhileDragging property.
+		/// This dependency property indicates opacity while the control is being dragged.
 		/// </summary>
 		public double OpacityWhileDragging
 		{
@@ -82,8 +87,8 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion OpacityWhileDragging
 
-		#endregion
+		#endregion Properties
 	}
 }

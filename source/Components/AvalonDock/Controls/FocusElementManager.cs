@@ -23,7 +23,7 @@ namespace AvalonDock.Controls
 {
 	internal static class FocusElementManager
 	{
-		#region Member
+		#region fields
 
 		private static List<DockingManager> _managers = new List<DockingManager>();
 		private static FullWeakDictionary<ILayoutElement, IInputElement> _modelFocusedElement = new FullWeakDictionary<ILayoutElement, IInputElement>();
@@ -33,7 +33,7 @@ namespace AvalonDock.Controls
 		private static DispatcherOperation _setFocusAsyncOperation;
 		private static WeakReference _lastFocusedElementBeforeEnterMenuMode = null;
 
-		#endregion
+		#endregion fields
 
 		#region Internal Methods
 
