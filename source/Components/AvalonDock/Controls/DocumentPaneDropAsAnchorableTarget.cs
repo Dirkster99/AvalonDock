@@ -304,11 +304,8 @@ namespace AvalonDock.Controls
 			}
 
 			return false;
-
-
-
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

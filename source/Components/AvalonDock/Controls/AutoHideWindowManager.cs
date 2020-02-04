@@ -29,7 +29,7 @@ namespace AvalonDock.Controls
 			this.SetupCloseTimer();
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Private Methods
 
@@ -82,6 +82,6 @@ namespace AvalonDock.Controls
 			_currentAutohiddenAnchor = null;
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

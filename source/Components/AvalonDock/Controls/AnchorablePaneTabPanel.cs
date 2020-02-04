@@ -103,6 +103,6 @@ namespace AvalonDock.Controls
 			base.OnMouseLeave(e);
 		}
 
-		#endregion
+		#endregion Overrides
 	}
 }

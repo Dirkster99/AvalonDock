@@ -21,7 +21,7 @@ namespace AvalonDock.Controls
 		private bool _isMouseDown = false;
 		#endregion fields
 
-		#region Constructors
+		#region
 
 		static AnchorablePaneTitle()
 		{
@@ -34,9 +34,9 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion
+		#endregion Constructors
 
-		#region Properties
+		#region
 
 		#region Model
 
@@ -118,7 +118,7 @@ namespace AvalonDock.Controls
 
 		#endregion
 
-		#endregion
+		#endregion Constructors
 
 		#region Overrides
 
@@ -201,7 +201,7 @@ namespace AvalonDock.Controls
 				Model.IsActive = true;//FocusElementManager.SetFocusOnLastElement(Model);
 		}
 
-		#endregion
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -215,6 +215,6 @@ namespace AvalonDock.Controls
 			this.Model.ToggleAutoHide();
 		}
 
-		#endregion
+		#endregion Overrides
 	}
 }

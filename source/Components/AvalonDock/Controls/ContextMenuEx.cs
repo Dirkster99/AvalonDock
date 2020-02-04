@@ -27,7 +27,7 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Overrides
 
@@ -43,6 +43,6 @@ namespace AvalonDock.Controls
 			base.OnOpened(e);
 		}
 
-		#endregion
+		#endregion Overrides
 	}
 }
