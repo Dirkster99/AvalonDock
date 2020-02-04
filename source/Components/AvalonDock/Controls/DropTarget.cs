@@ -17,6 +17,11 @@ using System.Windows.Threading;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Abstract class to implement base for various drop target implementations on <see cref="DockingManager"/>,
+	/// <see cref="LayoutAnchorablePaneControl"/>, <see cref="LayoutDocumentPaneControl"/> etc.
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	internal abstract class DropTarget<T> : DropTargetBase, IDropTarget where T : FrameworkElement
 	{
 		#region fields

@@ -11,7 +11,10 @@ using System.Windows;
 
 namespace AvalonDock.Controls
 {
-	abstract class DropTargetBase : DependencyObject
+	/// <summary>
+	/// Implements a base implementation for the abstract <see cref="DropTarget{T}"/> class.
+	/// </summary>
+	internal abstract class DropTargetBase : DependencyObject
 	{
 		#region Properties
 
@@ -24,8 +27,8 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata((bool)false));
 
 		/// <summary>
-		/// Gets the IsDraggingOver property.  This dependency property 
-		/// indicates if user is dragging a window over the target element.
+		/// Gets the IsDraggingOver property.
+		/// This dependency property indicates if user is dragging a window over the target element.
 		/// </summary>
 		public static bool GetIsDraggingOver(DependencyObject d)
 		{
@@ -33,16 +36,16 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Sets the IsDraggingOver property.  This dependency property 
-		/// indicates if user is dragging away a window from the target element.
+		/// Sets the IsDraggingOver property.
+		/// This dependency property indicates if user is dragging away a window from the target element.
 		/// </summary>
 		public static void SetIsDraggingOver(DependencyObject d, bool value)
 		{
 			d.SetValue(IsDraggingOverProperty, value);
 		}
 
-		#endregion
+		#endregion IsDraggingOver
 
-		#endregion
+		#endregion Properties
 	}
 }

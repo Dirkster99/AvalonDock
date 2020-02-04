@@ -13,20 +13,24 @@ using System.Windows.Controls.Primitives;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements the title display for various items: <see cref="LayoutAnchorablePaneControl"/>,
+	/// <see cref="LayoutDocumentTabItem"/>, <see cref="LayoutAnchorableTabItem"/>,
+	/// <see cref="LayoutDocumentFloatingWindowControl"/>, and <see cref="LayoutAnchorableFloatingWindowControl"/>.
+	/// 
+	/// The content is usually displayed via ContentPresenter binding in the theme definition.
+	/// </summary>
 	public class DropDownControlArea : UserControl
 	{
 		#region Constructors
-
-		//static DropDownControlArea()
-		//{
-		//    //IsHitTestVisibleProperty.OverrideMetadata(typeof(DropDownControlArea), new FrameworkPropertyMetadata(true));
-		//}
-
+		/// <summary>
+		/// Class constructor
+		/// </summary>
 		public DropDownControlArea()
 		{
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -54,7 +58,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion DropDownContextMenu
 
 		#region DropDownContextMenuDataContext
 
@@ -80,9 +84,9 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion DropDownContextMenuDataContext
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -117,6 +121,6 @@ namespace AvalonDock.Controls
 		//    return hitResult;
 		//}
 
-		#endregion
+		#endregion Overrides
 	}
 }
