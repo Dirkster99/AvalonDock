@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Text;
 using System.Windows.Markup;
 using System.Xml.Serialization;
 using System.Xml;
@@ -413,7 +414,7 @@ namespace AvalonDock.Layout
 		}
 
 		/// <summary>
-		/// Removes any empty container not directly referenced by other layout items
+		/// Removes any empty container not directly referenced by other layout items.
 		/// </summary>
 		public void CollectGarbage()
 		{
@@ -446,13 +447,13 @@ namespace AvalonDock.Layout
 						contentReferencingEmptyPane.PreviousContainerIndex = -1;
 					}
 
-					//...if this pane is the only documentpane present in the layout of the main window (not floating) than skip it
+					//...if this pane is the only documentpane present in the layout of the main window (not floating) then skip it
 					if (emptyPane is LayoutDocumentPane &&
-					    emptyPane.FindParent<LayoutDocumentFloatingWindow>() == null &&
-					    this.Descendents().OfType<LayoutDocumentPane>().Count(c => c != emptyPane && c.FindParent<LayoutDocumentFloatingWindow>() == null) == 0)
+						 emptyPane.FindParent<LayoutDocumentFloatingWindow>() == null &&
+						 this.Descendents().OfType<LayoutDocumentPane>().Count(c => c != emptyPane && c.FindParent<LayoutDocumentFloatingWindow>() == null) == 0)
 						continue;
 
-					//...if this empty pane is not referenced by anyone, than removes it from its parent container
+					//...if this empty pane is not referenced by anyone, then remove it from its parent container
 					if (!this.Descendents().OfType<ILayoutPreviousContainer>().Any(c => c.PreviousContainer == emptyPane))
 					{
 						var parentGroup = emptyPane.Parent as ILayoutContainer;
@@ -540,17 +541,12 @@ namespace AvalonDock.Layout
 				{
 					var singleChild = paneGroupToCollapse.Children[0] as LayoutAnchorablePaneGroup;
 					paneGroupToCollapse.Orientation = singleChild.Orientation;
-					paneGroupToCollapse.RemoveChild(singleChild);
 					while (singleChild.ChildrenCount > 0)
-					{
-						paneGroupToCollapse.InsertChildAt(
-							paneGroupToCollapse.ChildrenCount, singleChild.Children[0]);
-					}
-
+						paneGroupToCollapse.InsertChildAt(paneGroupToCollapse.ChildrenCount, singleChild.Children[0]);
+					paneGroupToCollapse.RemoveChild(singleChild);
 					exitFlag = false;
 					break;
 				}
-
 			}
 			while (!exitFlag);
 			#endregion
@@ -564,13 +560,9 @@ namespace AvalonDock.Layout
 				{
 					var singleChild = paneGroupToCollapse.Children[0] as LayoutDocumentPaneGroup;
 					paneGroupToCollapse.Orientation = singleChild.Orientation;
-					paneGroupToCollapse.RemoveChild(singleChild);
 					while (singleChild.ChildrenCount > 0)
-					{
-						paneGroupToCollapse.InsertChildAt(
-							paneGroupToCollapse.ChildrenCount, singleChild.Children[0]);
-					}
-
+						paneGroupToCollapse.InsertChildAt(paneGroupToCollapse.ChildrenCount, singleChild.Children[0]);
+					paneGroupToCollapse.RemoveChild(singleChild);
 					exitFlag = false;
 					break;
 				}
@@ -607,9 +599,8 @@ namespace AvalonDock.Layout
 			UpdateActiveContentProperty();
 			#endregion
 #if DEBUG
-			System.Diagnostics.Debug.Assert(
-				 !this.Descendents().OfType<LayoutAnchorablePane>().Any(a => a.ChildrenCount == 0 && a.IsVisible));
-			//DumpTree();
+			System.Diagnostics.Debug.Assert(!this.Descendents().OfType<LayoutAnchorablePane>().Any(a => a.ChildrenCount == 0 && a.IsVisible));
+			//DumpTree(true);
 #if TRACE
             RootPanel.ConsoleDump(4);
 #endif
@@ -1124,22 +1115,31 @@ namespace AvalonDock.Layout
 		#region Diagnostic tools
 
 #if DEBUG
-		public void DumpTree()
+		public void DumpTree(bool shortPropertyNames = false)
 		{
-			void DumpElement(ILayoutElement element, int level, int childID)
+			void DumpElement(ILayoutElement element, StringBuilder indent, int childID, bool isLastChild)
 			{
-				var indent = new string(' ', 3 * level++);
-				Debug.Write($"{indent} {childID:D2} 0x{element.GetHashCode():X8} {element.GetType().Name} Parent:0x{element.Parent?.GetHashCode()??0:X8} Root:0x{element.Root?.GetHashCode()??0:X8}");
+				Debug.Write($"{indent}{(indent.Length > 0 ? isLastChild ? " └─ " : " ├─ " : "")}{childID:D2} 0x{element.GetHashCode():X8} " +
+								$"{element.GetType().Name} {(shortPropertyNames ? "P" : "Parent")}:0x{element.Parent?.GetHashCode() ?? 0:X8} " +
+								$"{(shortPropertyNames ? "R" : "Root")}:0x{element.Root?.GetHashCode() ?? 0:X8}");
 				var containerElement = element as ILayoutContainer;
-				if(containerElement != null) Debug.Write($" Children:{containerElement.ChildrenCount}");
-				Debug.WriteLine("");
-				if (containerElement == null) return;
-
+				if (containerElement == null)
+				{
+					Debug.WriteLine("");
+					return;
+				}
+				Debug.WriteLine($" {(shortPropertyNames ? "C" : "Children")}:{containerElement.ChildrenCount}");
 				var nrChild = 0;
-				foreach (var child in containerElement.Children) DumpElement(child, level, nrChild++);
+				indent.Append(isLastChild ? "   " : " │ ");
+				foreach (var child in containerElement.Children)
+				{
+					var lastChild = nrChild == containerElement.ChildrenCount - 1;
+					DumpElement(child, indent, nrChild++, lastChild);
+				}
+				indent.Remove(indent.Length - 3, 3);
 			}
 
-			DumpElement(this, 0,0);
+			DumpElement(this, new StringBuilder(), 0, true);
 		}
 #endif
 

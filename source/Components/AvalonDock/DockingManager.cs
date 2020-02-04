@@ -2229,11 +2229,10 @@ namespace AvalonDock
 			if (contentModel.Parent.ChildrenCount == 1)
 			{
 				foreach (var fw in _fwList)
-				foreach (var layoutElement in ((LayoutDocumentFloatingWindow)fw.Model).Children)
-				foreach (var pane in ((LayoutDocumentPaneGroup)layoutElement).Children)
-				foreach (var layoutDoc in ((LayoutDocumentPane)pane).Children)
-					if (layoutDoc == contentModel)
-						fwc = fw;
+				{
+					var found = fw.Model.Descendents().OfType<LayoutDocument>().Any(doc => doc == contentModel);
+					if (found) fwc = fw;
+				}
 			}
 
 			var show = fwc == null; // Do not show already visible floating window
