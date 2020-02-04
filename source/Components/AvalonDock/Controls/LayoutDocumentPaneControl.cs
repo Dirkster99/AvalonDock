@@ -17,7 +17,8 @@ namespace AvalonDock.Controls
 {
 	/// <summary>
 	/// Implements the document container control with the
-	/// TabItem Header (<see cref="LayoutDocumentTabItem"/>) that contains the document title.
+	/// TabItem Header (<see cref="LayoutDocumentTabItem"/>) that contains the document titles
+	/// inside the <see cref="DocumentPaneTabPanel"/>.
 	/// </summary>
 	public class LayoutDocumentPaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
 	{

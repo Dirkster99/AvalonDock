@@ -15,16 +15,22 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Provides a panel that contains the TabItem Headers of the <see cref="LayoutDocumentPaneControl"/>.
+	/// </summary>
 	public class DocumentPaneTabPanel : Panel
 	{
 		#region Constructors
 
+		/// <summary>
+		/// Static constructor
+		/// </summary>
 		public DocumentPaneTabPanel()
 		{
 			this.FlowDirection = System.Windows.FlowDirection.LeftToRight;
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Overrides
 
@@ -104,6 +110,6 @@ namespace AvalonDock.Controls
 			base.OnMouseLeave(e);
 		}
 
-		#endregion
+		#endregion Overrides
 	}
 }

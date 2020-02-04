@@ -18,6 +18,10 @@ namespace AvalonDock.Controls
 	/// <summary>
 	/// Implements a <see cref="DockingManager"/> drop target
 	/// on which other items (<see cref="LayoutDocument"/> or <see cref="LayoutAnchorable"/>) can be dropped.
+	/// 
+	/// The resulting drop targets are usually the 4 outer drop target buttons
+	/// re-presenting a <see cref="LayoutAnchorSideControl"/> shown as overlay
+	/// on the <see cref="DockingManager"/> when the user drags an item over it.
 	/// </summary>
 	internal class DockingManagerDropTarget : DropTarget<DockingManager>
 	{

@@ -16,6 +16,10 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements a side panel dependency property in the <see cref="DockingManager"/> control.
+	/// See also <see cref="DockingManagerDropTarget"/>.
+	/// </summary>
 	public class LayoutAnchorSideControl : Control, ILayoutControl
 	{
 		#region fields
