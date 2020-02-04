@@ -13,6 +13,12 @@ using System.Windows.Controls;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements a button that is used to display a <see cref="ContextMenuEx"/>
+	/// when the user clicks on it
+	/// (see templates for <see cref="LayoutAnchorableFloatingWindowControl"/>,
+	/// <see cref="AnchorablePaneTitle"/>, and <see cref="LayoutDocumentPaneControl"/>).
+	/// </summary>
 	public class DropDownButton : ToggleButton
 	{
 		#region Constructors

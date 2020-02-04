@@ -16,7 +16,7 @@ namespace AvalonDock.Controls
 {
 	/// <summary>
 	/// Implements a <see cref="LayoutAnchorablePaneControl"/> drop target
-	/// on which other items (<see cref="LayoutAnchorable"/>) a can be dropped.
+	/// on which other items (<see cref="LayoutAnchorable"/>) can be dropped.
 	/// </summary>
 	internal class AnchorablePaneDropTarget : DropTarget<LayoutAnchorablePaneControl>
 	{

@@ -15,6 +15,9 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// provides a <see cref="Panel"/> that contains the TabItem Headers of the <see cref="LayoutAnchorablePaneControl"/>. 
+	/// </summary>
 	public class AnchorablePaneTabPanel : Panel
 	{
 		#region Constructors

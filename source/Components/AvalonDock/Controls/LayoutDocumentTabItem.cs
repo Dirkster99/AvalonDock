@@ -17,6 +17,11 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Implements the control for the TabItem Header of a <see cref="LayoutDocumentPaneControl"/>.
+	/// The Document's TabItem Header displays the title of a document and can be used to drag a
+	/// document from its docking position.
+	/// </summary>
 	public class LayoutDocumentTabItem : Control
 	{
 		#region fields
@@ -30,17 +35,21 @@ namespace AvalonDock.Controls
 		#endregion fields
 
 		#region Contructors
-
+		/// <summary>
+		/// Static class constructor to register WPF style keys.
+		/// </summary>
 		static LayoutDocumentTabItem()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutDocumentTabItem), new FrameworkPropertyMetadata(typeof(LayoutDocumentTabItem)));
 		}
 
+		/// <summary>
+		/// Class constructor
+		/// </summary>
 		public LayoutDocumentTabItem()
 		{
 		}
-
-		#endregion
+		#endregion Contructors
 
 		#region Properties
 
@@ -125,7 +134,7 @@ namespace AvalonDock.Controls
 
 		#endregion
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -200,8 +209,10 @@ namespace AvalonDock.Controls
 		{
 			_isMouseDown = false;
 			_allowDrag = false;
+
 			if (IsMouseCaptured)
 				ReleaseMouseCapture();
+
 			base.OnMouseLeftButtonUp(e);
 		}
 
@@ -228,7 +239,7 @@ namespace AvalonDock.Controls
 			base.OnMouseDown(e);
 		}
 
-		#endregion
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -236,28 +247,35 @@ namespace AvalonDock.Controls
 		{
 			_parentDocumentTabPanel = this.FindLogicalAncestor<DocumentPaneTabPanel>();
 			_parentDocumentTabPanelScreenArea = _parentDocumentTabPanel.GetScreenArea();
+
 			_otherTabs = _parentDocumentTabPanel.Children.Cast<TabItem>().Where(ch =>
 				ch.Visibility != System.Windows.Visibility.Collapsed).ToList();
+
 			Rect currentTabScreenArea = this.FindLogicalAncestor<TabItem>().GetScreenArea();
+
 			_otherTabsScreenArea = _otherTabs.Select(ti =>
-		   {
-			   var screenArea = ti.GetScreenArea();
-			   return new Rect(screenArea.Left, screenArea.Top, currentTabScreenArea.Width, screenArea.Height);
-		   }).ToList();
+			{
+				var screenArea = ti.GetScreenArea();
+				return new Rect(screenArea.Left, screenArea.Top, currentTabScreenArea.Width, screenArea.Height);
+			}).ToList();
 		}
 
+		/// <summary>
+		/// Is invoked when the user started to drag this control and its content
+		/// should be contained in a <see cref="LayoutFloatingWindowControl"/> to allow
+		/// dragging out of the currently docked position.
+		/// </summary>
 		private void StartDraggingFloatingWindowForContent()
 		{
 			this.ReleaseMouseCapture();
 
 			if (this.Model is LayoutAnchorable)
-			{
 				((LayoutAnchorable)this.Model).ResetCanCloseInternal();
-			}
+
 			var manager = this.Model.Root.Manager;
 			manager.StartDraggingFloatingWindowForContent(this.Model);
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

@@ -154,11 +154,12 @@ namespace AvalonDock.Controls
 						var root = model.Root;
 						if (root != null)
 						{
+							// Start dragging a LayoutAnchorable control that docked/reduced into a SidePanel and
+							// 1) made visible by clicking on to its name in AutoHide mode
+							// 2) user drags the top title bar of the LayoutAnchorable control to drag it out of its current docking position
 							var manager = root.Manager;
 							if (manager != null)
-							{
 								manager.StartDraggingFloatingWindowForContent(model);
-							}
 						}
 					}
 				}
