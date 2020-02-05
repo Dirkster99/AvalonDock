@@ -20,13 +20,10 @@ namespace AvalonDock.Controls
 	{
 		#region Properties
 		/// <summary>
-		/// Gets the DockingManager control that should be invoked to do the actual docking
+		/// Gets the <see cref="DockingManager"/> control that should be invoked to do the actual docking
 		/// if docking into this <see cref="IOverlayWindowHost"/> should be performed.
 		/// </summary>
-		DockingManager Manager
-		{
-			get;
-		}
+		DockingManager Manager { get; }
 
 		#endregion
 
@@ -35,8 +32,8 @@ namespace AvalonDock.Controls
 		/// Determines whether the given screen coordinates are part of the <see cref="IOverlayWindowHost"/>
 		/// window or not.
 		/// </summary>
-		/// <param name="dragPoint"></param>
-		/// <returns></returns>
+		/// <param name="dragPoint">The point to test.</param>
+		/// <returns><c>true</c> if inside window, otherwise <c>false</c>.</returns>
 		bool HitTest(Point dragPoint);
 
 		/// <summary>
@@ -45,8 +42,8 @@ namespace AvalonDock.Controls
 		/// on an <see cref="IOverlayWindowHost"/> (where the <see cref="IOverlayWindowHost"/> is the drop target
 		/// and the <see cref="LayoutFloatingWindowControl"/> the dragged item).
 		/// </summary>
-		/// <param name="draggingWindow"></param>
-		/// <returns></returns>
+		/// <param name="draggingWindow">The control being dragged.</param>
+		/// <returns>The window encapsulating the dragged item.</returns>
 		IOverlayWindow ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow);
 
 		/// <summary>
@@ -60,8 +57,8 @@ namespace AvalonDock.Controls
 		/// to enumerate and show all overlay buttons in an <see cref="IOverlayWindow"/> when the
 		/// floating window is dragged over an <see cref="IOverlayWindowHost"/>.
 		/// </summary>
-		/// <param name="draggingWindow"></param>
-		/// <returns></returns>
+		/// <param name="draggingWindow">The window to examine.</param>
+		/// <returns>The associated drop areas.</returns>
 		IEnumerable<IDropArea> GetDropAreas(LayoutFloatingWindowControl draggingWindow);
 
 		#endregion
