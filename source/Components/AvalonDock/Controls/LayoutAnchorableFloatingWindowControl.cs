@@ -21,9 +21,7 @@ using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
-	/// <summary>
-	/// Class visualizes floating LayoutAnchorables (toolwindows) in AvalonDock.
-	/// </summary>
+	/// <summary>Class visualizes floating <see cref="LayoutAnchorable"/> (tool windows) in AvalonDock.</summary>
 	public class LayoutAnchorableFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
 	{
 		#region fields
@@ -515,17 +513,11 @@ namespace AvalonDock.Controls
 
 		bool IOverlayWindowHost.HitTest(Point dragPoint)
 		{
-			Rect detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
+			var detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			return detectionRect.Contains(dragPoint);
 		}
 
-		DockingManager IOverlayWindowHost.Manager
-		{
-			get
-			{
-				return _model.Root.Manager;
-			}
-		}
+		DockingManager IOverlayWindowHost.Manager => _model.Root.Manager;
 
 		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
 		{
@@ -546,28 +538,16 @@ namespace AvalonDock.Controls
 
 		IEnumerable<IDropArea> IOverlayWindowHost.GetDropAreas(LayoutFloatingWindowControl draggingWindow)
 		{
-			if (_dropAreas != null)
-				return _dropAreas;
-
+			if (_dropAreas != null) return _dropAreas;
 			_dropAreas = new List<IDropArea>();
-
-			if (draggingWindow.Model is LayoutDocumentFloatingWindow)
-				return _dropAreas;
+			if (draggingWindow.Model is LayoutDocumentFloatingWindow) return _dropAreas;
 
 			var rootVisual = (Content as FloatingWindowContentHost).RootVisual;
 
 			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>())
-			{
-				_dropAreas.Add(new DropArea<LayoutAnchorablePaneControl>(
-					areaHost,
-					DropAreaType.AnchorablePane));
-			}
+				_dropAreas.Add(new DropArea<LayoutAnchorablePaneControl>(areaHost, DropAreaType.AnchorablePane));
 			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutDocumentPaneControl>())
-			{
-				_dropAreas.Add(new DropArea<LayoutDocumentPaneControl>(
-					areaHost,
-					DropAreaType.DocumentPane));
-			}
+				_dropAreas.Add(new DropArea<LayoutDocumentPaneControl>(areaHost, DropAreaType.DocumentPane));
 
 			return _dropAreas;
 		}

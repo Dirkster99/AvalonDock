@@ -27,13 +27,8 @@ namespace AvalonDock.Controls
 	internal interface IDropTarget
 	{
 		#region Properties
-		/// <summary>
-		/// Gets the type of a drop target that descries a specific docking position inside a <see cref="DropAreaType"/>.
-		/// </summary>
-		DropTargetType Type
-		{
-			get;
-		}
+		/// <summary>Gets the type of a drop target that descries a specific docking position inside a <see cref="DropAreaType"/>.</summary>
+		DropTargetType Type { get; }
 		#endregion
 
 		#region Methods
@@ -47,11 +42,9 @@ namespace AvalonDock.Controls
 		/// <returns>The geometry of the preview/highlighting WPF figure path.</returns>
 		Geometry GetPreviewPath(OverlayWindow overlayWindow, LayoutFloatingWindow floatingWindowModel);
 
-		/// <summary>
-		/// Determines whether the <paramref name="dragPoint"/> is part of this drop target or not.
-		/// </summary>
-		/// <param name="dragPoint"></param>
-		/// <returns></returns>
+		/// <summary>Determines whether the <paramref name="dragPoint"/> is part of this drop target or not.</summary>
+		/// <param name="dragPoint">The point to test.</param>
+		/// <returns><c>true</c> if it is inside the target.</returns>
 		bool HitTest(Point dragPoint);
 
 		/// <summary>

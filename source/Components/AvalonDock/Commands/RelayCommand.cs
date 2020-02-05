@@ -12,13 +12,15 @@ using System.Windows.Input;
 
 namespace AvalonDock.Commands
 {
+	/// <inheritdoc />
 	/// <summary>
 	/// A command whose sole purpose is to  relay its functionality to other
 	/// objects by invoking delegates.
-	/// The default return value for the CanExecute method is 'true'.
+	/// The default return value for the <see cref="ICommand.CanExecute"/> method is <c>true</c>.
 	/// 
-	/// Source: http://www.codeproject.com/Articles/31837/Creating-an-Internationalized-Wizard-in-WPF
+	/// Source: <see href="http://www.codeproject.com/Articles/31837/Creating-an-Internationalized-Wizard-in-WPF"/>
 	/// </summary>
+	/// <seealso cref="ICommand"/>
 	internal class RelayCommand : ICommand
 	{
 		#region fields
@@ -27,12 +29,12 @@ namespace AvalonDock.Commands
 		#endregion fields
 
 		#region Constructors
+		
 		/// <summary>
 		/// Class constructor from <see cref="Action{T}"/> parameter.
 		/// </summary>
-		/// <param name="execute"></param>
-		public RelayCommand(Action<object> execute)
-			: this(execute, null)
+		/// <param name="execute">The action to execute when the command is activated.</param>
+		public RelayCommand(Action<object> execute) : this(execute, null)
 		{
 		}
 
@@ -41,51 +43,31 @@ namespace AvalonDock.Commands
 		/// canExecute predicate to decide whether command should currently
 		/// be available or not.
 		/// </summary>
-		/// <param name="execute"></param>
+		/// <param name="execute">The action to execute when the command is activated.</param>
+		/// <param name="canExecute">The predicate to determine if this command can be executed.</param>
 		public RelayCommand(Action<object> execute, Predicate<object> canExecute)
 		{
-			if (execute == null)
-				throw new ArgumentNullException("execute");
-
-			_execute = execute;
+			_execute = execute ?? throw new ArgumentNullException(nameof(execute));
 			_canExecute = canExecute;
 		}
+
 		#endregion Constructors
 
 		#region ICommand Members
-		/// <summary>
-		/// Eventhandler to re-evaluate whether this command can execute or not
-		/// </summary>
+		
+		/// <inheritdoc />
 		public event EventHandler CanExecuteChanged
 		{
-			add
-			{
-				CommandManager.RequerySuggested += value;
-			}
-			remove
-			{
-				CommandManager.RequerySuggested -= value;
-			}
+			add => CommandManager.RequerySuggested += value;
+			remove => CommandManager.RequerySuggested -= value;
 		}
 
-		/// <summary>
-		/// Determine whether this pre-requisites to execute this command is given or not.
-		/// </summary>
-		/// <param name="parameter"></param>
-		/// <returns></returns>
-		public bool CanExecute(object parameter)
-		{
-			return _canExecute == null ? true : _canExecute(parameter);
-		}
+		/// <inheritdoc />
+		/// <remarks>Returns <c>true</c>, if no predicate is set for the check.</remarks>
+		public bool CanExecute(object parameter) => _canExecute?.Invoke(parameter) ?? true;
 
-		/// <summary>
-		/// Execute the command method managed in this class.
-		/// </summary>
-		/// <param name="parameter"></param>
-		public void Execute(object parameter)
-		{
-			_execute(parameter);
-		}
+		/// <inheritdoc />
+		public void Execute(object parameter) => _execute(parameter);
 
 		#endregion ICommand Members
 	}

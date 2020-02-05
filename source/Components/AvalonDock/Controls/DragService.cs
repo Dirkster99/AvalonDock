@@ -17,7 +17,7 @@ namespace AvalonDock.Controls
 	/// <summary>
 	/// This class manages the drag & drop behavior when the user drags a:
 	/// - document (<see cref="LayoutDocument"/>) or
-	/// - toolwindow (<see cref="LayoutAnchorable"/>) and drops it in an alternative position.
+	/// - tool window (<see cref="LayoutAnchorable"/>) and drops it in an alternative position.
 	/// 
 	/// The <see cref="LayoutFloatingWindowControl"/> contains a <see cref="DragService"/> field
 	/// in order to implement the drag behavior for inheriting classes
@@ -35,6 +35,12 @@ namespace AvalonDock.Controls
 	/// 1- the item being dragged around (and its content) and
 	/// 2- the drop position (and its content).
 	/// </summary>
+	/// <seealso cref="LayoutAnchorable"/>
+	/// <seealso cref="LayoutDocument"/>
+	/// <seealso cref="LayoutAnchorableFloatingWindow"/>
+	/// <seealso cref="LayoutDocumentFloatingWindow"/>
+	/// <seealso cref="LayoutDocumentFloatingWindowControl"/>
+	/// <seeslso cref="LayoutAnchorableFloatingWindowControl"/>).
 	internal class DragService
 	{
 		#region fields
@@ -165,10 +171,10 @@ namespace AvalonDock.Controls
 		/// The drop/dock behavior depends on whether the current mouse position is an actual drop target
 		/// the item being dragged, and the item being docked (if any) etc.
 		/// </summary>
-		/// <param name="dropLocation">The screen coordinates of the drop/dock postion.</param>
+		/// <param name="dropLocation">The screen coordinates of the drop/dock position.</param>
 		/// <param name="dropHandled">Indicates whether the drop was handled such that the
 		/// dropped <see cref="LayoutFloatingWindowControl"/> can be removed now (since it content
-		/// is dacked into a new visual tree position).</param>
+		/// is docked into a new visual tree position).</param>
 		internal void Drop(Point dropLocation, out bool dropHandled)
 		{
 			dropHandled = false;
