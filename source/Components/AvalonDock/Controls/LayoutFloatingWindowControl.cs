@@ -67,7 +67,7 @@ namespace AvalonDock.Controls
 			this.IsContentImmutable = isContentImmutable;
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 		/// <summary>
@@ -81,14 +81,10 @@ namespace AvalonDock.Controls
 		/// </summary>
 		internal Point DragDelta { get; set; }
 
-		#region Model
-
 		public abstract ILayoutElement Model
 		{
 			get;
 		}
-
-		#endregion
 
 		#region IsContentImmutable
 
@@ -114,7 +110,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion IsContentImmutable
 
 		#region IsDragging
 
@@ -171,7 +167,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion IsDragging
 
 		#region CloseInitiatedByUser
 
@@ -183,17 +179,9 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion CloseInitiatedByUser
 
-		#region KeepContentVisibleOnClose
-
-		internal bool KeepContentVisibleOnClose
-		{
-			get;
-			set;
-		}
-
-		#endregion
+		internal bool KeepContentVisibleOnClose { get; set; }
 
 		#region IsMaximized
 
@@ -243,48 +231,9 @@ namespace AvalonDock.Controls
 			base.OnStateChanged(e);
 		}
 
-		#endregion
+		#endregion IsMaximized
 
-		#endregion
-
-		#region Overrides
-
-		protected override void OnClosed(EventArgs e)
-		{
-			SizeChanged -= OnSizeChanged;
-
-			if (Content != null)
-			{
-				var host = Content as FloatingWindowContentHost;
-				host.Dispose();
-
-				if (_hwndSrc != null)
-				{
-					_hwndSrc.RemoveHook(_hwndSrcHook);
-					_hwndSrc.Dispose();
-					_hwndSrc = null;
-				}
-			}
-
-			base.OnClosed(e);
-		}
-
-		protected override void OnInitialized(EventArgs e)
-		{
-			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.CloseWindowCommand,
-				new ExecutedRoutedEventHandler((s, args) => Microsoft.Windows.Shell.SystemCommands.CloseWindow((Window)args.Parameter))));
-			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.MaximizeWindowCommand,
-				new ExecutedRoutedEventHandler((s, args) => Microsoft.Windows.Shell.SystemCommands.MaximizeWindow((Window)args.Parameter))));
-			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.MinimizeWindowCommand,
-				new ExecutedRoutedEventHandler((s, args) => Microsoft.Windows.Shell.SystemCommands.MinimizeWindow((Window)args.Parameter))));
-			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.RestoreWindowCommand,
-				new ExecutedRoutedEventHandler((s, args) => Microsoft.Windows.Shell.SystemCommands.RestoreWindow((Window)args.Parameter))));
-			//Debug.Assert(this.Owner != null);
-			base.OnInitialized(e);
-		}
-
-
-		#endregion
+		#endregion Properties
 
 		#region Internal Methods
 
@@ -398,8 +347,6 @@ namespace AvalonDock.Controls
 					break;
 			}
 
-
-
 			return IntPtr.Zero;
 		}
 
@@ -413,7 +360,46 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Internal Methods
+
+		#region Overrides
+
+		protected override void OnClosed(EventArgs e)
+		{
+			SizeChanged -= OnSizeChanged;
+
+			if (Content != null)
+			{
+				var host = Content as FloatingWindowContentHost;
+				host.Dispose();
+
+				if (_hwndSrc != null)
+				{
+					_hwndSrc.RemoveHook(_hwndSrcHook);
+					_hwndSrc.Dispose();
+					_hwndSrc = null;
+				}
+			}
+
+			base.OnClosed(e);
+		}
+
+		protected override void OnInitialized(EventArgs e)
+		{
+			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.CloseWindowCommand,
+				new ExecutedRoutedEventHandler((s, args) => Microsoft.Windows.Shell.SystemCommands.CloseWindow((Window)args.Parameter))));
+			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.MaximizeWindowCommand,
+				new ExecutedRoutedEventHandler((s, args) => Microsoft.Windows.Shell.SystemCommands.MaximizeWindow((Window)args.Parameter))));
+			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.MinimizeWindowCommand,
+				new ExecutedRoutedEventHandler((s, args) => Microsoft.Windows.Shell.SystemCommands.MinimizeWindow((Window)args.Parameter))));
+			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.RestoreWindowCommand,
+				new ExecutedRoutedEventHandler((s, args) => Microsoft.Windows.Shell.SystemCommands.RestoreWindow((Window)args.Parameter))));
+			//Debug.Assert(this.Owner != null);
+			base.OnInitialized(e);
+		}
+
+
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -540,7 +526,7 @@ namespace AvalonDock.Controls
 			_dragService.UpdateMouseLocation(mousePosition);
 		}
 
-		#endregion
+		#endregion Private Methods
 
 		public virtual void EnableBindings()
 		{
@@ -572,11 +558,9 @@ namespace AvalonDock.Controls
 				BindingOperations.SetBinding(this, FloatingWindowContentHost.SizeToContentProperty, binding);
 			}
 
-			#endregion
+			#endregion Constructors
 
 			#region Properties
-
-			#region RootVisual
 
 			public Visual RootVisual
 			{
@@ -585,8 +569,6 @@ namespace AvalonDock.Controls
 					return _rootPresenter;
 				}
 			}
-
-			#endregion
 
 			#region Content
 
@@ -641,7 +623,7 @@ namespace AvalonDock.Controls
 				}
 			}
 
-			#endregion
+			#endregion Content
 
 			#region SizeToContent
 
@@ -685,9 +667,9 @@ namespace AvalonDock.Controls
 				}
 			}
 
-			#endregion
+			#endregion SizeToContent
 
-			#endregion
+			#endregion Properties
 
 			#region Overrides
 
@@ -730,19 +712,22 @@ namespace AvalonDock.Controls
 				return Content.DesiredSize;
 			}
 
-			#endregion
+			#endregion Overrides
 
-			#region Event Handlers
+			#region Methods
 
+			/// <summary>
+			/// Content_SizeChanged event handler.
+			/// </summary>
 			private void Content_SizeChanged(object sender, SizeChangedEventArgs e)
 			{
 				this.InvalidateMeasure();
 				this.InvalidateArrange();
 			}
 
-			#endregion
+			#endregion Methods
 		}
 
-		#endregion
+		#endregion Internal Classes
 	}
 }

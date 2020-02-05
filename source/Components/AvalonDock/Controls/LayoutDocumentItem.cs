@@ -24,7 +24,7 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -68,9 +68,9 @@ namespace AvalonDock.Controls
 			_document.Description = (string)e.NewValue;
 		}
 
-		#endregion
+		#endregion Description
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -99,11 +99,6 @@ namespace AvalonDock.Controls
 		}
 
 
-
-
-
-
-
 		internal override void Attach(LayoutContent model)
 		{
 			_document = model as LayoutDocument;
@@ -116,16 +111,6 @@ namespace AvalonDock.Controls
 			base.Detach();
 		}
 
-		#endregion
-
-		#region Private Methods
-
-
-
-
-
-
-
-		#endregion
+		#endregion Overrides
 	}
 }

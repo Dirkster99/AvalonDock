@@ -39,7 +39,7 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -87,7 +87,7 @@ namespace AvalonDock.Controls
 			//UpdateLogicalParent();
 		}
 
-		#endregion
+		#endregion Model
 
 		#region LayoutItem
 
@@ -121,9 +121,32 @@ namespace AvalonDock.Controls
 			SetValue(LayoutItemPropertyKey, value);
 		}
 
-		#endregion
+		#endregion LayoutItem
 
-		#endregion
+		#endregion Properties
+
+		#region Internal Methods
+
+		internal static bool IsDraggingItem()
+		{
+			return _draggingItem != null;
+		}
+
+		internal static LayoutAnchorableTabItem GetDraggingItem()
+		{
+			return _draggingItem;
+		}
+		internal static void ResetDraggingItem()
+		{
+			_draggingItem = null;
+		}
+
+		internal static void CancelMouseLeave()
+		{
+			_cancelMouseLeave = true;
+		}
+
+		#endregion Internal Methods
 
 		#region Overrides
 		protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
@@ -207,29 +230,6 @@ namespace AvalonDock.Controls
 
 		}
 
-		#endregion
-
-		#region Internal Methods
-
-		internal static bool IsDraggingItem()
-		{
-			return _draggingItem != null;
-		}
-
-		internal static LayoutAnchorableTabItem GetDraggingItem()
-		{
-			return _draggingItem;
-		}
-		internal static void ResetDraggingItem()
-		{
-			_draggingItem = null;
-		}
-
-		internal static void CancelMouseLeave()
-		{
-			_cancelMouseLeave = true;
-		}
-
-		#endregion
+		#endregion Overrides
 	}
 }

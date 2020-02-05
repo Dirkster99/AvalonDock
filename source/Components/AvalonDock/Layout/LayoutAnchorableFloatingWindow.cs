@@ -34,11 +34,15 @@ namespace AvalonDock.Layout
 		{
 		}
 
+		#endregion Constructors
+
+		#region Events
+
+		public event EventHandler IsVisibleChanged;
+
 		#endregion
 
 		#region Properties
-
-		#region IsSinglePane
 
 		public bool IsSinglePane
 		{
@@ -47,10 +51,6 @@ namespace AvalonDock.Layout
 				return RootPanel != null && RootPanel.Descendents().OfType<ILayoutAnchorablePane>().Where(p => p.IsVisible).Count() == 1;
 			}
 		}
-
-		#endregion
-
-		#region IsVisible
 
 		[XmlIgnore]
 		public bool IsVisible
@@ -71,10 +71,6 @@ namespace AvalonDock.Layout
 				}
 			}
 		}
-
-		#endregion
-
-		#region RootPanel
 
 		public LayoutAnchorablePaneGroup RootPanel
 		{
@@ -108,10 +104,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region SinglePane
-
 		public ILayoutAnchorablePane SinglePane
 		{
 			get
@@ -125,9 +117,16 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion Properties
 
-		#endregion
+		#region ILayoutElementWithVisibility Interface
+
+		void ILayoutElementWithVisibility.ComputeVisibility()
+		{
+			ComputeVisibility();
+		}
+
+		#endregion ILayoutElementWithVisibility Interface
 
 		#region Overrides
 
@@ -229,7 +228,7 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -247,21 +246,6 @@ namespace AvalonDock.Layout
 				IsVisible = false;
 		}
 
-		#endregion
-
-		#region Events
-
-		public event EventHandler IsVisibleChanged;
-
-		#endregion
-
-		#region ILayoutElementWithVisibility Interface
-
-		void ILayoutElementWithVisibility.ComputeVisibility()
-		{
-			ComputeVisibility();
-		}
-
-		#endregion
+		#endregion Private Methods
 	}
 }

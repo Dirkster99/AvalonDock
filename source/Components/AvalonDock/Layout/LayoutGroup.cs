@@ -19,7 +19,8 @@ namespace AvalonDock.Layout
 	public abstract class LayoutGroup<T> : LayoutGroupBase, ILayoutContainer, ILayoutGroup, IXmlSerializable where T : class, ILayoutElement
 	{
 		#region fields
-		ObservableCollection<T> _children = new ObservableCollection<T>();
+		private ObservableCollection<T> _children = new ObservableCollection<T>();
+		private bool _isVisible = true;
 		#endregion fields
 
 		#region Constructors
@@ -29,11 +30,9 @@ namespace AvalonDock.Layout
 			_children.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(_children_CollectionChanged);
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
-
-		#region Children
 
 		public ObservableCollection<T> Children
 		{
@@ -43,11 +42,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region IsVisible
-
-		private bool _isVisible = true;
 		public bool IsVisible
 		{
 			get
@@ -66,10 +60,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region ChildrenCount
-
 		public int ChildrenCount
 		{
 			get
@@ -78,22 +68,16 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#endregion
-
-		#region Overrides
-
-		protected override void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
-		{
-			base.OnParentChanged(oldValue, newValue);
-
-			ComputeVisibility();
-		}
-
-		#endregion
+		#endregion Properties
 
 		#region Public Methods
+		IEnumerable<ILayoutElement> ILayoutContainer.Children
+		{
+			get
+			{
+				return _children.Cast<ILayoutElement>();
+			}
+		}
 
 		public void ComputeVisibility()
 		{
@@ -212,7 +196,7 @@ namespace AvalonDock.Layout
 
 		}
 
-		#endregion
+		#endregion Public Methods
 
 		#region Internal Methods
 
@@ -227,7 +211,18 @@ namespace AvalonDock.Layout
 		{
 		}
 
-		#endregion
+		#endregion Internal Methods
+
+		#region Overrides
+
+		protected override void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
+		{
+			base.OnParentChanged(oldValue, newValue);
+
+			ComputeVisibility();
+		}
+
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -300,19 +295,6 @@ namespace AvalonDock.Layout
 			return null;
 		}
 
-		#endregion
-
-		#region ILayoutContainer Interface
-
-		IEnumerable<ILayoutElement> ILayoutContainer.Children
-		{
-			get
-			{
-				return _children.Cast<ILayoutElement>();
-			}
-		}
-
-		#endregion
-
+		#endregion Private Methods
 	}
 }

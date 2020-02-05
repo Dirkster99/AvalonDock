@@ -22,6 +22,32 @@ namespace Microsoft.Windows.Shell
 
 	public class WindowChrome : Freezable
 	{
+		public WindowChrome()
+		{
+			// Effective default values for some of these properties are set to be bindings
+			// that set them to system defaults.
+			// A more correct way to do this would be to Coerce the value iff the source of the DP was the default value.
+			// Unfortunately with the current property system we can't detect whether the value being applied at the time
+			// of the coersion is the default.
+			foreach (var bp in _BoundProperties)
+			{
+				// This list must be declared after the DP's are assigned.
+				Assert.IsNotNull(bp.DependencyProperty);
+				BindingOperations.SetBinding(
+					this,
+					bp.DependencyProperty,
+					new Binding
+					{
+						Source = SystemParameters2.Current,
+						Path = new PropertyPath(bp.SystemParameterPropertyName),
+						Mode = BindingMode.OneWay,
+						UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+					});
+			}
+		}
+
+		internal event EventHandler PropertyChangedThatRequiresRepaint;
+
 		private struct _SystemParameterBoundProperty
 		{
 			public string SystemParameterPropertyName
@@ -129,7 +155,7 @@ namespace Microsoft.Windows.Shell
 			dobj.SetValue(IsHitTestVisibleInChromeProperty, hitTestVisible);
 		}
 
-		#endregion
+		#endregion Attached Properties
 
 		#region Dependency Properties
 
@@ -227,23 +253,13 @@ namespace Microsoft.Windows.Shell
 			}
 		}
 
-		#region ShowSystemMenu
-
 		/// <summary>
 		/// Gets or sets the ShowSystemMenu property.  This dependency property 
 		/// indicates if the system menu should be shown at right click on the caption.
 		/// </summary>
-		public bool ShowSystemMenu
-		{
-			get;
-			set;
-		}
+		public bool ShowSystemMenu { get; set; }
 
-		#endregion
-
-
-
-		#endregion
+		#endregion Dependency Properties
 
 		protected override Freezable CreateInstanceCore()
 		{
@@ -258,30 +274,6 @@ namespace Microsoft.Windows.Shell
 			new _SystemParameterBoundProperty { DependencyProperty = GlassFrameThicknessProperty, SystemParameterPropertyName = "WindowNonClientFrameThickness" },
 		};
 
-		public WindowChrome()
-		{
-			// Effective default values for some of these properties are set to be bindings
-			// that set them to system defaults.
-			// A more correct way to do this would be to Coerce the value iff the source of the DP was the default value.
-			// Unfortunately with the current property system we can't detect whether the value being applied at the time
-			// of the coersion is the default.
-			foreach (var bp in _BoundProperties)
-			{
-				// This list must be declared after the DP's are assigned.
-				Assert.IsNotNull(bp.DependencyProperty);
-				BindingOperations.SetBinding(
-					this,
-					bp.DependencyProperty,
-					new Binding
-					{
-						Source = SystemParameters2.Current,
-						Path = new PropertyPath(bp.SystemParameterPropertyName),
-						Mode = BindingMode.OneWay,
-						UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-					});
-			}
-		}
-
 		private void _OnPropertyChangedThatRequiresRepaint()
 		{
 			var handler = PropertyChangedThatRequiresRepaint;
@@ -290,7 +282,5 @@ namespace Microsoft.Windows.Shell
 				handler(this, EventArgs.Empty);
 			}
 		}
-
-		internal event EventHandler PropertyChangedThatRequiresRepaint;
 	}
 }

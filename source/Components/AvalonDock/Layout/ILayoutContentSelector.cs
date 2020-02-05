@@ -23,12 +23,12 @@ namespace AvalonDock.Layout
 			get;
 		}
 
-		#endregion
+		#endregion Properties
 
 		#region Methods
 
 		int IndexOf(LayoutContent content);
 
-		#endregion
+		#endregion Methods
 	}
 }

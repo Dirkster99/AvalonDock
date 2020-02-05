@@ -21,11 +21,19 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutDocumentFloatingWindow : LayoutFloatingWindow, ILayoutElementWithVisibility
 	{
+		#region fields
+		private LayoutDocumentPaneGroup _rootPanel = null;
+
+		[NonSerialized]
+		private bool _isVisible = true;
+		#endregion fields
+
+		public event EventHandler IsVisibleChanged;
+
 		#region Properties
 
 		#region RootPanel
 
-		private LayoutDocumentPaneGroup _rootPanel = null;
 		public LayoutDocumentPaneGroup RootPanel
 		{
 			get => _rootPanel;
@@ -53,6 +61,9 @@ namespace AvalonDock.Layout
 			RaisePropertyChanged(nameof(SinglePane));
 		}
 
+		#endregion RootPanel
+
+		#region IsSinglePane
 		public bool IsSinglePane => RootPanel?.Descendents().OfType<LayoutDocumentPane>().Count(p => p.IsVisible) == 1;
 
 		public LayoutDocumentPane SinglePane
@@ -65,10 +76,23 @@ namespace AvalonDock.Layout
 				return singlePane;
 			}
 		}
+		#endregion IsSinglePane
 
-		#endregion
+		[XmlIgnore]
+		public bool IsVisible
+		{
+			get => _isVisible;
+			private set
+			{
+				if (_isVisible == value) return;
+				RaisePropertyChanging(nameof(IsVisible));
+				_isVisible = value;
+				RaisePropertyChanged(nameof(IsVisible));
+				IsVisibleChanged?.Invoke(this, EventArgs.Empty);
+			}
+		}
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -94,28 +118,6 @@ namespace AvalonDock.Layout
 
 		/// <inheritdoc />
 		public override int ChildrenCount => RootPanel == null ? 0 : 1;
-
-		#region IsVisible
-		[NonSerialized]
-		private bool _isVisible = true;
-
-		[XmlIgnore]
-		public bool IsVisible
-		{
-			get => _isVisible;
-			private set
-			{
-				if (_isVisible == value) return;
-				RaisePropertyChanging(nameof(IsVisible));
-				_isVisible = value;
-				RaisePropertyChanged(nameof(IsVisible));
-				IsVisibleChanged?.Invoke(this, EventArgs.Empty);
-			}
-		}
-
-		public event EventHandler IsVisibleChanged;
-
-		#endregion
 
 		void ILayoutElementWithVisibility.ComputeVisibility()
 		{
@@ -173,6 +175,6 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion
+		#endregion Overrides
 	}
 }

@@ -86,7 +86,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion AnchorableStyle
 
 		#region Background
 
@@ -112,9 +112,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
-
-		#region Model
+		#endregion Background
 
 		public ILayoutElement Model
 		{
@@ -124,83 +122,16 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
-
-		#region Resizer
-
+		/// <summary>
+		/// Resizer
+		/// </summary>
 		internal bool IsResizing
 		{
 			get;
 			private set;
 		}
 
-		#endregion
-
-		#endregion
-
-		#region Overrides
-
-		protected override System.Runtime.InteropServices.HandleRef BuildWindowCore(System.Runtime.InteropServices.HandleRef hwndParent)
-		{
-			parentWindowHandle = hwndParent.Handle;
-			_internalHwndSource = new HwndSource(new HwndSourceParameters()
-			{
-				ParentWindow = hwndParent.Handle,
-				WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_VISIBLE | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
-				Width = 0,
-				Height = 0,
-			});
-
-			_internalHwndSource.RootVisual = _internalHostPresenter;
-			AddLogicalChild(_internalHostPresenter);
-			Win32Helper.BringWindowToTop(_internalHwndSource.Handle);
-			return new HandleRef(this, _internalHwndSource.Handle);
-		}
-
-		protected override void DestroyWindowCore(System.Runtime.InteropServices.HandleRef hwnd)
-		{
-			if (_internalHwndSource != null)
-			{
-				_internalHwndSource.Dispose();
-				_internalHwndSource = null;
-			}
-		}
-
-		protected override bool HasFocusWithinCore()
-		{
-			return false;
-		}
-
-		protected override System.Collections.IEnumerator LogicalChildren
-		{
-			get
-			{
-				if (_internalHostPresenter == null)
-					return new UIElement[] { }.GetEnumerator();
-				return new UIElement[] { _internalHostPresenter }.GetEnumerator();
-			}
-		}
-
-		protected override Size MeasureOverride(Size constraint)
-		{
-			if (_internalHostPresenter == null)
-				return base.MeasureOverride(constraint);
-
-			_internalHostPresenter.Measure(constraint);
-			//return base.MeasureOverride(constraint);
-			return _internalHostPresenter.DesiredSize;
-		}
-
-		protected override Size ArrangeOverride(Size finalSize)
-		{
-			if (_internalHostPresenter == null)
-				return base.ArrangeOverride(finalSize);
-
-			_internalHostPresenter.Arrange(new Rect(finalSize));
-			return base.ArrangeOverride(finalSize);// new Size(_internalHostPresenter.ActualWidth, _internalHostPresenter.ActualHeight);
-		}
-
-		#endregion
+		#endregion Properties
 
 		#region Internal Methods
 
@@ -266,7 +197,71 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Internal Methods
+
+		#region Overrides
+
+		protected override System.Runtime.InteropServices.HandleRef BuildWindowCore(System.Runtime.InteropServices.HandleRef hwndParent)
+		{
+			parentWindowHandle = hwndParent.Handle;
+			_internalHwndSource = new HwndSource(new HwndSourceParameters()
+			{
+				ParentWindow = hwndParent.Handle,
+				WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_VISIBLE | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
+				Width = 0,
+				Height = 0,
+			});
+
+			_internalHwndSource.RootVisual = _internalHostPresenter;
+			AddLogicalChild(_internalHostPresenter);
+			Win32Helper.BringWindowToTop(_internalHwndSource.Handle);
+			return new HandleRef(this, _internalHwndSource.Handle);
+		}
+
+		protected override void DestroyWindowCore(System.Runtime.InteropServices.HandleRef hwnd)
+		{
+			if (_internalHwndSource != null)
+			{
+				_internalHwndSource.Dispose();
+				_internalHwndSource = null;
+			}
+		}
+
+		protected override bool HasFocusWithinCore()
+		{
+			return false;
+		}
+
+		protected override System.Collections.IEnumerator LogicalChildren
+		{
+			get
+			{
+				if (_internalHostPresenter == null)
+					return new UIElement[] { }.GetEnumerator();
+				return new UIElement[] { _internalHostPresenter }.GetEnumerator();
+			}
+		}
+
+		protected override Size MeasureOverride(Size constraint)
+		{
+			if (_internalHostPresenter == null)
+				return base.MeasureOverride(constraint);
+
+			_internalHostPresenter.Measure(constraint);
+			//return base.MeasureOverride(constraint);
+			return _internalHostPresenter.DesiredSize;
+		}
+
+		protected override Size ArrangeOverride(Size finalSize)
+		{
+			if (_internalHostPresenter == null)
+				return base.ArrangeOverride(finalSize);
+
+			_internalHostPresenter.Arrange(new Rect(finalSize));
+			return base.ArrangeOverride(finalSize);// new Size(_internalHostPresenter.ActualWidth, _internalHostPresenter.ActualHeight);
+		}
+
+		#endregion Overrides
 
 		#region Private Methods
 		private void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -550,6 +545,6 @@ namespace AvalonDock.Controls
 			IsResizing = true;
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

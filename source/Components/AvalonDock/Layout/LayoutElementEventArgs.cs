@@ -13,23 +13,14 @@ namespace AvalonDock.Layout
 {
 	public class LayoutElementEventArgs : EventArgs
 	{
-		#region Constructors
-
+		/// <summary>
+		/// Class constructor
+		/// </summary>
 		public LayoutElementEventArgs(LayoutElement element)
 		{
 			Element = element;
 		}
 
-		#endregion
-
-		#region Properties
-
-		public LayoutElement Element
-		{
-			get;
-			private set;
-		}
-
-		#endregion
+		public LayoutElement Element { get; private set; }
 	}
 }

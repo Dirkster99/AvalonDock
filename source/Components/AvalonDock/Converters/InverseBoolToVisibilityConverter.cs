@@ -16,8 +16,6 @@ namespace AvalonDock.Converters
 	[ValueConversion(typeof(bool), typeof(Visibility))]
 	public class InverseBoolToVisibilityConverter : IValueConverter
 	{
-
-		#region IValueConverter Members 
 		/// <summary> 
 		/// Converts a value. 
 		/// </summary> 
@@ -66,6 +64,5 @@ namespace AvalonDock.Converters
 			}
 			throw new ArgumentException("Invalid argument/return type. Expected argument: Visibility and return type: bool");
 		}
-		#endregion
 	}
 }

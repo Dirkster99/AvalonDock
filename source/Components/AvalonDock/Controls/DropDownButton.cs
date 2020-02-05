@@ -28,7 +28,7 @@ namespace AvalonDock.Controls
 			this.Unloaded += new RoutedEventHandler(DropDownButton_Unloaded);
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -74,7 +74,7 @@ namespace AvalonDock.Controls
 				oldContextMenu.Closed -= new RoutedEventHandler(OnContextMenuClosed);
 		}
 
-		#endregion
+		#endregion DropDownContextMenu
 
 		#region DropDownContextMenuDataContext
 
@@ -100,9 +100,9 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion DropDownContextMenuDataContext
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -121,7 +121,7 @@ namespace AvalonDock.Controls
 			base.OnClick();
 		}
 
-		#endregion
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -143,6 +143,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

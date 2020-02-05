@@ -101,7 +101,7 @@ namespace AvalonDock.Layout
 			return AnchorSide.Right;
 		}
 
-		#endregion
+		#endregion Public Methods
 
 		#region Internal Methods
 
@@ -154,9 +154,8 @@ namespace AvalonDock.Layout
 					}
 				}
 			}
-
 		}
 
-		#endregion
+		#endregion Internal Methods
 	}
 }

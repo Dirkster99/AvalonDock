@@ -98,7 +98,7 @@ namespace AvalonDock.Controls
 			//UpdateLogicalParent();
 		}
 
-		#endregion
+		#endregion Model
 
 		#region LayoutItem
 
@@ -132,7 +132,7 @@ namespace AvalonDock.Controls
 			SetValue(LayoutItemPropertyKey, value);
 		}
 
-		#endregion
+		#endregion LayoutItem
 
 		#endregion Properties
 

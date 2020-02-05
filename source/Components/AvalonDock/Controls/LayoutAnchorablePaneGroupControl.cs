@@ -36,7 +36,7 @@ namespace AvalonDock.Controls
 			_model = model;
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Overrides
 
@@ -68,6 +68,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Overrides
 	}
 }

@@ -25,7 +25,7 @@ namespace AvalonDock.Themes
 			this.ThemeResourceDictionary = themeResourceDictionary;
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -35,7 +35,7 @@ namespace AvalonDock.Themes
 			private set;
 		}
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -44,6 +44,6 @@ namespace AvalonDock.Themes
 			return null;
 		}
 
-		#endregion
+		#endregion Overrides
 	}
 }

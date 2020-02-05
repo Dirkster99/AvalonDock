@@ -42,7 +42,7 @@ namespace AvalonDock.Controls
 			_model.Children.CollectionChanged += (s, e) => OnModelChildrenCollectionChanged(e);
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -62,7 +62,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Properties
 
 		#region Private Methods
 
@@ -111,6 +111,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

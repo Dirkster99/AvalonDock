@@ -18,44 +18,19 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public abstract class LayoutFloatingWindow : LayoutElement, ILayoutContainer, IXmlSerializable
 	{
-		#region Constructors
-
-		public LayoutFloatingWindow()
-		{
-		}
-
-		#endregion
-
 		#region Properties
 
 		#region Children
 
-		public abstract IEnumerable<ILayoutElement> Children
-		{
-			get;
-		}
+		public abstract IEnumerable<ILayoutElement> Children { get; }
 
-		#endregion
+		public abstract int ChildrenCount { get; }
 
-		#region ChildrenCount
+		#endregion Children
 
-		public abstract int ChildrenCount
-		{
-			get;
-		}
+		public abstract bool IsValid { get; }
 
-		#endregion
-
-		#region IsValid
-
-		public abstract bool IsValid
-		{
-			get;
-		}
-
-		#endregion
-
-		#endregion
+		#endregion Properties
 
 		#region Public Methods
 
@@ -80,6 +55,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion Public Methods
 	}
 }

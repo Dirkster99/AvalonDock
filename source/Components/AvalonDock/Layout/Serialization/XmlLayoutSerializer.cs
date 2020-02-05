@@ -21,7 +21,7 @@ namespace AvalonDock.Layout.Serialization
 		{
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Public Methods
 
@@ -103,6 +103,6 @@ namespace AvalonDock.Layout.Serialization
 				Deserialize(stream);
 		}
 
-		#endregion
+		#endregion Public Methods
 	}
 }

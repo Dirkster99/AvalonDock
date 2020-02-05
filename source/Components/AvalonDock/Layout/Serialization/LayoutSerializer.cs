@@ -32,7 +32,7 @@ namespace AvalonDock.Layout.Serialization
 			_previousDocuments = _manager.Layout.Descendents().OfType<LayoutDocument>().ToArray();
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -44,13 +44,13 @@ namespace AvalonDock.Layout.Serialization
 			}
 		}
 
-		#endregion
+		#endregion Properties
 
 		#region Events
 
 		public event EventHandler<LayoutSerializationCallbackEventArgs> LayoutSerializationCallback;
 
-		#endregion
+		#endregion Events
 
 		#region Methods
 
@@ -142,7 +142,6 @@ namespace AvalonDock.Layout.Serialization
 			Manager.SuspendDocumentsSourceBinding = false;
 			Manager.SuspendAnchorablesSourceBinding = false;
 		}
-
-		#endregion
+		#endregion Methods
 	}
 }

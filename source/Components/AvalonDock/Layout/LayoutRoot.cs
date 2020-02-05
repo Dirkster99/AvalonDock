@@ -36,7 +36,7 @@ namespace AvalonDock.Layout
 			RootPanel = new LayoutPanel(new LayoutDocumentPane());
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -69,7 +69,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion RootPanel
 
 		#region TopSide
 
@@ -93,7 +93,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion TopSide
 
 		#region RightSide
 
@@ -117,7 +117,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion RightSide
 
 		#region LeftSide
 
@@ -141,7 +141,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion LeftSide
 
 		#region BottomSide
 
@@ -165,7 +165,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion BottomSide
 
 		#region FloatingWindows
 
@@ -185,7 +185,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion FloatingWindows
 
 		#region HiddenAnchorables
 
@@ -205,7 +205,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion HiddenAnchorables
 
 		#region Children
 
@@ -236,10 +236,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region ChildrenCount
-
 		public int ChildrenCount
 		{
 			get
@@ -250,7 +246,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion Children
 
 		#region ActiveContent
 
@@ -276,7 +272,7 @@ namespace AvalonDock.Layout
 		}
 
 
-		#endregion
+		#endregion ActiveContent
 
 		#region LastFocusedDocument
 
@@ -310,10 +306,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion LastFocusedDocument
 
 		#region Manager
-
 
 		[NonSerialized]
 		private DockingManager _manager = null;
@@ -336,9 +331,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion Manager
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -364,7 +359,7 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion
+		#endregion Overrides
 
 		#region Public Methods
 
@@ -530,7 +525,7 @@ namespace AvalonDock.Layout
 				}
 			}
 			while (!exitFlag);
-			#endregion
+			#endregion collect empty panes
 
 			#region collapse single child anchorable pane groups
 			do
@@ -549,7 +544,7 @@ namespace AvalonDock.Layout
 				}
 			}
 			while (!exitFlag);
-			#endregion
+			#endregion collapse single child anchorable pane groups
 
 			#region collapse single child document pane groups
 			do
@@ -569,35 +564,34 @@ namespace AvalonDock.Layout
 
 			}
 			while (!exitFlag);
-			#endregion
+			#endregion collapse single child document pane groups
 
-			//do
-			//{
-			//  exitFlag = true;
-			//  //for each panel that has only one child
-			//  foreach( var panelToCollapse in this.Descendents().OfType<LayoutPanel>().Where( p => p.ChildrenCount == 1 && p.Children[ 0 ] is LayoutPanel ).ToArray() )
-			//  {
-			//    var singleChild = panelToCollapse.Children[ 0 ] as LayoutPanel;
-			//    panelToCollapse.Orientation = singleChild.Orientation;
-			//    panelToCollapse.RemoveChild( singleChild );
-			//    ILayoutPanelElement[] singleChildChildren = new ILayoutPanelElement[ singleChild.ChildrenCount ];
-			//    singleChild.Children.CopyTo( singleChildChildren, 0 );
-			//    while( singleChild.ChildrenCount > 0 )
-			//    {
-			//      panelToCollapse.InsertChildAt(
-			//          panelToCollapse.ChildrenCount, singleChildChildren[ panelToCollapse.ChildrenCount ] );
-			//    }
+			////do
+			////{
+			////  exitFlag = true;
+			////  //for each panel that has only one child
+			////  foreach( var panelToCollapse in this.Descendents().OfType<LayoutPanel>().Where( p => p.ChildrenCount == 1 && p.Children[ 0 ] is LayoutPanel ).ToArray() )
+			////  {
+			////    var singleChild = panelToCollapse.Children[ 0 ] as LayoutPanel;
+			////    panelToCollapse.Orientation = singleChild.Orientation;
+			////    panelToCollapse.RemoveChild( singleChild );
+			////    ILayoutPanelElement[] singleChildChildren = new ILayoutPanelElement[ singleChild.ChildrenCount ];
+			////    singleChild.Children.CopyTo( singleChildChildren, 0 );
+			////    while( singleChild.ChildrenCount > 0 )
+			////    {
+			////      panelToCollapse.InsertChildAt(
+			////          panelToCollapse.ChildrenCount, singleChildChildren[ panelToCollapse.ChildrenCount ] );
+			////    }
+            
+			////    exitFlag = false;
+			////    break;
+			////  }
+			////}
+			////while( !exitFlag );
 
-			//    exitFlag = false;
-			//    break;
-			//  }
-
-			//}
-			//while( !exitFlag );
-
-			#region Update ActiveContent and LastFocusedDocument properties
+			// Update ActiveContent and LastFocusedDocument properties
 			UpdateActiveContentProperty();
-			#endregion
+
 #if DEBUG
 			System.Diagnostics.Debug.Assert(!this.Descendents().OfType<LayoutAnchorablePane>().Any(a => a.ChildrenCount == 0 && a.IsVisible));
 			//DumpTree(true);
@@ -730,7 +724,7 @@ namespace AvalonDock.Layout
 			writer.WriteEndElement();
 		}
 
-		#endregion
+		#endregion Public Methods
 
 		#region Internal Methods
 
@@ -769,7 +763,7 @@ namespace AvalonDock.Layout
 				ElementRemoved(this, new LayoutElementEventArgs(element));
 		}
 
-		#endregion
+		#endregion Internal Methods
 
 		#region Private Methods
 
@@ -1102,7 +1096,7 @@ namespace AvalonDock.Layout
 			return serializer.Deserialize(reader);
 		}
 
-		#endregion
+		#endregion Private Methods
 
 		#region Events
 
@@ -1110,7 +1104,7 @@ namespace AvalonDock.Layout
 		public event EventHandler<LayoutElementEventArgs> ElementAdded;
 		public event EventHandler<LayoutElementEventArgs> ElementRemoved;
 
-		#endregion
+		#endregion Events
 
 		#region Diagnostic tools
 
@@ -1143,6 +1137,6 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion
+		#endregion Diagnostic tools
 	}
 }

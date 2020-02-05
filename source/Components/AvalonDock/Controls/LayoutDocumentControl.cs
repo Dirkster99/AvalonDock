@@ -29,7 +29,7 @@ namespace AvalonDock.Controls
 			FocusableProperty.OverrideMetadata(typeof(LayoutDocumentControl), new FrameworkPropertyMetadata(true));
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -104,7 +104,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Model
 
 		#region LayoutItem
 
@@ -138,9 +138,9 @@ namespace AvalonDock.Controls
 			SetValue(LayoutItemPropertyKey, value);
 		}
 
-		#endregion
+		#endregion LayoutItem
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -163,7 +163,7 @@ namespace AvalonDock.Controls
 		}
 
 
-		#endregion
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -175,6 +175,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

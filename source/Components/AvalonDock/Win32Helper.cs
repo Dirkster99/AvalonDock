@@ -258,6 +258,7 @@ namespace AvalonDock
 					return new Size(Width, Height);
 				}
 			}
+
 			public Point Location
 			{
 				get
@@ -265,15 +266,18 @@ namespace AvalonDock
 					return new Point(Left, Top);
 				}
 			}
+
 			// Handy method for converting to a System.Drawing.Rectangle  
 			public Rect ToRectangle()
 			{
 				return new Rect(Left, Top, Right, Bottom);
 			}
+
 			public static RECT FromRectangle(Rect rectangle)
 			{
 				return new Rect(rectangle.Left, rectangle.Top, rectangle.Right, rectangle.Bottom);
 			}
+
 			public override int GetHashCode()
 			{
 				return Left ^ ((Top << 13) | (Top >> 0x13)) ^ ((Width << 0x1a) | (Width >> 6)) ^ ((Height << 7) | (Height >> 0x19));
@@ -288,7 +292,7 @@ namespace AvalonDock
 			{
 				return FromRectangle(rect);
 			}
-			#endregion
+			#endregion Operator overloads
 		}
 
 		internal static RECT GetClientRect(IntPtr hWnd)
@@ -297,6 +301,7 @@ namespace AvalonDock
 			GetClientRect(hWnd, out result);
 			return result;
 		}
+
 		internal static RECT GetWindowRect(IntPtr hWnd)
 		{
 			RECT result = new RECT();
@@ -481,6 +486,5 @@ namespace AvalonDock
 		[DllImport("user32.dll")]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool GetMonitorInfo(IntPtr hMonitor, [In, Out] MonitorInfo lpmi);
-
 	}
 }

@@ -27,7 +27,7 @@ namespace AvalonDock.Controls
 			this.FlowDirection = System.Windows.FlowDirection.LeftToRight;
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Overrides
 

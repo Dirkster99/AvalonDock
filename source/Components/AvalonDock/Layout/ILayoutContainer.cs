@@ -25,7 +25,7 @@ namespace AvalonDock.Layout
 			get;
 		}
 
-		#endregion
+		#endregion Properties
 
 		#region Methods
 
@@ -33,6 +33,6 @@ namespace AvalonDock.Layout
 
 		void ReplaceChild(ILayoutElement oldElement, ILayoutElement newElement);
 
-		#endregion
+		#endregion Methods
 	}
 }

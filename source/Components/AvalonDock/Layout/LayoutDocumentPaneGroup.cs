@@ -17,6 +17,10 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutDocumentPaneGroup : LayoutPositionableGroup<ILayoutDocumentPane>, ILayoutDocumentPane, ILayoutOrientableGroup
 	{
+		#region fields
+		private Orientation _orientation;
+		#endregion fields
+
 		#region Constructors
 
 		public LayoutDocumentPaneGroup()
@@ -28,13 +32,10 @@ namespace AvalonDock.Layout
 			Children.Add(documentPane);
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
-		#region Orientation
-
-		private Orientation _orientation;
 		public Orientation Orientation
 		{
 			get
@@ -52,9 +53,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -87,6 +86,6 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion
+		#endregion Overrides
 	}
 }

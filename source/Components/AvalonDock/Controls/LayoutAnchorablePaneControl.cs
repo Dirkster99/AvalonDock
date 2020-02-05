@@ -47,7 +47,7 @@ namespace AvalonDock.Controls
 			this.SizeChanged += OnSizeChanged;
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -59,7 +59,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -90,8 +90,7 @@ namespace AvalonDock.Controls
 
 		}
 
-
-		#endregion
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -102,6 +101,6 @@ namespace AvalonDock.Controls
 			modelWithActualSize.ActualHeight = ActualHeight;
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

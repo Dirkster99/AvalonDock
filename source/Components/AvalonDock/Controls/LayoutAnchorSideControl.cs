@@ -49,11 +49,9 @@ namespace AvalonDock.Controls
 			UpdateSide();
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
-
-		#region Model
 
 		public ILayoutElement Model
 		{
@@ -63,10 +61,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
-
-		#region Children
-
 		public ObservableCollection<LayoutAnchorGroupControl> Children
 		{
 			get
@@ -74,8 +68,6 @@ namespace AvalonDock.Controls
 				return _childViews;
 			}
 		}
-
-		#endregion
 
 		#region IsLeftSide
 
@@ -109,7 +101,7 @@ namespace AvalonDock.Controls
 			SetValue(IsLeftSidePropertyKey, value);
 		}
 
-		#endregion
+		#endregion IsLeftSide
 
 		#region IsTopSide
 
@@ -143,7 +135,7 @@ namespace AvalonDock.Controls
 			SetValue(IsTopSidePropertyKey, value);
 		}
 
-		#endregion
+		#endregion IsTopSide
 
 		#region IsRightSide
 
@@ -177,7 +169,7 @@ namespace AvalonDock.Controls
 			SetValue(IsRightSidePropertyKey, value);
 		}
 
-		#endregion
+		#endregion IsRightSide
 
 		#region IsBottomSide
 
@@ -211,14 +203,9 @@ namespace AvalonDock.Controls
 			SetValue(IsBottomSidePropertyKey, value);
 		}
 
-		#endregion
+		#endregion IsBottomSide
 
-		#endregion
-
-		#region Overrides
-
-
-		#endregion
+		#endregion Properties
 
 		#region Private Methods
 
@@ -276,6 +263,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

@@ -39,11 +39,16 @@ namespace AvalonDock.Layout
 			_canClose = false;
 		}
 
-		#endregion
+		#endregion Constructors
+
+		#region Events
+
+		public event EventHandler IsVisibleChanged;
+		public event EventHandler<CancelEventArgs> Hiding;
+
+		#endregion Events
 
 		#region Properties
-
-		#region AutoHideWidth
 
 		public double AutoHideWidth
 		{
@@ -62,10 +67,6 @@ namespace AvalonDock.Layout
 				}
 			}
 		}
-
-		#endregion
-
-		#region AutoHideMinWidth
 
 		public double AutoHideMinWidth
 		{
@@ -86,10 +87,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region AutoHideHeight
-
 		public double AutoHideHeight
 		{
 			get
@@ -107,10 +104,6 @@ namespace AvalonDock.Layout
 				}
 			}
 		}
-
-		#endregion
-
-		#region AutoHideMinHeight
 
 		public double AutoHideMinHeight
 		{
@@ -131,10 +124,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region CanHide
-
 		public bool CanHide
 		{
 			get
@@ -150,10 +139,6 @@ namespace AvalonDock.Layout
 				}
 			}
 		}
-
-		#endregion
-
-		#region CanAutoHide
 
 		public bool CanAutoHide
 		{
@@ -171,10 +156,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region CanDockAsTabbedDocument
-
 		public bool CanDockAsTabbedDocument
 		{
 			get
@@ -191,10 +172,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region IsAutoHidden
-
 		/// <summary>
 		/// Get a value indicating if the anchorable is anchored to a border in an autohide status
 		/// </summary>
@@ -206,10 +183,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region IsHidden
-
 		[XmlIgnore]
 		public bool IsHidden
 		{
@@ -218,10 +191,6 @@ namespace AvalonDock.Layout
 				return (Parent is LayoutRoot);
 			}
 		}
-
-		#endregion
-
-		#region IsVisible
 
 		[XmlIgnore]
 		public bool IsVisible
@@ -243,16 +212,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#endregion
-
-		#region Events
-
-		public event EventHandler IsVisibleChanged;
-		public event EventHandler<CancelEventArgs> Hiding;
-
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -377,7 +337,7 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion
+		#endregion Overrides
 
 		#region Public Methods
 
@@ -663,7 +623,7 @@ namespace AvalonDock.Layout
 					parent = parent.Parent as LayoutGroupBase;
 				}
 			}
-			#endregion
+			#endregion Anchorable is already auto hidden
 
 			#region Anchorable is docked
 			else if (Parent is LayoutAnchorablePane)
@@ -709,10 +669,10 @@ namespace AvalonDock.Layout
 						break;
 				}
 			}
-			#endregion
+			#endregion Anchorable is docked
 		}
 
-		#endregion
+		#endregion Public Methods
 
 		#region Internal Methods
 
@@ -744,7 +704,7 @@ namespace AvalonDock.Layout
 			_canClose = _canCloseValueBeforeInternalSet;
 		}
 
-		#endregion
+		#endregion Internal Methods
 
 		#region Private Methods
 
@@ -769,6 +729,6 @@ namespace AvalonDock.Layout
 				parentPane.ComputeVisibility();
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

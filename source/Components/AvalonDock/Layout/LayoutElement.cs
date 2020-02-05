@@ -31,11 +31,21 @@ namespace AvalonDock.Layout
 		{
 		}
 
-		#endregion
+		#endregion Constructors
+
+		#region Events
+
+		[field: NonSerialized]
+		[field: XmlIgnore]
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		[field: NonSerialized]
+		[field: XmlIgnore]
+		public event PropertyChangingEventHandler PropertyChanging;
+
+		#endregion Events
 
 		#region Properties
-
-		#region Parent
 
 		[XmlIgnore]
 		public ILayoutContainer Parent
@@ -68,10 +78,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region Root
-
 		public ILayoutRoot Root
 		{
 			get
@@ -87,9 +93,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#endregion
+		#endregion Properties
 
 		#region Public Methods
 
@@ -101,7 +105,7 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion
+		#endregion Public Methods
 
 		#region Internal Methods
 
@@ -140,18 +144,6 @@ namespace AvalonDock.Layout
 				PropertyChanging(this, new System.ComponentModel.PropertyChangingEventArgs(propertyName));
 		}
 
-		#endregion
-
-		#region Events
-
-		[field: NonSerialized]
-		[field: XmlIgnore]
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		[field: NonSerialized]
-		[field: XmlIgnore]
-		public event PropertyChangingEventHandler PropertyChanging;
-
-		#endregion
+		#endregion Internal Methods
 	}
 }

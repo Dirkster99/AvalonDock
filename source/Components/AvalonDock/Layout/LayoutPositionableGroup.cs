@@ -21,21 +21,46 @@ namespace AvalonDock.Layout
 	{
 		#region fields
 		private static GridLengthConverter _gridLengthConverter = new GridLengthConverter();
+
+		// DockWidth fields
+		private GridLength _dockWidth = new GridLength(1.0, GridUnitType.Star);
+		private double? _resizableAbsoluteDockWidth;
+
+		// DockHeight fields
+		private GridLength _dockHeight = new GridLength(1.0, GridUnitType.Star);
+		private double? _resizableAbsoluteDockHeight;
+
+		private bool _allowDuplicateContent = true;
+		private bool _canRepositionItems = true;
+
+		private double _dockMinWidth = 25.0;
+		private double _dockMinHeight = 25.0;
+		private double _floatingWidth = 0.0;
+		private double _floatingHeight = 0.0;
+		private double _floatingLeft = 0.0;
+		private double _floatingTop = 0.0;
+
+		private bool _isMaximized = false;
+
+		[NonSerialized]
+		private double _actualWidth;
+
+		[NonSerialized]
+		private double _actualHeight;
 		#endregion fields
 
-		#region Constructors
+		#region Events
 
-		public LayoutPositionableGroup()
-		{
-		}
+		/// <summary>
+		/// Event fired when floating properties were updated.
+		/// </summary>
+		public event EventHandler FloatingPropertiesUpdated;
 
-		#endregion
+		#endregion Events
 
 		#region Properties
 
 		#region DockWidth
-
-		GridLength _dockWidth = new GridLength(1.0, GridUnitType.Star);
 		public GridLength DockWidth
 		{
 			get
@@ -64,8 +89,6 @@ namespace AvalonDock.Layout
 
 		public double FixedDockWidth => _dockWidth.IsAbsolute && _dockWidth.Value >= _dockMinWidth ? _dockWidth.Value : _dockMinWidth;
 
-		private double? _resizableAbsoluteDockWidth;
-
 		public double ResizableAbsoluteDockWidth
 		{
 			get { return _resizableAbsoluteDockWidth ?? 0; }
@@ -88,11 +111,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion DockWidth
 
 		#region DockHeight
-
-		GridLength _dockHeight = new GridLength(1.0, GridUnitType.Star);
 		public GridLength DockHeight
 		{
 			get
@@ -121,8 +142,6 @@ namespace AvalonDock.Layout
 
 		public double FixedDockHeight => _dockHeight.IsAbsolute && _dockHeight.Value >= _dockMinHeight ? _dockHeight.Value : _dockMinHeight;
 
-		private double? _resizableAbsoluteDockHeight;
-
 		public double ResizableAbsoluteDockHeight
 		{
 			get { return _resizableAbsoluteDockHeight ?? 0; }
@@ -149,11 +168,8 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion DockHeight
 
-		#region AllowDuplicateContent
-
-		private bool _allowDuplicateContent = true;
 		/// <summary>
 		/// Gets or sets the AllowDuplicateContent property.
 		/// When this property is true, then the LayoutDocumentPane or LayoutAnchorablePane allows dropping
@@ -177,11 +193,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region CanRepositionItems
-
-		private bool _canRepositionItems = true;
 		public bool CanRepositionItems
 		{
 			get
@@ -199,10 +210,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region CalculatedDockMinWidth
-
 		public double CalculatedDockMinWidth()
 		{
 			double childrenDockMinWidth = 0.0;
@@ -218,11 +225,6 @@ namespace AvalonDock.Layout
 			return Math.Max(this._dockMinWidth, childrenDockMinWidth);
 		}
 
-		#endregion
-
-		#region DockMinWidth
-
-		private double _dockMinWidth = 25.0;
 		/// <summary>
 		/// Defines the smallest available width that can be applied to a deriving element.
 		/// 
@@ -247,10 +249,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region CalculatedDockMinHeight
-
 		public double CalculatedDockMinHeight()
 		{
 			double childrenDockMinHeight = 0.0;
@@ -266,11 +264,6 @@ namespace AvalonDock.Layout
 			return Math.Max(this._dockMinHeight, childrenDockMinHeight);
 		}
 
-		#endregion
-
-		#region DockMinHeight
-
-		private double _dockMinHeight = 25.0;
 		/// <summary>
 		/// Defines the smallest available height that can be applied to a deriving element.
 		/// 
@@ -295,11 +288,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region FloatingWidth
-
-		private double _floatingWidth = 0.0;
 		public double FloatingWidth
 		{
 			get
@@ -317,11 +305,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region FloatingHeight
-
-		private double _floatingHeight = 0.0;
 		public double FloatingHeight
 		{
 			get
@@ -339,11 +322,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region FloatingLeft
-
-		private double _floatingLeft = 0.0;
 		public double FloatingLeft
 		{
 			get
@@ -361,11 +339,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region FloatingTop
-
-		private double _floatingTop = 0.0;
 		public double FloatingTop
 		{
 			get
@@ -383,11 +356,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region IsMaximized
-
-		private bool _isMaximized = false;
 		public bool IsMaximized
 		{
 			get
@@ -404,12 +372,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region ActualWidth
-
-		[NonSerialized]
-		double _actualWidth;
 		double ILayoutPositionableElementWithActualSize.ActualWidth
 		{
 			get
@@ -422,12 +384,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region ActualHeight
-
-		[NonSerialized]
-		double _actualHeight;
 		double ILayoutPositionableElementWithActualSize.ActualHeight
 		{
 			get
@@ -440,9 +396,15 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion Properties
 
-		#endregion
+		#region Internal Methods
+		void ILayoutElementForFloatingWindow.RaiseFloatingPropertiesUpdated()
+		{
+			FloatingPropertiesUpdated?.Invoke(this, EventArgs.Empty);
+		}
+
+		#endregion Methods
 
 		#region Overrides
 
@@ -499,10 +461,6 @@ namespace AvalonDock.Layout
 			base.ReadXml(reader);
 		}
 
-		#endregion
-
-		#region Internal Methods
-
 		protected virtual void OnDockWidthChanged()
 		{
 		}
@@ -511,20 +469,6 @@ namespace AvalonDock.Layout
 		{
 		}
 
-		void ILayoutElementForFloatingWindow.RaiseFloatingPropertiesUpdated()
-		{
-			FloatingPropertiesUpdated?.Invoke(this, EventArgs.Empty);
-		}
-
-		#endregion
-
-		#region Events.
-
-		/// <summary>
-		/// Event fired when floating properties were updated.
-		/// </summary>
-		public event EventHandler FloatingPropertiesUpdated;
-
-		#endregion
+		#endregion Overrides
 	}
 }

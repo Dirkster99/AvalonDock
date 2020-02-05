@@ -87,6 +87,29 @@ namespace AvalonDock
 
 		#endregion Constructors
 
+		#region Events
+
+		/// <summary>Event fired when <see cref="DockingManager.Layout"/> property changes.</summary>
+		/// <seealso cref="Layout"/>
+		public event EventHandler LayoutChanged;
+
+		/// <summary>Event fired when <see cref="DockingManager.Layout"/> property is about to be changed.</summary>
+		/// <seealso cref="Layout"/>
+		public event EventHandler LayoutChanging;
+
+		/// <summary>Event fired when a document is about to be closed.</summary>
+		/// <remarks>Subscribers have the opportunity to cancel the operation.</remarks>
+		public event EventHandler<DocumentClosingEventArgs> DocumentClosing;
+
+		/// <summary>Event fired after a document is closed.</summary>
+		public event EventHandler<DocumentClosedEventArgs> DocumentClosed;
+
+		/// <summary>Event is raised when <see cref="ActiveContent"/> changes.</summary>
+		/// <seealso cref="ActiveContent"/>
+		public event EventHandler ActiveContentChanged;
+
+		#endregion Events
+
 		#region Public Properties
 
 		#region Layout
@@ -216,7 +239,7 @@ namespace AvalonDock
 			CommandManager.InvalidateRequerySuggested();
 		}
 
-		#endregion
+		#endregion Layout
 
 		#region LayoutUpdateStrategy
 
@@ -236,7 +259,7 @@ namespace AvalonDock
 			set => SetValue(LayoutUpdateStrategyProperty, value);
 		}
 
-		#endregion
+		#endregion LayoutUpdateStrategy
 
 		#region DocumentPaneTemplate
 
@@ -265,7 +288,7 @@ namespace AvalonDock
 		{
 		}
 
-		#endregion
+		#endregion DocumentPaneTemplate
 
 		#region AnchorablePaneTemplate
 
@@ -293,7 +316,7 @@ namespace AvalonDock
 		{
 		}
 
-		#endregion
+		#endregion AnchorablePaneTemplate
 
 		#region AnchorSideTemplate
 
@@ -311,7 +334,7 @@ namespace AvalonDock
 			set => SetValue(AnchorSideTemplateProperty, value);
 		}
 
-		#endregion
+		#endregion AnchorSideTemplate
 
 		#region AnchorGroupTemplate
 
@@ -329,7 +352,7 @@ namespace AvalonDock
 			set => SetValue(AnchorGroupTemplateProperty, value);
 		}
 
-		#endregion
+		#endregion AnchorGroupTemplate
 
 		#region AnchorTemplate
 
@@ -347,7 +370,7 @@ namespace AvalonDock
 			set => SetValue(AnchorTemplateProperty, value);
 		}
 
-		#endregion
+		#endregion AnchorTemplate
 
 		#region DocumentPaneControlStyle
 
@@ -373,7 +396,7 @@ namespace AvalonDock
 		{
 		}
 
-		#endregion
+		#endregion DocumentPaneControlStyle
 
 		#region AnchorablePaneControlStyle
 
@@ -399,7 +422,7 @@ namespace AvalonDock
 		{
 		}
 
-		#endregion
+		#endregion AnchorablePaneControlStyle
 
 		#region DocumentHeaderTemplate
 
@@ -433,7 +456,7 @@ namespace AvalonDock
 			return value;
 		}
 
-		#endregion
+		#endregion DocumentHeaderTemplate
 
 		#region DocumentHeaderTemplateSelector
 
@@ -466,7 +489,7 @@ namespace AvalonDock
 		/// <summary>Coerces the <see cref="DocumentHeaderTemplateSelector"/> value.</summary>
 		private static object CoerceDocumentHeaderTemplateSelectorValue(DependencyObject d, object value) => value;
 
-		#endregion
+		#endregion DocumentHeaderTemplateSelector
 
 		#region DocumentTitleTemplate
 
@@ -500,7 +523,7 @@ namespace AvalonDock
 			return value;
 		}
 
-		#endregion
+		#endregion DocumentTitleTemplate
 
 		#region DocumentTitleTemplateSelector
 
@@ -531,7 +554,7 @@ namespace AvalonDock
 		/// <summary>Coerces the <see cref="DocumentTitleTemplateSelector"/> value.</summary>
 		private static object CoerceDocumentTitleTemplateSelectorValue(DependencyObject d, object value) => value;
 
-		#endregion
+		#endregion DocumentTitleTemplateSelector
 
 		#region AnchorableTitleTemplate
 
@@ -565,7 +588,7 @@ namespace AvalonDock
 			return value;
 		}
 
-		#endregion
+		#endregion AnchorableTitleTemplate
 
 		#region AnchorableTitleTemplateSelector
 
@@ -593,7 +616,7 @@ namespace AvalonDock
 				AnchorableTitleTemplate = null;
 		}
 
-		#endregion
+		#endregion AnchorableTitleTemplateSelector
 
 		#region AnchorableHeaderTemplate
 
@@ -627,7 +650,7 @@ namespace AvalonDock
 			return value;
 		}
 
-		#endregion
+		#endregion AnchorableHeaderTemplate
 
 		#region AnchorableHeaderTemplateSelector
 
@@ -655,7 +678,7 @@ namespace AvalonDock
 				AnchorableHeaderTemplate = null;
 		}
 
-		#endregion
+		#endregion AnchorableHeaderTemplateSelector
 
 		#region LayoutRootPanel
 
@@ -685,7 +708,7 @@ namespace AvalonDock
 				InternalAddLogicalChild(e.NewValue);
 		}
 
-		#endregion
+		#endregion LayoutRootPanel
 
 		#region RightSidePanel
 
@@ -712,7 +735,7 @@ namespace AvalonDock
 				InternalAddLogicalChild(e.NewValue);
 		}
 
-		#endregion
+		#endregion RightSidePanel
 
 		#region LeftSidePanel
 
@@ -739,7 +762,7 @@ namespace AvalonDock
 				InternalAddLogicalChild(e.NewValue);
 		}
 
-		#endregion
+		#endregion LeftSidePanel
 
 		#region TopSidePanel
 
@@ -766,7 +789,7 @@ namespace AvalonDock
 				InternalAddLogicalChild(e.NewValue);
 		}
 
-		#endregion
+		#endregion TopSidePanel
 
 		#region BottomSidePanel
 
@@ -793,7 +816,7 @@ namespace AvalonDock
 				InternalAddLogicalChild(e.NewValue);
 		}
 
-		#endregion
+		#endregion BottomSidePanel
 
 		#region LogicalChildren
 
@@ -833,7 +856,7 @@ namespace AvalonDock
 			_logicalChildren.Clear();
 		}
 
-		#endregion
+		#endregion LogicalChildren
 
 		#region AutoHideWindow
 
@@ -865,13 +888,10 @@ namespace AvalonDock
 				InternalAddLogicalChild(e.NewValue);
 		}
 
-		#endregion
+		#endregion AutoHideWindow
 
-		#region Floating Windows
-
+		/// <summary>Floating Windows</summary>
 		public IEnumerable<LayoutFloatingWindowControl> FloatingWindows => _fwList;
-
-		#endregion
 
 		#region LayoutItemTemplate
 
@@ -897,7 +917,7 @@ namespace AvalonDock
 		{
 		}
 
-		#endregion
+		#endregion LayoutItemTemplate
 
 		#region LayoutItemTemplateSelector
 
@@ -920,7 +940,7 @@ namespace AvalonDock
 		{
 		}
 
-		#endregion
+		#endregion LayoutItemTemplateSelector
 
 		#region DocumentsSource
 
@@ -945,7 +965,7 @@ namespace AvalonDock
 			AttachDocumentsSource(Layout, e.NewValue as IEnumerable);
 		}
 
-		#endregion
+		#endregion DocumentsSource
 
 		#region DocumentContextMenu
 
@@ -960,7 +980,7 @@ namespace AvalonDock
 			set => SetValue(DocumentContextMenuProperty, value);
 		}
 
-		#endregion
+		#endregion DocumentContextMenu
 
 		#region AnchorablesSource
 
@@ -984,8 +1004,8 @@ namespace AvalonDock
 			DetachAnchorablesSource(Layout, e.OldValue as IEnumerable);
 			AttachAnchorablesSource(Layout, e.NewValue as IEnumerable);
 		}
-		
-		#endregion
+
+		#endregion AnchorablesSource
 
 		#region ActiveContent
 
@@ -1010,7 +1030,7 @@ namespace AvalonDock
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="ActiveContent"/> property.</summary>
 		protected virtual void OnActiveContentChanged(DependencyPropertyChangedEventArgs e) => ActiveContentChanged?.Invoke(this, EventArgs.Empty);
 
-		#endregion
+		#endregion ActiveContent
 
 		#region AnchorableContextMenu
 
@@ -1025,7 +1045,7 @@ namespace AvalonDock
 			set => SetValue(AnchorableContextMenuProperty, value);
 		}
 
-		#endregion
+		#endregion AnchorableContextMenu
 
 		#region Theme
 
@@ -1089,7 +1109,7 @@ namespace AvalonDock
 			_overlayWindow?.UpdateThemeResources();
 		}
 
-		#endregion
+		#endregion Theme
 
 		#region GridSplitterWidth
 
@@ -1104,7 +1124,7 @@ namespace AvalonDock
 			set => SetValue(GridSplitterWidthProperty, value);
 		}
 
-		#endregion
+		#endregion GridSplitterWidth
 
 		#region GridSplitterHeight
 
@@ -1119,7 +1139,7 @@ namespace AvalonDock
 			set => SetValue(GridSplitterHeightProperty, value);
 		}
 
-		#endregion
+		#endregion GridSplitterHeight
 
 		#region DocumentPaneMenuItemHeaderTemplate
 
@@ -1150,7 +1170,7 @@ namespace AvalonDock
 			return value ?? d.GetValue(DocumentHeaderTemplateProperty);
 		}
 
-		#endregion
+		#endregion DocumentPaneMenuItemHeaderTemplate
 
 		#region DocumentPaneMenuItemHeaderTemplateSelector
 
@@ -1181,7 +1201,7 @@ namespace AvalonDock
 		/// <summary>Coerces the <see cref="DocumentPaneMenuItemHeaderTemplateSelector"/> value.</summary>
 		private static object CoerceDocumentPaneMenuItemHeaderTemplateSelectorValue(DependencyObject d, object value) => value;
 
-		#endregion
+		#endregion DocumentPaneMenuItemHeaderTemplateSelector
 
 		#region IconContentTemplate
 
@@ -1199,7 +1219,7 @@ namespace AvalonDock
 			set => SetValue(IconContentTemplateProperty, value);
 		}
 
-		#endregion
+		#endregion IconContentTemplate
 
 		#region IconContentTemplateSelector
 
@@ -1217,7 +1237,7 @@ namespace AvalonDock
 			set => SetValue(IconContentTemplateSelectorProperty, value);
 		}
 
-		#endregion
+		#endregion IconContentTemplateSelector
 
 		#region LayoutItemContainerStyle
 
@@ -1241,7 +1261,7 @@ namespace AvalonDock
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="LayoutItemContainerStyle"/> property.</summary>
 		protected virtual void OnLayoutItemContainerStyleChanged(DependencyPropertyChangedEventArgs e) => AttachLayoutItems();
 
-		#endregion
+		#endregion LayoutItemContainerStyle
 
 		#region LayoutItemContainerStyleSelector
 
@@ -1262,7 +1282,7 @@ namespace AvalonDock
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="LayoutItemContainerStyleSelector"/> property.</summary>
 		protected virtual void OnLayoutItemContainerStyleSelectorChanged(DependencyPropertyChangedEventArgs e) => AttachLayoutItems();
 
-		#endregion
+		#endregion LayoutItemContainerStyleSelector
 
 		#region ShowSystemMenu
 
@@ -1277,7 +1297,7 @@ namespace AvalonDock
 			set => SetValue(ShowSystemMenuProperty, value);
 		}
 
-		#endregion
+		#endregion ShowSystemMenu
 
 		#region AllowMixedOrientation
 
@@ -1292,7 +1312,7 @@ namespace AvalonDock
 			set => SetValue(AllowMixedOrientationProperty, value);
 		}
 
-		#endregion
+		#endregion AllowMixedOrientation
 
 		#endregion Public Properties
 
@@ -1302,38 +1322,113 @@ namespace AvalonDock
 
 		#endregion Private Properties
 
-		#region Overrides
+		#region IOverlayWindowHost Interface
 
-		public override void OnApplyTemplate()
+		bool IOverlayWindowHost.HitTest(Point dragPoint)
 		{
-			base.OnApplyTemplate();
-			_autohideArea = GetTemplateChild("PART_AutoHideArea") as FrameworkElement;
+			var detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
+			return detectionRect.Contains(dragPoint);
 		}
 
-		protected override Size ArrangeOverride(Size arrangeBounds)
+		DockingManager IOverlayWindowHost.Manager => this;
+
+		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
+		{
+			CreateOverlayWindow();
+			_overlayWindow.Owner = draggingWindow;
+			_overlayWindow.EnableDropTargets();
+			_overlayWindow.Show();
+			return _overlayWindow;
+		}
+
+		void IOverlayWindowHost.HideOverlayWindow()
 		{
 			_areas = null;
-			return base.ArrangeOverride(arrangeBounds);
+			_overlayWindow.Owner = null;
+			_overlayWindow.HideDropTargets();
 		}
 
-		protected override void OnPreviewKeyDown(KeyEventArgs e)
+		IEnumerable<IDropArea> IOverlayWindowHost.GetDropAreas(LayoutFloatingWindowControl draggingWindow)
 		{
-			if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+			if (_areas != null) return _areas;
+			_areas = new List<IDropArea>();
+			var isDraggingDocuments = draggingWindow.Model is LayoutDocumentFloatingWindow;
+			if (!isDraggingDocuments)
 			{
-				if (e.IsDown && e.Key == Key.Tab)
+				_areas.Add(new DropArea<DockingManager>(this, DropAreaType.DockingManager));
+				foreach (var areaHost in this.FindVisualChildren<LayoutAnchorablePaneControl>())
+					if (areaHost.Model.Descendents().Any()) _areas.Add(new DropArea<LayoutAnchorablePaneControl>(areaHost, DropAreaType.AnchorablePane));
+			}
+
+			// Determine if floatingWindow is configured to dock as document or not
+			var dockAsDocument = true;
+			if (!isDraggingDocuments)
+			{
+				if (draggingWindow.Model is LayoutAnchorableFloatingWindow toolWindow)
 				{
-					if (!IsNavigatorWindowActive)
+					foreach (var item in GetAnchorableInFloatingWindow(draggingWindow))
 					{
-						ShowNavigatorWindow();
-						e.Handled = true;
+						if (item.CanDockAsTabbedDocument != false) continue;
+						dockAsDocument = false;
+						break;
 					}
 				}
 			}
 
-			base.OnPreviewKeyDown(e);
+			// Dock only documents and tools in DocumentPane if configuration does allow that
+			if (dockAsDocument)
+			{
+				foreach (var areaHost in this.FindVisualChildren<LayoutDocumentPaneControl>())
+					_areas.Add(new DropArea<LayoutDocumentPaneControl>(areaHost, DropAreaType.DocumentPane));
+			}
+
+			foreach (var areaHost in this.FindVisualChildren<LayoutDocumentPaneGroupControl>())
+			{
+				var documentGroupModel = areaHost.Model as LayoutDocumentPaneGroup;
+				if (!documentGroupModel.Children.Any(c => c.IsVisible))
+					_areas.Add(new DropArea<LayoutDocumentPaneGroupControl>(areaHost, DropAreaType.DocumentPaneGroup));
+			}
+
+			return _areas;
 		}
 
-		#endregion Overrides
+		/// <summary>
+		/// Finds all <see cref="LayoutAnchorable"/> objects (tool windows) within a
+		/// <see cref="LayoutFloatingWindow"/> (if any) and return them.
+		/// </summary>
+		/// <param name="draggingWindow"></param>
+		/// <returns></returns>
+		private IEnumerable<LayoutAnchorable> GetAnchorableInFloatingWindow(LayoutFloatingWindowControl draggingWindow)
+		{
+			if (!(draggingWindow.Model is LayoutAnchorableFloatingWindow layoutAnchorableFloatingWindow)) yield break;
+			//big part of code for getting type
+			var layoutAnchorablePane = layoutAnchorableFloatingWindow.SinglePane as LayoutAnchorablePane;
+
+			if (layoutAnchorablePane != null && (layoutAnchorableFloatingWindow.IsSinglePane && layoutAnchorablePane.SelectedContent != null))
+			{
+				var layoutAnchorable = ((LayoutAnchorablePane)layoutAnchorableFloatingWindow.SinglePane).SelectedContent as LayoutAnchorable;
+				yield return layoutAnchorable;
+			}
+			else
+				foreach (var item in GetLayoutAnchorable(layoutAnchorableFloatingWindow.RootPanel))
+					yield return item;
+		}
+
+		/// <summary>
+		/// Finds all <see cref="LayoutAnchorable"/> objects (toolwindows) within a
+		/// <see cref="LayoutAnchorablePaneGroup"/> (if any) and return them.
+		/// </summary>
+		/// <param name="layoutAnchPaneGroup"></param>
+		/// <returns>All the anchorable items found.</returns>
+		/// <seealso cref="LayoutAnchorable"/>
+		/// <seealso cref="LayoutAnchorablePaneGroup"/>
+		internal IEnumerable<LayoutAnchorable> GetLayoutAnchorable(LayoutAnchorablePaneGroup layoutAnchPaneGroup)
+		{
+			if (layoutAnchPaneGroup == null) yield break;
+			foreach (var anchorable in layoutAnchPaneGroup.Descendents().OfType<LayoutAnchorable>())
+				yield return anchorable;
+		}
+		#endregion IOverlayWindowHost Interface
 
 		#region Public Methods
 
@@ -1635,6 +1730,39 @@ namespace AvalonDock
 		internal void _ExecuteContentActivateCommand(LayoutContent content) => content.IsActive = true;
 
 		#endregion Internal Methods
+
+		#region Overrides
+
+		public override void OnApplyTemplate()
+		{
+			base.OnApplyTemplate();
+			_autohideArea = GetTemplateChild("PART_AutoHideArea") as FrameworkElement;
+		}
+
+		protected override Size ArrangeOverride(Size arrangeBounds)
+		{
+			_areas = null;
+			return base.ArrangeOverride(arrangeBounds);
+		}
+
+		protected override void OnPreviewKeyDown(KeyEventArgs e)
+		{
+			if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+			{
+				if (e.IsDown && e.Key == Key.Tab)
+				{
+					if (!IsNavigatorWindowActive)
+					{
+						ShowNavigatorWindow();
+						e.Handled = true;
+					}
+				}
+			}
+
+			base.OnPreviewKeyDown(e);
+		}
+
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -2499,136 +2627,5 @@ namespace AvalonDock
 		}
 
 		#endregion Private Methods
-
-		#region Events
-
-		/// <summary>Event fired when <see cref="DockingManager.Layout"/> property changes.</summary>
-		/// <seealso cref="Layout"/>
-		public event EventHandler LayoutChanged;
-
-		/// <summary>Event fired when <see cref="DockingManager.Layout"/> property is about to be changed.</summary>
-		/// <seealso cref="Layout"/>
-		public event EventHandler LayoutChanging;
-
-		/// <summary>Event fired when a document is about to be closed.</summary>
-		/// <remarks>Subscribers have the opportunity to cancel the operation.</remarks>
-		public event EventHandler<DocumentClosingEventArgs> DocumentClosing;
-
-		/// <summary>Event fired after a document is closed.</summary>
-		public event EventHandler<DocumentClosedEventArgs> DocumentClosed;
-
-		/// <summary>Event is raised when <see cref="ActiveContent"/> changes.</summary>
-		/// <seealso cref="ActiveContent"/>
-		public event EventHandler ActiveContentChanged;
-
-		#endregion Events
-
-		#region IOverlayWindowHost Interface
-
-		bool IOverlayWindowHost.HitTest(Point dragPoint)
-		{
-			var detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
-			return detectionRect.Contains(dragPoint);
-		}
-
-		DockingManager IOverlayWindowHost.Manager => this;
-
-		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
-		{
-			CreateOverlayWindow();
-			_overlayWindow.Owner = draggingWindow;
-			_overlayWindow.EnableDropTargets();
-			_overlayWindow.Show();
-			return _overlayWindow;
-		}
-
-		void IOverlayWindowHost.HideOverlayWindow()
-		{
-			_areas = null;
-			_overlayWindow.Owner = null;
-			_overlayWindow.HideDropTargets();
-		}
-
-		IEnumerable<IDropArea> IOverlayWindowHost.GetDropAreas(LayoutFloatingWindowControl draggingWindow)
-		{
-			if (_areas != null) return _areas;
-			_areas = new List<IDropArea>();
-			var isDraggingDocuments = draggingWindow.Model is LayoutDocumentFloatingWindow;
-			if (!isDraggingDocuments)
-			{
-				_areas.Add(new DropArea<DockingManager>(this, DropAreaType.DockingManager));
-				foreach (var areaHost in this.FindVisualChildren<LayoutAnchorablePaneControl>())
-					if (areaHost.Model.Descendents().Any()) _areas.Add(new DropArea<LayoutAnchorablePaneControl>(areaHost, DropAreaType.AnchorablePane));
-			}
-
-			// Determine if floatingWindow is configured to dock as document or not
-			var dockAsDocument = true;
-			if (!isDraggingDocuments)
-			{
-				if (draggingWindow.Model is LayoutAnchorableFloatingWindow toolWindow)
-				{
-					foreach (var item in GetAnchorableInFloatingWindow(draggingWindow))
-					{
-						if (item.CanDockAsTabbedDocument != false) continue;
-						dockAsDocument = false;
-						break;
-					}
-				}
-			}
-
-			// Dock only documents and tools in DocumentPane if configuration does allow that
-			if (dockAsDocument)
-			{
-				foreach (var areaHost in this.FindVisualChildren<LayoutDocumentPaneControl>())
-					_areas.Add(new DropArea<LayoutDocumentPaneControl>(areaHost, DropAreaType.DocumentPane));
-			}
-
-			foreach (var areaHost in this.FindVisualChildren<LayoutDocumentPaneGroupControl>())
-			{
-				var documentGroupModel = areaHost.Model as LayoutDocumentPaneGroup;
-				if (!documentGroupModel.Children.Any(c => c.IsVisible)) 
-					_areas.Add(new DropArea<LayoutDocumentPaneGroupControl>(areaHost, DropAreaType.DocumentPaneGroup));
-			}
-
-			return _areas;
-		}
-
-		/// <summary>
-		/// Finds all <see cref="LayoutAnchorable"/> objects (tool windows) within a
-		/// <see cref="LayoutFloatingWindow"/> (if any) and return them.
-		/// </summary>
-		/// <param name="draggingWindow"></param>
-		/// <returns></returns>
-		private IEnumerable<LayoutAnchorable> GetAnchorableInFloatingWindow(LayoutFloatingWindowControl draggingWindow)
-		{
-			if (!(draggingWindow.Model is LayoutAnchorableFloatingWindow layoutAnchorableFloatingWindow)) yield break;
-			//big part of code for getting type
-			var layoutAnchorablePane = layoutAnchorableFloatingWindow.SinglePane as LayoutAnchorablePane;
-
-			if (layoutAnchorablePane != null && (layoutAnchorableFloatingWindow.IsSinglePane && layoutAnchorablePane.SelectedContent != null))
-			{
-				var layoutAnchorable = ((LayoutAnchorablePane)layoutAnchorableFloatingWindow.SinglePane).SelectedContent as LayoutAnchorable;
-				yield return layoutAnchorable;
-			}
-			else
-				foreach (var item in GetLayoutAnchorable(layoutAnchorableFloatingWindow.RootPanel)) 
-					yield return item;
-		}
-
-		/// <summary>
-		/// Finds all <see cref="LayoutAnchorable"/> objects (toolwindows) within a
-		/// <see cref="LayoutAnchorablePaneGroup"/> (if any) and return them.
-		/// </summary>
-		/// <param name="layoutAnchPaneGroup"></param>
-		/// <returns>All the anchorable items found.</returns>
-		/// <seealso cref="LayoutAnchorable"/>
-		/// <seealso cref="LayoutAnchorablePaneGroup"/>
-		internal IEnumerable<LayoutAnchorable> GetLayoutAnchorable(LayoutAnchorablePaneGroup layoutAnchPaneGroup)
-		{
-			if (layoutAnchPaneGroup == null) yield break;
-			foreach (var anchorable in layoutAnchPaneGroup.Descendents().OfType<LayoutAnchorable>())
-				yield return anchorable;
-		}
-		#endregion IOverlayWindowHost Interface
 	}
 }

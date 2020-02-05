@@ -59,7 +59,7 @@ namespace AvalonDock.Controls
 			Type = type;
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region IDropArea
 
@@ -79,6 +79,6 @@ namespace AvalonDock.Controls
 		/// </summary>
 		public T AreaElement { get; }
 
-		#endregion
+		#endregion Properties
 	}
 }

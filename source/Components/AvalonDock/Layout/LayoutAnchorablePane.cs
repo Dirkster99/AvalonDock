@@ -41,8 +41,6 @@ namespace AvalonDock.Layout
 
 		#region Properties
 
-		#region CanHide
-
 		public bool CanHide
 		{
 			get
@@ -50,10 +48,6 @@ namespace AvalonDock.Layout
 				return Children.All(a => a.CanHide);
 			}
 		}
-
-		#endregion
-
-		#region CanClose
 
 		public bool CanClose
 		{
@@ -63,10 +57,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region IsHostedInFloatingWindow
-
 		public bool IsHostedInFloatingWindow
 		{
 			get
@@ -74,10 +64,6 @@ namespace AvalonDock.Layout
 				return this.FindParent<LayoutFloatingWindow>() != null;
 			}
 		}
-
-		#endregion
-
-		#region Name
 
 		public string Name
 		{
@@ -94,10 +80,6 @@ namespace AvalonDock.Layout
 				}
 			}
 		}
-
-		#endregion
-
-		#region SelectedContentIndex
 
 		public int SelectedContentIndex
 		{
@@ -131,10 +113,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region SelectedContent
-
 		public LayoutContent SelectedContent
 		{
 			get
@@ -142,8 +120,6 @@ namespace AvalonDock.Layout
 				return _selectedIndex == -1 ? null : Children[_selectedIndex];
 			}
 		}
-
-		#endregion
 
 		#endregion Properties
 

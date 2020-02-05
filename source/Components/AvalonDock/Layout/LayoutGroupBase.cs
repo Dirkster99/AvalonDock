@@ -15,6 +15,18 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public abstract class LayoutGroupBase : LayoutElement
 	{
+		#region Events
+
+		[field: NonSerialized]
+		[field: XmlIgnore]
+		public event EventHandler ChildrenCollectionChanged;
+
+		[field: NonSerialized]
+		[field: XmlIgnore]
+		public event EventHandler<ChildrenTreeChangedEventArgs> ChildrenTreeChanged;
+
+		#endregion Events
+
 		#region Internal Methods
 
 		protected virtual void OnChildrenCollectionChanged()
@@ -45,18 +57,6 @@ namespace AvalonDock.Layout
 				ChildrenTreeChanged(this, new ChildrenTreeChangedEventArgs(change));
 		}
 
-		#endregion
-
-		#region Events
-
-		[field: NonSerialized]
-		[field: XmlIgnore]
-		public event EventHandler ChildrenCollectionChanged;
-
-		[field: NonSerialized]
-		[field: XmlIgnore]
-		public event EventHandler<ChildrenTreeChangedEventArgs> ChildrenTreeChanged;
-
-		#endregion
+		#endregion Internal Methods
 	}
 }
