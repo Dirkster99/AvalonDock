@@ -58,7 +58,7 @@ namespace AvalonDock.Controls
 		private void SetupCloseTimer()
 		{
 			_closeTimer = new DispatcherTimer(DispatcherPriority.Background);
-			_closeTimer.Interval = TimeSpan.FromMilliseconds(1500);
+			_closeTimer.Interval = TimeSpan.FromMilliseconds(_manager.AutoHideDelay);
 			_closeTimer.Tick += (s, e) =>
 			{
 				if (_manager.AutoHideWindow.IsWin32MouseOver ||
