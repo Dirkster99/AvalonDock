@@ -17,7 +17,7 @@
     <RepositoryUrl>https://github.com/Dirkster99/AvalonDock</RepositoryUrl>
     <PackageId>Dirkster.AvalonDock</PackageId>
     <Authors>https://github.com/Dirkster99/AvalonDock</Authors>
-    <PackageLicenseFile>../../../LICENSE</PackageLicenseFile>
+    <PackageLicenseFile>../../../../LICENSE</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.0|AnyCPU'">
     <DefineConstants />
@@ -29,7 +29,7 @@
 
   <!-- NuGet Packaging -->
   <ItemGroup>
-    <None Include="../../../LICENSE" Pack="true" PackagePath="" />
+    <None Include="../../../../LICENSE" Pack="true" PackagePath="" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
