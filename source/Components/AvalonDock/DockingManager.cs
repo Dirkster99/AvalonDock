@@ -908,7 +908,7 @@ namespace AvalonDock
 		/// 2) clicks somewhere else into a focusable element (different document).
 		/// 
 		/// Expected behavior: The system waits for the configured time and reduces the <see cref="LayoutAnchorableControl"/> (into its side anchor).
-		/// Recommended configuration value range should be beetween 0 and 1500.
+		/// Recommended configuration value range should be between 0 and 1500 milliseconds.
 		/// </summary>
 		public int AutoHideDelay
 		{
