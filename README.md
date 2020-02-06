@@ -119,7 +119,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## In Master branch but not yet released
+## In Master branch but not released to NuGet, yet
 
 - [Resolve #98 with floating window without a content #99](https://github.com/Dirkster99/AvalonDock/pull/99) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
@@ -129,6 +129,8 @@ to also theme standard elements, such as, button and textblock etc.
 - [Fix #101 and new fix for #81 with docked pane becomes not visible.](https://github.com/Dirkster99/AvalonDock/issues/101) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
 - [Feature added: allow documents to be docked in a floating window](https://github.com/Dirkster99/AvalonDock/pull/107) Thanx to [amolf-se](https://github.com/amolf-se) [https://github.com/mkonijnenburg](mkonijnenburg) @ [http://www.amolf.nl](http://www.amolf.nl)
+
+- [Feature added: AutoHideDelay property to control the time until an AutoHide window is reduced back to its anchored representation](https://github.com/Dirkster99/AvalonDock/pull/110) Thanx to [Alexei Stukov](https://github.com/Jiiks)
 
 ## Patch History for AvalonDock 3.6.2
 - [Fixed issue #92 Always update floating properties](https://github.com/Dirkster99/AvalonDock/issues/92) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
