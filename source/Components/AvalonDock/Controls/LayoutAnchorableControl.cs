@@ -31,7 +31,7 @@ namespace AvalonDock.Controls
 			//SetBinding(FlowDirectionProperty, new Binding("Model.Root.Manager.FlowDirection") { Source = this });
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -104,7 +104,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Model
 
 		#region LayoutItem
 
@@ -138,9 +138,9 @@ namespace AvalonDock.Controls
 			SetValue(LayoutItemPropertyKey, value);
 		}
 
-		#endregion
+		#endregion LayoutItem
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -152,7 +152,6 @@ namespace AvalonDock.Controls
 			base.OnGotKeyboardFocus(e);
 		}
 
-
-		#endregion
+		#endregion Overrides
 	}
 }

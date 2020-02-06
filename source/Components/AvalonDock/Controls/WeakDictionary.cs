@@ -96,7 +96,7 @@ namespace AvalonDock.Controls
 			return true;
 		}
 
-		#endregion
+		#endregion Public Methods
 
 		#region Private Methods
 
@@ -119,6 +119,6 @@ namespace AvalonDock.Controls
 			while (vIndex >= 0);
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

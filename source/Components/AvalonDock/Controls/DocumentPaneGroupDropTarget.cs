@@ -62,7 +62,7 @@ namespace AvalonDock.Controls
 					paneModel.Children.Insert(0, sourceModel);
 				}
 				break;
-				#endregion
+				#endregion DropTargetType.DocumentPaneGroupDockInside
 			}
 
 			base.Drop(floatingWindow);
@@ -96,7 +96,7 @@ namespace AvalonDock.Controls
 					}
 				}
 				break;
-				#endregion
+				#endregion DropTargetType.DocumentPaneGroupDockInside
 			}
 
 			base.Drop(floatingWindow);
@@ -123,7 +123,7 @@ namespace AvalonDock.Controls
 
 					return new RectangleGeometry(targetScreenRect);
 				}
-				#endregion
+				#endregion DropTargetType.DocumentPaneGroupDockInside
 			}
 
 			return null;

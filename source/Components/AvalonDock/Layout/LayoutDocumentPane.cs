@@ -19,6 +19,12 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutDocumentPane : LayoutPositionableGroup<LayoutContent>, ILayoutDocumentPane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable
 	{
+		#region fields
+		private bool _showHeader = true;
+		private int _selectedIndex = -1;
+		string _id;
+		#endregion fields
+
 		#region Constructors
 
 		public LayoutDocumentPane()
@@ -29,13 +35,10 @@ namespace AvalonDock.Layout
 			this.Children.Add(firstChild);
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
-		#region ShowHeader
-
-		private bool _showHeader = true;
 		public bool ShowHeader
 		{
 			get
@@ -52,11 +55,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region SelectedContentIndex
-
-		private int _selectedIndex = -1;
 		public int SelectedContentIndex
 		{
 			get
@@ -89,10 +87,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region SelectedContent
-
 		public LayoutContent SelectedContent
 		{
 			get
@@ -101,9 +95,18 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#endregion
+		string ILayoutPaneSerializable.Id
+		{
+			get
+			{
+				return _id;
+			}
+			set
+			{
+				_id = value;
+			}
+		}
+		#endregion Properties
 
 		#region Overrides
 
@@ -208,7 +211,7 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion
+		#endregion Overrides
 
 		#region Public Methods
 
@@ -220,7 +223,7 @@ namespace AvalonDock.Layout
 			return Children.IndexOf(documentChild);
 		}
 
-		#endregion
+		#endregion Public Methods
 
 		#region Internal Methods
 
@@ -237,14 +240,14 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region Private Methods
-
 		internal void UpdateIsDirectlyHostedInFloatingWindow()
 		{
 			RaisePropertyChanged("IsDirectlyHostedInFloatingWindow");
 		}
+
+		#endregion Internal Methods
+
+		#region Private Methods
 
 		public bool IsHostedInFloatingWindow
 		{
@@ -284,24 +287,6 @@ namespace AvalonDock.Layout
 			RaisePropertyChanged("IsDirectlyHostedInFloatingWindow");
 		}
 
-
-		#endregion
-
-		#region ILayoutPaneSerializable Interface
-
-		string _id;
-		string ILayoutPaneSerializable.Id
-		{
-			get
-			{
-				return _id;
-			}
-			set
-			{
-				_id = value;
-			}
-		}
-
-		#endregion
+		#endregion Private Methods
 	}
 }

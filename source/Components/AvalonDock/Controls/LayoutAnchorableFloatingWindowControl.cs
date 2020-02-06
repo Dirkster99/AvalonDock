@@ -21,7 +21,9 @@ using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
-	/// <summary>Class visualizes floating <see cref="LayoutAnchorable"/> (tool windows) in AvalonDock.</summary>
+	/// <summary>
+	/// Class visualizes floating LayoutAnchorables (toolwindows) in AvalonDock.
+	/// </summary>
 	public class LayoutAnchorableFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
 	{
 		#region fields
@@ -82,7 +84,7 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -125,9 +127,123 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion
+		#endregion SingleContentLayoutItem
 
-		#endregion
+		public ICommand HideWindowCommand
+		{
+			get;
+			private set;
+		}
+		
+		public ICommand CloseWindowCommand
+		{
+			get;
+			private set;
+		}
+
+		DockingManager IOverlayWindowHost.Manager
+		{
+			get
+			{
+				return _model.Root.Manager;
+			}
+		}
+
+		#endregion Properties
+
+		#region Public Methods
+
+		public override void EnableBindings()
+		{
+			_model.PropertyChanged += _model_PropertyChanged;
+			SetVisibilityBinding();
+			var root = Model.Root;
+			if (root != null)
+			{
+				LayoutRoot layoutRoot = root as LayoutRoot;
+				if (layoutRoot != null)
+				{
+					layoutRoot.Updated += OnRootUpdated;
+				}
+			}
+
+			base.EnableBindings();
+		}
+
+		public override void DisableBindings()
+		{
+			var root = Model.Root;
+			if (root != null)
+			{
+				LayoutRoot layoutRoot = root as LayoutRoot;
+				if (layoutRoot != null)
+				{
+					layoutRoot.Updated -= OnRootUpdated;
+				}
+			}
+
+			BindingOperations.ClearBinding(_model, VisibilityProperty);
+			_model.PropertyChanged -= _model_PropertyChanged;
+
+			base.DisableBindings();
+		}
+
+		#region IOverlayWindowHost
+
+		bool IOverlayWindowHost.HitTest(Point dragPoint)
+		{
+			Rect detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
+			return detectionRect.Contains(dragPoint);
+		}
+
+		void IOverlayWindowHost.HideOverlayWindow()
+		{
+			_dropAreas = null;
+			_overlayWindow.Owner = null;
+			_overlayWindow.HideDropTargets();
+		}
+
+		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
+		{
+			CreateOverlayWindow();
+			_overlayWindow.Owner = draggingWindow;
+			_overlayWindow.EnableDropTargets();
+			_overlayWindow.Show();
+
+			return _overlayWindow;
+		}
+
+		IEnumerable<IDropArea> IOverlayWindowHost.GetDropAreas(LayoutFloatingWindowControl draggingWindow)
+		{
+			if (_dropAreas != null)
+				return _dropAreas;
+
+			_dropAreas = new List<IDropArea>();
+
+			if (draggingWindow.Model is LayoutDocumentFloatingWindow)
+				return _dropAreas;
+
+			var rootVisual = (Content as FloatingWindowContentHost).RootVisual;
+
+			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>())
+			{
+				_dropAreas.Add(new DropArea<LayoutAnchorablePaneControl>(
+					areaHost,
+					DropAreaType.AnchorablePane));
+			}
+			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutDocumentPaneControl>())
+			{
+				_dropAreas.Add(new DropArea<LayoutDocumentPaneControl>(
+					areaHost,
+					DropAreaType.DocumentPane));
+			}
+
+			return _dropAreas;
+		}
+
+		#endregion IOverlayWindowHost
+
+		#endregion Public Methods
 
 		#region Overrides
 
@@ -254,7 +370,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -339,48 +455,9 @@ namespace AvalonDock.Controls
 			);
 		}
 
-		#endregion
-
-		#region Public Methods
-
-		public override void EnableBindings()
-		{
-			_model.PropertyChanged += _model_PropertyChanged;
-			SetVisibilityBinding();
-			var root = Model.Root;
-			if (root != null)
-			{
-				LayoutRoot layoutRoot = root as LayoutRoot;
-				if (layoutRoot != null)
-				{
-					layoutRoot.Updated += OnRootUpdated;
-				}
-			}
-
-			base.EnableBindings();
-		}
-
-		public override void DisableBindings()
-		{
-			var root = Model.Root;
-			if (root != null)
-			{
-				LayoutRoot layoutRoot = root as LayoutRoot;
-				if (layoutRoot != null)
-				{
-					layoutRoot.Updated -= OnRootUpdated;
-				}
-			}
-
-			BindingOperations.ClearBinding(_model, VisibilityProperty);
-			_model.PropertyChanged -= _model_PropertyChanged;
-
-			base.DisableBindings();
-		}
-
-		#endregion
-
-		#region Event Handlers
+		/// <summary>
+		/// IsVisibleChanged Event Handler.
+		/// </summary>
 		private void LayoutAnchorableFloatingWindowControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
 		{
 			var visibilityBinding = GetBindingExpression(VisibilityProperty);
@@ -389,18 +466,8 @@ namespace AvalonDock.Controls
 				SetBinding(VisibilityProperty, new Binding("IsVisible") { Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden });
 			}
 		}
-		#endregion Event Handlers
-
-		#region Commands
 
 		#region HideWindowCommand
-
-		public ICommand HideWindowCommand
-		{
-			get;
-			private set;
-		}
-
 		private bool CanExecuteHideWindowCommand(object parameter)
 		{
 			if (Model == null)
@@ -449,15 +516,9 @@ namespace AvalonDock.Controls
 
 			Hide(); // Bring toolwindows inside hidden FloatingWindow back requires restart of app
 		}
-		#endregion
+		#endregion HideWindowCommand
 
 		#region CloseWindowCommand
-		public ICommand CloseWindowCommand
-		{
-			get;
-			private set;
-		}
-
 		private bool CanExecuteCloseWindowCommand(object parameter)
 		{
 			if (Model == null)
@@ -505,53 +566,8 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion CloseWindowCommand
 
-		#endregion
-
-		#region IOverlayWindowHost
-
-		bool IOverlayWindowHost.HitTest(Point dragPoint)
-		{
-			var detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
-			return detectionRect.Contains(dragPoint);
-		}
-
-		DockingManager IOverlayWindowHost.Manager => _model.Root.Manager;
-
-		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
-		{
-			CreateOverlayWindow();
-			_overlayWindow.Owner = draggingWindow;
-			_overlayWindow.EnableDropTargets();
-			_overlayWindow.Show();
-
-			return _overlayWindow;
-		}
-
-		void IOverlayWindowHost.HideOverlayWindow()
-		{
-			_dropAreas = null;
-			_overlayWindow.Owner = null;
-			_overlayWindow.HideDropTargets();
-		}
-
-		IEnumerable<IDropArea> IOverlayWindowHost.GetDropAreas(LayoutFloatingWindowControl draggingWindow)
-		{
-			if (_dropAreas != null) return _dropAreas;
-			_dropAreas = new List<IDropArea>();
-			if (draggingWindow.Model is LayoutDocumentFloatingWindow) return _dropAreas;
-
-			var rootVisual = (Content as FloatingWindowContentHost).RootVisual;
-
-			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>())
-				_dropAreas.Add(new DropArea<LayoutAnchorablePaneControl>(areaHost, DropAreaType.AnchorablePane));
-			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutDocumentPaneControl>())
-				_dropAreas.Add(new DropArea<LayoutDocumentPaneControl>(areaHost, DropAreaType.DocumentPane));
-
-			return _dropAreas;
-		}
-
-		#endregion
+		#endregion Private Methods
 	}
 }

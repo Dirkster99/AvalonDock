@@ -31,7 +31,7 @@ namespace Microsoft.Windows.Shell
 		// Delegate signature used for Dispatcher.BeginInvoke.
 		private delegate void _Action();
 
-		#region Fields
+		#region fields
 
 		private const SWP _SwpFlags = SWP.FRAMECHANGED | SWP.NOSIZE | SWP.NOMOVE | SWP.NOZORDER | SWP.NOOWNERZORDER | SWP.NOACTIVATE;
 
@@ -62,7 +62,7 @@ namespace Microsoft.Windows.Shell
 		private WindowState _lastMenuState;
 		private bool _isGlassEnabled;
 
-		#endregion
+		#endregion fields
 
 		public WindowChromeWorker()
 		{
@@ -704,7 +704,7 @@ namespace Microsoft.Windows.Shell
 			return IntPtr.Zero;
 		}
 
-		#endregion
+		#endregion WindowProc and Message Handlers
 
 		/// <summary>Add and remove a native WindowStyle from the HWND.</summary>
 		/// <param name="removeStyle">The styles to be removed.  These can be bitwise combined.</param>
@@ -1216,6 +1216,6 @@ namespace Microsoft.Windows.Shell
 			NativeMethods.SetWindowPos(_hwnd, IntPtr.Zero, 0, 0, 0, 0, _SwpFlags);
 		}
 
-		#endregion
+		#endregion Remove Custom Chrome Methods
 	}
 }

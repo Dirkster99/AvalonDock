@@ -89,7 +89,7 @@ namespace AvalonDock.Controls
 				_anchorable.Root.Manager._ExecuteHideCommand(_anchorable);
 		}
 
-		#endregion
+		#endregion HideCommand
 
 		#region AutoHideCommand
 
@@ -156,7 +156,7 @@ namespace AvalonDock.Controls
 				_anchorable.Root.Manager._ExecuteAutoHideCommand(_anchorable);
 		}
 
-		#endregion
+		#endregion AutoHideCommand
 
 		#region DockCommand
 
@@ -218,7 +218,7 @@ namespace AvalonDock.Controls
 			LayoutElement.Root.Manager._ExecuteDockCommand(_anchorable);
 		}
 
-		#endregion
+		#endregion DockCommand
 
 		#region CanHide
 
@@ -261,7 +261,7 @@ namespace AvalonDock.Controls
 				_anchorable.CanHide = (bool)e.NewValue;
 		}
 
-		#endregion
+		#endregion CanHide
 
 		#endregion Properties
 

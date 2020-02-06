@@ -21,7 +21,7 @@ namespace AvalonDock.Controls
 		private bool _isMouseDown = false;
 		#endregion fields
 
-		#region
+		#region Constructors
 
 		static AnchorablePaneTitle()
 		{
@@ -35,8 +35,6 @@ namespace AvalonDock.Controls
 		}
 
 		#endregion Constructors
-
-		#region
 
 		#region Model
 
@@ -82,7 +80,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Model
 
 		#region LayoutItem
 
@@ -116,9 +114,7 @@ namespace AvalonDock.Controls
 			this.SetValue(LayoutItemPropertyKey, value);
 		}
 
-		#endregion
-
-		#endregion Constructors
+		#endregion LayoutItem
 
 		#region Overrides
 
@@ -215,6 +211,6 @@ namespace AvalonDock.Controls
 			this.Model.ToggleAutoHide();
 		}
 
-		#endregion Overrides
+		#endregion Private Methods
 	}
 }

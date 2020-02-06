@@ -21,22 +21,15 @@ namespace AvalonDock.Controls
 			LostFocusWinHandle = lostFocusWinHandle;
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
-		public IntPtr GotFocusWinHandle
-		{
-			get;
-			private set;
-		}
-		public IntPtr LostFocusWinHandle
-		{
-			get;
-			private set;
-		}
+		public IntPtr GotFocusWinHandle { get; private set; }
 
-		#endregion
+		public IntPtr LostFocusWinHandle { get; private set; }
+
+		#endregion Properties
 	}
 
 	internal class WindowHookHandler
@@ -53,7 +46,14 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion
+		#endregion Constructors
+
+		#region Events
+
+		public event EventHandler<FocusChangeEventArgs> FocusChanged;
+		//public event EventHandler<WindowActivateEventArgs> Activate;
+
+		#endregion Events
 
 		#region Public Methods
 
@@ -95,13 +95,6 @@ namespace AvalonDock.Controls
 			return Win32Helper.CallNextHookEx(_windowHook, code, wParam, lParam);
 		}
 
-		#endregion
-
-		#region Events
-
-		public event EventHandler<FocusChangeEventArgs> FocusChanged;
-		//public event EventHandler<WindowActivateEventArgs> Activate;
-
-		#endregion
+		#endregion Public Methods
 	}
 }

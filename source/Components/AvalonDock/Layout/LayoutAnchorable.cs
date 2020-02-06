@@ -39,11 +39,16 @@ namespace AvalonDock.Layout
 			_canClose = false;
 		}
 
-		#endregion
+		#endregion Constructors
+
+		#region Events
+
+		public event EventHandler IsVisibleChanged;
+		public event EventHandler<CancelEventArgs> Hiding;
+
+		#endregion Events
 
 		#region Properties
-
-		#region AutoHideWidth
 
 		public double AutoHideWidth
 		{
@@ -58,10 +63,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region AutoHideMinWidth
-
 		public double AutoHideMinWidth
 		{
 			get => _autohideMinWidth;
@@ -69,15 +70,11 @@ namespace AvalonDock.Layout
 			{
 				if (value == _autohideMinWidth) return;
 				RaisePropertyChanging(nameof(AutoHideMinWidth));
-				if (value < 0) throw new ArgumentException("Negative value is not allowed.", nameof(value));
+				if (value < 0) throw new ArgumentOutOfRangeException("Negative value is not allowed.", nameof(value));
 				_autohideMinWidth = value;
 				RaisePropertyChanged(nameof(AutoHideMinWidth));
 			}
 		}
-
-		#endregion
-
-		#region AutoHideHeight
 
 		public double AutoHideHeight
 		{
@@ -92,10 +89,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region AutoHideMinHeight
-
 		public double AutoHideMinHeight
 		{
 			get => _autohideMinHeight;
@@ -103,59 +96,50 @@ namespace AvalonDock.Layout
 			{
 				if (value == _autohideMinHeight) return;
 				RaisePropertyChanging(nameof(AutoHideMinHeight));
-				if (value < 0) throw new ArgumentException("Negative value is not allowed.", nameof(value));
+				if (value < 0) throw new ArgumentOutOfRangeException("Negative value is not allowed.", nameof(value));
 				_autohideMinHeight = value;
 				RaisePropertyChanged(nameof(AutoHideMinHeight));
 			}
 		}
 
-		#endregion
-
-		#region CanHide
-
 		public bool CanHide
 		{
 			get => _canHide;
-			set { if (value == _canHide) return; _canHide = value; RaisePropertyChanged(nameof(CanHide)); }
+			set
+			{
+				if (value == _canHide) return;
+				_canHide = value;
+				RaisePropertyChanged(nameof(CanHide));
+			}
 		}
-
-		#endregion
-
-		#region CanAutoHide
 
 		public bool CanAutoHide
 		{
 			get => _canAutoHide;
-			set { if (value == _canAutoHide) return; _canAutoHide = value; RaisePropertyChanged(nameof(CanAutoHide)); }
+			set
+			{
+				if (value == _canAutoHide) return;
+				_canAutoHide = value;
+				RaisePropertyChanged(nameof(CanAutoHide));
+			}
 		}
-
-		#endregion
-
-		#region CanDockAsTabbedDocument
 
 		public bool CanDockAsTabbedDocument
 		{
 			get => _canDockAsTabbedDocument;
-			set { if (value == _canDockAsTabbedDocument) return; _canDockAsTabbedDocument = value; RaisePropertyChanged(nameof(CanDockAsTabbedDocument)); }
+			set
+			{
+				if (_canDockAsTabbedDocument == value) return;
+				_canDockAsTabbedDocument = value;
+				RaisePropertyChanged(nameof(CanDockAsTabbedDocument));
+			}
 		}
 
-		#endregion
-
-		#region IsAutoHidden
-
-		/// <summary> Get a value indicating if the anchorable is anchored to a border in an autohide status. </summary>
+		/// <summary>Get a value indicating if the anchorable is anchored to a border in an autohide status.</summary>
 		public bool IsAutoHidden => Parent is LayoutAnchorGroup;
-
-		#endregion
-
-		#region IsHidden
 
 		[XmlIgnore]
 		public bool IsHidden => Parent is LayoutRoot;
-
-		#endregion
-
-		#region IsVisible
 
 		[XmlIgnore]
 		public bool IsVisible
@@ -164,16 +148,7 @@ namespace AvalonDock.Layout
 			set { if (value) Show(); else Hide(); }
 		}
 
-		#endregion
-
-		#endregion
-
-		#region Events
-
-		public event EventHandler IsVisibleChanged;
-		public event EventHandler<CancelEventArgs> Hiding;
-
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -212,7 +187,9 @@ namespace AvalonDock.Layout
 
 			var added = false;
 			if (root.Manager.LayoutUpdateStrategy != null)
+			{
 				added = root.Manager.LayoutUpdateStrategy.BeforeInsertAnchorable(root, this, anchorablePane);
+			}
 
 			if (!added)
 			{
@@ -220,9 +197,7 @@ namespace AvalonDock.Layout
 				{
 					var mainLayoutPanel = new LayoutPanel { Orientation = Orientation.Horizontal };
 					if (root.RootPanel != null)
-					{
 						mainLayoutPanel.Children.Add(root.RootPanel);
-					}
 
 					root.RootPanel = mainLayoutPanel;
 					anchorablePane = new LayoutAnchorablePane { DockWidth = new GridLength(200.0, GridUnitType.Pixel) };
@@ -230,7 +205,6 @@ namespace AvalonDock.Layout
 				}
 
 				anchorablePane.Children.Add(this);
-				added = true;
 			}
 
 			root.Manager.LayoutUpdateStrategy?.AfterInsertAnchorable(root, this);
@@ -290,7 +264,7 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion
+		#endregion Overrides
 
 		#region Public Methods
 
@@ -326,16 +300,14 @@ namespace AvalonDock.Layout
 			NotifyIsVisibleChanged();
 		}
 
-		/// <summary>Show the content. </summary>
+		/// <summary>Show the content.</summary>
 		/// <remarks>Try to show the content where it was previously hidden.</remarks>
 		public void Show()
 		{
 			if (IsVisible) return;
 			if (!IsHidden) throw new InvalidOperationException();
-
 			RaisePropertyChanging(nameof(IsHidden));
 			RaisePropertyChanging(nameof(IsVisible));
-
 			var added = false;
 			var root = Root;
 			if (root?.Manager?.LayoutUpdateStrategy != null)
@@ -353,6 +325,7 @@ namespace AvalonDock.Layout
 				IsSelected = true;
 				IsActive = true;
 			}
+
 			root?.Manager?.LayoutUpdateStrategy?.AfterInsertAnchorable(root as LayoutRoot, this);
 			PreviousContainer = null;
 			PreviousContainerIndex = -1;
@@ -361,13 +334,13 @@ namespace AvalonDock.Layout
 			NotifyIsVisibleChanged();
 		}
 
-
 		/// <summary>Add the anchorable to a <see cref="DockingManager"/> layout.</summary>
-		/// <param name="manager">The docking manager</param>
+		/// <param name="manager"></param>
 		/// <param name="strategy"></param>
 		public void AddToLayout(DockingManager manager, AnchorableShowStrategy strategy)
 		{
 			if (IsVisible || IsHidden) throw new InvalidOperationException();
+
 			var most = (strategy & AnchorableShowStrategy.Most) == AnchorableShowStrategy.Most;
 			var left = (strategy & AnchorableShowStrategy.Left) == AnchorableShowStrategy.Left;
 			var right = (strategy & AnchorableShowStrategy.Right) == AnchorableShowStrategy.Right;
@@ -389,32 +362,29 @@ namespace AvalonDock.Layout
 					most = true;
 			}
 
-			if (most)
+			if (!most) return;
+			if (manager.Layout.RootPanel == null)
+				manager.Layout.RootPanel = new LayoutPanel { Orientation = left || right ? Orientation.Horizontal : Orientation.Vertical };
+
+			if (left || right)
 			{
-				if (manager.Layout.RootPanel == null)
-					manager.Layout.RootPanel = new LayoutPanel { Orientation = (left || right ? Orientation.Horizontal : Orientation.Vertical) };
-
-				if (left || right)
-				{
-					if (manager.Layout.RootPanel.Orientation == Orientation.Vertical && manager.Layout.RootPanel.ChildrenCount > 1)
-						manager.Layout.RootPanel = new LayoutPanel(manager.Layout.RootPanel);
-					manager.Layout.RootPanel.Orientation = Orientation.Horizontal;
-					if (left)
-						manager.Layout.RootPanel.Children.Insert(0, new LayoutAnchorablePane(this));
-					else
-						manager.Layout.RootPanel.Children.Add(new LayoutAnchorablePane(this));
-				}
+				if (manager.Layout.RootPanel.Orientation == Orientation.Vertical && manager.Layout.RootPanel.ChildrenCount > 1)
+					manager.Layout.RootPanel = new LayoutPanel(manager.Layout.RootPanel);
+				manager.Layout.RootPanel.Orientation = Orientation.Horizontal;
+				if (left)
+					manager.Layout.RootPanel.Children.Insert(0, new LayoutAnchorablePane(this));
 				else
-				{
-					if (manager.Layout.RootPanel.Orientation == Orientation.Horizontal && manager.Layout.RootPanel.ChildrenCount > 1)
-						manager.Layout.RootPanel = new LayoutPanel(manager.Layout.RootPanel);
-					manager.Layout.RootPanel.Orientation = Orientation.Vertical;
-					if (top)
-						manager.Layout.RootPanel.Children.Insert(0, new LayoutAnchorablePane(this));
-					else
-						manager.Layout.RootPanel.Children.Add(new LayoutAnchorablePane(this));
-				}
-
+					manager.Layout.RootPanel.Children.Add(new LayoutAnchorablePane(this));
+			}
+			else
+			{
+				if (manager.Layout.RootPanel.Orientation == Orientation.Horizontal && manager.Layout.RootPanel.ChildrenCount > 1)
+					manager.Layout.RootPanel = new LayoutPanel(manager.Layout.RootPanel);
+				manager.Layout.RootPanel.Orientation = Orientation.Vertical;
+				if (top)
+					manager.Layout.RootPanel.Children.Insert(0, new LayoutAnchorablePane(this));
+				else
+					manager.Layout.RootPanel.Children.Add(new LayoutAnchorablePane(this));
 			}
 		}
 
@@ -429,14 +399,13 @@ namespace AvalonDock.Layout
 
 				if (previousContainer == null)
 				{
-					var side = (parentGroup.Parent as LayoutAnchorSide).Side;
+					var side = ((LayoutAnchorSide)parentGroup.Parent).Side;
 					switch (side)
 					{
 						case AnchorSide.Right:
 							if (parentGroup.Root.RootPanel.Orientation == Orientation.Horizontal)
 							{
-								previousContainer = new LayoutAnchorablePane();
-								previousContainer.DockMinWidth = AutoHideMinWidth;
+								previousContainer = new LayoutAnchorablePane { DockMinWidth = AutoHideMinWidth };
 								parentGroup.Root.RootPanel.Children.Add(previousContainer);
 							}
 							else
@@ -470,7 +439,7 @@ namespace AvalonDock.Layout
 						case AnchorSide.Top:
 							if (parentGroup.Root.RootPanel.Orientation == Orientation.Vertical)
 							{
-								previousContainer = new LayoutAnchorablePane { DockMinHeight = AutoHideMinHeight };
+								previousContainer = new LayoutAnchorablePane {DockMinHeight = AutoHideMinHeight};
 								parentGroup.Root.RootPanel.Children.Insert(0, previousContainer);
 							}
 							else
@@ -487,7 +456,8 @@ namespace AvalonDock.Layout
 						case AnchorSide.Bottom:
 							if (parentGroup.Root.RootPanel.Orientation == Orientation.Vertical)
 							{
-								previousContainer = new LayoutAnchorablePane { DockMinHeight = AutoHideMinHeight };
+								previousContainer = new LayoutAnchorablePane();
+								previousContainer.DockMinHeight = AutoHideMinHeight;
 								parentGroup.Root.RootPanel.Children.Add(previousContainer);
 							}
 							else
@@ -508,21 +478,24 @@ namespace AvalonDock.Layout
 					//I'm about to remove parentGroup, redirect any content (ie hidden contents) that point to it
 					//to previousContainer
 					var root = parentGroup.Root as LayoutRoot;
-					foreach (var cnt in root.Descendents().OfType<ILayoutPreviousContainer>().Where(c => c.PreviousContainer == parentGroup))
+					foreach (var cnt in root.Descendents().OfType<ILayoutPreviousContainer>().Where(c => c.PreviousContainer == parentGroup)) 
 						cnt.PreviousContainer = previousContainer;
 				}
 
-				foreach (var anchorableToToggle in parentGroup.Children.ToArray())
+				foreach (var anchorableToToggle in parentGroup.Children.ToArray()) 
 					previousContainer.Children.Add(anchorableToToggle);
+
 				parentSide.Children.Remove(parentGroup);
+
 				var parent = previousContainer.Parent as LayoutGroupBase;
 				while (parent != null)
 				{
-					if (parent is LayoutGroup<ILayoutPanelElement> layoutGroup) layoutGroup.ComputeVisibility();
+					if (parent is LayoutGroup<ILayoutPanelElement> layoutGroup) 
+						layoutGroup.ComputeVisibility();
 					parent = parent.Parent as LayoutGroupBase;
 				}
 			}
-			#endregion
+			#endregion Anchorable is already auto hidden
 
 			#region Anchorable is docked
 			else if (Parent is LayoutAnchorablePane)
@@ -531,11 +504,13 @@ namespace AvalonDock.Layout
 				var parentPane = Parent as LayoutAnchorablePane;
 				var newAnchorGroup = new LayoutAnchorGroup();
 				((ILayoutPreviousContainer)newAnchorGroup).PreviousContainer = parentPane;
+
 				foreach (var anchorableToImport in parentPane.Children.ToArray())
 					newAnchorGroup.Children.Add(anchorableToImport);
 
 				//detect anchor side for the pane
 				var anchorSide = parentPane.GetSide();
+
 				switch (anchorSide)
 				{
 					case AnchorSide.Right: root.RightSide?.Children.Add(newAnchorGroup); break;
@@ -544,10 +519,10 @@ namespace AvalonDock.Layout
 					case AnchorSide.Bottom: root.BottomSide?.Children.Add(newAnchorGroup); break;
 				}
 			}
-			#endregion
+			#endregion Anchorable is docked
 		}
 
-		#endregion
+		#endregion Public Methods
 
 		#region Internal Methods
 
@@ -566,9 +541,12 @@ namespace AvalonDock.Layout
 			_canClose = canClose;
 		}
 
-		internal void ResetCanCloseInternal() => _canClose = _canCloseValueBeforeInternalSet;
+		internal void ResetCanCloseInternal()
+		{
+			_canClose = _canCloseValueBeforeInternalSet;
+		}
 
-		#endregion
+		#endregion Internal Methods
 
 		#region Private Methods
 
@@ -583,9 +561,11 @@ namespace AvalonDock.Layout
 				Parent = PreviousContainer;
 				////        PreviousContainer = null;
 			}
-			if (Parent is ILayoutElementWithVisibility parentPane) parentPane.ComputeVisibility();
+
+			if (Parent is ILayoutElementWithVisibility parentPane)
+				parentPane.ComputeVisibility();
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

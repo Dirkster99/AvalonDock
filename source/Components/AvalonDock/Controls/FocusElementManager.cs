@@ -149,7 +149,7 @@ namespace AvalonDock.Controls
 
 		}
 
-		#endregion
+		#endregion Internal Methods
 
 		#region Private Methods
 
@@ -282,6 +282,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

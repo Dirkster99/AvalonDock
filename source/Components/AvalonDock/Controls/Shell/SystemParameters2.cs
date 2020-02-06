@@ -297,8 +297,7 @@ namespace Microsoft.Windows.Shell
 			_InitializeWindowCornerRadius();
 		}
 
-
-		#endregion
+		#endregion Initialization and Update Methods
 
 		/// <summary>
 		/// Private constructor.  The public way to access this class is through the static Current property.
@@ -594,6 +593,6 @@ namespace Microsoft.Windows.Shell
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		#endregion
+		#endregion INotifyPropertyChanged Members
 	}
 }

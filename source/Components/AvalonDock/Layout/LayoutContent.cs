@@ -29,7 +29,30 @@ namespace AvalonDock.Layout
 		{
 		}
 
-		#endregion
+		#endregion Constructors
+
+		#region Events
+
+		/// <summary>
+		/// Event fired when the content is closed (i.e. removed definitely from the layout)
+		/// </summary>
+		public event EventHandler Closed;
+
+		/// <summary>
+		/// Event fired when the content is about to be closed (i.e. removed definitely from the layout)
+		/// </summary>
+		/// <remarks>Please note that LayoutAnchorable also can be hidden. Usually user hide anchorables when click the 'X' button. To completely close 
+		/// an anchorable the user should click the 'Close' menu item from the context menu. When an LayoutAnchorable is hidden its visibility changes to false and
+		/// IsHidden property is set to true.
+		/// Hanlde the Hiding event for the LayoutAnchorable to cancel the hide operation.</remarks>
+		public event EventHandler<CancelEventArgs> Closing;
+
+		/// <summary>
+		/// Event fired when floating properties were updated.
+		/// </summary>
+		public event EventHandler FloatingPropertiesUpdated;
+
+		#endregion Events
 
 		#region Properties
 
@@ -69,6 +92,7 @@ namespace AvalonDock.Layout
 		#region Content
 		[NonSerialized]
 		private object _content = null;
+
 		[XmlIgnore]
 		public object Content
 		{
@@ -91,7 +115,7 @@ namespace AvalonDock.Layout
 				}
 			}
 		}
-		#endregion
+		#endregion Content
 
 		#region ContentId
 
@@ -146,6 +170,7 @@ namespace AvalonDock.Layout
 		#region IsSelected
 
 		private bool _isSelected = false;
+
 		public bool IsSelected
 		{
 			get
@@ -180,12 +205,13 @@ namespace AvalonDock.Layout
 
 		public event EventHandler IsSelectedChanged;
 
-		#endregion
+		#endregion IsSelected
 
 		#region IsActive
 
 		[field: NonSerialized]
 		private bool _isActive = false;
+
 		[XmlIgnore]
 		public bool IsActive
 		{
@@ -229,7 +255,7 @@ namespace AvalonDock.Layout
 
 		public event EventHandler IsActiveChanged;
 
-		#endregion
+		#endregion IsActive
 
 		#region IsLastFocusedDocument
 
@@ -251,7 +277,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion IsLastFocusedDocument
 
 		#region PreviousContainer
 
@@ -311,11 +337,12 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion PreviousContainer
 
 		#region PreviousContainerIndex
 		[field: NonSerialized]
 		private int _previousContainerIndex = -1;
+
 		[XmlIgnore]
 		public int PreviousContainerIndex
 		{
@@ -333,11 +360,12 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion PreviousContainerIndex
 
 		#region LastActivationTimeStamp
 
 		private DateTime? _lastActivationTimeStamp = null;
+
 		public DateTime? LastActivationTimeStamp
 		{
 			get
@@ -354,7 +382,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion LastActivationTimeStamp
 
 		#region FloatingWidth
 
@@ -376,11 +404,12 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion FloatingWidth
 
 		#region FloatingHeight
 
 		private double _floatingHeight = 0.0;
+
 		public double FloatingHeight
 		{
 			get
@@ -398,7 +427,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion FloatingHeight
 
 		#region FloatingLeft
 
@@ -420,7 +449,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion FloatingLeft
 
 		#region FloatingTop
 
@@ -442,11 +471,12 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion FloatingTop
 
 		#region IsMaximized
 
 		private bool _isMaximized = false;
+
 		public bool IsMaximized
 		{
 			get
@@ -464,17 +494,16 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion IsMaximized
 
 		#region ToolTip
 
 		private object _toolTip = null;
+
 		public object ToolTip
 		{
-			get
-			{
-				return _toolTip;
-			}
+			get => _toolTip;
+
 			set
 			{
 				if (_toolTip != value)
@@ -485,9 +514,8 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion ToolTip
 
-		#region IsFloating
 		public bool IsFloating
 		{
 			get
@@ -495,8 +523,6 @@ namespace AvalonDock.Layout
 				return this.FindParent<LayoutFloatingWindow>() != null;
 			}
 		}
-
-		#endregion
 
 		#region IconSource
 
@@ -517,7 +543,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion IconSource
 
 		#region CanClose
 
@@ -538,7 +564,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion CanClose
 
 		#region CanFloat
 
@@ -559,7 +585,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion CanFloat
 
 		#region IsEnabled
 
@@ -580,47 +606,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion IsEnabled
 
-
-
-
-
-
-
-		#endregion
-
-		#region Overrides
-
-		protected override void OnParentChanging(ILayoutContainer oldValue, ILayoutContainer newValue)
-		{
-			var root = Root;
-
-			if (oldValue != null)
-				IsSelected = false;
-
-			//if (root != null && _isActive && newValue == null)
-			//    root.ActiveContent = null;
-
-			base.OnParentChanging(oldValue, newValue);
-		}
-
-		protected override void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
-		{
-			if (IsSelected && Parent != null && Parent is ILayoutContentSelector)
-			{
-				var parentSelector = (Parent as ILayoutContentSelector);
-				parentSelector.SelectedContentIndex = parentSelector.IndexOf(this);
-			}
-
-			//var root = Root;
-			//if (root != null && _isActive)
-			//    root.ActiveContent = this;
-
-			base.OnParentChanged(oldValue, newValue);
-		}
-
-		#endregion
+		#endregion Properties
 
 		#region Public Methods
 
@@ -851,11 +839,39 @@ namespace AvalonDock.Layout
 
 		}
 
+		#endregion Public Methods
 
+		#region Overrides
 
+		protected override void OnParentChanging(ILayoutContainer oldValue, ILayoutContainer newValue)
+		{
+			var root = Root;
 
+			if (oldValue != null)
+				IsSelected = false;
 
-		#endregion
+			//if (root != null && _isActive && newValue == null)
+			//    root.ActiveContent = null;
+
+			base.OnParentChanging(oldValue, newValue);
+		}
+
+		protected override void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
+		{
+			if (IsSelected && Parent != null && Parent is ILayoutContentSelector)
+			{
+				var parentSelector = (Parent as ILayoutContentSelector);
+				parentSelector.SelectedContentIndex = parentSelector.IndexOf(this);
+			}
+
+			//var root = Root;
+			//if (root != null && _isActive)
+			//    root.ActiveContent = this;
+
+			base.OnParentChanged(oldValue, newValue);
+		}
+
+		#endregion Overrides
 
 		#region Internal Methods
 
@@ -933,29 +949,6 @@ namespace AvalonDock.Layout
 			FloatingPropertiesUpdated?.Invoke(this, EventArgs.Empty);
 		}
 
-		#endregion
-
-		#region Events
-
-		/// <summary>
-		/// Event fired when the content is closed (i.e. removed definitely from the layout)
-		/// </summary>
-		public event EventHandler Closed;
-
-		/// <summary>
-		/// Event fired when the content is about to be closed (i.e. removed definitely from the layout)
-		/// </summary>
-		/// <remarks>Please note that LayoutAnchorable also can be hidden. Usually user hide anchorables when click the 'X' button. To completely close 
-		/// an anchorable the user should click the 'Close' menu item from the context menu. When an LayoutAnchorable is hidden its visibility changes to false and
-		/// IsHidden property is set to true.
-		/// Hanlde the Hiding event for the LayoutAnchorable to cancel the hide operation.</remarks>
-		public event EventHandler<CancelEventArgs> Closing;
-
-		/// <summary>
-		/// Event fired when floating properties were updated.
-		/// </summary>
-		public event EventHandler FloatingPropertiesUpdated;
-
-		#endregion
+		#endregion Internal Methods
 	}
 }

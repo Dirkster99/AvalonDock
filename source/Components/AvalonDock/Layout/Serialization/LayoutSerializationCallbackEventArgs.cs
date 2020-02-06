@@ -13,7 +13,7 @@ namespace AvalonDock.Layout.Serialization
 {
 	public class LayoutSerializationCallbackEventArgs : CancelEventArgs
 	{
-		#region constructor
+		#region constructors
 
 		public LayoutSerializationCallbackEventArgs(LayoutContent model, object previousContent)
 		{
@@ -22,7 +22,7 @@ namespace AvalonDock.Layout.Serialization
 			Content = previousContent;
 		}
 
-		#endregion
+		#endregion constructors
 
 		#region Properties
 
@@ -36,6 +36,6 @@ namespace AvalonDock.Layout.Serialization
 			get; set;
 		}
 
-		#endregion
+		#endregion Properties
 	}
 }

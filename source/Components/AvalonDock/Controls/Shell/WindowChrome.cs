@@ -22,6 +22,30 @@ namespace Microsoft.Windows.Shell
 
 	public class WindowChrome : Freezable
 	{
+		public WindowChrome()
+		{
+			// Effective default values for some of these properties are set to be bindings
+			// that set them to system defaults.
+			// A more correct way to do this would be to Coerce the value iff the source of the DP was the default value.
+			// Unfortunately with the current property system we can't detect whether the value being applied at the time
+			// of the coersion is the default.
+			foreach (var bp in _BoundProperties)
+			{
+				// This list must be declared after the DP's are assigned.
+				Assert.IsNotNull(bp.DependencyProperty);
+				BindingOperations.SetBinding(this, bp.DependencyProperty,
+					new Binding
+					{
+						Source = SystemParameters2.Current,
+						Path = new PropertyPath(bp.SystemParameterPropertyName),
+						Mode = BindingMode.OneWay,
+						UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+					});
+			}
+		}
+
+		internal event EventHandler PropertyChangedThatRequiresRepaint;
+
 		private struct _SystemParameterBoundProperty
 		{
 			public string SystemParameterPropertyName { get; set; }
@@ -33,8 +57,8 @@ namespace Microsoft.Windows.Shell
 
 		#region Attached Properties
 
-		public static readonly DependencyProperty WindowChromeProperty = DependencyProperty.RegisterAttached(
-			"WindowChrome", typeof(WindowChrome), typeof(WindowChrome), new PropertyMetadata(null, _OnChromeChanged));
+		public static readonly DependencyProperty WindowChromeProperty = DependencyProperty.RegisterAttached("WindowChrome", typeof(WindowChrome), typeof(WindowChrome),
+			new PropertyMetadata(null, _OnChromeChanged));
 
 		private static void _OnChromeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
@@ -43,6 +67,7 @@ namespace Microsoft.Windows.Shell
 			// chrome anyways.
 			// There's certainly room for improvement here.
 			if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(d)) return;
+
 			var window = (Window)d;
 			var newChrome = (WindowChrome)e.NewValue;
 			Assert.IsNotNull(window);
@@ -85,8 +110,9 @@ namespace Microsoft.Windows.Shell
 		public static bool GetIsHitTestVisibleInChrome(IInputElement inputElement)
 		{
 			Verify.IsNotNull(inputElement, nameof(inputElement));
-			if (!(inputElement is DependencyObject dObj)) throw new ArgumentException("The element must be a DependencyObject", nameof(inputElement));
-			return (bool)dObj.GetValue(IsHitTestVisibleInChromeProperty);
+			if (!(inputElement is DependencyObject dobj))
+				throw new ArgumentException("The element must be a DependencyObject", nameof(inputElement));
+			return (bool)dobj.GetValue(IsHitTestVisibleInChromeProperty);
 		}
 
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
@@ -94,18 +120,17 @@ namespace Microsoft.Windows.Shell
 		public static void SetIsHitTestVisibleInChrome(IInputElement inputElement, bool hitTestVisible)
 		{
 			Verify.IsNotNull(inputElement, nameof(inputElement));
-			if (!(inputElement is DependencyObject dObj)) throw new ArgumentException("The element must be a DependencyObject", nameof(inputElement));
-			dObj.SetValue(IsHitTestVisibleInChromeProperty, hitTestVisible);
+			if (!(inputElement is DependencyObject dobj))
+				throw new ArgumentException("The element must be a DependencyObject", nameof(inputElement));
+			dobj.SetValue(IsHitTestVisibleInChromeProperty, hitTestVisible);
 		}
 
-		#endregion
+		#endregion Attached Properties
 
 		#region Dependency Properties
 
-		public static readonly DependencyProperty CaptionHeightProperty = DependencyProperty.Register(
-			nameof(CaptionHeight), typeof(double), typeof(WindowChrome), 
-			new PropertyMetadata(0d, (d, e) => ((WindowChrome)d)._OnPropertyChangedThatRequiresRepaint()),
-			value => (double)value >= 0d);
+		public static readonly DependencyProperty CaptionHeightProperty = DependencyProperty.Register(nameof(CaptionHeight), typeof(double), typeof(WindowChrome),
+			new PropertyMetadata(0d, (d, e) => ((WindowChrome)d)._OnPropertyChangedThatRequiresRepaint()), value => (double)value >= 0d);
 
 		/// <summary>The extent of the top of the window to treat as the caption.</summary>
 		public double CaptionHeight
@@ -114,8 +139,7 @@ namespace Microsoft.Windows.Shell
 			set => SetValue(CaptionHeightProperty, value);
 		}
 
-		public static readonly DependencyProperty ResizeBorderThicknessProperty = DependencyProperty.Register(
-			nameof(ResizeBorderThickness), typeof(Thickness), typeof(WindowChrome),
+		public static readonly DependencyProperty ResizeBorderThicknessProperty = DependencyProperty.Register(nameof(ResizeBorderThickness), typeof(Thickness), typeof(WindowChrome),
 			new PropertyMetadata(default(Thickness)), (value) => Utility.IsThicknessNonNegative((Thickness)value));
 
 		public Thickness ResizeBorderThickness
@@ -124,11 +148,8 @@ namespace Microsoft.Windows.Shell
 			set => SetValue(ResizeBorderThicknessProperty, value);
 		}
 
-		public static readonly DependencyProperty GlassFrameThicknessProperty = DependencyProperty.Register(
-			nameof(GlassFrameThickness), typeof(Thickness), typeof(WindowChrome),
-			new PropertyMetadata(default(Thickness),
-				(d, e) => ((WindowChrome)d)._OnPropertyChangedThatRequiresRepaint(),
-				(d, o) => _CoerceGlassFrameThickness((Thickness)o)));
+		public static readonly DependencyProperty GlassFrameThicknessProperty = DependencyProperty.Register(nameof(GlassFrameThickness), typeof(Thickness), typeof(WindowChrome),
+			new PropertyMetadata(default(Thickness), (d, e) => ((WindowChrome)d)._OnPropertyChangedThatRequiresRepaint(), (d, o) => _CoerceGlassFrameThickness((Thickness)o)));
 
 		private static object _CoerceGlassFrameThickness(Thickness thickness)
 		{
@@ -136,17 +157,15 @@ namespace Microsoft.Windows.Shell
 			// coerce the value to the stock GlassFrameCompleteThickness.
 			return !Utility.IsThicknessNonNegative(thickness) ? GlassFrameCompleteThickness : thickness;
 		}
+
 		public Thickness GlassFrameThickness
 		{
 			get => (Thickness)GetValue(GlassFrameThicknessProperty);
 			set => SetValue(GlassFrameThicknessProperty, value);
 		}
 
-		public static readonly DependencyProperty CornerRadiusProperty = DependencyProperty.Register(
-			nameof(CornerRadius), typeof(CornerRadius), typeof(WindowChrome),
-			new PropertyMetadata(default(CornerRadius),
-				(d, e) => ((WindowChrome)d)._OnPropertyChangedThatRequiresRepaint()),
-			(value) => Utility.IsCornerRadiusValid((CornerRadius)value));
+		public static readonly DependencyProperty CornerRadiusProperty = DependencyProperty.Register(nameof(CornerRadius), typeof(CornerRadius), typeof(WindowChrome),
+			new PropertyMetadata(default(CornerRadius), (d, e) => ((WindowChrome)d)._OnPropertyChangedThatRequiresRepaint()), (value) => Utility.IsCornerRadiusValid((CornerRadius)value));
 
 		public CornerRadius CornerRadius
 		{
@@ -154,20 +173,16 @@ namespace Microsoft.Windows.Shell
 			set => SetValue(CornerRadiusProperty, value);
 		}
 
-		#region ShowSystemMenu
-
-		/// <summary>
-		/// Gets or sets the <see cref="ShowSystemMenu"/> property.  This dependency property 
-		/// indicates if the system menu should be shown at right click on the caption.
-		/// </summary>
+		/// <summary>Gets or sets the ShowSystemMenu property.  This dependency property indicates if the system menu should be shown at right click on the caption. </summary>
 		public bool ShowSystemMenu { get; set; }
 
-		#endregion
-		
-		#endregion
+		#endregion Dependency Properties
 
 		/// <inheritdoc />
-		protected override Freezable CreateInstanceCore() => new WindowChrome();
+		protected override Freezable CreateInstanceCore()
+		{
+			return new WindowChrome();
+		}
 
 		private static readonly List<_SystemParameterBoundProperty> _BoundProperties = new List<_SystemParameterBoundProperty>
 		{
@@ -177,32 +192,6 @@ namespace Microsoft.Windows.Shell
 			new _SystemParameterBoundProperty { DependencyProperty = GlassFrameThicknessProperty, SystemParameterPropertyName = "WindowNonClientFrameThickness" },
 		};
 
-		public WindowChrome()
-		{
-			// Effective default values for some of these properties are set to be bindings
-			// that set them to system defaults.
-			// A more correct way to do this would be to Coerce the value iff the source of the DP was the default value.
-			// Unfortunately with the current property system we can't detect whether the value being applied at the time
-			// of the coersion is the default.
-			foreach (var bp in _BoundProperties)
-			{
-				// This list must be declared after the DP's are assigned.
-				Assert.IsNotNull(bp.DependencyProperty);
-				BindingOperations.SetBinding(
-					this,
-					bp.DependencyProperty,
-					new Binding
-					{
-						Source = SystemParameters2.Current,
-						Path = new PropertyPath(bp.SystemParameterPropertyName),
-						Mode = BindingMode.OneWay,
-						UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-					});
-			}
-		}
-
 		private void _OnPropertyChangedThatRequiresRepaint() => PropertyChangedThatRequiresRepaint?.Invoke(this, EventArgs.Empty);
-
-		internal event EventHandler PropertyChangedThatRequiresRepaint;
 	}
 }

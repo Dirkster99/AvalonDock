@@ -15,11 +15,14 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutDocument : LayoutContent
 	{
+		#region fields
+		private bool _canMove = true;
+		private bool _isVisible = true;
+		private string _description = null;
+		#endregion fields
+
 		#region Properties
 
-		#region CanMove
-
-		internal bool _canMove = true;
 		public bool CanMove
 		{
 			get
@@ -36,10 +39,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
-
-		#region IsVisible
-
 		public bool IsVisible
 		{
 			get
@@ -52,13 +51,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		private bool _isVisible = true;
-
-		#endregion
-
-		#region Description
-
-		private string _description = null;
 		public string Description
 		{
 			get
@@ -75,7 +67,20 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion Properties
+
+		#region Internal Methods
+
+		internal bool CloseDocument()
+		{
+			if (this.TestCanClose())
+			{
+				this.CloseInternal();
+				return true;
+			}
+
+			return false;
+		}
 
 		#endregion
 
@@ -162,21 +167,6 @@ namespace AvalonDock.Layout
 			base.InternalDock();
 		}
 
-		#endregion
-
-		#region Internal Methods
-
-		internal bool CloseDocument()
-		{
-			if (this.TestCanClose())
-			{
-				this.CloseInternal();
-				return true;
-			}
-
-			return false;
-		}
-
-		#endregion
+		#endregion Overrides
 	}
 }

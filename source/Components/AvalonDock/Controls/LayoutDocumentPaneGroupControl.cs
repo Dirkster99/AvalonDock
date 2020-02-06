@@ -33,7 +33,7 @@ namespace AvalonDock.Controls
 			_model = model;
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Overrides
 
@@ -62,9 +62,9 @@ namespace AvalonDock.Controls
 					}
 				}
 			}
-			#endregion
+			#endregion Setup DockWidth/Height for children
 		}
 
-		#endregion
+		#endregion Overrides
 	}
 }

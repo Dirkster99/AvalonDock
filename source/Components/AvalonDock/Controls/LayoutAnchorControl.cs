@@ -43,11 +43,9 @@ namespace AvalonDock.Controls
 			SetSide(_model.FindParent<LayoutAnchorSide>().Side);
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
-
-		#region Model
 
 		public ILayoutElement Model
 		{
@@ -56,8 +54,6 @@ namespace AvalonDock.Controls
 				return _model;
 			}
 		}
-
-		#endregion
 
 		#region Side
 
@@ -91,40 +87,9 @@ namespace AvalonDock.Controls
 			SetValue(SidePropertyKey, value);
 		}
 
-		#endregion
+		#endregion Side
 
-		#endregion
-
-		#region Private Methods
-
-		private void _model_IsSelectedChanged(object sender, EventArgs e)
-		{
-			if (!_model.IsAutoHidden)
-				_model.IsSelectedChanged -= new EventHandler(_model_IsSelectedChanged);
-			else if (_model.IsSelected)
-			{
-				_model.Root.Manager.ShowAutoHideWindow(this);
-				_model.IsSelected = false;
-			}
-		}
-
-		private void _model_IsActiveChanged(object sender, EventArgs e)
-		{
-			if (!_model.IsAutoHidden)
-				_model.IsActiveChanged -= new EventHandler(_model_IsActiveChanged);
-			else if (_model.IsActive)
-				_model.Root.Manager.ShowAutoHideWindow(this);
-		}
-
-		private void _openUpTimer_Tick(object sender, EventArgs e)
-		{
-			_openUpTimer.Tick -= new EventHandler(_openUpTimer_Tick);
-			_openUpTimer.Stop();
-			_openUpTimer = null;
-			_model.Root.Manager.ShowAutoHideWindow(this);
-		}
-
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -194,6 +159,37 @@ namespace AvalonDock.Controls
 		}
 
 
-		#endregion
+		#endregion Overrides
+
+		#region Private Methods
+
+		private void _model_IsSelectedChanged(object sender, EventArgs e)
+		{
+			if (!_model.IsAutoHidden)
+				_model.IsSelectedChanged -= new EventHandler(_model_IsSelectedChanged);
+			else if (_model.IsSelected)
+			{
+				_model.Root.Manager.ShowAutoHideWindow(this);
+				_model.IsSelected = false;
+			}
+		}
+
+		private void _model_IsActiveChanged(object sender, EventArgs e)
+		{
+			if (!_model.IsAutoHidden)
+				_model.IsActiveChanged -= new EventHandler(_model_IsActiveChanged);
+			else if (_model.IsActive)
+				_model.Root.Manager.ShowAutoHideWindow(this);
+		}
+
+		private void _openUpTimer_Tick(object sender, EventArgs e)
+		{
+			_openUpTimer.Tick -= new EventHandler(_openUpTimer_Tick);
+			_openUpTimer.Stop();
+			_openUpTimer = null;
+			_model.Root.Manager.ShowAutoHideWindow(this);
+		}
+
+		#endregion Private Methods
 	}
 }
