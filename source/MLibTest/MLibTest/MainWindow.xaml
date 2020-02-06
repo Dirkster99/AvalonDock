@@ -1,103 +1,118 @@
-﻿<MWindow:MetroWindow x:Class="MLibTest.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        
-        x:Name="mainWindow"
-        xmlns:MWindow="clr-namespace:MWindowLib;assembly=MWindowLib"
-        xmlns:demos="clr-namespace:MLibTest.Demos"
-        xmlns:demoviews="clr-namespace:MLibTest.Demos.Views"
-        xmlns:advConv="clr-namespace:AvalonDock.Converters;assembly=AvalonDock"
-        
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-	<Grid xmlns:bindLocal="clr-namespace:MLibTest.Demos"
-          xmlns:ThemeBehav="clr-namespace:MLib.Behaviors;assembly=MLib"
-          
-          xmlns:avalonDock="clr-namespace:AvalonDock;assembly=AvalonDock"
-          xmlns:avalonDockControls="clr-namespace:AvalonDock.Controls;assembly=AvalonDock"
-          xmlns:avalonDockLayout="clr-namespace:AvalonDock.Layout;assembly=AvalonDock"
-          xmlns:conv="clr-namespace:MLibTest.Demos.Demos.Converters"
-        >
+﻿<MWindow:MetroWindow
+	x:Class="MLibTest.MainWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:MWindow="clr-namespace:MWindowLib;assembly=MWindowLib"
+	xmlns:advConv="clr-namespace:AvalonDock.Converters;assembly=AvalonDock"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:demos="clr-namespace:MLibTest.Demos"
+	xmlns:demoviews="clr-namespace:MLibTest.Demos.Views"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	x:Name="mainWindow"
+	Title="MainWindow"
+	Width="800"
+	Height="450"
+	mc:Ignorable="d">
+	<Grid
+		xmlns:ThemeBehav="clr-namespace:MLib.Behaviors;assembly=MLib"
+		xmlns:avalonDock="clr-namespace:AvalonDock;assembly=AvalonDock"
+		xmlns:avalonDockControls="clr-namespace:AvalonDock.Controls;assembly=AvalonDock"
+		xmlns:avalonDockLayout="clr-namespace:AvalonDock.Layout;assembly=AvalonDock"
+		xmlns:bindLocal="clr-namespace:MLibTest.Demos"
+		xmlns:conv="clr-namespace:MLibTest.Demos.Demos.Converters">
 		<Grid.Resources>
-			<conv:ActiveDocumentConverter x:Key="ActiveDocumentConverter"/>
-			<advConv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+			<conv:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
+			<advConv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 		</Grid.Resources>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="16"/>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="16" />
 		</Grid.RowDefinitions>
 
 		<Menu>
 			<Menu.Resources>
-				<!-- Use a proxy to bind items to root object of this collection -->
+				<!--  Use a proxy to bind items to root object of this collection  -->
 				<bindLocal:BindingProxy x:Key="MenuItemsProxy" Data="{Binding}" />
 			</Menu.Resources>
 			<MenuItem Header="File">
-				<MenuItem Header="New" Command="{Binding AD_WorkSpace.NewCommand}"/>
-				<MenuItem Header="Open" Command="{Binding AD_WorkSpace.OpenCommand}"/>
-				<Separator/>
-				<MenuItem Header="Save" Command="{Binding AD_WorkSpace.ActiveDocument.SaveCommand}"/>
-				<MenuItem Header="Save As..." Command="{Binding AD_WorkSpace.ActiveDocument.SaveAsCommand}"/>
-				<Separator/>
-				<MenuItem Header="Close" Command="{Binding AD_WorkSpace.ActiveDocument.CloseCommand}"/>
+				<MenuItem Command="{Binding AD_WorkSpace.NewCommand}" Header="New" />
+				<MenuItem Command="{Binding AD_WorkSpace.OpenCommand}" Header="Open" />
+				<Separator />
+				<MenuItem Command="{Binding AD_WorkSpace.ActiveDocument.SaveCommand}" Header="Save" />
+				<MenuItem Command="{Binding AD_WorkSpace.ActiveDocument.SaveAsCommand}" Header="Save As..." />
+				<Separator />
+				<MenuItem Command="{Binding AD_WorkSpace.ActiveDocument.CloseCommand}" Header="Close" />
 			</MenuItem>
 			<MenuItem Header="Layout">
-				<MenuItem Header="Load" Command="{Binding LoadLayoutCommand, ElementName=mainWindow}"/>
-				<MenuItem Header="Save" Command="{Binding SaveLayoutCommand, ElementName=mainWindow}"/>
-				<MenuItem Header="Dump to Console" Click="OnDumpToConsole"/>
+				<MenuItem Command="{Binding LoadLayoutCommand, ElementName=mainWindow}" Header="Load" />
+				<MenuItem Command="{Binding SaveLayoutCommand, ElementName=mainWindow}" Header="Save" />
+				<MenuItem Click="OnDumpToConsole" Header="Dump to Console" />
 			</MenuItem>
 			<MenuItem Header="Tools">
-				<MenuItem Header="Themes"
-                                  ItemsSource="{Binding AppTheme.ListOfThemes}"
-                                  IsEnabled="{Binding AppTheme.IsEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                  DisplayMemberPath="Model.DisplayName"
-                              >
+				<MenuItem
+					DisplayMemberPath="Model.DisplayName"
+					Header="Themes"
+					IsEnabled="{Binding AppTheme.IsEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+					ItemsSource="{Binding AppTheme.ListOfThemes}">
 					<MenuItem.ItemContainerStyle>
-						<Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
-							<!-- Setter Property="Header" Value="{Binding Model.Name, Mode=OneWay}" / -->
-							<Setter Property="IsChecked" Value="{Binding IsSelected, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
-							<Setter Property="IsCheckable" Value="True"/>
+						<Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="{x:Type MenuItem}">
+							<!--  Setter Property="Header" Value="{Binding Model.Name, Mode=OneWay}" /  -->
+							<Setter Property="IsChecked" Value="{Binding IsSelected, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+							<Setter Property="IsCheckable" Value="True" />
 							<Setter Property="Command" Value="{Binding Path=Data.ThemeSelectionChangedCommand, Source={StaticResource MenuItemsProxy}}" />
 							<Setter Property="CommandParameter" Value="{Binding}" />
-							<!-- Send this item for processing to the bound command -->
-							<Setter Property="ThemeBehav:MergeStyleBehaviour.AutoMergeStyle" Value="True"/>
+							<!--  Send this item for processing to the bound command  -->
+							<Setter Property="ThemeBehav:MergeStyleBehaviour.AutoMergeStyle" Value="True" />
 						</Style>
 					</MenuItem.ItemContainerStyle>
 				</MenuItem>
-				<MenuItem Header="File Stats" IsChecked="{Binding AD_WorkSpace.FileStats.IsVisible, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsCheckable="True"/>
-				<MenuItem Header="Color Picker" IsChecked="{Binding AD_WorkSpace.ColorPicker.IsVisible, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsCheckable="True"/>
-				<MenuItem Header="Tool1" IsChecked="{Binding AD_WorkSpace.Tool1.IsVisible, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsCheckable="True"/>
-				<MenuItem Header="Tool2" IsChecked="{Binding AD_WorkSpace.Tool2.IsVisible, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsCheckable="True"/>
-				<MenuItem Header="Tool3" IsChecked="{Binding AD_WorkSpace.Tool3.IsVisible, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" IsCheckable="True"/>
+				<MenuItem
+					Header="File Stats"
+					IsCheckable="True"
+					IsChecked="{Binding AD_WorkSpace.FileStats.IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<MenuItem
+					Header="Color Picker"
+					IsCheckable="True"
+					IsChecked="{Binding AD_WorkSpace.ColorPicker.IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<MenuItem
+					Header="Tool1"
+					IsCheckable="True"
+					IsChecked="{Binding AD_WorkSpace.Tool1.IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<MenuItem
+					Header="Tool2"
+					IsCheckable="True"
+					IsChecked="{Binding AD_WorkSpace.Tool2.IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+				<MenuItem
+					Header="Tool3"
+					IsCheckable="True"
+					IsChecked="{Binding AD_WorkSpace.Tool3.IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 			</MenuItem>
 		</Menu>
 
 		<TabControl Grid.Row="1">
 			<TabItem Name="tab1" Header="tab 1">
-				<avalonDock:DockingManager x:Name="dockManager"
-                                   DataContext="{Binding AD_WorkSpace}"
-                                   AnchorablesSource="{Binding Tools}" 
-                                   DocumentsSource="{Binding Files}"
-                                   ActiveContent="{Binding ActiveDocument, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
-                                   Grid.Row="1"
-                                   Visibility="Hidden"
-                                   >
+				<avalonDock:DockingManager
+					x:Name="dockManager"
+					Grid.Row="1"
+					ActiveContent="{Binding ActiveDocument, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
+					AnchorablesSource="{Binding Tools}"
+					DataContext="{Binding AD_WorkSpace}"
+					DocumentsSource="{Binding Files}"
+					Visibility="Hidden">
 					<!-- avalonDock:DockingManager.Theme>
                 <avalonDock:Vs2013LightTheme/>
-            </avalonDock:DockingManager.Theme -->
+            </avalonDock:DockingManager.Theme-->
 					<avalonDock:DockingManager.LayoutItemTemplateSelector>
 						<demos:PanesTemplateSelector>
 							<demos:PanesTemplateSelector.FileViewTemplate>
 								<DataTemplate>
 									<Grid>
 										<TextBox
-                                    Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}"
-                                    TextWrapping="Wrap"
-                                    AcceptsReturn="True"
-                                    BorderThickness="0" />
+											AcceptsReturn="True"
+											BorderThickness="0"
+											Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}"
+											TextWrapping="Wrap" />
 									</Grid>
 								</DataTemplate>
 							</demos:PanesTemplateSelector.FileViewTemplate>
@@ -105,9 +120,9 @@
 								<DataTemplate>
 									<Border Padding="6">
 										<StackPanel Orientation="Vertical">
-											<TextBlock Text="{Binding FileSize}"/>
-											<TextBlock Text="{Binding LastModified}"/>
-											<TextBox Text="test"/>
+											<TextBlock Text="{Binding FileSize}" />
+											<TextBlock Text="{Binding LastModified}" />
+											<TextBox Text="test" />
 										</StackPanel>
 									</Border>
 								</DataTemplate>
@@ -125,7 +140,7 @@
 								<DataTemplate>
 									<Border Padding="6">
 										<StackPanel Orientation="Vertical">
-											<TextBlock Text="I am a ToolWindow test implementation"/>
+											<TextBlock Text="I am a ToolWindow test implementation" />
 										</StackPanel>
 									</Border>
 								</DataTemplate>
@@ -136,45 +151,47 @@
 					<avalonDock:DockingManager.LayoutItemContainerStyleSelector>
 						<demos:PanesStyleSelector>
 							<demos:PanesStyleSelector.ToolStyle>
-								<!-- Define Style of a Tool Window View -->
+								<!--  Define Style of a Tool Window View  -->
 								<Style TargetType="{x:Type avalonDockControls:LayoutAnchorableItem}">
-									<Setter Property="Title" Value="{Binding Model.Title}"/>
-									<Setter Property="IconSource" Value="{Binding Model.IconSource}"/>
-									<Setter Property="Visibility" Value="{Binding Model.IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}"/>
-									<Setter Property="ContentId" Value="{Binding Model.ContentId}"/>
-									<Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}"/>
-									<Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}"/>
+									<Setter Property="Title" Value="{Binding Model.Title}" />
+									<Setter Property="IconSource" Value="{Binding Model.IconSource}" />
+									<Setter Property="Visibility" Value="{Binding Model.IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}" />
+									<Setter Property="ContentId" Value="{Binding Model.ContentId}" />
+									<Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}" />
+									<Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}" />
 									<Setter Property="CanHide" Value="True" />
 								</Style>
 							</demos:PanesStyleSelector.ToolStyle>
 							<demos:PanesStyleSelector.FileStyle>
-								<!-- Define Style of a Document View -->
+								<!--  Define Style of a Document View  -->
 								<Style TargetType="{x:Type avalonDockControls:LayoutItem}">
-									<Setter Property="Title" Value="{Binding Model.Title}"/>
-									<Setter Property="ToolTip" Value="{Binding Model.FilePath}"/>
-									<Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}"/>
-									<Setter Property="IconSource" Value="{Binding Model.IconSource}"/>
-									<Setter Property="ContentId" Value="{Binding Model.ContentId}"/>
+									<Setter Property="Title" Value="{Binding Model.Title}" />
+									<Setter Property="ToolTip" Value="{Binding Model.FilePath}" />
+									<Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
+									<Setter Property="IconSource" Value="{Binding Model.IconSource}" />
+									<Setter Property="ContentId" Value="{Binding Model.ContentId}" />
 								</Style>
 							</demos:PanesStyleSelector.FileStyle>
 						</demos:PanesStyleSelector>
 					</avalonDock:DockingManager.LayoutItemContainerStyleSelector>
 					<avalonDock:DockingManager.LayoutUpdateStrategy>
-						<demos:LayoutInitializer/>
+						<demos:LayoutInitializer />
 					</avalonDock:DockingManager.LayoutUpdateStrategy>
 
 					<avalonDockLayout:LayoutRoot>
 						<avalonDockLayout:LayoutPanel Orientation="Vertical">
-							<avalonDockLayout:LayoutDocumentPane/>
-							<!-- Use DockMinWidth="250" to limit the size of a LayoutAnchorable -->
-							<avalonDockLayout:LayoutAnchorablePane Name="ToolsPane" DockMinWidth="250" DockHeight="150">
-							</avalonDockLayout:LayoutAnchorablePane>
+							<avalonDockLayout:LayoutDocumentPane />
+							<!--  Use DockMinWidth="250" to limit the size of a LayoutAnchorable  -->
+							<avalonDockLayout:LayoutAnchorablePane
+								Name="ToolsPane"
+								DockHeight="150"
+								DockMinWidth="250" />
 						</avalonDockLayout:LayoutPanel>
 					</avalonDockLayout:LayoutRoot>
 				</avalonDock:DockingManager>
 			</TabItem>
 			<TabItem Name="tab2" Header="tab 2">
-				<TextBlock Text="tab2 is just for testing load/unload control in tab1"></TextBlock>
+				<TextBlock Text="tab2 is just for testing load/unload control in tab1" />
 			</TabItem>
 		</TabControl>
 	</Grid>

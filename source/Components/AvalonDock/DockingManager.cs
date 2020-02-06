@@ -112,22 +112,6 @@ namespace AvalonDock
 
 		#region Public Properties
 
-		// Make autohide delay a configurable property
-		public static readonly DependencyProperty AutoHideDelayProperty = DependencyProperty.Register("AutoHideDelay", typeof(int), typeof(DockingManager),
-            new FrameworkPropertyMetadata(1500));
-
-		public int AutoHideDelay 
-		{
-			get 
-			{
-				return (int)GetValue(AutoHideDelayProperty);
-			}
-			set 
-			{
-				SetValue(AutoHideDelayProperty, value);
-			}
-		}
-
 		#region Layout
 
 		/// <summary>
@@ -906,6 +890,33 @@ namespace AvalonDock
 
 		#endregion AutoHideWindow
 
+		#region AutoHideDelay
+		/// <summary>
+		/// Implements the backing store of the <see cref="AutoHideDelay"/> dependency property.
+		/// </summary>
+		public static readonly DependencyProperty AutoHideDelayProperty =
+			DependencyProperty.Register("AutoHideDelay", typeof(int), typeof(DockingManager),
+										new UIPropertyMetadata(0));
+
+		/// <summary>
+		/// Gets/sets the wait time in milliseconds that is applicable when the system AutoHides
+		/// a <see cref="LayoutAnchorableControl"/> (reduces it to a side anchor) after the user:
+		/// 
+		/// 1) clicks on a <see cref="LayoutAnchorControl "/> that is anchored in one of the <see cref="Layout"/>
+		/// property sides (top, right, left, or bottom) and
+		/// 
+		/// 2) clicks somewhere else into a focusable element (different document).
+		/// 
+		/// Expected behavior: The system waits for the configured time and reduces the <see cref="LayoutAnchorableControl"/> (into its side anchor).
+		/// Recommended configuration value range should be beetween 0 and 1500.
+		/// </summary>
+		public int AutoHideDelay
+		{
+			get => (int)GetValue(AutoHideDelayProperty);
+			set => SetValue(AutoHideDelayProperty, value);
+		}
+		#endregion AutoHideDelay
+
 		/// <summary>Floating Windows</summary>
 		public IEnumerable<LayoutFloatingWindowControl> FloatingWindows => _fwList;
 
@@ -1603,23 +1614,11 @@ namespace AvalonDock
 			return null;
 		}
 
+		/// <summary>Method is invoked to pop put an Anchorable that was in AutoHide mode.</summary>
+		/// <param name="anchor"><see cref="LayoutAnchorControl"/> to pop out of the side panel.</param>
 		internal void ShowAutoHideWindow(LayoutAnchorControl anchor)
 		{
 			_autoHideWindowManager.ShowAutoHideWindow(anchor);
-			//if (_autohideArea == null)
-			//    return;
-
-			//if (AutoHideWindow != null && AutoHideWindow.Model == anchor.Model)
-			//    return;
-
-			//Trace.WriteLine("ShowAutoHideWindow()");
-
-			//_currentAutohiddenAnchor = new WeakReference(anchor);
-
-			//HideAutoHideWindow(anchor);
-
-			//SetAutoHideWindow(new LayoutAutoHideWindowControl(anchor));
-			//AutoHideWindow.Show();
 		}
 
 		internal void HideAutoHideWindow(LayoutAnchorControl anchor) => _autoHideWindowManager.HideAutoWindow(anchor);

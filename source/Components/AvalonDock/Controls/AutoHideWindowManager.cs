@@ -13,6 +13,12 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// This class manages the timing process when the user clicks on a <see cref="LayoutAnchorControl"/>
+	/// of a particular anchored item and the system pops up the corresponding <see cref="LayoutAutoHideWindowControl"/>
+	/// and reduces it later back to the anchored <see cref="LayoutAnchorControl"/> if the user clicks
+	/// into another focusable element.
+	/// </summary>
 	internal class AutoHideWindowManager
 	{
 		#region fields
@@ -21,18 +27,20 @@ namespace AvalonDock.Controls
 		private DispatcherTimer _closeTimer = null;
 		#endregion fields
 
-		#region Constructors
-
+		#region constructors
+		/// <summary>Class constructor from <see cref="DockingManager"/>.</summary>
+		/// <param name="manager"></param>
 		internal AutoHideWindowManager(DockingManager manager)
 		{
 			_manager = manager;
 			this.SetupCloseTimer();
 		}
 
-		#endregion Constructors
+		#endregion constructors
 
-		#region Private Methods
-
+		#region public methods
+		/// <summary>Method is invoked to pop put an Anchorable that was in AutoHide mode.</summary>
+		/// <param name="anchor"><see cref="LayoutAnchorControl"/> to pop out of the side panel.</param>
 		public void ShowAutoHideWindow(LayoutAnchorControl anchor)
 		{
 			if (_currentAutohiddenAnchor.GetValueOrDefault<LayoutAnchorControl>() != anchor)
@@ -44,6 +52,9 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <summary>Method is invoked to reduce the Anchorable back to AutoHide mode
+		/// after waiting for a configured time in the <see cref="DockingManager.AutoHideDelay"/> property.</summary>
+		/// <param name="anchor"><see cref="LayoutAnchorControl"/> to pop out of the side panel.</param>
 		public void HideAutoWindow(LayoutAnchorControl anchor = null)
 		{
 			if (anchor == null ||
@@ -54,7 +65,9 @@ namespace AvalonDock.Controls
 			else
 				System.Diagnostics.Debug.Assert(false);
 		}
+		#endregion public methods
 
+		#region private methods
 		private void SetupCloseTimer()
 		{
 			_closeTimer = new DispatcherTimer(DispatcherPriority.Background);
@@ -81,7 +94,6 @@ namespace AvalonDock.Controls
 			_manager.AutoHideWindow.Hide();
 			_currentAutohiddenAnchor = null;
 		}
-
-		#endregion Private Methods
+		#endregion private methods
 	}
 }
