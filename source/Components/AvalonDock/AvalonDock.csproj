@@ -17,7 +17,7 @@
     <RepositoryUrl>https://github.com/Dirkster99/AvalonDock</RepositoryUrl>
     <PackageId>Dirkster.AvalonDock</PackageId>
     <Authors>https://github.com/Dirkster99/AvalonDock</Authors>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageLicenseFile>../../../LICENSE</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.0|AnyCPU'">
     <DefineConstants />
