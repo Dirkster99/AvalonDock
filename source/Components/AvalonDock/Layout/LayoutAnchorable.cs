@@ -17,6 +17,11 @@ using System.ComponentModel;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>Implements the model for a layout anchorable control (tool window).
+	/// A LayoutAnchorable can be anchored to the left, right, top, or bottom side of
+	/// the Layout property of the <see cref="DockingManager"/>. It can contain
+	/// custom application content (WPF controls) and other children elements.
+	/// </summary>
 	[Serializable]
 	public class LayoutAnchorable : LayoutContent
 	{
@@ -32,7 +37,7 @@ namespace AvalonDock.Layout
 		#endregion fields
 
 		#region Constructors
-
+		/// <summary>Class constructor</summary>
 		public LayoutAnchorable()
 		{
 			// LayoutAnchorable will hide by default, not close.
@@ -43,163 +48,147 @@ namespace AvalonDock.Layout
 
 		#region Events
 
+		/// <summary>Event is invoked when the visibility of this object has changed.</summary>
 		public event EventHandler IsVisibleChanged;
+
 		public event EventHandler<CancelEventArgs> Hiding;
 
 		#endregion Events
 
 		#region Properties
 
+		/// <summary>Gets/sets the width for this anchorable in AutoHide mode.</summary>
 		public double AutoHideWidth
 		{
-			get
-			{
-				return _autohideWidth;
-			}
+			get => _autohideWidth;
+
 			set
 			{
 				if (_autohideWidth != value)
 				{
-					RaisePropertyChanging("AutoHideWidth");
+					RaisePropertyChanging(nameof(AutoHideWidth));
 					value = Math.Max(value, _autohideMinWidth);
 					_autohideWidth = value;
-					RaisePropertyChanged("AutoHideWidth");
+					RaisePropertyChanged(nameof(AutoHideWidth));
 				}
 			}
 		}
 
+		/// <summary>Gets/sets the minimum width for this anchorable in AutoHide mode.</summary>
 		public double AutoHideMinWidth
 		{
-			get
-			{
-				return _autohideMinWidth;
-			}
+			get => _autohideMinWidth;
+
 			set
 			{
 				if (_autohideMinWidth != value)
 				{
-					RaisePropertyChanging("AutoHideMinWidth");
+					RaisePropertyChanging(nameof(AutoHideMinWidth));
 					if (value < 0)
 						throw new ArgumentException("value");
 					_autohideMinWidth = value;
-					RaisePropertyChanged("AutoHideMinWidth");
+					RaisePropertyChanged(nameof(AutoHideMinWidth));
 				}
 			}
 		}
 
+		/// <summary>Gets/sets the height for this anchorable in AutoHide mode.</summary>
 		public double AutoHideHeight
 		{
-			get
-			{
-				return _autohideHeight;
-			}
+			get => _autohideHeight;
+
 			set
 			{
 				if (_autohideHeight != value)
 				{
-					RaisePropertyChanging("AutoHideHeight");
+					RaisePropertyChanging(nameof(AutoHideHeight));
 					value = Math.Max(value, _autohideMinHeight);
 					_autohideHeight = value;
-					RaisePropertyChanged("AutoHideHeight");
+					RaisePropertyChanged(nameof(AutoHideHeight));
 				}
 			}
 		}
 
+		/// <summary>Gets/sets the minimum height for this anchorable in AutoHide mode.</summary>
 		public double AutoHideMinHeight
 		{
-			get
-			{
-				return _autohideMinHeight;
-			}
+			get => _autohideMinHeight;
+
 			set
 			{
 				if (_autohideMinHeight != value)
 				{
-					RaisePropertyChanging("AutoHideMinHeight");
+					RaisePropertyChanging(nameof(AutoHideMinHeight));
+
 					if (value < 0)
 						throw new ArgumentException("value");
+
 					_autohideMinHeight = value;
-					RaisePropertyChanged("AutoHideMinHeight");
+					RaisePropertyChanged(nameof(AutoHideMinHeight));
 				}
 			}
 		}
 
+		/// <summary>Gets/sets whether the anchorable can hide (be invisible in the UI) or not.</summary>
 		public bool CanHide
 		{
-			get
-			{
-				return _canHide;
-			}
+			get => _canHide;
+
 			set
 			{
 				if (_canHide != value)
 				{
 					_canHide = value;
-					RaisePropertyChanged("CanHide");
+					RaisePropertyChanged(nameof(CanHide));
 				}
 			}
 		}
 
+		/// <summary>Gets/sets whether the anchorable can be anchored to an achor side in an AutoHide status or not.</summary>
 		public bool CanAutoHide
 		{
-			get
-			{
-				return _canAutoHide;
-			}
+			get => _canAutoHide;
+
 			set
 			{
 				if (_canAutoHide != value)
 				{
 					_canAutoHide = value;
-					RaisePropertyChanged("CanAutoHide");
+					RaisePropertyChanged(nameof(CanAutoHide));
 				}
 			}
 		}
 
+		/// <summary>Gets/sets whether the anchorable can be docked as a tabbed document or not.</summary>
 		public bool CanDockAsTabbedDocument
 		{
-			get
-			{
-				return _canDockAsTabbedDocument;
-			}
+			get => _canDockAsTabbedDocument;
+
 			set
 			{
 				if (_canDockAsTabbedDocument != value)
 				{
 					_canDockAsTabbedDocument = value;
-					RaisePropertyChanged("CanDockAsTabbedDocument");
+					RaisePropertyChanged(nameof(CanDockAsTabbedDocument));
 				}
 			}
 		}
 
-		/// <summary>
-		/// Get a value indicating if the anchorable is anchored to a border in an autohide status
-		/// </summary>
-		public bool IsAutoHidden
-		{
-			get
-			{
-				return Parent != null && Parent is LayoutAnchorGroup;
-			}
-		}
+		/// <summary>Get a value indicating if the anchorable is anchored to an achor side in an AutoHide status or not.</summary>
+		public bool IsAutoHidden { get => Parent != null && Parent is LayoutAnchorGroup; }
 
+		/// <summary>Gets whether this object is in a state where it is not visible in the UI or not.</summary>
 		[XmlIgnore]
-		public bool IsHidden
-		{
-			get
-			{
-				return (Parent is LayoutRoot);
-			}
-		}
+		public bool IsHidden { get => (Parent is LayoutRoot); }
 
+		/// <summary>Gets/sets whether this object is in a state where it is visible in the UI or not.</summary>
 		[XmlIgnore]
 		public bool IsVisible
 		{
-			get
-			{
-				return Parent != null && !(Parent is LayoutRoot);
-			}
+			get => Parent != null && !(Parent is LayoutRoot);
+
 			set
+
 			{
 				if (value)
 				{
@@ -215,17 +204,18 @@ namespace AvalonDock.Layout
 		#endregion Properties
 
 		#region Overrides
-
+		/// <inheritdoc />
 		protected override void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
 			UpdateParentVisibility();
-			RaisePropertyChanged("IsVisible");
+			RaisePropertyChanged(nameof(IsVisible));
 			NotifyIsVisibleChanged();
-			RaisePropertyChanged("IsHidden");
-			RaisePropertyChanged("IsAutoHidden");
+			RaisePropertyChanged(nameof(IsHidden));
+			RaisePropertyChanged(nameof(IsAutoHidden));
 			base.OnParentChanged(oldValue, newValue);
 		}
 
+		/// <inheritdoc />
 		protected override void InternalDock()
 		{
 			var root = Root as LayoutRoot;
@@ -284,6 +274,7 @@ namespace AvalonDock.Layout
 			base.InternalDock();
 		}
 
+		/// <inheritdoc />
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
 			if (reader.MoveToAttribute("CanHide"))
@@ -304,6 +295,7 @@ namespace AvalonDock.Layout
 			base.ReadXml(reader);
 		}
 
+		/// <inheritdoc />
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{
 			if (!CanHide)
@@ -324,12 +316,14 @@ namespace AvalonDock.Layout
 			base.WriteXml(writer);
 		}
 
+		/// <inheritdoc />
 		public override void Close()
 		{
 			this.CloseAnchorable();
 		}
 
 #if TRACE
+		/// <inheritdoc />
 		public override void ConsoleDump(int tab)
 		{
 			System.Diagnostics.Trace.Write(new string(' ', tab * 4));
@@ -337,14 +331,20 @@ namespace AvalonDock.Layout
 		}
 #endif
 
+		/// <summary>Method can be invoked to fire the <see cref="Hiding"/> event.</summary>
+		/// <param name="args"></param>
+		protected virtual void OnHiding(CancelEventArgs args)
+		{
+			if (Hiding != null)
+				Hiding(this, args);
+		}
 		#endregion Overrides
 
 		#region Public Methods
 
-		/// <summary>
-		/// Hide this contents
-		/// </summary>
+		/// <summary>Hide this contents</summary>
 		/// <remarks>Add this content to <see cref="ILayoutRoot.Hidden"/> collection of parent root.</remarks>
+		/// <param name="cancelable"></param>
 		public void Hide(bool cancelable = true)
 		{
 			if (!IsVisible)
@@ -376,10 +376,7 @@ namespace AvalonDock.Layout
 			NotifyIsVisibleChanged();
 		}
 
-
-		/// <summary>
-		/// Show the content
-		/// </summary>
+		/// <summary>Show the content</summary>
 		/// <remarks>Try to show the content where it was previously hidden.</remarks>
 		public void Show()
 		{
@@ -430,9 +427,7 @@ namespace AvalonDock.Layout
 		}
 
 
-		/// <summary>
-		/// Add the anchorable to a DockingManager layout
-		/// </summary>
+		/// <summary>Add the anchorable to a DockingManager layout using the given strategy as preference.</summary>
 		/// <param name="manager"></param>
 		/// <param name="strategy"></param>
 		public void AddToLayout(DockingManager manager, AnchorableShowStrategy strategy)
@@ -507,6 +502,10 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Reduce this object into an achored side panel position if it is currently docked or
+		/// dock this object in the parent group if it is currently anchored in a side panel (AutoHide is active).
+		/// </summary>
 		public void ToggleAutoHide()
 		{
 			#region Anchorable is already auto hidden
@@ -675,13 +674,6 @@ namespace AvalonDock.Layout
 		#endregion Public Methods
 
 		#region Internal Methods
-
-		protected virtual void OnHiding(CancelEventArgs args)
-		{
-			if (Hiding != null)
-				Hiding(this, args);
-		}
-
 		internal void CloseAnchorable()
 		{
 			if (this.TestCanClose())

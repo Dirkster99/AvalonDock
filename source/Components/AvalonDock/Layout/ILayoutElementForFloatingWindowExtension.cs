@@ -10,7 +10,9 @@
 	/// </summary>
 	public static class ILayoutElementForFloatingWindowExtension
 	{
-		// RECT structure required by WINDOWPLACEMENT structure
+		/// <summary>
+		/// RECT structure required by WINDOWPLACEMENT structure
+		/// </summary>
 		[StructLayout(LayoutKind.Sequential)]
 		internal struct RECT
 		{

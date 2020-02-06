@@ -11,14 +11,8 @@ namespace AvalonDock.Layout
 {
 	interface ILayoutPreviousContainer
 	{
-		ILayoutContainer PreviousContainer
-		{
-			get; set;
-		}
+		ILayoutContainer PreviousContainer { get; set; }
 
-		string PreviousContainerId
-		{
-			get; set;
-		}
+		string PreviousContainerId { get; set; }
 	}
 }

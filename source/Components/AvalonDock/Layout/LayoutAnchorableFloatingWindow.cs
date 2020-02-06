@@ -17,8 +17,9 @@ using System.Xml;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>Implements the model for a floating window control that can host an anchorable control (tool window) in a floating window.</summary>
 	[Serializable]
-	[ContentProperty("RootPanel")]
+	[ContentProperty(nameof(RootPanel))]
 	public class LayoutAnchorableFloatingWindow : LayoutFloatingWindow, ILayoutElementWithVisibility
 	{
 		#region fields
@@ -28,16 +29,9 @@ namespace AvalonDock.Layout
 		private bool _isVisible = true;
 		#endregion fields
 
-		#region Constructors
-
-		public LayoutAnchorableFloatingWindow()
-		{
-		}
-
-		#endregion Constructors
-
 		#region Events
 
+		/// <summary>Event is invoked when the visibility of this object has changed.</summary>
 		public event EventHandler IsVisibleChanged;
 
 		#endregion
@@ -52,6 +46,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>Gets/sets whether this object is in a state where it is visible in the UI or not.</summary>
 		[XmlIgnore]
 		public bool IsVisible
 		{
@@ -63,9 +58,9 @@ namespace AvalonDock.Layout
 			{
 				if (_isVisible != value)
 				{
-					RaisePropertyChanging("IsVisible");
+					RaisePropertyChanging(nameof(IsVisible));
 					_isVisible = value;
-					RaisePropertyChanged("IsVisible");
+					RaisePropertyChanged(nameof(IsVisible));
 					if (IsVisibleChanged != null)
 						IsVisibleChanged(this, EventArgs.Empty);
 				}
@@ -74,15 +69,13 @@ namespace AvalonDock.Layout
 
 		public LayoutAnchorablePaneGroup RootPanel
 		{
-			get
-			{
-				return _rootPanel;
-			}
+			get => _rootPanel;
+
 			set
 			{
 				if (_rootPanel != value)
 				{
-					RaisePropertyChanging("RootPanel");
+					RaisePropertyChanging(nameof(RootPanel));
 
 					if (_rootPanel != null)
 						_rootPanel.ChildrenTreeChanged -= new EventHandler<ChildrenTreeChangedEventArgs>(_rootPanel_ChildrenTreeChanged);
@@ -94,11 +87,11 @@ namespace AvalonDock.Layout
 					if (_rootPanel != null)
 						_rootPanel.ChildrenTreeChanged += new EventHandler<ChildrenTreeChangedEventArgs>(_rootPanel_ChildrenTreeChanged);
 
-					RaisePropertyChanged("RootPanel");
-					RaisePropertyChanged("IsSinglePane");
-					RaisePropertyChanged("SinglePane");
-					RaisePropertyChanged("Children");
-					RaisePropertyChanged("ChildrenCount");
+					RaisePropertyChanged(nameof(RootPanel));
+					RaisePropertyChanged(nameof(IsSinglePane));
+					RaisePropertyChanged(nameof(SinglePane));
+					RaisePropertyChanged(nameof(Children));
+					RaisePropertyChanged(nameof(ChildrenCount));
 					((ILayoutElementWithVisibility)this).ComputeVisibility();
 				}
 			}
@@ -121,6 +114,7 @@ namespace AvalonDock.Layout
 
 		#region ILayoutElementWithVisibility Interface
 
+		/// <inheritdoc />
 		void ILayoutElementWithVisibility.ComputeVisibility()
 		{
 			ComputeVisibility();
@@ -130,6 +124,7 @@ namespace AvalonDock.Layout
 
 		#region Overrides
 
+		/// <inheritdoc />
 		public override IEnumerable<ILayoutElement> Children
 		{
 			get
@@ -141,18 +136,21 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <inheritdoc />
 		public override void RemoveChild(ILayoutElement element)
 		{
 			Debug.Assert(element == RootPanel && element != null);
 			RootPanel = null;
 		}
 
+		/// <inheritdoc />
 		public override void ReplaceChild(ILayoutElement oldElement, ILayoutElement newElement)
 		{
 			Debug.Assert(oldElement == RootPanel && oldElement != null);
 			RootPanel = newElement as LayoutAnchorablePaneGroup;
 		}
 
+		/// <inheritdoc />
 		public override int ChildrenCount
 		{
 			get
@@ -163,6 +161,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <inheritdoc />
 		public override bool IsValid
 		{
 			get
@@ -171,6 +170,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <inheritdoc />
 		public override void ReadXml(XmlReader reader)
 		{
 			reader.MoveToContent();
@@ -219,6 +219,7 @@ namespace AvalonDock.Layout
 		}
 
 #if TRACE
+		/// <inheritdoc />
 		public override void ConsoleDump(int tab)
 		{
 			System.Diagnostics.Trace.Write(new string(' ', tab * 4));
@@ -234,8 +235,8 @@ namespace AvalonDock.Layout
 
 		private void _rootPanel_ChildrenTreeChanged(object sender, ChildrenTreeChangedEventArgs e)
 		{
-			RaisePropertyChanged("IsSinglePane");
-			RaisePropertyChanged("SinglePane");
+			RaisePropertyChanged(nameof(IsSinglePane));
+			RaisePropertyChanged(nameof(SinglePane));
 		}
 
 		private void ComputeVisibility()
