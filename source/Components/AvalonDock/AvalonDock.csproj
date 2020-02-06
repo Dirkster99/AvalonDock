@@ -29,7 +29,7 @@
 
   <!-- NuGet Packaging -->
   <ItemGroup>
-    <None Include="LICENSE.txt" Pack="true" PackagePath="" />
+    <None Include="../../../LICENSE" Pack="true" PackagePath="" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
