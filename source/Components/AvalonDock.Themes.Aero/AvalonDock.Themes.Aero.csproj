@@ -17,7 +17,7 @@
     <RepositoryUrl>https://github.com/Dirkster99/AvalonDock</RepositoryUrl>
     <PackageId>Dirkster.AvalonDock.Themes.Aero</PackageId>
     <Authors>https://github.com/Dirkster99/AvalonDock</Authors>
-    <PackageLicenseFile>../../../../LICENSE</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +26,7 @@
 
   <!-- NuGet Packaging -->
   <ItemGroup>
-    <None Include="../../../../LICENSE" Pack="true" PackagePath="" />
+    <None Include="LICENSE" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>
