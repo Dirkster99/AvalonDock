@@ -117,10 +117,7 @@ namespace AvalonDock.Layout
 
 		#endregion
 
-		void ILayoutElementWithVisibility.ComputeVisibility()
-		{
-			IsVisible = RootPanel != null && RootPanel.IsVisible;
-		}
+		void ILayoutElementWithVisibility.ComputeVisibility() => IsVisible = RootPanel != null && RootPanel.IsVisible;
 
 		/// <inheritdoc />
 		public override bool IsValid => RootPanel != null;

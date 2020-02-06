@@ -4,17 +4,14 @@
 	using System.Runtime.InteropServices;
 	using System.Security;
 
-	/// <summary>
-	/// Source: http://blogs.msdn.com/b/fpintos/archive/2009/06/12/how-to-properly-convert-securestring-to-string.aspx
-	/// </summary>
+	/// <summary>Source: <see href="http://blogs.msdn.com/b/fpintos/archive/2009/06/12/how-to-properly-convert-securestring-to-string.aspx"/>.</summary>
 	internal static class SecureStringExtensionMethod
 	{
 		public static string ConvertToUnsecureString(this SecureString securePassword)
 		{
-			if (securePassword == null)
-				throw new ArgumentNullException("securePassword");
+			if (securePassword == null) throw new ArgumentNullException(nameof(securePassword));
 
-			IntPtr unmanagedString = IntPtr.Zero;
+			var unmanagedString = IntPtr.Zero;
 			try
 			{
 				unmanagedString = Marshal.SecureStringToGlobalAllocUnicode(securePassword);
@@ -28,11 +25,10 @@
 
 		public static SecureString ConvertToSecureString(this string password)
 		{
-			if (password == null)
-				throw new ArgumentNullException("password");
+			if (password == null) throw new ArgumentNullException(nameof(password));
 
 			var securePassword = new SecureString();
-			foreach (char c in password)
+			foreach (var c in password)
 				securePassword.AppendChar(c);
 
 			securePassword.MakeReadOnly();

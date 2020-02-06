@@ -15,7 +15,7 @@ namespace AvalonDock.Layout.Serialization
 	public abstract class LayoutSerializer
 	{
 		#region fields
-		private DockingManager _manager;
+
 		private LayoutAnchorable[] _previousAnchorables = null;
 		private LayoutDocument[] _previousDocuments = null;
 		#endregion fields
@@ -24,25 +24,16 @@ namespace AvalonDock.Layout.Serialization
 
 		public LayoutSerializer(DockingManager manager)
 		{
-			if (manager == null)
-				throw new ArgumentNullException("manager");
-
-			_manager = manager;
-			_previousAnchorables = _manager.Layout.Descendents().OfType<LayoutAnchorable>().ToArray();
-			_previousDocuments = _manager.Layout.Descendents().OfType<LayoutDocument>().ToArray();
+			Manager = manager ?? throw new ArgumentNullException(nameof(manager));
+			_previousAnchorables = Manager.Layout.Descendents().OfType<LayoutAnchorable>().ToArray();
+			_previousDocuments = Manager.Layout.Descendents().OfType<LayoutDocument>().ToArray();
 		}
 
 		#endregion
 
 		#region Properties
 
-		public DockingManager Manager
-		{
-			get
-			{
-				return _manager;
-			}
-		}
+		public DockingManager Manager { get; }
 
 		#endregion
 
@@ -61,11 +52,9 @@ namespace AvalonDock.Layout.Serialization
 			{
 				var paneContainerToAttach = layout.Descendents().OfType<ILayoutPaneSerializable>().FirstOrDefault(lps => lps.Id == lcToAttach.PreviousContainerId);
 				if (paneContainerToAttach == null)
-					throw new ArgumentException(string.Format("Unable to find a pane with id ='{0}'", lcToAttach.PreviousContainerId));
-
+					throw new ArgumentException($"Unable to find a pane with id ='{lcToAttach.PreviousContainerId}'");
 				lcToAttach.PreviousContainer = paneContainerToAttach as ILayoutContainer;
 			}
-
 
 			//now fix the content of the layoutcontents
 			foreach (var lcToFix in layout.Descendents().OfType<LayoutAnchorable>().Where(lc => lc.Content == null).ToArray())
@@ -79,7 +68,7 @@ namespace AvalonDock.Layout.Serialization
 
 				if (LayoutSerializationCallback != null)
 				{
-					var args = new LayoutSerializationCallbackEventArgs(lcToFix, previousAchorable != null ? previousAchorable.Content : null);
+					var args = new LayoutSerializationCallbackEventArgs(lcToFix, previousAchorable?.Content);
 					LayoutSerializationCallback(this, args);
 					if (args.Cancel)
 						lcToFix.Close();
@@ -97,7 +86,6 @@ namespace AvalonDock.Layout.Serialization
 				}
 			}
 
-
 			foreach (var lcToFix in layout.Descendents().OfType<LayoutDocument>().Where(lc => lc.Content == null).ToArray())
 			{
 				LayoutDocument previousDocument = null;
@@ -109,7 +97,7 @@ namespace AvalonDock.Layout.Serialization
 
 				if (LayoutSerializationCallback != null)
 				{
-					var args = new LayoutSerializationCallbackEventArgs(lcToFix, previousDocument != null ? previousDocument.Content : null);
+					var args = new LayoutSerializationCallbackEventArgs(lcToFix, previousDocument?.Content);
 					LayoutSerializationCallback(this, args);
 
 					if (args.Cancel)
