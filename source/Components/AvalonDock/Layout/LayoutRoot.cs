@@ -806,7 +806,7 @@ namespace AvalonDock.Layout
 
 			if (reader.LocalName.Equals(nameof(RootPanel)))
 			{
-				orientation = reader.GetAttribute(nameof(Orientation)) == nameof(Orientation.Vertical) ? Orientation.Vertical : Orientation.Horizontal;
+				orientation = (Orientation)Enum.Parse(typeof(Orientation),reader.GetAttribute(nameof(Orientation)), true);
 				reader.Read();
 				while (true)
 				{

@@ -31,230 +31,130 @@ namespace AvalonDock.Controls
 
 		#region HideCommand
 
-		/// <summary>
-		/// HideCommand Dependency Property
-		/// </summary>
-		public static readonly DependencyProperty HideCommandProperty = DependencyProperty.Register("HideCommand", typeof(ICommand), typeof(LayoutAnchorableItem),
-				new FrameworkPropertyMetadata(null, new PropertyChangedCallback(OnHideCommandChanged), new CoerceValueCallback(CoerceHideCommandValue)));
+		/// <summary><see cref="HideCommand"/> dependency property.</summary>
+		public static readonly DependencyProperty HideCommandProperty = DependencyProperty.Register(nameof(HideCommand), typeof(ICommand), typeof(LayoutAnchorableItem),
+				new FrameworkPropertyMetadata(null, OnHideCommandChanged, CoerceHideCommandValue));
 
 		/// <summary>
-		/// Gets or sets the HideCommand property.  This dependency property 
+		/// Gets or sets the <see cref="HideCommand"/> property. This dependency property 
 		/// indicates the command to execute when an anchorable is hidden.
 		/// </summary>
 		public ICommand HideCommand
 		{
-			get
-			{
-				return (ICommand)GetValue(HideCommandProperty);
-			}
-			set
-			{
-				SetValue(HideCommandProperty, value);
-			}
+			get => (ICommand)GetValue(HideCommandProperty);
+			set => SetValue(HideCommandProperty, value);
 		}
 
-		/// <summary>
-		/// Handles changes to the HideCommand property.
-		/// </summary>
-		private static void OnHideCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			((LayoutAnchorableItem)d).OnHideCommandChanged(e);
-		}
+		/// <summary>Handles changes to the <see cref="HideCommand"/> property.</summary>
+		private static void OnHideCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutAnchorableItem)d).OnHideCommandChanged(e);
 
-		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the HideCommand property.
-		/// </summary>
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="HideCommand"/> property.</summary>
 		protected virtual void OnHideCommandChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
 
-		/// <summary>
-		/// Coerces the HideCommand value.
-		/// </summary>
-		private static object CoerceHideCommandValue(DependencyObject d, object value)
-		{
-			return value;
-		}
+		/// <summary>Coerces the <see cref="HideCommand"/> value.</summary>
+		private static object CoerceHideCommandValue(DependencyObject d, object value) => value;
 
-		private bool CanExecuteHideCommand(object parameter)
-		{
-			if (LayoutElement == null)
-				return false;
-			return _anchorable.CanHide;
-		}
+		private bool CanExecuteHideCommand(object parameter) => LayoutElement != null && _anchorable.CanHide;
 
-		private void ExecuteHideCommand(object parameter)
-		{
-			if (_anchorable != null && _anchorable.Root != null && _anchorable.Root.Manager != null)
-				_anchorable.Root.Manager._ExecuteHideCommand(_anchorable);
-		}
+		private void ExecuteHideCommand(object parameter) => _anchorable?.Root?.Manager?._ExecuteHideCommand(_anchorable);
 
 		#endregion HideCommand
 
 		#region AutoHideCommand
 
-		/// <summary>
-		/// AutoHideCommand Dependency Property
-		/// </summary>
-		public static readonly DependencyProperty AutoHideCommandProperty = DependencyProperty.Register("AutoHideCommand", typeof(ICommand), typeof(LayoutAnchorableItem),
-				new FrameworkPropertyMetadata(null, new PropertyChangedCallback(OnAutoHideCommandChanged), new CoerceValueCallback(CoerceAutoHideCommandValue)));
+		/// <summary><see cref="AutoHideCommand"/> dependency property.</summary>
+		public static readonly DependencyProperty AutoHideCommandProperty = DependencyProperty.Register(nameof(AutoHideCommand), typeof(ICommand), typeof(LayoutAnchorableItem),
+				new FrameworkPropertyMetadata(null, OnAutoHideCommandChanged, CoerceAutoHideCommandValue));
 
 		/// <summary>
-		/// Gets or sets the AutoHideCommand property.  This dependency property 
+		/// Gets or sets the <see cref="AutoHideCommand"/> property. This dependency property 
 		/// indicates the command to execute when user click the auto hide button.
 		/// </summary>
 		/// <remarks>By default this command toggles auto hide state for an anchorable.</remarks>
 		public ICommand AutoHideCommand
 		{
-			get
-			{
-				return (ICommand)GetValue(AutoHideCommandProperty);
-			}
-			set
-			{
-				SetValue(AutoHideCommandProperty, value);
-			}
+			get => (ICommand)GetValue(AutoHideCommandProperty);
+			set => SetValue(AutoHideCommandProperty, value);
 		}
 
-		/// <summary>
-		/// Handles changes to the AutoHideCommand property.
-		/// </summary>
-		private static void OnAutoHideCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			((LayoutAnchorableItem)d).OnAutoHideCommandChanged(e);
-		}
+		/// <summary>Handles changes to the <see cref="AutoHideCommand"/> property.</summary>
+		private static void OnAutoHideCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutAnchorableItem)d).OnAutoHideCommandChanged(e);
 
-		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the AutoHideCommand property.
-		/// </summary>
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="AutoHideCommand"/> property.</summary>
 		protected virtual void OnAutoHideCommandChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
 
-		/// <summary>
-		/// Coerces the AutoHideCommand value.
-		/// </summary>
-		private static object CoerceAutoHideCommandValue(DependencyObject d, object value)
-		{
-			return value;
-		}
+		/// <summary>Coerces the <see cref="AutoHideCommand"/> value.</summary>
+		private static object CoerceAutoHideCommandValue(DependencyObject d, object value) => value;
 
 		private bool CanExecuteAutoHideCommand(object parameter)
 		{
-			if (LayoutElement == null)
-				return false;
-
-			if (LayoutElement.FindParent<LayoutAnchorableFloatingWindow>() != null)
-				return false;//is floating
-
+			if (LayoutElement == null) return false;
+			if (LayoutElement.FindParent<LayoutAnchorableFloatingWindow>() != null) return false;//is floating
 			return _anchorable.CanAutoHide;
 		}
 
-		private void ExecuteAutoHideCommand(object parameter)
-		{
-			if (_anchorable != null && _anchorable.Root != null && _anchorable.Root.Manager != null)
-				_anchorable.Root.Manager._ExecuteAutoHideCommand(_anchorable);
-		}
+		private void ExecuteAutoHideCommand(object parameter) => _anchorable?.Root?.Manager?._ExecuteAutoHideCommand(_anchorable);
 
 		#endregion AutoHideCommand
 
 		#region DockCommand
 
-		/// <summary>
-		/// DockCommand Dependency Property
-		/// </summary>
-		public static readonly DependencyProperty DockCommandProperty = DependencyProperty.Register("DockCommand", typeof(ICommand), typeof(LayoutAnchorableItem),
-				new FrameworkPropertyMetadata(null, new PropertyChangedCallback(OnDockCommandChanged), new CoerceValueCallback(CoerceDockCommandValue)));
+		/// <summary><see cref="DockCommand"/> dependency property.</summary>
+		public static readonly DependencyProperty DockCommandProperty = DependencyProperty.Register(nameof(DockCommand), typeof(ICommand), typeof(LayoutAnchorableItem),
+				new FrameworkPropertyMetadata(null, OnDockCommandChanged, CoerceDockCommandValue));
 
 		/// <summary>
-		/// Gets or sets the DockCommand property.  This dependency property 
+		/// Gets or sets the <see cref="DockCommand"/> property.  This dependency property 
 		/// indicates the command to execute when user click the Dock button.
 		/// </summary>
 		/// <remarks>By default this command moves the anchorable inside the container pane which previously hosted the object.</remarks>
 		public ICommand DockCommand
 		{
-			get
-			{
-				return (ICommand)GetValue(DockCommandProperty);
-			}
-			set
-			{
-				SetValue(DockCommandProperty, value);
-			}
+			get => (ICommand)GetValue(DockCommandProperty);
+			set => SetValue(DockCommandProperty, value);
 		}
 
-		/// <summary>
-		/// Handles changes to the DockCommand property.
-		/// </summary>
-		private static void OnDockCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			((LayoutAnchorableItem)d).OnDockCommandChanged(e);
-		}
+		/// <summary>Handles changes to the <see cref="DockCommand"/> property.</summary>
+		private static void OnDockCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutAnchorableItem)d).OnDockCommandChanged(e);
 
-		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the DockCommand property.
-		/// </summary>
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="DockCommand"/> property.</summary>
 		protected virtual void OnDockCommandChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
 
-		/// <summary>
-		/// Coerces the DockCommand value.
-		/// </summary>
-		private static object CoerceDockCommandValue(DependencyObject d, object value)
-		{
-			return value;
-		}
+		/// <summary>Coerces the <see cref="DockCommand"/> value.</summary>
+		private static object CoerceDockCommandValue(DependencyObject d, object value) => value;
 
-		private bool CanExecuteDockCommand(object parameter)
-		{
-			if (LayoutElement == null)
-				return false;
-			return LayoutElement.FindParent<LayoutAnchorableFloatingWindow>() != null;
-		}
+		private bool CanExecuteDockCommand(object parameter) => LayoutElement?.FindParent<LayoutAnchorableFloatingWindow>() != null;
 
-		private void ExecuteDockCommand(object parameter)
-		{
-			LayoutElement.Root.Manager._ExecuteDockCommand(_anchorable);
-		}
+		private void ExecuteDockCommand(object parameter) => LayoutElement.Root.Manager._ExecuteDockCommand(_anchorable);
 
 		#endregion DockCommand
 
 		#region CanHide
 
-		/// <summary>
-		/// CanHide Dependency Property
-		/// </summary>
-		public static readonly DependencyProperty CanHideProperty = DependencyProperty.Register("CanHide", typeof(bool), typeof(LayoutAnchorableItem), new FrameworkPropertyMetadata((bool)true,
-					new PropertyChangedCallback(OnCanHideChanged)));
+		/// <summary><see cref="CanHide"/> dependency property.</summary>
+		public static readonly DependencyProperty CanHideProperty = DependencyProperty.Register(nameof(CanHide), typeof(bool), typeof(LayoutAnchorableItem), new FrameworkPropertyMetadata((bool)true,
+					OnCanHideChanged));
 
 		/// <summary>
-		/// Gets or sets the CanHide property.  This dependency property 
+		/// Gets or sets the <see cref="CanHide"/> property. This dependency property 
 		/// indicates if user can hide the anchorable item.
 		/// </summary>
 		public bool CanHide
 		{
-			get
-			{
-				return (bool)GetValue(CanHideProperty);
-			}
-			set
-			{
-				SetValue(CanHideProperty, value);
-			}
+			get => (bool)GetValue(CanHideProperty);
+			set => SetValue(CanHideProperty, value);
 		}
 
-		/// <summary>
-		/// Handles changes to the CanHide property.
-		/// </summary>
-		private static void OnCanHideChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			((LayoutAnchorableItem)d).OnCanHideChanged(e);
-		}
+		/// <summary>Handles changes to the <see cref="CanHide"/> property.</summary>
+		private static void OnCanHideChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutAnchorableItem)d).OnCanHideChanged(e);
 
-		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the CanHide property.
-		/// </summary>
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="CanHide"/> property.</summary>
 		protected virtual void OnCanHideChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (_anchorable != null)
@@ -270,86 +170,75 @@ namespace AvalonDock.Controls
 		internal override void Attach(LayoutContent model)
 		{
 			_anchorable = model as LayoutAnchorable;
-			_anchorable.IsVisibleChanged += new EventHandler(_anchorable_IsVisibleChanged);
-
+			_anchorable.IsVisibleChanged += _anchorable_IsVisibleChanged;
 			base.Attach(model);
 		}
 
 		internal override void Detach()
 		{
-			_anchorable.IsVisibleChanged -= new EventHandler(_anchorable_IsVisibleChanged);
+			_anchorable.IsVisibleChanged -= _anchorable_IsVisibleChanged;
 			_anchorable = null;
 			base.Detach();
 		}
 
+		/// <inheritdoc />
 		protected override bool CanExecuteDockAsDocumentCommand()
 		{
 			var canExecute = base.CanExecuteDockAsDocumentCommand();
-			if (canExecute && (_anchorable != null))
-				return _anchorable.CanDockAsTabbedDocument;
-
+			if (canExecute && _anchorable != null) return _anchorable.CanDockAsTabbedDocument;
 			return canExecute;
 		}
 
+		/// <inheritdoc />
 		protected override void Close()
 		{
-			if ((_anchorable.Root != null) && (_anchorable.Root.Manager != null))
-			{
-				var dockingManager = _anchorable.Root.Manager;
-				dockingManager._ExecuteCloseCommand(_anchorable);
-			}
+			if (_anchorable.Root?.Manager == null) return;
+			var dockingManager = _anchorable.Root.Manager;
+			dockingManager._ExecuteCloseCommand(_anchorable);
 		}
 
+		/// <inheritdoc />
 		protected override void InitDefaultCommands()
 		{
-			_defaultHideCommand = new RelayCommand((p) => ExecuteHideCommand(p), (p) => CanExecuteHideCommand(p));
-			_defaultAutoHideCommand = new RelayCommand((p) => ExecuteAutoHideCommand(p), (p) => CanExecuteAutoHideCommand(p));
-			_defaultDockCommand = new RelayCommand((p) => ExecuteDockCommand(p), (p) => CanExecuteDockCommand(p));
-
+			_defaultHideCommand = new RelayCommand(ExecuteHideCommand, CanExecuteHideCommand);
+			_defaultAutoHideCommand = new RelayCommand(ExecuteAutoHideCommand, CanExecuteAutoHideCommand);
+			_defaultDockCommand = new RelayCommand(ExecuteDockCommand, CanExecuteDockCommand);
 			base.InitDefaultCommands();
 		}
 
+		/// <inheritdoc />
 		protected override void ClearDefaultBindings()
 		{
-			if (HideCommand == _defaultHideCommand)
-				BindingOperations.ClearBinding(this, HideCommandProperty);
-			if (AutoHideCommand == _defaultAutoHideCommand)
-				BindingOperations.ClearBinding(this, AutoHideCommandProperty);
-			if (DockCommand == _defaultDockCommand)
-				BindingOperations.ClearBinding(this, DockCommandProperty);
-
+			if (HideCommand == _defaultHideCommand) BindingOperations.ClearBinding(this, HideCommandProperty);
+			if (AutoHideCommand == _defaultAutoHideCommand) BindingOperations.ClearBinding(this, AutoHideCommandProperty);
+			if (DockCommand == _defaultDockCommand) BindingOperations.ClearBinding(this, DockCommandProperty);
 			base.ClearDefaultBindings();
 		}
 
+		/// <inheritdoc />
 		protected override void SetDefaultBindings()
 		{
-			if (HideCommand == null)
-				HideCommand = _defaultHideCommand;
-			if (AutoHideCommand == null)
-				AutoHideCommand = _defaultAutoHideCommand;
-			if (DockCommand == null)
-				DockCommand = _defaultDockCommand;
-
-			Visibility = _anchorable.IsVisible ? Visibility.Visible : System.Windows.Visibility.Hidden;
+			if (HideCommand == null) HideCommand = _defaultHideCommand;
+			if (AutoHideCommand == null) AutoHideCommand = _defaultAutoHideCommand;
+			if (DockCommand == null) DockCommand = _defaultDockCommand;
+			Visibility = _anchorable.IsVisible ? Visibility.Visible : Visibility.Hidden;
 			base.SetDefaultBindings();
 		}
 
+		/// <inheritdoc />
 		protected override void OnVisibilityChanged()
 		{
-			if (_anchorable != null && _anchorable.Root != null)
+			if (_anchorable?.Root != null && _visibilityReentrantFlag.CanEnter)
 			{
-				if (_visibilityReentrantFlag.CanEnter)
+				using (_visibilityReentrantFlag.Enter())
 				{
-					using (_visibilityReentrantFlag.Enter())
+					switch (Visibility)
 					{
-						if (Visibility == System.Windows.Visibility.Hidden)
-							_anchorable.Hide(false);
-						else if (Visibility == System.Windows.Visibility.Visible)
-							_anchorable.Show();
+						case Visibility.Hidden: _anchorable.Hide(false); break;
+						case Visibility.Visible: _anchorable.Show(); break;
 					}
 				}
 			}
-
 			base.OnVisibilityChanged();
 		}
 
@@ -359,18 +248,13 @@ namespace AvalonDock.Controls
 
 		private void _anchorable_IsVisibleChanged(object sender, EventArgs e)
 		{
-			if (_anchorable != null && _anchorable.Root != null)
+			if (_anchorable?.Root == null || !_anchorableVisibilityReentrantFlag.CanEnter) return;
+			using (_anchorableVisibilityReentrantFlag.Enter())
 			{
-				if (_anchorableVisibilityReentrantFlag.CanEnter)
-				{
-					using (_anchorableVisibilityReentrantFlag.Enter())
-					{
-						if (_anchorable.IsVisible)
-							Visibility = Visibility.Visible;
-						else
-							Visibility = Visibility.Hidden;
-					}
-				}
+				if (_anchorable.IsVisible)
+					Visibility = Visibility.Visible;
+				else
+					Visibility = Visibility.Hidden;
 			}
 		}
 

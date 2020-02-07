@@ -25,45 +25,29 @@ namespace AvalonDock.Layout
 
 		public bool CanMove
 		{
-			get
-			{
-				return _canMove;
-			}
+			get => _canMove;
 			set
 			{
-				if (_canMove != value)
-				{
-					_canMove = value;
-					RaisePropertyChanged("CanMove");
-				}
+				if (value == _canMove) return;
+				_canMove = value;
+				RaisePropertyChanged(nameof(CanMove));
 			}
 		}
 
 		public bool IsVisible
 		{
-			get
-			{
-				return _isVisible;
-			}
-			internal set
-			{
-				_isVisible = value;
-			}
+			get => _isVisible;
+			internal set => _isVisible = value;
 		}
 
 		public string Description
 		{
-			get
-			{
-				return _description;
-			}
+			get => _description;
 			set
 			{
-				if (_description != value)
-				{
-					_description = value;
-					RaisePropertyChanged("Description");
-				}
+				if (_description == value) return;
+				_description = value;
+				RaisePropertyChanged(nameof(Description));
 			}
 		}
 
@@ -73,50 +57,41 @@ namespace AvalonDock.Layout
 
 		internal bool CloseDocument()
 		{
-			if (this.TestCanClose())
-			{
-				this.CloseInternal();
-				return true;
-			}
-
-			return false;
+			if (!TestCanClose()) return false;
+			CloseInternal();
+			return true;
 		}
 
 		#endregion
 
 		#region Overrides
 
+		/// <inheritdoc />
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{
 			base.WriteXml(writer);
-
-			if (!string.IsNullOrWhiteSpace(this.Description))
-				writer.WriteAttributeString("Description", this.Description);
-			if (!CanMove)
-				writer.WriteAttributeString("CanMove", CanMove.ToString());
+			if (!string.IsNullOrWhiteSpace(Description)) writer.WriteAttributeString(nameof(Description), Description);
+			if (!CanMove) writer.WriteAttributeString(nameof(CanMove), CanMove.ToString());
 		}
 
+		/// <inheritdoc />
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
-			if (reader.MoveToAttribute("Description"))
-				this.Description = reader.Value;
-			if (reader.MoveToAttribute("CanMove"))
-				CanMove = bool.Parse(reader.Value);
-
+			if (reader.MoveToAttribute(nameof(Description))) Description = reader.Value;
+			if (reader.MoveToAttribute(nameof(CanMove))) CanMove = bool.Parse(reader.Value);
 			base.ReadXml(reader);
 		}
 
+		/// <inheritdoc />
 		public override void Close()
 		{
-			if ((this.Root != null) && (this.Root.Manager != null))
+			if (Root?.Manager != null)
 			{
-				var dockingManager = this.Root.Manager;
+				var dockingManager = Root.Manager;
 				dockingManager._ExecuteCloseCommand(this);
 			}
 			else
-			{
-				this.CloseDocument();
-			}
+				CloseDocument();
 		}
 
 #if TRACE
@@ -131,39 +106,16 @@ namespace AvalonDock.Layout
 		{
 			var root = Root as LayoutRoot;
 			LayoutDocumentPane documentPane = null;
-			if (root.LastFocusedDocument != null &&
-				root.LastFocusedDocument != this)
-			{
-				documentPane = root.LastFocusedDocument.Parent as LayoutDocumentPane;
-			}
-
-			if (documentPane == null)
-			{
-				documentPane = root.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
-			}
-
-
-			bool added = false;
-			if (root.Manager.LayoutUpdateStrategy != null)
-			{
-				added = root.Manager.LayoutUpdateStrategy.BeforeInsertDocument(root, this, documentPane);
-			}
-
+			if (root?.LastFocusedDocument != null && root.LastFocusedDocument != this) documentPane = root.LastFocusedDocument.Parent as LayoutDocumentPane;
+			if (documentPane == null) documentPane = root.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
+			var added = false;
+			if (root?.Manager.LayoutUpdateStrategy != null) added = root.Manager.LayoutUpdateStrategy.BeforeInsertDocument(root, this, documentPane);
 			if (!added)
 			{
-				if (documentPane == null)
-					throw new InvalidOperationException("Layout must contains at least one LayoutDocumentPane in order to host documents");
-
+				if (documentPane == null) throw new InvalidOperationException("Layout must contains at least one LayoutDocumentPane in order to host documents");
 				documentPane.Children.Add(this);
-				added = true;
 			}
-
-			if (root.Manager.LayoutUpdateStrategy != null)
-			{
-				root.Manager.LayoutUpdateStrategy.AfterInsertDocument(root, this);
-			}
-
-
+			root?.Manager.LayoutUpdateStrategy?.AfterInsertDocument(root, this);
 			base.InternalDock();
 		}
 

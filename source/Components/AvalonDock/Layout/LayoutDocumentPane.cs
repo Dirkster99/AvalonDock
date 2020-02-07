@@ -15,7 +15,7 @@ using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
-	[ContentProperty("Children")]
+	[ContentProperty(nameof(Children))]
 	[Serializable]
 	public class LayoutDocumentPane : LayoutPositionableGroup<LayoutContent>, ILayoutDocumentPane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable
 	{
@@ -30,9 +30,10 @@ namespace AvalonDock.Layout
 		public LayoutDocumentPane()
 		{
 		}
+
 		public LayoutDocumentPane(LayoutContent firstChild)
 		{
-			this.Children.Add(firstChild);
+			Children.Add(firstChild);
 		}
 
 		#endregion Constructors
@@ -41,128 +42,90 @@ namespace AvalonDock.Layout
 
 		public bool ShowHeader
 		{
-			get
-			{
-				return _showHeader;
-			}
+			get => _showHeader;
 			set
 			{
-				if (value != _showHeader)
-				{
-					_showHeader = value;
-					RaisePropertyChanged("ShowHeader");
-				}
+				if (value == _showHeader) return;
+				_showHeader = value;
+				RaisePropertyChanged(nameof(ShowHeader));
 			}
 		}
 
 		public int SelectedContentIndex
 		{
-			get
-			{
-				return _selectedIndex;
-			}
+			get => _selectedIndex;
 			set
 			{
-				if (value < 0 ||
-					value >= Children.Count)
-					value = -1;
-
-				if (_selectedIndex != value)
-				{
-					RaisePropertyChanging("SelectedContentIndex");
-					RaisePropertyChanging("SelectedContent");
-					if (_selectedIndex >= 0 &&
-						_selectedIndex < Children.Count)
-						Children[_selectedIndex].IsSelected = false;
-
-					_selectedIndex = value;
-
-					if (_selectedIndex >= 0 &&
-						_selectedIndex < Children.Count)
-						Children[_selectedIndex].IsSelected = true;
-
-					RaisePropertyChanged("SelectedContentIndex");
-					RaisePropertyChanged("SelectedContent");
-				}
+				if (value < 0 || value >= Children.Count) value = -1;
+				if (value == _selectedIndex) return;
+				RaisePropertyChanging(nameof(SelectedContentIndex));
+				RaisePropertyChanging(nameof(SelectedContent));
+				if (_selectedIndex >= 0 && _selectedIndex < Children.Count) Children[_selectedIndex].IsSelected = false;
+				_selectedIndex = value;
+				if (_selectedIndex >= 0 && _selectedIndex < Children.Count) Children[_selectedIndex].IsSelected = true;
+				RaisePropertyChanged(nameof(SelectedContentIndex));
+				RaisePropertyChanged(nameof(SelectedContent));
 			}
 		}
 
-		public LayoutContent SelectedContent
-		{
-			get
-			{
-				return _selectedIndex == -1 ? null : Children[_selectedIndex];
-			}
-		}
+		public LayoutContent SelectedContent => _selectedIndex == -1 ? null : Children[_selectedIndex];
 
+		/// <inheritdoc />
 		string ILayoutPaneSerializable.Id
 		{
-			get
-			{
-				return _id;
-			}
-			set
-			{
-				_id = value;
-			}
+			get => _id;
+			set => _id = value;
 		}
 		#endregion Properties
 
 		#region Overrides
 
+		/// <inheritdoc />
 		protected override bool GetVisibility()
 		{
-			if (this.Parent is LayoutDocumentPaneGroup)
-				return (this.ChildrenCount > 0) && this.Children.Any(c => (c is LayoutDocument && ((LayoutDocument)c).IsVisible) || (c is LayoutAnchorable));
-
+			if (Parent is LayoutDocumentPaneGroup)
+				return ChildrenCount > 0 && Children.Any(c => c is LayoutDocument && ((LayoutDocument)c).IsVisible || c is LayoutAnchorable);
 			return true;
 		}
 
+		/// <inheritdoc />
 		protected override void ChildMoved(int oldIndex, int newIndex)
 		{
 			if (_selectedIndex == oldIndex)
 			{
-				RaisePropertyChanging("SelectedContentIndex");
+				RaisePropertyChanging(nameof(SelectedContentIndex));
 				_selectedIndex = newIndex;
-				RaisePropertyChanged("SelectedContentIndex");
+				RaisePropertyChanged(nameof(SelectedContentIndex));
 			}
-
-
 			base.ChildMoved(oldIndex, newIndex);
 		}
 
+		/// <inheritdoc />
 		protected override void OnChildrenCollectionChanged()
 		{
 			AutoFixSelectedContent();
-			for (int i = 0; i < Children.Count; i++)
+			for (var i = 0; i < Children.Count; i++)
 			{
-				if (Children[i].IsSelected)
-				{
-					SelectedContentIndex = i;
-					break;
-				}
+				if (!Children[i].IsSelected) continue;
+				SelectedContentIndex = i;
+				break;
 			}
-
-			RaisePropertyChanged("CanClose");
-			RaisePropertyChanged("CanHide");
-			RaisePropertyChanged("IsDirectlyHostedInFloatingWindow");
+			// TODO: MK who's properties are these??
+			//RaisePropertyChanged(nameof(CanClose));
+			//RaisePropertyChanged(nameof(CanHide));
+			RaisePropertyChanged(nameof(IsDirectlyHostedInFloatingWindow));
 			base.OnChildrenCollectionChanged();
-
-			RaisePropertyChanged( "ChildrenSorted" );
+			RaisePropertyChanged( nameof(ChildrenSorted));
 		}
 
 		[XmlIgnore]
 		bool _autoFixSelectedContent = true;
-		void AutoFixSelectedContent()
-		{
-			if (_autoFixSelectedContent)
-			{
-				if (SelectedContentIndex >= ChildrenCount)
-					SelectedContentIndex = Children.Count - 1;
 
-				if (SelectedContentIndex == -1 && ChildrenCount > 0)
-					SetNextSelectedIndex();
-			}
+		private void AutoFixSelectedContent()
+		{
+			if (!_autoFixSelectedContent) return;
+			if (SelectedContentIndex >= ChildrenCount) SelectedContentIndex = Children.Count - 1;
+			if (SelectedContentIndex == -1 && ChildrenCount > 0) SetNextSelectedIndex();
 		}
 
 		public bool IsDirectlyHostedInFloatingWindow
@@ -170,35 +133,24 @@ namespace AvalonDock.Layout
 			get
 			{
 				var parentFloatingWindow = this.FindParent<LayoutDocumentFloatingWindow>();
-				if (parentFloatingWindow != null)
-					return parentFloatingWindow.IsSinglePane;
-
-				return false;
+				return parentFloatingWindow != null && parentFloatingWindow.IsSinglePane;
 				//return Parent != null && Parent.ChildrenCount == 1 && Parent.Parent is LayoutFloatingWindow;
 			}
 		}
 
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{
-			if (_id != null)
-				writer.WriteAttributeString("Id", _id);
-			if (!_showHeader)
-				writer.WriteAttributeString("ShowHeader", _showHeader.ToString());
-
+			if (_id != null) writer.WriteAttributeString(nameof(ILayoutPaneSerializable.Id), _id);
+			if (!_showHeader) writer.WriteAttributeString(nameof(ShowHeader), _showHeader.ToString());
 			base.WriteXml(writer);
 		}
 
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
-			if (reader.MoveToAttribute("Id"))
-				_id = reader.Value;
-			if (reader.MoveToAttribute("ShowHeader"))
-				_showHeader = bool.Parse(reader.Value);
-
-
+			if (reader.MoveToAttribute(nameof(ILayoutPaneSerializable.Id))) _id = reader.Value;
+			if (reader.MoveToAttribute(nameof(ShowHeader))) _showHeader = bool.Parse(reader.Value);
 			base.ReadXml(reader);
 		}
-
 
 #if TRACE
 		public override void ConsoleDump(int tab)
@@ -218,9 +170,7 @@ namespace AvalonDock.Layout
 		public int IndexOf(LayoutContent content)
 		{
 			var documentChild = content as LayoutDocument;
-			if (documentChild == null)
-				return -1;
-			return Children.IndexOf(documentChild);
+			return documentChild == null ? -1 : Children.IndexOf(documentChild);
 		}
 
 		#endregion Public Methods
@@ -229,34 +179,23 @@ namespace AvalonDock.Layout
 
 		internal void SetNextSelectedIndex()
 		{
-			this.SelectedContentIndex = -1;
-			for (int i = 0; i < this.Children.Count; ++i)
+			SelectedContentIndex = -1;
+			for (var i = 0; i < Children.Count; ++i)
 			{
-				if (this.Children[i].IsEnabled)
-				{
-					this.SelectedContentIndex = i;
-					return;
-				}
+				if (!Children[i].IsEnabled) continue;
+				SelectedContentIndex = i;
+				return;
 			}
 		}
 
-		internal void UpdateIsDirectlyHostedInFloatingWindow()
-		{
-			RaisePropertyChanged("IsDirectlyHostedInFloatingWindow");
-		}
+		internal void UpdateIsDirectlyHostedInFloatingWindow() => RaisePropertyChanged(nameof(IsDirectlyHostedInFloatingWindow));
 
 		#endregion Internal Methods
 
 		#region Private Methods
 
-		public bool IsHostedInFloatingWindow
-		{
-			get
-			{
-				return this.FindParent<LayoutFloatingWindow>() != null;
-			}
-		}
-		
+		public bool IsHostedInFloatingWindow => this.FindParent<LayoutFloatingWindow>() != null;
+
 		public IEnumerable<LayoutContent> ChildrenSorted
 		{
 			get
@@ -269,23 +208,13 @@ namespace AvalonDock.Layout
 		
 		protected override void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
-			var oldGroup = oldValue as ILayoutGroup;
-			if (oldGroup != null)
-				oldGroup.ChildrenCollectionChanged -= new EventHandler(OnParentChildrenCollectionChanged);
-
-			RaisePropertyChanged("IsDirectlyHostedInFloatingWindow");
-
-			var newGroup = newValue as ILayoutGroup;
-			if (newGroup != null)
-				newGroup.ChildrenCollectionChanged += new EventHandler(OnParentChildrenCollectionChanged);
-
+			if (oldValue is ILayoutGroup oldGroup) oldGroup.ChildrenCollectionChanged -= OnParentChildrenCollectionChanged;
+			RaisePropertyChanged(nameof(IsDirectlyHostedInFloatingWindow));
+			if (newValue is ILayoutGroup newGroup) newGroup.ChildrenCollectionChanged += OnParentChildrenCollectionChanged;
 			base.OnParentChanged(oldValue, newValue);
 		}
 
-		void OnParentChildrenCollectionChanged(object sender, EventArgs e)
-		{
-			RaisePropertyChanged("IsDirectlyHostedInFloatingWindow");
-		}
+		private void OnParentChildrenCollectionChanged(object sender, EventArgs e) => RaisePropertyChanged(nameof(IsDirectlyHostedInFloatingWindow));
 
 		#endregion Private Methods
 	}

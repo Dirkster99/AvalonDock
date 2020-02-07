@@ -16,10 +16,12 @@ using System.Windows.Controls;
 
 namespace AvalonDock.Controls
 {
+	/// <inheritdoc />
 	/// <summary>
 	/// Implements a floating window for navigating between documents and toolwindows in AvalonDock.
 	/// The floating navigator window can be invoked with CTRL+TAB.
 	/// </summary>
+	/// <seealso cref="Window"/>
 	[TemplatePart(Name = PART_AnchorableListBox, Type = typeof(ListBox))]
 	[TemplatePart(Name = PART_DocumentListBox, Type = typeof(ListBox))]
 	public class NavigatorWindow : Window
@@ -49,29 +51,24 @@ namespace AvalonDock.Controls
 		internal NavigatorWindow(DockingManager manager)
 		{
 			_manager = manager;
-
 			_internalSetSelectedDocument = true;
-			this.SetAnchorables(_manager.Layout.Descendents().OfType<LayoutAnchorable>().Where(a => a.IsVisible).Select(d => (LayoutAnchorableItem)_manager.GetLayoutItemFromModel(d)).ToArray());
-			this.SetDocuments(_manager.Layout.Descendents().OfType<LayoutDocument>().OrderByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault()).Select(d => (LayoutDocumentItem)_manager.GetLayoutItemFromModel(d)).ToArray());
+			SetAnchorables(_manager.Layout.Descendents().OfType<LayoutAnchorable>().Where(a => a.IsVisible).Select(d => (LayoutAnchorableItem)_manager.GetLayoutItemFromModel(d)).ToArray());
+			SetDocuments(_manager.Layout.Descendents().OfType<LayoutDocument>().OrderByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault()).Select(d => (LayoutDocumentItem)_manager.GetLayoutItemFromModel(d)).ToArray());
 			_internalSetSelectedDocument = false;
-
-			if (this.Documents.Length > 1)
+			if (Documents.Length > 1)
 			{
-				this.InternalSetSelectedDocument(this.Documents[1]);
+				InternalSetSelectedDocument(Documents[1]);
 				_isSelectingDocument = true;
 			}
-			else if (this.Anchorables.Count() > 1)
+			else if (Anchorables.Count() > 1)
 			{
-				this.InternalSetSelectedAnchorable(this.Anchorables.ToArray()[1]);
+				InternalSetSelectedAnchorable(Anchorables.ToArray()[1]);
 				_isSelectingDocument = false;
 			}
-
-			this.DataContext = this;
-
-			this.Loaded += new RoutedEventHandler(OnLoaded);
-			this.Unloaded += new RoutedEventHandler(OnUnloaded);
-
-			this.UpdateThemeResources();
+			DataContext = this;
+			Loaded += OnLoaded;
+			Unloaded += OnUnloaded;
+			UpdateThemeResources();
 		}
 
 		#endregion
@@ -80,148 +77,94 @@ namespace AvalonDock.Controls
 
 		#region Documents
 
-		/// <summary>
-		/// Documents Read-Only Dependency Property
-		/// </summary>
-		private static readonly DependencyPropertyKey DocumentsPropertyKey = DependencyProperty.RegisterReadOnly("Documents", typeof(IEnumerable<LayoutDocumentItem>), typeof(NavigatorWindow),
+		/// <summary><see cref="Documents"/> read-only dependency property.</summary>
+		private static readonly DependencyPropertyKey DocumentsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Documents), typeof(IEnumerable<LayoutDocumentItem>), typeof(NavigatorWindow),
 				new FrameworkPropertyMetadata(null));
 
 		public static readonly DependencyProperty DocumentsProperty = DocumentsPropertyKey.DependencyProperty;
 
 		/// <summary>
-		/// Gets the Documents property.  This dependency property 
+		/// Gets the <see cref="Documents"/> property. This dependency property 
 		/// indicates the list of documents.
 		/// </summary>
-		public LayoutDocumentItem[] Documents
-		{
-			get
-			{
-				return (LayoutDocumentItem[])GetValue(DocumentsProperty);
-			}
-		}
+		public LayoutDocumentItem[] Documents => (LayoutDocumentItem[])GetValue(DocumentsProperty);
 
 		#endregion
 
 		#region Anchorables
 
-		/// <summary>
-		/// Anchorables Read-Only Dependency Property
-		/// </summary>
-		private static readonly DependencyPropertyKey AnchorablesPropertyKey = DependencyProperty.RegisterReadOnly("Anchorables", typeof(IEnumerable<LayoutAnchorableItem>), typeof(NavigatorWindow),
+		/// <summary><see cref="Anchorables"/> read-only dependency property.</summary>
+		private static readonly DependencyPropertyKey AnchorablesPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Anchorables), typeof(IEnumerable<LayoutAnchorableItem>), typeof(NavigatorWindow),
 				new FrameworkPropertyMetadata((IEnumerable<LayoutAnchorableItem>)null));
 
 		public static readonly DependencyProperty AnchorablesProperty = AnchorablesPropertyKey.DependencyProperty;
 
 		/// <summary>
-		/// Gets the Anchorables property.  This dependency property 
+		/// Gets the <see cref="Anchorables"/> property. This dependency property 
 		/// indicates the list of anchorables.
 		/// </summary>
-		public IEnumerable<LayoutAnchorableItem> Anchorables
-		{
-			get
-			{
-				return (IEnumerable<LayoutAnchorableItem>)GetValue(AnchorablesProperty);
-			}
-		}
+		public IEnumerable<LayoutAnchorableItem> Anchorables => (IEnumerable<LayoutAnchorableItem>)GetValue(AnchorablesProperty);
 
 		#endregion
 
 		#region SelectedDocument
 
-		/// <summary>
-		/// SelectedDocument Dependency Property
-		/// </summary>
-		public static readonly DependencyProperty SelectedDocumentProperty = DependencyProperty.Register("SelectedDocument", typeof(LayoutDocumentItem), typeof(NavigatorWindow),
-				new FrameworkPropertyMetadata((LayoutDocumentItem)null, new PropertyChangedCallback(OnSelectedDocumentChanged)));
+		/// <summary><see cref="SelectedDocument"/> dependency property.</summary>
+		public static readonly DependencyProperty SelectedDocumentProperty = DependencyProperty.Register(nameof(SelectedDocument), typeof(LayoutDocumentItem), typeof(NavigatorWindow),
+				new FrameworkPropertyMetadata(null, OnSelectedDocumentChanged));
 
 		/// <summary>
-		/// Gets or sets the SelectedDocument property.  This dependency property 
+		/// Gets or sets the <see cref="SelectedDocument"/> property.  This dependency property 
 		/// indicates the selected document.
 		/// </summary>
 		public LayoutDocumentItem SelectedDocument
 		{
-			get
-			{
-				return (LayoutDocumentItem)GetValue(SelectedDocumentProperty);
-			}
-			set
-			{
-				SetValue(SelectedDocumentProperty, value);
-			}
+			get => (LayoutDocumentItem)GetValue(SelectedDocumentProperty);
+			set => SetValue(SelectedDocumentProperty, value);
 		}
 
-		/// <summary>
-		/// Handles changes to the SelectedDocument property.
-		/// </summary>
-		private static void OnSelectedDocumentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			((NavigatorWindow)d).OnSelectedDocumentChanged(e);
-		}
+		/// <summary>Handles changes to the <see cref="SelectedDocument"/> property.</summary>
+		private static void OnSelectedDocumentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((NavigatorWindow)d).OnSelectedDocumentChanged(e);
 
-		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the SelectedDocument property.
-		/// </summary>
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="SelectedDocument"/> property.</summary>
 		protected virtual void OnSelectedDocumentChanged(DependencyPropertyChangedEventArgs e)
 		{
-			if (_internalSetSelectedDocument)
-				return;
-
-			if (this.SelectedDocument != null &&
-				this.SelectedDocument.ActivateCommand.CanExecute(null))
-			{
-				this.Hide();
-				this.SelectedDocument.ActivateCommand.Execute(null);
-			}
+			if (_internalSetSelectedDocument|| SelectedDocument == null || !SelectedDocument.ActivateCommand.CanExecute(null)) return;
+			Hide();
+			SelectedDocument.ActivateCommand.Execute(null);
 		}
 
 		#endregion
 
 		#region SelectedAnchorable
 
-		/// <summary>
-		/// SelectedAnchorable Dependency Property
-		/// </summary>
-		public static readonly DependencyProperty SelectedAnchorableProperty = DependencyProperty.Register("SelectedAnchorable", typeof(LayoutAnchorableItem), typeof(NavigatorWindow),
-				new FrameworkPropertyMetadata((LayoutAnchorableItem)null, new PropertyChangedCallback(OnSelectedAnchorableChanged)));
+		/// <summary><see cref="SelectedAnchorable"/> dependency property.</summary>
+		public static readonly DependencyProperty SelectedAnchorableProperty = DependencyProperty.Register(nameof(SelectedAnchorable), typeof(LayoutAnchorableItem), typeof(NavigatorWindow),
+				new FrameworkPropertyMetadata(null, OnSelectedAnchorableChanged));
 
 		/// <summary>
-		/// Gets or sets the SelectedAnchorable property.  This dependency property 
+		/// Gets or sets the <see cref="SelectedAnchorable"/> property. This dependency property 
 		/// indicates the selected anchorable.
 		/// </summary>
 		public LayoutAnchorableItem SelectedAnchorable
 		{
-			get
-			{
-				return (LayoutAnchorableItem)GetValue(SelectedAnchorableProperty);
-			}
-			set
-			{
-				SetValue(SelectedAnchorableProperty, value);
-			}
+			get => (LayoutAnchorableItem)GetValue(SelectedAnchorableProperty);
+			set => SetValue(SelectedAnchorableProperty, value);
 		}
 
-		/// <summary>
-		/// Handles changes to the SelectedAnchorable property.
-		/// </summary>
-		private static void OnSelectedAnchorableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			((NavigatorWindow)d).OnSelectedAnchorableChanged(e);
-		}
+		/// <summary>Handles changes to the <see cref="SelectedAnchorable"/> property.</summary>
+		private static void OnSelectedAnchorableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((NavigatorWindow)d).OnSelectedAnchorableChanged(e);
 
-		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the SelectedAnchorable property.
-		/// </summary>
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="SelectedAnchorable"/> property.</summary>
 		protected virtual void OnSelectedAnchorableChanged(DependencyPropertyChangedEventArgs e)
 		{
-			if (_internalSetSelectedAnchorable)
-				return;
-
+			if (_internalSetSelectedAnchorable) return;
+			// TODO: What goes on here??
 			var selectedAnchorable = e.NewValue as LayoutAnchorableItem;
-			if (this.SelectedAnchorable != null &&
-				this.SelectedAnchorable.ActivateCommand.CanExecute(null))
+			if (SelectedAnchorable != null && SelectedAnchorable.ActivateCommand.CanExecute(null))
 			{
-				this.Close();
-				this.SelectedAnchorable.ActivateCommand.Execute(null);
+				Close();
+				SelectedAnchorable.ActivateCommand.Execute(null);
 			}
 		}
 
@@ -231,50 +174,50 @@ namespace AvalonDock.Controls
 
 		#region Overrides   
 
+		/// <inheritdoc />
 		public override void OnApplyTemplate()
 		{
 			base.OnApplyTemplate();
-
-			_anchorableListBox = this.GetTemplateChild(PART_AnchorableListBox) as ListBox;
-			_documentListBox = this.GetTemplateChild(PART_DocumentListBox) as ListBox;
+			_anchorableListBox = GetTemplateChild(PART_AnchorableListBox) as ListBox;
+			_documentListBox = GetTemplateChild(PART_DocumentListBox) as ListBox;
 		}
 
+		/// <inheritdoc />
 		protected override void OnPreviewKeyDown(System.Windows.Input.KeyEventArgs e)
 		{
-			bool shouldHandle = false;
-
+			var shouldHandle = false;
 			// Press Tab to switch Selected LayoutContent.
 			if (e.Key == System.Windows.Input.Key.Tab)
 			{
 				// Selecting LayoutDocuments
 				if (_isSelectingDocument)
 				{
-					if (this.SelectedDocument != null)
+					if (SelectedDocument != null)
 					{
 						// Jump to next LayoutDocument
 						// if we are on the last LayoutDocument and we have Anchorables we jump over to the Anchorables list
 						// if there are no Anchorables we call SelectNextDocument which has logic in it to loop back to the top of the list
-						var docIndex = this.Documents.IndexOf<LayoutDocumentItem>(this.SelectedDocument);
-						if (docIndex < (this.Documents.Length - 1) || this.Anchorables.Count() == 0)
+						var docIndex = Documents.IndexOf(SelectedDocument);
+						if (docIndex < Documents.Length - 1 || !Anchorables.Any())
 						{
-							this.SelectNextDocument();
+							SelectNextDocument();
 							shouldHandle = true;
 						}
 						// Jump to first LayoutAnchorable
-						else if (this.Anchorables.Count() > 0)
+						else if (Anchorables.Any())
 						{
 							_isSelectingDocument = false;
-							this.InternalSetSelectedDocument(null);
-							this.InternalSetSelectedAnchorable(this.Anchorables.First());
+							InternalSetSelectedDocument(null);
+							InternalSetSelectedAnchorable(Anchorables.First());
 							shouldHandle = true;
 						}
 					}
 					// There is no SelectedDocument, select the first one.
 					else
 					{
-						if (this.Documents.Length > 0)
+						if (Documents.Length > 0)
 						{
-							this.InternalSetSelectedDocument(this.Documents[0]);
+							InternalSetSelectedDocument(Documents[0]);
 							shouldHandle = true;
 						}
 					}
@@ -282,67 +225,52 @@ namespace AvalonDock.Controls
 				// Selecting LayoutAnchorables
 				else
 				{
-					if (this.SelectedAnchorable != null)
+					if (SelectedAnchorable != null)
 					{
 						// Jump to next LayoutAnchorable
 						// if we are on the last LayoutAnchorable and we have one or more LayoutDocuments we jump over to the Documents list
 						// if there are no Documents we call SelectNextAnchorable which has logic in it to loop back to the top of the list
-						var anchorableIndex = this.Anchorables.ToArray().IndexOf<LayoutAnchorableItem>(this.SelectedAnchorable);
-						if (anchorableIndex < (this.Anchorables.Count() - 1) || this.Documents.Count() == 0)
+						var anchorableIndex = Anchorables.ToArray().IndexOf(SelectedAnchorable);
+						if (anchorableIndex < Anchorables.Count() - 1 || Documents.Count() == 0)
 						{
-							this.SelectNextAnchorable();
+							SelectNextAnchorable();
 							shouldHandle = true;
 						}
 						// Jump to first LayoutDocument
-						else if (this.Documents.Length > 0)
+						else if (Documents.Length > 0)
 						{
 							_isSelectingDocument = true;
-							this.InternalSetSelectedAnchorable(null);
-							this.InternalSetSelectedDocument(this.Documents[0]);
+							InternalSetSelectedAnchorable(null);
+							InternalSetSelectedDocument(Documents[0]);
 							shouldHandle = true;
 						}
 					}
 					// There is no SelectedAnchorable, select the first one.
 					else
 					{
-						if (this.Anchorables.Count() > 0)
+						if (Anchorables.Any())
 						{
-							this.InternalSetSelectedAnchorable(this.Anchorables.ToArray()[0]);
+							InternalSetSelectedAnchorable(Anchorables.ToArray()[0]);
 							shouldHandle = true;
 						}
 					}
 				}
 			}
 
-			if (shouldHandle)
-			{
-				e.Handled = true;
-			}
+			if (shouldHandle) e.Handled = true;
 			base.OnPreviewKeyDown(e);
 		}
 
+		/// <inheritdoc />
 		protected override void OnPreviewKeyUp(System.Windows.Input.KeyEventArgs e)
 		{
 			if (e.Key != System.Windows.Input.Key.Tab)
 			{
-				this.Close();
-
-				if (this.SelectedDocument != null &&
-				   this.SelectedDocument.ActivateCommand.CanExecute(null))
-				{
-					this.SelectedDocument.ActivateCommand.Execute(null);
-				}
-
-				if (this.SelectedDocument == null &&
-					this.SelectedAnchorable != null &&
-					this.SelectedAnchorable.ActivateCommand.CanExecute(null))
-				{
-					this.SelectedAnchorable.ActivateCommand.Execute(null);
-				}
-
+				Close();
+				if (SelectedDocument != null && SelectedDocument.ActivateCommand.CanExecute(null)) SelectedDocument.ActivateCommand.Execute(null);
+				if (SelectedDocument == null && SelectedAnchorable != null && SelectedAnchorable.ActivateCommand.CanExecute(null)) SelectedAnchorable.ActivateCommand.Execute(null);
 				e.Handled = true;
 			}
-
 			base.OnPreviewKeyUp(e);
 		}
 
@@ -356,20 +284,14 @@ namespace AvalonDock.Controls
 		/// This dependency property indicates the list of anchorables.
 		/// </summary>
 		/// <param name="value">The new value for the property.</param>
-		protected void SetAnchorables(IEnumerable<LayoutAnchorableItem> value)
-		{
-			this.SetValue(AnchorablesPropertyKey, value);
-		}
+		protected void SetAnchorables(IEnumerable<LayoutAnchorableItem> value) => SetValue(AnchorablesPropertyKey, value);
 
 		/// <summary>
 		/// Provides a secure method for setting the Documents property.  
 		/// This dependency property indicates the list of documents.
 		/// </summary>
 		/// <param name="value">The new value for the property.</param>
-		protected void SetDocuments(LayoutDocumentItem[] value)
-		{
-			this.SetValue(DocumentsPropertyKey, value);
-		}
+		protected void SetDocuments(LayoutDocumentItem[] value) => SetValue(DocumentsPropertyKey, value);
 
 		internal void UpdateThemeResources(Theme oldTheme = null)
 		{
@@ -379,61 +301,44 @@ namespace AvalonDock.Controls
 				{
 					if (currentThemeResourceDictionary != null)
 					{
-						this.Resources.MergedDictionaries.Remove(currentThemeResourceDictionary);
+						Resources.MergedDictionaries.Remove(currentThemeResourceDictionary);
 						currentThemeResourceDictionary = null;
 					}
 				}
 				else
 				{
-					var resourceDictionaryToRemove = this.Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
-					if (resourceDictionaryToRemove != null)
-					{
-						this.Resources.MergedDictionaries.Remove(resourceDictionaryToRemove);
-					}
+					var resourceDictionaryToRemove = Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
+					if (resourceDictionaryToRemove != null) Resources.MergedDictionaries.Remove(resourceDictionaryToRemove);
 				}
 			}
 
-			if (_manager.Theme != null)
+			if (_manager.Theme == null) return;
+			if (_manager.Theme is DictionaryTheme dictionaryTheme)
 			{
-				if (_manager.Theme is DictionaryTheme)
-				{
-					currentThemeResourceDictionary = ((DictionaryTheme)_manager.Theme).ThemeResourceDictionary;
-					this.Resources.MergedDictionaries.Add(currentThemeResourceDictionary);
-				}
-				else
-				{
-					this.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = _manager.Theme.GetResourceUri() });
-				}
+				currentThemeResourceDictionary = dictionaryTheme.ThemeResourceDictionary;
+				Resources.MergedDictionaries.Add(currentThemeResourceDictionary);
 			}
+			else
+				Resources.MergedDictionaries.Add(new ResourceDictionary() {Source = _manager.Theme.GetResourceUri()});
 		}
 
 		internal void SelectNextDocument()
 		{
-			if (this.SelectedDocument != null)
-			{
-				int docIndex = this.Documents.IndexOf<LayoutDocumentItem>(this.SelectedDocument);
-				docIndex++;
-				if (docIndex == this.Documents.Length)
-				{
-					docIndex = 0;
-				}
-				this.InternalSetSelectedDocument(this.Documents[docIndex]);
-			}
+			if (SelectedDocument == null) return;
+			var docIndex = Documents.IndexOf(SelectedDocument);
+			docIndex++;
+			if (docIndex == Documents.Length) docIndex = 0;
+			InternalSetSelectedDocument(Documents[docIndex]);
 		}
 
 		internal void SelectNextAnchorable()
 		{
-			if (this.SelectedAnchorable != null)
-			{
-				var anchorablesArray = this.Anchorables.ToArray();
-				int anchorableIndex = anchorablesArray.IndexOf<LayoutAnchorableItem>(this.SelectedAnchorable);
-				anchorableIndex++;
-				if (anchorableIndex == this.Anchorables.Count())
-				{
-					anchorableIndex = 0;
-				}
-				this.InternalSetSelectedAnchorable(anchorablesArray[anchorableIndex]);
-			}
+			if (SelectedAnchorable == null) return;
+			var anchorablesArray = Anchorables.ToArray();
+			var anchorableIndex = anchorablesArray.IndexOf(SelectedAnchorable);
+			anchorableIndex++;
+			if (anchorableIndex == Anchorables.Count()) anchorableIndex = 0;
+			InternalSetSelectedAnchorable(anchorablesArray[anchorableIndex]);
 		}
 
 		#endregion
@@ -443,47 +348,28 @@ namespace AvalonDock.Controls
 		private void InternalSetSelectedAnchorable(LayoutAnchorableItem anchorableToSelect)
 		{
 			_internalSetSelectedAnchorable = true;
-			this.SelectedAnchorable = anchorableToSelect;
+			SelectedAnchorable = anchorableToSelect;
 			_internalSetSelectedAnchorable = false;
-
-			if (_anchorableListBox != null)
-			{
-				_anchorableListBox.Focus();
-			}
+			_anchorableListBox?.Focus();
 		}
 
 		private void InternalSetSelectedDocument(LayoutDocumentItem documentToSelect)
 		{
 			_internalSetSelectedDocument = true;
-			this.SelectedDocument = documentToSelect;
+			SelectedDocument = documentToSelect;
 			_internalSetSelectedDocument = false;
-
-			if ((_documentListBox != null) && (documentToSelect != null))
-			{
-				_documentListBox.Focus();
-			}
+			if (_documentListBox != null && documentToSelect != null) _documentListBox.Focus();
 		}
 
 		private void OnLoaded(object sender, RoutedEventArgs e)
 		{
-			this.Loaded -= new RoutedEventHandler(OnLoaded);
-
-			if ((_documentListBox != null) && (this.SelectedDocument != null))
-			{
-				_documentListBox.Focus();
-			}
-			else if ((_anchorableListBox != null) && (this.SelectedAnchorable != null))
-			{
-				_anchorableListBox.Focus();
-			}
-
+			Loaded -= OnLoaded;
+			if (_documentListBox != null && SelectedDocument != null) _documentListBox.Focus();
+			else if (_anchorableListBox != null && SelectedAnchorable != null) _anchorableListBox.Focus();
 			WindowStartupLocation = WindowStartupLocation.CenterOwner;
 		}
 
-		private void OnUnloaded(object sender, RoutedEventArgs e)
-		{
-			this.Unloaded -= new RoutedEventHandler(OnUnloaded);
-		}
+		private void OnUnloaded(object sender, RoutedEventArgs e) => Unloaded -= OnUnloaded;
 
 		#endregion
 	}

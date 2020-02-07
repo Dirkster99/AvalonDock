@@ -114,44 +114,29 @@ namespace AvalonDock
 
 		#region Layout
 
-		/// <summary>
-		/// Layout dependency property
-		/// </summary>
-		public static readonly DependencyProperty LayoutProperty = DependencyProperty.Register("Layout", typeof(LayoutRoot), typeof(DockingManager),
+		/// <summary><see cref="Layout"/> dependency property.</summary>
+		public static readonly DependencyProperty LayoutProperty = DependencyProperty.Register(nameof(Layout), typeof(LayoutRoot), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnLayoutChanged, CoerceLayoutValue));
 
-		/// <summary>
-		/// Gets or sets the Layout property. This dependency property 
-		/// indicates layout tree.
-		/// </summary>
+		/// <summary>Gets or sets the <see cref="Layout"/> property. This dependency property indicates layout tree.</summary>
 		public LayoutRoot Layout
 		{
 			get => (LayoutRoot)GetValue(LayoutProperty);
 			set => SetValue(LayoutProperty, value);
 		}
 
-		/// <summary>
-		/// Coerces the <see cref="DockingManager.Layout"/> value.
-		/// </summary>
+		/// <summary>Coerces the <see cref="Layout"/> value.</summary>
 		private static object CoerceLayoutValue(DependencyObject d, object value)
 		{
-			if (value == null)
-				return new LayoutRoot { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) };
+			if (value == null) return new LayoutRoot { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) };
 			((DockingManager)d).OnLayoutChanging(value as LayoutRoot);
 			return value;
 		}
 
-		/// <summary>
-		/// Handles changes to the Layout property.
-		/// </summary>
-		private static void OnLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			((DockingManager)d).OnLayoutChanged(e.OldValue as LayoutRoot, e.NewValue as LayoutRoot);
-		}
+		/// <summary>Handles changes to the <see cref="Layout"/> property.</summary>
+		private static void OnLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((DockingManager)d).OnLayoutChanged(e.OldValue as LayoutRoot, e.NewValue as LayoutRoot);
 
-		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the <see cref="DockingManager.Layout"/> property.
-		/// </summary>
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Layout"/> property.</summary>
 		protected virtual void OnLayoutChanged(LayoutRoot oldLayout, LayoutRoot newLayout)
 		{
 			if (oldLayout != null)
@@ -198,10 +183,8 @@ namespace AvalonDock
 				BottomSidePanel = CreateUIElementForModel(Layout.BottomSide) as LayoutAnchorSideControl;
 
 				foreach (var fw in Layout.FloatingWindows.ToArray())
-				{
 					if (fw.IsValid)
 						_fwList.Add(CreateUIElementForModel(fw) as LayoutFloatingWindowControl);
-				}
 
 				foreach (var fw in _fwList.ToArray())
 				{
@@ -559,7 +542,7 @@ namespace AvalonDock
 		#region AnchorableTitleTemplate
 
 		/// <summary><see cref="AnchorableTitleTemplate"/> dependency property.</summary>
-		public static readonly DependencyProperty AnchorableTitleTemplateProperty = DependencyProperty.Register("AnchorableTitleTemplate", typeof(DataTemplate), typeof(DockingManager),
+		public static readonly DependencyProperty AnchorableTitleTemplateProperty = DependencyProperty.Register(nameof(AnchorableTitleTemplate), typeof(DataTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata((DataTemplate)null, OnAnchorableTitleTemplateChanged, CoerceAnchorableTitleTemplateValue));
 
 		/// <summary>

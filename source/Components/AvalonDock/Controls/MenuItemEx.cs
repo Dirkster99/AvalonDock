@@ -12,10 +12,12 @@ using System.Windows;
 
 namespace AvalonDock.Controls
 {
+	/// <inheritdoc />
 	/// <summary>
 	/// Implements a <see cref="MenuItem"/> extension that is used to display
 	/// menu items in the <see cref="ContextMenuEx"/> of the <see cref="LayoutDocumentPaneControl"/>.
 	/// </summary>
+	/// <seealso cref="MenuItem"/>
 	public class MenuItemEx : MenuItem
 	{
 		#region fields
@@ -26,11 +28,7 @@ namespace AvalonDock.Controls
 
 		static MenuItemEx()
 		{
-			IconProperty.OverrideMetadata(typeof(MenuItemEx), new FrameworkPropertyMetadata(new PropertyChangedCallback(OnIconPropertyChanged)));
-		}
-
-		public MenuItemEx()
-		{
+			IconProperty.OverrideMetadata(typeof(MenuItemEx), new FrameworkPropertyMetadata(OnIconPropertyChanged));
 		}
 
 		#endregion
@@ -39,85 +37,49 @@ namespace AvalonDock.Controls
 
 		#region IconTemplate
 
-		/// <summary>
-		/// IconTemplate Dependency Property
-		/// </summary>
-		public static readonly DependencyProperty IconTemplateProperty = DependencyProperty.Register("IconTemplate", typeof(DataTemplate), typeof(MenuItemEx),
-				new FrameworkPropertyMetadata((DataTemplate)null, new PropertyChangedCallback(OnIconTemplateChanged)));
+		/// <summary><see cref="IconTemplate "/> dependency property.</summary>
+		public static readonly DependencyProperty IconTemplateProperty = DependencyProperty.Register(nameof(IconTemplate), typeof(DataTemplate), typeof(MenuItemEx),
+				new FrameworkPropertyMetadata(null, OnIconTemplateChanged));
 
 		/// <summary>
-		/// Gets or sets the IconTemplate property.  This dependency property 
+		/// Gets or sets the <see cref="IconTemplate "/> property. This dependency property 
 		/// indicates the data template for the icon.
 		/// </summary>
 		public DataTemplate IconTemplate
 		{
-			get
-			{
-				return (DataTemplate)GetValue(IconTemplateProperty);
-			}
-			set
-			{
-				SetValue(IconTemplateProperty, value);
-			}
+			get => (DataTemplate)GetValue(IconTemplateProperty);
+			set => SetValue(IconTemplateProperty, value);
 		}
 
-		/// <summary>
-		/// Handles changes to the IconTemplate property.
-		/// </summary>
-		private static void OnIconTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			((MenuItemEx)d).OnIconTemplateChanged(e);
-		}
+		/// <summary>Handles changes to the <see cref="IconTemplate "/> property.</summary>
+		private static void OnIconTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((MenuItemEx)d).OnIconTemplateChanged(e);
 
-		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the IconTemplate property.
-		/// </summary>
-		protected virtual void OnIconTemplateChanged(DependencyPropertyChangedEventArgs e)
-		{
-			UpdateIcon();
-		}
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="IconTemplate "/> property.</summary>
+		protected virtual void OnIconTemplateChanged(DependencyPropertyChangedEventArgs e) => UpdateIcon();
 
 		#endregion
 
 		#region IconTemplateSelector
 
-		/// <summary>
-		/// IconTemplateSelector Dependency Property
-		/// </summary>
-		public static readonly DependencyProperty IconTemplateSelectorProperty = DependencyProperty.Register("IconTemplateSelector", typeof(DataTemplateSelector), typeof(MenuItemEx),
-				new FrameworkPropertyMetadata((DataTemplateSelector)null, new PropertyChangedCallback(OnIconTemplateSelectorChanged)));
+		/// <summary><see cref="IconTemplateSelector"/> dependency property.</summary>
+		public static readonly DependencyProperty IconTemplateSelectorProperty = DependencyProperty.Register(nameof(IconTemplateSelector), typeof(DataTemplateSelector), typeof(MenuItemEx),
+				new FrameworkPropertyMetadata(null, OnIconTemplateSelectorChanged));
 
 		/// <summary>
-		/// Gets or sets the IconTemplateSelector property.  This dependency property 
+		/// Gets or sets the <see cref="IconTemplateSelector"/> property. This dependency property 
 		/// indicates the DataTemplateSelector for the Icon.
 		/// </summary>
 		public DataTemplateSelector IconTemplateSelector
 		{
-			get
-			{
-				return (DataTemplateSelector)GetValue(IconTemplateSelectorProperty);
-			}
-			set
-			{
-				SetValue(IconTemplateSelectorProperty, value);
-			}
+			get => (DataTemplateSelector)GetValue(IconTemplateSelectorProperty);
+			set => SetValue(IconTemplateSelectorProperty, value);
 		}
 
-		/// <summary>
-		/// Handles changes to the IconTemplateSelector property.
-		/// </summary>
-		private static void OnIconTemplateSelectorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			((MenuItemEx)d).OnIconTemplateSelectorChanged(e);
-		}
+		/// <summary>Handles changes to the <see cref="IconTemplateSelector"/> property.</summary>
+		private static void OnIconTemplateSelectorChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((MenuItemEx)d).OnIconTemplateSelectorChanged(e);
 
-		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the IconTemplateSelector property.
-		/// </summary>
-		protected virtual void OnIconTemplateSelectorChanged(DependencyPropertyChangedEventArgs e)
-		{
-			UpdateIcon();
-		}
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="IconTemplateSelector"/> property.</summary>
+		protected virtual void OnIconTemplateSelectorChanged(DependencyPropertyChangedEventArgs e) => UpdateIcon();
 
 		#endregion
 
@@ -127,22 +89,17 @@ namespace AvalonDock.Controls
 
 		private static void OnIconPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
-			if (e.NewValue != null)
-			{
-				((MenuItemEx)sender).UpdateIcon();
-			}
+			if (e.NewValue != null) ((MenuItemEx) sender).UpdateIcon();
 		}
 
 		private void UpdateIcon()
 		{
-			if (_reentrantFlag)
-				return;
+			if (_reentrantFlag) return;
 			_reentrantFlag = true;
 			if (IconTemplateSelector != null)
 			{
 				var dataTemplateToUse = IconTemplateSelector.SelectTemplate(Icon, this);
-				if (dataTemplateToUse != null)
-					Icon = dataTemplateToUse.LoadContent();
+				if (dataTemplateToUse != null) Icon = dataTemplateToUse.LoadContent();
 			}
 			else if (IconTemplate != null)
 				Icon = IconTemplate.LoadContent();

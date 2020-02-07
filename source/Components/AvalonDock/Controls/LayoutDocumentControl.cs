@@ -35,108 +35,67 @@ namespace AvalonDock.Controls
 
 		#region Model
 
-		/// <summary>
-		/// Model Dependency Property
-		/// </summary>
-		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register("Model", typeof(LayoutContent), typeof(LayoutDocumentControl),
+		/// <summary><see cref="Model"/> dependency property.</summary>
+		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(nameof(Model), typeof(LayoutContent), typeof(LayoutDocumentControl),
 		  new FrameworkPropertyMetadata(null, OnModelChanged));
 
 		/// <summary>
-		/// Gets or sets the Model property.
+		/// Gets or sets the <see cref="Model"/> property.
 		/// This dependency property indicates the model attached to this view.
 		/// </summary>
 		public LayoutContent Model
 		{
-			get
-			{
-				return (LayoutContent)GetValue(ModelProperty);
-			}
-			set
-			{
-				SetValue(ModelProperty, value);
-			}
+			get => (LayoutContent)GetValue(ModelProperty);
+			set => SetValue(ModelProperty, value);
 		}
 
-		/// <summary>
-		/// Handles changes to the Model property.
-		/// </summary>
-		private static void OnModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			((LayoutDocumentControl)d).OnModelChanged(e);
-		}
+		/// <summary>Handles changes to the <see cref="Model"/> property.</summary>
+		private static void OnModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutDocumentControl)d).OnModelChanged(e);
 
-		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the Model property.
-		/// </summary>
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Model"/> property.</summary>
 		protected virtual void OnModelChanged(DependencyPropertyChangedEventArgs e)
 		{
-			if (e.OldValue != null)
-			{
-				((LayoutContent)e.OldValue).PropertyChanged -= Model_PropertyChanged;
-			}
-
+			if (e.OldValue != null) ((LayoutContent) e.OldValue).PropertyChanged -= Model_PropertyChanged;
 			if (Model != null)
 			{
 				Model.PropertyChanged += Model_PropertyChanged;
 				SetLayoutItem(Model.Root.Manager.GetLayoutItemFromModel(Model));
 			}
 			else
-			{
 				SetLayoutItem(null);
-			}
 		}
 
 		private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			if (e.PropertyName == "IsEnabled")
-			{
-				if (Model != null)
-				{
-					IsEnabled = Model.IsEnabled;
-					if (!IsEnabled && Model.IsActive)
-					{
-						if ((Model.Parent != null) && (Model.Parent is LayoutDocumentPane))
-						{
-							((LayoutDocumentPane)Model.Parent).SetNextSelectedIndex();
-						}
-					}
-				}
-			}
+			if (e.PropertyName != nameof(LayoutContent.IsEnabled)) return;
+			if (Model == null) return;
+			IsEnabled = Model.IsEnabled;
+			if (IsEnabled || !Model.IsActive) return;
+			if (Model.Parent is LayoutDocumentPane layoutDocumentPane) layoutDocumentPane.SetNextSelectedIndex();
 		}
 
 		#endregion Model
 
 		#region LayoutItem
 
-		/// <summary>
-		/// LayoutItem Read-Only Dependency Property
-		/// </summary>
-		private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly("LayoutItem", typeof(LayoutItem), typeof(LayoutDocumentControl),
-		  new FrameworkPropertyMetadata((LayoutItem)null));
+		/// <summary><see cref="LayoutItem"/> Read-Only dependency property.</summary>
+		private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(LayoutItem), typeof(LayoutItem), typeof(LayoutDocumentControl),
+		  new FrameworkPropertyMetadata(null));
 
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
 		/// <summary>
-		/// Gets the LayoutItem property.  This dependency property 
+		/// Gets the <see cref="LayoutItem"/> property. This dependency property 
 		/// indicates the LayoutItem attached to this tag item.
 		/// </summary>
-		public LayoutItem LayoutItem
-		{
-			get
-			{
-				return (LayoutItem)GetValue(LayoutItemProperty);
-			}
-		}
+		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
 
 		/// <summary>
-		/// Provides a secure method for setting the LayoutItem property.  
+		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.  
 		/// This dependency property indicates the LayoutItem attached to this tag item.
 		/// </summary>
 		/// <param name="value">The new value for the property.</param>
-		protected void SetLayoutItem(LayoutItem value)
-		{
-			SetValue(LayoutItemPropertyKey, value);
-		}
+		protected void SetLayoutItem(LayoutItem value) => SetValue(LayoutItemPropertyKey, value);
 
 		#endregion LayoutItem
 
@@ -144,35 +103,34 @@ namespace AvalonDock.Controls
 
 		#region Overrides
 
+		/// <inheritdoc />
 		protected override void OnPreviewGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
 		{
-			this.SetIsActive();
+			SetIsActive();
 			base.OnPreviewGotKeyboardFocus(e);
 		}
 
+		/// <inheritdoc />
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
-			this.SetIsActive();
+			SetIsActive();
 			base.OnMouseLeftButtonDown(e);
 		}
 
+		/// <inheritdoc />
 		protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
 		{
-			this.SetIsActive();
+			SetIsActive();
 			base.OnMouseLeftButtonDown(e);
 		}
-
-
+		
 		#endregion Overrides
 
 		#region Private Methods
 
 		private void SetIsActive()
 		{
-			if (this.Model != null)
-			{
-				this.Model.IsActive = true;
-			}
+			if (Model != null) Model.IsActive = true;
 		}
 
 		#endregion Private Methods

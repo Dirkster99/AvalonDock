@@ -15,11 +15,13 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <inheritdoc />
 	/// <summary>
 	/// Implements the TabItem Header that is displayed when the <see cref="LayoutAnchorablePaneControl"/>
 	/// shows more than 1 <see cref="LayoutAnchorableControl"/>. This TabItem is displayed at the bottom
 	/// of a <see cref="LayoutAnchorablePaneControl"/>.
 	/// </summary>
+	/// <seealso cref="Control"/>
 	public class LayoutAnchorableTabItem : Control
 	{
 		#region fields
@@ -35,55 +37,33 @@ namespace AvalonDock.Controls
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutAnchorableTabItem), new FrameworkPropertyMetadata(typeof(LayoutAnchorableTabItem)));
 		}
 
-		public LayoutAnchorableTabItem()
-		{
-		}
-
 		#endregion Constructors
 
 		#region Properties
 
 		#region Model
 
-		/// <summary>
-		/// Model Dependency Property
-		/// </summary>
-		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register("Model", typeof(LayoutContent), typeof(LayoutAnchorableTabItem),
-				new FrameworkPropertyMetadata((LayoutContent)null, new PropertyChangedCallback(OnModelChanged)));
+		/// <summary><see cref="Model"/> dependency property.</summary>
+		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(nameof(Model), typeof(LayoutContent), typeof(LayoutAnchorableTabItem),
+				new FrameworkPropertyMetadata(null, OnModelChanged));
 
 		/// <summary>
-		/// Gets or sets the Model property.  This dependency property 
+		/// Gets or sets the <see cref="Model"/> property. This dependency property 
 		/// indicates model attached to the anchorable tab item.
 		/// </summary>
 		public LayoutContent Model
 		{
-			get
-			{
-				return (LayoutContent)GetValue(ModelProperty);
-			}
-			set
-			{
-				SetValue(ModelProperty, value);
-			}
+			get => (LayoutContent)GetValue(ModelProperty);
+			set => SetValue(ModelProperty, value);
 		}
 
-		/// <summary>
-		/// Handles changes to the Model property.
-		/// </summary>
-		private static void OnModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			((LayoutAnchorableTabItem)d).OnModelChanged(e);
-		}
+		/// <summary>Handles changes to the <see cref="Model"/> property.</summary>
+		private static void OnModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutAnchorableTabItem)d).OnModelChanged(e);
 
-		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the Model property.
-		/// </summary>
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Model"/> property.</summary>
 		protected virtual void OnModelChanged(DependencyPropertyChangedEventArgs e)
 		{
-			if (Model != null)
-				SetLayoutItem(Model.Root.Manager.GetLayoutItemFromModel(Model));
-			else
-				SetLayoutItem(null);
+			SetLayoutItem(Model?.Root.Manager.GetLayoutItemFromModel(Model));
 			//UpdateLogicalParent();
 		}
 
@@ -91,35 +71,24 @@ namespace AvalonDock.Controls
 
 		#region LayoutItem
 
-		/// <summary>
-		/// LayoutItem Read-Only Dependency Property
-		/// </summary>
-		private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly("LayoutItem", typeof(LayoutItem), typeof(LayoutAnchorableTabItem),
-				new FrameworkPropertyMetadata((LayoutItem)null));
+		/// <summary><see cref="LayoutItem"/> Read-Only dependency property.</summary>
+		private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(LayoutItem), typeof(LayoutItem), typeof(LayoutAnchorableTabItem),
+				new FrameworkPropertyMetadata(null));
 
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
 		/// <summary>
-		/// Gets the LayoutItem property.  This dependency property 
+		/// Gets the <see cref="LayoutItem"/> property. This dependency property 
 		/// indicates the LayoutItem attached to this tag item.
 		/// </summary>
-		public LayoutItem LayoutItem
-		{
-			get
-			{
-				return (LayoutItem)GetValue(LayoutItemProperty);
-			}
-		}
+		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
 
 		/// <summary>
-		/// Provides a secure method for setting the LayoutItem property.  
+		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.  
 		/// This dependency property indicates the LayoutItem attached to this tag item.
 		/// </summary>
 		/// <param name="value">The new value for the property.</param>
-		protected void SetLayoutItem(LayoutItem value)
-		{
-			SetValue(LayoutItemPropertyKey, value);
-		}
+		protected void SetLayoutItem(LayoutItem value) => SetValue(LayoutItemPropertyKey, value);
 
 		#endregion LayoutItem
 
@@ -127,107 +96,76 @@ namespace AvalonDock.Controls
 
 		#region Internal Methods
 
-		internal static bool IsDraggingItem()
-		{
-			return _draggingItem != null;
-		}
+		internal static bool IsDraggingItem() => _draggingItem != null;
 
-		internal static LayoutAnchorableTabItem GetDraggingItem()
-		{
-			return _draggingItem;
-		}
-		internal static void ResetDraggingItem()
-		{
-			_draggingItem = null;
-		}
+		internal static LayoutAnchorableTabItem GetDraggingItem() => _draggingItem;
 
-		internal static void CancelMouseLeave()
-		{
-			_cancelMouseLeave = true;
-		}
+		internal static void ResetDraggingItem() => _draggingItem = null;
+
+		internal static void CancelMouseLeave() => _cancelMouseLeave = true;
 
 		#endregion Internal Methods
 
 		#region Overrides
+		/// <inheritdoc />
 		protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonDown(e);
-
 			_isMouseDown = true;
 			_draggingItem = this;
 		}
 
+		/// <inheritdoc />
 		protected override void OnMouseMove(System.Windows.Input.MouseEventArgs e)
 		{
 			base.OnMouseMove(e);
-
 			if (e.LeftButton != MouseButtonState.Pressed)
 			{
 				_isMouseDown = false;
 				_draggingItem = null;
 			}
 			else
-			{
 				_cancelMouseLeave = false;
-			}
 		}
 
+		/// <inheritdoc />
 		protected override void OnMouseLeftButtonUp(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			_isMouseDown = false;
-
 			base.OnMouseLeftButtonUp(e);
-
 			Model.IsActive = true;
 		}
 
+		/// <inheritdoc />
 		protected override void OnMouseLeave(System.Windows.Input.MouseEventArgs e)
 		{
 			base.OnMouseLeave(e);
-
 			if (_isMouseDown && e.LeftButton == MouseButtonState.Pressed)
 			{
 				// drag the item if the mouse leave is not canceled.
 				// Mouse leave should be canceled when selecting a new tab to prevent automatic undock when Panel size is Auto.
 				_draggingItem = !_cancelMouseLeave ? this : null;
 			}
-
 			_isMouseDown = false;
 			_cancelMouseLeave = false;
 		}
 
+		/// <inheritdoc />
 		protected override void OnMouseEnter(MouseEventArgs e)
 		{
 			base.OnMouseEnter(e);
+			if (_draggingItem == null || _draggingItem == this || e.LeftButton != MouseButtonState.Pressed) return;
+			var model = Model;
+			var container = model.Parent;
+			var containerPane = model.Parent as ILayoutPane;
+			if (containerPane is LayoutAnchorablePane layoutAnchorablePane && !layoutAnchorablePane.CanRepositionItems) return;
+			if (containerPane.Parent is LayoutAnchorablePaneGroup layoutAnchorablePaneGroup && !layoutAnchorablePaneGroup.CanRepositionItems) return;
+			var childrenList = container.Children.ToList();
 
-			if (_draggingItem != null
-				&& _draggingItem != this
-				&& e.LeftButton == MouseButtonState.Pressed)
-			{
-				var model = Model;
-				var container = model.Parent as ILayoutContainer;
-				var containerPane = model.Parent as ILayoutPane;
-
-				if ((containerPane is LayoutAnchorablePane) && !((LayoutAnchorablePane)containerPane).CanRepositionItems)
-					return;
-				if ((containerPane.Parent != null) && (containerPane.Parent is LayoutAnchorablePaneGroup) && !((LayoutAnchorablePaneGroup)containerPane.Parent).CanRepositionItems)
-					return;
-
-				var childrenList = container.Children.ToList();
-
-				// Hotfix to avoid crash caused by a likely threading issue Back in the containerPane.
-				var oldIndex = childrenList.IndexOf(_draggingItem.Model);
-				var newIndex = childrenList.IndexOf(model);
-
-				if (newIndex < containerPane.ChildrenCount && oldIndex > -1)
-					containerPane.MoveChild(oldIndex, newIndex);
-			}
-		}
-
-		protected override void OnPreviewGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
-		{
-			base.OnPreviewGotKeyboardFocus(e);
-
+			// Hotfix to avoid crash caused by a likely threading issue Back in the containerPane.
+			var oldIndex = childrenList.IndexOf(_draggingItem.Model);
+			var newIndex = childrenList.IndexOf(model);
+			if (newIndex < containerPane.ChildrenCount && oldIndex > -1) containerPane.MoveChild(oldIndex, newIndex);
 		}
 
 		#endregion Overrides

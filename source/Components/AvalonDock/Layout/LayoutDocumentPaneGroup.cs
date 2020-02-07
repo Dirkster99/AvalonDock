@@ -13,7 +13,7 @@ using System.Windows.Markup;
 
 namespace AvalonDock.Layout
 {
-	[ContentProperty("Children")]
+	[ContentProperty(nameof(Children))]
 	[Serializable]
 	public class LayoutDocumentPaneGroup : LayoutPositionableGroup<ILayoutDocumentPane>, ILayoutDocumentPane, ILayoutOrientableGroup
 	{
@@ -38,18 +38,13 @@ namespace AvalonDock.Layout
 
 		public Orientation Orientation
 		{
-			get
-			{
-				return _orientation;
-			}
+			get => _orientation;
 			set
 			{
-				if (_orientation != value)
-				{
-					RaisePropertyChanging("Orientation");
-					_orientation = value;
-					RaisePropertyChanged("Orientation");
-				}
+				if (value == _orientation) return;
+				RaisePropertyChanging(nameof(Orientation));
+				_orientation = value;
+				RaisePropertyChanged(nameof(Orientation));
 			}
 		}
 
@@ -57,21 +52,19 @@ namespace AvalonDock.Layout
 
 		#region Overrides
 
-		protected override bool GetVisibility()
-		{
-			return true;
-		}
+		/// <inheritdoc />
+		protected override bool GetVisibility() => true;
 
+		/// <inheritdoc />
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{
-			writer.WriteAttributeString("Orientation", Orientation.ToString());
+			writer.WriteAttributeString(nameof(Orientation), Orientation.ToString());
 			base.WriteXml(writer);
 		}
 
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
-			if (reader.MoveToAttribute("Orientation"))
-				Orientation = (Orientation)Enum.Parse(typeof(Orientation), reader.Value, true);
+			if (reader.MoveToAttribute(nameof(Orientation))) Orientation = (Orientation)Enum.Parse(typeof(Orientation), reader.Value, true);
 			base.ReadXml(reader);
 		}
 
