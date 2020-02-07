@@ -17,6 +17,7 @@ using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>Implements the model for a floating window control that can host an anchorable control (tool window) in a floating window.</summary>
 	[Serializable]
 	[ContentProperty(nameof(RootPanel))]
 	public class LayoutAnchorableFloatingWindow : LayoutFloatingWindow, ILayoutElementWithVisibility
@@ -30,6 +31,7 @@ namespace AvalonDock.Layout
 
 		#region Events
 
+		/// <summary>Event is invoked when the visibility of this object has changed.</summary>
 		public event EventHandler IsVisibleChanged;
 
 		#endregion
@@ -38,6 +40,7 @@ namespace AvalonDock.Layout
 
 		public bool IsSinglePane => RootPanel != null && RootPanel.Descendents().OfType<ILayoutAnchorablePane>().Count(p => p.IsVisible) == 1;
 
+		/// <summary>Gets/sets whether this object is in a state where it is visible in the UI or not.</summary>
 		[XmlIgnore]
 		public bool IsVisible
 		{
@@ -164,6 +167,7 @@ namespace AvalonDock.Layout
 		}
 
 #if TRACE
+		/// <inheritdoc />
 		public override void ConsoleDump(int tab)
 		{
 			System.Diagnostics.Trace.Write(new string(' ', tab * 4));

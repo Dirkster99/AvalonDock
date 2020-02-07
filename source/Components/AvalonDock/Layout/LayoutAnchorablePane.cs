@@ -14,6 +14,9 @@ using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>Implements the model for a layout anchorable pane control (a pane in a tool window environment).
+	/// A layout anchorable pane control can have multiple LayoutAnchorable controls  as its children.
+	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
 	public class LayoutAnchorablePane : LayoutPositionableGroup<LayoutAnchorable>, ILayoutAnchorablePane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable
@@ -24,14 +27,16 @@ namespace AvalonDock.Layout
 		[XmlIgnore]
 		private bool _autoFixSelectedContent = true;
 		private string _name = null;
+		string _id;
 		#endregion fields
 
 		#region Constructors
-
+		/// <summary>Class constructor</summary>
 		public LayoutAnchorablePane()
 		{
 		}
 
+		/// <summary>Class constructor from <see cref="LayoutAnchorable"/> which will be added into its children collection.</summary>
 		public LayoutAnchorablePane(LayoutAnchorable anchorable)
 		{
 			Children.Add(anchorable);
@@ -41,12 +46,16 @@ namespace AvalonDock.Layout
 
 		#region Properties
 
+		/// <summary>Gets whether the pane can be hidden.</summary>
 		public bool CanHide => Children.All(a => a.CanHide);
 
+		/// <summary>Gets whether the pane can be closed.</summary>
 		public bool CanClose => Children.All(a => a.CanClose);
 
+		/// <summary>Gets whether the pane is hosted in a floating window.</summary>
 		public bool IsHostedInFloatingWindow => this.FindParent<LayoutFloatingWindow>() != null;
 
+		/// <summary>Gets whether the pane is hosted in a floating window.</summary>
 		public string Name
 		{
 			get => _name;
@@ -58,6 +67,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>Gets or sets the index of the selected content in the pane.</summary>
 		public int SelectedContentIndex
 		{
 			get => _selectedIndex;
@@ -77,7 +87,15 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>Gets the selected content in the pane or null.</summary>
 		public LayoutContent SelectedContent => _selectedIndex == -1 ? null : Children[_selectedIndex];
+
+		/// <summary>Gets/sets the unique id that is used for the serialization of this panel.</summary>
+		string ILayoutPaneSerializable.Id
+		{
+			get => _id;
+			set => _id = value;
+		}
 
 		#endregion Properties
 
@@ -131,6 +149,7 @@ namespace AvalonDock.Layout
 			base.WriteXml(writer);
 		}
 
+		/// <inheritdoc />
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
 			if (reader.MoveToAttribute(nameof(ILayoutPaneSerializable.Id))) _id = reader.Value;
@@ -142,6 +161,7 @@ namespace AvalonDock.Layout
 		}
 
 #if TRACE
+		/// <inheritdoc />
 		public override void ConsoleDump(int tab)
 		{
 			System.Diagnostics.Trace.Write(new string(' ', tab * 4));
@@ -156,6 +176,11 @@ namespace AvalonDock.Layout
 
 		#region Public Methods
 
+		/// <summary>
+		/// Gets the index of the layout content (which is required to be a <see cref="LayoutAnchorable"/>)
+		/// or -1 if the layout content is not a <see cref="LayoutAnchorable"/> or is not part of the childrens collection.
+		/// </summary>
+		/// <param name="content"></param>
 		public int IndexOf(LayoutContent content)
 		{
 			if (!(content is LayoutAnchorable anchorableChild)) return -1;
@@ -181,6 +206,9 @@ namespace AvalonDock.Layout
 
 		#region Internal Methods
 
+		/// <summary>
+		/// Invalidates the current <see cref="SelectedContentIndex"/> and sets the index for the next avialable child with IsEnabled == true.
+		/// </summary>
 		internal void SetNextSelectedIndex()
 		{
 			SelectedContentIndex = -1;
@@ -192,6 +220,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Updates whether this object is hosted at the root level of a floating window control or not.
+		/// </summary>
 		internal void UpdateIsDirectlyHostedInFloatingWindow() => RaisePropertyChanged(nameof(IsDirectlyHostedInFloatingWindow));
 
 		#endregion Internal Methods
@@ -208,18 +239,5 @@ namespace AvalonDock.Layout
 		private void OnParentChildrenCollectionChanged(object sender, EventArgs e) => RaisePropertyChanged(nameof(IsDirectlyHostedInFloatingWindow));
 
 		#endregion Private Methods
-
-		#region ILayoutPaneSerializable Interface
-
-		string _id;
-
-		/// <inheritdoc />
-		string ILayoutPaneSerializable.Id
-		{
-			get => _id;
-			set => _id = value;
-		}
-
-		#endregion ILayoutPaneSerializable Interface
 	}
 }
