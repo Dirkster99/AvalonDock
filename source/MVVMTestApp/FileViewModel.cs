@@ -32,9 +32,9 @@
 				if (_filePath != value)
 				{
 					_filePath = value;
-					RaisePropertyChanged("FilePath");
-					RaisePropertyChanged("FileName");
-					RaisePropertyChanged("Title");
+					RaisePropertyChanged(nameof(FilePath));
+					RaisePropertyChanged(nameof(FileName));
+					RaisePropertyChanged(nameof(Title));
 
 					if (File.Exists(_filePath))
 					{
@@ -71,7 +71,7 @@
 				if (_textContent != value)
 				{
 					_textContent = value;
-					RaisePropertyChanged("TextContent");
+					RaisePropertyChanged(nameof(TextContent));
 					IsDirty = true;
 				}
 			}
@@ -90,8 +90,8 @@
 				if (_isDirty != value)
 				{
 					_isDirty = value;
-					RaisePropertyChanged("IsDirty");
-					RaisePropertyChanged("FileName");
+					RaisePropertyChanged(nameof(IsDirty));
+					RaisePropertyChanged(nameof(FileName));
 				}
 			}
 		}

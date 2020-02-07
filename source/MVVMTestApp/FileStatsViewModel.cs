@@ -4,8 +4,18 @@
 	using System.IO;
 	using System.Windows.Media.Imaging;
 
-	class FileStatsViewModel : ToolViewModel
+	internal class FileStatsViewModel : ToolViewModel
 	{
+		#region fields
+		public const string ToolContentId = "FileStatsTool";
+		private DateTime _lastModified;
+		private long _fileSize;
+		#endregion fields
+
+		#region constructors
+		/// <summary>
+		/// Class constructor
+		/// </summary>
 		public FileStatsViewModel()
 			: base("File Stats")
 		{
@@ -18,10 +28,40 @@
 			bi.EndInit();
 			IconSource = bi;
 		}
+		#endregion constructors
 
-		public const string ToolContentId = "FileStatsTool";
+		#region Properties
 
-		void OnActiveDocumentChanged(object sender, EventArgs e)
+		public long FileSize
+		{
+			get => _fileSize;
+			set
+			{
+				if (_fileSize != value)
+				{
+					_fileSize = value;
+					RaisePropertyChanged(nameof(FileSize));
+				}
+			}
+		}
+
+		public DateTime LastModified
+		{
+			get => _lastModified;
+			set
+			{
+				if (_lastModified != value)
+				{
+					_lastModified = value;
+					RaisePropertyChanged(nameof(LastModified));
+				}
+			}
+		}
+
+		#endregion Properties
+
+		#region methods
+		private void OnActiveDocumentChanged(object sender, EventArgs e)
 		{
 			if (Workspace.This.ActiveDocument != null &&
 				Workspace.This.ActiveDocument.FilePath != null &&
@@ -37,45 +77,7 @@
 				LastModified = DateTime.MinValue;
 			}
 		}
-
-		#region FileSize
-
-		private long _fileSize;
-		public long FileSize
-		{
-			get { return _fileSize; }
-			set
-			{
-				if (_fileSize != value)
-				{
-					_fileSize = value;
-					RaisePropertyChanged("FileSize");
-				}
-			}
-		}
-
-		#endregion
-
-		#region LastModified
-
-		private DateTime _lastModified;
-		public DateTime LastModified
-		{
-			get { return _lastModified; }
-			set
-			{
-				if (_lastModified != value)
-				{
-					_lastModified = value;
-					RaisePropertyChanged("LastModified");
-				}
-			}
-		}
-
-		#endregion
-
-
-
+		#endregion methods
 
 	}
 }

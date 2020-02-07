@@ -59,7 +59,6 @@
 		#endregion constructors
 
 		#region properties
-		#region FileSize
 		/// <summary>
 		/// Gets the byte size of the on disc file (if any).
 		/// </summary>
@@ -72,13 +71,11 @@
 				if (_fileSize != value)
 				{
 					_fileSize = value;
-					RaisePropertyChanged("FileSize");
+					RaisePropertyChanged(nameof(FileSize));
 				}
 			}
 		}
-		#endregion
 
-		#region LastModified
 		/// <summary>
 		/// Gets the last modification time of the on disc file (if any).
 		/// </summary>
@@ -91,11 +88,10 @@
 				if (_lastModified != value)
 				{
 					_lastModified = value;
-					RaisePropertyChanged("LastModified");
+					RaisePropertyChanged(nameof(LastModified));
 				}
 			}
 		}
-		#endregion
 		#endregion properties
 
 		#region methods

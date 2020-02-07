@@ -52,15 +52,15 @@
 		#region Properties
 		public string FilePath
 		{
-			get { return _filePath; }
+			get => _filePath;
 			set
 			{
 				if (_filePath != value)
 				{
 					_filePath = value;
-					RaisePropertyChanged("FilePath");
-					RaisePropertyChanged("FileName");
-					RaisePropertyChanged("Title");
+					RaisePropertyChanged(nameof(FilePath));
+					RaisePropertyChanged(nameof(FileName));
+					RaisePropertyChanged(nameof(Title));
 
 					if (File.Exists(_filePath))
 					{
@@ -82,33 +82,30 @@
 			}
 		}
 
-		#region TextContent
 		public string TextContent
 		{
-			get { return _textContent; }
+			get => _textContent;
 			set
 			{
 				if (_textContent != value)
 				{
 					_textContent = value;
-					RaisePropertyChanged("TextContent");
+					RaisePropertyChanged(nameof(TextContent));
 					IsDirty = true;
 				}
 			}
 		}
 
-		#endregion
-
 		public bool IsDirty
 		{
-			get { return _isDirty; }
+			get => _isDirty;
 			set
 			{
 				if (_isDirty != value)
 				{
 					_isDirty = value;
-					RaisePropertyChanged("IsDirty");
-					RaisePropertyChanged("FileName");
+					RaisePropertyChanged(nameof(IsDirty));
+					RaisePropertyChanged(nameof(FileName));
 				}
 			}
 		}
@@ -131,28 +128,22 @@
 			get
 			{
 				if (_saveAsCommand == null)
-				{
 					_saveAsCommand = new RelayCommand<object>((p) => OnSaveAs(p), (p) => CanSaveAs(p));
-				}
 
 				return _saveAsCommand;
 			}
 		}
 
-		#region CloseCommand
 		public ICommand CloseCommand
 		{
 			get
 			{
 				if (_closeCommand == null)
-				{
 					_closeCommand = new RelayCommand<object>((p) => OnClose(), (p) => CanClose());
-				}
 
 				return _closeCommand;
 			}
 		}
-		#endregion
 		#endregion Properties
 
 		#region methods

@@ -91,7 +91,7 @@
 	/// </summary>
 	internal class WorkSpaceViewModel : MLibTest.ViewModels.Base.ViewModelBase, IWorkSpaceViewModel
 	{
-		#region private fields
+		#region fields
 		private ObservableCollection<FileViewModel> _files = new ObservableCollection<FileViewModel>();
 		private ReadOnlyObservableCollection<FileViewModel> _readonyFiles = null;
 		private ToolViewModel[] _tools = null;
@@ -106,7 +106,7 @@
 		private Tool3_ViewModel _Tool3;
 
 		private FileViewModel _activeDocument = null;
-		#endregion private fields
+		#endregion fields
 
 		#region constructors
 		/// <summary>
@@ -123,7 +123,6 @@
 		public event EventHandler ActiveDocumentChanged;
 
 		#region Properties
-		#region ActiveDocument
 		/// <summary>
 		/// Gets/Sets the currently active document.
 		/// </summary>
@@ -136,14 +135,13 @@
 				if (_activeDocument != value)
 				{
 					_activeDocument = value;
-					RaisePropertyChanged("ActiveDocument");
+					RaisePropertyChanged(nameof(ActiveDocument));
 
 					if (ActiveDocumentChanged != null)
 						ActiveDocumentChanged(this, EventArgs.Empty);
 				}
 			}
 		}
-		#endregion
 
 		/// <summary>
 		/// Gets a collection of all currently available documents
