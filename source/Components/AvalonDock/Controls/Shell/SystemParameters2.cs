@@ -66,23 +66,18 @@ namespace Microsoft.Windows.Shell
 
 		private void _InitializeGlassColor()
 		{
-			bool isOpaque;
-			uint color;
-			NativeMethods.DwmGetColorizationColor(out color, out isOpaque);
+			NativeMethods.DwmGetColorizationColor(out var color, out var isOpaque);
 			color |= isOpaque ? 0xFF000000 : 0;
-
 			WindowGlassColor = Utility.ColorFromArgbDword(color);
-
 			var glassBrush = new SolidColorBrush(WindowGlassColor);
 			glassBrush.Freeze();
-
 			WindowGlassBrush = glassBrush;
 		}
 
 		private void _UpdateGlassColor(IntPtr wParam, IntPtr lParam)
 		{
-			bool isOpaque = lParam != IntPtr.Zero;
-			uint color = unchecked((uint)(int)wParam.ToInt64());
+			var isOpaque = lParam != IntPtr.Zero;
+			var color = unchecked((uint)(int)wParam.ToInt64());
 			color |= isOpaque ? 0xFF000000 : 0;
 			WindowGlassColor = Utility.ColorFromArgbDword(color);
 			var glassBrush = new SolidColorBrush(WindowGlassColor);
@@ -92,7 +87,7 @@ namespace Microsoft.Windows.Shell
 
 		private void _InitializeCaptionHeight()
 		{
-			Point ptCaption = new Point(0, NativeMethods.GetSystemMetrics(SM.CYCAPTION));
+			var ptCaption = new Point(0, NativeMethods.GetSystemMetrics(SM.CYCAPTION));
 			WindowCaptionHeight = DpiHelper.DevicePixelsToLogical(ptCaption).Y;
 		}
 
@@ -103,10 +98,8 @@ namespace Microsoft.Windows.Shell
 
 		private void _InitializeWindowResizeBorderThickness()
 		{
-			Size frameSize = new Size(
-				NativeMethods.GetSystemMetrics(SM.CXSIZEFRAME),
-				NativeMethods.GetSystemMetrics(SM.CYSIZEFRAME));
-			Size frameSizeInDips = DpiHelper.DeviceSizeToLogical(frameSize);
+			var frameSize = new Size(NativeMethods.GetSystemMetrics(SM.CXSIZEFRAME), NativeMethods.GetSystemMetrics(SM.CYSIZEFRAME));
+			var frameSizeInDips = DpiHelper.DeviceSizeToLogical(frameSize);
 			WindowResizeBorderThickness = new Thickness(frameSizeInDips.Width, frameSizeInDips.Height, frameSizeInDips.Width, frameSizeInDips.Height);
 		}
 
@@ -117,12 +110,10 @@ namespace Microsoft.Windows.Shell
 
 		private void _InitializeWindowNonClientFrameThickness()
 		{
-			Size frameSize = new Size(
-				NativeMethods.GetSystemMetrics(SM.CXSIZEFRAME),
-				NativeMethods.GetSystemMetrics(SM.CYSIZEFRAME));
-			Size frameSizeInDips = DpiHelper.DeviceSizeToLogical(frameSize);
-			int captionHeight = NativeMethods.GetSystemMetrics(SM.CYCAPTION);
-			double captionHeightInDips = DpiHelper.DevicePixelsToLogical(new Point(0, captionHeight)).Y;
+			var frameSize = new Size(NativeMethods.GetSystemMetrics(SM.CXSIZEFRAME), NativeMethods.GetSystemMetrics(SM.CYSIZEFRAME));
+			var frameSizeInDips = DpiHelper.DeviceSizeToLogical(frameSize);
+			var captionHeight = NativeMethods.GetSystemMetrics(SM.CYCAPTION);
+			var captionHeightInDips = DpiHelper.DevicePixelsToLogical(new Point(0, captionHeight)).Y;
 			WindowNonClientFrameThickness = new Thickness(frameSizeInDips.Width, frameSizeInDips.Height + captionHeightInDips, frameSizeInDips.Width, frameSizeInDips.Height);
 		}
 
@@ -133,9 +124,7 @@ namespace Microsoft.Windows.Shell
 
 		private void _InitializeSmallIconSize()
 		{
-			SmallIconSize = new Size(
-				NativeMethods.GetSystemMetrics(SM.CXSMICON),
-				NativeMethods.GetSystemMetrics(SM.CYSMICON));
+			SmallIconSize = new Size(NativeMethods.GetSystemMetrics(SM.CXSMICON), NativeMethods.GetSystemMetrics(SM.CYSMICON));
 		}
 
 		private void _UpdateSmallIconSize(IntPtr wParam, IntPtr lParam)
@@ -147,13 +136,13 @@ namespace Microsoft.Windows.Shell
 		{
 			// This calculation isn't quite right, but it's pretty close.
 			// I expect this is good enough for the scenarios where this is expected to be used.
-			int captionX = NativeMethods.GetSystemMetrics(SM.CXSIZE);
-			int captionY = NativeMethods.GetSystemMetrics(SM.CYSIZE);
+			var captionX = NativeMethods.GetSystemMetrics(SM.CXSIZE);
+			var captionY = NativeMethods.GetSystemMetrics(SM.CYSIZE);
 
-			int frameX = NativeMethods.GetSystemMetrics(SM.CXSIZEFRAME) + NativeMethods.GetSystemMetrics(SM.CXEDGE);
-			int frameY = NativeMethods.GetSystemMetrics(SM.CYSIZEFRAME) + NativeMethods.GetSystemMetrics(SM.CYEDGE);
+			var frameX = NativeMethods.GetSystemMetrics(SM.CXSIZEFRAME) + NativeMethods.GetSystemMetrics(SM.CXEDGE);
+			var frameY = NativeMethods.GetSystemMetrics(SM.CYSIZEFRAME) + NativeMethods.GetSystemMetrics(SM.CYEDGE);
 
-			Rect captionRect = new Rect(0, 0, captionX * 3, captionY);
+			var captionRect = new Rect(0, 0, captionX * 3, captionY);
 			captionRect.Offset(-frameX - captionRect.Width, frameY);
 
 			WindowCaptionButtonsLocation = captionRect;
@@ -170,7 +159,7 @@ namespace Microsoft.Windows.Shell
 			}
 
 			var tbix = new TITLEBARINFOEX { cbSize = Marshal.SizeOf(typeof(TITLEBARINFOEX)) };
-			IntPtr lParam = Marshal.AllocHGlobal(tbix.cbSize);
+			var lParam = Marshal.AllocHGlobal(tbix.cbSize);
 			try
 			{
 				Marshal.StructureToPtr(tbix, lParam, false);
@@ -188,11 +177,11 @@ namespace Microsoft.Windows.Shell
 
 			// TITLEBARINFOEX has information relative to the screen.  We need to convert the containing rect
 			// to instead be relative to the top-right corner of the window.
-			RECT rcAllCaptionButtons = RECT.Union(tbix.rgrect_CloseButton, tbix.rgrect_MinimizeButton);
+			var rcAllCaptionButtons = RECT.Union(tbix.rgrect_CloseButton, tbix.rgrect_MinimizeButton);
 			// For all known themes, the RECT for the maximize box shouldn't add anything to the union of the minimize and close boxes.
 			Assert.AreEqual(rcAllCaptionButtons, RECT.Union(rcAllCaptionButtons, tbix.rgrect_MaximizeButton));
 
-			RECT rcWindow = NativeMethods.GetWindowRect(_messageHwnd.Handle);
+			var rcWindow = NativeMethods.GetWindowRect(_messageHwnd.Handle);
 
 			// Reorient the Top/Right to be relative to the top right edge of the Window.
 			var deviceCaptionLocation = new Rect(
@@ -200,9 +189,7 @@ namespace Microsoft.Windows.Shell
 				rcAllCaptionButtons.Top - rcWindow.Top,
 				rcAllCaptionButtons.Width,
 				rcAllCaptionButtons.Height);
-
-			Rect logicalCaptionLocation = DpiHelper.DeviceRectToLogical(deviceCaptionLocation);
-
+			var logicalCaptionLocation = DpiHelper.DeviceRectToLogical(deviceCaptionLocation);
 			WindowCaptionButtonsLocation = logicalCaptionLocation;
 		}
 
@@ -213,7 +200,7 @@ namespace Microsoft.Windows.Shell
 
 		private void _InitializeHighContrast()
 		{
-			HIGHCONTRAST hc = NativeMethods.SystemParameterInfo_GetHIGHCONTRAST();
+			var hc = NativeMethods.SystemParameterInfo_GetHIGHCONTRAST();
 			HighContrast = (hc.dwFlags & HCF.HIGHCONTRASTON) != 0;
 		}
 
@@ -231,10 +218,7 @@ namespace Microsoft.Windows.Shell
 				return;
 			}
 
-			string name;
-			string color;
-			string size;
-			NativeMethods.GetCurrentThemeName(out name, out color, out size);
+			NativeMethods.GetCurrentThemeName(out var name, out var color, out var size);
 
 			// Consider whether this is the most useful way to expose this...
 			UxThemeName = System.IO.Path.GetFileNameWithoutExtension(name);
@@ -347,151 +331,97 @@ namespace Microsoft.Windows.Shell
 			};
 		}
 
-		public static SystemParameters2 Current
-		{
-			get
-			{
-				if (_threadLocalSingleton == null)
-				{
-					_threadLocalSingleton = new SystemParameters2();
-				}
-				return _threadLocalSingleton;
-			}
-		}
+		public static SystemParameters2 Current => _threadLocalSingleton ?? (_threadLocalSingleton = new SystemParameters2());
 
 		private IntPtr _WndProc(IntPtr hwnd, WM msg, IntPtr wParam, IntPtr lParam)
 		{
 			// Don't do this if called within the SystemParameters2 constructor
-			if (_UpdateTable != null)
-			{
-				List<_SystemMetricUpdate> handlers;
-				if (_UpdateTable.TryGetValue(msg, out handlers))
-				{
-					Assert.IsNotNull(handlers);
-					foreach (var handler in handlers)
-					{
-						handler(wParam, lParam);
-					}
-				}
-			}
-
+			if (_UpdateTable == null) return NativeMethods.DefWindowProc(hwnd, msg, wParam, lParam);
+			if (!_UpdateTable.TryGetValue(msg, out var handlers)) return NativeMethods.DefWindowProc(hwnd, msg, wParam, lParam);
+			Assert.IsNotNull(handlers);
+			foreach (var handler in handlers) handler(wParam, lParam);
 			return NativeMethods.DefWindowProc(hwnd, msg, wParam, lParam);
 		}
 
 		public bool IsGlassEnabled
 		{
-			get
-			{
-				// return _isGlassEnabled;
-				// It turns out there may be some lag between someone asking this
-				// and the window getting updated.  It's not too expensive, just always do the check.
-				return NativeMethods.DwmIsCompositionEnabled();
-			}
+			// return _isGlassEnabled;
+			// It turns out there may be some lag between someone asking this
+			// and the window getting updated.  It's not too expensive, just always do the check.
+			get => NativeMethods.DwmIsCompositionEnabled();
 			private set
 			{
-				if (value != _isGlassEnabled)
-				{
-					_isGlassEnabled = value;
-					_NotifyPropertyChanged("IsGlassEnabled");
-				}
+				if (value == _isGlassEnabled) return;
+				_isGlassEnabled = value;
+				_NotifyPropertyChanged(nameof(IsGlassEnabled));
 			}
 		}
 
 		public Color WindowGlassColor
 		{
-			get
-			{
-				return _glassColor;
-			}
+			get => _glassColor;
 			private set
 			{
-				if (value != _glassColor)
-				{
-					_glassColor = value;
-					_NotifyPropertyChanged("WindowGlassColor");
-				}
+				if (value == _glassColor) return;
+				_glassColor = value;
+				_NotifyPropertyChanged(nameof(WindowGlassColor));
 			}
 		}
 
 		public SolidColorBrush WindowGlassBrush
 		{
-			get
-			{
-				return _glassColorBrush;
-			}
+			get => _glassColorBrush;
 			private set
 			{
 				Assert.IsNotNull(value);
 				Assert.IsTrue(value.IsFrozen);
-				if (_glassColorBrush == null || value.Color != _glassColorBrush.Color)
-				{
-					_glassColorBrush = value;
-					_NotifyPropertyChanged("WindowGlassBrush");
-				}
+				if (_glassColorBrush != null && value.Color == _glassColorBrush.Color) return;
+				_glassColorBrush = value;
+				_NotifyPropertyChanged(nameof(WindowGlassBrush));
 			}
 		}
 
 		public Thickness WindowResizeBorderThickness
 		{
-			get
-			{
-				return _windowResizeBorderThickness;
-			}
+			get => _windowResizeBorderThickness;
 			private set
 			{
-				if (value != _windowResizeBorderThickness)
-				{
-					_windowResizeBorderThickness = value;
-					_NotifyPropertyChanged("WindowResizeBorderThickness");
-				}
+				if (value == _windowResizeBorderThickness) return;
+				_windowResizeBorderThickness = value;
+				_NotifyPropertyChanged(nameof(WindowResizeBorderThickness));
 			}
 		}
 
 		public Thickness WindowNonClientFrameThickness
 		{
-			get
-			{
-				return _windowNonClientFrameThickness;
-			}
+			get => _windowNonClientFrameThickness;
 			private set
 			{
-				if (value != _windowNonClientFrameThickness)
-				{
-					_windowNonClientFrameThickness = value;
-					_NotifyPropertyChanged("WindowNonClientFrameThickness");
-				}
+				if (value == _windowNonClientFrameThickness) return;
+				_windowNonClientFrameThickness = value;
+				_NotifyPropertyChanged(nameof(WindowNonClientFrameThickness));
 			}
 		}
 
 		public double WindowCaptionHeight
 		{
-			get
-			{
-				return _captionHeight;
-			}
+			get => _captionHeight;
 			private set
 			{
-				if (value != _captionHeight)
-				{
-					_captionHeight = value;
-					_NotifyPropertyChanged("WindowCaptionHeight");
-				}
+				if (value == _captionHeight) return;
+				_captionHeight = value;
+				_NotifyPropertyChanged(nameof(WindowCaptionHeight));
 			}
 		}
 
 		public Size SmallIconSize
 		{
-			get
-			{
-				return new Size(_smallIconSize.Width, _smallIconSize.Height);
-			}
+			get => new Size(_smallIconSize.Width, _smallIconSize.Height);
 			private set
 			{
-				if (value != _smallIconSize)
-				{
-					_smallIconSize = value;
-					_NotifyPropertyChanged("SmallIconSize");
-				}
+				if (value == _smallIconSize) return;
+				_smallIconSize = value;
+				_NotifyPropertyChanged(nameof(SmallIconSize));
 			}
 		}
 
@@ -499,17 +429,12 @@ namespace Microsoft.Windows.Shell
 		[SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Ux")]
 		public string UxThemeName
 		{
-			get
-			{
-				return _uxThemeName;
-			}
+			get => _uxThemeName;
 			private set
 			{
-				if (value != _uxThemeName)
-				{
-					_uxThemeName = value;
-					_NotifyPropertyChanged("UxThemeName");
-				}
+				if (value == _uxThemeName) return;
+				_uxThemeName = value;
+				_NotifyPropertyChanged(nameof(UxThemeName));
 			}
 		}
 
@@ -517,65 +442,45 @@ namespace Microsoft.Windows.Shell
 		[SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Ux")]
 		public string UxThemeColor
 		{
-			get
-			{
-				return _uxThemeColor;
-			}
+			get => _uxThemeColor;
 			private set
 			{
-				if (value != _uxThemeColor)
-				{
-					_uxThemeColor = value;
-					_NotifyPropertyChanged("UxThemeColor");
-				}
+				if (value == _uxThemeColor) return;
+				_uxThemeColor = value;
+				_NotifyPropertyChanged(nameof(UxThemeColor));
 			}
 		}
 
 		public bool HighContrast
 		{
-			get
-			{
-				return _isHighContrast;
-			}
+			get => _isHighContrast;
 			private set
 			{
-				if (value != _isHighContrast)
-				{
-					_isHighContrast = value;
-					_NotifyPropertyChanged("HighContrast");
-				}
+				if (value == _isHighContrast) return;
+				_isHighContrast = value;
+				_NotifyPropertyChanged(nameof(HighContrast));
 			}
 		}
 
 		public CornerRadius WindowCornerRadius
 		{
-			get
-			{
-				return _windowCornerRadius;
-			}
+			get => _windowCornerRadius;
 			private set
 			{
-				if (value != _windowCornerRadius)
-				{
-					_windowCornerRadius = value;
-					_NotifyPropertyChanged("WindowCornerRadius");
-				}
+				if (value == _windowCornerRadius) return;
+				_windowCornerRadius = value;
+				_NotifyPropertyChanged(nameof(WindowCornerRadius));
 			}
 		}
 
 		public Rect WindowCaptionButtonsLocation
 		{
-			get
-			{
-				return _captionButtonLocation;
-			}
+			get => _captionButtonLocation;
 			private set
 			{
-				if (value != _captionButtonLocation)
-				{
-					_captionButtonLocation = value;
-					_NotifyPropertyChanged("WindowCaptionButtonsLocation");
-				}
+				if (value == _captionButtonLocation) return;
+				_captionButtonLocation = value;
+				_NotifyPropertyChanged(nameof(WindowCaptionButtonsLocation));
 			}
 		}
 
@@ -584,11 +489,7 @@ namespace Microsoft.Windows.Shell
 		private void _NotifyPropertyChanged(string propertyName)
 		{
 			Assert.IsNeitherNullNorEmpty(propertyName);
-			var handler = PropertyChanged;
-			if (handler != null)
-			{
-				handler(this, new PropertyChangedEventArgs(propertyName));
-			}
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;

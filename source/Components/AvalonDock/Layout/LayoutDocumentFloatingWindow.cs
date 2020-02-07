@@ -55,7 +55,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		void _rootPanel_ChildrenTreeChanged(object sender, ChildrenTreeChangedEventArgs e)
+		private void _rootPanel_ChildrenTreeChanged(object sender, ChildrenTreeChangedEventArgs e)
 		{
 			RaisePropertyChanged(nameof(IsSinglePane));
 			RaisePropertyChanged(nameof(SinglePane));
@@ -119,10 +119,7 @@ namespace AvalonDock.Layout
 		/// <inheritdoc />
 		public override int ChildrenCount => RootPanel == null ? 0 : 1;
 
-		void ILayoutElementWithVisibility.ComputeVisibility()
-		{
-			IsVisible = RootPanel != null && RootPanel.IsVisible;
-		}
+		void ILayoutElementWithVisibility.ComputeVisibility() => IsVisible = RootPanel != null && RootPanel.IsVisible;
 
 		/// <inheritdoc />
 		public override bool IsValid => RootPanel != null;
@@ -143,7 +140,6 @@ namespace AvalonDock.Layout
 			while (true)
 			{
 				if (reader.LocalName.Equals(localName) && reader.NodeType == XmlNodeType.EndElement) break;
-
 				if (reader.NodeType == XmlNodeType.Whitespace)
 				{
 					reader.Read();

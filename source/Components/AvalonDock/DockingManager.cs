@@ -81,8 +81,8 @@ namespace AvalonDock
 #else
           this.SetCurrentValue( DockingManager.LayoutProperty, new LayoutRoot() { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) } );
 #endif
-			this.Loaded += DockingManager_Loaded;
-			this.Unloaded += DockingManager_Unloaded;
+			Loaded += DockingManager_Loaded;
+			Unloaded += DockingManager_Unloaded;
 		}
 
 		#endregion Constructors
@@ -114,44 +114,29 @@ namespace AvalonDock
 
 		#region Layout
 
-		/// <summary>
-		/// Layout dependency property
-		/// </summary>
-		public static readonly DependencyProperty LayoutProperty = DependencyProperty.Register("Layout", typeof(LayoutRoot), typeof(DockingManager),
+		/// <summary><see cref="Layout"/> dependency property.</summary>
+		public static readonly DependencyProperty LayoutProperty = DependencyProperty.Register(nameof(Layout), typeof(LayoutRoot), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnLayoutChanged, CoerceLayoutValue));
 
-		/// <summary>
-		/// Gets or sets the Layout property. This dependency property 
-		/// indicates layout tree.
-		/// </summary>
+		/// <summary>Gets or sets the <see cref="Layout"/> property. This dependency property indicates layout tree.</summary>
 		public LayoutRoot Layout
 		{
 			get => (LayoutRoot)GetValue(LayoutProperty);
 			set => SetValue(LayoutProperty, value);
 		}
 
-		/// <summary>
-		/// Coerces the <see cref="DockingManager.Layout"/> value.
-		/// </summary>
+		/// <summary>Coerces the <see cref="Layout"/> value.</summary>
 		private static object CoerceLayoutValue(DependencyObject d, object value)
 		{
-			if (value == null)
-				return new LayoutRoot { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) };
+			if (value == null) return new LayoutRoot { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) };
 			((DockingManager)d).OnLayoutChanging(value as LayoutRoot);
 			return value;
 		}
 
-		/// <summary>
-		/// Handles changes to the Layout property.
-		/// </summary>
-		private static void OnLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			((DockingManager)d).OnLayoutChanged(e.OldValue as LayoutRoot, e.NewValue as LayoutRoot);
-		}
+		/// <summary>Handles changes to the <see cref="Layout"/> property.</summary>
+		private static void OnLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((DockingManager)d).OnLayoutChanged(e.OldValue as LayoutRoot, e.NewValue as LayoutRoot);
 
-		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the <see cref="DockingManager.Layout"/> property.
-		/// </summary>
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Layout"/> property.</summary>
 		protected virtual void OnLayoutChanged(LayoutRoot oldLayout, LayoutRoot newLayout)
 		{
 			if (oldLayout != null)
@@ -198,10 +183,8 @@ namespace AvalonDock
 				BottomSidePanel = CreateUIElementForModel(Layout.BottomSide) as LayoutAnchorSideControl;
 
 				foreach (var fw in Layout.FloatingWindows.ToArray())
-				{
 					if (fw.IsValid)
 						_fwList.Add(CreateUIElementForModel(fw) as LayoutFloatingWindowControl);
-				}
 
 				foreach (var fw in _fwList.ToArray())
 				{
@@ -559,7 +542,7 @@ namespace AvalonDock
 		#region AnchorableTitleTemplate
 
 		/// <summary><see cref="AnchorableTitleTemplate"/> dependency property.</summary>
-		public static readonly DependencyProperty AnchorableTitleTemplateProperty = DependencyProperty.Register("AnchorableTitleTemplate", typeof(DataTemplate), typeof(DockingManager),
+		public static readonly DependencyProperty AnchorableTitleTemplateProperty = DependencyProperty.Register(nameof(AnchorableTitleTemplate), typeof(DataTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata((DataTemplate)null, OnAnchorableTitleTemplateChanged, CoerceAnchorableTitleTemplateValue));
 
 		/// <summary>
@@ -624,10 +607,7 @@ namespace AvalonDock
 		public static readonly DependencyProperty AnchorableHeaderTemplateProperty = DependencyProperty.Register(nameof(AnchorableHeaderTemplate), typeof(DataTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnAnchorableHeaderTemplateChanged, CoerceAnchorableHeaderTemplateValue));
 
-		/// <summary>
-		/// Gets or sets the <see cref="AnchorableHeaderTemplate"/> property. This dependency property 
-		/// indicates the data template to use for anchorable templates.
-		/// </summary>
+		/// <summary>Gets or sets the <see cref="AnchorableHeaderTemplate"/> property. This dependency property indicates the data template to use for anchorable templates.</summary>
 		public DataTemplate AnchorableHeaderTemplate
 		{
 			get => (DataTemplate)GetValue(AnchorableHeaderTemplateProperty);
@@ -823,9 +803,9 @@ namespace AvalonDock
 		List<WeakReference> _logicalChildren = new List<WeakReference>();
 
 		/// <inheritdoc />
-		protected override System.Collections.IEnumerator LogicalChildren => _logicalChildren.Select(ch => ch.GetValueOrDefault<object>()).GetEnumerator();
+		protected override IEnumerator LogicalChildren => _logicalChildren.Select(ch => ch.GetValueOrDefault<object>()).GetEnumerator();
 
-		public System.Collections.IEnumerator LogicalChildrenPublic => this.LogicalChildren;
+		public IEnumerator LogicalChildrenPublic => LogicalChildren;
 
 
 		internal void InternalAddLogicalChild(object element)
@@ -1095,7 +1075,7 @@ namespace AvalonDock
 		{
 			var oldTheme = e.OldValue as Theme;
 			var newTheme = e.NewValue as Theme;
-			var resources = this.Resources;
+			var resources = Resources;
 			if (oldTheme != null)
 			{
 				if (oldTheme is DictionaryTheme)
@@ -1124,9 +1104,7 @@ namespace AvalonDock
 					resources.MergedDictionaries.Add(currentThemeResourceDictionary);
 				}
 				else
-				{
 					resources.MergedDictionaries.Add(new ResourceDictionary { Source = newTheme.GetResourceUri() });
-				}
 			}
 
 			foreach (var fwc in _fwList)
@@ -1481,11 +1459,11 @@ namespace AvalonDock
 						FloatingWidth = contentModel.FloatingWidth,
 						FloatingHeight = contentModel.FloatingHeight
 					};
-					lfwc = this.CreateFloatingWindowForLayoutAnchorableWithoutParent(pane, isContentImmutable);
+					lfwc = CreateFloatingWindowForLayoutAnchorableWithoutParent(pane, isContentImmutable);
 				}
 			}
 
-			return this.CreateFloatingWindowCore(contentModel, isContentImmutable);
+			return CreateFloatingWindowCore(contentModel, isContentImmutable);
 		}
 
 		#endregion Public Methods
@@ -1512,26 +1490,26 @@ namespace AvalonDock
 			if (model is LayoutAnchorSide)
 			{
 				var templateModelView = new LayoutAnchorSideControl(model as LayoutAnchorSide);
-				templateModelView.SetBinding(LayoutAnchorSideControl.TemplateProperty, new Binding(DockingManager.AnchorSideTemplateProperty.Name) { Source = this });
+				templateModelView.SetBinding(TemplateProperty, new Binding(AnchorSideTemplateProperty.Name) { Source = this });
 				return templateModelView;
 			}
 			if (model is LayoutAnchorGroup)
 			{
 				var templateModelView = new LayoutAnchorGroupControl(model as LayoutAnchorGroup);
-				templateModelView.SetBinding(LayoutAnchorGroupControl.TemplateProperty, new Binding(DockingManager.AnchorGroupTemplateProperty.Name) { Source = this });
+				templateModelView.SetBinding(TemplateProperty, new Binding(AnchorGroupTemplateProperty.Name) { Source = this });
 				return templateModelView;
 			}
 
 			if (model is LayoutDocumentPane)
 			{
 				var templateModelView = new LayoutDocumentPaneControl(model as LayoutDocumentPane);
-				templateModelView.SetBinding(LayoutDocumentPaneControl.StyleProperty, new Binding(DockingManager.DocumentPaneControlStyleProperty.Name) { Source = this });
+				templateModelView.SetBinding(StyleProperty, new Binding(DocumentPaneControlStyleProperty.Name) { Source = this });
 				return templateModelView;
 			}
 			if (model is LayoutAnchorablePane)
 			{
 				var templateModelView = new LayoutAnchorablePaneControl(model as LayoutAnchorablePane);
-				templateModelView.SetBinding(LayoutAnchorablePaneControl.StyleProperty, new Binding(DockingManager.AnchorablePaneControlStyleProperty.Name) { Source = this });
+				templateModelView.SetBinding(StyleProperty, new Binding(AnchorablePaneControlStyleProperty.Name) { Source = this });
 				return templateModelView;
 			}
 
@@ -1596,7 +1574,6 @@ namespace AvalonDock
 					newFW.Width = paneForExtensions.FloatingWidth;
 					newFW.Height = paneForExtensions.FloatingHeight;
 				}
-
 				newFW.ShowInTaskbar = false;
 				newFW.Show();
 				// Do not set the WindowState before showing or it will be lost
@@ -1604,13 +1581,11 @@ namespace AvalonDock
 					newFW.WindowState = WindowState.Maximized;
 				return newFW;
 			}
-
-			if (model is LayoutDocument)
+			if (model is LayoutDocument layoutDocument)
 			{
-				var templateModelView = new LayoutDocumentControl { Model = model as LayoutDocument };
+				var templateModelView = new LayoutDocumentControl { Model = layoutDocument };
 				return templateModelView;
 			}
-
 			return null;
 		}
 
@@ -1644,13 +1619,16 @@ namespace AvalonDock
 				foreach (var fw in _fwList)
 				{
 					var found = fw.Model.Descendents().OfType<LayoutDocument>().Any(doc => doc == contentModel);
-					if (found) fwc = fw;
+					if (!found) continue;
+					if(fw.Model.Descendents().OfType<LayoutDocument>().Count()+ fw.Model.Descendents().OfType<LayoutAnchorable>().Count() == 1)
+					fwc = fw;
+					break;
 				}
 			}
 
 			var show = fwc == null; // Do not show already visible floating window
 			if (fwc == null)
-				fwc = this.CreateFloatingWindow(contentModel, false);
+				fwc = CreateFloatingWindow(contentModel, false);
 
 			if (fwc != null)
 			{
@@ -1670,7 +1648,7 @@ namespace AvalonDock
 		/// <param name="paneModel"></param>
 		internal void StartDraggingFloatingWindowForPane(LayoutAnchorablePane paneModel)
 		{
-			var fwc = this.CreateFloatingWindowForLayoutAnchorableWithoutParent(paneModel, false);
+			var fwc = CreateFloatingWindowForLayoutAnchorableWithoutParent(paneModel, false);
 			if (fwc == null) return;
 			fwc.AttachDrag();
 			fwc.Show();
@@ -1702,27 +1680,27 @@ namespace AvalonDock
 				if (argsClosing.Cancel) return;
 			}
 			if (!document.CloseDocument()) return;
-			this.RemoveViewFromLogicalChild(document);
+			RemoveViewFromLogicalChild(document);
 			DocumentClosed?.Invoke(this, new DocumentClosedEventArgs(document));
 		}
 
 		internal void _ExecuteCloseAllButThisCommand(LayoutContent contentSelected)
 		{
 			foreach (var contentToClose in Layout.Descendents().OfType<LayoutContent>().Where(d => d != contentSelected && (d.Parent is LayoutDocumentPane || d.Parent is LayoutDocumentFloatingWindow)).ToArray())
-				this.Close(contentToClose);
+				Close(contentToClose);
 		}
 
 		internal void _ExecuteCloseAllCommand(LayoutContent contentSelected)
 		{
 			foreach (var contentToClose in Layout.Descendents().OfType<LayoutContent>().Where(d => (d.Parent is LayoutDocumentPane || d.Parent is LayoutDocumentFloatingWindow)).ToArray())
-				this.Close(contentToClose);
+				Close(contentToClose);
 		}
 
 		internal void _ExecuteCloseCommand(LayoutAnchorable anchorable)
 		{
 			if (!(anchorable is LayoutAnchorable model)) return;
 			model.CloseAnchorable();
-			this.RemoveViewFromLogicalChild(anchorable);
+			RemoveViewFromLogicalChild(anchorable);
 		}
 
 		internal void _ExecuteHideCommand(LayoutAnchorable anchorable) => anchorable?.Hide();
@@ -1809,7 +1787,7 @@ namespace AvalonDock
 					//}
 
 					if (!_insideInternalSetActiveContent)
-						this.ActiveContent = Layout.ActiveContent?.Content;
+						ActiveContent = Layout.ActiveContent?.Content;
 					break;
 				}
 			}
@@ -1980,7 +1958,6 @@ namespace AvalonDock
 						throw new InvalidOperationException("Layout must contains at least one LayoutDocumentPane in order to host documents");
 
 					documentPane.Children.Add(documentToImport);
-					added = true;
 				}
 
 				LayoutUpdateStrategy?.AfterInsertDocument(layout, documentToImport);
@@ -1998,25 +1975,22 @@ namespace AvalonDock
 			if (SuspendDocumentsSourceBinding) return;
 
 			//handle remove
-			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove ||
-				e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+			if (e.Action == NotifyCollectionChangedAction.Remove ||
+				e.Action == NotifyCollectionChangedAction.Replace)
 			{
 				if (e.OldItems != null)
 				{
 					var documentsToRemove = Layout.Descendents().OfType<LayoutDocument>().Where(d => e.OldItems.Contains(d.Content)).ToArray();
 					foreach (var documentToRemove in documentsToRemove)
 					{
-						(documentToRemove.Parent as ILayoutContainer).RemoveChild(
-							documentToRemove);
-						this.RemoveViewFromLogicalChild(documentToRemove);
+						documentToRemove.Parent.RemoveChild(documentToRemove);
+						RemoveViewFromLogicalChild(documentToRemove);
 					}
 				}
 			}
 
 			//handle add
-			if (e.NewItems != null &&
-				(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add ||
-				e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace))
+			if (e.NewItems != null && (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Replace))
 			{
 				if (e.NewItems != null)
 				{
@@ -2025,17 +1999,13 @@ namespace AvalonDock
 					{
 						documentPane = Layout.LastFocusedDocument.Parent as LayoutDocumentPane;
 					}
-
 					if (documentPane == null)
 					{
 						documentPane = Layout.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
 					}
-
 					//if (documentPane == null)
 					//    throw new InvalidOperationException("Layout must contains at least one LayoutDocumentPane in order to host documents");
-
 					_suspendLayoutItemCreation = true;
-
 					foreach (var documentContentToImport in e.NewItems)
 					{
 						var documentToImport = new LayoutDocument
@@ -2078,7 +2048,7 @@ namespace AvalonDock
 				{
 					(documentToRemove.Parent as ILayoutContainer).RemoveChild(
 						documentToRemove);
-					this.RemoveViewFromLogicalChild(documentToRemove);
+					RemoveViewFromLogicalChild(documentToRemove);
 				}
 			}
 
@@ -2097,7 +2067,7 @@ namespace AvalonDock
 			{
 				(documentToRemove.Parent as ILayoutContainer).RemoveChild(
 					documentToRemove);
-				this.RemoveViewFromLogicalChild(documentToRemove);
+				RemoveViewFromLogicalChild(documentToRemove);
 			}
 
 			var documentsSourceAsNotifier = documentsSource as INotifyCollectionChanged;
@@ -2140,26 +2110,22 @@ namespace AvalonDock
 				if (anchorablesImported.Contains(document))
 					listOfAnchorablesToImport.Remove(document);
 			}
-
 			LayoutAnchorablePane anchorablePane = null;
 			if (layout.ActiveContent != null)
 			{
 				//look for active content parent pane
 				anchorablePane = layout.ActiveContent.Parent as LayoutAnchorablePane;
 			}
-
 			if (anchorablePane == null)
 			{
 				//look for a pane on the right side
-				anchorablePane = layout.Descendents().OfType<LayoutAnchorablePane>().Where(pane => !pane.IsHostedInFloatingWindow && pane.GetSide() == AnchorSide.Right).FirstOrDefault();
+				anchorablePane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(pane => !pane.IsHostedInFloatingWindow && pane.GetSide() == AnchorSide.Right);
 			}
-
 			if (anchorablePane == null)
 			{
 				//look for an available pane
 				anchorablePane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault();
 			}
-
 			_suspendLayoutItemCreation = true;
 			foreach (var anchorableContentToImport in listOfAnchorablesToImport)
 			{
@@ -2190,11 +2156,8 @@ namespace AvalonDock
 				LayoutUpdateStrategy?.AfterInsertAnchorable(layout, anchorableToImport);
 				CreateAnchorableLayoutItem(anchorableToImport);
 			}
-
 			_suspendLayoutItemCreation = false;
-
-			var anchorablesSourceAsNotifier = anchorablesSource as INotifyCollectionChanged;
-			if (anchorablesSourceAsNotifier != null)
+			if (anchorablesSource is INotifyCollectionChanged anchorablesSourceAsNotifier)
 				anchorablesSourceAsNotifier.CollectionChanged += anchorablesSourceElementsChanged;
 		}
 
@@ -2206,8 +2169,7 @@ namespace AvalonDock
 			if (SuspendAnchorablesSourceBinding) return;
 
 			//handle remove
-			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove ||
-				e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+			if (e.Action == NotifyCollectionChangedAction.Remove || e.Action == NotifyCollectionChangedAction.Replace)
 			{
 				if (e.OldItems != null)
 				{
@@ -2215,40 +2177,33 @@ namespace AvalonDock
 					foreach (var anchorableToRemove in anchorablesToRemove)
 					{
 						anchorableToRemove.Content = null;
-						(anchorableToRemove.Parent as ILayoutContainer).RemoveChild(
-							anchorableToRemove);
-						this.RemoveViewFromLogicalChild(anchorableToRemove);
+						anchorableToRemove.Parent.RemoveChild(anchorableToRemove);
+						RemoveViewFromLogicalChild(anchorableToRemove);
 					}
 				}
 			}
 
 			//handle add
-			if (e.NewItems != null &&
-				(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add ||
-				e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace))
+			if (e.NewItems != null && (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Replace))
 			{
 				if (e.NewItems != null)
 				{
 					LayoutAnchorablePane anchorablePane = null;
-
 					if (Layout.ActiveContent != null)
 					{
 						//look for active content parent pane
 						anchorablePane = Layout.ActiveContent.Parent as LayoutAnchorablePane;
 					}
-
 					if (anchorablePane == null)
 					{
 						//look for a pane on the right side
-						anchorablePane = Layout.Descendents().OfType<LayoutAnchorablePane>().Where(pane => !pane.IsHostedInFloatingWindow && pane.GetSide() == AnchorSide.Right).FirstOrDefault();
+						anchorablePane = Layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(pane => !pane.IsHostedInFloatingWindow && pane.GetSide() == AnchorSide.Right);
 					}
-
 					if (anchorablePane == null)
 					{
 						//look for an available pane
 						anchorablePane = Layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault();
 					}
-
 					_suspendLayoutItemCreation = true;
 					foreach (var anchorableContentToImport in e.NewItems)
 					{
@@ -2256,7 +2211,6 @@ namespace AvalonDock
 						var added = false;
 						if (LayoutUpdateStrategy != null)
 							added = LayoutUpdateStrategy.BeforeInsertAnchorable(Layout, anchorableToImport, anchorablePane);
-
 						if (!added)
 						{
 							if (anchorablePane == null)
@@ -2266,16 +2220,13 @@ namespace AvalonDock
 								{
 									mainLayoutPanel.Children.Add(Layout.RootPanel);
 								}
-
 								Layout.RootPanel = mainLayoutPanel;
 								anchorablePane = new LayoutAnchorablePane { DockWidth = new GridLength(200.0, GridUnitType.Pixel) };
 								mainLayoutPanel.Children.Add(anchorablePane);
 							}
-
 							anchorablePane.Children.Add(anchorableToImport);
 							added = true;
 						}
-
 						LayoutUpdateStrategy?.AfterInsertAnchorable(Layout, anchorableToImport);
 						var root = anchorableToImport.Root;
 						if (root != null && root.Manager == this)
@@ -2294,7 +2245,7 @@ namespace AvalonDock
 				{
 					(anchorableToRemove.Parent as ILayoutContainer).RemoveChild(
 						anchorableToRemove);
-					this.RemoveViewFromLogicalChild(anchorableToRemove);
+					RemoveViewFromLogicalChild(anchorableToRemove);
 				}
 			}
 
@@ -2312,7 +2263,7 @@ namespace AvalonDock
 			foreach (var anchorableToRemove in anchorablesToRemove)
 			{
 				anchorableToRemove.Parent.RemoveChild(anchorableToRemove);
-				this.RemoveViewFromLogicalChild(anchorableToRemove);
+				RemoveViewFromLogicalChild(anchorableToRemove);
 			}
 
 			if (anchorablesSource is INotifyCollectionChanged anchorablesSourceAsNotifier)
@@ -2322,9 +2273,9 @@ namespace AvalonDock
 		private void RemoveViewFromLogicalChild(LayoutContent layoutContent)
 		{
 			if (layoutContent == null) return;
-			var layoutItem = this.GetLayoutItemFromModel(layoutContent);
+			var layoutItem = GetLayoutItemFromModel(layoutContent);
 			if (layoutItem == null) return;
-			if (layoutItem.IsViewExists()) this.InternalRemoveLogicalChild(layoutItem.View);
+			if (layoutItem.IsViewExists()) InternalRemoveLogicalChild(layoutItem.View);
 		}
 
 		private void InternalSetActiveContent(object contentObject)
@@ -2500,8 +2451,7 @@ namespace AvalonDock
 
 				if (savePreviousContainer)
 				{
-					var contentModelAsPreviousContainer = contentModel as ILayoutPreviousContainer;
-					contentModelAsPreviousContainer.PreviousContainer = paneModel;
+					((ILayoutPreviousContainer) contentModel).PreviousContainer = paneModel;
 					contentModel.PreviousContainerIndex = paneModel.Children.Count - 1;
 				}
 
@@ -2510,7 +2460,6 @@ namespace AvalonDock
 			}
 
 			if (destPane.Children.Count > 0) destPane.SelectedContentIndex = currentSelectedContentIndex;
-
 			LayoutFloatingWindow fw;
 			LayoutFloatingWindowControl fwc;
 			fw = new LayoutAnchorableFloatingWindow
@@ -2543,11 +2492,8 @@ namespace AvalonDock
 
 		private LayoutFloatingWindowControl CreateFloatingWindowCore(LayoutContent contentModel, bool isContentImmutable)
 		{
-			if (!contentModel.CanFloat)
-				return null;
-			var contentModelAsAnchorable = contentModel as LayoutAnchorable;
-			if (contentModelAsAnchorable != null &&
-				contentModelAsAnchorable.IsAutoHidden)
+			if (!contentModel.CanFloat) return null;
+			if (contentModel is LayoutAnchorable contentModelAsAnchorable && contentModelAsAnchorable.IsAutoHidden)
 				contentModelAsAnchorable.ToggleAutoHide();
 
 			var parentPane = contentModel.Parent as ILayoutPane;
@@ -2610,8 +2556,7 @@ namespace AvalonDock
 				var anchorableDocument = contentModel as LayoutDocument;
 				fw = new LayoutDocumentFloatingWindow
 				{
-					RootPanel = new LayoutDocumentPaneGroup(
-						new LayoutDocumentPane(anchorableDocument)
+					RootPanel = new LayoutDocumentPaneGroup(new LayoutDocumentPane(anchorableDocument)
 						{
 							DockWidth = parentPaneAsPositionableElement.DockWidth,
 							DockHeight = parentPaneAsPositionableElement.DockHeight,

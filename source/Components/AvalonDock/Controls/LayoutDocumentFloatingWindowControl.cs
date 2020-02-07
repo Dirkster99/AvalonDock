@@ -38,11 +38,11 @@ namespace AvalonDock.Controls
 		}
 
 		internal LayoutDocumentFloatingWindowControl(LayoutDocumentFloatingWindow model, bool isContentImmutable)
-		   : base(model, isContentImmutable)
+			: base(model, isContentImmutable)
 		{
 			_model = model;
-			HideWindowCommand = new RelayCommand((p) => OnExecuteHideWindowCommand(p), (p) => CanExecuteHideWindowCommand(p));
-			CloseWindowCommand = new RelayCommand((p) => OnExecuteCloseWindowCommand(p), (p) => CanExecuteCloseWindowCommand(p));
+			HideWindowCommand = new RelayCommand(OnExecuteHideWindowCommand, CanExecuteHideWindowCommand);
+			CloseWindowCommand = new RelayCommand(OnExecuteCloseWindowCommand, CanExecuteCloseWindowCommand);
 			Closed += (sender, args) => { Owner?.Focus(); };
 			UpdateThemeResources();
 		}
@@ -56,45 +56,29 @@ namespace AvalonDock.Controls
 
 		#region Overrides
 
-		public override ILayoutElement Model
-		{
-			get
-			{
-				return _model;
-			}
-		}
+		/// <inheritdoc />
+		public override ILayoutElement Model => _model;
 
 		#region SingleContentLayoutItem
 
-		/// <summary>
-		/// SingleContentLayoutItem Dependency Property
-		/// </summary>
-		public static readonly DependencyProperty SingleContentLayoutItemProperty =
-			DependencyProperty.Register("SingleContentLayoutItem", typeof(LayoutItem), typeof(LayoutDocumentFloatingWindowControl),
-				new FrameworkPropertyMetadata((LayoutItem)null,
-					new PropertyChangedCallback(OnSingleContentLayoutItemChanged)));
+		/// <summary><see cref="SingleContentLayoutItem"/> dependency property.</summary>
+		public static readonly DependencyProperty SingleContentLayoutItemProperty = DependencyProperty.Register(nameof(SingleContentLayoutItem), typeof(LayoutItem), typeof(LayoutDocumentFloatingWindowControl),
+				new FrameworkPropertyMetadata(null, OnSingleContentLayoutItemChanged));
 
 		/// <summary>
-		/// Gets or sets the SingleContentLayoutItem property.  This dependency property 
+		/// Gets or sets the <see cref="SingleContentLayoutItem"/> property.  This dependency property 
 		/// indicates the layout item of the selected content when is shown a single document pane.
 		/// </summary>
 		public LayoutItem SingleContentLayoutItem
 		{
-			get { return (LayoutItem)GetValue(SingleContentLayoutItemProperty); }
-			set { SetValue(SingleContentLayoutItemProperty, value); }
+			get => (LayoutItem)GetValue(SingleContentLayoutItemProperty);
+			set => SetValue(SingleContentLayoutItemProperty, value);
 		}
 
-		/// <summary>
-		/// Handles changes to the <see cref="SingleContentLayoutItem"/> property.
-		/// </summary>
-		private static void OnSingleContentLayoutItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			((LayoutDocumentFloatingWindowControl)d).OnSingleContentLayoutItemChanged(e);
-		}
+		/// <summary>Handles changes to the <see cref="SingleContentLayoutItem"/> property.</summary>
+		private static void OnSingleContentLayoutItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutDocumentFloatingWindowControl)d).OnSingleContentLayoutItemChanged(e);
 
-		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the <see cref="SingleContentLayoutItem"/> property.
-		/// </summary>
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="SingleContentLayoutItem"/> property.</summary>
 		protected virtual void OnSingleContentLayoutItemChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
@@ -104,25 +88,19 @@ namespace AvalonDock.Controls
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
-
 			var manager = _model.Root.Manager;
-
 			Content = manager.CreateUIElementForModel(_model.RootPanel);
 			// TODO IsVisibleChanged
 			//SetBinding(SingleContentLayoutItemProperty, new Binding("Model.SinglePane.SelectedContent") { Source = this, Converter = new LayoutItemFromLayoutModelConverter() });
-
 			_model.RootPanel.ChildrenCollectionChanged += RootPanelOnChildrenCollectionChanged;
 		}
 
 		void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
-			if (e.PropertyName == "RootPanel" &&
-			    _model.RootPanel == null)
-			{
-				InternalClose();
-			}
+			if (e.PropertyName == nameof(LayoutDocumentFloatingWindow.RootPanel) && _model.RootPanel == null) InternalClose();
 		}
 
+		/// <inheritdoc />
 		protected override IntPtr FilterMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
 		{
 			switch (msg)
@@ -145,12 +123,11 @@ namespace AvalonDock.Controls
 							WindowChrome.GetWindowChrome(this).ShowSystemMenu = false;
 					}
 					break;
-
 			}
-
 			return base.FilterMessage(hwnd, msg, wParam, lParam, ref handled);
 		}
 
+		/// <inheritdoc />
 		protected override void OnClosed(EventArgs e)
 		{
 			var root = Model.Root;
@@ -160,21 +137,14 @@ namespace AvalonDock.Controls
 				root.Manager.RemoveFloatingWindow(this);
 				root.CollectGarbage();
 			}
-
 			if (_overlayWindow != null)
 			{
 				_overlayWindow.Close();
 				_overlayWindow = null;
 			}
-
 			base.OnClosed(e);
-
-			if (!CloseInitiatedByUser)
-			{
-				root?.FloatingWindows.Remove(_model);
-			}
-
-			_model.PropertyChanged -= new System.ComponentModel.PropertyChangedEventHandler(_model_PropertyChanged);
+			if (!CloseInitiatedByUser) root?.FloatingWindows.Remove(_model);
+			_model.PropertyChanged -= _model_PropertyChanged;
 		}
 
 		#endregion
@@ -183,27 +153,21 @@ namespace AvalonDock.Controls
 
 		private void RootPanelOnChildrenCollectionChanged(object sender, EventArgs e)
 		{
-			if( _model.RootPanel == null ||_model.RootPanel.Children.Count == 0)
-			{
-				InternalClose();
-			}
+			if (_model.RootPanel == null || _model.RootPanel.Children.Count == 0) InternalClose();
 		}
 
 		private bool OpenContextMenu()
 		{
 			var ctxMenu = _model.Root.Manager.DocumentContextMenu;
-			if (ctxMenu != null && SingleContentLayoutItem != null)
-			{
-				ctxMenu.PlacementTarget = null;
-				ctxMenu.Placement = PlacementMode.MousePoint;
-				ctxMenu.DataContext = SingleContentLayoutItem;
-				ctxMenu.IsOpen = true;
-				return true;
-			}
-
-			return false;
+			if (ctxMenu == null || SingleContentLayoutItem == null) return false;
+			ctxMenu.PlacementTarget = null;
+			ctxMenu.Placement = PlacementMode.MousePoint;
+			ctxMenu.DataContext = SingleContentLayoutItem;
+			ctxMenu.IsOpen = true;
+			return true;
 		}
 
+		/// <inheritdoc />
 		protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
 		{
 			// TODO
@@ -212,28 +176,23 @@ namespace AvalonDock.Controls
 				e.Cancel = true;
 				//_model.Descendents().OfType<LayoutDocument>().ToArray().ForEach<LayoutDocument>((a) => a.Hide());
 			}
-
 			base.OnClosing(e);
 		}
 
 		bool IOverlayWindowHost.HitTest(Point dragPoint)
 		{
-			Rect detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
+			var detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			return detectionRect.Contains(dragPoint);
 		}
 
-		DockingManager IOverlayWindowHost.Manager
-		{
-			get { return _model.Root.Manager; }
-		}
+		DockingManager IOverlayWindowHost.Manager => _model.Root.Manager;
 
 		OverlayWindow _overlayWindow = null;
 
 		void CreateOverlayWindow()
 		{
-			if (_overlayWindow == null)
-				_overlayWindow = new OverlayWindow(this);
-			Rect rectWindow = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
+			if (_overlayWindow == null) _overlayWindow = new OverlayWindow(this);
+			var rectWindow = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			_overlayWindow.Left = rectWindow.Left;
 			_overlayWindow.Top = rectWindow.Top;
 			_overlayWindow.Width = rectWindow.Width;
@@ -246,7 +205,6 @@ namespace AvalonDock.Controls
 			_overlayWindow.Owner = draggingWindow;
 			_overlayWindow.EnableDropTargets();
 			_overlayWindow.Show();
-
 			return _overlayWindow;
 		}
 
@@ -260,55 +218,30 @@ namespace AvalonDock.Controls
 		List<IDropArea> _dropAreas = null;
 		public IEnumerable<IDropArea> GetDropAreas(LayoutFloatingWindowControl draggingWindow)
 		{
-			if (_dropAreas != null)
-				return _dropAreas;
-
+			if (_dropAreas != null) return _dropAreas;
 			_dropAreas = new List<IDropArea>();
-
-			var rootVisual = (Content as FloatingWindowContentHost).RootVisual;
-
+			var rootVisual = ((FloatingWindowContentHost)Content).RootVisual;
 			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>())
-			{
-				_dropAreas.Add(new DropArea<LayoutAnchorablePaneControl>(
-					 areaHost,
-					 DropAreaType.AnchorablePane));
-			}
+				_dropAreas.Add(new DropArea<LayoutAnchorablePaneControl>(areaHost, DropAreaType.AnchorablePane));
 			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutDocumentPaneControl>())
-			{
-				_dropAreas.Add(new DropArea<LayoutDocumentPaneControl>(
-					 areaHost,
-					 DropAreaType.DocumentPane));
-			}
-
+				_dropAreas.Add(new DropArea<LayoutDocumentPaneControl>(areaHost, DropAreaType.DocumentPane));
 			return _dropAreas;
 		}
 
 		#region HideWindowCommand
-		public ICommand HideWindowCommand
-		{
-			get;
-			private set;
-		}
+		public ICommand HideWindowCommand { get; }
 
 		private bool CanExecuteHideWindowCommand(object parameter)
 		{
-			if (Model == null)
-				return false;
-
-			var root = Model.Root;
-			if (root == null)
-				return false;
-
-			var manager = root.Manager;
-			if (manager == null)
-				return false;
+			var root = Model?.Root;
+			var manager = root?.Manager;
+			if (manager == null) return false;
 
 			// TODO check CanHide of anchorables
-			bool canExecute = false;
+			var canExecute = false;
 			foreach (var content in this.Model.Descendents().OfType<LayoutContent>().ToArray())
 			{
-				if ((content is LayoutAnchorable anchorable && !anchorable.CanHide) ||
-					 !content.CanClose)
+				if (content is LayoutAnchorable anchorable && !anchorable.CanHide || !content.CanClose)
 				{
 					canExecute = false;
 					break;
@@ -321,17 +254,13 @@ namespace AvalonDock.Controls
 				//	canExecute = false;
 				//	break;
 				//}
-				if (!(manager.GetLayoutItemFromModel(content) is LayoutItem layoutItem) ||
-							layoutItem.CloseCommand == null ||
-							!layoutItem.CloseCommand.CanExecute(parameter))
+				if (!(manager.GetLayoutItemFromModel(content) is LayoutItem layoutItem) || layoutItem.CloseCommand == null || !layoutItem.CloseCommand.CanExecute(parameter))
 				{
 					canExecute = false;
 					break;
 				}
-
 				canExecute = true;
 			}
-
 			return canExecute;
 		}
 
@@ -348,52 +277,44 @@ namespace AvalonDock.Controls
 		#endregion
 
 		#region CloseWindowCommand
-		public ICommand CloseWindowCommand
-		{
-			get;
-			private set;
-		}
+		public ICommand CloseWindowCommand { get; }
 
-		private bool CanExecuteCloseWindowCommand( object parameter )
+		private bool CanExecuteCloseWindowCommand(object parameter)
 		{
 			var manager = Model?.Root?.Manager;
-			if( manager == null )
-				return false;
+			if (manager == null) return false;
 
 			var canExecute = false;
-			foreach( var document in this.Model.Descendents().OfType<LayoutDocument>().ToArray() )
+			foreach (var document in this.Model.Descendents().OfType<LayoutDocument>().ToArray())
 			{
-				if( !document.CanClose )
+				if (!document.CanClose)
 				{
 					canExecute = false;
 					break;
 				}
 
-				if( !(manager.GetLayoutItemFromModel( document ) is LayoutDocumentItem documentLayoutItem) ||
-				    documentLayoutItem.CloseCommand == null ||
-				    !documentLayoutItem.CloseCommand.CanExecute( parameter ) )
+				if (!(manager.GetLayoutItemFromModel(document) is LayoutDocumentItem documentLayoutItem) || documentLayoutItem.CloseCommand == null || !documentLayoutItem.CloseCommand.CanExecute(parameter))
 				{
 					canExecute = false;
 					break;
 				}
 				canExecute = true;
 			}
-
 			return canExecute;
 		}
 
-		private void OnExecuteCloseWindowCommand( object parameter )
+		private void OnExecuteCloseWindowCommand(object parameter)
 		{
 			var manager = Model.Root.Manager;
-			foreach( var document in this.Model.Descendents().OfType<LayoutDocument>().ToArray() )
+			foreach (var document in this.Model.Descendents().OfType<LayoutDocument>().ToArray())
 			{
-				var documentLayoutItem = manager.GetLayoutItemFromModel( document ) as LayoutDocumentItem;
+				var documentLayoutItem = manager.GetLayoutItemFromModel(document) as LayoutDocumentItem;
 				documentLayoutItem?.CloseCommand.Execute(parameter);
 			}
 		}
 
 		#endregion
 
-    #endregion
-  }
+		#endregion
+	}
 }

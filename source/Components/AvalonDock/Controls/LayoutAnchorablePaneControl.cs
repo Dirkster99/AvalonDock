@@ -15,10 +15,14 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <inheritdoc cref="TabControl"/>
+	/// <inheritdoc cref="ILayoutControl"/>
 	/// <summary>
 	/// Provides a control to display multible (or just one) LayoutAnchorable(s).
 	/// See also <seealso cref="AnchorablePaneTabPanel"/>.
 	/// </summary>
+	/// <seealso cref="TabControl"/>
+	/// <seealso cref="ILayoutControl"/>
 	public class LayoutAnchorablePaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
 	{
 		#region fields
@@ -34,30 +38,19 @@ namespace AvalonDock.Controls
 
 		public LayoutAnchorablePaneControl(LayoutAnchorablePane model)
 		{
-			if (model == null)
-				throw new ArgumentNullException("model");
-
-			_model = model;
-
+			_model = model ?? throw new ArgumentNullException(nameof(model));
 			SetBinding(ItemsSourceProperty, new Binding("Model.Children") { Source = this });
 			SetBinding(FlowDirectionProperty, new Binding("Model.Root.Manager.FlowDirection") { Source = this });
-
-			// Handle SizeChanged event instead of LayoutUpdated. It will exlude fluctuations of Actual size values.
+			// Handle SizeChanged event instead of LayoutUpdated. It will exclude fluctuations of Actual size values.
 			// this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
-			this.SizeChanged += OnSizeChanged;
+			SizeChanged += OnSizeChanged;
 		}
 
 		#endregion Constructors
 
 		#region Properties
 
-		public ILayoutElement Model
-		{
-			get
-			{
-				return _model;
-			}
-		}
+		public ILayoutElement Model => _model;
 
 		#endregion Properties
 
@@ -65,29 +58,20 @@ namespace AvalonDock.Controls
 
 		protected override void OnGotKeyboardFocus(System.Windows.Input.KeyboardFocusChangedEventArgs e)
 		{
-			if ((_model != null) && (_model.SelectedContent != null))
-			{
-				_model.SelectedContent.IsActive = true;
-			}
-
+			if (_model?.SelectedContent != null) _model.SelectedContent.IsActive = true;
 			base.OnGotKeyboardFocus(e);
 		}
 
 		protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonDown(e);
-
-			if (!e.Handled && (_model != null) && _model.SelectedContent != null)
-				_model.SelectedContent.IsActive = true;
+			if (!e.Handled && _model?.SelectedContent != null) _model.SelectedContent.IsActive = true;
 		}
 
 		protected override void OnMouseRightButtonDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseRightButtonDown(e);
-
-			if (!e.Handled && (_model != null) && _model.SelectedContent != null)
-				_model.SelectedContent.IsActive = true;
-
+			if (!e.Handled && _model?.SelectedContent != null) _model.SelectedContent.IsActive = true;
 		}
 
 		#endregion Overrides

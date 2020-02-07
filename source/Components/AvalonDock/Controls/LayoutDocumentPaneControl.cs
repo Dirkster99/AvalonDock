@@ -15,11 +15,15 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <inheritdoc cref="TabControl"/>
+	/// <inheritdoc cref="ILayoutControl"/>
 	/// <summary>
 	/// Implements the document container control with the
 	/// TabItem Header (<see cref="LayoutDocumentTabItem"/>) that contains the document titles
 	/// inside the <see cref="DocumentPaneTabPanel"/>.
 	/// </summary>
+	/// <seealso cref="TabControl"/>
+	/// <seealso cref="ILayoutControl"/>
 	public class LayoutDocumentPaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
 	{
 		#region fields
@@ -27,28 +31,20 @@ namespace AvalonDock.Controls
 		#endregion fields
 
 		#region Constructors
-		/// <summary>
-		/// Static class constructor to register WPF style keys.
-		/// </summary>
+		/// <summary>Static class constructor to register WPF style keys.</summary>
 		static LayoutDocumentPaneControl()
 		{
 			FocusableProperty.OverrideMetadata(typeof(LayoutDocumentPaneControl), new FrameworkPropertyMetadata(false));
 		}
 
-		/// <summary>
-		/// Class constructor from model parameter.
-		/// </summary>
+		/// <summary>Class constructor from model parameter.</summary>
 		/// <param name="model"></param>
 		internal LayoutDocumentPaneControl(LayoutDocumentPane model)
 		{
-			if (model == null)
-				throw new ArgumentNullException("model");
-
-			_model = model;
+			_model = model ?? throw new ArgumentNullException(nameof(model));
 			SetBinding(ItemsSourceProperty, new Binding("Model.Children") { Source = this });
 			SetBinding(FlowDirectionProperty, new Binding("Model.Root.Manager.FlowDirection") { Source = this });
-
-			// Handle SizeChanged event instead of LayoutUpdated. It will exlude fluctuations of Actual size values.
+			// Handle SizeChanged event instead of LayoutUpdated. It will exclude fluctuations of Actual size values.
 			// this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
 			this.SizeChanged += OnSizeChanged;
 		}
@@ -56,13 +52,7 @@ namespace AvalonDock.Controls
 
 		#region Properties
 
-		public ILayoutElement Model
-		{
-			get
-			{
-				return _model;
-			}
-		}
+		public ILayoutElement Model => _model;
 
 		#endregion Properties
 
@@ -71,7 +61,6 @@ namespace AvalonDock.Controls
 		protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonDown(e);
-
 			if (!e.Handled && _model.SelectedContent != null)
 				_model.SelectedContent.IsActive = true;
 		}
@@ -79,10 +68,8 @@ namespace AvalonDock.Controls
 		protected override void OnMouseRightButtonDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseRightButtonDown(e);
-
 			if (!e.Handled && _model.SelectedContent != null)
 				_model.SelectedContent.IsActive = true;
-
 		}
 
 		#endregion Overrides

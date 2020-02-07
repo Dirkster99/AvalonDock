@@ -13,12 +13,14 @@ using System.Windows;
 
 namespace AvalonDock.Converters
 {
+	/// <inheritdoc />
 	/// <summary>
 	/// Converts a bool value into a <see cref="Visibility"/> value and back.
 	/// </summary>
 	[ValueConversion(typeof(bool), typeof(Visibility))]
 	public class BoolToVisibilityConverter : IValueConverter
 	{
+		/// <inheritdoc />
 		/// <summary>
 		/// Converts a bool value into a <see cref="Visibility"/> value.
 		/// </summary>
@@ -31,29 +33,22 @@ namespace AvalonDock.Converters
 		/// </returns>
 		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
-			if (value is bool && targetType == typeof(Visibility))
+			switch (value)
 			{
-				bool val = (bool)value;
-				if (val)
+				case bool val when targetType == typeof(Visibility):
+					if (val) return Visibility.Visible;
+					return parameter is Visibility ? parameter : Visibility.Collapsed;
+				case null when parameter is Visibility:
+					return parameter;
+				case null:
+					return Visibility.Collapsed;
+				default:
 					return Visibility.Visible;
-				else
-					if (parameter != null && parameter is Visibility)
-					return parameter;
-				else
-					return Visibility.Collapsed;
+					///throw new ArgumentException("Invalid argument/return type. Expected argument: bool and return type: Visibility");
 			}
-			if (value == null)
-			{
-				if (parameter != null && parameter is Visibility)
-					return parameter;
-				else
-					return Visibility.Collapsed;
-			}
-
-			return Visibility.Visible;
-			///throw new ArgumentException("Invalid argument/return type. Expected argument: bool and return type: Visibility");
 		}
 
+		/// <inheritdoc />
 		/// <summary> 
 		/// Converts a <see cref="Visibility"/> value into a bool value.
 		/// </summary> 
@@ -66,15 +61,9 @@ namespace AvalonDock.Converters
 		/// </returns> 
 		public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
-			if (value is Visibility && targetType == typeof(bool))
-			{
-				Visibility val = (Visibility)value;
-				if (val == Visibility.Visible)
-					return true;
-				else
-					return false;
-			}
-			throw new ArgumentException("Invalid argument/return type. Expected argument: Visibility and return type: bool");
+			if (!(value is Visibility)) throw new ArgumentException("Invalid argument type. Expected argument: Visibility.", nameof(value));
+			if (targetType != typeof(bool)) throw new ArgumentException("Invalid return type. Expected type: bool", nameof(targetType));
+			return (Visibility)value == Visibility.Visible;
 		}
 	}
 }
