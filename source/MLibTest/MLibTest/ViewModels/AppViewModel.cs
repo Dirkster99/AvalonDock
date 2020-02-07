@@ -122,8 +122,7 @@
 		/// </summary>
 		public ThemeViewModel AppTheme
 		{
-			get { return _AppTheme; }
-
+			get => _AppTheme;
 			private set
 			{
 				if (_AppTheme != value)

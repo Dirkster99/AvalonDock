@@ -128,8 +128,7 @@
 		/// </summary>
 		public FileViewModel ActiveDocument
 		{
-			get { return _activeDocument; }
-
+			get => _activeDocument;
 			set             // This can also be set by the user via the view
 			{
 				if (_activeDocument != value)

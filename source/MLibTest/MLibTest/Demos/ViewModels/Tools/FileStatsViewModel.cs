@@ -64,8 +64,7 @@
 		/// </summary>
 		public long FileSize
 		{
-			get { return _fileSize; }
-
+			get => _fileSize;
 			protected set
 			{
 				if (_fileSize != value)
@@ -81,8 +80,7 @@
 		/// </summary>
 		public DateTime LastModified
 		{
-			get { return _lastModified; }
-
+			get => _lastModified;
 			protected set
 			{
 				if (_lastModified != value)

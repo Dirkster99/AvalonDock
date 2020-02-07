@@ -97,7 +97,7 @@ namespace AvalonDock.MVVMTestApp
 
 		public FileViewModel ActiveDocument
 		{
-			get { return _activeDocument; }
+			get => _activeDocument;
 			set
 			{
 				if (_activeDocument != value)

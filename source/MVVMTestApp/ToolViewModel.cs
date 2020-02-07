@@ -23,7 +23,7 @@
 
 		public bool IsVisible
 		{
-			get { return _isVisible; }
+			get => _isVisible;
 			set
 			{
 				if (_isVisible != value)

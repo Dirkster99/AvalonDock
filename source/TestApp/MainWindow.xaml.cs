@@ -70,8 +70,8 @@ namespace TestApp
 		/// </summary>
 		public int TestTimer
 		{
-			get { return (int)GetValue(TestTimerProperty); }
-			set { SetValue(TestTimerProperty, value); }
+			get => (int)GetValue(TestTimerProperty);
+			set => SetValue(TestTimerProperty, value);
 		}
 
 		#endregion
@@ -91,8 +91,8 @@ namespace TestApp
 		/// </summary>
 		public Brush TestBackground
 		{
-			get { return (Brush)GetValue(TestBackgroundProperty); }
-			set { SetValue(TestBackgroundProperty, value); }
+			get => (Brush)GetValue(TestBackgroundProperty);
+			set => SetValue(TestBackgroundProperty, value);
 		}
 
 		#endregion
@@ -112,8 +112,8 @@ namespace TestApp
 		/// </summary>
 		public string FocusedElement
 		{
-			get { return (string)GetValue(FocusedElementProperty); }
-			set { SetValue(FocusedElementProperty, value); }
+			get => (string)GetValue(FocusedElementProperty);
+			set => SetValue(FocusedElementProperty, value);
 		}
 
 		#endregion
