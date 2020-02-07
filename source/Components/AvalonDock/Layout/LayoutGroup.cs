@@ -15,6 +15,11 @@ using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>
+	/// Provides a base class for layout anchorable (group and non-group) related classes
+	/// that implement the viewmodel aspect for layout anchorable controls.
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	[Serializable]
 	public abstract class LayoutGroup<T> : LayoutGroupBase, ILayoutGroup, IXmlSerializable where T : class, ILayoutElement
 	{
@@ -24,7 +29,7 @@ namespace AvalonDock.Layout
 		#endregion fields
 
 		#region Constructors
-
+		/// <summary>Class constructor.</summary>
 		internal LayoutGroup()
 		{
 			_children.CollectionChanged += _children_CollectionChanged;
@@ -33,9 +38,16 @@ namespace AvalonDock.Layout
 		#endregion Constructors
 
 		#region Properties
-
+		/// <summary>Gets a collection of children objects below this object.</summary>
 		public ObservableCollection<T> Children => _children;
 
+		/// <summary>Gets the number of of children objects below this object.</summary>
+		public int ChildrenCount => _children.Count;
+
+		/// <summary>Gets a collection of <see cref="ILayoutElement"/> based children objects below this object.</summary>
+		IEnumerable<ILayoutElement> ILayoutContainer.Children => _children.Cast<ILayoutElement>();
+
+		/// <summary>Gets whether this object is visible or not.</summary>
 		public bool IsVisible
 		{
 			get => _isVisible;
@@ -49,15 +61,13 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		public int ChildrenCount => _children.Count;
-
 		#endregion Properties
 
 		#region Public Methods
-		IEnumerable<ILayoutElement> ILayoutContainer.Children => _children.Cast<ILayoutElement>();
-
+		/// <inheritdoc cref="ILayoutElementWithVisibility" />
 		public void ComputeVisibility() => IsVisible = GetVisibility();
 
+		/// <inheritdoc cref="ILayoutPane" />
 		public void MoveChild(int oldIndex, int newIndex)
 		{
 			if (oldIndex == newIndex) return;
@@ -65,26 +75,31 @@ namespace AvalonDock.Layout
 			ChildMoved(oldIndex, newIndex);
 		}
 
+		/// <inheritdoc cref="ILayoutGroup" />
 		public void RemoveChildAt(int childIndex)
 		{
 			_children.RemoveAt(childIndex);
 		}
 
+		/// <inheritdoc cref="ILayoutGroup" />
 		public int IndexOfChild(ILayoutElement element)
 		{
 			return _children.Cast<ILayoutElement>().ToList().IndexOf(element);
 		}
 
+		/// <inheritdoc cref="ILayoutGroup" />
 		public void InsertChildAt(int index, ILayoutElement element)
 		{
 			_children.Insert(index, (T)element);
 		}
 
+		/// <inheritdoc cref="ILayoutContainer" />
 		public void RemoveChild(ILayoutElement element)
 		{
 			_children.Remove((T)element);
 		}
 
+		/// <inheritdoc cref="ILayoutContainer" />
 		public void ReplaceChild(ILayoutElement oldElement, ILayoutElement newElement)
 		{
 			var index = _children.IndexOf((T)oldElement);
@@ -92,15 +107,17 @@ namespace AvalonDock.Layout
 			_children.RemoveAt(index + 1);
 		}
 
+		/// <inheritdoc cref="ILayoutGroup" />
 		public void ReplaceChildAt(int index, ILayoutElement element)
 		{
 			_children[index] = (T)element;
 		}
 
-		/// <inheritdoc />
-		public System.Xml.Schema.XmlSchema GetSchema() => null;
+		/// <inheritdoc cref=" IXmlSerializable." />
+		System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() => null;
 
-		/// <inheritdoc />
+		/// <inheritdoc cref=" IXmlSerializable." />
+		/// <summary>provides a standard overridable implmentation for derriving classes.</summary>
 		public virtual void ReadXml(System.Xml.XmlReader reader)
 		{
 			reader.MoveToContent();
@@ -156,7 +173,8 @@ namespace AvalonDock.Layout
 			reader.ReadEndElement();
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc cref=" IXmlSerializable." />
+		/// <summary>provides a standard overridable implmentation for derriving classes.</summary>
 		public virtual void WriteXml(System.Xml.XmlWriter writer)
 		{
 			foreach (var child in Children)
