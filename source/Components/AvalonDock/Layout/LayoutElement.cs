@@ -79,7 +79,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		/// <summary>Gets or sets the root of the element.</summary>
+		/// <summary>Gets or sets the layout root of the element.</summary>
 		public ILayoutRoot Root
 		{
 			get

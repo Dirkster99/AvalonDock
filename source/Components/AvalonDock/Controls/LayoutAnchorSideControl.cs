@@ -32,12 +32,13 @@ namespace AvalonDock.Controls
 		#endregion fields
 
 		#region Constructors
-
+		/// <summary>Static class constructor</summary>
 		static LayoutAnchorSideControl()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutAnchorSideControl), new FrameworkPropertyMetadata(typeof(LayoutAnchorSideControl)));
 		}
 
+		/// <summary>Class constructor from <see cref="LayoutAnchorSide"/> model.</summary>
 		internal LayoutAnchorSideControl(LayoutAnchorSide model)
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));

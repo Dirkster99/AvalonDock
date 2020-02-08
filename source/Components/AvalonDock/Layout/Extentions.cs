@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>Provides extension methods for WPF specific (Visual Tree) capabilities.</summary>
 	public static class Extensions
 	{
 		#region Public Methods
