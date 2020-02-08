@@ -13,6 +13,10 @@ using System.Windows.Markup;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>
+	/// Implements an element in the layout model that can contain and organize multiple
+	/// <see cref="LayoutDocumentPane"/> elements, which in turn contain <see cref="LayoutDocument"/> elements.
+	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
 	public class LayoutDocumentPaneGroup : LayoutPositionableGroup<ILayoutDocumentPane>, ILayoutDocumentPane, ILayoutOrientableGroup
@@ -22,11 +26,12 @@ namespace AvalonDock.Layout
 		#endregion fields
 
 		#region Constructors
-
+		/// <summary>Class constructor</summary>
 		public LayoutDocumentPaneGroup()
 		{
 		}
 
+		/// <summary>Class constructor from <paramref name="documentPane"/> that is added into the children collection of this object.</summary>
 		public LayoutDocumentPaneGroup(LayoutDocumentPane documentPane)
 		{
 			Children.Add(documentPane);
@@ -35,7 +40,7 @@ namespace AvalonDock.Layout
 		#endregion Constructors
 
 		#region Properties
-
+		/// <summary>Gets/sets the (Horizontal, Vertical) <see cref="System.Windows.Controls.Orientation"/> of this group.</summary>
 		public Orientation Orientation
 		{
 			get => _orientation;
@@ -62,6 +67,7 @@ namespace AvalonDock.Layout
 			base.WriteXml(writer);
 		}
 
+		/// <inheritdoc />
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
 			if (reader.MoveToAttribute(nameof(Orientation))) Orientation = (Orientation)Enum.Parse(typeof(Orientation), reader.Value, true);
@@ -69,6 +75,7 @@ namespace AvalonDock.Layout
 		}
 
 #if TRACE
+		/// <inheritdoc />
 		public override void ConsoleDump(int tab)
 		{
 			System.Diagnostics.Trace.Write(new string(' ', tab * 4));
