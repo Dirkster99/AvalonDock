@@ -29,6 +29,14 @@ namespace AvalonDock.Layout
 
 		#region Internal Methods
 
+		internal void RaiseChildrenTreeChanged()
+		{
+			OnChildrenTreeChanged(ChildrenTreeChange.DirectChildrenChanged);
+			var parentGroup = Parent as LayoutGroupBase;
+			if (parentGroup != null)
+				parentGroup.RaiseChildrenTreeChanged();
+		}
+
 		protected virtual void OnChildrenCollectionChanged()
 		{
 			if (ChildrenCollectionChanged != null)
@@ -41,14 +49,6 @@ namespace AvalonDock.Layout
 			var parentGroup = Parent as LayoutGroupBase;
 			if (parentGroup != null)
 				parentGroup.NotifyChildrenTreeChanged(ChildrenTreeChange.TreeChanged);
-		}
-
-		internal void RaiseChildrenTreeChanged()
-		{
-			OnChildrenTreeChanged(ChildrenTreeChange.DirectChildrenChanged);
-			var parentGroup = Parent as LayoutGroupBase;
-			if (parentGroup != null)
-				parentGroup.RaiseChildrenTreeChanged();
 		}
 
 		protected virtual void OnChildrenTreeChanged(ChildrenTreeChange change)
