@@ -330,7 +330,7 @@ namespace AvalonDock.Controls
 		#endregion
 
 		#region IOverlayWindow
-
+		/// <inheritdoc cref="IOverlayWindow"/>
 		IEnumerable<IDropTarget> IOverlayWindow.GetTargets()
 		{
 			foreach (var visibleArea in _visibleAreas)
@@ -474,18 +474,21 @@ namespace AvalonDock.Controls
 			yield break;
 		}
 
+		/// <inheritdoc cref="IOverlayWindow"/>
 		void IOverlayWindow.DragEnter(LayoutFloatingWindowControl floatingWindow)
 		{
 			_floatingWindow = floatingWindow;
 			EnableDropTargets();
 		}
 
+		/// <inheritdoc cref="IOverlayWindow"/>
 		void IOverlayWindow.DragLeave(LayoutFloatingWindowControl floatingWindow)
 		{
 			Visibility = System.Windows.Visibility.Hidden;
 			_floatingWindow = null;
 		}
 
+		/// <inheritdoc cref="IOverlayWindow"/>
 		void IOverlayWindow.DragEnter(IDropArea area)
 		{
 			var floatingWindowManager = _floatingWindow.Model.Root.Manager;
@@ -695,6 +698,7 @@ namespace AvalonDock.Controls
 			areaElement.Visibility = System.Windows.Visibility.Visible;
 		}
 
+		/// <inheritdoc cref="IOverlayWindow"/>
 		void IOverlayWindow.DragLeave(IDropArea area)
 		{
 			_visibleAreas.Remove(area);
@@ -726,6 +730,7 @@ namespace AvalonDock.Controls
 			areaElement.Visibility = System.Windows.Visibility.Hidden;
 		}
 
+		/// <inheritdoc cref="IOverlayWindow"/>
 		void IOverlayWindow.DragEnter(IDropTarget target)
 		{
 			var previewBoxPath = target.GetPreviewPath(this, _floatingWindow.Model as LayoutFloatingWindow);
@@ -736,11 +741,13 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <inheritdoc cref="IOverlayWindow"/>
 		void IOverlayWindow.DragLeave(IDropTarget target)
 		{
 			_previewBox.Visibility = System.Windows.Visibility.Hidden;
 		}
 
+		/// <inheritdoc cref="IOverlayWindow"/>
 		void IOverlayWindow.DragDrop(IDropTarget target)
 		{
 			target.Drop(_floatingWindow.Model as LayoutFloatingWindow);
