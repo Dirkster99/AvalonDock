@@ -15,32 +15,20 @@ namespace AvalonDock
 {
 	internal static class Win32Helper
 	{
-		[DllImport("user32.dll", EntryPoint = "CreateWindowEx", CharSet = CharSet.Unicode)]
-		internal static extern IntPtr CreateWindowEx(int dwExStyle,
-													  string lpszClassName,
-													  string lpszWindowName,
-													  int style,
-													  int x, int y,
-													  int width, int height,
-													  IntPtr hwndParent,
-													  IntPtr hMenu,
-													  IntPtr hInst,
-													  [MarshalAs(UnmanagedType.AsAny)] object pvParam);
 		internal const int
-			  WS_CHILD = 0x40000000,
-			  WS_VISIBLE = 0x10000000,
-			  WS_VSCROLL = 0x00200000,
-			  WS_BORDER = 0x00800000,
-			  WS_CLIPSIBLINGS = 0x04000000,
-			  WS_CLIPCHILDREN = 0x02000000,
-			  WS_TABSTOP = 0x00010000,
-			  WS_GROUP = 0x00020000;
+				  WS_CHILD = 0x40000000,
+				  WS_VISIBLE = 0x10000000,
+				  WS_VSCROLL = 0x00200000,
+				  WS_BORDER = 0x00800000,
+				  WS_CLIPSIBLINGS = 0x04000000,
+				  WS_CLIPCHILDREN = 0x02000000,
+				  WS_TABSTOP = 0x00010000,
+				  WS_GROUP = 0x00020000;
 
 
-		/// <summary>
-		/// SetWindowPos Flags
-		/// </summary>
-		[Flags()]
+		/// <summary>SetWindowPos Flags.</summary>
+		/// <seealso href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowpos"/>
+		[Flags]
 		internal enum SetWindowPosFlags : uint
 		{
 			/// <summary>If the calling thread and the thread that owns the window are attached to different input queues,
@@ -208,7 +196,7 @@ namespace AvalonDock
 		public static extern uint GetCurrentThreadId();
 
 		public delegate int HookProc(int code, IntPtr wParam,
-		   IntPtr lParam);
+			IntPtr lParam);
 
 		[DllImport("user32.dll")]
 		public static extern IntPtr SetWindowsHookEx(HookType code,

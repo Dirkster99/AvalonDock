@@ -72,10 +72,7 @@ namespace Standard
 
 	internal static partial class CLSID
 	{
-		public static T CoCreateInstance<T>(string clsid)
-		{
-			return (T)System.Activator.CreateInstance(System.Type.GetTypeFromCLSID(new System.Guid(clsid)));
-		}
+		public static T CoCreateInstance<T>(string clsid) => (T)System.Activator.CreateInstance(System.Type.GetTypeFromCLSID(new System.Guid(clsid)));
 
 		/// <summary>CLSID_TaskbarList</summary>
 		/// <remarks>IID_ITaskbarList</remarks>

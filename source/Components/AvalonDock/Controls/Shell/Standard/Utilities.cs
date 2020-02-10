@@ -40,28 +40,19 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		private static bool _MemCmp(IntPtr left, IntPtr right, long cb)
 		{
-			int offset = 0;
-
-			for (; offset < (cb - sizeof(Int64)); offset += sizeof(Int64))
+			var offset = 0;
+			for (; offset < cb - sizeof(Int64); offset += sizeof(Int64))
 			{
-				Int64 left64 = Marshal.ReadInt64(left, offset);
-				Int64 right64 = Marshal.ReadInt64(right, offset);
-
-				if (left64 != right64)
-				{
-					return false;
-				}
+				var left64 = Marshal.ReadInt64(left, offset);
+				var right64 = Marshal.ReadInt64(right, offset);
+				if (left64 != right64) return false;
 			}
 
 			for (; offset < cb; offset += sizeof(byte))
 			{
-				byte left8 = Marshal.ReadByte(left, offset);
-				byte right8 = Marshal.ReadByte(right, offset);
-
-				if (left8 != right8)
-				{
-					return false;
-				}
+				var left8 = Marshal.ReadByte(left, offset);
+				var right8 = Marshal.ReadByte(right, offset);
+				if (left8 != right8) return false;
 			}
 
 			return true;
@@ -71,70 +62,34 @@ namespace Standard
 		/// <param name="c"></param>
 		/// <returns></returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static int RGB(Color c)
-		{
-			return c.R | (c.G << 8) | (c.B << 16);
-		}
+		public static int RGB(Color c) => c.R | (c.G << 8) | (c.B << 16);
 
 		/// <summary>Convert a native integer that represent a color with an alpha channel into a Color struct.</summary>
 		/// <param name="color">The integer that represents the color.  Its bits are of the format 0xAARRGGBB.</param>
 		/// <returns>A Color representation of the parameter.</returns>
-		public static Color ColorFromArgbDword(uint color)
-		{
-			return Color.FromArgb(
-				(byte)((color & 0xFF000000) >> 24),
-				(byte)((color & 0x00FF0000) >> 16),
-				(byte)((color & 0x0000FF00) >> 8),
-				(byte)((color & 0x000000FF) >> 0));
-		}
+		public static Color ColorFromArgbDword(uint color) => Color.FromArgb((byte)((color & 0xFF000000) >> 24), (byte)((color & 0x00FF0000) >> 16), (byte)((color & 0x0000FF00) >> 8), (byte)((color & 0x000000FF) >> 0));
 
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static int GET_X_LPARAM(IntPtr lParam)
-		{
-			return LOWORD(lParam.ToInt32());
-		}
+		public static int GET_X_LPARAM(IntPtr lParam) => LOWORD(lParam.ToInt32());
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static int GET_Y_LPARAM(IntPtr lParam)
-		{
-			return HIWORD(lParam.ToInt32());
-		}
+		public static int GET_Y_LPARAM(IntPtr lParam) => HIWORD(lParam.ToInt32());
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static int HIWORD(int i)
-		{
-			return (short)(i >> 16);
-		}
+		public static int HIWORD(int i) => (short)(i >> 16);
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static int LOWORD(int i)
-		{
-			return (short)(i & 0xFFFF);
-		}
+		public static int LOWORD(int i) => (short)(i & 0xFFFF);
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public static bool AreStreamsEqual(Stream left, Stream right)
 		{
-			if (null == left)
-			{
-				return right == null;
-			}
-			if (null == right)
-			{
-				return false;
-			}
-
-			if (!left.CanRead || !right.CanRead)
-			{
-				throw new NotSupportedException("The streams can't be read for comparison");
-			}
-
-			if (left.Length != right.Length)
-			{
-				return false;
-			}
+			if (left == null) return right == null;
+			if (right == null) return false;
+			if (!left.CanRead || !right.CanRead) throw new NotSupportedException("The streams can't be read for comparison");
+			if (left.Length != right.Length) return false;
 
 			var length = (int)left.Length;
 
@@ -143,53 +98,41 @@ namespace Standard
 			right.Position = 0;
 
 			// total bytes read
-			int totalReadLeft = 0;
-			int totalReadRight = 0;
+			var totalReadLeft = 0;
+			var totalReadRight = 0;
 
 			// bytes read on this iteration
-			int cbReadLeft = 0;
-			int cbReadRight = 0;
+			var cbReadLeft = 0;
+			var cbReadRight = 0;
 
 			// where to store the read data
 			var leftBuffer = new byte[512];
 			var rightBuffer = new byte[512];
 
 			// pin the left buffer
-			GCHandle handleLeft = GCHandle.Alloc(leftBuffer, GCHandleType.Pinned);
-			IntPtr ptrLeft = handleLeft.AddrOfPinnedObject();
+			var handleLeft = GCHandle.Alloc(leftBuffer, GCHandleType.Pinned);
+			var ptrLeft = handleLeft.AddrOfPinnedObject();
 
 			// pin the right buffer
-			GCHandle handleRight = GCHandle.Alloc(rightBuffer, GCHandleType.Pinned);
-			IntPtr ptrRight = handleRight.AddrOfPinnedObject();
+			var handleRight = GCHandle.Alloc(rightBuffer, GCHandleType.Pinned);
+			var ptrRight = handleRight.AddrOfPinnedObject();
 
 			try
 			{
 				while (totalReadLeft < length)
 				{
 					Assert.AreEqual(totalReadLeft, totalReadRight);
-
 					cbReadLeft = left.Read(leftBuffer, 0, leftBuffer.Length);
 					cbReadRight = right.Read(rightBuffer, 0, rightBuffer.Length);
-
 					// verify the contents are an exact match
-					if (cbReadLeft != cbReadRight)
-					{
-						return false;
-					}
-
-					if (!_MemCmp(ptrLeft, ptrRight, cbReadLeft))
-					{
-						return false;
-					}
-
+					if (cbReadLeft != cbReadRight) return false;
+					if (!_MemCmp(ptrLeft, ptrRight, cbReadLeft)) return false;
 					totalReadLeft += cbReadLeft;
 					totalReadRight += cbReadRight;
 				}
-
 				Assert.AreEqual(cbReadLeft, cbReadRight);
 				Assert.AreEqual(totalReadLeft, totalReadRight);
 				Assert.AreEqual(length, totalReadLeft);
-
 				return true;
 			}
 			finally
@@ -202,8 +145,7 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static bool GuidTryParse(string guidString, out Guid guid)
 		{
-			Verify.IsNeitherNullNorEmpty(guidString, "guidString");
-
+			Verify.IsNeitherNullNorEmpty(guidString, nameof(guidString));
 			try
 			{
 				guid = new Guid(guidString);
@@ -221,55 +163,25 @@ namespace Standard
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static bool IsFlagSet(int value, int mask)
-		{
-			return 0 != (value & mask);
-		}
+		public static bool IsFlagSet(int value, int mask) => (value & mask) != 0;
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static bool IsFlagSet(uint value, uint mask)
-		{
-			return 0 != (value & mask);
-		}
+		public static bool IsFlagSet(uint value, uint mask) => (value & mask) != 0;
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static bool IsFlagSet(long value, long mask)
-		{
-			return 0 != (value & mask);
-		}
+		public static bool IsFlagSet(long value, long mask) => (value & mask) != 0;
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static bool IsFlagSet(ulong value, ulong mask)
-		{
-			return 0 != (value & mask);
-		}
+		public static bool IsFlagSet(ulong value, ulong mask) => (value & mask) != 0;
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static bool IsOSVistaOrNewer
-		{
-			get
-			{
-				return _osVersion >= new Version(6, 0);
-			}
-		}
+		public static bool IsOSVistaOrNewer => _osVersion >= new Version(6, 0);
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static bool IsOSWindows7OrNewer
-		{
-			get
-			{
-				return _osVersion >= new Version(6, 1);
-			}
-		}
+		public static bool IsOSWindows7OrNewer => _osVersion >= new Version(6, 1);
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static bool IsOSWindows8OrNewer
-		{
-			get
-			{
-				return _osVersion >= new Version(6, 2);
-			}
-		}
+		public static bool IsOSWindows8OrNewer => _osVersion >= new Version(6, 2);
 
 		/// <summary>
 		/// Is this using WPF4?
@@ -278,13 +190,7 @@ namespace Standard
 		/// There are a few specific bugs in Window in 3.5SP1 and below that require workarounds
 		/// when handling WM_NCCALCSIZE on the HWND.
 		/// </remarks>
-		public static bool IsPresentationFrameworkVersionLessThan4
-		{
-			get
-			{
-				return _presentationFrameworkVersion < new Version(4, 0);
-			}
-		}
+		public static bool IsPresentationFrameworkVersionLessThan4 => _presentationFrameworkVersion < new Version(4, 0);
 
 		// Caller is responsible for destroying the HICON
 		// Caller is responsible to ensure that GDI+ has been initialized.
@@ -292,46 +198,36 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static IntPtr GenerateHICON(ImageSource image, Size dimensions)
 		{
-			if (image == null)
-			{
-				return IntPtr.Zero;
-			}
+			if (image == null) return IntPtr.Zero;
 
 			// If we're getting this from a ".ico" resource, then it comes through as a BitmapFrame.
 			// We can use leverage this as a shortcut to get the right 16x16 representation
 			// because DrawImage doesn't do that for us.
-			var bf = image as BitmapFrame;
-			if (bf != null)
-			{
+			if (image is BitmapFrame bf)
 				bf = GetBestMatch(bf.Decoder.Frames, (int)dimensions.Width, (int)dimensions.Height);
-			}
 			else
 			{
 				// Constrain the dimensions based on the aspect ratio.
 				var drawingDimensions = new Rect(0, 0, dimensions.Width, dimensions.Height);
-
 				// There's no reason to assume that the requested image dimensions are square.
-				double renderRatio = dimensions.Width / dimensions.Height;
-				double aspectRatio = image.Width / image.Height;
-
+				var renderRatio = dimensions.Width / dimensions.Height;
+				var aspectRatio = image.Width / image.Height;
 				// If it's smaller than the requested size, then place it in the middle and pad the image.
 				if (image.Width <= dimensions.Width && image.Height <= dimensions.Height)
-				{
 					drawingDimensions = new Rect((dimensions.Width - image.Width) / 2, (dimensions.Height - image.Height) / 2, image.Width, image.Height);
-				}
 				else if (renderRatio > aspectRatio)
 				{
-					double scaledRenderWidth = (image.Width / image.Height) * dimensions.Width;
+					var scaledRenderWidth = image.Width / image.Height * dimensions.Width;
 					drawingDimensions = new Rect((dimensions.Width - scaledRenderWidth) / 2, 0, scaledRenderWidth, dimensions.Height);
 				}
 				else if (renderRatio < aspectRatio)
 				{
-					double scaledRenderHeight = (image.Height / image.Width) * dimensions.Height;
+					var scaledRenderHeight = image.Height / image.Width * dimensions.Height;
 					drawingDimensions = new Rect(0, (dimensions.Height - scaledRenderHeight) / 2, dimensions.Width, scaledRenderHeight);
 				}
 
 				var dv = new DrawingVisual();
-				DrawingContext dc = dv.RenderOpen();
+				var dc = dv.RenderOpen();
 				dc.DrawImage(image, drawingDimensions);
 				dc.Close();
 
@@ -342,33 +238,22 @@ namespace Standard
 
 			// Using GDI+ to convert to an HICON.
 			// I'd rather not duplicate their code.
-			using (MemoryStream memstm = new MemoryStream())
+			using (var memstm = new MemoryStream())
 			{
 				BitmapEncoder enc = new PngBitmapEncoder();
 				enc.Frames.Add(bf);
 				enc.Save(memstm);
-
 				using (var istm = new ManagedIStream(memstm))
 				{
 					// We are not bubbling out GDI+ errors when creating the native image fails.
-					IntPtr bitmap = IntPtr.Zero;
+					var bitmap = IntPtr.Zero;
 					try
 					{
-						Status gpStatus = NativeMethods.GdipCreateBitmapFromStream(istm, out bitmap);
-						if (Status.Ok != gpStatus)
-						{
-							return IntPtr.Zero;
-						}
-
-						IntPtr hicon;
-						gpStatus = NativeMethods.GdipCreateHICONFromBitmap(bitmap, out hicon);
-						if (Status.Ok != gpStatus)
-						{
-							return IntPtr.Zero;
-						}
-
+						var gpStatus = NativeMethods.GdipCreateBitmapFromStream(istm, out bitmap);
+						if (Status.Ok != gpStatus) return IntPtr.Zero;
+						gpStatus = NativeMethods.GdipCreateHICONFromBitmap(bitmap, out var hicon);
+						return Status.Ok != gpStatus ? IntPtr.Zero : hicon;
 						// Caller is responsible for freeing this.
-						return hicon;
 					}
 					finally
 					{
@@ -378,30 +263,19 @@ namespace Standard
 			}
 		}
 
-		public static BitmapFrame GetBestMatch(IList<BitmapFrame> frames, int width, int height)
-		{
-			return _GetBestMatch(frames, _GetBitDepth(), width, height);
-		}
+		public static BitmapFrame GetBestMatch(IList<BitmapFrame> frames, int width, int height) => _GetBestMatch(frames, _GetBitDepth(), width, height);
 
 		private static int _MatchImage(BitmapFrame frame, int bitDepth, int width, int height, int bpp)
 		{
-			int score = 2 * _WeightedAbs(bpp, bitDepth, false) +
-					_WeightedAbs(frame.PixelWidth, width, true) +
-					_WeightedAbs(frame.PixelHeight, height, true);
-
-			return score;
+			return 2 * _WeightedAbs(bpp, bitDepth, false) +
+							_WeightedAbs(frame.PixelWidth, width, true) +
+							_WeightedAbs(frame.PixelHeight, height, true);
 		}
 
 		private static int _WeightedAbs(int valueHave, int valueWant, bool fPunish)
 		{
-			int diff = (valueHave - valueWant);
-
-			if (diff < 0)
-			{
-				diff = (fPunish ? -2 : -1) * diff;
-			}
-
-			return diff;
+			var diff = valueHave - valueWant;
+			return diff >= 0 ? diff : (fPunish ? -2 : -1) * diff;
 		}
 
 		/// From a list of BitmapFrames find the one that best matches the requested dimensions.
@@ -409,22 +283,15 @@ namespace Standard
 		/// system behaviors.
 		private static BitmapFrame _GetBestMatch(IList<BitmapFrame> frames, int bitDepth, int width, int height)
 		{
-			int bestScore = int.MaxValue;
-			int bestBpp = 0;
-			int bestIndex = 0;
-
-			bool isBitmapIconDecoder = frames[0].Decoder is IconBitmapDecoder;
-
-			for (int i = 0; i < frames.Count && bestScore != 0; ++i)
+			var bestScore = int.MaxValue;
+			var bestBpp = 0;
+			var bestIndex = 0;
+			var isBitmapIconDecoder = frames[0].Decoder is IconBitmapDecoder;
+			for (var i = 0; i < frames.Count && bestScore != 0; ++i)
 			{
-				int currentIconBitDepth = isBitmapIconDecoder ? frames[i].Thumbnail.Format.BitsPerPixel : frames[i].Format.BitsPerPixel;
-
-				if (currentIconBitDepth == 0)
-				{
-					currentIconBitDepth = 8;
-				}
-
-				int score = _MatchImage(frames[i], bitDepth, width, height, currentIconBitDepth);
+				var currentIconBitDepth = isBitmapIconDecoder ? frames[i].Thumbnail.Format.BitsPerPixel : frames[i].Format.BitsPerPixel;
+				if (currentIconBitDepth == 0) currentIconBitDepth = 8;
+				var score = _MatchImage(frames[i], bitDepth, width, height, currentIconBitDepth);
 				if (score < bestScore)
 				{
 					bestIndex = i;
@@ -434,14 +301,11 @@ namespace Standard
 				else if (score == bestScore)
 				{
 					// Tie breaker: choose the higher color depth.  If that fails, choose first one.
-					if (bestBpp < currentIconBitDepth)
-					{
-						bestIndex = i;
-						bestBpp = currentIconBitDepth;
-					}
+					if (bestBpp >= currentIconBitDepth) continue;
+					bestIndex = i;
+					bestBpp = currentIconBitDepth;
 				}
 			}
-
 			return frames[bestIndex];
 		}
 
@@ -449,13 +313,9 @@ namespace Standard
 		private static int s_bitDepth; // = 0;
 		private static int _GetBitDepth()
 		{
-			if (s_bitDepth == 0)
-			{
-				using (SafeDC dc = SafeDC.GetDesktop())
-				{
-					s_bitDepth = NativeMethods.GetDeviceCaps(dc, DeviceCap.BITSPIXEL) * NativeMethods.GetDeviceCaps(dc, DeviceCap.PLANES);
-				}
-			}
+			if (s_bitDepth != 0) return s_bitDepth;
+			using (var dc = SafeDC.GetDesktop())
+				s_bitDepth = NativeMethods.GetDeviceCaps(dc, DeviceCap.BITSPIXEL) * NativeMethods.GetDeviceCaps(dc, DeviceCap.PLANES);
 			return s_bitDepth;
 		}
 
@@ -470,45 +330,32 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SafeDeleteFile(string path)
 		{
-			if (!string.IsNullOrEmpty(path))
-			{
-
-				File.Delete(path);
-			}
+			if (!string.IsNullOrEmpty(path)) File.Delete(path);
 		}
 
 		/// <summary>GDI's DeleteObject</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SafeDeleteObject(ref IntPtr gdiObject)
 		{
-			IntPtr p = gdiObject;
+			var p = gdiObject;
 			gdiObject = IntPtr.Zero;
-			if (IntPtr.Zero != p)
-			{
-				NativeMethods.DeleteObject(p);
-			}
+			if (p != IntPtr.Zero) NativeMethods.DeleteObject(p);
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SafeDestroyIcon(ref IntPtr hicon)
 		{
-			IntPtr p = hicon;
+			var p = hicon;
 			hicon = IntPtr.Zero;
-			if (IntPtr.Zero != p)
-			{
-				NativeMethods.DestroyIcon(p);
-			}
+			if (p != IntPtr.Zero) NativeMethods.DestroyIcon(p);
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SafeDestroyWindow(ref IntPtr hwnd)
 		{
-			IntPtr p = hwnd;
+			var p = hwnd;
 			hwnd = IntPtr.Zero;
-			if (NativeMethods.IsWindow(p))
-			{
-				NativeMethods.DestroyWindow(p);
-			}
+			if (NativeMethods.IsWindow(p)) NativeMethods.DestroyWindow(p);
 		}
 
 
@@ -517,11 +364,8 @@ namespace Standard
 		{
 			// Dispose can safely be called on an object multiple times.
 			IDisposable t = disposable;
-			disposable = default(T);
-			if (null != t)
-			{
-				t.Dispose();
-			}
+			disposable = default;
+			t?.Dispose();
 		}
 
 		/// <summary>GDI+'s DisposeImage</summary>
@@ -529,74 +373,56 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SafeDisposeImage(ref IntPtr gdipImage)
 		{
-			IntPtr p = gdipImage;
+			var p = gdipImage;
 			gdipImage = IntPtr.Zero;
-			if (IntPtr.Zero != p)
-			{
-				NativeMethods.GdipDisposeImage(p);
-			}
+			if (p != IntPtr.Zero) NativeMethods.GdipDisposeImage(p);
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public static void SafeCoTaskMemFree(ref IntPtr ptr)
 		{
-			IntPtr p = ptr;
+			var p = ptr;
 			ptr = IntPtr.Zero;
-			if (IntPtr.Zero != p)
-			{
-				Marshal.FreeCoTaskMem(p);
-			}
+			if (p != IntPtr.Zero) Marshal.FreeCoTaskMem(p);
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public static void SafeFreeHGlobal(ref IntPtr hglobal)
 		{
-			IntPtr p = hglobal;
+			var p = hglobal;
 			hglobal = IntPtr.Zero;
-			if (IntPtr.Zero != p)
-			{
-				Marshal.FreeHGlobal(p);
-			}
+			if (p != IntPtr.Zero) Marshal.FreeHGlobal(p);
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public static void SafeRelease<T>(ref T comObject) where T : class
 		{
-			T t = comObject;
+			var t = comObject;
 			comObject = default(T);
-			if (null != t)
-			{
-				Assert.IsTrue(Marshal.IsComObject(t));
-				Marshal.ReleaseComObject(t);
-			}
+			if (t == null) return;
+			Assert.IsTrue(Marshal.IsComObject(t));
+			Marshal.ReleaseComObject(t);
 		}
 
 		/// <summary>
-		/// Utility to help classes catenate their properties for implementing ToString().
+		/// Utility to help classes concatenate their properties for implementing ToString().
 		/// </summary>
-		/// <param name="source">The StringBuilder to catenate the results into.</param>
-		/// <param name="propertyName">The name of the property to be catenated.</param>
-		/// <param name="value">The value of the property to be catenated.</param>
+		/// <param name="source">The <see cref="StringBuilder"/> to concatenate the results into.</param>
+		/// <param name="propertyName">The name of the property to be concatenated.</param>
+		/// <param name="value">The value of the property to be concatenated.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void GeneratePropertyString(StringBuilder source, string propertyName, string value)
 		{
 			Assert.IsNotNull(source);
 			Assert.IsFalse(string.IsNullOrEmpty(propertyName));
-
-			if (0 != source.Length)
-			{
-				source.Append(' ');
-			}
-
+			if (source.Length != 0) source.Append(' ');
 			source.Append(propertyName);
 			source.Append(": ");
 			if (string.IsNullOrEmpty(value))
-			{
 				source.Append("<null>");
-			}
 			else
 			{
 				source.Append('\"');
@@ -619,15 +445,12 @@ namespace Standard
 		public static string GenerateToString<T>(T @object) where T : struct
 		{
 			var sbRet = new StringBuilder();
-			foreach (PropertyInfo property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance))
+			foreach (var property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance))
 			{
-				if (0 != sbRet.Length)
-				{
-					sbRet.Append(", ");
-				}
+				if (sbRet.Length != 0) sbRet.Append(", ");
 				Assert.AreEqual(0, property.GetIndexParameters().Length);
-				object value = property.GetValue(@object, null);
-				string format = null == value ? "{0}: <null>" : "{0}: \"{1}\"";
+				var value = property.GetValue(@object, null);
+				var format = null == value ? "{0}: <null>" : "{0}: \"{1}\"";
 				sbRet.AppendFormat(format, property.Name, value);
 			}
 			return sbRet.ToString();
@@ -638,29 +461,21 @@ namespace Standard
 		{
 			Assert.IsNotNull(source);
 			Assert.IsNotNull(destination);
-
 			destination.Position = 0;
-
 			// If we're copying from, say, a web stream, don't fail because of this.
 			if (source.CanSeek)
 			{
 				source.Position = 0;
-
 				// Consider that this could throw because 
 				// the source stream doesn't know it's size...
 				destination.SetLength(source.Length);
 			}
-
 			var buffer = new byte[4096];
 			int cbRead;
-
 			do
 			{
 				cbRead = source.Read(buffer, 0, buffer.Length);
-				if (0 != cbRead)
-				{
-					destination.Write(buffer, 0, cbRead);
-				}
+				if (cbRead != 0) destination.Write(buffer, 0, cbRead);
 			}
 			while (buffer.Length == cbRead);
 
@@ -673,24 +488,17 @@ namespace Standard
 		{
 			stm.Position = 0;
 			var hashBuilder = new StringBuilder();
-			using (MD5 md5 = MD5.Create())
+			using (var md5 = MD5.Create())
 			{
-				foreach (byte b in md5.ComputeHash(stm))
-				{
-					hashBuilder.Append(b.ToString("x2", CultureInfo.InvariantCulture));
-				}
+				foreach (var b in md5.ComputeHash(stm)) hashBuilder.Append(b.ToString("x2", CultureInfo.InvariantCulture));
+				return hashBuilder.ToString();
 			}
-
-			return hashBuilder.ToString();
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void EnsureDirectory(string path)
 		{
-			if (!Directory.Exists(Path.GetDirectoryName(path)))
-			{
-				Directory.CreateDirectory(Path.GetDirectoryName(path));
-			}
+			if (!Directory.Exists(Path.GetDirectoryName(path))) Directory.CreateDirectory(Path.GetDirectoryName(path));
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
@@ -698,22 +506,17 @@ namespace Standard
 		{
 			Assert.IsNotNull(left);
 			Assert.IsNotNull(right);
-
 			Assert.IsTrue(cb <= Math.Min(left.Length, right.Length));
 
 			// pin this buffer
-			GCHandle handleLeft = GCHandle.Alloc(left, GCHandleType.Pinned);
-			IntPtr ptrLeft = handleLeft.AddrOfPinnedObject();
-
+			var handleLeft = GCHandle.Alloc(left, GCHandleType.Pinned);
+			var ptrLeft = handleLeft.AddrOfPinnedObject();
 			// pin the other buffer
-			GCHandle handleRight = GCHandle.Alloc(right, GCHandleType.Pinned);
-			IntPtr ptrRight = handleRight.AddrOfPinnedObject();
-
-			bool fRet = _MemCmp(ptrLeft, ptrRight, cb);
-
+			var handleRight = GCHandle.Alloc(right, GCHandleType.Pinned);
+			var ptrRight = handleRight.AddrOfPinnedObject();
+			var fRet = _MemCmp(ptrLeft, ptrRight, cb);
 			handleLeft.Free();
 			handleRight.Free();
-
 			return fRet;
 		}
 
@@ -734,10 +537,7 @@ namespace Standard
 			}
 
 			[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-			public void AddByte(byte b)
-			{
-				_byteBuffer[_byteCount++] = b;
-			}
+			public void AddByte(byte b) => _byteBuffer[_byteCount++] = b;
 
 			[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 			public void AddChar(char ch)
@@ -749,39 +549,29 @@ namespace Standard
 			[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 			private void _FlushBytes()
 			{
-				if (_byteCount > 0)
-				{
-					_charCount += _encoding.GetChars(_byteBuffer, 0, _byteCount, _charBuffer, _charCount);
-					_byteCount = 0;
-				}
+				if (_byteCount <= 0) return;
+				_charCount += _encoding.GetChars(_byteBuffer, 0, _byteCount, _charBuffer, _charCount);
+				_byteCount = 0;
 			}
 
 			[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 			public string GetString()
 			{
 				_FlushBytes();
-				if (_charCount > 0)
-				{
-					return new string(_charBuffer, 0, _charCount);
-				}
-				return "";
+				return _charCount > 0 ? new string(_charBuffer, 0, _charCount) : "";
 			}
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static string UrlDecode(string url)
 		{
-			if (url == null)
-			{
-				return null;
-			}
+			if (url == null) return null;
 
 			var decoder = new _UrlDecoder(url.Length, Encoding.UTF8);
-			int length = url.Length;
-			for (int i = 0; i < length; ++i)
+			var length = url.Length;
+			for (var i = 0; i < length; ++i)
 			{
-				char ch = url[i];
-
+				var ch = url[i];
 				if (ch == '+')
 				{
 					decoder.AddByte((byte)' ');
@@ -793,10 +583,10 @@ namespace Standard
 					// decode %uXXXX into a Unicode character.
 					if (url[i + 1] == 'u' && i < length - 5)
 					{
-						int a = _HexToInt(url[i + 2]);
-						int b = _HexToInt(url[i + 3]);
-						int c = _HexToInt(url[i + 4]);
-						int d = _HexToInt(url[i + 5]);
+						var a = _HexToInt(url[i + 2]);
+						var b = _HexToInt(url[i + 3]);
+						var c = _HexToInt(url[i + 4]);
+						var d = _HexToInt(url[i + 5]);
 						if (a >= 0 && b >= 0 && c >= 0 && d >= 0)
 						{
 							decoder.AddChar((char)((a << 12) | (b << 8) | (c << 4) | d));
@@ -808,8 +598,8 @@ namespace Standard
 					else
 					{
 						// decode %XX into a Unicode character.
-						int a = _HexToInt(url[i + 1]);
-						int b = _HexToInt(url[i + 2]);
+						var a = _HexToInt(url[i + 1]);
+						var b = _HexToInt(url[i + 2]);
 
 						if (a >= 0 && b >= 0)
 						{
@@ -823,15 +613,10 @@ namespace Standard
 
 				// Add any 7bit character as a byte.
 				if ((ch & 0xFF80) == 0)
-				{
 					decoder.AddByte((byte)ch);
-				}
 				else
-				{
 					decoder.AddChar(ch);
-				}
 			}
-
 			return decoder.GetString();
 		}
 
@@ -850,21 +635,14 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static string UrlEncode(string url)
 		{
-			if (url == null)
-			{
-				return null;
-			}
-
-			byte[] bytes = Encoding.UTF8.GetBytes(url);
-
-			bool needsEncoding = false;
-			int unsafeCharCount = 0;
-			foreach (byte b in bytes)
+			if (url == null) return null;
+			var bytes = Encoding.UTF8.GetBytes(url);
+			var needsEncoding = false;
+			var unsafeCharCount = 0;
+			foreach (var b in bytes)
 			{
 				if (b == ' ')
-				{
 					needsEncoding = true;
-				}
 				else if (!_UrlEncodeIsSafe(b))
 				{
 					++unsafeCharCount;
@@ -872,31 +650,24 @@ namespace Standard
 				}
 			}
 
-			if (needsEncoding)
+			if (!needsEncoding) return Encoding.ASCII.GetString(bytes);
+			var buffer = new byte[bytes.Length + unsafeCharCount * 2];
+			var writeIndex = 0;
+			foreach (var b in bytes)
 			{
-				var buffer = new byte[bytes.Length + (unsafeCharCount * 2)];
-				int writeIndex = 0;
-				foreach (byte b in bytes)
+				if (_UrlEncodeIsSafe(b))
+					buffer[writeIndex++] = b;
+				else if (b == ' ')
+					buffer[writeIndex++] = (byte)'+';
+				else
 				{
-					if (_UrlEncodeIsSafe(b))
-					{
-						buffer[writeIndex++] = b;
-					}
-					else if (b == ' ')
-					{
-						buffer[writeIndex++] = (byte)'+';
-					}
-					else
-					{
-						buffer[writeIndex++] = (byte)'%';
-						buffer[writeIndex++] = _IntToHex((b >> 4) & 0xF);
-						buffer[writeIndex++] = _IntToHex(b & 0xF);
-					}
+					buffer[writeIndex++] = (byte)'%';
+					buffer[writeIndex++] = _IntToHex((b >> 4) & 0xF);
+					buffer[writeIndex++] = _IntToHex(b & 0xF);
 				}
-				bytes = buffer;
-				Assert.AreEqual(buffer.Length, writeIndex);
 			}
-
+			bytes = buffer;
+			Assert.AreEqual(buffer.Length, writeIndex);
 			return Encoding.ASCII.GetString(bytes);
 		}
 
@@ -908,10 +679,7 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		private static bool _UrlEncodeIsSafe(byte b)
 		{
-			if (_IsAsciiAlphaNumeric(b))
-			{
-				return true;
-			}
+			if (_IsAsciiAlphaNumeric(b)) return true;
 
 			switch ((char)b)
 			{
@@ -925,75 +693,45 @@ namespace Standard
 				case '(':
 				case ')':
 					return true;
+				default: return false;
 			}
-
-			return false;
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		private static bool _IsAsciiAlphaNumeric(byte b)
-		{
-			return (b >= 'a' && b <= 'z')
-				|| (b >= 'A' && b <= 'Z')
-				|| (b >= '0' && b <= '9');
-		}
+		private static bool _IsAsciiAlphaNumeric(byte b) => b >= 'a' && b <= 'z' || b >= 'A' && b <= 'Z' || b >= '0' && b <= '9';
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		private static byte _IntToHex(int n)
 		{
 			Assert.BoundedInteger(0, n, 16);
-			if (n <= 9)
-			{
-				return (byte)(n + '0');
-			}
-			return (byte)(n - 10 + 'A');
+			return n <= 9 ? (byte)(n + '0') : (byte)(n - 10 + 'A');
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		private static int _HexToInt(char h)
 		{
-			if (h >= '0' && h <= '9')
-			{
-				return h - '0';
-			}
-
-			if (h >= 'a' && h <= 'f')
-			{
-				return h - 'a' + 10;
-			}
-
-			if (h >= 'A' && h <= 'F')
-			{
-				return h - 'A' + 10;
-			}
-
+			if (h >= '0' && h <= '9') return h - '0';
+			if (h >= 'a' && h <= 'f') return h - 'a' + 10;
+			if (h >= 'A' && h <= 'F') return h - 'A' + 10;
 			Assert.Fail("Invalid hex character " + h);
 			return -1;
 		}
 
 		public static void AddDependencyPropertyChangeListener(object component, DependencyProperty property, EventHandler listener)
 		{
-			if (component == null)
-			{
-				return;
-			}
+			if (component == null) return;
 			Assert.IsNotNull(property);
 			Assert.IsNotNull(listener);
-
-			DependencyPropertyDescriptor dpd = DependencyPropertyDescriptor.FromProperty(property, component.GetType());
+			var dpd = DependencyPropertyDescriptor.FromProperty(property, component.GetType());
 			dpd.AddValueChanged(component, listener);
 		}
 
 		public static void RemoveDependencyPropertyChangeListener(object component, DependencyProperty property, EventHandler listener)
 		{
-			if (component == null)
-			{
-				return;
-			}
+			if (component == null) return;
 			Assert.IsNotNull(property);
 			Assert.IsNotNull(listener);
-
-			DependencyPropertyDescriptor dpd = DependencyPropertyDescriptor.FromProperty(property, component.GetType());
+			var dpd = DependencyPropertyDescriptor.FromProperty(property, component.GetType());
 			dpd.RemoveValueChanged(component, listener);
 		}
 
@@ -1001,63 +739,23 @@ namespace Standard
 
 		public static bool IsThicknessNonNegative(Thickness thickness)
 		{
-			if (!IsDoubleFiniteAndNonNegative(thickness.Top))
-			{
-				return false;
-			}
-
-			if (!IsDoubleFiniteAndNonNegative(thickness.Left))
-			{
-				return false;
-			}
-
-			if (!IsDoubleFiniteAndNonNegative(thickness.Bottom))
-			{
-				return false;
-			}
-
-			if (!IsDoubleFiniteAndNonNegative(thickness.Right))
-			{
-				return false;
-			}
-
+			if (!IsDoubleFiniteAndNonNegative(thickness.Top)) return false;
+			if (!IsDoubleFiniteAndNonNegative(thickness.Left)) return false;
+			if (!IsDoubleFiniteAndNonNegative(thickness.Bottom)) return false;
+			if (!IsDoubleFiniteAndNonNegative(thickness.Right)) return false;
 			return true;
 		}
 
 		public static bool IsCornerRadiusValid(CornerRadius cornerRadius)
 		{
-			if (!IsDoubleFiniteAndNonNegative(cornerRadius.TopLeft))
-			{
-				return false;
-			}
-
-			if (!IsDoubleFiniteAndNonNegative(cornerRadius.TopRight))
-			{
-				return false;
-			}
-
-			if (!IsDoubleFiniteAndNonNegative(cornerRadius.BottomLeft))
-			{
-				return false;
-			}
-
-			if (!IsDoubleFiniteAndNonNegative(cornerRadius.BottomRight))
-			{
-				return false;
-			}
-
+			if (!IsDoubleFiniteAndNonNegative(cornerRadius.TopLeft)) return false;
+			if (!IsDoubleFiniteAndNonNegative(cornerRadius.TopRight)) return false;
+			if (!IsDoubleFiniteAndNonNegative(cornerRadius.BottomLeft)) return false;
+			if (!IsDoubleFiniteAndNonNegative(cornerRadius.BottomRight)) return false;
 			return true;
 		}
 
-		public static bool IsDoubleFiniteAndNonNegative(double d)
-		{
-			if (double.IsNaN(d) || double.IsInfinity(d) || d < 0)
-			{
-				return false;
-			}
-
-			return true;
-		}
+		public static bool IsDoubleFiniteAndNonNegative(double d) => !double.IsNaN(d) && !double.IsInfinity(d) && !(d < 0);
 
 		#endregion
 	}

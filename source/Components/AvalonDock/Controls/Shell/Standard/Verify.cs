@@ -208,7 +208,6 @@ namespace Standard
 			Assert.IsNeitherNullNorEmpty(parameterName);
 			Verify.IsNotNull(type, nameof(type));
 			Verify.IsNotNull(interfaceType, nameof(interfaceType));
-
 			if (type.GetInterface(interfaceType.Name) == null)
 				throw new ArgumentException("The type of this parameter does not support a required interface", parameterName);
 		}
@@ -237,7 +236,6 @@ namespace Standard
 				isImplemented = true;
 				break;
 			}
-
 			if (!isImplemented)
 				throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The parameter must implement interface {0}.", interfaceType.ToString()), parameterName);
 		}
