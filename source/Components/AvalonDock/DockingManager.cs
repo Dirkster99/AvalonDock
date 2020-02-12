@@ -1328,15 +1328,17 @@ namespace AvalonDock
 		#endregion Private Properties
 
 		#region IOverlayWindowHost Interface
-
+		/// <inheritdoc/>
 		bool IOverlayWindowHost.HitTest(Point dragPoint)
 		{
 			var detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			return detectionRect.Contains(dragPoint);
 		}
 
+		/// <inheritdoc/>
 		DockingManager IOverlayWindowHost.Manager => this;
 
+		/// <inheritdoc/>
 		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
 		{
 			CreateOverlayWindow();
@@ -1346,6 +1348,7 @@ namespace AvalonDock
 			return _overlayWindow;
 		}
 
+		/// <inheritdoc/>
 		void IOverlayWindowHost.HideOverlayWindow()
 		{
 			_areas = null;
@@ -1353,6 +1356,7 @@ namespace AvalonDock
 			_overlayWindow.HideDropTargets();
 		}
 
+		/// <inheritdoc/>
 		IEnumerable<IDropArea> IOverlayWindowHost.GetDropAreas(LayoutFloatingWindowControl draggingWindow)
 		{
 			if (_areas != null) return _areas;

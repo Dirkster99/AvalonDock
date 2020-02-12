@@ -14,7 +14,7 @@ namespace AvalonDock.Layout
 	/// custom client application code and determine whether the <see cref="DockingManager"/>
 	/// should go ahead and insert the new Anchorable/Document or not.
 	///
-	/// The layout initializer object should be bound to the LayoutUpdateStrategy dependency property of the <see cref="DockingManager"/>.</summary>
+	/// The layout initializer object should be bound to the <see cref="DockingManager.LayoutUpdateStrategy"/> dependency property.</summary>
 	public interface ILayoutUpdateStrategy
 	{
 		/// <summary>Is invoked before inserting a <see cref="LayoutAnchorable"/> to determine whether the <see cref="DockingManager"/> should insert this item at the given position or not.</summary>
