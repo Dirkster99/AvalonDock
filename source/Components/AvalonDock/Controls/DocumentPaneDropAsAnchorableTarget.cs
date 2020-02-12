@@ -71,8 +71,21 @@ namespace AvalonDock.Controls
 			ILayoutDocumentPane targetModel = _targetPane.Model as ILayoutDocumentPane;
 			LayoutDocumentPaneGroup parentGroup;
 			LayoutPanel parentGroupPanel;
-			FindParentLayoutDocumentPane(targetModel, out parentGroup, out parentGroupPanel);
+			if (!FindParentLayoutDocumentPane(targetModel, out parentGroup, out parentGroupPanel))
+			{
+				parentGroup = targetModel.Parent as LayoutDocumentPaneGroup;
+				var dropTargetObject = parentGroup.Parent as LayoutDocumentFloatingWindow;
+				if (parentGroup != null && dropTargetObject != null)
+				{
+					// Dirk: ToDo Drop the LayoutAnchorable into the DropTarget of the LayoutDocumentFloatingWindow
+					throw new NotImplementedException();
+				}
 
+				base.Drop(floatingWindow);
+				return;
+			}
+
+			// We found  a parentGroup and a parentGroupPanel o lets go ahead and insert it
 			switch (Type)
 			{
 				case DropTargetType.DocumentPaneDockAsAnchorableBottom:
@@ -100,8 +113,6 @@ namespace AvalonDock.Controls
 					{
 						throw new NotImplementedException();
 					}
-
-
 				}
 				break;
 				#endregion DropTargetType.DocumentPaneDockAsAnchorableBottom
@@ -212,63 +223,83 @@ namespace AvalonDock.Controls
 			ILayoutDocumentPane targetModel = _targetPane.Model as ILayoutDocumentPane;
 			var manager = targetModel.Root.Manager;
 
-			//ILayoutDocumentPane targetModel = _targetPane.Model as ILayoutDocumentPane;
 			LayoutDocumentPaneGroup parentGroup;
 			LayoutPanel parentGroupPanel;
+			FrameworkElement documentPaneControl;
 			if (!FindParentLayoutDocumentPane(targetModel, out parentGroup, out parentGroupPanel))
+			{
+				parentGroup = targetModel.Parent as LayoutDocumentPaneGroup;
+				if (parentGroup != null && parentGroup.Parent is LayoutFloatingWindow)
+				{
+					documentPaneControl = manager.FindLogicalChildren<FrameworkElement>()
+						.OfType<ILayoutControl>().First(d => parentGroup != null ? d.Model == parentGroup :
+																				   d.Model == parentGroup.Parent) as FrameworkElement;
+					targetScreenRect = documentPaneControl.GetScreenArea();
+
+					return PreviewDocumentPaneDockAsAnchorable(overlayWindow, targetScreenRect, this.Type);
+				}
+
 				return null;
+			}
 
-			//if (targetModel.Parent is LayoutDocumentPaneGroup)
-			//{
-			//    var parentGroup = targetModel.Parent as LayoutDocumentPaneGroup;
-			//    var documentPaneGroupControl = manager.FindLogicalChildren<LayoutDocumentPaneGroupControl>().First(d => d.Model == parentGroup);
-			//    targetScreenRect = documentPaneGroupControl.GetScreenArea();
-			//}
-			//else
-			//{
-			//    var documentPaneControl = manager.FindLogicalChildren<LayoutDocumentPaneControl>().First(d => d.Model == targetModel);
-			//    targetScreenRect = documentPaneControl.GetScreenArea();
-			//}
-
-			//var parentPanel = targetModel.FindParent<LayoutPanel>();
-			var documentPaneControl = manager.FindLogicalChildren<FrameworkElement>().OfType<ILayoutControl>().First(d => parentGroup != null ? d.Model == parentGroup : d.Model == parentGroupPanel) as FrameworkElement;
+			documentPaneControl = manager.FindLogicalChildren<FrameworkElement>().OfType<ILayoutControl>().First(d => parentGroup != null ? d.Model == parentGroup : d.Model == parentGroupPanel) as FrameworkElement;
 			targetScreenRect = documentPaneControl.GetScreenArea();
 
-			switch (Type)
+			return PreviewDocumentPaneDockAsAnchorable(overlayWindow, targetScreenRect, Type);
+		}
+
+		/// <summary>
+		/// Show a top, bottom, left, or right preview box for an associated <see cref="DropTargetType"/>.
+		/// </summary>
+		/// <param name="overlayWindow"></param>
+		/// <param name="targetScreenRect"></param>
+		/// <param name="targetType">Drop Target Types that result in a preview Geometry being returned are:
+		/// <see cref="DropTargetType.DocumentPaneDockAsAnchorableBottom"/>,
+		/// <see cref="DropTargetType.DocumentPaneDockAsAnchorableTop"/>,
+		/// <see cref="DropTargetType.DocumentPaneDockAsAnchorableLeft"/>,
+		/// <see cref="DropTargetType.DocumentPaneDockAsAnchorableRight"/>, other drop targets result in null being returned.</param>
+		/// <returns>The <see cref="Geometry"/> object that represents the preview area or null.</returns>
+		private static Geometry PreviewDocumentPaneDockAsAnchorable(
+			OverlayWindow overlayWindow,
+			Rect targetScreenRect,
+			DropTargetType targetType)
+		{
+			switch (targetType)
 			{
 				case DropTargetType.DocumentPaneDockAsAnchorableBottom:
-				{
-					targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
-					targetScreenRect.Offset(0.0, targetScreenRect.Height - targetScreenRect.Height / 3.0);
-					targetScreenRect.Height /= 3.0;
-					return new RectangleGeometry(targetScreenRect);
-				}
+					{
+						targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
+						targetScreenRect.Offset(0.0, targetScreenRect.Height - targetScreenRect.Height / 3.0);
+						targetScreenRect.Height /= 3.0;
+						return new RectangleGeometry(targetScreenRect);
+					}
 
 				case DropTargetType.DocumentPaneDockAsAnchorableTop:
-				{
-					targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
-					targetScreenRect.Height /= 3.0;
-					return new RectangleGeometry(targetScreenRect);
-				}
+					{
+						targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
+						targetScreenRect.Height /= 3.0;
+						return new RectangleGeometry(targetScreenRect);
+					}
 
 				case DropTargetType.DocumentPaneDockAsAnchorableRight:
-				{
-					targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
-					targetScreenRect.Offset(targetScreenRect.Width - targetScreenRect.Width / 3.0, 0.0);
-					targetScreenRect.Width /= 3.0;
-					return new RectangleGeometry(targetScreenRect);
-				}
+					{
+						targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
+						targetScreenRect.Offset(targetScreenRect.Width - targetScreenRect.Width / 3.0, 0.0);
+						targetScreenRect.Width /= 3.0;
+						return new RectangleGeometry(targetScreenRect);
+					}
 
 				case DropTargetType.DocumentPaneDockAsAnchorableLeft:
-				{
-					targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
-					targetScreenRect.Width /= 3.0;
-					return new RectangleGeometry(targetScreenRect);
-				}
+					{
+						targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
+						targetScreenRect.Width /= 3.0;
+						return new RectangleGeometry(targetScreenRect);
+					}
 			}
 
 			return null;
 		}
+
 		#endregion Overrides
 
 		#region Private Methods

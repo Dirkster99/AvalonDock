@@ -553,6 +553,7 @@ namespace AvalonDock.Controls
 						bool isDraggingAnchorables = _floatingWindow.Model is LayoutAnchorableFloatingWindow;
 						if (isDraggingAnchorables && _gridDocumentPaneFullDropTargets != null)
 						{
+							// Showing a drop target star like structure with 9 buttons (full targets)
 							areaElement = _gridDocumentPaneFullDropTargets;
 							var dropAreaDocumentPaneGroup = area as DropArea<LayoutDocumentPaneControl>;
 							var layoutDocumentPane = dropAreaDocumentPaneGroup.AreaElement.Model as LayoutDocumentPane;
@@ -649,6 +650,7 @@ namespace AvalonDock.Controls
 						}
 						else
 						{
+							// Showing a drop target structure with 5 centered star like bottons
 							areaElement = _gridDocumentPaneDropTargets;
 							var dropAreaDocumentPaneGroup = area as DropArea<LayoutDocumentPaneControl>;
 							var layoutDocumentPane = dropAreaDocumentPaneGroup.AreaElement.Model as LayoutDocumentPane;
