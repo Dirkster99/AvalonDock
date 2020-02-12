@@ -26,29 +26,36 @@ namespace AvalonDock.Controls
 		#region fields
 		private ResourceDictionary currentThemeResourceDictionary; // = null
 		private Canvas _mainCanvasPanel;
-		private Grid _gridDockingManagerDropTargets;
-		private Grid _gridAnchorablePaneDropTargets;
-		private Grid _gridDocumentPaneDropTargets;
-		private Grid _gridDocumentPaneFullDropTargets;
+		private Grid _gridDockingManagerDropTargets;    // Showing and activating 4 outer drop taget buttons over DockingManager
+		private Grid _gridAnchorablePaneDropTargets;    // Showing and activating 5 inner drop target buttons over layout anchorable pane
+		private Grid _gridDocumentPaneDropTargets;      // Showing and activating 5 inner drop target buttons over document pane
+		private Grid _gridDocumentPaneFullDropTargets;  // Showing and activating 9 inner drop target buttons over document pane
 
-		private FrameworkElement _dockingManagerDropTargetBottom;
+		#region DockingManagerDropTargets
+		private FrameworkElement _dockingManagerDropTargetBottom; // 4 outer drop taget buttons over DockingManager
 		private FrameworkElement _dockingManagerDropTargetTop;
 		private FrameworkElement _dockingManagerDropTargetLeft;
 		private FrameworkElement _dockingManagerDropTargetRight;
+		#endregion DockingManagerDropTargets
 
-		private FrameworkElement _anchorablePaneDropTargetBottom;
+		#region AnchorablePaneDropTargets
+		private FrameworkElement _anchorablePaneDropTargetBottom; // 5 inner drop target buttons over layout anchorable pane
 		private FrameworkElement _anchorablePaneDropTargetTop;
 		private FrameworkElement _anchorablePaneDropTargetLeft;
 		private FrameworkElement _anchorablePaneDropTargetRight;
 		private FrameworkElement _anchorablePaneDropTargetInto;
+		#endregion AnchorablePaneDropTargets
 
-		private FrameworkElement _documentPaneDropTargetBottom;
+		#region DocumentPaneDropTargets
+		private FrameworkElement _documentPaneDropTargetBottom;   // 5 inner drop target buttons over document pane
 		private FrameworkElement _documentPaneDropTargetTop;
 		private FrameworkElement _documentPaneDropTargetLeft;
 		private FrameworkElement _documentPaneDropTargetRight;
 		private FrameworkElement _documentPaneDropTargetInto;
+		#endregion DocumentPaneDropTargets
 
-		private FrameworkElement _documentPaneDropTargetBottomAsAnchorablePane;
+		#region DocumentPaneFullDropTargets
+		private FrameworkElement _documentPaneDropTargetBottomAsAnchorablePane; // 9 inner drop target buttons over document pane
 		private FrameworkElement _documentPaneDropTargetTopAsAnchorablePane;
 		private FrameworkElement _documentPaneDropTargetLeftAsAnchorablePane;
 		private FrameworkElement _documentPaneDropTargetRightAsAnchorablePane;
@@ -58,6 +65,7 @@ namespace AvalonDock.Controls
 		private FrameworkElement _documentPaneFullDropTargetLeft;
 		private FrameworkElement _documentPaneFullDropTargetRight;
 		private FrameworkElement _documentPaneFullDropTargetInto;
+		#endregion DocumentPaneFullDropTargets
 
 		private Path _previewBox;
 		private IOverlayWindowHost _host;
@@ -385,6 +393,8 @@ namespace AvalonDock.Controls
 							bool isDraggingAnchorables = _floatingWindow.Model is LayoutAnchorableFloatingWindow;
 							if (isDraggingAnchorables && _gridDocumentPaneFullDropTargets != null)
 							{
+								// Item dragged is a layout anchorable over the DockingManager's DocumentPane
+								// -> Yield a drop target structure with 9 buttons
 								var dropAreaDocumentPane = visibleArea as DropArea<LayoutDocumentPaneControl>;
 								if (_documentPaneFullDropTargetLeft.IsVisible)
 									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneFullDropTargetLeft.GetScreenArea(), DropTargetType.DocumentPaneDockLeft);
@@ -427,7 +437,8 @@ namespace AvalonDock.Controls
 							}
 							else
 							{
-
+								// Item being dragged is a document over the DockingManager's DocumentPane
+								// -> Yield a drop target structure with 5 center buttons over the document
 								var dropAreaDocumentPane = visibleArea as DropArea<LayoutDocumentPaneControl>;
 								if (_documentPaneDropTargetLeft.IsVisible)
 									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetLeft.GetScreenArea(), DropTargetType.DocumentPaneDockLeft);
