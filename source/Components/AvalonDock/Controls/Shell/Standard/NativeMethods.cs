@@ -1349,10 +1349,8 @@ namespace Standard
 		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
 		private SafeFindHandle() : base(true) { }
 
-		protected override bool ReleaseHandle()
-		{
-			return NativeMethods.FindClose(handle);
-		}
+		/// <inheritdoc />
+		protected override bool ReleaseHandle() => NativeMethods.FindClose(handle);
 	}
 
 	internal sealed class SafeDC : SafeHandleZeroOrMinusOneIsInvalid
@@ -1396,19 +1394,12 @@ namespace Standard
 
 		private SafeDC() : base(true) { }
 
+		/// <inheritdoc />
 		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
 		protected override bool ReleaseHandle()
 		{
-			if (_created)
-			{
-				return NativeMethods.DeleteDC(handle);
-			}
-
-			if (!_hwnd.HasValue || _hwnd.Value == IntPtr.Zero)
-			{
-				return true;
-			}
-
+			if (_created) return NativeMethods.DeleteDC(handle);
+			if (!_hwnd.HasValue || _hwnd.Value == IntPtr.Zero) return true;
 			return NativeMethods.ReleaseDC(_hwnd.Value, handle) == 1;
 		}
 
@@ -1423,19 +1414,11 @@ namespace Standard
 			}
 			finally
 			{
-				if (dc != null)
-				{
-					dc._created = true;
-				}
+				if (dc != null) dc._created = true;
 			}
-
-			if (dc.IsInvalid)
-			{
-				dc.Dispose();
-				throw new SystemException("Unable to create a device context from the specified device information.");
-			}
-
-			return dc;
+			if (!dc.IsInvalid) return dc;
+			dc.Dispose();
+			throw new SystemException("Unable to create a device context from the specified device information.");
 		}
 
 		[SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes"), SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
@@ -1444,32 +1427,18 @@ namespace Standard
 			SafeDC dc = null;
 			try
 			{
-				IntPtr hPtr = IntPtr.Zero;
-				if (hdc != null)
-				{
-					hPtr = hdc.handle;
-				}
+				var hPtr = IntPtr.Zero;
+				if (hdc != null) hPtr = hdc.handle;
 				dc = NativeMethods.CreateCompatibleDC(hPtr);
-				if (dc == null)
-				{
-					HRESULT.ThrowLastError();
-				}
+				if (dc == null) HRESULT.ThrowLastError();
 			}
 			finally
 			{
-				if (dc != null)
-				{
-					dc._created = true;
-				}
+				if (dc != null) dc._created = true;
 			}
-
-			if (dc.IsInvalid)
-			{
-				dc.Dispose();
-				throw new SystemException("Unable to create a device context from the specified device information.");
-			}
-
-			return dc;
+			if (!dc.IsInvalid) return dc;
+			dc.Dispose();
+			throw new SystemException("Unable to create a device context from the specified device information.");
 		}
 
 		public static SafeDC GetDC(IntPtr hwnd)
@@ -1481,18 +1450,11 @@ namespace Standard
 			}
 			finally
 			{
-				if (dc != null)
-				{
-					dc.Hwnd = hwnd;
-				}
+				if (dc != null) dc.Hwnd = hwnd;
 			}
 
-			if (dc.IsInvalid)
-			{
-				// GetDC does not set the last error...
-				HRESULT.E_FAIL.ThrowIfFailed();
-			}
-
+			// GetDC does not set the last error...
+			if (dc.IsInvalid) HRESULT.E_FAIL.ThrowIfFailed();
 			return dc;
 		}
 
@@ -1506,12 +1468,7 @@ namespace Standard
 		public static SafeDC WrapDC(IntPtr hdc)
 		{
 			// This won't actually get released by the class, but it allows an IntPtr to be converted for signatures.
-			return new SafeDC
-			{
-				handle = hdc,
-				_created = false,
-				_hwnd = IntPtr.Zero,
-			};
+			return new SafeDC {handle = hdc, _created = false, _hwnd = IntPtr.Zero};
 		}
 	}
 
@@ -1519,21 +1476,20 @@ namespace Standard
 	{
 		private SafeHBITMAP() : base(true) { }
 
+		/// <inheritdoc />
 		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-		protected override bool ReleaseHandle()
-		{
-			return NativeMethods.DeleteObject(handle);
-		}
+		protected override bool ReleaseHandle() => NativeMethods.DeleteObject(handle);
 	}
 
 	internal sealed class SafeGdiplusStartupToken : SafeHandleZeroOrMinusOneIsInvalid
 	{
 		private SafeGdiplusStartupToken() : base(true) { }
 
+		/// <inheritdoc />
 		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
 		protected override bool ReleaseHandle()
 		{
-			Status s = NativeMethods.GdiplusShutdown(this.handle);
+			var s = NativeMethods.GdiplusShutdown(this.handle);
 			return s == Status.Ok;
 		}
 
@@ -1542,10 +1498,8 @@ namespace Standard
 		[SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
 		public static SafeGdiplusStartupToken Startup()
 		{
-			SafeGdiplusStartupToken safeHandle = new SafeGdiplusStartupToken();
-			IntPtr unsafeHandle;
-			StartupOutput output;
-			Status s = NativeMethods.GdiplusStartup(out unsafeHandle, new StartupInput(), out output);
+			var safeHandle = new SafeGdiplusStartupToken();
+			var s = NativeMethods.GdiplusStartup(out var unsafeHandle, new StartupInput(), out var output);
 			if (s == Status.Ok)
 			{
 				safeHandle.handle = unsafeHandle;
@@ -1563,25 +1517,19 @@ namespace Standard
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "IConnectionPoint")]
-		public SafeConnectionPointCookie(IConnectionPointContainer target, object sink, Guid eventId)
-			: base(true)
+		public SafeConnectionPointCookie(IConnectionPointContainer target, object sink, Guid eventId) : base(true)
 		{
-			Verify.IsNotNull(target, "target");
-			Verify.IsNotNull(sink, "sink");
-			Verify.IsNotDefault(eventId, "eventId");
-
+			Verify.IsNotNull(target, nameof(target));
+			Verify.IsNotNull(sink, nameof(sink));
+			Verify.IsNotDefault(eventId, nameof(eventId));
 			handle = IntPtr.Zero;
-
 			IConnectionPoint cp = null;
 			try
 			{
-				int dwCookie;
 				target.FindConnectionPoint(ref eventId, out cp);
-				cp.Advise(sink, out dwCookie);
+				cp.Advise(sink, out var dwCookie);
 				if (dwCookie == 0)
-				{
 					throw new InvalidOperationException("IConnectionPoint::Advise returned an invalid cookie.");
-				}
 				handle = new IntPtr(dwCookie);
 				_cp = cp;
 				cp = null;
@@ -1604,20 +1552,17 @@ namespace Standard
 		{
 			try
 			{
-				if (!this.IsInvalid)
+				if (this.IsInvalid) return true;
+				var dwCookie = handle.ToInt32();
+				handle = IntPtr.Zero;
+				Assert.IsNotNull(_cp);
+				try
 				{
-					int dwCookie = handle.ToInt32();
-					handle = IntPtr.Zero;
-
-					Assert.IsNotNull(_cp);
-					try
-					{
-						_cp.Unadvise(dwCookie);
-					}
-					finally
-					{
-						Utility.SafeRelease(ref _cp);
-					}
+					_cp.Unadvise(dwCookie);
+				}
+				finally
+				{
+					Utility.SafeRelease(ref _cp);
 				}
 				return true;
 			}
@@ -1823,25 +1768,11 @@ namespace Standard
 		private short boolVal;
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public VarEnum VarType
-		{
-			get
-			{
-				return (VarEnum)vt;
-			}
-		}
+		public VarEnum VarType => (VarEnum)vt;
 
 		// Right now only using this for strings.
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
-		public string GetValue()
-		{
-			if (vt == (ushort)VarEnum.VT_LPWSTR)
-			{
-				return Marshal.PtrToStringUni(pointerVal);
-			}
-
-			return null;
-		}
+		public string GetValue() => vt == (ushort)VarEnum.VT_LPWSTR ? Marshal.PtrToStringUni(pointerVal) : null;
 
 		public void SetValue(bool f)
 		{
@@ -1860,12 +1791,13 @@ namespace Standard
 
 		public void Clear()
 		{
-			HRESULT hr = NativeMethods.PropVariantClear(this);
+			var hr = NativeMethods.PropVariantClear(this);
 			Assert.IsTrue(hr.Succeeded);
 		}
 
 		#region IDisposable Pattern
 
+		/// <inheritdoc />
 		public void Dispose()
 		{
 			Dispose(true);
@@ -2074,92 +2006,28 @@ namespace Standard
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public int Left
-		{
-			get
-			{
-				return _left;
-			}
-			set
-			{
-				_left = value;
-			}
-		}
+		public int Left { get => _left; set => _left = value; }
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public int Right
-		{
-			get
-			{
-				return _right;
-			}
-			set
-			{
-				_right = value;
-			}
-		}
+		public int Right { get => _right; set => _right = value; }
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public int Top
-		{
-			get
-			{
-				return _top;
-			}
-			set
-			{
-				_top = value;
-			}
-		}
+		public int Top { get => _top; set => _top = value; }
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public int Bottom
-		{
-			get
-			{
-				return _bottom;
-			}
-			set
-			{
-				_bottom = value;
-			}
-		}
+		public int Bottom { get => _bottom; set => _bottom = value;		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public int Width
-		{
-			get
-			{
-				return _right - _left;
-			}
-		}
+		public int Width => _right - _left;
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public int Height
-		{
-			get
-			{
-				return _bottom - _top;
-			}
-		}
+		public int Height => _bottom - _top;
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public POINT Position
-		{
-			get
-			{
-				return new POINT { x = _left, y = _top };
-			}
-		}
+		public POINT Position => new POINT { x = _left, y = _top };
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public SIZE Size
-		{
-			get
-			{
-				return new SIZE { cx = Width, cy = Height };
-			}
-		}
+		public SIZE Size => new SIZE { cx = Width, cy = Height };
 
 		public static RECT Union(RECT rect1, RECT rect2)
 		{
@@ -2188,6 +2056,7 @@ namespace Standard
 			}
 		}
 
+		/// <inheritdoc />
 		public override int GetHashCode()
 		{
 			return (_left << 16 | Utility.LOWORD(_right)) ^ (_top << 16 | Utility.LOWORD(_bottom));
@@ -2213,74 +2082,22 @@ namespace Standard
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public int Width
-		{
-			get
-			{
-				return _right - _left;
-			}
-		}
+		public int Width => _right - _left;
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public int Height
-		{
-			get
-			{
-				return _bottom - _top;
-			}
-		}
+		public int Height => _bottom - _top;
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public int Left
-		{
-			get
-			{
-				return _left;
-			}
-			set
-			{
-				_left = value;
-			}
-		}
+		public int Left { get => _left; set => _left = value; }
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public int Right
-		{
-			get
-			{
-				return _right;
-			}
-			set
-			{
-				_right = value;
-			}
-		}
+		public int Right { get => _right; set => _right = value; }
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public int Top
-		{
-			get
-			{
-				return _top;
-			}
-			set
-			{
-				_top = value;
-			}
-		}
+		public int Top { get => _top; set => _top = value; }
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public int Bottom
-		{
-			get
-			{
-				return _bottom;
-			}
-			set
-			{
-				_bottom = value;
-			}
-		}
+		public int Bottom { get => _bottom; set => _bottom = value; }
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public void Offset(int dx, int dy)
@@ -2468,11 +2285,7 @@ namespace Standard
 		public static RECT AdjustWindowRectEx(RECT lpRect, WS dwStyle, bool bMenu, WS_EX dwExStyle)
 		{
 			// Native version modifies the parameter in place.
-			if (!_AdjustWindowRectEx(ref lpRect, dwStyle, bMenu, dwExStyle))
-			{
-				HRESULT.ThrowLastError();
-			}
-
+			if (!_AdjustWindowRectEx(ref lpRect, dwStyle, bMenu, dwExStyle)) HRESULT.ThrowLastError();
 			return lpRect;
 		}
 
@@ -2498,9 +2311,7 @@ namespace Standard
 			// This origins of this API were added for Vista.  The Ex version was added for Windows 7.
 			// If we're not on either, then this message filter isolation doesn't exist.
 			if (!Utility.IsOSVistaOrNewer)
-			{
 				return HRESULT.S_FALSE;
-			}
 
 			// If we're on Vista rather than Win7 then we can't use the Ex version of this function.
 			// The Ex version is preferred if possible because this results in process-wide modifications of the filter
@@ -2509,19 +2320,12 @@ namespace Standard
 			{
 				// Note that the Win7 MSGFLT_ALLOW/DISALLOW enum values map to the Vista MSGFLT_ADD/REMOVE
 				ret = _ChangeWindowMessageFilter(message, action);
-				if (!ret)
-				{
-					return (HRESULT)Win32Error.GetLastError();
-				}
-				return HRESULT.S_OK;
+				return !ret ? (HRESULT) Win32Error.GetLastError() : HRESULT.S_OK;
 			}
 
 			var filterstruct = new CHANGEFILTERSTRUCT { cbSize = (uint)Marshal.SizeOf(typeof(CHANGEFILTERSTRUCT)) };
 			ret = _ChangeWindowMessageFilterEx(hwnd, message, action, ref filterstruct);
-			if (!ret)
-			{
-				return (HRESULT)Win32Error.GetLastError();
-			}
+			if (!ret) return (HRESULT) Win32Error.GetLastError();
 
 			filterInfo = filterstruct.ExtStatus;
 			return HRESULT.S_OK;
@@ -2538,30 +2342,22 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static string[] CommandLineToArgvW(string cmdLine)
 		{
-			IntPtr argv = IntPtr.Zero;
+			var argv = IntPtr.Zero;
 			try
 			{
-				int numArgs = 0;
-
-				argv = _CommandLineToArgvW(cmdLine, out numArgs);
-				if (argv == IntPtr.Zero)
-				{
-					throw new Win32Exception();
-				}
+				argv = _CommandLineToArgvW(cmdLine, out var numArgs);
+				if (argv == IntPtr.Zero) throw new Win32Exception();
 				var result = new string[numArgs];
-
-				for (int i = 0; i < numArgs; i++)
+				for (var i = 0; i < numArgs; i++)
 				{
-					IntPtr currArg = Marshal.ReadIntPtr(argv, i * Marshal.SizeOf(typeof(IntPtr)));
+					var currArg = Marshal.ReadIntPtr(argv, i * Marshal.SizeOf(typeof(IntPtr)));
 					result[i] = Marshal.PtrToStringUni(currArg);
 				}
-
 				return result;
 			}
 			finally
 			{
-
-				IntPtr p = _LocalFree(argv);
+				var p = _LocalFree(argv);
 				// Otherwise LocalFree failed.
 				Assert.AreEqual(IntPtr.Zero, p);
 			}
@@ -2581,19 +2377,10 @@ namespace Standard
 			const int DIB_RGB_COLORS = 0;
 			SafeHBITMAP hBitmap = null;
 			if (hdc == null)
-			{
 				hBitmap = _CreateDIBSectionIntPtr(IntPtr.Zero, ref bitmapInfo, DIB_RGB_COLORS, out ppvBits, hSection, dwOffset);
-			}
 			else
-			{
 				hBitmap = _CreateDIBSection(hdc, ref bitmapInfo, DIB_RGB_COLORS, out ppvBits, hSection, dwOffset);
-			}
-
-			if (hBitmap.IsInvalid)
-			{
-				HRESULT.ThrowLastError();
-			}
-
+			if (hBitmap.IsInvalid) HRESULT.ThrowLastError();
 			return hBitmap;
 		}
 
@@ -2604,11 +2391,8 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static IntPtr CreateRoundRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidthEllipse, int nHeightEllipse)
 		{
-			IntPtr ret = _CreateRoundRectRgn(nLeftRect, nTopRect, nRightRect, nBottomRect, nWidthEllipse, nHeightEllipse);
-			if (IntPtr.Zero == ret)
-			{
-				throw new Win32Exception();
-			}
+			var ret = _CreateRoundRectRgn(nLeftRect, nTopRect, nRightRect, nBottomRect, nWidthEllipse, nHeightEllipse);
+			if (ret == IntPtr.Zero) throw new Win32Exception();
 			return ret;
 		}
 
@@ -2619,11 +2403,8 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static IntPtr CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect)
 		{
-			IntPtr ret = _CreateRectRgn(nLeftRect, nTopRect, nRightRect, nBottomRect);
-			if (IntPtr.Zero == ret)
-			{
-				throw new Win32Exception();
-			}
+			var ret = _CreateRectRgn(nLeftRect, nTopRect, nRightRect, nBottomRect);
+			if (ret == IntPtr.Zero) throw new Win32Exception();
 			return ret;
 		}
 
@@ -2634,11 +2415,8 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static IntPtr CreateRectRgnIndirect(RECT lprc)
 		{
-			IntPtr ret = _CreateRectRgnIndirect(ref lprc);
-			if (IntPtr.Zero == ret)
-			{
-				throw new Win32Exception();
-			}
+			var ret = _CreateRectRgnIndirect(ref lprc);
+			if (ret == IntPtr.Zero) throw new Win32Exception();
 			return ret;
 		}
 
@@ -2677,12 +2455,8 @@ namespace Standard
 			IntPtr hInstance,
 			IntPtr lpParam)
 		{
-			IntPtr ret = _CreateWindowEx(dwExStyle, lpClassName, lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
-			if (IntPtr.Zero == ret)
-			{
-				HRESULT.ThrowLastError();
-			}
-
+			var ret = _CreateWindowEx(dwExStyle, lpClassName, lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+			if (ret == IntPtr.Zero) HRESULT.ThrowLastError();
 			return ret;
 		}
 
@@ -2728,7 +2502,7 @@ namespace Standard
 			// Make this call safe to make on downlevel OSes...
 			if (Utility.IsOSVistaOrNewer && IsThemeActive())
 			{
-				HRESULT hr = _DwmGetColorizationColor(out pcrColorization, out pfOpaqueBlend);
+				var hr = _DwmGetColorizationColor(out pcrColorization, out pfOpaqueBlend);
 				if (hr.Succeeded)
 				{
 					return true;
@@ -2776,7 +2550,7 @@ namespace Standard
 		public static void DwmSetWindowAttributeDisallowPeek(IntPtr hwnd, bool disallowPeek)
 		{
 			Assert.IsTrue(Utility.IsOSWindows7OrNewer);
-			int dwDisallow = (int)(disallowPeek ? Win32Value.TRUE : Win32Value.FALSE);
+			var dwDisallow = (int)(disallowPeek ? Win32Value.TRUE : Win32Value.FALSE);
 			_DwmSetWindowAttribute(hwnd, DWMWA.DISALLOW_PEEK, ref dwDisallow, sizeof(int));
 		}
 
@@ -2788,7 +2562,7 @@ namespace Standard
 		public static MF EnableMenuItem(IntPtr hMenu, SC uIDEnableItem, MF uEnable)
 		{
 			// Returns the previous state of the menu item, or -1 if the menu item does not exist.
-			int iRet = _EnableMenuItem(hMenu, uIDEnableItem, uEnable);
+			var iRet = _EnableMenuItem(hMenu, uIDEnableItem, uEnable);
 			return (MF)iRet;
 		}
 
@@ -2814,10 +2588,7 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void DrawMenuBar(IntPtr hWnd)
 		{
-			if (!_DrawMenuBar(hWnd))
-			{
-				throw new Win32Exception();
-			}
+			if (!_DrawMenuBar(hWnd)) throw new Win32Exception();
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
@@ -2845,11 +2616,7 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static RECT GetClientRect(IntPtr hwnd)
 		{
-			RECT rc;
-			if (!_GetClientRect(hwnd, out rc))
-			{
-				HRESULT.ThrowLastError();
-			}
+			if (!_GetClientRect(hwnd, out var rc)) HRESULT.ThrowLastError();
 			return rc;
 		}
 
@@ -2904,11 +2671,8 @@ namespace Standard
 			var buffer = new StringBuilder((int)Win32Value.MAX_PATH);
 			while (true)
 			{
-				int size = _GetModuleFileName(hModule, buffer, buffer.Capacity);
-				if (size == 0)
-				{
-					HRESULT.ThrowLastError();
-				}
+				var size = _GetModuleFileName(hModule, buffer, buffer.Capacity);
+				if (size == 0) HRESULT.ThrowLastError();
 
 				// GetModuleFileName returns nSize when it's truncated but does NOT set the last error.
 				// MSDN documentation says this has changed in Windows 2000+.
@@ -2928,11 +2692,8 @@ namespace Standard
 
 		public static IntPtr GetModuleHandle(string lpModuleName)
 		{
-			IntPtr retPtr = _GetModuleHandle(lpModuleName);
-			if (retPtr == IntPtr.Zero)
-			{
-				HRESULT.ThrowLastError();
-			}
+			var retPtr = _GetModuleHandle(lpModuleName);
+			if (retPtr == IntPtr.Zero) HRESULT.ThrowLastError();
 			return retPtr;
 		}
 
@@ -2945,10 +2706,7 @@ namespace Standard
 		public static MONITORINFO GetMonitorInfo(IntPtr hMonitor)
 		{
 			var mi = new MONITORINFO();
-			if (!_GetMonitorInfo(hMonitor, mi))
-			{
-				throw new Win32Exception();
-			}
+			if (!_GetMonitorInfo(hMonitor, mi)) throw new Win32Exception();
 			return mi;
 		}
 
@@ -2957,11 +2715,8 @@ namespace Standard
 
 		public static IntPtr GetStockObject(StockObject fnObject)
 		{
-			IntPtr retPtr = _GetStockObject(fnObject);
-			if (retPtr == null)
-			{
-				HRESULT.ThrowLastError();
-			}
+			var retPtr = _GetStockObject(fnObject);
+			if (retPtr == null) HRESULT.ThrowLastError();
 			return retPtr;
 		}
 
@@ -2977,19 +2732,9 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static IntPtr GetWindowLongPtr(IntPtr hwnd, GWL nIndex)
 		{
-			IntPtr ret = IntPtr.Zero;
-			if (8 == IntPtr.Size)
-			{
-				ret = GetWindowLongPtr64(hwnd, nIndex);
-			}
-			else
-			{
-				ret = new IntPtr(GetWindowLongPtr32(hwnd, nIndex));
-			}
-			if (IntPtr.Zero == ret)
-			{
-				throw new Win32Exception();
-			}
+			var ret = IntPtr.Zero;
+			ret = IntPtr.Size == 8 ? GetWindowLongPtr64(hwnd, nIndex) : new IntPtr(GetWindowLongPtr32(hwnd, nIndex));
+			if (ret == IntPtr.Zero) throw new Win32Exception();
 			return ret;
 		}
 
@@ -3034,11 +2779,8 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static WINDOWPLACEMENT GetWindowPlacement(IntPtr hwnd)
 		{
-			WINDOWPLACEMENT wndpl = new WINDOWPLACEMENT();
-			if (GetWindowPlacement(hwnd, wndpl))
-			{
-				return wndpl;
-			}
+			var wndpl = new WINDOWPLACEMENT();
+			if (GetWindowPlacement(hwnd, wndpl)) return wndpl;
 			throw new Win32Exception();
 		}
 
@@ -3049,11 +2791,7 @@ namespace Standard
 
 		public static RECT GetWindowRect(IntPtr hwnd)
 		{
-			RECT rc;
-			if (!_GetWindowRect(hwnd, out rc))
-			{
-				HRESULT.ThrowLastError();
-			}
+			if (!_GetWindowRect(hwnd, out var rc)) HRESULT.ThrowLastError();
 			return rc;
 		}
 
@@ -3106,10 +2844,7 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void PostMessage(IntPtr hWnd, WM Msg, IntPtr wParam, IntPtr lParam)
 		{
-			if (!_PostMessage(hWnd, Msg, wParam, lParam))
-			{
-				throw new Win32Exception();
-			}
+			if (!_PostMessage(hWnd, Msg, wParam, lParam)) throw new Win32Exception();
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
@@ -3122,12 +2857,8 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static short RegisterClassEx(ref WNDCLASSEX lpwcx)
 		{
-			short ret = _RegisterClassEx(ref lpwcx);
-			if (ret == 0)
-			{
-				HRESULT.ThrowLastError();
-			}
-
+			var ret = _RegisterClassEx(ref lpwcx);
+			if (ret == 0) HRESULT.ThrowLastError();
 			return ret;
 		}
 
@@ -3138,11 +2869,8 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static WM RegisterWindowMessage(string lpString)
 		{
-			uint iRet = _RegisterWindowMessage(lpString);
-			if (iRet == 0)
-			{
-				HRESULT.ThrowLastError();
-			}
+			var iRet = _RegisterWindowMessage(lpString);
+			if (iRet == 0) HRESULT.ThrowLastError();
 			return (WM)iRet;
 		}
 
@@ -3153,13 +2881,9 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static IntPtr SetActiveWindow(IntPtr hwnd)
 		{
-			Verify.IsNotDefault(hwnd, "hwnd");
-			IntPtr ret = _SetActiveWindow(hwnd);
-			if (ret == IntPtr.Zero)
-			{
-				HRESULT.ThrowLastError();
-			}
-
+			Verify.IsNotDefault(hwnd, nameof(hwnd));
+			var ret = _SetActiveWindow(hwnd);
+			if (ret == IntPtr.Zero) HRESULT.ThrowLastError();
 			return ret;
 		}
 
@@ -3167,10 +2891,7 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static IntPtr SetClassLongPtr(IntPtr hwnd, GCLP nIndex, IntPtr dwNewLong)
 		{
-			if (8 == IntPtr.Size)
-			{
-				return SetClassLongPtr64(hwnd, nIndex, dwNewLong);
-			}
+			if (IntPtr.Size == 8) return SetClassLongPtr64(hwnd, nIndex, dwNewLong);
 			return new IntPtr(SetClassLongPtr32(hwnd, nIndex, dwNewLong.ToInt32()));
 		}
 
@@ -3196,22 +2917,13 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SetProcessWorkingSetSize(IntPtr hProcess, int dwMinimumWorkingSetSize, int dwMaximumWorkingSetSize)
 		{
-			if (!_SetProcessWorkingSetSize(hProcess, new IntPtr(dwMinimumWorkingSetSize), new IntPtr(dwMaximumWorkingSetSize)))
-			{
-				throw new Win32Exception();
-			}
+			if (!_SetProcessWorkingSetSize(hProcess, new IntPtr(dwMinimumWorkingSetSize), new IntPtr(dwMaximumWorkingSetSize))) throw new Win32Exception();
 		}
 
 		// This is aliased as a macro in 32bit Windows.
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static IntPtr SetWindowLongPtr(IntPtr hwnd, GWL nIndex, IntPtr dwNewLong)
-		{
-			if (8 == IntPtr.Size)
-			{
-				return SetWindowLongPtr64(hwnd, nIndex, dwNewLong);
-			}
-			return new IntPtr(SetWindowLongPtr32(hwnd, nIndex, dwNewLong.ToInt32()));
-		}
+		public static IntPtr SetWindowLongPtr(IntPtr hwnd, GWL nIndex, IntPtr dwNewLong) 
+			=> IntPtr.Size == 8 ? SetWindowLongPtr64(hwnd, nIndex, dwNewLong) : new IntPtr(SetWindowLongPtr32(hwnd, nIndex, dwNewLong.ToInt32()));
 
 		[SuppressMessage("Microsoft.Interoperability", "CA1400:PInvokeEntryPointsShouldExist")]
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
@@ -3230,11 +2942,7 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SetWindowRgn(IntPtr hWnd, IntPtr hRgn, bool bRedraw)
 		{
-			int err = _SetWindowRgn(hWnd, hRgn, bRedraw);
-			if (0 == err)
-			{
-				throw new Win32Exception();
-			}
+			if (_SetWindowRgn(hWnd, hRgn, bRedraw) == 0) throw new Win32Exception();
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
@@ -3243,16 +2951,8 @@ namespace Standard
 		private static extern bool _SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, SWP uFlags);
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, SWP uFlags)
-		{
-			if (!_SetWindowPos(hWnd, hWndInsertAfter, x, y, cx, cy, uFlags))
-			{
-				// If this fails it's never worth taking down the process.  Let the caller deal with the error if they want.
-				return false;
-			}
-
-			return true;
-		}
+		public static bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, SWP uFlags) 
+			=> _SetWindowPos(hWnd, hWndInsertAfter, x, y, cx, cy, uFlags);
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[DllImport("shell32.dll", SetLastError = false)]
@@ -3282,24 +2982,14 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SystemParametersInfo(SPI uiAction, int uiParam, string pvParam, SPIF fWinIni)
 		{
-			if (!_SystemParametersInfo_String(uiAction, uiParam, pvParam, fWinIni))
-			{
-				HRESULT.ThrowLastError();
-			}
+			if (!_SystemParametersInfo_String(uiAction, uiParam, pvParam, fWinIni)) HRESULT.ThrowLastError();
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static NONCLIENTMETRICS SystemParameterInfo_GetNONCLIENTMETRICS()
 		{
-			var metrics = Utility.IsOSVistaOrNewer
-				? NONCLIENTMETRICS.VistaMetricsStruct
-				: NONCLIENTMETRICS.XPMetricsStruct;
-
-			if (!_SystemParametersInfo_NONCLIENTMETRICS(SPI.GETNONCLIENTMETRICS, metrics.cbSize, ref metrics, SPIF.None))
-			{
-				HRESULT.ThrowLastError();
-			}
-
+			var metrics = Utility.IsOSVistaOrNewer ? NONCLIENTMETRICS.VistaMetricsStruct : NONCLIENTMETRICS.XPMetricsStruct;
+			if (!_SystemParametersInfo_NONCLIENTMETRICS(SPI.GETNONCLIENTMETRICS, metrics.cbSize, ref metrics, SPIF.None)) HRESULT.ThrowLastError();
 			return metrics;
 		}
 
@@ -3307,12 +2997,7 @@ namespace Standard
 		public static HIGHCONTRAST SystemParameterInfo_GetHIGHCONTRAST()
 		{
 			var hc = new HIGHCONTRAST { cbSize = Marshal.SizeOf(typeof(HIGHCONTRAST)) };
-
-			if (!_SystemParametersInfo_HIGHCONTRAST(SPI.GETHIGHCONTRAST, hc.cbSize, ref hc, SPIF.None))
-			{
-				HRESULT.ThrowLastError();
-			}
-
+			if (!_SystemParametersInfo_HIGHCONTRAST(SPI.GETHIGHCONTRAST, hc.cbSize, ref hc, SPIF.None)) HRESULT.ThrowLastError();
 			return hc;
 		}
 
@@ -3328,11 +3013,8 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static IntPtr SelectObject(SafeDC hdc, IntPtr hgdiobj)
 		{
-			IntPtr ret = _SelectObject(hdc, hgdiobj);
-			if (ret == IntPtr.Zero)
-			{
-				HRESULT.ThrowLastError();
-			}
+			var ret = _SelectObject(hdc, hgdiobj);
+			if (ret == IntPtr.Zero) HRESULT.ThrowLastError();
 			return ret;
 		}
 
@@ -3343,11 +3025,8 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static IntPtr SelectObject(SafeDC hdc, SafeHBITMAP hgdiobj)
 		{
-			IntPtr ret = _SelectObjectSafeHBITMAP(hdc, hgdiobj);
-			if (ret == IntPtr.Zero)
-			{
-				HRESULT.ThrowLastError();
-			}
+			var ret = _SelectObjectSafeHBITMAP(hdc, hgdiobj);
+			if (ret == IntPtr.Zero) HRESULT.ThrowLastError();
 			return ret;
 		}
 
@@ -3372,18 +3051,12 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void UnregisterClass(short atom, IntPtr hinstance)
 		{
-			if (!_UnregisterClassAtom(new IntPtr(atom), hinstance))
-			{
-				HRESULT.ThrowLastError();
-			}
+			if (!_UnregisterClassAtom(new IntPtr(atom), hinstance)) HRESULT.ThrowLastError();
 		}
 
 		public static void UnregisterClass(string lpClassName, IntPtr hInstance)
 		{
-			if (!_UnregisterClassName(lpClassName, hInstance))
-			{
-				HRESULT.ThrowLastError();
-			}
+			if (!_UnregisterClassName(lpClassName, hInstance)) HRESULT.ThrowLastError();
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
@@ -3426,23 +3099,14 @@ namespace Standard
 			ref BLENDFUNCTION pblend,
 			ULW dwFlags)
 		{
-			if (!_UpdateLayeredWindow(hwnd, hdcDst, ref pptDst, ref psize, hdcSrc, ref pptSrc, crKey, ref pblend, dwFlags))
-			{
-				HRESULT.ThrowLastError();
-			}
+			if (!_UpdateLayeredWindow(hwnd, hdcDst, ref pptDst, ref psize, hdcSrc, ref pptSrc, crKey, ref pblend, dwFlags)) HRESULT.ThrowLastError();
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static void UpdateLayeredWindow(
-			IntPtr hwnd,
-			int crKey,
-			ref BLENDFUNCTION pblend,
-			ULW dwFlags)
+		public static void UpdateLayeredWindow(IntPtr hwnd, int crKey, ref BLENDFUNCTION pblend, ULW dwFlags)
 		{
-			if (!_UpdateLayeredWindowIntPtr(hwnd, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, crKey, ref pblend, dwFlags))
-			{
+			if (!_UpdateLayeredWindowIntPtr(hwnd, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, crKey, ref pblend, dwFlags)) 
 				HRESULT.ThrowLastError();
-			}
 		}
 
 		#region Win7 declarations
@@ -3455,18 +3119,11 @@ namespace Standard
 		[DllImport("shell32.dll", EntryPoint = "SHAddToRecentDocs")]
 		private static extern void _SHAddToRecentDocs_ShellLink(SHARD uFlags, IShellLinkW pv);
 
-		public static void SHAddToRecentDocs(string path)
-		{
-			_SHAddToRecentDocs_String(SHARD.PATHW, path);
-		}
+		public static void SHAddToRecentDocs(string path) => _SHAddToRecentDocs_String(SHARD.PATHW, path);
 
 		// Win7 only.
-		public static void SHAddToRecentDocs(IShellLinkW shellLink)
-		{
-			_SHAddToRecentDocs_ShellLink(SHARD.LINK, shellLink);
-		}
-
-
+		public static void SHAddToRecentDocs(IShellLinkW shellLink) => _SHAddToRecentDocs_ShellLink(SHARD.LINK, shellLink);
+		
 		// #define DWM_SIT_DISPLAYFRAME    0x00000001  // Display a window frame around the provided bitmap
 
 		[DllImport("dwmapi.dll", EntryPoint = "DwmGetCompositionTimingInfo")]
@@ -3474,21 +3131,11 @@ namespace Standard
 
 		public static DWM_TIMING_INFO? DwmGetCompositionTimingInfo(IntPtr hwnd)
 		{
-			if (!Utility.IsOSVistaOrNewer)
-			{
-				// API was new to Vista.
-				return null;
-			}
-
+			if (!Utility.IsOSVistaOrNewer) return null; // API was new to Vista.
 			var dti = new DWM_TIMING_INFO { cbSize = Marshal.SizeOf(typeof(DWM_TIMING_INFO)) };
-			HRESULT hr = _DwmGetCompositionTimingInfo(Utility.IsOSWindows8OrNewer ? IntPtr.Zero : hwnd, ref dti);
-			if (hr == HRESULT.E_PENDING)
-			{
-				// The system isn't yet ready to respond.  Return null rather than throw.
-				return null;
-			}
+			var hr = _DwmGetCompositionTimingInfo(Utility.IsOSWindows8OrNewer ? IntPtr.Zero : hwnd, ref dti);
+			if (hr == HRESULT.E_PENDING) return null; // The system isn't yet ready to respond.  Return null rather than throw.
 			hr.ThrowIfFailed();
-
 			return dti;
 		}
 

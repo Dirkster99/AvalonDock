@@ -12,6 +12,12 @@ using System.Windows;
 
 namespace AvalonDock.Controls
 {
+	/// <inheritdoc />
+	/// <summary>
+	/// This is a wrapper for around the custom document content view of <see cref="LayoutElement"/>.
+	/// Implements the <see cref="AvalonDock.Controls.LayoutItem" />
+	/// </summary>
+	/// <seealso cref="AvalonDock.Controls.LayoutItem" />
 	public class LayoutDocumentItem : LayoutItem
 	{
 		#region fields

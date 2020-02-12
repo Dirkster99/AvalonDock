@@ -42,16 +42,13 @@ namespace Standard
 		/// </param>
 		public ManagedIStream(Stream source)
 		{
-			Verify.IsNotNull(source, "source");
+			Verify.IsNotNull(source, nameof(source));
 			_source = source;
 		}
 
 		private void _Validate()
 		{
-			if (null == _source)
-			{
-				throw new ObjectDisposedException("this");
-			}
+			if (_source == null) throw new ObjectDisposedException("this");
 		}
 
 		// Comments are taken from MSDN IStream documentation.
@@ -116,38 +113,24 @@ namespace Standard
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public void CopyTo(IStream pstm, long cb, IntPtr pcbRead, IntPtr pcbWritten)
 		{
-			Verify.IsNotNull(pstm, "pstm");
-
+			Verify.IsNotNull(pstm, nameof(pstm));
 			_Validate();
-
-			// Reasonbly sized buffer, don't try to copy large streams in bulk.
+			// Reasonably sized buffer, don't try to copy large streams in bulk.
 			var buffer = new byte[4096];
 			long cbWritten = 0;
 
 			while (cbWritten < cb)
 			{
-				int cbRead = _source.Read(buffer, 0, buffer.Length);
-				if (0 == cbRead)
-				{
-					break;
-				}
-
+				var cbRead = _source.Read(buffer, 0, buffer.Length);
+				if (cbRead == 0) break;
 				// COM documentation is a bit vague here whether NULL is valid for the third parameter.
 				// Going to assume it is, as most implementations I've seen treat it as optional.
 				// It's possible this will break on some IStream implementations.
 				pstm.Write(buffer, cbRead, IntPtr.Zero);
 				cbWritten += cbRead;
 			}
-
-			if (IntPtr.Zero != pcbRead)
-			{
-				Marshal.WriteInt64(pcbRead, cbWritten);
-			}
-
-			if (IntPtr.Zero != pcbWritten)
-			{
-				Marshal.WriteInt64(pcbWritten, cbWritten);
-			}
+			if (pcbRead != IntPtr.Zero) Marshal.WriteInt64(pcbRead, cbWritten);
+			if (pcbWritten != IntPtr.Zero) Marshal.WriteInt64(pcbWritten, cbWritten);
 		}
 
 		/// <summary>
@@ -167,10 +150,7 @@ namespace Standard
 		/// This class doesn't implement LockRegion.  A COMException is thrown if it is used.
 		/// </remarks>
 		[SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Standard.HRESULT.ThrowIfFailed(System.String)"), Obsolete("The method is not implemented", true)]
-		public void LockRegion(long libOffset, long cb, int dwLockType)
-		{
-			HRESULT.STG_E_INVALIDFUNCTION.ThrowIfFailed("The method is not implemented.");
-		}
+		public void LockRegion(long libOffset, long cb, int dwLockType) => HRESULT.STG_E_INVALIDFUNCTION.ThrowIfFailed("The method is not implemented.");
 
 		/// <summary>
 		/// Reads a specified number of bytes from the stream object into memory starting at the current seek pointer. 
@@ -191,13 +171,8 @@ namespace Standard
 		public void Read(byte[] pv, int cb, IntPtr pcbRead)
 		{
 			_Validate();
-
-			int cbRead = _source.Read(pv, 0, cb);
-
-			if (IntPtr.Zero != pcbRead)
-			{
-				Marshal.WriteInt32(pcbRead, cbRead);
-			}
+			var cbRead = _source.Read(pv, 0, cb);
+			if (pcbRead != IntPtr.Zero) Marshal.WriteInt32(pcbRead, cbRead);
 		}
 
 
@@ -208,10 +183,7 @@ namespace Standard
 		/// This class doesn't implement Revert.  A COMException is thrown if it is used.
 		/// </remarks>
 		[SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Standard.HRESULT.ThrowIfFailed(System.String)"), Obsolete("The method is not implemented", true)]
-		public void Revert()
-		{
-			HRESULT.STG_E_INVALIDFUNCTION.ThrowIfFailed("The method is not implemented.");
-		}
+		public void Revert() => HRESULT.STG_E_INVALIDFUNCTION.ThrowIfFailed("The method is not implemented.");
 
 		/// <summary>
 		/// Changes the seek pointer to a new location relative to the beginning of the
@@ -235,13 +207,8 @@ namespace Standard
 		public void Seek(long dlibMove, int dwOrigin, IntPtr plibNewPosition)
 		{
 			_Validate();
-
-			long position = _source.Seek(dlibMove, (SeekOrigin)dwOrigin);
-
-			if (IntPtr.Zero != plibNewPosition)
-			{
-				Marshal.WriteInt64(plibNewPosition, position);
-			}
+			var position = _source.Seek(dlibMove, (SeekOrigin)dwOrigin);
+			if (plibNewPosition != IntPtr.Zero) Marshal.WriteInt64(plibNewPosition, position);
 		}
 
 		/// <summary>
@@ -271,9 +238,8 @@ namespace Standard
 		/// </param>
 		public void Stat(out STATSTG pstatstg, int grfStatFlag)
 		{
-			pstatstg = default(STATSTG);
+			pstatstg = default;
 			_Validate();
-
 			pstatstg.type = STGTY_STREAM;
 			pstatstg.cbSize = _source.Length;
 			pstatstg.grfMode = STGM_READWRITE;
@@ -297,10 +263,7 @@ namespace Standard
 		/// </remarks>
 		[SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Standard.HRESULT.ThrowIfFailed(System.String)")]
 		[Obsolete("The method is not implemented", true)]
-		public void UnlockRegion(long libOffset, long cb, int dwLockType)
-		{
-			HRESULT.STG_E_INVALIDFUNCTION.ThrowIfFailed("The method is not implemented.");
-		}
+		public void UnlockRegion(long libOffset, long cb, int dwLockType) => HRESULT.STG_E_INVALIDFUNCTION.ThrowIfFailed("The method is not implemented.");
 
 		/// <summary>
 		/// Writes a specified number of bytes into the stream object starting at the current seek pointer.
@@ -320,30 +283,16 @@ namespace Standard
 		public void Write(byte[] pv, int cb, IntPtr pcbWritten)
 		{
 			_Validate();
-
 			_source.Write(pv, 0, cb);
-
-			if (IntPtr.Zero != pcbWritten)
-			{
-				Marshal.WriteInt32(pcbWritten, cb);
-			}
+			if (pcbWritten != IntPtr.Zero) Marshal.WriteInt32(pcbWritten, cb);
 		}
 
 		#endregion IStream Members
 
 		#region IDisposable Members
 
-		/// <summary>
-		/// Releases resources controlled by this object.
-		/// </summary>
-		/// <remarks>
-		/// Dispose can be called multiple times, but trying to use the object
-		/// after it has been disposed will generally throw ObjectDisposedExceptions.
-		/// </remarks>
-		public void Dispose()
-		{
-			_source = null;
-		}
+		/// <inheritdoc />
+		public void Dispose() => _source = null;
 
 		#endregion
 	}

@@ -17,76 +17,58 @@ namespace Microsoft.Windows.Shell
 
 	public static class SystemCommands
 	{
-		public static RoutedCommand CloseWindowCommand
-		{
-			get; private set;
-		}
-		public static RoutedCommand MaximizeWindowCommand
-		{
-			get; private set;
-		}
-		public static RoutedCommand MinimizeWindowCommand
-		{
-			get; private set;
-		}
-		public static RoutedCommand RestoreWindowCommand
-		{
-			get; private set;
-		}
-		public static RoutedCommand ShowSystemMenuCommand
-		{
-			get; private set;
-		}
+		public static RoutedCommand CloseWindowCommand { get; }
+		public static RoutedCommand MaximizeWindowCommand { get; }
+		public static RoutedCommand MinimizeWindowCommand { get; }
+		public static RoutedCommand RestoreWindowCommand { get; }
+		public static RoutedCommand ShowSystemMenuCommand { get; }
 
 		static SystemCommands()
 		{
-			CloseWindowCommand = new RoutedCommand("CloseWindow", typeof(SystemCommands));
-			MaximizeWindowCommand = new RoutedCommand("MaximizeWindow", typeof(SystemCommands));
-			MinimizeWindowCommand = new RoutedCommand("MinimizeWindow", typeof(SystemCommands));
-			RestoreWindowCommand = new RoutedCommand("RestoreWindow", typeof(SystemCommands));
-			ShowSystemMenuCommand = new RoutedCommand("ShowSystemMenu", typeof(SystemCommands));
+			CloseWindowCommand = new RoutedCommand(nameof(CloseWindow), typeof(SystemCommands));
+			MaximizeWindowCommand = new RoutedCommand(nameof(MaximizeWindow), typeof(SystemCommands));
+			MinimizeWindowCommand = new RoutedCommand(nameof(MinimizeWindow), typeof(SystemCommands));
+			RestoreWindowCommand = new RoutedCommand(nameof(RestoreWindow), typeof(SystemCommands));
+			ShowSystemMenuCommand = new RoutedCommand(nameof(ShowSystemMenu), typeof(SystemCommands));
 		}
 
 		private static void _PostSystemCommand(Window window, SC command)
 		{
-			IntPtr hwnd = new WindowInteropHelper(window).Handle;
-			if (hwnd == IntPtr.Zero || !NativeMethods.IsWindow(hwnd))
-			{
-				return;
-			}
-
-			NativeMethods.PostMessage(hwnd, WM.SYSCOMMAND, new IntPtr((int)command), IntPtr.Zero);
+			var hWnd = new WindowInteropHelper(window).Handle;
+			if (hWnd == IntPtr.Zero || !NativeMethods.IsWindow(hWnd)) return;
+			NativeMethods.PostMessage(hWnd, WM.SYSCOMMAND, new IntPtr((int)command), IntPtr.Zero);
 		}
 
 		public static void CloseWindow(Window window)
 		{
-			Verify.IsNotNull(window, "window");
+			Verify.IsNotNull(window, nameof(window));
 			_PostSystemCommand(window, SC.CLOSE);
 		}
 
 		public static void MaximizeWindow(Window window)
 		{
-			Verify.IsNotNull(window, "window");
+			Verify.IsNotNull(window, nameof(window));
 			_PostSystemCommand(window, SC.MAXIMIZE);
 		}
 
 		public static void MinimizeWindow(Window window)
 		{
-			Verify.IsNotNull(window, "window");
+			Verify.IsNotNull(window, nameof(window));
 			_PostSystemCommand(window, SC.MINIMIZE);
 		}
 
 		public static void RestoreWindow(Window window)
 		{
-			Verify.IsNotNull(window, "window");
+			Verify.IsNotNull(window, nameof(window));
 			_PostSystemCommand(window, SC.RESTORE);
 		}
 
 		/// <summary>Display the system menu at a specified location.</summary>
+		/// <param name="window"></param>
 		/// <param name="screenLocation">The location to display the system menu, in logical screen coordinates.</param>
 		public static void ShowSystemMenu(Window window, Point screenLocation)
 		{
-			Verify.IsNotNull(window, "window");
+			Verify.IsNotNull(window, nameof(window));
 			ShowSystemMenuPhysicalCoordinates(window, DpiHelper.LogicalPixelsToDevice(screenLocation));
 		}
 
@@ -95,20 +77,12 @@ namespace Microsoft.Windows.Shell
 			const uint TPM_RETURNCMD = 0x0100;
 			const uint TPM_LEFTBUTTON = 0x0;
 
-			Verify.IsNotNull(window, "window");
-			IntPtr hwnd = new WindowInteropHelper(window).Handle;
-			if (hwnd == IntPtr.Zero || !NativeMethods.IsWindow(hwnd))
-			{
-				return;
-			}
-
-			IntPtr hmenu = NativeMethods.GetSystemMenu(hwnd, false);
-
-			uint cmd = NativeMethods.TrackPopupMenuEx(hmenu, TPM_LEFTBUTTON | TPM_RETURNCMD, (int)physicalScreenLocation.X, (int)physicalScreenLocation.Y, hwnd, IntPtr.Zero);
-			if (0 != cmd)
-			{
-				NativeMethods.PostMessage(hwnd, WM.SYSCOMMAND, new IntPtr(cmd), IntPtr.Zero);
-			}
+			Verify.IsNotNull(window, nameof(window));
+			var hWnd = new WindowInteropHelper(window).Handle;
+			if (hWnd == IntPtr.Zero || !NativeMethods.IsWindow(hWnd)) return;
+			var hMenu = NativeMethods.GetSystemMenu(hWnd, false);
+			var cmd = NativeMethods.TrackPopupMenuEx(hMenu, TPM_LEFTBUTTON | TPM_RETURNCMD, (int)physicalScreenLocation.X, (int)physicalScreenLocation.Y, hWnd, IntPtr.Zero);
+			if (cmd != 0) NativeMethods.PostMessage(hWnd, WM.SYSCOMMAND, new IntPtr(cmd), IntPtr.Zero);
 		}
 	}
 }

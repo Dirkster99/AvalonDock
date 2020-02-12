@@ -117,7 +117,7 @@ namespace AvalonDock.Layout
 		System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() => null;
 
 		/// <inheritdoc cref=" IXmlSerializable." />
-		/// <summary>provides a standard overridable implmentation for derriving classes.</summary>
+		/// <summary>provides a standard overridable implementation for deriving classes.</summary>
 		public virtual void ReadXml(System.Xml.XmlReader reader)
 		{
 			reader.MoveToContent();
@@ -131,11 +131,8 @@ namespace AvalonDock.Layout
 			reader.Read();
 			while (true)
 			{
-				if ((reader.LocalName == localName) &&
-					(reader.NodeType == System.Xml.XmlNodeType.EndElement))
-				{
+				if (reader.LocalName == localName && reader.NodeType == System.Xml.XmlNodeType.EndElement)
 					break;
-				}
 				if (reader.NodeType == System.Xml.XmlNodeType.Whitespace)
 				{
 					reader.Read();
@@ -174,7 +171,7 @@ namespace AvalonDock.Layout
 		}
 
 		/// <inheritdoc cref=" IXmlSerializable." />
-		/// <summary>provides a standard overridable implmentation for derriving classes.</summary>
+		/// <summary>provides a standard overridable implementation for deriving classes.</summary>
 		public virtual void WriteXml(System.Xml.XmlWriter writer)
 		{
 			foreach (var child in Children)
