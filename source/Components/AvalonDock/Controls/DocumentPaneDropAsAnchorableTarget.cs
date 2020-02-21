@@ -76,10 +76,7 @@ namespace AvalonDock.Controls
 				parentGroup = targetModel.Parent as LayoutDocumentPaneGroup;
 				var dropTargetObject = parentGroup.Parent as LayoutDocumentFloatingWindow;
 				if (parentGroup != null && dropTargetObject != null)
-				{
-					// Dirk: ToDo Drop the LayoutAnchorable into the DropTarget of the LayoutDocumentFloatingWindow
-					throw new NotImplementedException();
-				}
+					DropLayoutAnchorable(floatingWindow);
 
 				base.Drop(floatingWindow);
 				return;
@@ -207,6 +204,179 @@ namespace AvalonDock.Controls
 			}
 
 			base.Drop(floatingWindow);
+		}
+
+		/// <summary>
+		/// Dropping a <see cref="LayoutAnchorableFloatingWindow"/> source into a
+		/// <see cref="LayoutDocumentFloatingWindow"/> target.
+		/// </summary>
+		/// <param name="floatingWindow"></param>
+		private void DropLayoutAnchorable(LayoutAnchorableFloatingWindow floatingWindow)
+		{
+			ILayoutDocumentPane targetModel = _targetPane.Model as ILayoutDocumentPane;
+
+			switch (Type)
+			{
+				case DropTargetType.DocumentPaneDockAsAnchorableBottom:
+					#region DropTargetType.DocumentPaneDockAsAnchorableBottom
+					{
+						var parentModel = targetModel.Parent as LayoutDocumentPaneGroup;
+						var newLayoutDocumentPane = new LayoutDocumentPane();
+
+						if (parentModel == null)
+						{
+							var parentContainer = targetModel.Parent as ILayoutContainer;
+							var newParentModel = new LayoutDocumentPaneGroup() { Orientation = System.Windows.Controls.Orientation.Vertical };
+							parentContainer.ReplaceChild(targetModel, newParentModel);
+							newParentModel.Children.Add(targetModel as LayoutDocumentPane);
+							newParentModel.Children.Add(newLayoutDocumentPane);
+						}
+						else
+						{
+							var manager = parentModel.Root.Manager;
+							if (!manager.AllowMixedOrientation || parentModel.Orientation == System.Windows.Controls.Orientation.Vertical)
+							{
+								parentModel.Orientation = System.Windows.Controls.Orientation.Vertical;
+								int targetPaneIndex = parentModel.IndexOfChild(targetModel);
+								parentModel.Children.Insert(targetPaneIndex + 1, newLayoutDocumentPane);
+							}
+							else
+							{
+								LayoutDocumentPaneGroup newChildGroup = new LayoutDocumentPaneGroup();
+								newChildGroup.Orientation = System.Windows.Controls.Orientation.Vertical;
+								parentModel.ReplaceChild(targetModel, newChildGroup);
+								newChildGroup.Children.Add(targetModel);
+								newChildGroup.Children.Add(newLayoutDocumentPane);
+							}
+						}
+
+						foreach (var cntToTransfer in floatingWindow.RootPanel.Descendents().OfType<LayoutAnchorable>().ToArray())
+							newLayoutDocumentPane.Children.Add(cntToTransfer);
+
+					}
+					break;
+				#endregion DropTargetType.DocumentPaneDockAsAnchorableBottom
+
+				case DropTargetType.DocumentPaneDockAsAnchorableTop:
+					#region DropTargetType.DocumentPaneDockAsAnchorableTop
+					{
+						var parentModel = targetModel.Parent as LayoutDocumentPaneGroup;
+						var newLayoutDocumentPane = new LayoutDocumentPane();
+
+						if (parentModel == null)
+						{
+							var parentContainer = targetModel.Parent as ILayoutContainer;
+							var newParentModel = new LayoutDocumentPaneGroup() { Orientation = System.Windows.Controls.Orientation.Vertical };
+							parentContainer.ReplaceChild(targetModel, newParentModel);
+							newParentModel.Children.Add(newLayoutDocumentPane);
+							newParentModel.Children.Add(targetModel as LayoutDocumentPane);
+						}
+						else
+						{
+							var manager = parentModel.Root.Manager;
+							if (!manager.AllowMixedOrientation || parentModel.Orientation == System.Windows.Controls.Orientation.Vertical)
+							{
+								parentModel.Orientation = System.Windows.Controls.Orientation.Vertical;
+								int targetPaneIndex = parentModel.IndexOfChild(targetModel);
+								parentModel.Children.Insert(targetPaneIndex, newLayoutDocumentPane);
+							}
+							else
+							{
+								LayoutDocumentPaneGroup newChildGroup = new LayoutDocumentPaneGroup();
+								newChildGroup.Orientation = System.Windows.Controls.Orientation.Vertical;
+								parentModel.ReplaceChild(targetModel, newChildGroup);
+								newChildGroup.Children.Add(newLayoutDocumentPane);
+								newChildGroup.Children.Add(targetModel);
+							}
+						}
+
+						foreach (var cntToTransfer in floatingWindow.RootPanel.Descendents().OfType<LayoutAnchorable>().ToArray())
+							newLayoutDocumentPane.Children.Add(cntToTransfer);
+
+					}
+					break;
+				#endregion DropTargetType.DocumentPaneDockAsAnchorableTop
+
+				case DropTargetType.DocumentPaneDockAsAnchorableLeft:
+					#region DropTargetType.DocumentPaneDockAsAnchorableLeft
+					{
+						var parentModel = targetModel.Parent as LayoutDocumentPaneGroup;
+						var newLayoutDocumentPane = new LayoutDocumentPane();
+
+						if (parentModel == null)
+						{
+							var parentContainer = targetModel.Parent as ILayoutContainer;
+							var newParentModel = new LayoutDocumentPaneGroup() { Orientation = System.Windows.Controls.Orientation.Horizontal };
+							parentContainer.ReplaceChild(targetModel, newParentModel);
+							newParentModel.Children.Add(newLayoutDocumentPane);
+							newParentModel.Children.Add(targetModel as LayoutDocumentPane);
+						}
+						else
+						{
+							var manager = parentModel.Root.Manager;
+							if (!manager.AllowMixedOrientation || parentModel.Orientation == System.Windows.Controls.Orientation.Horizontal)
+							{
+								parentModel.Orientation = System.Windows.Controls.Orientation.Horizontal;
+								int targetPaneIndex = parentModel.IndexOfChild(targetModel);
+								parentModel.Children.Insert(targetPaneIndex, newLayoutDocumentPane);
+							}
+							else
+							{
+								LayoutDocumentPaneGroup newChildGroup = new LayoutDocumentPaneGroup();
+								newChildGroup.Orientation = System.Windows.Controls.Orientation.Horizontal;
+								parentModel.ReplaceChild(targetModel, newChildGroup);
+								newChildGroup.Children.Add(newLayoutDocumentPane);
+								newChildGroup.Children.Add(targetModel);
+							}
+
+						}
+
+						foreach (var cntToTransfer in floatingWindow.RootPanel.Descendents().OfType<LayoutAnchorable>().ToArray())
+							newLayoutDocumentPane.Children.Add(cntToTransfer);
+					}
+					break;
+				#endregion DropTargetType.DocumentPaneDockAsAnchorableLeft
+
+				case DropTargetType.DocumentPaneDockAsAnchorableRight:
+					#region DropTargetType.DocumentPaneDockAsAnchorableRight
+					{
+						var parentModel = targetModel.Parent as LayoutDocumentPaneGroup;
+						var newLayoutDocumentPane = new LayoutDocumentPane();
+
+						if (parentModel == null)
+						{
+							var parentContainer = targetModel.Parent as ILayoutContainer;
+							var newParentModel = new LayoutDocumentPaneGroup() { Orientation = System.Windows.Controls.Orientation.Horizontal };
+							parentContainer.ReplaceChild(targetModel, newParentModel);
+							newParentModel.Children.Add(targetModel as LayoutDocumentPane);
+							newParentModel.Children.Add(newLayoutDocumentPane);
+						}
+						else
+						{
+							var manager = parentModel.Root.Manager;
+							if (!manager.AllowMixedOrientation || parentModel.Orientation == System.Windows.Controls.Orientation.Horizontal)
+							{
+								parentModel.Orientation = System.Windows.Controls.Orientation.Horizontal;
+								int targetPaneIndex = parentModel.IndexOfChild(targetModel);
+								parentModel.Children.Insert(targetPaneIndex + 1, newLayoutDocumentPane);
+							}
+							else
+							{
+								LayoutDocumentPaneGroup newChildGroup = new LayoutDocumentPaneGroup();
+								newChildGroup.Orientation = System.Windows.Controls.Orientation.Horizontal;
+								parentModel.ReplaceChild(targetModel, newChildGroup);
+								newChildGroup.Children.Add(targetModel);
+								newChildGroup.Children.Add(newLayoutDocumentPane);
+							}
+						}
+
+						foreach (var cntToTransfer in floatingWindow.RootPanel.Descendents().OfType<LayoutAnchorable>().ToArray())
+							newLayoutDocumentPane.Children.Add(cntToTransfer);
+
+					}
+					break;
+					#endregion DropTargetType.DocumentPaneDockAsAnchorableRight
+			}
 		}
 
 		/// <summary>
