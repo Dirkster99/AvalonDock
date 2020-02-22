@@ -19,18 +19,23 @@ namespace AvalonDock.Controls
 	public class LayoutAnchorableControl : Control
 	{
 		#region Constructors
-
+		/// <summary>
+		/// Static class constructor
+		/// </summary>
 		static LayoutAnchorableControl()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutAnchorableControl), new FrameworkPropertyMetadata(typeof(LayoutAnchorableControl)));
 			FocusableProperty.OverrideMetadata(typeof(LayoutAnchorableControl), new FrameworkPropertyMetadata(false));
 		}
 
+		/// <summary>
+		/// Class constructor
+		/// </summary>
 		public LayoutAnchorableControl()
 		{
 			//SetBinding(FlowDirectionProperty, new Binding("Model.Root.Manager.FlowDirection") { Source = this });
+			Unloaded += LayoutAnchorableControl_Unloaded;
 		}
-
 		#endregion Constructors
 
 		#region Properties
@@ -98,8 +103,8 @@ namespace AvalonDock.Controls
 
 		#endregion Properties
 
-		#region Overrides
-
+		#region Methods
+		/// <inheritdoc/>
 		protected override void OnGotKeyboardFocus(System.Windows.Input.KeyboardFocusChangedEventArgs e)
 		{
 			if (Model != null) 
@@ -107,6 +112,19 @@ namespace AvalonDock.Controls
 			base.OnGotKeyboardFocus(e);
 		}
 
-		#endregion Overrides
+		/// <summary>
+		/// Executes when the element is removed from within an element tree of loaded elements.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void LayoutAnchorableControl_Unloaded(object sender, RoutedEventArgs e)
+		{
+			// prevent memory leak via event handler
+			if (Model != null)
+				Model.PropertyChanged -= Model_PropertyChanged;
+
+			Unloaded -= LayoutAnchorableControl_Unloaded;
+		}
+		#endregion Methods
 	}
 }
