@@ -132,7 +132,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 - [Feature added: AutoHideDelay property to control the time until an AutoHide window is reduced back to its anchored representation](https://github.com/Dirkster99/AvalonDock/pull/110) Thanx to [Alexei Stukov](https://github.com/Jiiks)
 
-- [Fix for Issue 127](https://github.com/Dirkster99/AvalonDock/issues/127)  
+- [Fix for Issue 127 Controls cause memory leaks via event listener](https://github.com/Dirkster99/AvalonDock/issues/127)  
   [PL #128](https://github.com/Dirkster99/AvalonDock/pull/128)
 
 ## Patch History for AvalonDock 3.6.2
