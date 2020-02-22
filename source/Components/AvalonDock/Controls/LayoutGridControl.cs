@@ -100,7 +100,7 @@ namespace AvalonDock.Controls
 
 		#region Private Methods
 		/// <summary>
-		/// Mehtod executes when the element is removed from within an element tree of loaded elements.
+		/// Method executes when the element is removed from within an element tree of loaded elements.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
