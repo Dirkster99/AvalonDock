@@ -43,10 +43,11 @@ namespace AvalonDock.Controls
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));
 			CreateChildrenViews();
-			_model.Children.CollectionChanged += (s, e) => OnModelChildrenCollectionChanged(e);
+			_model.Children.CollectionChanged += OnModelChildrenCollectionChanged;
 			UpdateSide();
-		}
 
+			Unloaded += LayoutAnchorSideControl_Unloaded;
+		}
 		#endregion Constructors
 
 		#region Properties
@@ -126,6 +127,16 @@ namespace AvalonDock.Controls
 		#endregion Properties
 
 		#region Private Methods
+		/// <summary>
+		/// Executes when the element is removed from within an element tree of loaded elements.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void LayoutAnchorSideControl_Unloaded(object sender, RoutedEventArgs e)
+		{
+			_model.Children.CollectionChanged -= OnModelChildrenCollectionChanged;
+			Unloaded -= LayoutAnchorSideControl_Unloaded;
+		}
 
 		private void CreateChildrenViews()
 		{
@@ -133,7 +144,8 @@ namespace AvalonDock.Controls
 			foreach (var childModel in _model.Children) _childViews.Add(manager.CreateUIElementForModel(childModel) as LayoutAnchorGroupControl);
 		}
 
-		private void OnModelChildrenCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		private void OnModelChildrenCollectionChanged(object sender,
+													  System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
 			if (e.OldItems != null &&
 				(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove ||
