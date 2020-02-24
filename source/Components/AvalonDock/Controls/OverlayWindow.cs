@@ -94,6 +94,15 @@ namespace AvalonDock.Controls
 
 		#endregion
 
+		#region Properties.
+
+		/// <summary>
+		/// Gets whether the window is hosted in a floating window.
+		/// </summary>
+		public bool IsHostedInFloatingWindow => _host is LayoutDocumentFloatingWindowControl || _host is LayoutAnchorableFloatingWindowControl;
+
+		#endregion
+
 		#region Overrides
 
 		public override void OnApplyTemplate()
@@ -601,7 +610,17 @@ namespace AvalonDock.Controls
 								_documentPaneFullDropTargetBottom.Visibility = Visibility.Visible;
 							}
 
-							if (parentDocumentPaneGroup != null &&
+							if (layoutDocumentPane.IsHostedInFloatingWindow)
+							{
+								// Hide outer buttons if drop area is a document floating window host
+								// since these 4 drop area buttons are available over the DockingManager ONLY.
+								_documentPaneDropTargetBottomAsAnchorablePane.Visibility = System.Windows.Visibility.Collapsed;
+								_documentPaneDropTargetLeftAsAnchorablePane.Visibility = System.Windows.Visibility.Collapsed;
+								_documentPaneDropTargetRightAsAnchorablePane.Visibility = System.Windows.Visibility.Collapsed;
+								_documentPaneDropTargetTopAsAnchorablePane.Visibility = System.Windows.Visibility.Collapsed;
+							}
+
+							else if (parentDocumentPaneGroup != null &&
 								parentDocumentPaneGroup.Children.Where(c => c.IsVisible).Count() > 1)
 							{
 								int indexOfDocumentPane = parentDocumentPaneGroup.Children.Where(ch => ch.IsVisible).ToList().IndexOf(layoutDocumentPane);
@@ -649,6 +668,7 @@ namespace AvalonDock.Controls
 						}
 						else
 						{
+							// Showing a drop target structure with 5 centered star like buttons.
 							areaElement = _gridDocumentPaneDropTargets;
 							var dropAreaDocumentPaneGroup = area as DropArea<LayoutDocumentPaneControl>;
 							var layoutDocumentPane = dropAreaDocumentPaneGroup.AreaElement.Model as LayoutDocumentPane;

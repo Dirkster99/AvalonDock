@@ -31,6 +31,7 @@
   <avalonDockConverters:LayoutItemFromLayoutModelConverter x:Key="LayoutItemFromLayoutModelConverter" />
   <avalonDockConverters:ActivateCommandLayoutItemFromLayoutModelConverter x:Key="ActivateCommandLayoutItemFromLayoutModelConverter" />
   <avalonDockConverters:AnchorableContextMenuHideVisibilityConverter x:Key="AnchorableContextMenuHideVisibilityConverter" />
+  <avalonDockConverters:OverlayWindowToVisibilityConverter x:Key="OverlayWindowToVisibilityConverter" />
 
   <!--DocumentPaneControlStyle-->
   <Style x:Key="AvalonDock_ThemeAero_DocumentPaneControlStyle"
@@ -829,9 +830,14 @@
                 </Grid.RowDefinitions>
                 <Image Grid.ColumnSpan="5"
                        Grid.RowSpan="5"
+                       Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource OverlayWindowToVisibilityConverter}, ConverterParameter=True}"
                        Source="Images/DockPaneLargeEmpty.PNG"
-                       Stretch="None" >
-                </Image>
+                       Stretch="None" />
+                <Image Grid.ColumnSpan="5"
+                       Grid.RowSpan="5"
+                       Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource OverlayWindowToVisibilityConverter}, ConverterParameter=False}"
+                       Source="Images/DockPaneEmpty.PNG"
+                       Stretch="None" />
                 <Border Name="PART_DocumentPaneFullDropTargetTop"
                         Grid.Column="2"
                         Grid.Row="1">
