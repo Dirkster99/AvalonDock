@@ -816,6 +816,7 @@ namespace AvalonDock.Layout
 		{
 			var resultList = new List<object>();
 			while (reader.NodeType == XmlNodeType.Whitespace) reader.Read();
+			if (reader.NodeType == XmlNodeType.EndElement) return resultList;
 
 			if (reader.IsEmptyElement)
 			{
