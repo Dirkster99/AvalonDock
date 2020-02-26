@@ -1095,16 +1095,16 @@
                                       >
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition />
-                                        <ColumnDefinition />
-                                        <ColumnDefinition />
-                                        <ColumnDefinition />
+                                        <ColumnDefinition MinWidth="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}" />
+                                        <ColumnDefinition MinWidth="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}" />
+                                        <ColumnDefinition MinWidth="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}" />
                                         <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
                                         <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
+                                        <RowDefinition MinHeight="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}" />
+                                        <RowDefinition MinHeight="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}" />
+                                        <RowDefinition MinHeight="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}" />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
 

@@ -269,7 +269,10 @@ namespace AvalonDock.Controls
 				#endregion DropTargetType.DocumentPaneDockInside
 			}
 
-			documentActive.IsActive = true;
+			if (documentActive != null)
+			{
+				documentActive.IsActive = true;
+			}
 
 			base.Drop(floatingWindow);
 		}
