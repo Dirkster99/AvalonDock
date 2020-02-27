@@ -77,16 +77,28 @@ namespace AvalonDock.Controls
 		#endregion
 
 		#region Overrides
-
+		/// <summary>
+		/// Method is invoked to complete a drag & drop operation with a (new) docking position
+		/// by docking of the LayoutAnchorable <paramref name="floatingWindow"/> into this drop target.
+		/// 
+		/// Inheriting classes should override this method to implement their own custom logic.
+		/// </summary>
+		/// <param name="floatingWindow"></param>
 		protected virtual void Drop(LayoutAnchorableFloatingWindow floatingWindow)
 		{
 		}
 
+		/// <summary>
+		/// Method is invoked to complete a drag & drop operation with a (new) docking position
+		/// by docking of the LayoutDocument <paramref name="floatingWindow"/> into this drop target.
+		/// 
+		/// Inheriting classes should override this method to implement their own custom logic.
+		/// </summary>
+		/// <param name="floatingWindow"></param>
 		protected virtual void Drop(LayoutDocumentFloatingWindow floatingWindow)
 		{
 		}
-
-		#endregion
+		#endregion Overrides
 
 		#region Public Methods
 
