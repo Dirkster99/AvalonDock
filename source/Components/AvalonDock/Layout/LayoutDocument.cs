@@ -12,6 +12,9 @@ using System.Linq;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>
+	/// Implements the layout model for the <see cref="Controls.LayoutDocumentControl"/>.
+	/// </summary>
 	[Serializable]
 	public class LayoutDocument : LayoutContent
 	{

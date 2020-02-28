@@ -22,7 +22,9 @@ namespace AvalonDock.Controls
 	public class LayoutDocumentControl : Control
 	{
 		#region Constructors
-
+		/// <summary>
+		/// Static class constructor
+		/// </summary>
 		static LayoutDocumentControl()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutDocumentControl), new FrameworkPropertyMetadata(typeof(LayoutDocumentControl)));

@@ -9,6 +9,7 @@
 
 namespace AvalonDock.Layout
 {
+	/// <summary>Defines an API for interacting with (selected) content in a pane.</summary>
 	public interface ILayoutContentSelector
 	{
 		#region Properties

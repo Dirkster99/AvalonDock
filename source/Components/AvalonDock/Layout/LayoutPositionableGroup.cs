@@ -16,6 +16,8 @@ using System.Windows.Controls;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>Provides a base class for other layout panel models that support a specific class of panel.</summary>
+	/// <typeparam name="T"></typeparam>
 	[Serializable]
 	public abstract class LayoutPositionableGroup<T> : LayoutGroup<T>, ILayoutPositionableElementWithActualSize where T : class, ILayoutElement
 	{

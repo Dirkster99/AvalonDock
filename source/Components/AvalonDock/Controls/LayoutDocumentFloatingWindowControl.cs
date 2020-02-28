@@ -32,12 +32,17 @@ namespace AvalonDock.Controls
 		#endregion fields
 
 		#region Constructors
-
+		/// <summary>Static class constructor</summary>
 		static LayoutDocumentFloatingWindowControl()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutDocumentFloatingWindowControl), new FrameworkPropertyMetadata(typeof(LayoutDocumentFloatingWindowControl)));
 		}
 
+		/// <summary>
+		/// Class constructor
+		/// </summary>
+		/// <param name="model"></param>
+		/// <param name="isContentImmutable"></param>
 		internal LayoutDocumentFloatingWindowControl(LayoutDocumentFloatingWindow model, bool isContentImmutable)
 			: base(model, isContentImmutable)
 		{
@@ -48,6 +53,10 @@ namespace AvalonDock.Controls
 			UpdateThemeResources();
 		}
 
+		/// <summary>
+		/// Class constructor
+		/// </summary>
+		/// <param name="model"></param>
 		internal LayoutDocumentFloatingWindowControl(LayoutDocumentFloatingWindow model)
 			: this(model, false)
 		{

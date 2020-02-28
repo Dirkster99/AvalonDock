@@ -14,6 +14,7 @@ using System.Windows.Controls;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>Implements the layout model for the <see cref="Controls.LayoutPanelControl"/>.</summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
 	public class LayoutPanel : LayoutPositionableGroup<ILayoutPanelElement>, ILayoutPanelElement, ILayoutOrientableGroup
@@ -23,11 +24,13 @@ namespace AvalonDock.Layout
 		#endregion fields
 		
 		#region Constructors
-
+		/// <summary>Class constructor</summary>
 		public LayoutPanel()
 		{
 		}
 
+		/// <summary>Class constructor</summary>
+		/// <param name="firstChild"></param>
 		public LayoutPanel(ILayoutPanelElement firstChild)
 		{
 			Children.Add(firstChild);
@@ -36,7 +39,7 @@ namespace AvalonDock.Layout
 		#endregion Constructors
 
 		#region Properties
-
+		/// <summary>Gets/sets the orientation for this panel.</summary>
 		public Orientation Orientation
 		{
 			get => _orientation;
@@ -63,6 +66,7 @@ namespace AvalonDock.Layout
 			base.WriteXml(writer);
 		}
 
+		/// <inheritdoc />
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
 			if (reader.MoveToAttribute(nameof(Orientation)))
@@ -71,6 +75,7 @@ namespace AvalonDock.Layout
 		}
 
 #if TRACE
+		/// <inheritdoc />
 		public override void ConsoleDump(int tab)
 		{
 			System.Diagnostics.Trace.Write(new string(' ', tab * 4));

@@ -17,6 +17,7 @@ using System.Xml;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>Implements the layout model for the <see cref="Controls.LayoutDocumentFloatingWindowControl"/>.</summary>
 	[ContentProperty(nameof(RootPanel))]
 	[Serializable]
 	public class LayoutDocumentFloatingWindow : LayoutFloatingWindow, ILayoutElementWithVisibility
