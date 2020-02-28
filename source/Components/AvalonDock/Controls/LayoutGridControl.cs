@@ -42,7 +42,6 @@ namespace AvalonDock.Controls
 		private Border _resizerGhost = null;
 		private Window _resizerWindowHost = null;
 		private Vector _initialStartPoint;
-		private bool _InitEvents;
 		#endregion fields
 
 		#region Constructors
@@ -76,14 +75,20 @@ namespace AvalonDock.Controls
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
-
-			if (_InitEvents == false) // We'll do this only once even for multiple inits
+			_model.ChildrenTreeChanged += (s, args) =>
 			{
-				_InitEvents = true;
-				_model.ChildrenTreeChanged += _model_ChildrenTreeChanged;
-				this.SizeChanged += OnSizeChanged;
-			}
+				if (args.Change != ChildrenTreeChange.DirectChildrenChanged) return;
+				if (_asyncRefreshCalled.HasValue && _asyncRefreshCalled.Value == args.Change) return;
+				_asyncRefreshCalled = args.Change;
+				Dispatcher.BeginInvoke(new Action(() =>
+				{
+					_asyncRefreshCalled = null;
+					UpdateChildren();
+				}), DispatcherPriority.Normal, null);
+			};
+			this.SizeChanged += OnSizeChanged;
 		}
+
 		#endregion
 
 		#region Internal Methods
@@ -99,39 +104,6 @@ namespace AvalonDock.Controls
 		#endregion
 
 		#region Private Methods
-		/// <summary>
-		/// Method executes when the element is removed from within an element tree of loaded elements.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void OnUnloaded(object sender, RoutedEventArgs e)
-		{
-			// In order to prevent resource leaks, unsubscribe from subscribed events...
-			SizeChanged -= OnSizeChanged;
-			_model.ChildrenTreeChanged -= _model_ChildrenTreeChanged;
-
-			DetachOldSplitters();
-			DetachPropertyChangeHandler();  // Including property changed event handlers
-			Children.Clear();
-			ColumnDefinitions.Clear();
-			RowDefinitions.Clear();
-
-			Unloaded -= OnUnloaded;
-		}
-
-		private void _model_ChildrenTreeChanged(object sender, ChildrenTreeChangedEventArgs e)
-		{
-			{
-				if (e.Change != ChildrenTreeChange.DirectChildrenChanged) return;
-				if (_asyncRefreshCalled.HasValue && _asyncRefreshCalled.Value == e.Change) return;
-				_asyncRefreshCalled = e.Change;
-				Dispatcher.BeginInvoke(new Action(() =>
-				{
-					_asyncRefreshCalled = null;
-					UpdateChildren();
-				}), DispatcherPriority.Normal, null);
-			};
-		}
 
 		private void OnSizeChanged(object sender, SizeChangedEventArgs e)
 		{
@@ -144,6 +116,18 @@ namespace AvalonDock.Controls
 				UpdateChildren();
 			}
 			AdjustFixedChildrenPanelSizes();
+		}
+
+		/// <summary>
+		/// Method executes when the element is removed from within an element tree of loaded elements.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void OnUnloaded(object sender, RoutedEventArgs e)
+		{
+			// In order to prevent resource leaks, unsubscribe from SizeChanged events.
+			SizeChanged -= OnSizeChanged;
+			Unloaded -= OnUnloaded;
 		}
 
 		private void UpdateChildren()
@@ -566,7 +550,7 @@ namespace AvalonDock.Controls
 
 		private void ShowResizerOverlayWindow(LayoutGridResizerControl splitter)
 		{
-			_resizerGhost = new Border {Background = splitter.BackgroundWhileDragging, Opacity = splitter.OpacityWhileDragging};
+			_resizerGhost = new Border { Background = splitter.BackgroundWhileDragging, Opacity = splitter.OpacityWhileDragging };
 
 			var indexOfResizer = InternalChildren.IndexOf(splitter);
 
@@ -612,7 +596,7 @@ namespace AvalonDock.Controls
 			else
 				Canvas.SetTop(_resizerGhost, _initialStartPoint.Y);
 
-			var panelHostResizer = new Canvas {HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch, VerticalAlignment = System.Windows.VerticalAlignment.Stretch};
+			var panelHostResizer = new Canvas { HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch, VerticalAlignment = System.Windows.VerticalAlignment.Stretch };
 			panelHostResizer.Children.Add(_resizerGhost);
 
 			_resizerWindowHost = new Window
