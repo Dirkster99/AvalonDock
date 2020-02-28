@@ -21,7 +21,7 @@
 			if (toolsPane != null)
 			{
 				// do not allow this as Tabbed Document
-				//anchorableToShow.CanDockAsTabbedDocument = false;
+				anchorableToShow.CanDockAsTabbedDocument = false;
 				toolsPane.Children.Add(anchorableToShow);
 				return true;
 			}
