@@ -119,7 +119,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## In Master branch but not released to NuGet, yet
+## Fixes and Features add in Version 4.0
 
 - [Fix #98 with floating window without a content #99](https://github.com/Dirkster99/AvalonDock/pull/99) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
