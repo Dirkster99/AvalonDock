@@ -10,6 +10,8 @@
 		public const string ToolContentId = "FileStatsTool";
 		private DateTime _lastModified;
 		private long _fileSize;
+		private string _FileName;
+		private string _FilePath;
 		#endregion fields
 
 		#region constructors
@@ -35,7 +37,7 @@
 		public long FileSize
 		{
 			get => _fileSize;
-			set
+			protected set
 			{
 				if (_fileSize != value)
 				{
@@ -48,12 +50,38 @@
 		public DateTime LastModified
 		{
 			get => _lastModified;
-			set
+			protected set
 			{
 				if (_lastModified != value)
 				{
 					_lastModified = value;
 					RaisePropertyChanged(nameof(LastModified));
+				}
+			}
+		}
+
+		public string FileName
+		{
+			get => _FileName;
+			protected set
+			{
+				if (_FileName != value)
+				{
+					_FileName = value;
+					RaisePropertyChanged(nameof(FileName));
+				}
+			}
+		}
+
+		public string FilePath
+		{
+			get => _FilePath;
+			protected set
+			{
+				if (_FilePath != value)
+				{
+					_FilePath = value;
+					RaisePropertyChanged(nameof(FilePath));
 				}
 			}
 		}
@@ -70,11 +98,15 @@
 				var fi = new FileInfo(Workspace.This.ActiveDocument.FilePath);
 				FileSize = fi.Length;
 				LastModified = fi.LastWriteTime;
+				FileName = fi.Name;
+				FilePath = fi.Directory.FullName;
 			}
 			else
 			{
 				FileSize = 0;
 				LastModified = DateTime.MinValue;
+				FileName = string.Empty;
+				FilePath = string.Empty;
 			}
 		}
 		#endregion methods

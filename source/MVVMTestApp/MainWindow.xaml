@@ -62,10 +62,11 @@
                         <DataTemplate>
                             <Border Padding="5">
                                 <StackPanel Orientation="Vertical">
-                                    <TextBlock Text="{Binding FileSize}"/>
-                                    <TextBlock Text="{Binding LastModified}"/>
-                                    <TextBox Text="test"/>
-                                </StackPanel>
+									<TextBlock Text="{Binding FileSize,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"/>
+									<TextBlock Text="{Binding LastModified,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"/>
+									<TextBox IsReadOnly="True" Text="{Binding FilePath,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"/>
+									<TextBox IsReadOnly="True" Text="{Binding FileName,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"/>
+								</StackPanel>
                             </Border>
                         </DataTemplate>
                     </local:PanesTemplateSelector.FileStatsViewTemplate>
