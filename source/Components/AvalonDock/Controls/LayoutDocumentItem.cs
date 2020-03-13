@@ -25,11 +25,10 @@ namespace AvalonDock.Controls
 		#endregion fields
 
 		#region Constructors
-
+		/// <summary>Class constructor</summary>
 		internal LayoutDocumentItem()
 		{
 		}
-
 		#endregion Constructors
 
 		#region Properties
@@ -42,7 +41,7 @@ namespace AvalonDock.Controls
 
 		/// <summary>
 		/// Gets or sets the <see cref="Description"/> property.  This dependency property 
-		/// indicates the description to display for the document item.
+		/// indicates the description to display (in the <see cref="NavigatorWindow"/>) for the document item.
 		/// </summary>
 		public string Description
 		{
