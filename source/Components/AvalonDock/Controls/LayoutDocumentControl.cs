@@ -8,6 +8,7 @@
  ************************************************************************/
 
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -108,6 +109,7 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnPreviewGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
 		{
+			Debug.WriteLine("OnPreviewGotKeyboardFocus: " + LayoutItem.ContentId);
 			SetIsActive();
 			base.OnPreviewGotKeyboardFocus(e);
 		}
