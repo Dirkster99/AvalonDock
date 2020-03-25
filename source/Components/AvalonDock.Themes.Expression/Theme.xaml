@@ -938,14 +938,15 @@
                         </Border>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <!-- Show Header Bar (Window Title and Restore/Maximize/Minimize buttons with highlighting color if this IsActive) -->
                         <Trigger Property="WindowState" Value="Maximized">
                             <Setter Property="Padding" Value="3" TargetName="WindowBorder"/>
                         </Trigger>
-
-                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.RootDocument.IsActive}" Value="true">
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsActive}" Value="true">
                             <Setter Property="Background"
 									Value="{DynamicResource AvalonDock_Expression_BaseColor10}" />
                         </DataTrigger>
+
                         <Trigger Property="IsMouseOver" SourceName="PART_PinMaximize" Value="True">
                             <Setter Property="Source" TargetName="PART_ImgPinMaximize" Value="/AvalonDock.Themes.Expression;component/Images/PinMaximize_Light.png"/>
                         </Trigger>
