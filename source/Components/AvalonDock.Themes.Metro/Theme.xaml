@@ -1455,13 +1455,14 @@
             </Border>
           </Grid>
           <ControlTemplate.Triggers>
+            <!-- Show Header Bar (Window Title and Restore/Maximize/Minimize buttons with highlighting color if this IsActive) -->
             <Trigger Property="WindowState"
                      Value="Maximized">
               <Setter Property="Padding"
                       Value="3"
                       TargetName="WindowBorder" />
             </Trigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.RootDocument.IsActive}"
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsActive}"
                          Value="True">
               <Setter TargetName="bd"
                       Property="Background"
