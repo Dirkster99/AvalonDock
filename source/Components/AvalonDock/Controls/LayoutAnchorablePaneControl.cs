@@ -21,9 +21,9 @@ namespace AvalonDock.Controls
 	/// Provides a control to display multible (or just one) LayoutAnchorable(s).
 	/// See also <seealso cref="AnchorablePaneTabPanel"/>.
 	/// </summary>
-	/// <seealso cref="TabControl"/>
+	/// <seealso cref="TabControlEx"/>
 	/// <seealso cref="ILayoutControl"/>
-	public class LayoutAnchorablePaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
+	public class LayoutAnchorablePaneControl : TabControlEx, ILayoutControl//, ILogicalChildrenContainer
 	{
 		#region fields
 		private LayoutAnchorablePane _model;

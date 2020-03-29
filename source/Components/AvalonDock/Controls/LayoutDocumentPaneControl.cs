@@ -22,9 +22,9 @@ namespace AvalonDock.Controls
 	/// TabItem Header (<see cref="LayoutDocumentTabItem"/>) that contains the document titles
 	/// inside the <see cref="DocumentPaneTabPanel"/>.
 	/// </summary>
-	/// <seealso cref="TabControl"/>
+	/// <seealso cref="TabControlEx"/>
 	/// <seealso cref="ILayoutControl"/>
-	public class LayoutDocumentPaneControl : TabControl, ILayoutControl//, ILogicalChildrenContainer
+	public class LayoutDocumentPaneControl : TabControlEx, ILayoutControl//, ILogicalChildrenContainer
 	{
 		#region fields
 		private LayoutDocumentPane _model;
