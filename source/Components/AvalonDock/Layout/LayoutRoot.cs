@@ -376,9 +376,7 @@ namespace AvalonDock.Layout
 					}
 
 					//...if this pane is the only documentpane present in the layout of the main window (not floating) then skip it
-					if (emptyPane is LayoutDocumentPane &&
-						 emptyPane.FindParent<LayoutDocumentFloatingWindow>() == null &&
-						 this.Descendents().OfType<LayoutDocumentPane>().Count(c => c != emptyPane && c.FindParent<LayoutDocumentFloatingWindow>() == null) == 0)
+					if (IsParentRemoved(emptyPane))
 						continue;
 
 					//...if this empty pane is not referenced by anyone, then remove it from its parent container
@@ -619,6 +617,24 @@ namespace AvalonDock.Layout
 				writer.WriteEndElement();
 			}
 			writer.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Determine if the parent pane is the only DocumentPane present in the layout of the main window (not floating)
+		/// then it will be skipped for removal in GarbageCollection (even if it is empty).
+		/// 
+		/// Otherwise, an empty pane will be removed in the LayoutRoot.GarbageCollection() which means that PreviousContainer
+		/// must be adjusted before items are removed from their parent pane.
+		/// </summary>
+		/// <param name="parent"></param>
+		/// <returns></returns>
+		internal bool IsParentRemoved(ILayoutContainer parent)
+		{
+			if (parent == null) return false;
+
+			return (parent is LayoutDocumentPane &&
+					parent.FindParent<LayoutDocumentFloatingWindow>() == null &&
+						this.Descendents().OfType<LayoutDocumentPane>().Count(c => c != parent && c.FindParent<LayoutDocumentFloatingWindow>() == null) == 0);
 		}
 		#endregion IXmlSerializable interface members
 

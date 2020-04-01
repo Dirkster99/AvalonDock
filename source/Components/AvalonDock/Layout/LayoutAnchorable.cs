@@ -323,7 +323,7 @@ namespace AvalonDock.Layout
 			{
 				var previousContainerAsLayoutGroup = PreviousContainer as ILayoutGroup;
 				if (PreviousContainerIndex < previousContainerAsLayoutGroup.ChildrenCount)
-					previousContainerAsLayoutGroup.InsertChildAt(PreviousContainerIndex, this);
+					previousContainerAsLayoutGroup.InsertChildAt((PreviousContainerIndex < 0 ? 0 : PreviousContainerIndex), this);
 				else
 					previousContainerAsLayoutGroup.InsertChildAt(previousContainerAsLayoutGroup.ChildrenCount, this);
 

@@ -693,18 +693,25 @@ namespace AvalonDock.Layout
 			var root = Root;
 			var parentAsContainer = Parent;
 
+			// Determine if this pane is the only DocumentPane present in the layout of the main window (not floating)
+			// then it will be skipped for removal in GarbageCollection (even if it is empty)
+			bool isParentRemoved = Root.Manager.Layout.IsParentRemoved(Parent);
+
 			if (PreviousContainer == null)
 			{
 				var parentAsGroup = Parent as ILayoutGroup;
 				PreviousContainer = parentAsContainer;
 				PreviousContainerIndex = parentAsGroup.IndexOfChild(this);
 
-				if (parentAsGroup is ILayoutPaneSerializable layoutPaneSerializable)
+				if (isParentRemoved == false && parentAsGroup is ILayoutPaneSerializable layoutPaneSerializable)
 				{
 					PreviousContainerId = layoutPaneSerializable.Id;
-					// This parentAsGroup will be removed in the GarbageCollection below
+
+					// Check whether this parentAsGroup will be removed in the GarbageCollection below
 					if (parentAsGroup.Children.Count() == 1 && parentAsGroup.Parent != null && Root.Manager != null)
 					{
+						// move LayoutContent up in the layout tree by setting PreviousContainer to it's grandparent
+						// (a LayoutPanel) by assumption that the parent will be garbage collected below.
 						Parent = Root.Manager.Layout;
 						PreviousContainer = parentAsGroup.Parent;
 						PreviousContainerIndex = -1;
