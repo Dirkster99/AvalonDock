@@ -233,6 +233,8 @@ namespace AvalonDock.Controls
 			}
 		}
 
+        internal Thickness TotalMargin { get; private set; }
+        private bool _foundMargin = false;
 		protected virtual IntPtr FilterMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
 		{
 			handled = false;
@@ -248,7 +250,9 @@ namespace AvalonDock.Controls
 							handled = true;
 						}
 					}
-					break;
+                    UpdateWindowsSizeBasedOnMinSize();
+
+                    break;
 				case Win32Helper.WM_EXITSIZEMOVE:
 					UpdatePositionAndSizeOfPanes();
 
@@ -283,7 +287,54 @@ namespace AvalonDock.Controls
 			return IntPtr.Zero;
 		}
 
-		internal void InternalClose(bool closeInitiatedByUser = false)
+        private void UpdateMargins()
+        {
+            var grid = this.GetChildrenRecursive()
+                .OfType<Grid>()
+                .FirstOrDefault(g => g.RowDefinitions.Count > 0);
+            if (grid != null)
+			{
+				_foundMargin = true;
+				var margin = grid.Margin;
+                margin.Top = grid.RowDefinitions[0].MinHeight + grid.Margin.Top;
+                TotalMargin =  margin;
+            }
+        }
+
+        private void UpdateWindowsSizeBasedOnMinSize()
+        {
+            if (!_foundMargin)
+            {
+                UpdateMargins();
+                if (_foundMargin)
+                {
+                    ContentPresenter contentControl = this.GetChildrenRecursive()
+                        .OfType<ContentPresenter>()
+                        .FirstOrDefault(c => c.Content is LayoutContent);
+                    if (contentControl == null)
+                        return;
+                    var layoutContent = (LayoutContent)contentControl.Content;
+                    if (layoutContent.Content is FrameworkElement content)
+                    {
+                        var parent = VisualTreeHelper.GetParent(content) as FrameworkElement;
+                        // StackPanels among others have an ActualHeight larger than visible, hence we check the parent control as well
+                        if (content.ActualHeight < content.MinHeight ||
+							 parent != null && parent.ActualHeight < content.MinHeight)
+                        {
+                            Height = content.MinHeight + TotalMargin.Top + TotalMargin.Bottom;
+                        }
+
+                        if (content.ActualWidth < content.MinWidth ||
+                             parent != null && parent.ActualWidth < content.MinWidth)
+                        {
+                            Width = content.MinWidth + TotalMargin.Left + TotalMargin.Right;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal void InternalClose(bool closeInitiatedByUser = false)
 		{
 			_internalCloseFlag = !closeInitiatedByUser;
 			if (_isClosing) return;
