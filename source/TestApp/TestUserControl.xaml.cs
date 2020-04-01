@@ -23,12 +23,6 @@ namespace TestApp
 
 			this.Loaded += new RoutedEventHandler(TestUserControl_Loaded);
 			this.Unloaded += new RoutedEventHandler(TestUserControl_Unloaded);
-			this.SizeChanged += TestUserControl_SizeChanged;
-		}
-
-		private void TestUserControl_SizeChanged(object sender, SizeChangedEventArgs e)
-		{
-			
 		}
 
 		void TestUserControl_Unloaded(object sender, RoutedEventArgs e)
