@@ -1,7 +1,7 @@
 ﻿/************************************************************************
    AvalonDock
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+   Copyright (C) 2007-2020 Xceed Software Inc.
 
    This program is provided to you under the terms of the Microsoft Public
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
@@ -289,16 +289,46 @@ namespace AvalonDock.Controls
 
         private void UpdateMargins()
         {
+			// The grid with window bar and content
             var grid = this.GetChildrenRecursive()
                 .OfType<Grid>()
                 .FirstOrDefault(g => g.RowDefinitions.Count > 0);
-            if (grid != null)
-			{
-				_foundMargin = true;
-				var margin = grid.Margin;
-                margin.Top = grid.RowDefinitions[0].MinHeight + grid.Margin.Top;
-                TotalMargin =  margin;
-            }
+            ContentPresenter contentControl = this.GetChildrenRecursive()
+                .OfType<ContentPresenter>()
+                .FirstOrDefault(c => c.Content is LayoutContent);
+            if (contentControl == null)
+                return;
+            // The content control in the grid, this has a different visual tree to walk up
+			var layoutContent = (LayoutContent)contentControl.Content;	
+    		if (grid != null && layoutContent.Content is FrameworkElement content)
+            {
+                var parents = content.GetParents().ToArray();
+                var children = this.GetChildrenRecursive()
+                    .TakeWhile(c => c != grid)
+                    .ToArray();
+				var borders = children
+					.OfType<Border>()
+                    .Concat(parents
+                        .OfType<Border>())
+                    .ToArray();
+                var controls = children
+                    .OfType<Control>()
+                    .Concat(parents
+                        .OfType<Control>())
+                    .ToArray();
+                var frameworkElements = children
+                    .OfType<FrameworkElement>()
+                    .Concat(parents
+                        .OfType<FrameworkElement>())
+                    .ToArray();
+				var padding = controls.Sum(b => b.Padding);
+                var border = borders.Sum(b => b.BorderThickness);
+                var margin = frameworkElements.Sum(f => f.Margin);
+                margin = margin.Add(padding).Add(border).Add(grid.Margin);
+                margin.Top = grid.RowDefinitions[0].MinHeight;
+                TotalMargin = margin;
+                _foundMargin = true;
+			}
         }
 
         private void UpdateWindowsSizeBasedOnMinSize()
@@ -315,8 +345,10 @@ namespace AvalonDock.Controls
                         return;
                     var layoutContent = (LayoutContent)contentControl.Content;
                     if (layoutContent.Content is FrameworkElement content)
-                    {
-                        var parent = VisualTreeHelper.GetParent(content) as FrameworkElement;
+					{
+                        var parent = content.GetParents()
+                            .OfType<FrameworkElement>()
+                            .FirstOrDefault();
                         // StackPanels among others have an ActualHeight larger than visible, hence we check the parent control as well
                         if (content.ActualHeight < content.MinHeight ||
 							 parent != null && parent.ActualHeight < content.MinHeight)
