@@ -45,7 +45,13 @@ namespace AvalonDock.Controls
 		private DragService _dragService = null;
 		private bool _internalCloseFlag = false;
 		private bool _isClosing = false;
-		#endregion fields
+
+		/// <summary>
+		/// Margin queried from the visual tree the first time it is rendered, null until the first first FilterMessage(WM_ACTIVATE)
+		/// </summary>
+		private Thickness? _totalMargin;		
+
+        #endregion fields
 
 		#region Constructors
 
@@ -233,8 +239,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-        internal Thickness TotalMargin { get; private set; }
-        private bool _foundMargin = false;
 		protected virtual IntPtr FilterMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
 		{
 			handled = false;
@@ -298,7 +302,7 @@ namespace AvalonDock.Controls
                 .FirstOrDefault(c => c.Content is LayoutContent);
             if (contentControl == null)
                 return;
-            // The content control in the grid, this has a different visual tree to walk up
+            // The content control in the grid, this has a different tree to walk up
 			var layoutContent = (LayoutContent)contentControl.Content;	
     		if (grid != null && layoutContent.Content is FrameworkElement content)
             {
@@ -326,17 +330,16 @@ namespace AvalonDock.Controls
                 var margin = frameworkElements.Sum(f => f.Margin);
                 margin = margin.Add(padding).Add(border).Add(grid.Margin);
                 margin.Top = grid.RowDefinitions[0].MinHeight;
-                TotalMargin = margin;
-                _foundMargin = true;
+                _totalMargin = margin;
 			}
         }
 
         private void UpdateWindowsSizeBasedOnMinSize()
         {
-            if (!_foundMargin)
+            if (!_totalMargin.HasValue)
             {
                 UpdateMargins();
-                if (_foundMargin)
+                if (_totalMargin.HasValue)
                 {
                     ContentPresenter contentControl = this.GetChildrenRecursive()
                         .OfType<ContentPresenter>()
@@ -353,13 +356,13 @@ namespace AvalonDock.Controls
                         if (content.ActualHeight < content.MinHeight ||
 							 parent != null && parent.ActualHeight < content.MinHeight)
                         {
-                            Height = content.MinHeight + TotalMargin.Top + TotalMargin.Bottom;
+                            Height = content.MinHeight + _totalMargin.Value.Top + _totalMargin.Value.Bottom;
                         }
 
                         if (content.ActualWidth < content.MinWidth ||
                              parent != null && parent.ActualWidth < content.MinWidth)
                         {
-                            Width = content.MinWidth + TotalMargin.Left + TotalMargin.Right;
+                            Width = content.MinWidth + _totalMargin.Value.Left + _totalMargin.Value.Right;
                         }
                     }
                 }
