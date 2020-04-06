@@ -291,7 +291,12 @@ namespace AvalonDock.Controls
 			return IntPtr.Zero;
 		}
 
-        private void UpdateMargins()
+		/// <summary>
+		/// Set the margins of the window control (including the borders of the floating window and the title bar).
+		/// The result will be stored in <code>_totalMargin</code>.
+		/// </summary>
+		/// <remarks>If the control is not loaded <code>_totalMargin</code> will not be set.</remarks>
+		private void UpdateMargins()
         {
 			// The grid with window bar and content
             var grid = this.GetChildrenRecursive()
@@ -334,7 +339,11 @@ namespace AvalonDock.Controls
 			}
         }
 
-        private void UpdateWindowsSizeBasedOnMinSize()
+		/// <summary>
+		/// Update the floating window size based on the <code>MinHeight</code> and <code>MinWidth</code> of the content of the control.
+		/// </summary>
+		/// <remarks>This will only be run once, when the window is rendered the first time and <code>_totalMargin</code> is identified.</remarks>
+		private void UpdateWindowsSizeBasedOnMinSize()
         {
             if (!_totalMargin.HasValue)
             {
