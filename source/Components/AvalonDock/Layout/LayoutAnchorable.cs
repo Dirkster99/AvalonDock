@@ -540,7 +540,11 @@ namespace AvalonDock.Layout
 		{
 			if (!TestCanClose()) return;
 			if (IsAutoHidden) ToggleAutoHide();
+
+			RaisePropertyChanging(nameof(IsVisible));
 			CloseInternal();
+			IsVisible = false;
+			RaisePropertyChanged(nameof(IsVisible));
 		}
 
 		internal void SetCanCloseInternal(bool canClose)

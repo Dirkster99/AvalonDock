@@ -93,12 +93,21 @@ namespace AvalonDock.Controls
 
 		#region Internal Methods
 
+		/// <summary>
+		/// Method is invoked to invoke custom code when all children are updated
+		/// towards the size they can occupy in the available space of the Grid control.
+		/// </summary>
 		protected void FixChildrenDockLengths()
 		{
 			using (_fixingChildrenDockLengths.Enter())
 				OnFixChildrenDockLengths();
 		}
 
+		/// <summary>
+		/// This method provides an opportunity for deriving classes to invoke custom when
+		/// all children of this Grid are update towards the size
+		/// they can occupy in the available space of the Grid control.
+		/// </summary>
 		protected abstract void OnFixChildrenDockLengths();
 
 		#endregion
@@ -130,6 +139,11 @@ namespace AvalonDock.Controls
 			Unloaded -= OnUnloaded;
 		}
 
+		/// <summary>
+		/// Is invoked to update all children towards the size they can occupy in the available space
+		/// of the Grid control. This includes detaching/attaching all relevant event handlers and
+		/// property bindings.
+		/// </summary>
 		private void UpdateChildren()
 		{
 			var alreadyContainedChildren = Children.OfType<ILayoutControl>().ToArray();
@@ -189,6 +203,10 @@ namespace AvalonDock.Controls
 				UpdateRowColDefinitions();
 		}
 
+		/// <summary>
+		/// Is invoked to update column and row definitions towards the available size
+		/// when processing resize events or application start-up.
+		/// </summary>
 		private void UpdateRowColDefinitions()
 		{
 			var root = _model.Root;
