@@ -236,5 +236,17 @@ namespace TestApp
 		{
 			////            LayoutDocumentPane.ShowHeader = !LayoutDocumentPane.ShowHeader;
 		}
-	}
+
+        private void OnNewFloatingWindow(object sender, RoutedEventArgs e)
+        {
+            var view = new TestUserControl();
+            var anchorable = new LayoutAnchorable()
+            {
+                Title = "New floating window",
+				Content = view
+			};
+            anchorable.AddToLayout(dockManager,AnchorableShowStrategy.Most);
+            anchorable.Float();
+        }
+    }
 }

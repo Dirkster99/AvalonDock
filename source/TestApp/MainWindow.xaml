@@ -54,6 +54,7 @@
 			<MenuItem Header="Tools">
 				<MenuItem Click="OnShowWinformsWindow" Header="WinForms Window" />
 				<MenuItem Click="OnShowToolWindow1" Header="Tool Window1" />
+				<MenuItem Click="OnNewFloatingWindow" Header="New floating window"/>
 			</MenuItem>
 		</Menu>
 
@@ -108,7 +109,7 @@
 								Title="Tool Window 1"
 								ContentId="toolWindow1"
 								Hiding="OnToolWindow1Hiding">
-								<StackPanel>
+								<StackPanel MinHeight="1500">
 									<local:TestUserControl />
 									<TextBox Text="{Binding TestTimer, Mode=OneWay, StringFormat='Tool Window 1 Attached to Timer ->\{0\}'}" />
 								</StackPanel>
