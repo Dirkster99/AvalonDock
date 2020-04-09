@@ -1,11 +1,13 @@
-﻿<!--************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************-->
+﻿<!--
+	************************************************************************
+	AvalonDock
+	
+	Copyright (C) 2007-2013 Xceed Software Inc.
+	
+	This program is provided to you under the terms of the Microsoft Public
+	License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
+	************************************************************************
+-->
 
 <Window
 	x:Class="TestApp.MainWindow"
@@ -54,7 +56,7 @@
 			<MenuItem Header="Tools">
 				<MenuItem Click="OnShowWinformsWindow" Header="WinForms Window" />
 				<MenuItem Click="OnShowToolWindow1" Header="Tool Window1" />
-				<MenuItem Click="OnNewFloatingWindow" Header="New floating window"/>
+				<MenuItem Click="OnNewFloatingWindow" Header="New floating window" />
 			</MenuItem>
 		</Menu>
 
@@ -109,7 +111,7 @@
 								Title="Tool Window 1"
 								ContentId="toolWindow1"
 								Hiding="OnToolWindow1Hiding">
-								<StackPanel MinHeight="1500">
+								<StackPanel MinHeight="450">
 									<local:TestUserControl />
 									<TextBox Text="{Binding TestTimer, Mode=OneWay, StringFormat='Tool Window 1 Attached to Timer ->\{0\}'}" />
 								</StackPanel>

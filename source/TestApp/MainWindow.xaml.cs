@@ -237,12 +237,19 @@ namespace TestApp
 			////            LayoutDocumentPane.ShowHeader = !LayoutDocumentPane.ShowHeader;
 		}
 
-        private void OnNewFloatingWindow(object sender, RoutedEventArgs e)
+		/// <summary>
+		/// Method create a new anchorable window to test whether a floating window will auto-adjust its size to the
+		/// containing control. See SetWindowSizeWhenOpened property in <seealso cref="LayoutAnchorableFloatingWindow"/>
+		/// and App.xaml in this demo App for more details.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void OnNewFloatingWindow(object sender, RoutedEventArgs e)
         {
             var view = new TestUserControl();
             var anchorable = new LayoutAnchorable()
             {
-                Title = "New floating window",
+                Title = "Floating window with initial usercontrol size",
 				Content = view
 			};
             anchorable.AddToLayout(dockManager,AnchorableShowStrategy.Most);
