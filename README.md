@@ -123,6 +123,8 @@ to also theme standard elements, such as, button and textblock etc.
 
 - [Fix #137 BindingExpression in VS2013 theme](https://github.com/Dirkster99/AvalonDock/issues/137)
 
+- [Feature Added: Auto resizing floating window to content](https://github.com/Dirkster99/AvalonDock/pull/146) [thanx to Erik Ovegård](https://github.com/eriove)
+
 ## Fixes and Features added in Version 4.0
 
 - [Fix #98 with floating window without a content #99](https://github.com/Dirkster99/AvalonDock/pull/99) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
