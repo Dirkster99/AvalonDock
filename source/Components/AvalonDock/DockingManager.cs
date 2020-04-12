@@ -1319,6 +1319,22 @@ namespace AvalonDock
 
 		#endregion AllowMixedOrientation
 
+		#region IsVirtualizingLayoutDocument IsVirtualizingLayoutAnchorable
+
+		/// <summary>
+		/// Gets/sets (a simple non-dependency property) to determine whether the
+		/// <see cref="LayoutDocumentPaneControl"/> is virtualizing its tabbed item child controls or not.
+		/// </summary>
+		public bool IsVirtualizingLayoutDocument { get; set; }
+
+		/// <summary>
+		/// Gets/sets (a simple non-dependency property) to determine whether the
+		/// <see cref="LayoutAnchorablePaneControl"/> is virtualizing its tabbed item child controls or not.
+		/// </summary>
+		public bool IsVirtualizingLayoutAnchorable { get; set; }
+
+		#endregion IsVirtualizingLayoutDocument IsVirtualizingLayoutAnchorable
+
 		#endregion Public Properties
 
 		#region Private Properties
@@ -1506,13 +1522,13 @@ namespace AvalonDock
 
 			if (model is LayoutDocumentPane)
 			{
-				var templateModelView = new LayoutDocumentPaneControl(model as LayoutDocumentPane);
+				var templateModelView = new LayoutDocumentPaneControl(model as LayoutDocumentPane, IsVirtualizingLayoutDocument);
 				templateModelView.SetBinding(StyleProperty, new Binding(DocumentPaneControlStyleProperty.Name) { Source = this });
 				return templateModelView;
 			}
 			if (model is LayoutAnchorablePane)
 			{
-				var templateModelView = new LayoutAnchorablePaneControl(model as LayoutAnchorablePane);
+				var templateModelView = new LayoutAnchorablePaneControl(model as LayoutAnchorablePane, IsVirtualizingLayoutAnchorable);
 				templateModelView.SetBinding(StyleProperty, new Binding(AnchorablePaneControlStyleProperty.Name) { Source = this });
 				return templateModelView;
 			}

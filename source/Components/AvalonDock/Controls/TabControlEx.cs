@@ -5,45 +5,57 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 
-namespace AvalonDock
+namespace AvalonDock.Controls
 {
     /// <summary>
     /// This control added to mitigate issue with tab (document) switching speed
     /// See this https://stackoverflow.com/questions/2080764/how-to-preserve-control-state-within-tab-items-in-a-tabcontrol
     /// and this https://stackoverflow.com/questions/31030293/cefsharp-in-tabcontrol-not-working/37171847#37171847
+    /// 
+    /// by implmenting an option to enable virtualization for tabbed document containers.
     /// </summary>
     [TemplatePart(Name = "PART_ItemsHolder", Type = typeof(Panel))]
     public class TabControlEx : TabControl
     {
+        #region fields
         private Panel ItemsHolderPanel = null;
+        private readonly bool _IsVirtualizing;
+        #endregion fields
 
-        public TabControlEx()
+        #region constructors
+        /// <summary>
+        /// Class constructor from virtualization parameter.
+        /// </summary>
+        /// <param name="isVirtualizing">Whether tabbed items are virtualized or not.</param>
+        public TabControlEx(bool isVirtualizing)
+            : this()
+        {
+            _IsVirtualizing = isVirtualizing;
+        }
+
+        /// <summary>
+        /// Class constructor
+        /// </summary>
+        protected TabControlEx()
             : base()
         {
             // This is necessary so that we get the initial databound selected item
             ItemContainerGenerator.StatusChanged += ItemContainerGenerator_StatusChanged;
         }
+        #endregion constructors
 
-        /// <summary>
-        /// If containers are done, generate the selected item
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ItemContainerGenerator_StatusChanged(object sender, EventArgs e)
-        {
-            if (this.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
-            {
-                this.ItemContainerGenerator.StatusChanged -= ItemContainerGenerator_StatusChanged;
-                UpdateSelectedItem();
-            }
-        }
-
+        #region methods
         /// <summary>
         /// Get the ItemsHolder and generate any children
         /// </summary>
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+
+            // Code below is required only if virtualization is turned ON
+            if (_IsVirtualizing == false)
+                return;
+
             ItemsHolderPanel = CreateGrid();
             // exchange ContentPresenter for Grid
             var topGrid = (Grid)GetVisualChild(0);
@@ -68,19 +80,6 @@ namespace AvalonDock
             UpdateSelectedItem();
         }
 
-        private Grid CreateGrid()
-        {
-            var grid = new Grid();
-            Binding binding = new Binding(PaddingProperty.Name);
-            binding.Source = this;  // view model?
-            grid.SetBinding(Grid.MarginProperty, binding);
-
-            binding = new Binding(SnapsToDevicePixelsProperty.Name);
-            binding.Source = this;  // view model?
-            grid.SetBinding(Grid.SnapsToDevicePixelsProperty, binding);
-
-            return grid;
-        }
 
         /// <summary>
         /// When the items change we remove any generated panel children and add any new ones as necessary
@@ -89,6 +88,10 @@ namespace AvalonDock
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
             base.OnItemsChanged(e);
+
+            // Code below is required only if virtualization is turned ON
+            if (_IsVirtualizing == false)
+                return;
 
             if (ItemsHolderPanel == null)
                 return;
@@ -122,10 +125,69 @@ namespace AvalonDock
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="System.Windows.Controls.Primitives.Selector.SelectionChanged"/> routed event.
+        /// </summary>
+        /// <param name="e">Provides data for <see cref="SelectionChangedEventArgs"/>.</param>
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
             base.OnSelectionChanged(e);
+
+            // Code below is required only if virtualization is turned ON
+            if (_IsVirtualizing == false)
+                return;
+
             UpdateSelectedItem();
+        }
+
+        /// <summary>
+        /// Gets the currently selected item (including its generation if Virtualization is currently switched on).
+        /// </summary>
+        /// <returns></returns>
+        protected TabItem GetSelectedTabItem()
+        {
+            object selectedItem = base.SelectedItem;
+
+            // Code below is required only if virtualization is turned ON
+            if (_IsVirtualizing == false)
+                return selectedItem as TabItem;
+
+            if (selectedItem == null)
+                return null;
+
+            TabItem item = selectedItem as TabItem;
+            if (item == null)
+                item = base.ItemContainerGenerator.ContainerFromIndex(base.SelectedIndex) as TabItem;
+
+            return item;
+        }
+
+        /// <summary>
+        /// If containers are done, generate the selected item
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ItemContainerGenerator_StatusChanged(object sender, EventArgs e)
+        {
+            if (this.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
+            {
+                this.ItemContainerGenerator.StatusChanged -= ItemContainerGenerator_StatusChanged;
+                UpdateSelectedItem();
+            }
+        }
+
+        private Grid CreateGrid()
+        {
+            var grid = new Grid();
+            Binding binding = new Binding(PaddingProperty.Name);
+            binding.Source = this;  // view model?
+            grid.SetBinding(Grid.MarginProperty, binding);
+
+            binding = new Binding(SnapsToDevicePixelsProperty.Name);
+            binding.Source = this;  // view model?
+            grid.SetBinding(Grid.SnapsToDevicePixelsProperty, binding);
+
+            return grid;
         }
 
         private void UpdateSelectedItem()
@@ -184,18 +246,6 @@ namespace AvalonDock
 
             return null;
         }
-
-        protected TabItem GetSelectedTabItem()
-        {
-            object selectedItem = base.SelectedItem;
-            if (selectedItem == null)
-                return null;
-
-            TabItem item = selectedItem as TabItem;
-            if (item == null)
-                item = base.ItemContainerGenerator.ContainerFromIndex(base.SelectedIndex) as TabItem;
-
-            return item;
-        }
+        #endregion methods
     }
 }

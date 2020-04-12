@@ -37,9 +37,11 @@ namespace AvalonDock.Controls
 			FocusableProperty.OverrideMetadata(typeof(LayoutDocumentPaneControl), new FrameworkPropertyMetadata(false));
 		}
 
-		/// <summary>Class constructor from model parameter.</summary>
+		/// <summary>Class constructor from model and virtualization parameter.</summary>
 		/// <param name="model"></param>
-		internal LayoutDocumentPaneControl(LayoutDocumentPane model)
+		/// <param name="isVirtualizing">Whether tabbed items are virtualized or not.</param>
+		internal LayoutDocumentPaneControl(LayoutDocumentPane model, bool isVirtualizing)
+			: base(isVirtualizing)
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));
 			SetBinding(ItemsSourceProperty, new Binding("Model.Children") { Source = this });
@@ -51,13 +53,19 @@ namespace AvalonDock.Controls
 		#endregion Constructors
 
 		#region Properties
-
+		/// <summary>Gets the layout model of this control.</summary>
 		public ILayoutElement Model => _model;
 
 		#endregion Properties
 
 		#region Overrides
-
+		/// <summary>
+		/// Invoked when an unhandled <see cref="System.Windows.UIElement.MouseLeftButtonDown"/> routed
+		/// event is raised on this element. Implement this method to add class handling
+		/// for this event.
+		/// </summary>
+		/// <param name="e">The <see cref="System.Windows.Input.MouseButtonEventArgs"/> that contains the event data.
+		/// The event data reports that the left mouse button was pressed.</param>
 		protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonDown(e);
@@ -65,6 +73,13 @@ namespace AvalonDock.Controls
 				_model.SelectedContent.IsActive = true;
 		}
 
+		/// <summary>
+		/// Invoked when an unhandled <see cref="System.Windows.UIElement.MouseRightButtonDown"/> routed
+		/// event reaches an element in its route that is derived from this class. Implement
+		/// this method to add class handling for this event.
+		/// </summary>
+		/// <param name="e">The <see cref="System.Windows.Input.MouseButtonEventArgs"/> that contains the event data. The
+		/// event data reports that the right mouse button was pressed.</param>
 		protected override void OnMouseRightButtonDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseRightButtonDown(e);
