@@ -119,11 +119,13 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## Fixes in Master (not Released to NuGet yet)
+## Fixes & Features in master (not Released to NuGet yet)
 
 - [Fix #137 BindingExpression in VS2013 theme](https://github.com/Dirkster99/AvalonDock/issues/137)
 
 - [Feature Added: Auto resizing floating window to content](https://github.com/Dirkster99/AvalonDock/pull/146) [thanx to Erik Ovegård](https://github.com/eriove)
+
+- Feature Added: Virtualizing Tabbed Documents and/or LayoutAnchorables [PR #143](https://github.com/Dirkster99/AvalonDock/pull/143) + [Virtualization Options](https://github.com/Dirkster99/AvalonDock/commit/1a45dbbe66c931e6c87ad769a9b269da4cb290ae)  [thanx to matko238](https://github.com/matko238)
 
 ## Fixes and Features added in Version 4.0
 
