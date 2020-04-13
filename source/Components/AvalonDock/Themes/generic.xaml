@@ -332,7 +332,7 @@
 								Focusable="False"
 								Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
 								ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_CxMenu_Hint}">
-								<Border Background="White">
+								<Border Background="Transparent">
 									<Image Source="/AvalonDock;component/Themes/Generic/Images/PinMenu.png" />
 								</Border>
 							</avalonDockControls:DropDownButton>
@@ -345,7 +345,7 @@
 								Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
 								ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnAutoHide_Hint}"
 								Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-								<Border Background="White">
+								<Border Background="Transparent">
 									<Image Source="/AvalonDock;component/Themes/Generic/Images/PinAutoHide.png" />
 								</Border>
 							</Button>
@@ -358,7 +358,7 @@
 								Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
 								ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}"
 								Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-								<Border Background="White">
+								<Border Background="Transparent">
 									<Image Source="/AvalonDock;component/Themes/Generic/Images/PinClose.png" />
 								</Border>
 							</Button>
