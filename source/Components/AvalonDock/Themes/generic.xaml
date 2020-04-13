@@ -1,11 +1,13 @@
-﻿<!--************************************************************************
+﻿<!--
+	************************************************************************
 	AvalonDock
 	
 	Copyright (C) 2007-2013 Xceed Software Inc.
 	
 	This program is provided to you under the terms of the Microsoft Public
 	License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
-	************************************************************************-->
+	************************************************************************
+-->
 
 <ResourceDictionary
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -25,6 +27,54 @@
 	<avalonDockConverters:LayoutItemFromLayoutModelConverter x:Key="LayoutItemFromLayoutModelConverter" />
 	<avalonDockConverters:ActivateCommandLayoutItemFromLayoutModelConverter x:Key="ActivateCommandLayoutItemFromLayoutModelConverter" />
 	<avalonDockConverters:AnchorableContextMenuHideVisibilityConverter x:Key="AnchorableContextMenuHideVisibilityConverter" />
+
+	<Style x:Key="dfdg" BasedOn="{StaticResource {x:Type TabControl}}" TargetType="{x:Type avalonDockControls:TabControlEx}">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type avalonDockControls:TabControlEx}">
+					<Grid
+						Background="{TemplateBinding Background}"
+						ClipToBounds="True"
+						KeyboardNavigation.TabNavigation="Local"
+						SnapsToDevicePixels="True">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition x:Name="ColumnDefinition0" />
+							<ColumnDefinition x:Name="ColumnDefinition1" Width="0" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition x:Name="RowDefinition0" Height="Auto" />
+							<RowDefinition x:Name="RowDefinition1" Height="*" />
+						</Grid.RowDefinitions>
+						<DockPanel Margin="2,2,0,0" LastChildFill="False">
+							<TabPanel
+								x:Name="HeaderPanel"
+								Margin="0,0,0,-1"
+								VerticalAlignment="Bottom"
+								Panel.ZIndex="1"
+								DockPanel.Dock="Right"
+								IsItemsHost="True"
+								KeyboardNavigation.TabIndex="1" />
+						</DockPanel>
+						<Border
+							x:Name="ContentPanel"
+							Grid.Row="1"
+							Grid.Column="0"
+							Background="{TemplateBinding Background}"
+							BorderBrush="{TemplateBinding BorderBrush}"
+							BorderThickness="{TemplateBinding BorderThickness}"
+							KeyboardNavigation.DirectionalNavigation="Contained"
+							KeyboardNavigation.TabIndex="2"
+							KeyboardNavigation.TabNavigation="Local">
+							<Grid
+								x:Name="PART_ItemsHolder"
+								Margin="{TemplateBinding Padding}"
+								SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+						</Border>
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 
 	<!--  DocumentPaneControlStyle  -->
 	<Style x:Key="DocumentPaneControlStyle" TargetType="{x:Type avalonDockControls:LayoutDocumentPaneControl}">
@@ -1017,7 +1067,7 @@
 							BorderThickness="{TemplateBinding BorderThickness}">
 							<Grid Margin="3">
 								<Grid.RowDefinitions>
-									<RowDefinition Height="Auto" MinHeight="16" /> 
+									<RowDefinition Height="Auto" MinHeight="16" />
 									<!--  https://github.com/xceedsoftware/wpftoolkit/issues/1203  -->
 									<RowDefinition Height="*" />
 								</Grid.RowDefinitions>

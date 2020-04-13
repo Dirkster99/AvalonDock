@@ -46,40 +46,28 @@ namespace AvalonDock.Controls
 
         #region methods
         /// <summary>
+        /// If containers are done, generate the selected item
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ItemContainerGenerator_StatusChanged(object sender, EventArgs e)
+        {
+            if (this.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
+            {
+                this.ItemContainerGenerator.StatusChanged -= ItemContainerGenerator_StatusChanged;
+                UpdateSelectedItem();
+            }
+        }
+
+        /// <summary>
         /// Get the ItemsHolder and generate any children
         /// </summary>
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-
-            // Code below is required only if virtualization is turned ON
-            if (_IsVirtualizing == false)
-                return;
-
-            ItemsHolderPanel = CreateGrid();
-            // exchange ContentPresenter for Grid
-            var topGrid = (Grid)GetVisualChild(0);
-
-            if (topGrid != null)
-            {
-                if (topGrid.Children != null && topGrid.Children.Count > 2)
-                {
-                    if (topGrid.Children[1] is Border)
-                    {
-                        var border = (Border)topGrid.Children[1];
-                        border.Child = ItemsHolderPanel;
-                    }
-                    else if (topGrid.Children[2] is Border)
-                    {
-                        var border = (Border)topGrid.Children[2];
-                        border.Child = ItemsHolderPanel;
-                    }
-                }
-            }
-
+            ItemsHolderPanel = GetTemplateChild("PART_ItemsHolder") as Panel;
             UpdateSelectedItem();
         }
-
 
         /// <summary>
         /// When the items change we remove any generated panel children and add any new ones as necessary
@@ -88,10 +76,6 @@ namespace AvalonDock.Controls
         protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
         {
             base.OnItemsChanged(e);
-
-            // Code below is required only if virtualization is turned ON
-            if (_IsVirtualizing == false)
-                return;
 
             if (ItemsHolderPanel == null)
                 return;
@@ -125,69 +109,10 @@ namespace AvalonDock.Controls
             }
         }
 
-        /// <summary>
-        /// Raises the <see cref="System.Windows.Controls.Primitives.Selector.SelectionChanged"/> routed event.
-        /// </summary>
-        /// <param name="e">Provides data for <see cref="SelectionChangedEventArgs"/>.</param>
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
             base.OnSelectionChanged(e);
-
-            // Code below is required only if virtualization is turned ON
-            if (_IsVirtualizing == false)
-                return;
-
             UpdateSelectedItem();
-        }
-
-        /// <summary>
-        /// Gets the currently selected item (including its generation if Virtualization is currently switched on).
-        /// </summary>
-        /// <returns></returns>
-        protected TabItem GetSelectedTabItem()
-        {
-            object selectedItem = base.SelectedItem;
-
-            // Code below is required only if virtualization is turned ON
-            if (_IsVirtualizing == false)
-                return selectedItem as TabItem;
-
-            if (selectedItem == null)
-                return null;
-
-            TabItem item = selectedItem as TabItem;
-            if (item == null)
-                item = base.ItemContainerGenerator.ContainerFromIndex(base.SelectedIndex) as TabItem;
-
-            return item;
-        }
-
-        /// <summary>
-        /// If containers are done, generate the selected item
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ItemContainerGenerator_StatusChanged(object sender, EventArgs e)
-        {
-            if (this.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
-            {
-                this.ItemContainerGenerator.StatusChanged -= ItemContainerGenerator_StatusChanged;
-                UpdateSelectedItem();
-            }
-        }
-
-        private Grid CreateGrid()
-        {
-            var grid = new Grid();
-            Binding binding = new Binding(PaddingProperty.Name);
-            binding.Source = this;  // view model?
-            grid.SetBinding(Grid.MarginProperty, binding);
-
-            binding = new Binding(SnapsToDevicePixelsProperty.Name);
-            binding.Source = this;  // view model?
-            grid.SetBinding(Grid.SnapsToDevicePixelsProperty, binding);
-
-            return grid;
         }
 
         private void UpdateSelectedItem()
@@ -245,6 +170,19 @@ namespace AvalonDock.Controls
             }
 
             return null;
+        }
+
+        protected TabItem GetSelectedTabItem()
+        {
+            object selectedItem = base.SelectedItem;
+            if (selectedItem == null)
+                return null;
+
+            TabItem item = selectedItem as TabItem;
+            if (item == null)
+                item = base.ItemContainerGenerator.ContainerFromIndex(base.SelectedIndex) as TabItem;
+
+            return item;
         }
         #endregion methods
     }

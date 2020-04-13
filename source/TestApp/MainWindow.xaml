@@ -65,8 +65,8 @@
 			Grid.Row="1"
 			AllowMixedOrientation="True"
 			DocumentClosing="dockManager_DocumentClosing"
-			IsVirtualizingLayoutAnchorable="False"
-			IsVirtualizingLayoutDocument="False">
+			IsVirtualizingLayoutAnchorable="True"
+			IsVirtualizingLayoutDocument="True">
 			<!-- avalonDock:DockingManager.Theme>
                 <avalonDock:Vs2013DarkTheme/>
             </avalonDock:DockingManager.Theme-->
