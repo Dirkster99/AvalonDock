@@ -1,11 +1,13 @@
-﻿<!--************************************************************************
+﻿<!--
+	************************************************************************
 	AvalonDock
 	
 	Copyright (C) 2007-2013 Xceed Software Inc.
 	
 	This program is provided to you under the terms of the Microsoft Public
 	License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
-	************************************************************************-->
+	************************************************************************
+-->
 
 <ResourceDictionary
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -891,6 +893,16 @@
 							</MultiDataTrigger.Conditions>
 							<Setter TargetName="Header" Property="Visibility" Value="Collapsed" />
 						</MultiDataTrigger>
+						<MultiDataTrigger>
+							<!--
+								Also hide the title, if model cannot be bound which can happen when using virtualization
+								See Issue #148 Drop Down Menu for LayoutAnchorables is not correct with Virtualization
+							-->
+							<MultiDataTrigger.Conditions>
+								<Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model}" Value="{x:Null}" />
+							</MultiDataTrigger.Conditions>
+							<Setter TargetName="Header" Property="Visibility" Value="Collapsed" />
+						</MultiDataTrigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
@@ -1017,7 +1029,7 @@
 							BorderThickness="{TemplateBinding BorderThickness}">
 							<Grid Margin="3">
 								<Grid.RowDefinitions>
-									<RowDefinition Height="Auto" MinHeight="16" /> 
+									<RowDefinition Height="Auto" MinHeight="16" />
 									<!--  https://github.com/xceedsoftware/wpftoolkit/issues/1203  -->
 									<RowDefinition Height="*" />
 								</Grid.RowDefinitions>
