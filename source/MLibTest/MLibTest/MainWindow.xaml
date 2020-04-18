@@ -99,8 +99,8 @@
 					AnchorablesSource="{Binding Tools}"
 					DataContext="{Binding AD_WorkSpace}"
 					DocumentsSource="{Binding Files}"
-					IsVirtualizingLayoutAnchorable="True"
-					IsVirtualizingLayoutDocument="True"
+					IsVirtualizingAnchorable="True"
+					IsVirtualizingDocument="True"
 					Visibility="Hidden">
 					<!-- avalonDock:DockingManager.Theme>
                 <avalonDock:Vs2013LightTheme/>

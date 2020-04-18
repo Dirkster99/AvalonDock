@@ -75,6 +75,8 @@ namespace AvalonDock
 		/// </summary>
 		public DockingManager()
 		{
+			IsVirtualizingDocument = true;
+			IsVirtualizingAnchorable = true;
 
 #if !VS2008
 			Layout = new LayoutRoot { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) };
@@ -1325,13 +1327,13 @@ namespace AvalonDock
 		/// Gets/sets (a simple non-dependency property) to determine whether the
 		/// <see cref="LayoutDocumentPaneControl"/> is virtualizing its tabbed item child controls or not.
 		/// </summary>
-		public bool IsVirtualizingLayoutDocument { get; set; }
+		public bool IsVirtualizingDocument { get; set; }
 
 		/// <summary>
 		/// Gets/sets (a simple non-dependency property) to determine whether the
 		/// <see cref="LayoutAnchorablePaneControl"/> is virtualizing its tabbed item child controls or not.
 		/// </summary>
-		public bool IsVirtualizingLayoutAnchorable { get; set; }
+		public bool IsVirtualizingAnchorable { get; set; }
 
 		#endregion IsVirtualizingLayoutDocument IsVirtualizingLayoutAnchorable
 
@@ -1522,13 +1524,13 @@ namespace AvalonDock
 
 			if (model is LayoutDocumentPane)
 			{
-				var templateModelView = new LayoutDocumentPaneControl(model as LayoutDocumentPane, IsVirtualizingLayoutDocument);
+				var templateModelView = new LayoutDocumentPaneControl(model as LayoutDocumentPane, IsVirtualizingDocument);
 				templateModelView.SetBinding(StyleProperty, new Binding(DocumentPaneControlStyleProperty.Name) { Source = this });
 				return templateModelView;
 			}
 			if (model is LayoutAnchorablePane)
 			{
-				var templateModelView = new LayoutAnchorablePaneControl(model as LayoutAnchorablePane, IsVirtualizingLayoutAnchorable);
+				var templateModelView = new LayoutAnchorablePaneControl(model as LayoutAnchorablePane, IsVirtualizingAnchorable);
 				templateModelView.SetBinding(StyleProperty, new Binding(AnchorablePaneControlStyleProperty.Name) { Source = this });
 				return templateModelView;
 			}
