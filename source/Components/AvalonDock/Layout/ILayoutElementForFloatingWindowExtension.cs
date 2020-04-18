@@ -42,7 +42,8 @@
 			if (SystemParameters.PrimaryScreenWidth == SystemParameters.VirtualScreenWidth &&
 				SystemParameters.PrimaryScreenHeight == SystemParameters.VirtualScreenHeight)
 			{
-				RECT primaryscreen = new RECT(0, 0, (int)SystemParameters.PrimaryScreenWidth, (int)SystemParameters.PrimaryScreenHeight);
+				RECT primaryscreen = new RECT((int)SystemParameters.VirtualScreenLeft, (int)SystemParameters.VirtualScreenTop,
+				                              (int)SystemParameters.PrimaryScreenWidth, (int)SystemParameters.PrimaryScreenHeight);
 
 				if (!RectanglesIntersect(normalPosition, primaryscreen))
 				{
@@ -60,7 +61,8 @@
 			}
 			else
 			{
-				RECT primaryscreen = new RECT(0, 0, (int)SystemParameters.VirtualScreenWidth, (int)SystemParameters.VirtualScreenHeight);
+				RECT primaryscreen = new RECT((int)SystemParameters.VirtualScreenLeft, (int)SystemParameters.VirtualScreenTop,
+				                              (int)SystemParameters.VirtualScreenWidth, (int)SystemParameters.VirtualScreenHeight);
 
 				if (!RectanglesIntersect(normalPosition, primaryscreen))
 				{
