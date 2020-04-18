@@ -125,7 +125,8 @@ to also theme standard elements, such as, button and textblock etc.
 
 - [Feature Added: Auto resizing floating window to content](https://github.com/Dirkster99/AvalonDock/pull/146) [thanx to Erik Ovegård](https://github.com/eriove)
 
-- Feature Added: Virtualizing Tabbed Documents and/or LayoutAnchorables [PR #143](https://github.com/Dirkster99/AvalonDock/pull/143) + [Virtualization Options](https://github.com/Dirkster99/AvalonDock/commit/1a45dbbe66c931e6c87ad769a9b269da4cb290ae)  [thanx to matko238](https://github.com/matko238)
+- Feature Added: Virtualizing Tabbed Documents and/or LayoutAnchorables [PR #143](https://github.com/Dirkster99/AvalonDock/pull/143) + [Virtualization Options](https://github.com/Dirkster99/AvalonDock/commit/1a45dbbe66c931e6c87ad769a9b269da4cb290ae)  [thanx to matko238](https://github.com/matko238)  
+  - See ``DockingManager.IsVirtualizingAnchorable``, ``DockingManager.IsVirtualizingDocument``, and ``IsVirtualizing`` property on ``LayoutAnchorablePaneControl`` and ``LayoutDocumentPaneControl``.
 
 - [Fixed Issue #149 Flicker/Lag when restoring floating window from Maximized state](https://github.com/Dirkster99/AvalonDock/issues/149) [thanx to skyneps](https://github.com/skyneps)
 
