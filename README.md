@@ -129,6 +129,8 @@ to also theme standard elements, such as, button and textblock etc.
 
 - [Fixed Issue #149 Flicker/Lag when restoring floating window from Maximized state](https://github.com/Dirkster99/AvalonDock/issues/149) [thanx to skyneps](https://github.com/skyneps)
 
+- [Fixed Issue #150 Restoring floating window position on multiple monitors uses wrong Point for Virtual Screen location](https://github.com/Dirkster99/AvalonDock/issues/150) [thanx to charles-roberts](https://github.com/charles-roberts
+
 ## Fixes and Features added in Version 4.0
 
 - [Fix #98 with floating window without a content #99](https://github.com/Dirkster99/AvalonDock/pull/99) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
