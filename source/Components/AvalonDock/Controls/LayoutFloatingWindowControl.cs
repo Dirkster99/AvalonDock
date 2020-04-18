@@ -176,12 +176,8 @@ namespace AvalonDock.Controls
 		protected override void OnStateChanged(EventArgs e)
 		{
 			if (!_isInternalChange)
-			{
-				if (WindowState == WindowState.Maximized)
-					UpdateMaximizedState(true);
-				else
-					WindowState = IsMaximized ? WindowState.Maximized : WindowState.Normal;
-			}
+				UpdateMaximizedState(WindowState == WindowState.Maximized);
+
 			base.OnStateChanged(e);
 		}
 
