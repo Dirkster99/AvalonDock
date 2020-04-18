@@ -46,6 +46,13 @@ namespace AvalonDock.Controls
 		}
 		#endregion constructors
 
+		#region properties
+		/// <summary>
+		/// Gets whether the control and its inheriting classes are virtualiing their items or not.
+		/// </summary>
+		public bool IsVirtualiting => _IsVirtualizing;
+		#endregion properties
+
 		#region methods
 		/// <summary>
 		/// Get the ItemsHolder and generate any children
