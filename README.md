@@ -119,7 +119,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## Fixes & Features in master (not Released to NuGet yet)
+## Fixes & Features  added in Version 4.1
 
 - [Fix #137 BindingExpression in VS2013 theme](https://github.com/Dirkster99/AvalonDock/issues/137)
 
