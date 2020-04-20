@@ -69,7 +69,8 @@ namespace AvalonDock.Controls
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Model"/> property.</summary>
 		protected virtual void OnModelChanged(DependencyPropertyChangedEventArgs e)
 		{
-			SetLayoutItem(Model != null ? Model.Root.Manager.GetLayoutItemFromModel(Model) : null);
+			DockingManager manager = Model?.Root?.Manager;
+			SetLayoutItem(manager != null ? manager.GetLayoutItemFromModel(Model) : null);
 			//UpdateLogicalParent();
 		}
 
