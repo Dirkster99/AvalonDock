@@ -48,7 +48,7 @@ namespace AvalonDock.Controls
 
 		#region properties
 		/// <summary>
-		/// Gets whether the control and its inheriting classes are virtualiing their items or not.
+		/// Gets whether the control and its inheriting classes are virtualizing their items or not.
 		/// </summary>
 		public bool IsVirtualiting => _IsVirtualizing;
 		#endregion properties
