@@ -121,6 +121,8 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Fixes & Features in master branch (not released to NuGet, yet)
 
+- [# 159 Docking manager in TabControl can cause InvalidOperationException](https://github.com/Dirkster99/AvalonDock/issues/159)
+
 - [# 151 Model.Root.Manager may be null in LayoutDocumentTabItem](https://github.com/Dirkster99/AvalonDock/issues/151) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
 
 ## Fixes & Features  added in Version 4.1
