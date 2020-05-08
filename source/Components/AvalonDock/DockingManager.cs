@@ -1349,8 +1349,17 @@ namespace AvalonDock
 		/// <inheritdoc/>
 		bool IOverlayWindowHost.HitTest(Point dragPoint)
 		{
-			var detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
-			return detectionRect.Contains(dragPoint);
+			try
+			{
+				var detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
+				return detectionRect.Contains(dragPoint);
+			}
+			catch
+			{
+				// Silently swallow exception that may occur if DockingManager is not visible (because its hidden by a tab)
+			}
+
+			return false;
 		}
 
 		/// <inheritdoc/>
