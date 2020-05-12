@@ -122,7 +122,9 @@ namespace AvalonDock.Controls
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonDown(e);
-			if (e.Handled) return;
+			
+			// Start a drag & drop action for a LayoutAnchorable
+			if (e.Handled || Model.CanMove == false) return;
 			var attachFloatingWindow = false;
 			var parentFloatingWindow = Model.FindParent<LayoutAnchorableFloatingWindow>();
 			if (parentFloatingWindow != null) attachFloatingWindow = parentFloatingWindow.Descendents().OfType<LayoutAnchorablePane>().Count() == 1;

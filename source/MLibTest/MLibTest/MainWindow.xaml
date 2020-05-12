@@ -166,7 +166,7 @@
 							</demos:PanesStyleSelector.ToolStyle>
 							<demos:PanesStyleSelector.FileStyle>
 								<!--  Define Style of a Document View  -->
-								<Style TargetType="{x:Type avalonDockControls:LayoutItem}">
+								<Style TargetType="{x:Type avalonDockControls:LayoutDocumentItem}">
 									<Setter Property="Title" Value="{Binding Model.Title}" />
 									<Setter Property="ToolTip" Value="{Binding Model.FilePath}" />
 									<Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
