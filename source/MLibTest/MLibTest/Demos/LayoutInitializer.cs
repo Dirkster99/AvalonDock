@@ -35,14 +35,15 @@
 		}
 
 
-		public bool BeforeInsertDocument(LayoutRoot layout, LayoutDocument anchorableToShow, ILayoutContainer destinationContainer)
+		public bool BeforeInsertDocument(LayoutRoot layout,
+										LayoutDocument layoutDocumentToShow,
+										ILayoutContainer destinationContainer)
 		{
 			return false;
 		}
 
-		public void AfterInsertDocument(LayoutRoot layout, LayoutDocument anchorableShown)
+		public void AfterInsertDocument(LayoutRoot layout, LayoutDocument layoutDocumentToShow)
 		{
-
 		}
 	}
 }
