@@ -121,6 +121,8 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Fixes & Features in master branch (not released to NuGet, yet)
 
+- [#136 Layout "locking" method for Anchorables (tool windows)](https://github.com/Dirkster99/AvalonDock/issues/136)
+
 - [# 159 Docking manager in TabControl can cause InvalidOperationException](https://github.com/Dirkster99/AvalonDock/issues/159)
 
 - [# 151 Model.Root.Manager may be null in LayoutDocumentTabItem](https://github.com/Dirkster99/AvalonDock/issues/151) Thanx to [scdmitryvodich](https://github.com/scdmitryvodich)
