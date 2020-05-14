@@ -159,10 +159,10 @@
 								<demos:PanesStyleSelector.ToolStyle>
 									<!--  Define Style of a Tool Window View  -->
 									<Style TargetType="{x:Type avalonDockControls:LayoutAnchorableItem}">
-										<Setter Property="Title" Value="{Binding Model.Title}" />
-										<Setter Property="IconSource" Value="{Binding Model.IconSource}" />
+										<Setter Property="Title" Value="{Binding Model.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+										<Setter Property="IconSource" Value="{Binding Model.IconSource, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 										<Setter Property="Visibility" Value="{Binding Model.IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}" />
-										<Setter Property="ContentId" Value="{Binding Model.ContentId}" />
+										<Setter Property="ContentId" Value="{Binding Model.ContentId, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 										<Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}" />
 										<Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}" />
 										<Setter Property="CanHide" Value="True" />
@@ -171,11 +171,11 @@
 								<demos:PanesStyleSelector.FileStyle>
 									<!--  Define Style of a Document View  -->
 									<Style TargetType="{x:Type avalonDockControls:LayoutDocumentItem}">
-										<Setter Property="Title" Value="{Binding Model.Title}" />
-										<Setter Property="ToolTip" Value="{Binding Model.FilePath}" />
+										<Setter Property="Title" Value="{Binding Model.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+										<Setter Property="ToolTip" Value="{Binding Model.FilePath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 										<Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
-										<Setter Property="IconSource" Value="{Binding Model.IconSource}" />
-										<Setter Property="ContentId" Value="{Binding Model.ContentId}" />
+										<Setter Property="IconSource" Value="{Binding Model.IconSource, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+										<Setter Property="ContentId" Value="{Binding Model.ContentId, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 									</Style>
 								</demos:PanesStyleSelector.FileStyle>
 							</demos:PanesStyleSelector>

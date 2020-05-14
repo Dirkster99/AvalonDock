@@ -3,12 +3,13 @@
 	using MLibTest.Demos.ViewModels.AD;
 	using System;
 	using System.Collections.Generic;
+    using System.Threading.Tasks;
 
-	/// <summary>
-	/// Defines the interface to the <see cref="WorkSpaceViewModel"/> which implements
-	/// AvalonDock demo specific properties, events and methods.
-	/// </summary>
-	internal interface IWorkSpaceViewModel
+    /// <summary>
+    /// Defines the interface to the <see cref="WorkSpaceViewModel"/> which implements
+    /// AvalonDock demo specific properties, events and methods.
+    /// </summary>
+    internal interface IWorkSpaceViewModel
 	{
 		/// <summary>
 		/// Event is raised when AvalonDock (or the user) selects a new document.
@@ -45,7 +46,7 @@
 		/// </summary>
 		/// <param name="filepath"></param>
 		/// <returns></returns>
-		FileViewModel Open(string filepath);
+		Task<FileViewModel> OpenAsync(string filepath);
 		#endregion methods
 	}
 }

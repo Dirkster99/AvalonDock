@@ -42,7 +42,7 @@
 		public string ContentId
 		{
 			get => _contentId;
-			set
+			protected set
 			{
 				if (_contentId != value)
 				{

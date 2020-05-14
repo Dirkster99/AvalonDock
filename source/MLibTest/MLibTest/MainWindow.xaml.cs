@@ -10,6 +10,8 @@
 	using System.Windows;
 	using System.Windows.Input;
 	using AvalonDock.Layout.Serialization;
+	using System.Xml.Serialization;
+	using MLibTest.Demos.ViewModels.AD;
 
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
@@ -58,6 +60,7 @@
 
 		internal void OnLayoutLoaded_Event(object sender, LayoutLoadedEventArgs layoutLoadedEvent)
 		{
+
 			Application.Current.Dispatcher.Invoke(() =>
 			{
 				try
@@ -73,7 +76,11 @@
 
 					if (result.LoadwasSuccesful == true)
 					{
-						var stringLayoutSerializer = new XmlLayoutSerializer(dockManager);
+						XmlLayoutSerializer stringLayoutSerializer;
+
+						// Make sure AvalonDock control is visible at the end of restoring layout
+						stringLayoutSerializer = new XmlLayoutSerializer(dockManager);
+
 						//Here I've implemented the LayoutSerializationCallback just to show
 						// a way to feed layout desarialization with content loaded at runtime
 						//Actually I could in this case let AvalonDock to attach the contents
@@ -81,7 +88,7 @@
 						//LayoutSerializationCallback should anyway be handled to attach contents
 						//not currently loaded
 
-						stringLayoutSerializer.LayoutSerializationCallback += (s, e) =>
+						stringLayoutSerializer.LayoutSerializationCallback += async (s, e) =>
 						{
 							try
 							{
@@ -102,9 +109,18 @@
 								}
 
 								// Its not a tool window -> So, this could rever to a document then
-								if (!string.IsNullOrWhiteSpace(e.Model.ContentId) && File.Exists(e.Model.ContentId))
+								if (!string.IsNullOrWhiteSpace(e.Model.ContentId))
 								{
-									e.Content = workSpace.Open(e.Model.ContentId);
+									FileViewModel vm = await workSpace.OpenAsync(e.Model.ContentId);
+
+									if (vm != null)
+									{
+										e.Content = vm;
+										e.Cancel = false;
+										return;
+									}
+
+									e.Cancel = true;
 									return;
 								}
 
@@ -133,8 +149,7 @@
 					dockManager.Visibility = Visibility.Visible;
 					loadProgress.Visibility = Visibility.Collapsed;
 				}
-			},
-			System.Windows.Threading.DispatcherPriority.Background);
+			}, System.Windows.Threading.DispatcherPriority.Background);
 		}
 
 		internal async void OnLoadLayoutAsync(object parameter = null)
@@ -182,7 +197,7 @@
 			// in build Tab of MLibTest project and AvalonDock project
 			// to generate trace in output window
 #if TRACE
-    dockManager.Layout.ConsoleDump(0);
+			dockManager.Layout.ConsoleDump(0);
 #endif
 		}
 		#endregion methods

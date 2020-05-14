@@ -10,7 +10,8 @@
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.Linq;
-	using System.Windows;
+    using System.Threading.Tasks;
+    using System.Windows;
 	using System.Windows.Input;
 
 	#region Helper Test Classes
@@ -249,7 +250,7 @@
 			{
 				if (_openCommand == null)
 				{
-					_openCommand = new RelayCommand<object>((p) => OnOpen(p), (p) => CanOpen(p));
+					_openCommand = new RelayCommand<object>(async (p) => await OnOpenAsync(p), (p) => CanOpen(p));
 				}
 
 				return _openCommand;
@@ -325,12 +326,12 @@
 			return true;
 		}
 
-		private void OnOpen(object parameter)
+		private async Task OnOpenAsync(object parameter)
 		{
 			var dlg = new OpenFileDialog();
 			if (dlg.ShowDialog().GetValueOrDefault())
 			{
-				var fileViewModel = Open(dlg.FileName);
+				var fileViewModel = await OpenAsync(dlg.FileName);
 				ActiveDocument = fileViewModel;
 			}
 		}
@@ -340,16 +341,23 @@
 		/// </summary>
 		/// <param name="filepath"></param>
 		/// <returns></returns>
-		public FileViewModel Open(string filepath)
+		public async Task<FileViewModel> OpenAsync(string filepath)
 		{
+			// Check if we have already loaded this file and return it if so
 			var fileViewModel = _files.FirstOrDefault(fm => fm.FilePath == filepath);
 			if (fileViewModel != null)
 				return fileViewModel;
 
-			fileViewModel = new FileViewModel(filepath, this as IWorkSpaceViewModel);
-			_files.Add(fileViewModel);
+			fileViewModel = new FileViewModel(this as IWorkSpaceViewModel);
+			bool result = await fileViewModel.OpenFileAsync(filepath);
 
-			return fileViewModel;
+			if (result)
+			{
+				_files.Add(fileViewModel);
+				return fileViewModel;
+			}
+
+			return null;
 		}
 		#endregion  OpenCommand
 

@@ -3,7 +3,9 @@
 	using MLibTest.Demos.ViewModels.Interfaces;
 	using MLibTest.ViewModels.Base;
 	using System.IO;
-	using System.Windows.Input;
+    using System.Text;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
 	using System.Windows.Media;
 
 	internal class FileViewModel : PaneViewModel
@@ -23,21 +25,6 @@
 
 		#region ctors
 		/// <summary>
-		/// Class constructor
-		/// </summary>
-		/// <param name="filePath"></param>
-		/// <param name="workSpaceViewModel"></param>
-		public FileViewModel(string filePath, IWorkSpaceViewModel workSpaceViewModel)
-			: this(workSpaceViewModel)
-		{
-			FilePath = filePath;
-			Title = FileName;
-
-			//Set the icon only for open documents (just a test)
-			IconSource = ISC.ConvertFromInvariantString(@"pack://application:,,/Demos/Images/document.png") as ImageSource;
-		}
-
-		/// <summary>
 		/// class constructor
 		/// </summary>
 		/// <param name="workSpaceViewModel"></param>
@@ -45,7 +32,9 @@
 		{
 			_workSpaceViewModel = workSpaceViewModel;
 			IsDirty = false;
-			Title = FileName;
+
+			//Set the icon only for open documents (just a test)
+			IconSource = ISC.ConvertFromInvariantString(@"pack://application:,,/Demos/Images/document.png") as ImageSource;
 		}
 		#endregion ctors
 
@@ -53,7 +42,7 @@
 		public string FilePath
 		{
 			get => _filePath;
-			set
+			internal set
 			{
 				if (_filePath != value)
 				{
@@ -61,12 +50,6 @@
 					RaisePropertyChanged(nameof(FilePath));
 					RaisePropertyChanged(nameof(FileName));
 					RaisePropertyChanged(nameof(Title));
-
-					if (File.Exists(_filePath))
-					{
-						_textContent = File.ReadAllText(_filePath);
-						ContentId = _filePath;
-					}
 				}
 			}
 		}
@@ -147,6 +130,83 @@
 		#endregion Properties
 
 		#region methods
+		/// <summary>
+		/// Attempts to read the contents of a text file and assigns it to
+		/// text content of this viewmodel.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns>True if file read was successful, otherwise false</returns>
+		internal async Task<bool> OpenFileAsync(string path)
+		{
+			try
+			{
+				string textContent = string.Empty;
+
+				// This is the same default buffer size as
+				// <see cref="StreamReader"/> and <see cref="FileStream"/>.
+				int DefaultBufferSize = 4096;
+
+				// Indicates that
+				// 1. The file is to be used for asynchronous reading.
+				// 2. The file is to be accessed sequentially from beginning to end.
+				FileOptions DefaultOptions = FileOptions.Asynchronous | FileOptions.SequentialScan;
+
+				using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, DefaultOptions))
+				{
+					var bom = new byte[4];
+					await stream.ReadAsync(bom, 0, 4);
+					stream.Seek(0, SeekOrigin.Begin);
+					Encoding fileEncoding = GetEncoding(bom);
+
+					using (var reader = new StreamReader(stream, fileEncoding))
+					{
+						textContent = await reader.ReadToEndAsync();
+					}
+				}
+
+				TextContent = textContent;
+				ContentId = path;
+				FilePath = path;
+				IsDirty = false;
+				Title = FileName;
+
+				return true;
+			}
+			catch
+			{
+				// Not processing this catch in any other way than rejecting to load this
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Gets the encoding of a file from its first 4 bytes.
+		/// </summary>
+		/// <param name="bom">BOM to be translated into an <see cref="Encoding"/>.
+		/// This should be at least 4 bytes long.</param>
+		/// <returns>Recommended <see cref="Encoding"/> to be used to read text from this file.</returns>
+		public Encoding GetEncoding(byte[] bom)
+		{
+			// Analyze the BOM
+			if (bom[0] == 0x2b && bom[1] == 0x2f && bom[2] == 0x76)
+				return Encoding.UTF7;
+
+			if (bom[0] == 0xef && bom[1] == 0xbb && bom[2] == 0xbf)
+				return Encoding.UTF8;
+
+			if (bom[0] == 0xff && bom[1] == 0xfe)
+				return Encoding.Unicode; //UTF-16LE
+
+			if (bom[0] == 0xfe && bom[1] == 0xff)
+				return Encoding.BigEndianUnicode; //UTF-16BE
+
+			if (bom[0] == 0 && bom[1] == 0 && bom[2] == 0xfe && bom[3] == 0xff)
+				return Encoding.UTF32;
+
+			return Encoding.Default;
+		}
+
 		private bool CanClose()
 		{
 			return true;
