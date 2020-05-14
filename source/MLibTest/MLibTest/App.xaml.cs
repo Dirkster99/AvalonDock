@@ -49,8 +49,6 @@
 		#region methods
 		private void Application_Startup(object sender, StartupEventArgs e)
 		{
-			LayoutLoaded.LoadLayout();
-
 			// Set shutdown mode here (and reset further below) to enable showing custom dialogs (messageboxes)
 			// durring start-up without shutting down application when the custom dialogs (messagebox) closes
 			ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown;
@@ -122,9 +120,7 @@
 						dispose.Dispose();
 
 					_mainWindow.DataContext = null;
-					// _appVM = null;     readonly property
-					//_mainWindow = null; readonly property
-				};
+ 				};
 
 				MainWindow.Show();
 			}
@@ -147,6 +143,8 @@
 			{
 				Debug.WriteLine(exp);
 			}
+
+			LayoutLoaded.LoadLayout();
 
 			// Load and layout AvalonDock elements when MainWindow has loaded
 			_mainWindow.OnLoadLayoutAsync();

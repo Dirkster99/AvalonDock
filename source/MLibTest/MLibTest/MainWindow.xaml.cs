@@ -66,7 +66,11 @@
 					if (layoutLoadedEvent == null)
 						return;
 
+					// Process the finally block since we have nothing to do here
 					var result = layoutLoadedEvent.Result;
+					if (result == null)
+						return;
+
 					if (result.LoadwasSuccesful == true)
 					{
 						var stringLayoutSerializer = new XmlLayoutSerializer(dockManager);
@@ -127,6 +131,7 @@
 				{
 					// Make sure AvalonDock control is visible at the end of restoring layout
 					dockManager.Visibility = Visibility.Visible;
+					loadProgress.Visibility = Visibility.Collapsed;
 				}
 			},
 			System.Windows.Threading.DispatcherPriority.Background);
