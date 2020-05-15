@@ -91,12 +91,20 @@
 		<TabControl Grid.Row="1">
 			<TabItem Name="tab1" Header="tab 1">
 				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="*" />
+					</Grid.RowDefinitions>
+
 					<ProgressBar
 						x:Name="loadProgress"
+						Grid.Row="0"
+						Background="White"
 						IsIndeterminate="True"
 						Visibility="Visible" />
 
 					<avalonDock:DockingManager
+						xmlns:views="clr-namespace:MLibTest.Demos.ViewModels.Views"
 						x:Name="dockManager"
 						Grid.Row="1"
 						ActiveContent="{Binding ActiveDocument, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
@@ -113,13 +121,7 @@
 							<demos:PanesTemplateSelector>
 								<demos:PanesTemplateSelector.FileViewTemplate>
 									<DataTemplate>
-										<Grid>
-											<TextBox
-												AcceptsReturn="True"
-												BorderThickness="0"
-												Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}"
-												TextWrapping="Wrap" />
-										</Grid>
+										<views:DocumentView />
 									</DataTemplate>
 								</demos:PanesTemplateSelector.FileViewTemplate>
 								<demos:PanesTemplateSelector.FileStatsViewTemplate>

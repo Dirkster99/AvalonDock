@@ -10,7 +10,6 @@
 	using System.Windows;
 	using System.Windows.Input;
 	using AvalonDock.Layout.Serialization;
-	using System.Xml.Serialization;
 	using MLibTest.Demos.ViewModels.AD;
 
 	/// <summary>
@@ -88,7 +87,7 @@
 						//LayoutSerializationCallback should anyway be handled to attach contents
 						//not currently loaded
 
-						stringLayoutSerializer.LayoutSerializationCallback += async (s, e) =>
+						stringLayoutSerializer.LayoutSerializationCallback += (s, e) =>
 						{
 							try
 							{
@@ -111,11 +110,14 @@
 								// Its not a tool window -> So, this could rever to a document then
 								if (!string.IsNullOrWhiteSpace(e.Model.ContentId))
 								{
-									FileViewModel vm = await workSpace.OpenAsync(e.Model.ContentId);
+									DocumentViewModel vm = new DocumentViewModel(workSpace, e.Model.ContentId);
+									////DocumentViewModel vm = await workSpace.OpenAsync(e.Model.ContentId);
+									////Task<FileViewModel> vm = workSpace.OpenAsync(e.Model.ContentId);
 
 									if (vm != null)
 									{
 										e.Content = vm;
+										////e.Content = vm.Result;
 										e.Cancel = false;
 										return;
 									}

@@ -3,12 +3,12 @@
 	using MLibTest.Demos.ViewModels.Interfaces;
 	using MLibTest.ViewModels.Base;
 	using System.IO;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Windows.Input;
+	using System.Text;
+	using System.Threading.Tasks;
+	using System.Windows.Input;
 	using System.Windows.Media;
 
-	internal class FileViewModel : PaneViewModel
+	internal class DocumentViewModel : PaneViewModel, IDocumentViewModel
 	{
 		#region fields
 		private static ImageSourceConverter ISC = new ImageSourceConverter();
@@ -21,6 +21,9 @@
 		ICommand _closeCommand = null;
 		ICommand _saveAsCommand = null;
 		ICommand _saveCommand = null;
+
+		private string _initialPath;
+		private bool _isInitialized;
 		#endregion fields
 
 		#region ctors
@@ -28,9 +31,29 @@
 		/// class constructor
 		/// </summary>
 		/// <param name="workSpaceViewModel"></param>
-		public FileViewModel(IWorkSpaceViewModel workSpaceViewModel)
+		/// <param name="initialPath"></param>
+		public DocumentViewModel(IWorkSpaceViewModel workSpaceViewModel,
+								string initialPath)
+			: this(workSpaceViewModel)
+		{
+			_initialPath = initialPath;
+		}
+
+		/// <summary>
+		/// class constructor
+		/// </summary>
+		/// <param name="workSpaceViewModel"></param>
+		public DocumentViewModel(IWorkSpaceViewModel workSpaceViewModel)
+			: this()
 		{
 			_workSpaceViewModel = workSpaceViewModel;
+		}
+
+		/// <summary>
+		/// class constructor
+		/// </summary>
+		public DocumentViewModel()
+		{
 			IsDirty = false;
 
 			//Set the icon only for open documents (just a test)
@@ -39,6 +62,9 @@
 		#endregion ctors
 
 		#region Properties
+		/// <summary>
+		/// Gets the current path of the file being managed in this document viewmodel.
+		/// </summary>
 		public string FilePath
 		{
 			get => _filePath;
@@ -54,6 +80,9 @@
 			}
 		}
 
+		/// <summary>
+		/// Gets the current filename of the file being managed in this document viewmodel.
+		/// </summary>
 		public string FileName
 		{
 			get
@@ -65,6 +94,9 @@
 			}
 		}
 
+		/// <summary>
+		/// Gets/sets the text content being managed in this document viewmodel.
+		/// </summary>
 		public string TextContent
 		{
 			get => _textContent;
@@ -79,6 +111,9 @@
 			}
 		}
 
+		/// <summary>
+		/// Gets/sets whether the documents content has been changed without saving into file system or not.
+		/// </summary>
 		public bool IsDirty
 		{
 			get => _isDirty;
@@ -93,6 +128,9 @@
 			}
 		}
 
+		/// <summary>
+		/// Gets a command to save this document's content into the file system.
+		/// </summary>
 		public ICommand SaveCommand
 		{
 			get
@@ -106,6 +144,9 @@
 			}
 		}
 
+		/// <summary>
+		/// Gets a command to save this document's content into another file in the file system.
+		/// </summary>
 		public ICommand SaveAsCommand
 		{
 			get
@@ -117,6 +158,9 @@
 			}
 		}
 
+		/// <summary>
+		/// Gets a command to close this document.
+		/// </summary>
 		public ICommand CloseCommand
 		{
 			get
@@ -131,12 +175,34 @@
 
 		#region methods
 		/// <summary>
+		/// Attempts to read the contents of a text file defined via initialPath
+		/// and assigns it to text content of this viewmodel.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns>True if file read was successful, otherwise false</returns>
+		public async Task<bool> OpenFileWithInitialPathAsync()
+		{
+			if (string.IsNullOrEmpty(_initialPath) && _isInitialized == false)
+				return false;
+
+			if (_isInitialized)
+				return true;
+
+			bool result = await OpenFileAsync(_initialPath);
+
+			if (result == true)
+				_initialPath = null;
+
+			return result;
+		}
+
+		/// <summary>
 		/// Attempts to read the contents of a text file and assigns it to
 		/// text content of this viewmodel.
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns>True if file read was successful, otherwise false</returns>
-		internal async Task<bool> OpenFileAsync(string path)
+		public async Task<bool> OpenFileAsync(string path)
 		{
 			try
 			{
@@ -169,12 +235,14 @@
 				FilePath = path;
 				IsDirty = false;
 				Title = FileName;
+				_isInitialized = true;
 
 				return true;
 			}
 			catch
 			{
-				// Not processing this catch in any other way than rejecting to load this
+				// Not processing this catch in any other way than rejecting to initialize this
+				_isInitialized = false;
 			}
 
 			return false;

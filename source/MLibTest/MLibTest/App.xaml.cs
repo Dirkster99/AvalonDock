@@ -10,7 +10,8 @@
 	using System.Diagnostics;
 	using System.Globalization;
 	using System.Threading;
-	using System.Windows;
+    using System.Threading.Tasks;
+    using System.Windows;
 
 	/// <summary>
 	/// Interaction logic for App.xaml
@@ -105,7 +106,7 @@
 				ConstructMainWindowSession(_appVM, _mainWindow, settings);
 
 				// and show it to the user ...
-				MainWindow.Loaded += MainWindow_Loaded;
+				MainWindow.Loaded += MainWindow_LoadedAsync;
 				MainWindow.Closing += OnClosing;
 
 				// When the ViewModel asks to be closed, close the window.
@@ -133,7 +134,7 @@
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+		private async void MainWindow_LoadedAsync(object sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -144,7 +145,7 @@
 				Debug.WriteLine(exp);
 			}
 
-			LayoutLoaded.LoadLayout();
+			await LayoutLoaded.LoadLayoutAsync();
 
 			// Load and layout AvalonDock elements when MainWindow has loaded
 			_mainWindow.OnLoadLayoutAsync();

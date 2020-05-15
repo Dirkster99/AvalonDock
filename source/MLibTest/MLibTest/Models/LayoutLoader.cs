@@ -1,7 +1,9 @@
 namespace MLibTest.Models
 {
 	using System;
-	using System.Threading;
+    using System.IO;
+    using System.Text;
+    using System.Threading;
 	using System.Threading.Tasks;
 
 	/// <summary>
@@ -54,34 +56,31 @@ namespace MLibTest.Models
 		/// The will return the result via <see cref="LayoutLoadedEvent"/> as soon as it
 		/// is available.
 		/// </summary>
-		public void LoadLayout()
+		public async Task LoadLayoutAsync()
 		{
 			try
 			{
-				Task.Factory.StartNew<LayoutLoaderResult>(() => LoadAvalonDockLayoutToString()
-					).ContinueWith(async r =>
-					{
-						await this._LayoutSemaphore.WaitAsync();
-						try
-						{
-							this._LayoutLoaded = r.Result;
+				var result = await LoadAvalonDockLayoutToStringAsync();
 
-							// Send an event if event subscriber is available
-							// if MainWindow is already successfull constructed and waiting for Xml Layout
-							LayoutLoadedEvent?.Invoke(this, new LayoutLoadedEventArgs(r.Result));
-						}
-						finally
-						{
-							this._LayoutSemaphore.Release();
-						}
-					});
+				await this._LayoutSemaphore.WaitAsync();
+				try
+				{
+					this._LayoutLoaded = result;
+
+					// Send an event if event subscriber is available
+					// if MainWindow is already successfull constructed and waiting for Xml Layout
+					LayoutLoadedEvent?.Invoke(this, new LayoutLoadedEventArgs(result));
+				}
+				finally
+				{
+					this._LayoutSemaphore.Release();
+				}
 			}
 			catch (Exception exc)
 			{
 				this._LayoutLoaded = new LayoutLoaderResult(null, false, exc);
 			}
 		}
-
 		#region IDisposable
 
 		/// <summary>
@@ -119,7 +118,7 @@ namespace MLibTest.Models
 		#endregion IDisposable
 
 		/// <summary>
-		/// Loads the layout object queried via <see cref="LoadLayout"/> method or
+		/// Loads the layout object queried via <see cref="LoadLayoutAsync"/> method or
 		/// connects the caller to the eventhandler to return the result object at
 		/// a later stage (if it was not available at this time).
 		/// </summary>
@@ -151,7 +150,7 @@ namespace MLibTest.Models
 		/// information wrapped into a <see cref="LayoutLoaderResult"/>.
 		/// </summary>
 		/// <returns></returns>
-		private LayoutLoaderResult LoadAvalonDockLayoutToString()
+		private async Task<LayoutLoaderResult> LoadAvalonDockLayoutToStringAsync()
 		{
 			string path = GetFullPathToLayout();
 
@@ -160,8 +159,29 @@ namespace MLibTest.Models
 
 			try
 			{
+				string textContent = string.Empty;
+				// This is the same default buffer size as StreamReader and FileStream
+				int DefaultBufferSize = 4096;
+
+				// 1. The file is to be used for asynchronous reading.
+				// 2. The file is to be accessed sequentially from beginning to end.
+				FileOptions DefaultOptions = FileOptions.Asynchronous | FileOptions.SequentialScan;
+
+				using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, DefaultBufferSize, DefaultOptions))
+				{
+					var bom = new byte[4];
+					await stream.ReadAsync(bom, 0, 4);
+					stream.Seek(0, SeekOrigin.Begin);
+					Encoding fileEncoding = GetEncoding(bom);
+
+					using (var reader = new StreamReader(stream, fileEncoding))
+					{
+						textContent = await reader.ReadToEndAsync();
+					}
+				}
+
 				//Thread.Sleep(2000);
-				return new LayoutLoaderResult(System.IO.File.ReadAllText(path), true, null);
+				return new LayoutLoaderResult(textContent, true, null);
 			}
 			catch (Exception exc)
 			{
@@ -186,6 +206,33 @@ namespace MLibTest.Models
 		internal string GetFullPathToLayout()
 		{
 			return System.IO.Path.GetFullPath(_layoutFileName);
+		}
+
+		/// <summary>
+		/// Gets the encoding of a file from its first 4 bytes.
+		/// </summary>
+		/// <param name="bom">BOM to be translated into an <see cref="Encoding"/>.
+		/// This should be at least 4 bytes long.</param>
+		/// <returns>Recommended <see cref="Encoding"/> to be used to read text from this file.</returns>
+		public Encoding GetEncoding(byte[] bom)
+		{
+			// Analyze the BOM
+			if (bom[0] == 0x2b && bom[1] == 0x2f && bom[2] == 0x76)
+				return Encoding.UTF7;
+
+			if (bom[0] == 0xef && bom[1] == 0xbb && bom[2] == 0xbf)
+				return Encoding.UTF8;
+
+			if (bom[0] == 0xff && bom[1] == 0xfe)
+				return Encoding.Unicode; //UTF-16LE
+
+			if (bom[0] == 0xfe && bom[1] == 0xff)
+				return Encoding.BigEndianUnicode; //UTF-16BE
+
+			if (bom[0] == 0 && bom[1] == 0 && bom[2] == 0xfe && bom[3] == 0xff)
+				return Encoding.UTF32;
+
+			return Encoding.Default;
 		}
 		#endregion methods
 	}

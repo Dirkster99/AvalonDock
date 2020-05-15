@@ -23,7 +23,7 @@
 			if (item is ToolViewModel)
 				return ToolStyle;
 
-			if (item is FileViewModel)
+			if (item is DocumentViewModel)
 				return FileStyle;
 
 			return base.SelectStyle(item, container);

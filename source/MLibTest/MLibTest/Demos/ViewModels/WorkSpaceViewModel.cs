@@ -93,8 +93,8 @@
 	internal class WorkSpaceViewModel : MLibTest.ViewModels.Base.ViewModelBase, IWorkSpaceViewModel
 	{
 		#region fields
-		private ObservableCollection<FileViewModel> _files = new ObservableCollection<FileViewModel>();
-		private ReadOnlyObservableCollection<FileViewModel> _readonyFiles = null;
+		private ObservableCollection<DocumentViewModel> _files = new ObservableCollection<DocumentViewModel>();
+		private ReadOnlyObservableCollection<DocumentViewModel> _readonyFiles = null;
 		private ToolViewModel[] _tools = null;
 
 		private ICommand _openCommand = null;
@@ -106,7 +106,7 @@
 		private Tool2_ViewModel _Tool2;
 		private Tool3_ViewModel _Tool3;
 
-		private FileViewModel _activeDocument = null;
+		private DocumentViewModel _activeDocument = null;
 		#endregion fields
 
 		#region constructors
@@ -127,7 +127,7 @@
 		/// <summary>
 		/// Gets/Sets the currently active document.
 		/// </summary>
-		public FileViewModel ActiveDocument
+		public DocumentViewModel ActiveDocument
 		{
 			get => _activeDocument;
 			set             // This can also be set by the user via the view
@@ -146,12 +146,12 @@
 		/// <summary>
 		/// Gets a collection of all currently available documents
 		/// </summary>
-		public ReadOnlyObservableCollection<FileViewModel> Files
+		public ReadOnlyObservableCollection<DocumentViewModel> Files
 		{
 			get
 			{
 				if (_readonyFiles == null)
-					_readonyFiles = new ReadOnlyObservableCollection<FileViewModel>(_files);
+					_readonyFiles = new ReadOnlyObservableCollection<DocumentViewModel>(_files);
 
 				return _readonyFiles;
 			}
@@ -280,7 +280,7 @@
 		/// to save before closing if the document appears to be dirty.
 		/// </summary>
 		/// <param name="fileToClose"></param>
-		public void Close(FileViewModel fileToClose)
+		public void Close(DocumentViewModel fileToClose)
 		{
 			if (fileToClose.IsDirty)
 			{
@@ -302,7 +302,7 @@
 		/// </summary>
 		/// <param name="fileToSave"></param>
 		/// <param name="saveAsFlag"></param>
-		public void Save(FileViewModel fileToSave, bool saveAsFlag = false)
+		public void Save(DocumentViewModel fileToSave, bool saveAsFlag = false)
 		{
 			if (fileToSave.FilePath == null || saveAsFlag)
 			{
@@ -341,14 +341,14 @@
 		/// </summary>
 		/// <param name="filepath"></param>
 		/// <returns></returns>
-		public async Task<FileViewModel> OpenAsync(string filepath)
+		public async Task<DocumentViewModel> OpenAsync(string filepath)
 		{
 			// Check if we have already loaded this file and return it if so
 			var fileViewModel = _files.FirstOrDefault(fm => fm.FilePath == filepath);
 			if (fileViewModel != null)
 				return fileViewModel;
 
-			fileViewModel = new FileViewModel(this as IWorkSpaceViewModel);
+			fileViewModel = new DocumentViewModel(this as IWorkSpaceViewModel, filepath);
 			bool result = await fileViewModel.OpenFileAsync(filepath);
 
 			if (result)
@@ -374,7 +374,7 @@
 
 		private void OnNew(object parameter)
 		{
-			_files.Add(new FileViewModel(this as IWorkSpaceViewModel));
+			_files.Add(new DocumentViewModel(this as IWorkSpaceViewModel));
 			ActiveDocument = _files.Last();
 		}
 
