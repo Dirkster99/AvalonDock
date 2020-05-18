@@ -119,7 +119,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## Fixes & Features in master branch (not released to NuGet, yet)
+## Fixes & Features  added in Version 4.2
 
 - [#136 Layout "locking" method for Anchorables (tool windows)](https://github.com/Dirkster99/AvalonDock/issues/136)
 
