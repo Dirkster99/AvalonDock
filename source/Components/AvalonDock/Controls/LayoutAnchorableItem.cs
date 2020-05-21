@@ -20,12 +20,15 @@ namespace AvalonDock.Controls
 	/// <summary>
 	/// This is a wrapper for around the custom anchorable content view of <see cref="LayoutElement"/>.
 	/// Implements the <see cref="AvalonDock.Controls.LayoutItem" />
+	/// 
+	/// All DPs implemented here can be bound in a corresponding style to control parameters
+	/// in dependency properties via binding in MVVM.
 	/// </summary>
 	/// <seealso cref="AvalonDock.Controls.LayoutItem" />
 	public class LayoutAnchorableItem : LayoutItem
 	{
 		#region fields
-		private LayoutAnchorable _anchorable;
+		private LayoutAnchorable _anchorable;   // The model for this item
 		private ICommand _defaultHideCommand;
 		private ICommand _defaultAutoHideCommand;
 		private ICommand _defaultDockCommand;
@@ -174,6 +177,33 @@ namespace AvalonDock.Controls
 		}
 
 		#endregion CanHide
+
+		#region CanMove
+
+		/// <summary><see cref="CanMove"/> dependency property.</summary>
+		public static readonly DependencyProperty CanMoveProperty = DependencyProperty.Register(nameof(CanMove), typeof(bool), typeof(LayoutAnchorableItem), new FrameworkPropertyMetadata((bool)true,
+					OnCanMoveChanged));
+
+		/// <summary>
+		/// Gets or sets the <see cref="CanMove"/> property. This dependency property 
+		/// indicates if user can hide the anchorable item.
+		/// </summary>
+		public bool CanMove
+		{
+			get => (bool)GetValue(CanMoveProperty);
+			set => SetValue(CanMoveProperty, value);
+		}
+
+		/// <summary>Handles changes to the <see cref="CanMove"/> property.</summary>
+		private static void OnCanMoveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutAnchorableItem)d).OnCanHideChanged(e);
+
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="CanMove"/> property.</summary>
+		protected virtual void OnCanMoveChanged(DependencyPropertyChangedEventArgs e)
+		{
+			if (_anchorable != null) _anchorable.CanMove = (bool)e.NewValue;
+		}
+
+		#endregion CanMove
 
 		#endregion Properties
 
