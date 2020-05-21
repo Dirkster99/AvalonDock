@@ -28,7 +28,7 @@ namespace AvalonDock.Controls
 	public class LayoutAnchorableItem : LayoutItem
 	{
 		#region fields
-		private LayoutAnchorable _anchorable;   // The model for this item
+		private LayoutAnchorable _anchorable;   // The content of this item
 		private ICommand _defaultHideCommand;
 		private ICommand _defaultAutoHideCommand;
 		private ICommand _defaultDockCommand;

@@ -50,7 +50,11 @@ namespace AvalonDock
 		private OverlayWindow _overlayWindow = null;
 		private List<IDropArea> _areas = null;
 		private bool _insideInternalSetActiveContent = false;
+
+		// Collection of LayoutDocumentItems & LayoutAnchorableItems attached to their corresponding
+		// LayoutDocument & LayoutAnchorable
 		private List<LayoutItem> _layoutItems = new List<LayoutItem>();
+
 		private bool _suspendLayoutItemCreation = false;
 		private DispatcherOperation _collectLayoutItemsOperations = null;
 		private NavigatorWindow _navigatorWindow = null;
@@ -2319,21 +2323,23 @@ namespace AvalonDock
 			_insideInternalSetActiveContent = false;
 		}
 
-		private void DetachLayoutItems()
-		{
-			if (Layout == null) return;
-			_layoutItems.ForEach<LayoutItem>(i => i.Detach());
-			_layoutItems.Clear();
-			Layout.ElementAdded -= Layout_ElementAdded;
-			Layout.ElementRemoved -= Layout_ElementRemoved;
-		}
-
+		#region LayoutItems
+		/// <summary>
+		/// Implements the EventHandler for the <see cref="LayoutRoot.ElementRemoved"/> event.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Layout_ElementRemoved(object sender, LayoutElementEventArgs e)
 		{
 			if (_suspendLayoutItemCreation) return;
 			CollectLayoutItemsDeleted();
 		}
 
+		/// <summary>
+		/// Implements the EventHandler for the <see cref="LayoutRoot.ElementAdded"/> event.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Layout_ElementAdded(object sender, LayoutElementEventArgs e)
 		{
 			if (_suspendLayoutItemCreation) return;
@@ -2347,49 +2353,61 @@ namespace AvalonDock
 			CollectLayoutItemsDeleted();
 		}
 
+		/// <summary>
+		/// Detach and remove all LayoutItems that are no longer part of the <see cref="LayoutRoot"/>.
+		/// </summary>
 		private void CollectLayoutItemsDeleted()
 		{
 			if (_collectLayoutItemsOperations != null) return;
 			_collectLayoutItemsOperations = Dispatcher.BeginInvoke(new Action(() =>
-		  {
-			  _collectLayoutItemsOperations = null;
-			  foreach (var itemToRemove in _layoutItems.Where(item => item.LayoutElement.Root != Layout).ToArray())
-			  {
-				  if (itemToRemove?.Model != null && itemToRemove.Model is UIElement)
-				  {
-					  //((ILogicalChildrenContainer)this).InternalRemoveLogicalChild(itemToRemove.Model as UIElement);
-				  }
-
-				  itemToRemove.Detach();
-				  _layoutItems.Remove(itemToRemove);
+			{
+				_collectLayoutItemsOperations = null;
+				foreach (var itemToRemove in _layoutItems.Where(item => item.LayoutElement.Root != Layout).ToArray())
+				{
+					itemToRemove.Detach();
+					_layoutItems.Remove(itemToRemove);
 			  }
-		  }));
+			}));
 		}
 
+		/// <summary>
+		/// Detaches all LayoutItems from their content and clears the private collection of LayoutItems.
+		/// </summary>
+		private void DetachLayoutItems()
+		{
+			if (Layout == null) return;
+			_layoutItems.ForEach<LayoutItem>(i => i.Detach());
+			_layoutItems.Clear();
+			Layout.ElementAdded -= Layout_ElementAdded;
+			Layout.ElementRemoved -= Layout_ElementRemoved;
+		}
+
+		/// <summary>
+		/// Attaches a:
+		/// - <see cref="LayoutDocumentItem"/> to each <see cref="<see cref="LayoutDocumentItem"/> and
+		/// - <see cref="LayoutAnchorableItem"/> to each <see cref="<see cref="LayoutAnchorable"/>
+		/// 
+		/// in the <see cref="LayoutRoot"/> property.
+		/// </summary>
 		private void AttachLayoutItems()
 		{
 			if (Layout == null) return;
 			foreach (var document in Layout.Descendents().OfType<LayoutDocument>().ToArray())
-			{
 				CreateDocumentLayoutItem(document);
-				//var documentItem = new LayoutDocumentItem();
-				//documentItem.Attach(document);
-				//ApplyStyleToLayoutItem(documentItem);
-				//_layoutItems.Add(documentItem);
-			}
+
 			foreach (var anchorable in Layout.Descendents().OfType<LayoutAnchorable>().ToArray())
-			{
 				CreateAnchorableLayoutItem(anchorable);
-				//var anchorableItem = new LayoutAnchorableItem();
-				//anchorableItem.Attach(anchorable);
-				//ApplyStyleToLayoutItem(anchorableItem);
-				//_layoutItems.Add(anchorableItem);
-			}
 
 			Layout.ElementAdded += Layout_ElementAdded;
 			Layout.ElementRemoved += Layout_ElementRemoved;
 		}
 
+		/// <summary>
+		/// Applies the corresponding style to a <see cref="LayoutItem"/> either from:
+		/// 1) <see cref="LayoutItemContainerStyle"/> property or
+		/// 2) <see cref="LayoutItemContainerStyleSelector"/> property
+		/// </summary>
+		/// <param name="layoutItem"></param>
 		private void ApplyStyleToLayoutItem(LayoutItem layoutItem)
 		{
 			layoutItem._ClearDefaultBindings();
@@ -2400,6 +2418,11 @@ namespace AvalonDock
 			layoutItem._SetDefaultBindings();
 		}
 
+		/// <summary>
+		/// Creates a <see cref="LayoutAnchorableItem"/> for each <see cref="LayoutAnchorable"/>
+		/// or returns the existing <see cref="LayoutAnchorableItem"/> if there is already one.
+		/// </summary>
+		/// <param name="contentToAttach"></param>
 		private void CreateAnchorableLayoutItem(LayoutAnchorable contentToAttach)
 		{
 			if (_layoutItems.Any(item => item.LayoutElement == contentToAttach))
@@ -2415,6 +2438,11 @@ namespace AvalonDock
 			if (contentToAttach?.Content is UIElement) InternalAddLogicalChild(contentToAttach.Content);
 		}
 
+		/// <summary>
+		/// Creates a <see cref="LayoutDocumentItem"/> for each <see cref="LayoutDocument"/>
+		/// or returns the existing <see cref="LayoutDocument"/> if there is already one.
+		/// </summary>
+		/// <param name="contentToAttach"></param>
 		private void CreateDocumentLayoutItem(LayoutDocument contentToAttach)
 		{
 			if (_layoutItems.Any(item => item.LayoutElement == contentToAttach))
@@ -2429,6 +2457,7 @@ namespace AvalonDock
 			ApplyStyleToLayoutItem(layoutItem);
 			if (contentToAttach?.Content is UIElement) InternalAddLogicalChild(contentToAttach.Content);
 		}
+		#endregion LayoutItems
 
 		private void ShowNavigatorWindow()
 		{
