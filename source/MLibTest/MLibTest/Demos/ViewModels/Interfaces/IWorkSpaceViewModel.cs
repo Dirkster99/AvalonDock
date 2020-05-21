@@ -3,7 +3,8 @@
 	using MLibTest.Demos.ViewModels.AD;
 	using System;
 	using System.Collections.Generic;
-    using System.Threading.Tasks;
+	using System.Collections.ObjectModel;
+	using System.Threading.Tasks;
 
     /// <summary>
     /// Defines the interface to the <see cref="WorkSpaceViewModel"/> which implements
@@ -26,6 +27,11 @@
 		/// </summary>
 		IEnumerable<ToolViewModel> Tools { get; }
 
+		/// <summary>
+		/// Gets an enumeration of all currently available document viewmodels.
+		/// </summary>
+		IEnumerable<DocumentViewModel> Files { get; }
+
 		#region methods
 		/// <summary>
 		/// Checks if a document can be closed and asks the user whether
@@ -33,6 +39,12 @@
 		/// </summary>
 		/// <param name="fileToClose"></param>
 		void Close(DocumentViewModel fileToClose);
+
+		/// <summary>
+		/// Add a new document viewmodel into the collection of files.
+		/// </summary>
+		/// <param name="fileToAdd"></param>
+		void AddFile(DocumentViewModel fileToAdd);
 
 		/// <summary>
 		/// Saves a document and resets the dirty flag.

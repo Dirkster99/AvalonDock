@@ -37,6 +37,7 @@
 			: this(workSpaceViewModel)
 		{
 			_initialPath = initialPath;
+			ContentId = initialPath;
 		}
 
 		/// <summary>

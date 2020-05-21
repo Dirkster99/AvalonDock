@@ -94,7 +94,6 @@
 	{
 		#region fields
 		private ObservableCollection<DocumentViewModel> _files = new ObservableCollection<DocumentViewModel>();
-		private ReadOnlyObservableCollection<DocumentViewModel> _readonyFiles = null;
 		private ToolViewModel[] _tools = null;
 
 		private ICommand _openCommand = null;
@@ -144,16 +143,13 @@
 		}
 
 		/// <summary>
-		/// Gets a collection of all currently available documents
+		/// Gets a collection of all currently available document viewmodels
 		/// </summary>
-		public ReadOnlyObservableCollection<DocumentViewModel> Files
+		public IEnumerable<DocumentViewModel> Files
 		{
 			get
 			{
-				if (_readonyFiles == null)
-					_readonyFiles = new ReadOnlyObservableCollection<DocumentViewModel>(_files);
-
-				return _readonyFiles;
+				return _files;
 			}
 		}
 
@@ -295,6 +291,21 @@
 			}
 
 			_files.Remove(fileToClose);
+		}
+
+		/// <summary>
+		/// Add a new document viewmodel into the collection of files.
+		/// </summary>
+		/// <param name="fileToAdd"></param>
+		public void AddFile(DocumentViewModel fileToAdd)
+		{
+			if (fileToAdd == null) return;
+
+			// Don't add this twice
+			if (_files.Any(f => f.ContentId == fileToAdd.ContentId))
+				return;
+
+			_files.Add(fileToAdd);
 		}
 
 		/// <summary>

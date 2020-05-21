@@ -81,6 +81,7 @@ namespace MLibTest.Models
 				this._LayoutLoaded = new LayoutLoaderResult(null, false, exc);
 			}
 		}
+
 		#region IDisposable
 
 		/// <summary>

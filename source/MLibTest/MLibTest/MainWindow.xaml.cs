@@ -111,13 +111,11 @@
 								if (!string.IsNullOrWhiteSpace(e.Model.ContentId))
 								{
 									DocumentViewModel vm = new DocumentViewModel(workSpace, e.Model.ContentId);
-									////DocumentViewModel vm = await workSpace.OpenAsync(e.Model.ContentId);
-									////Task<FileViewModel> vm = workSpace.OpenAsync(e.Model.ContentId);
 
 									if (vm != null)
 									{
+										workSpace.AddFile(vm);
 										e.Content = vm;
-										////e.Content = vm.Result;
 										e.Cancel = false;
 										return;
 									}
