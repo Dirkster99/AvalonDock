@@ -89,8 +89,7 @@
 		/// </summary>
 		public bool IsEnabled
 		{
-			get { return _IsEnabled; }
-
+			get => _IsEnabled;
 			private set
 			{
 				if (_IsEnabled != value)

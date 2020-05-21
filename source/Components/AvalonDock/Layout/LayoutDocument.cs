@@ -12,6 +12,9 @@ using System.Linq;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>
+	/// Implements the layout model for the <see cref="Controls.LayoutDocumentControl"/>.
+	/// </summary>
 	[Serializable]
 	public class LayoutDocument : LayoutContent
 	{
@@ -23,6 +26,7 @@ namespace AvalonDock.Layout
 
 		#region Properties
 
+		/// <summary>Gets/sets whether a document can be dragged (to be dropped in a different location) or not. Use this property in conjunction with <see cref="CanMove"/> and <see cref="CanClose"/> to lock a document in its layout position.</summary>
 		public bool CanMove
 		{
 			get => _canMove;
@@ -34,12 +38,16 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>Gets whether a document is visible or not.</summary>
 		public bool IsVisible
 		{
 			get => _isVisible;
 			internal set => _isVisible = value;
 		}
 
+		/// <summary>Gets/sets the document's description.
+		/// Indicates the description to display (in the <see cref="NavigatorWindow"/>) for the document item.
+		/// </summary>
 		public string Description
 		{
 			get => _description;

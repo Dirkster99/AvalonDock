@@ -12,15 +12,20 @@ using System.Windows.Markup;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>
+	/// Implements the viewmodel for a a side element (left, right, top, bottom) in AvalonDock's
+	/// visual root of the <see cref="DockingManager"/>.
+	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
 	public class LayoutAnchorSide : LayoutGroup<LayoutAnchorGroup>
 	{
-		#region Properties
-
-		#region Side
-
+		#region fields
 		private AnchorSide _side;
+		#endregion fields
+
+		#region Properties
+		/// <summary>Gets the side (top, bottom, left, right) that this layout is anchored in the layout.</summary>
 		public AnchorSide Side
 		{
 			get => _side;
@@ -32,9 +37,6 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(Side));
 			}
 		}
-
-		#endregion
-
 		#endregion
 
 		#region Overrides

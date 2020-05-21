@@ -97,10 +97,7 @@ namespace Standard
 		/// Create a new Win32 error.
 		/// </summary>
 		/// <param name="i">The integer value of the error.</param>
-		public Win32Error(int i)
-		{
-			_value = i;
-		}
+		public Win32Error(int i) => _value = i;
 
 		/// <summary>Performs HRESULT_FROM_WIN32 conversion.</summary>
 		/// <param name="error">The Win32 error being converted to an HRESULT.</param>
@@ -109,29 +106,19 @@ namespace Standard
 		{
 			// #define __HRESULT_FROM_WIN32(x) 
 			//     ((HRESULT)(x) <= 0 ? ((HRESULT)(x)) : ((HRESULT) (((x) & 0x0000FFFF) | (FACILITY_WIN32 << 16) | 0x80000000)))
-			if (error._value <= 0)
-			{
-				return new HRESULT((uint)error._value);
-			}
-			return HRESULT.Make(true, Facility.Win32, error._value & 0x0000FFFF);
+			return error._value <= 0 ? new HRESULT((uint)error._value) : HRESULT.Make(true, Facility.Win32, error._value & 0x0000FFFF);
 		}
 
 		// Method version of the cast operation
 		/// <summary>Performs HRESULT_FROM_WIN32 conversion.</summary>
 		/// <param name="error">The Win32 error being converted to an HRESULT.</param>
-		/// <returns>The equivilent HRESULT value.</returns>
-		public HRESULT ToHRESULT()
-		{
-			return (HRESULT)this;
-		}
+		/// <returns>The equivalent HRESULT value.</returns>
+		public HRESULT ToHRESULT() => (HRESULT)this;
 
 		/// <summary>Performs the equivalent of Win32's GetLastError()</summary>
 		/// <returns>A Win32Error instance with the result of the native GetLastError</returns>
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
-		public static Win32Error GetLastError()
-		{
-			return new Win32Error(Marshal.GetLastWin32Error());
-		}
+		public static Win32Error GetLastError() => new Win32Error(Marshal.GetLastWin32Error());
 
 		public override bool Equals(object obj)
 		{
@@ -145,10 +132,7 @@ namespace Standard
 			}
 		}
 
-		public override int GetHashCode()
-		{
-			return _value.GetHashCode();
-		}
+		public override int GetHashCode() => _value.GetHashCode();
 
 		/// <summary>
 		/// Compare two Win32 error codes for equality.
@@ -167,10 +151,7 @@ namespace Standard
 		/// <param name="errLeft">The first error code to compare.</param>
 		/// <param name="errRight">The second error code to compare.</param>
 		/// <returns>Whether the two error codes are not the same.</returns>
-		public static bool operator !=(Win32Error errLeft, Win32Error errRight)
-		{
-			return !(errLeft == errRight);
-		}
+		public static bool operator !=(Win32Error errLeft, Win32Error errRight) => errLeft != errRight;
 	}
 
 	internal enum Facility
@@ -282,10 +263,7 @@ namespace Standard
 		/// Create an HRESULT from an integer value.
 		/// </summary>
 		/// <param name="i"></param>
-		public HRESULT(uint i)
-		{
-			_value = i;
-		}
+		public HRESULT(uint i) => _value = i;
 
 		public static HRESULT Make(bool severe, Facility facility, int code)
 		{
@@ -308,13 +286,7 @@ namespace Standard
 		/// <summary>
 		/// retrieve HRESULT_FACILITY
 		/// </summary>
-		public Facility Facility
-		{
-			get
-			{
-				return GetFacility((int)_value);
-			}
-		}
+		public Facility Facility => GetFacility((int)_value);
 
 		public static Facility GetFacility(int errorCode)
 		{
@@ -325,13 +297,7 @@ namespace Standard
 		/// <summary>
 		/// retrieve HRESULT_CODE
 		/// </summary>
-		public int Code
-		{
-			get
-			{
-				return GetCode((int)_value);
-			}
-		}
+		public int Code => GetCode((int)_value);
 
 		public static int GetCode(int error)
 		{
@@ -358,30 +324,26 @@ namespace Standard
 			// CONSIDER: This data is static.  It could be cached 
 			// after first usage for fast lookup since the keys are unique.
 			//
-			foreach (FieldInfo publicStaticField in typeof(HRESULT).GetFields(BindingFlags.Static | BindingFlags.Public))
+			foreach (var publicStaticField in typeof(HRESULT).GetFields(BindingFlags.Static | BindingFlags.Public))
 			{
 				if (publicStaticField.FieldType == typeof(HRESULT))
 				{
 					var hr = (HRESULT)publicStaticField.GetValue(null);
 					if (hr == this)
-					{
 						return publicStaticField.Name;
-					}
 				}
 			}
 
 			// Try Win32 error codes also
 			if (Facility == Facility.Win32)
 			{
-				foreach (FieldInfo publicStaticField in typeof(Win32Error).GetFields(BindingFlags.Static | BindingFlags.Public))
+				foreach (var publicStaticField in typeof(Win32Error).GetFields(BindingFlags.Static | BindingFlags.Public))
 				{
 					if (publicStaticField.FieldType == typeof(Win32Error))
 					{
 						var error = (Win32Error)publicStaticField.GetValue(null);
 						if ((HRESULT)error == this)
-						{
 							return "HRESULT_FROM_WIN32(" + publicStaticField.Name + ")";
-						}
 					}
 				}
 			}
@@ -391,6 +353,7 @@ namespace Standard
 			return string.Format(CultureInfo.InvariantCulture, "0x{0:X8}", _value);
 		}
 
+		/// <inheritdoc />
 		public override bool Equals(object obj)
 		{
 			try
@@ -403,111 +366,71 @@ namespace Standard
 			}
 		}
 
-		public override int GetHashCode()
-		{
-			return _value.GetHashCode();
-		}
+		/// <inheritdoc />
+		public override int GetHashCode() => _value.GetHashCode();
 
 		#endregion Overrides
 
-		public static bool operator ==(HRESULT hrLeft, HRESULT hrRight)
-		{
-			return hrLeft._value == hrRight._value;
-		}
+		public static bool operator ==(HRESULT hrLeft, HRESULT hrRight) => hrLeft._value == hrRight._value;
 
-		public static bool operator !=(HRESULT hrLeft, HRESULT hrRight)
-		{
-			return !(hrLeft == hrRight);
-		}
+		public static bool operator !=(HRESULT hrLeft, HRESULT hrRight) => !(hrLeft == hrRight);
 
-		public bool Succeeded
-		{
-			get
-			{
-				return (int)_value >= 0;
-			}
-		}
+		public bool Succeeded => (int)_value >= 0;
 
-		public bool Failed
-		{
-			get
-			{
-				return (int)_value < 0;
-			}
-		}
+		public bool Failed => (int)_value < 0;
 
-		public void ThrowIfFailed()
-		{
-			ThrowIfFailed(null);
-		}
+		public void ThrowIfFailed() => ThrowIfFailed(null);
 
-		[
-			SuppressMessage(
-				"Microsoft.Usage",
-				"CA2201:DoNotRaiseReservedExceptionTypes",
-				Justification = "Only recreating Exceptions that were already raised."),
-			SuppressMessage(
-				"Microsoft.Security",
-				"CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")
-		]
+		[SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes", Justification = "Only recreating Exceptions that were already raised."),
+		 SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public void ThrowIfFailed(string message)
 		{
-			if (Failed)
-			{
-				if (string.IsNullOrEmpty(message))
-				{
-					message = ToString();
-				}
+			if (!Failed) return;
+			if (string.IsNullOrEmpty(message))
+				message = ToString();
 #if DEBUG
-        else
-        {
-          message += " (" + ToString() + ")";
-        }
+			else
+				message += " (" + ToString() + ")";
 #endif
-				// Wow.  Reflection in a throw call.  Later on this may turn out to have been a bad idea.
-				// If you're throwing an exception I assume it's OK for me to take some time to give it back.
-				// I want to convert the HRESULT to a more appropriate exception type than COMException.
-				// Marshal.ThrowExceptionForHR does this for me, but the general call uses GetErrorInfo
-				// if it's set, and then ignores the HRESULT that I've provided.  This makes it so this
-				// call works the first time but you get burned on the second.  To avoid this, I use
-				// the overload that explicitly ignores the IErrorInfo.
-				// In addition, the function doesn't allow me to set the Message unless I go through
-				// the process of implementing an IErrorInfo and then use that.  There's no stock
-				// implementations of IErrorInfo available and I don't think it's worth the maintenance
-				// overhead of doing it, nor would it have significant value over this approach.
-				Exception e = Marshal.GetExceptionForHR((int)_value, new IntPtr(-1));
-				Assert.IsNotNull(e);
-				// ArgumentNullException doesn't have the right constructor parameters,
-				// (nor does Win32Exception...)
-				// but E_POINTER gets mapped to NullReferenceException,
-				// so I don't think it will ever matter.
-				Assert.IsFalse(e is ArgumentNullException);
+			// Wow.  Reflection in a throw call.  Later on this may turn out to have been a bad idea.
+			// If you're throwing an exception I assume it's OK for me to take some time to give it back.
+			// I want to convert the HRESULT to a more appropriate exception type than COMException.
+			// Marshal.ThrowExceptionForHR does this for me, but the general call uses GetErrorInfo
+			// if it's set, and then ignores the HRESULT that I've provided.  This makes it so this
+			// call works the first time but you get burned on the second.  To avoid this, I use
+			// the overload that explicitly ignores the IErrorInfo.
+			// In addition, the function doesn't allow me to set the Message unless I go through
+			// the process of implementing an IErrorInfo and then use that.  There's no stock
+			// implementations of IErrorInfo available and I don't think it's worth the maintenance
+			// overhead of doing it, nor would it have significant value over this approach.
+			var e = Marshal.GetExceptionForHR((int)_value, new IntPtr(-1));
+			Assert.IsNotNull(e);
+			// ArgumentNullException doesn't have the right constructor parameters,
+			// (nor does Win32Exception...)
+			// but E_POINTER gets mapped to NullReferenceException,
+			// so I don't think it will ever matter.
+			Assert.IsFalse(e is ArgumentNullException);
 
-				// If we're not getting anything better than a COMException from Marshal,
-				// then at least check the facility and attempt to do better ourselves.
-				if (e.GetType() == typeof(COMException))
+			// If we're not getting anything better than a COMException from Marshal,
+			// then at least check the facility and attempt to do better ourselves.
+			if (e.GetType() == typeof(COMException))
+			{
+				switch (Facility)
 				{
-					switch (Facility)
-					{
-						case Facility.Win32:
-							e = new Win32Exception(Code, message);
-							break;
-						default:
-							e = new COMException(message, (int)_value);
-							break;
-					}
+					case Facility.Win32: e = new Win32Exception(Code, message); break;
+					default: e = new COMException(message, (int)_value); break;
 				}
-				else
-				{
-					ConstructorInfo cons = e.GetType().GetConstructor(new[] { typeof(string) });
-					if (null != cons)
-					{
-						e = cons.Invoke(new object[] { message }) as Exception;
-						Assert.IsNotNull(e);
-					}
-				}
-				throw e;
 			}
+			else
+			{
+				var cons = e.GetType().GetConstructor(new[] { typeof(string) });
+				if (null != cons)
+				{
+					e = cons.Invoke(new object[] { message }) as Exception;
+					Assert.IsNotNull(e);
+				}
+			}
+			throw e;
 		}
 
 		/// <summary>

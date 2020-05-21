@@ -15,6 +15,11 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// This control defines the Title area of a <see cref="LayoutAnchorableControl"/>.
+	/// It is used to show a title bar with docking window buttons to let users interact
+	/// with a <see cref="LayoutAnchorable"/> via drop down menu click or drag & drop.
+	/// </summary>
 	public class AnchorablePaneTitle : Control
 	{
 		#region fields
@@ -22,7 +27,9 @@ namespace AvalonDock.Controls
 		#endregion fields
 
 		#region Constructors
-
+		/// <summary>
+		/// Static class constructor
+		/// </summary>
 		static AnchorablePaneTitle()
 		{
 			IsHitTestVisibleProperty.OverrideMetadata(typeof(AnchorablePaneTitle), new FrameworkPropertyMetadata(true));
@@ -115,7 +122,9 @@ namespace AvalonDock.Controls
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonDown(e);
-			if (e.Handled) return;
+			
+			// Start a drag & drop action for a LayoutAnchorable
+			if (e.Handled || Model.CanMove == false) return;
 			var attachFloatingWindow = false;
 			var parentFloatingWindow = Model.FindParent<LayoutAnchorableFloatingWindow>();
 			if (parentFloatingWindow != null) attachFloatingWindow = parentFloatingWindow.Descendents().OfType<LayoutAnchorablePane>().Count() == 1;

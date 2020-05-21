@@ -70,8 +70,8 @@ namespace TestApp
 		/// </summary>
 		public int TestTimer
 		{
-			get { return (int)GetValue(TestTimerProperty); }
-			set { SetValue(TestTimerProperty, value); }
+			get => (int)GetValue(TestTimerProperty);
+			set => SetValue(TestTimerProperty, value);
 		}
 
 		#endregion
@@ -91,8 +91,8 @@ namespace TestApp
 		/// </summary>
 		public Brush TestBackground
 		{
-			get { return (Brush)GetValue(TestBackgroundProperty); }
-			set { SetValue(TestBackgroundProperty, value); }
+			get => (Brush)GetValue(TestBackgroundProperty);
+			set => SetValue(TestBackgroundProperty, value);
 		}
 
 		#endregion
@@ -112,8 +112,8 @@ namespace TestApp
 		/// </summary>
 		public string FocusedElement
 		{
-			get { return (string)GetValue(FocusedElementProperty); }
-			set { SetValue(FocusedElementProperty, value); }
+			get => (string)GetValue(FocusedElementProperty);
+			set => SetValue(FocusedElementProperty, value);
 		}
 
 		#endregion
@@ -236,5 +236,24 @@ namespace TestApp
 		{
 			////            LayoutDocumentPane.ShowHeader = !LayoutDocumentPane.ShowHeader;
 		}
-	}
+
+		/// <summary>
+		/// Method create a new anchorable window to test whether a floating window will auto-adjust its size to the
+		/// containing control. See SetWindowSizeWhenOpened property in <seealso cref="LayoutAnchorableFloatingWindow"/>
+		/// and App.xaml in this demo App for more details.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void OnNewFloatingWindow(object sender, RoutedEventArgs e)
+        {
+            var view = new TestUserControl();
+            var anchorable = new LayoutAnchorable()
+            {
+                Title = "Floating window with initial usercontrol size",
+				Content = view
+			};
+            anchorable.AddToLayout(dockManager,AnchorableShowStrategy.Most);
+            anchorable.Float();
+        }
+    }
 }

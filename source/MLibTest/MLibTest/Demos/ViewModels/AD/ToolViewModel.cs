@@ -3,7 +3,7 @@
 	internal class ToolViewModel : PaneViewModel
 	{
 		#region Fields
-		private bool _isVisible = true;
+		private bool _isVisible = false;
 		#endregion Fields
 
 		#region constructors
@@ -37,7 +37,7 @@
 		/// </summary>
 		public bool IsVisible
 		{
-			get { return _isVisible; }
+			get => _isVisible;
 			set
 			{
 				if (_isVisible != value)

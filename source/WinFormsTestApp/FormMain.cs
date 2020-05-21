@@ -100,6 +100,12 @@
             this.SetChecked(menuItemVS2013Dark);
         }
 
+        private void menuItemAero_Vs2013Blue(object sender, EventArgs e)
+        {
+            _dockingManager.Theme = new AvalonDock.Themes.Vs2013BlueTheme();
+            this.SetChecked(menuItemVS2013Dark);
+        }
+
         private void SetChecked(ToolStripMenuItem toCheck)
         {
             menuItemVS2013Dark.Checked = false;

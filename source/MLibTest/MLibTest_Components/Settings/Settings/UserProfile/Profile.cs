@@ -45,10 +45,7 @@
 		/// to read and write MainWindow position and size information.
 		/// </summary>
 		[XmlIgnore]
-		public string MainWindowName
-		{
-			get { return "MainWindow"; }
-		}
+		public string MainWindowName => "MainWindow";
 
 		/// <summary>
 		/// Get/set position and size of MainWindow and other windows in the collection.

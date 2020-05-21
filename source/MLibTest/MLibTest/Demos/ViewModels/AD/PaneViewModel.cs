@@ -5,27 +5,33 @@
 
 	internal class PaneViewModel : ViewModelBase
 	{
-		public PaneViewModel()
-		{ }
-
-
-		#region Title
-
+		#region fields
 		private string _title = null;
+		private string _contentId = null;
+		private bool _isSelected = false;
+		private bool _isActive = false;
+		#endregion fields
+
+		#region constructors
+		public PaneViewModel()
+		{
+		}
+		#endregion constructors
+
+		#region Properties
+
 		public string Title
 		{
-			get { return _title; }
+			get => _title;
 			set
 			{
 				if (_title != value)
 				{
 					_title = value;
-					RaisePropertyChanged("Title");
+					RaisePropertyChanged(nameof(Title));
 				}
 			}
 		}
-
-		#endregion
 
 		public ImageSource IconSource
 		{
@@ -33,60 +39,45 @@
 			protected set;
 		}
 
-		#region ContentId
-
-		private string _contentId = null;
 		public string ContentId
 		{
-			get { return _contentId; }
-			set
+			get => _contentId;
+			protected set
 			{
 				if (_contentId != value)
 				{
 					_contentId = value;
-					RaisePropertyChanged("ContentId");
+					RaisePropertyChanged(nameof(ContentId));
 				}
 			}
 		}
 
-		#endregion
-
-		#region IsSelected
-
-		private bool _isSelected = false;
 		public bool IsSelected
 		{
-			get { return _isSelected; }
+			get => _isSelected;
 			set
 			{
 				if (_isSelected != value)
 				{
 					_isSelected = value;
-					RaisePropertyChanged("IsSelected");
+					RaisePropertyChanged(nameof(IsSelected));
 				}
 			}
 		}
 
-		#endregion
-
-		#region IsActive
-
-		private bool _isActive = false;
 		public bool IsActive
 		{
-			get { return _isActive; }
+			get => _isActive;
 			set
 			{
 				if (_isActive != value)
 				{
 					_isActive = value;
-					RaisePropertyChanged("IsActive");
+					RaisePropertyChanged(nameof(IsActive));
 				}
 			}
 		}
 
-		#endregion
-
-
+		#endregion Properties
 	}
 }

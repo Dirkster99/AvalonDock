@@ -16,6 +16,12 @@ using System.Windows.Data;
 
 namespace AvalonDock.Controls
 {
+	/// <inheritdoc />
+	/// <summary>
+	/// This is a wrapper for around the custom anchorable content view of <see cref="LayoutElement"/>.
+	/// Implements the <see cref="AvalonDock.Controls.LayoutItem" />
+	/// </summary>
+	/// <seealso cref="AvalonDock.Controls.LayoutItem" />
 	public class LayoutAnchorableItem : LayoutItem
 	{
 		#region fields
@@ -26,6 +32,13 @@ namespace AvalonDock.Controls
 		private ReentrantFlag _visibilityReentrantFlag = new ReentrantFlag();
 		private ReentrantFlag _anchorableVisibilityReentrantFlag = new ReentrantFlag();
 		#endregion fields
+
+		#region Constructors
+		/// <summary>Class constructor</summary>
+		internal LayoutAnchorableItem()
+		{
+		}
+		#endregion Constructors
 
 		#region Properties
 
@@ -157,8 +170,7 @@ namespace AvalonDock.Controls
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="CanHide"/> property.</summary>
 		protected virtual void OnCanHideChanged(DependencyPropertyChangedEventArgs e)
 		{
-			if (_anchorable != null)
-				_anchorable.CanHide = (bool)e.NewValue;
+			if (_anchorable != null) _anchorable.CanHide = (bool)e.NewValue;
 		}
 
 		#endregion CanHide
@@ -251,10 +263,7 @@ namespace AvalonDock.Controls
 			if (_anchorable?.Root == null || !_anchorableVisibilityReentrantFlag.CanEnter) return;
 			using (_anchorableVisibilityReentrantFlag.Enter())
 			{
-				if (_anchorable.IsVisible)
-					Visibility = Visibility.Visible;
-				else
-					Visibility = Visibility.Hidden;
+				Visibility = _anchorable.IsVisible ? Visibility.Visible : Visibility.Hidden;
 			}
 		}
 

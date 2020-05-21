@@ -28,15 +28,21 @@ namespace AvalonDock.Controls
 	{
 		#region fields
 		private LayoutDocumentFloatingWindow _model;
+		private List<IDropArea> _dropAreas = null;
 		#endregion fields
 
 		#region Constructors
-
+		/// <summary>Static class constructor</summary>
 		static LayoutDocumentFloatingWindowControl()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutDocumentFloatingWindowControl), new FrameworkPropertyMetadata(typeof(LayoutDocumentFloatingWindowControl)));
 		}
 
+		/// <summary>
+		/// Class constructor
+		/// </summary>
+		/// <param name="model"></param>
+		/// <param name="isContentImmutable"></param>
 		internal LayoutDocumentFloatingWindowControl(LayoutDocumentFloatingWindow model, bool isContentImmutable)
 			: base(model, isContentImmutable)
 		{
@@ -47,6 +53,10 @@ namespace AvalonDock.Controls
 			UpdateThemeResources();
 		}
 
+		/// <summary>
+		/// Class constructor
+		/// </summary>
+		/// <param name="model"></param>
 		internal LayoutDocumentFloatingWindowControl(LayoutDocumentFloatingWindow model)
 			: this(model, false)
 		{
@@ -108,7 +118,12 @@ namespace AvalonDock.Controls
 				case Win32Helper.WM_NCLBUTTONDOWN: //Left button down on title -> start dragging over docking manager
 					if (wParam.ToInt32() == Win32Helper.HT_CAPTION)
 					{
-						_model.Descendents().OfType<LayoutDocumentPane>().First(p => p.ChildrenCount > 0 && p.SelectedContent != null).SelectedContent.IsActive = true;
+						LayoutDocumentPane layoutDocumentPane = _model.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault(p => p.ChildrenCount > 0 && p.SelectedContent != null);
+						if (layoutDocumentPane != null)
+						{
+							layoutDocumentPane.SelectedContent.IsActive = true;
+						}
+
 						handled = true;
 					}
 					break;
@@ -215,17 +230,79 @@ namespace AvalonDock.Controls
 			_overlayWindow.HideDropTargets();
 		}
 
-		List<IDropArea> _dropAreas = null;
 		public IEnumerable<IDropArea> GetDropAreas(LayoutFloatingWindowControl draggingWindow)
 		{
 			if (_dropAreas != null) return _dropAreas;
 			_dropAreas = new List<IDropArea>();
+			var isDraggingDocuments = draggingWindow.Model is LayoutDocumentFloatingWindow;
+
+			// Determine if floatingWindow is configured to dock as document or not
+			var dockAsDocument = true;
+			if (!isDraggingDocuments)
+			{
+				if (draggingWindow.Model is LayoutAnchorableFloatingWindow toolWindow)
+				{
+					foreach (var item in GetAnchorableInFloatingWindow(draggingWindow))
+					{
+						if (item.CanDockAsTabbedDocument != false) continue;
+						dockAsDocument = false;
+						break;
+					}
+				}
+			}
+
 			var rootVisual = ((FloatingWindowContentHost)Content).RootVisual;
+
 			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>())
 				_dropAreas.Add(new DropArea<LayoutAnchorablePaneControl>(areaHost, DropAreaType.AnchorablePane));
-			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutDocumentPaneControl>())
-				_dropAreas.Add(new DropArea<LayoutDocumentPaneControl>(areaHost, DropAreaType.DocumentPane));
+
+			if (dockAsDocument)
+			{
+				foreach (var areaHost in rootVisual.FindVisualChildren<LayoutDocumentPaneControl>())
+				{
+					if (areaHost is LayoutDocumentPaneControl == true)
+						_dropAreas.Add(new DropArea<LayoutDocumentPaneControl>(areaHost, DropAreaType.DocumentPane));
+				}
+			}
+
 			return _dropAreas;
+		}
+
+		/// <summary>
+		/// Finds all <see cref="LayoutAnchorable"/> objects (tool windows) within a
+		/// <see cref="LayoutFloatingWindow"/> (if any) and return them.
+		/// </summary>
+		/// <param name="draggingWindow"></param>
+		/// <returns></returns>
+		private IEnumerable<LayoutAnchorable> GetAnchorableInFloatingWindow(LayoutFloatingWindowControl draggingWindow)
+		{
+			if (!(draggingWindow.Model is LayoutAnchorableFloatingWindow layoutAnchorableFloatingWindow)) yield break;
+			//big part of code for getting type
+			var layoutAnchorablePane = layoutAnchorableFloatingWindow.SinglePane as LayoutAnchorablePane;
+
+			if (layoutAnchorablePane != null && (layoutAnchorableFloatingWindow.IsSinglePane && layoutAnchorablePane.SelectedContent != null))
+			{
+				var layoutAnchorable = ((LayoutAnchorablePane)layoutAnchorableFloatingWindow.SinglePane).SelectedContent as LayoutAnchorable;
+				yield return layoutAnchorable;
+			}
+			else
+				foreach (var item in GetLayoutAnchorable(layoutAnchorableFloatingWindow.RootPanel))
+					yield return item;
+		}
+
+		/// <summary>
+		/// Finds all <see cref="LayoutAnchorable"/> objects (toolwindows) within a
+		/// <see cref="LayoutAnchorablePaneGroup"/> (if any) and return them.
+		/// </summary>
+		/// <param name="layoutAnchPaneGroup"></param>
+		/// <returns>All the anchorable items found.</returns>
+		/// <seealso cref="LayoutAnchorable"/>
+		/// <seealso cref="LayoutAnchorablePaneGroup"/>
+		internal IEnumerable<LayoutAnchorable> GetLayoutAnchorable(LayoutAnchorablePaneGroup layoutAnchPaneGroup)
+		{
+			if (layoutAnchPaneGroup == null) yield break;
+			foreach (var anchorable in layoutAnchPaneGroup.Descendents().OfType<LayoutAnchorable>())
+				yield return anchorable;
 		}
 
 		#region HideWindowCommand

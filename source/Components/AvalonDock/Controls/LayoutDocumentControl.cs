@@ -8,6 +8,7 @@
  ************************************************************************/
 
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -22,7 +23,9 @@ namespace AvalonDock.Controls
 	public class LayoutDocumentControl : Control
 	{
 		#region Constructors
-
+		/// <summary>
+		/// Static class constructor
+		/// </summary>
 		static LayoutDocumentControl()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutDocumentControl), new FrameworkPropertyMetadata(typeof(LayoutDocumentControl)));
@@ -106,6 +109,7 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnPreviewGotKeyboardFocus(KeyboardFocusChangedEventArgs e)
 		{
+			Debug.WriteLine("OnPreviewGotKeyboardFocus: " + LayoutItem.ContentId);
 			SetIsActive();
 			base.OnPreviewGotKeyboardFocus(e);
 		}

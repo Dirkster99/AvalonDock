@@ -10,7 +10,8 @@
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.Linq;
-	using System.Windows;
+    using System.Threading.Tasks;
+    using System.Windows;
 	using System.Windows.Input;
 
 	#region Helper Test Classes
@@ -91,9 +92,9 @@
 	/// </summary>
 	internal class WorkSpaceViewModel : MLibTest.ViewModels.Base.ViewModelBase, IWorkSpaceViewModel
 	{
-		#region private fields
-		private ObservableCollection<FileViewModel> _files = new ObservableCollection<FileViewModel>();
-		private ReadOnlyObservableCollection<FileViewModel> _readonyFiles = null;
+		#region fields
+		private ObservableCollection<DocumentViewModel> _files = new ObservableCollection<DocumentViewModel>();
+		private ReadOnlyObservableCollection<DocumentViewModel> _readonyFiles = null;
 		private ToolViewModel[] _tools = null;
 
 		private ICommand _openCommand = null;
@@ -105,8 +106,8 @@
 		private Tool2_ViewModel _Tool2;
 		private Tool3_ViewModel _Tool3;
 
-		private FileViewModel _activeDocument = null;
-		#endregion private fields
+		private DocumentViewModel _activeDocument = null;
+		#endregion fields
 
 		#region constructors
 		/// <summary>
@@ -123,37 +124,34 @@
 		public event EventHandler ActiveDocumentChanged;
 
 		#region Properties
-		#region ActiveDocument
 		/// <summary>
 		/// Gets/Sets the currently active document.
 		/// </summary>
-		public FileViewModel ActiveDocument
+		public DocumentViewModel ActiveDocument
 		{
-			get { return _activeDocument; }
-
+			get => _activeDocument;
 			set             // This can also be set by the user via the view
 			{
 				if (_activeDocument != value)
 				{
 					_activeDocument = value;
-					RaisePropertyChanged("ActiveDocument");
+					RaisePropertyChanged(nameof(ActiveDocument));
 
 					if (ActiveDocumentChanged != null)
 						ActiveDocumentChanged(this, EventArgs.Empty);
 				}
 			}
 		}
-		#endregion
 
 		/// <summary>
 		/// Gets a collection of all currently available documents
 		/// </summary>
-		public ReadOnlyObservableCollection<FileViewModel> Files
+		public ReadOnlyObservableCollection<DocumentViewModel> Files
 		{
 			get
 			{
 				if (_readonyFiles == null)
-					_readonyFiles = new ReadOnlyObservableCollection<FileViewModel>(_files);
+					_readonyFiles = new ReadOnlyObservableCollection<DocumentViewModel>(_files);
 
 				return _readonyFiles;
 			}
@@ -252,7 +250,7 @@
 			{
 				if (_openCommand == null)
 				{
-					_openCommand = new RelayCommand<object>((p) => OnOpen(p), (p) => CanOpen(p));
+					_openCommand = new RelayCommand<object>(async (p) => await OnOpenAsync(p), (p) => CanOpen(p));
 				}
 
 				return _openCommand;
@@ -282,7 +280,7 @@
 		/// to save before closing if the document appears to be dirty.
 		/// </summary>
 		/// <param name="fileToClose"></param>
-		public void Close(FileViewModel fileToClose)
+		public void Close(DocumentViewModel fileToClose)
 		{
 			if (fileToClose.IsDirty)
 			{
@@ -304,7 +302,7 @@
 		/// </summary>
 		/// <param name="fileToSave"></param>
 		/// <param name="saveAsFlag"></param>
-		public void Save(FileViewModel fileToSave, bool saveAsFlag = false)
+		public void Save(DocumentViewModel fileToSave, bool saveAsFlag = false)
 		{
 			if (fileToSave.FilePath == null || saveAsFlag)
 			{
@@ -328,12 +326,12 @@
 			return true;
 		}
 
-		private void OnOpen(object parameter)
+		private async Task OnOpenAsync(object parameter)
 		{
 			var dlg = new OpenFileDialog();
 			if (dlg.ShowDialog().GetValueOrDefault())
 			{
-				var fileViewModel = Open(dlg.FileName);
+				var fileViewModel = await OpenAsync(dlg.FileName);
 				ActiveDocument = fileViewModel;
 			}
 		}
@@ -343,16 +341,23 @@
 		/// </summary>
 		/// <param name="filepath"></param>
 		/// <returns></returns>
-		public FileViewModel Open(string filepath)
+		public async Task<DocumentViewModel> OpenAsync(string filepath)
 		{
+			// Check if we have already loaded this file and return it if so
 			var fileViewModel = _files.FirstOrDefault(fm => fm.FilePath == filepath);
 			if (fileViewModel != null)
 				return fileViewModel;
 
-			fileViewModel = new FileViewModel(filepath, this as IWorkSpaceViewModel);
-			_files.Add(fileViewModel);
+			fileViewModel = new DocumentViewModel(this as IWorkSpaceViewModel, filepath);
+			bool result = await fileViewModel.OpenFileAsync(filepath);
 
-			return fileViewModel;
+			if (result)
+			{
+				_files.Add(fileViewModel);
+				return fileViewModel;
+			}
+
+			return null;
 		}
 		#endregion  OpenCommand
 
@@ -369,7 +374,7 @@
 
 		private void OnNew(object parameter)
 		{
-			_files.Add(new FileViewModel(this as IWorkSpaceViewModel));
+			_files.Add(new DocumentViewModel(this as IWorkSpaceViewModel));
 			ActiveDocument = _files.Last();
 		}
 

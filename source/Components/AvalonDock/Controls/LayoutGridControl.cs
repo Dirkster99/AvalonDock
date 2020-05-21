@@ -45,7 +45,11 @@ namespace AvalonDock.Controls
 		#endregion fields
 
 		#region Constructors
-
+		/// <summary>
+		/// Class constructor
+		/// </summary>
+		/// <param name="model"></param>
+		/// <param name="orientation"></param>
 		internal LayoutGridControl(LayoutPositionableGroup<T> model, Orientation orientation)
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));
@@ -67,21 +71,21 @@ namespace AvalonDock.Controls
 		#endregion
 
 		#region Overrides
-
+		/// <inheritdoc/>
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
 			_model.ChildrenTreeChanged += (s, args) =>
+			{
+				if (args.Change != ChildrenTreeChange.DirectChildrenChanged) return;
+				if (_asyncRefreshCalled.HasValue && _asyncRefreshCalled.Value == args.Change) return;
+				_asyncRefreshCalled = args.Change;
+				Dispatcher.BeginInvoke(new Action(() =>
 				{
-					if (args.Change != ChildrenTreeChange.DirectChildrenChanged) return;
-					if (_asyncRefreshCalled.HasValue && _asyncRefreshCalled.Value == args.Change) return;
-					_asyncRefreshCalled = args.Change;
-					Dispatcher.BeginInvoke(new Action(() =>
-						{
-							_asyncRefreshCalled = null;
-							UpdateChildren();
-						}), DispatcherPriority.Normal, null);
-				};
+					_asyncRefreshCalled = null;
+					UpdateChildren();
+				}), DispatcherPriority.Normal, null);
+			};
 			this.SizeChanged += OnSizeChanged;
 		}
 
@@ -114,6 +118,11 @@ namespace AvalonDock.Controls
 			AdjustFixedChildrenPanelSizes();
 		}
 
+		/// <summary>
+		/// Method executes when the element is removed from within an element tree of loaded elements.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void OnUnloaded(object sender, RoutedEventArgs e)
 		{
 			// In order to prevent resource leaks, unsubscribe from SizeChanged events.
@@ -541,7 +550,7 @@ namespace AvalonDock.Controls
 
 		private void ShowResizerOverlayWindow(LayoutGridResizerControl splitter)
 		{
-			_resizerGhost = new Border {Background = splitter.BackgroundWhileDragging, Opacity = splitter.OpacityWhileDragging};
+			_resizerGhost = new Border { Background = splitter.BackgroundWhileDragging, Opacity = splitter.OpacityWhileDragging };
 
 			var indexOfResizer = InternalChildren.IndexOf(splitter);
 
@@ -587,7 +596,7 @@ namespace AvalonDock.Controls
 			else
 				Canvas.SetTop(_resizerGhost, _initialStartPoint.Y);
 
-			var panelHostResizer = new Canvas {HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch, VerticalAlignment = System.Windows.VerticalAlignment.Stretch};
+			var panelHostResizer = new Canvas { HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch, VerticalAlignment = System.Windows.VerticalAlignment.Stretch };
 			panelHostResizer.Children.Add(_resizerGhost);
 
 			_resizerWindowHost = new Window

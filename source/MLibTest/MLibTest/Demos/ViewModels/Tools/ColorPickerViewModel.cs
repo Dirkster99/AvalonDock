@@ -67,7 +67,7 @@
         /// </summary>
         public Color SelectedBackgroundColor
         {
-            get { return _SelectedBackgroundColor; }
+            get => _SelectedBackgroundColor;
             set
             {
                 if (_SelectedBackgroundColor != value)
@@ -83,7 +83,7 @@
         /// </summary>
         public Color SelectedAccentColor
         {
-            get { return _SelectedAccentColor; }
+            get => _SelectedAccentColor;
             set
             {
                 if (_SelectedAccentColor != value)

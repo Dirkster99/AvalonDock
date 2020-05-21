@@ -20,8 +20,8 @@
 		/// </summary>
 		public object Data
 		{
-			get { return (object)this.GetValue(DataProperty); }
-			set { this.SetValue(DataProperty, value); }
+			get => (object)this.GetValue(DataProperty);
+			set => this.SetValue(DataProperty, value);
 		}
 
 		/// <summary>

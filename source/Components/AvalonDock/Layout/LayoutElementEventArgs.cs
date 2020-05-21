@@ -11,6 +11,10 @@ using System;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>
+	/// Provides an implmentation to raise an event concerning a particular <see cref="LayoutElement"/>.
+	/// (eg. This <see cref="LayoutElement"/> has been removed from my childrens collection)
+	/// </summary>
 	public class LayoutElementEventArgs : EventArgs
 	{
 		/// <summary>
@@ -21,6 +25,7 @@ namespace AvalonDock.Layout
 			Element = element;
 		}
 
+		/// <summary>Gets the particular <see cref="LayoutElement"/> for which this event has been raised.</summary>
 		public LayoutElement Element { get; private set; }
 	}
 }

@@ -13,6 +13,9 @@ using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>
+	/// Implements the layout model for the <see cref="Controls.LayoutAnchorGroupControl"/>.
+	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
 	public class LayoutAnchorGroup : LayoutGroup<LayoutAnchorable>, ILayoutPreviousContainer, ILayoutPaneSerializable

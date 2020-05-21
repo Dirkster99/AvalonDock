@@ -45,7 +45,13 @@ namespace AvalonDock.Controls
 		private DragService _dragService = null;
 		private bool _internalCloseFlag = false;
 		private bool _isClosing = false;
-		#endregion fields
+
+		/// <summary>
+		/// Is false until the margins have been found once.
+		/// </summary>
+		/// <see cref="TotalMargin"/>
+        private bool _isTotalMarginSet = false;
+        #endregion fields
 
 		#region Constructors
 
@@ -170,17 +176,97 @@ namespace AvalonDock.Controls
 		protected override void OnStateChanged(EventArgs e)
 		{
 			if (!_isInternalChange)
-			{
-				if (WindowState == WindowState.Maximized)
-					UpdateMaximizedState(true);
-				else
-					WindowState = IsMaximized ? WindowState.Maximized : WindowState.Normal;
-			}
+				UpdateMaximizedState(WindowState == WindowState.Maximized);
+
 			base.OnStateChanged(e);
 		}
 
 		#endregion IsMaximized
 
+        #region TotalMargin
+
+        private static readonly DependencyPropertyKey TotalMarginPropertyKey = 
+            DependencyProperty.RegisterReadOnly(nameof(TotalMargin),
+                typeof(Thickness), 
+                typeof(LayoutFloatingWindowControl),
+                new FrameworkPropertyMetadata(default(Thickness)));
+
+        public static readonly DependencyProperty TotalMarginProperty = TotalMarginPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// The total margin (including window chrome and title bar).
+        /// 
+        /// The margin is queried from the visual tree the first time it is rendered, zero until the first call of FilterMessage(WM_ACTIVATE)
+        /// </summary>
+		public Thickness TotalMargin
+		{
+            get { return (Thickness) GetValue(TotalMarginProperty); }
+            protected set { SetValue(TotalMarginPropertyKey, value); }
+        }
+
+		#endregion
+
+		#region ContentMinHeight
+		public static readonly DependencyPropertyKey ContentMinHeightPropertyKey = DependencyProperty.RegisterReadOnly(
+            nameof(ContentMinHeight), typeof(double), typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(0.0));
+
+        public static readonly DependencyProperty ContentMinHeightProperty =
+            ContentMinHeightPropertyKey.DependencyProperty;
+
+		/// <summary>
+		/// The MinHeight of the content of the window, will be 0 until the window has been rendered, or if the MinHeight is unset for the content
+		/// </summary>
+		public double ContentMinHeight
+        {
+            get { return (double) GetValue(ContentMinHeightProperty); }
+            set { SetValue(ContentMinHeightPropertyKey, value); }
+        }
+		#endregion
+
+		#region ContentMinWidth
+		public static readonly DependencyPropertyKey ContentMinWidthPropertyKey = DependencyProperty.RegisterReadOnly(
+            nameof(ContentMinWidth), typeof(double), typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(0.0));
+
+        public static readonly DependencyProperty ContentMinWidthProperty =
+            ContentMinWidthPropertyKey.DependencyProperty;
+
+		/// <summary>
+		/// The MinWidth ocf the content of the window, will be 0 until the window has been rendered, or if the MinWidth is unset for the content
+		/// </summary>
+		public double ContentMinWidth
+        {
+            get { return (double) GetValue(ContentMinWidthProperty); }
+            set { SetValue(ContentMinWidthPropertyKey, value); }
+        }
+		#endregion
+
+		#region SetWindowSizeWhenOpened
+
+        public static readonly DependencyProperty SetWindowSizeWhenOpenedProperty = DependencyProperty.Register(
+            nameof(SetWindowSizeWhenOpened), typeof(bool), typeof(LayoutFloatingWindowControl), new PropertyMetadata(false,
+                (sender, args) =>
+                {
+                    if (args.OldValue != args.NewValue &&
+                        sender is LayoutFloatingWindowControl control)
+                    {
+						// This will resize the window when this property is set to true and the window is open
+                        control._isTotalMarginSet = false;
+                    }
+                }));
+
+		/// <summary>
+		/// If true the MinHeight and MinWidth of the content will be used together with the margins to determine the initial size of the floating window
+		/// </summary>
+		/// <seealso cref="TotalMargin"/>
+		/// <seealso cref="ContentMinWidth"/>
+		/// <seealso cref="ContentMinHeight"/>
+		public bool SetWindowSizeWhenOpened
+        {
+            get { return (bool) GetValue(SetWindowSizeWhenOpenedProperty); }
+            set { SetValue(SetWindowSizeWhenOpenedProperty, value); }
+        }
+
+        #endregion
 		#endregion Properties
 
 		#region Internal Methods
@@ -248,7 +334,9 @@ namespace AvalonDock.Controls
 							handled = true;
 						}
 					}
-					break;
+                    UpdateWindowsSizeBasedOnMinSize();
+
+                    break;
 				case Win32Helper.WM_EXITSIZEMOVE:
 					UpdatePositionAndSizeOfPanes();
 
@@ -283,7 +371,102 @@ namespace AvalonDock.Controls
 			return IntPtr.Zero;
 		}
 
-		internal void InternalClose(bool closeInitiatedByUser = false)
+		/// <summary>
+		/// Set the margins of the window control (including the borders of the floating window and the title bar).
+		/// The result will be stored in <code>_totalMargin</code>.
+		/// </summary>
+		/// <remarks>If the control is not loaded <code>_totalMargin</code> will not be set.</remarks>
+		private void UpdateMargins()
+        {
+			// The grid with window bar and content
+            var grid = this.GetChildrenRecursive()
+                .OfType<Grid>()
+                .FirstOrDefault(g => g.RowDefinitions.Count > 0);
+            ContentPresenter contentControl = this.GetChildrenRecursive()
+                .OfType<ContentPresenter>()
+                .FirstOrDefault(c => c.Content is LayoutContent);
+            if (contentControl == null)
+                return;
+            // The content control in the grid, this has a different tree to walk up
+			var layoutContent = (LayoutContent)contentControl.Content;	
+    		if (grid != null && layoutContent.Content is FrameworkElement content)
+            {
+                var parents = content.GetParents().ToArray();
+                var children = this.GetChildrenRecursive()
+                    .TakeWhile(c => c != grid)
+                    .ToArray();
+				var borders = children
+					.OfType<Border>()
+                    .Concat(parents
+                        .OfType<Border>())
+                    .ToArray();
+                var controls = children
+                    .OfType<Control>()
+                    .Concat(parents
+                        .OfType<Control>())
+                    .ToArray();
+                var frameworkElements = children
+                    .OfType<FrameworkElement>()
+                    .Concat(parents
+                        .OfType<FrameworkElement>())
+                    .ToArray();
+				var padding = controls.Sum(b => b.Padding);
+                var border = borders.Sum(b => b.BorderThickness);
+                var margin = frameworkElements.Sum(f => f.Margin);
+                margin = margin.Add(padding).Add(border).Add(grid.Margin);
+                margin.Top = grid.RowDefinitions[0].MinHeight;
+                TotalMargin = margin;
+                _isTotalMarginSet = true;
+            }
+        }
+
+		/// <summary>
+		/// Update the floating window size based on the <code>MinHeight</code> and <code>MinWidth</code> of the content of the control.
+		/// </summary>
+		/// <remarks>This will only be run once, when the window is rendered the first time and <code>_totalMargin</code> is identified.</remarks>
+		private void UpdateWindowsSizeBasedOnMinSize()
+        {
+            if (!_isTotalMarginSet)
+            {
+                UpdateMargins();
+                if(_isTotalMarginSet)
+                {
+					// The LayoutAnchorableControl is bound via the ContentPresenter, hence it is best to do below in code and not in a style
+					// See https://github.com/Dirkster99/AvalonDock/pull/146#issuecomment-609974424
+					var layoutContents = this.GetChildrenRecursive()
+                        .OfType<ContentPresenter>()
+                        .Select(c => c.Content)
+                        .OfType<LayoutContent>()
+                        .Select(lc => lc.Content);
+					var contents = layoutContents.OfType<FrameworkElement>();
+                    foreach (var content in contents)
+                    {
+                        ContentMinHeight = Math.Max(content.MinHeight, ContentMinHeight);
+                        ContentMinWidth = Math.Max(content.MinWidth, ContentMinWidth);
+                        if (SetWindowSizeWhenOpened)
+                        {
+                            var parent = content.GetParents()
+                                .OfType<FrameworkElement>()
+                                .FirstOrDefault();
+                            // StackPanels among others have an ActualHeight larger than visible, hence we check the parent control as well
+                            if (content.ActualHeight < content.MinHeight ||
+                                parent != null && parent.ActualHeight < content.MinHeight)
+                            {
+                                Height = content.MinHeight + TotalMargin.Top + TotalMargin.Bottom;
+                            }
+
+                            if (content.ActualWidth < content.MinWidth ||
+                                parent != null && parent.ActualWidth < content.MinWidth)
+                            {
+                                Width = content.MinWidth + TotalMargin.Left + TotalMargin.Right;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        internal void InternalClose(bool closeInitiatedByUser = false)
 		{
 			_internalCloseFlag = !closeInitiatedByUser;
 			if (_isClosing) return;

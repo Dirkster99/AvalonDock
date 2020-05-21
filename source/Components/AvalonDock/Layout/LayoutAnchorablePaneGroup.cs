@@ -14,16 +14,26 @@ using System.Windows.Markup;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>
+	/// Implements an element in the layout model tree that can contain and arrange multiple
+	/// <see cref="LayoutAnchorablePane"/> elements in x or y directions, which in turn contain
+	/// <see cref="LayoutAnchorable"/> elements. 
+	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
 	public class LayoutAnchorablePaneGroup : LayoutPositionableGroup<ILayoutAnchorablePane>, ILayoutAnchorablePane, ILayoutOrientableGroup
 	{
-		#region Constructors
+		#region fields
+		private Orientation _orientation;
+		#endregion fields
 
+		#region Constructors
+		/// <summary>Class constructor</summary>
 		public LayoutAnchorablePaneGroup()
 		{
 		}
 
+		/// <summary>Class constructor <paramref name="firstChild"/> to be inserted into collection of children models.</summary>
 		public LayoutAnchorablePaneGroup(LayoutAnchorablePane firstChild)
 		{
 			Children.Add(firstChild);
@@ -32,10 +42,9 @@ namespace AvalonDock.Layout
 		#endregion
 
 		#region Properties
-
-		#region Orientation
-
-		private Orientation _orientation;
+		/// <summary>
+		/// Gets/sets the <see cref="System.Windows.Controls.Orientation"/> of this object.
+		/// </summary>
 		public Orientation Orientation
 		{
 			get => _orientation;
@@ -47,10 +56,7 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(Orientation));
 			}
 		}
-
-		#endregion
-
-		#endregion
+		#endregion Properties
 
 		#region Overrides
 
@@ -97,6 +103,7 @@ namespace AvalonDock.Layout
 			base.WriteXml(writer);
 		}
 
+		/// <inheritdoc />
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
 			if (reader.MoveToAttribute(nameof(Orientation)))
@@ -105,6 +112,7 @@ namespace AvalonDock.Layout
 		}
 
 #if TRACE
+		/// <inheritdoc />
 		public override void ConsoleDump(int tab)
 		{
 			System.Diagnostics.Trace.Write(new string(' ', tab * 4));

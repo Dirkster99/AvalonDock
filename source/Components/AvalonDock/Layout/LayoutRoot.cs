@@ -21,12 +21,42 @@ using System.Windows.Controls;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>
+	/// Implements the root of the layout viewmodel (see  <see cref="DockingManager.Layout"/> property).
+	/// This root includes a  <see cref="RootPanel"/> property for binding content, side panel properties
+	/// and many other layout related root items.
+	/// 
+	/// This class implements <see cref="LayoutElement.PropertyChanged"/> and
+	/// <see cref="LayoutElement.PropertyChanging"/> to support direct UI binding scenarios
+	/// with view updates supported.
+	/// </summary>
 	[ContentProperty(nameof(RootPanel))]
 	[Serializable]
 	public class LayoutRoot : LayoutElement, ILayoutContainer, ILayoutRoot, IXmlSerializable
 	{
-		#region Constructors
+		#region fields
+		private LayoutPanel _rootPanel;
+		private LayoutAnchorSide _topSide = null;
+		private LayoutAnchorSide _rightSide;
+		private LayoutAnchorSide _leftSide = null;
+		private LayoutAnchorSide _bottomSide = null;
 
+		private ObservableCollection<LayoutFloatingWindow> _floatingWindows = null;
+		private ObservableCollection<LayoutAnchorable> _hiddenAnchorables = null;
+
+		[field: NonSerialized]
+		private WeakReference _activeContent = null;
+		private bool _activeContentSet = false;
+
+		[field: NonSerialized]
+		private WeakReference _lastFocusedDocument = null;
+
+		[NonSerialized]
+		private DockingManager _manager = null;
+		#endregion fields
+
+		#region Constructors
+		/// <summary>Standard class constructor</summary>
 		public LayoutRoot()
 		{
 			RightSide = new LayoutAnchorSide();
@@ -38,11 +68,22 @@ namespace AvalonDock.Layout
 
 		#endregion Constructors
 
+		#region Events
+		/// <summary>
+		/// Raised when the layout is updated. This event is raised via <see cref="FireLayoutUpdated()"/> method
+		/// when a parent of a LayoutElement has changed.
+		/// </summary>
+		public event EventHandler Updated;
+
+		/// <summary>Raised when an element is added to the layout.</summary>
+		public event EventHandler<LayoutElementEventArgs> ElementAdded;
+
+		/// <summary>Raised when an element is removed from the layout.</summary>
+		public event EventHandler<LayoutElementEventArgs> ElementRemoved;
+		#endregion Events
+
 		#region Properties
-
-		#region RootPanel
-
-		private LayoutPanel _rootPanel;
+		/// <summary>Gets/sets the root layout panel that contains the <see cref="LayoutDocumentPane"/>.</summary>
 		public LayoutPanel RootPanel
 		{
 			get => _rootPanel;
@@ -57,11 +98,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion RootPanel
-
-		#region TopSide
-
-		private LayoutAnchorSide _topSide = null;
+		/// <summary>Gets or sets the top side of the layout root.</summary>
 		public LayoutAnchorSide TopSide
 		{
 			get => _topSide;
@@ -75,11 +112,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion TopSide
-
-		#region RightSide
-
-		private LayoutAnchorSide _rightSide;
+		/// <summary>Gets or sets the right side of the layout root.</summary>
 		public LayoutAnchorSide RightSide
 		{
 			get => _rightSide;
@@ -93,11 +126,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion RightSide
-
-		#region LeftSide
-
-		private LayoutAnchorSide _leftSide = null;
+		/// <summary>Gets or sets the left side of the layout root.</summary>
 		public LayoutAnchorSide LeftSide
 		{
 			get => _leftSide;
@@ -111,11 +140,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion LeftSide
-
-		#region BottomSide
-
-		private LayoutAnchorSide _bottomSide = null;
+		/// <summary>Gets or sets the bottom side of the layout root.</summary>
 		public LayoutAnchorSide BottomSide
 		{
 			get => _bottomSide;
@@ -129,12 +154,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion BottomSide
-
-		#region FloatingWindows
-
-		ObservableCollection<LayoutFloatingWindow> _floatingWindows = null;
-
+		/// <summary>Gets the floating windows that are part of this layout.</summary>
 		public ObservableCollection<LayoutFloatingWindow> FloatingWindows
 		{
 			get
@@ -149,12 +169,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion FloatingWindows
-
-		#region HiddenAnchorables
-
-		ObservableCollection<LayoutAnchorable> _hiddenAnchorables = null;
-
+		/// <summary>Gets the hidden anchorables in the layout.</summary>
 		public ObservableCollection<LayoutAnchorable> Hidden
 		{
 			get
@@ -169,10 +184,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion HiddenAnchorables
-
 		#region Children
 
+		/// <summary>Gets the child elements of the layout root.</summary>
 		public IEnumerable<ILayoutElement> Children
 		{
 			get
@@ -200,16 +214,12 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>Gets the number of child elements of the layout root.</summary>
 		public int ChildrenCount => 5 + (_floatingWindows?.Count ?? 0) + (_hiddenAnchorables?.Count ?? 0);
 
 		#endregion Children
 
-		#region ActiveContent
-
-		[field: NonSerialized]
-		private WeakReference _activeContent = null;
-		private bool _activeContentSet = false;
-
+		/// <summary>Gets the active LayoutContent-derived element.</summary>
 		[XmlIgnore]
 		public LayoutContent ActiveContent
 		{
@@ -226,14 +236,6 @@ namespace AvalonDock.Layout
 				}
 			}
 		}
-
-
-		#endregion ActiveContent
-
-		#region LastFocusedDocument
-
-		[field: NonSerialized]
-		private WeakReference _lastFocusedDocument;
 
 		[XmlIgnore]
 		public LayoutContent LastFocusedDocument
@@ -254,13 +256,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion LastFocusedDocument
-
-		#region Manager
-
-		[NonSerialized]
-		private DockingManager _manager = null;
-
+		/// <summary>Gets/sets the docking manager root control for this library.</summary>
 		[XmlIgnore]
 		public DockingManager Manager
 		{
@@ -273,9 +269,6 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(Manager));
 			}
 		}
-
-		#endregion Manager
-
 		#endregion Properties
 
 		#region Overrides
@@ -301,7 +294,6 @@ namespace AvalonDock.Layout
 				hidden.ConsoleDump(tab + 1);
 		}
 #endif
-
 		#endregion Overrides
 
 		#region Public Methods
@@ -351,9 +343,7 @@ namespace AvalonDock.Layout
 				LeftSide = (LayoutAnchorSide)newElement;
 		}
 
-		/// <summary>
-		/// Removes any empty container not directly referenced by other layout items.
-		/// </summary>
+		/// <summary>Removes any empty container not directly referenced by other layout items.</summary>
 		public void CollectGarbage()
 		{
 			var exitFlag = true;
@@ -544,11 +534,12 @@ namespace AvalonDock.Layout
 #endif
 		}
 
+		#region IXmlSerializable interface members
 		/// <inheritdoc />
-		public XmlSchema GetSchema() => null;
+		XmlSchema IXmlSerializable.GetSchema() => null;
 
 		/// <inheritdoc />
-		public void ReadXml(XmlReader reader)
+		void IXmlSerializable.ReadXml(XmlReader reader)
 		{
 			reader.MoveToContent();
 			if (reader.IsEmptyElement)
@@ -587,7 +578,7 @@ namespace AvalonDock.Layout
 		}
 
 		/// <inheritdoc />
-		public void WriteXml(XmlWriter writer)
+		void IXmlSerializable.WriteXml(XmlWriter writer)
 		{
 			writer.WriteStartElement(nameof(RootPanel));
 			RootPanel?.WriteXml(writer);
@@ -629,6 +620,7 @@ namespace AvalonDock.Layout
 			}
 			writer.WriteEndElement();
 		}
+		#endregion IXmlSerializable interface members
 
 		#endregion Public Methods
 
@@ -824,6 +816,7 @@ namespace AvalonDock.Layout
 		{
 			var resultList = new List<object>();
 			while (reader.NodeType == XmlNodeType.Whitespace) reader.Read();
+			if (reader.NodeType == XmlNodeType.EndElement) return resultList;
 
 			if (reader.IsEmptyElement)
 			{
@@ -917,14 +910,6 @@ namespace AvalonDock.Layout
 		}
 
 		#endregion Private Methods
-
-		#region Events
-
-		public event EventHandler Updated;
-		public event EventHandler<LayoutElementEventArgs> ElementAdded;
-		public event EventHandler<LayoutElementEventArgs> ElementRemoved;
-
-		#endregion Events
 
 		#region Diagnostic tools
 

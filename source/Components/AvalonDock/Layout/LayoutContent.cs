@@ -19,12 +19,18 @@ using AvalonDock.Controls;
 
 namespace AvalonDock.Layout
 {
+	/// <summary>
+	/// Provides an abstract base class for common properties and methods of
+	/// the <see cref="LayoutAnchorable"/> and <see cref="LayoutDocument"/> classes.
+	/// </summary>
 	[ContentProperty(nameof(Content))]
 	[Serializable]
 	public abstract class LayoutContent : LayoutElement, IXmlSerializable, ILayoutElementForFloatingWindow, IComparable<LayoutContent>, ILayoutPreviousContainer
 	{
 		#region Constructors
-
+		/// <summary>
+		/// Class constructor
+		/// </summary>
 		internal LayoutContent()
 		{
 		}

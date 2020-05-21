@@ -1,38 +1,38 @@
 ﻿namespace AvalonDock.MVVMTestApp
 {
-	class ToolViewModel : PaneViewModel
+	internal class ToolViewModel : PaneViewModel
 	{
+		#region fields
+		private bool _isVisible = true;
+		#endregion fields
+
+		#region constructor
+		/// <summary>
+		/// Class constructor
+		/// </summary>
+		/// <param name="name"></param>
 		public ToolViewModel(string name)
 		{
 			Name = name;
 			Title = name;
 		}
+		#endregion constructor
 
-		public string Name
-		{
-			get;
-			private set;
-		}
+		#region Properties
+		public string Name { get; private set; }
 
-
-		#region IsVisible
-
-		private bool _isVisible = true;
 		public bool IsVisible
 		{
-			get { return _isVisible; }
+			get => _isVisible;
 			set
 			{
 				if (_isVisible != value)
 				{
 					_isVisible = value;
-					RaisePropertyChanged("IsVisible");
+					RaisePropertyChanged(nameof(IsVisible));
 				}
 			}
 		}
-
-		#endregion
-
-
+		#endregion Properties
 	}
 }

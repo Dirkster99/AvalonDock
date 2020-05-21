@@ -1,20 +1,28 @@
-﻿<!--************************************************************************
-   AvalonDock
+﻿<!--
+	************************************************************************
+	This program is provided to you under the terms of the Microsoft Public
+	License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
+	************************************************************************
+-->
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************-->
-	
-<UserControl x:Class="TestApp.TestUserControl"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
-             Height="300" Width="300">
-    <Grid>
-
-    </Grid>
+<UserControl
+	x:Class="TestApp.TestUserControl"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	MinWidth="300"
+	MinHeight="300"
+	mc:Ignorable="d">
+	<Grid>
+		<StackPanel Margin="0">
+			<TextBlock TextWrapping="WrapWithOverflow">
+				<TextBlock FontWeight="Bold">This Comtrol demos an Auto-Size FloatingWindow</TextBlock>
+				<TextBlock TextWrapping="WrapWithOverflow">
+					This content can initially be sized to the content of a containing user control when dragging
+					the LayoutAnchorable into floating mode using the SetWindowSizeWhenOpened property (see App.xaml of this demo app).
+				</TextBlock>
+			</TextBlock>
+		</StackPanel>
+	</Grid>
 </UserControl>

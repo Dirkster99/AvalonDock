@@ -51,7 +51,7 @@
 		{
 			var itemAsLayoutContent = item as LayoutContent;
 
-			if (item is FileViewModel)
+			if (item is IDocumentViewModel)
 				return FileViewTemplate;
 
 			if (item is FileStatsViewModel)

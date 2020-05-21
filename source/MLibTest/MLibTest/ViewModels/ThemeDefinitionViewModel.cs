@@ -41,8 +41,7 @@
 		/// </summary>
 		public bool IsSelected
 		{
-			get { return _IsSelected; }
-
+			get => _IsSelected;
 			set
 			{
 				if (_IsSelected != value)

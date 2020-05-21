@@ -6,7 +6,21 @@
 
 	class FileViewModel : PaneViewModel
 	{
-		static ImageSourceConverter ISC = new ImageSourceConverter();
+		#region fields
+		private static ImageSourceConverter ISC = new ImageSourceConverter();
+		private string _filePath = null;
+		private string _textContent = string.Empty;
+		private bool _isDirty = false;
+		private RelayCommand _saveCommand = null;
+		private RelayCommand _saveAsCommand = null;
+		private RelayCommand _closeCommand = null;
+		#endregion fields
+
+		#region constructors
+		/// <summary>
+		/// Class constructor from file path.
+		/// </summary>
+		/// <param name="filePath"></param>
 		public FileViewModel(string filePath)
 		{
 			FilePath = filePath;
@@ -16,25 +30,28 @@
 			IconSource = ISC.ConvertFromInvariantString(@"pack://application:,,/Images/document.png") as ImageSource;
 		}
 
+		/// <summary>
+		/// Default class constructor
+		/// </summary>
 		public FileViewModel()
 		{
 			IsDirty = true;
 			Title = FileName;
 		}
+		#endregion constructors
 
-		#region FilePath
-		private string _filePath = null;
+		#region Properties
 		public string FilePath
 		{
-			get { return _filePath; }
+			get => _filePath;
 			set
 			{
 				if (_filePath != value)
 				{
 					_filePath = value;
-					RaisePropertyChanged("FilePath");
-					RaisePropertyChanged("FileName");
-					RaisePropertyChanged("Title");
+					RaisePropertyChanged(nameof(FilePath));
+					RaisePropertyChanged(nameof(FileName));
+					RaisePropertyChanged(nameof(Title));
 
 					if (File.Exists(_filePath))
 					{
@@ -44,8 +61,6 @@
 				}
 			}
 		}
-		#endregion
-
 
 		public string FileName
 		{
@@ -58,48 +73,34 @@
 			}
 		}
 
-
-
-		#region TextContent
-
-		private string _textContent = string.Empty;
 		public string TextContent
 		{
-			get { return _textContent; }
+			get => _textContent;
 			set
 			{
 				if (_textContent != value)
 				{
 					_textContent = value;
-					RaisePropertyChanged("TextContent");
+					RaisePropertyChanged(nameof(TextContent));
 					IsDirty = true;
 				}
 			}
 		}
 
-		#endregion
-
-		#region IsDirty
-
-		private bool _isDirty = false;
 		public bool IsDirty
 		{
-			get { return _isDirty; }
+			get => _isDirty;
 			set
 			{
 				if (_isDirty != value)
 				{
 					_isDirty = value;
-					RaisePropertyChanged("IsDirty");
-					RaisePropertyChanged("FileName");
+					RaisePropertyChanged(nameof(IsDirty));
+					RaisePropertyChanged(nameof(FileName));
 				}
 			}
 		}
 
-		#endregion
-
-		#region SaveCommand
-		RelayCommand _saveCommand = null;
 		public ICommand SaveCommand
 		{
 			get
@@ -113,20 +114,6 @@
 			}
 		}
 
-		private bool CanSave(object parameter)
-		{
-			return IsDirty;
-		}
-
-		private void OnSave(object parameter)
-		{
-			Workspace.This.Save(this, false);
-		}
-
-		#endregion
-
-		#region SaveAsCommand
-		RelayCommand _saveAsCommand = null;
 		public ICommand SaveAsCommand
 		{
 			get
@@ -140,20 +127,6 @@
 			}
 		}
 
-		private bool CanSaveAs(object parameter)
-		{
-			return IsDirty;
-		}
-
-		private void OnSaveAs(object parameter)
-		{
-			Workspace.This.Save(this, true);
-		}
-
-		#endregion
-
-		#region CloseCommand
-		RelayCommand _closeCommand = null;
 		public ICommand CloseCommand
 		{
 			get
@@ -166,7 +139,9 @@
 				return _closeCommand;
 			}
 		}
+		#endregion  Properties
 
+		#region methods
 		private bool CanClose()
 		{
 			return true;
@@ -176,7 +151,26 @@
 		{
 			Workspace.This.Close(this);
 		}
-		#endregion
 
+		private bool CanSave(object parameter)
+		{
+			return IsDirty;
+		}
+
+		private void OnSave(object parameter)
+		{
+			Workspace.This.Save(this, false);
+		}
+
+		private bool CanSaveAs(object parameter)
+		{
+			return IsDirty;
+		}
+
+		private void OnSaveAs(object parameter)
+		{
+			Workspace.This.Save(this, true);
+		}
+		#endregion methods
 	}
 }

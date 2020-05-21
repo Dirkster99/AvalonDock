@@ -205,10 +205,7 @@ namespace AvalonDock.Layout
 		#endregion Public Methods
 
 		#region Internal Methods
-
-		/// <summary>
-		/// Invalidates the current <see cref="SelectedContentIndex"/> and sets the index for the next avialable child with IsEnabled == true.
-		/// </summary>
+		/// <summary>Invalidates the current <see cref="SelectedContentIndex"/> and sets the index for the next avialable child with IsEnabled == true.</summary>
 		internal void SetNextSelectedIndex()
 		{
 			SelectedContentIndex = -1;

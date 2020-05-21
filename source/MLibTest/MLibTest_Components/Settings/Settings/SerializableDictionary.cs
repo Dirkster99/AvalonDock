@@ -56,12 +56,12 @@
 		#region Private Properties
 		protected XmlSerializer ValueSerializer
 		{
-			get { return _valueSerializer ?? (_valueSerializer = new XmlSerializer(typeof(TVal))); }
+			get => _valueSerializer ?? (_valueSerializer = new XmlSerializer(typeof(TVal)));
 		}
 
 		private XmlSerializer KeySerializer
 		{
-			get { return _keySerializer ?? (_keySerializer = new XmlSerializer(typeof(TKey))); }
+			get => _keySerializer ?? (_keySerializer = new XmlSerializer(typeof(TKey)));
 		}
 		#endregion
 

@@ -34,6 +34,7 @@ namespace AvalonDock.Layout
 		private bool _canAutoHide = true;
 		private bool _canDockAsTabbedDocument = true;
 		private bool _canCloseValueBeforeInternalSet;
+		private bool _canMove = true;
 		#endregion fields
 
 		#region Constructors
@@ -150,6 +151,18 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>Gets/sets whether a document can be dragged (to be dropped in a different location) or not. Use this property in conjunction with <see cref="CanMove"/> and <see cref="CanClose"/> to lock a document in its layout position.</summary>
+		public bool CanMove
+		{
+			get => _canMove;
+			set
+			{
+				if (value == _canMove) return;
+				_canMove = value;
+				RaisePropertyChanged(nameof(CanMove));
+			}
+		}
+
 		/// <summary>Get a value indicating if the anchorable is anchored to an achor side in an AutoHide status or not.</summary>
 		public bool IsAutoHidden => Parent is LayoutAnchorGroup;
 
@@ -230,6 +243,8 @@ namespace AvalonDock.Layout
 				AutoHideMinHeight = double.Parse(reader.Value, CultureInfo.InvariantCulture);
 			if (reader.MoveToAttribute(nameof(CanDockAsTabbedDocument)))
 				CanDockAsTabbedDocument = bool.Parse(reader.Value);
+			if (reader.MoveToAttribute(nameof(CanMove)))
+				CanMove = bool.Parse(reader.Value);
 			base.ReadXml(reader);
 		}
 
@@ -250,6 +265,8 @@ namespace AvalonDock.Layout
 				writer.WriteAttributeString(nameof(AutoHideMinHeight), AutoHideMinHeight.ToString(CultureInfo.InvariantCulture));
 			if (!CanDockAsTabbedDocument)
 				writer.WriteAttributeString(nameof(CanDockAsTabbedDocument), CanDockAsTabbedDocument.ToString(CultureInfo.InvariantCulture));
+			if (!CanMove)
+				writer.WriteAttributeString(nameof(CanMove), CanMove.ToString());
 			base.WriteXml(writer);
 		}
 

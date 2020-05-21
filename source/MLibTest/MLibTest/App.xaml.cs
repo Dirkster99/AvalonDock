@@ -10,7 +10,8 @@
 	using System.Diagnostics;
 	using System.Globalization;
 	using System.Threading;
-	using System.Windows;
+    using System.Threading.Tasks;
+    using System.Windows;
 
 	/// <summary>
 	/// Interaction logic for App.xaml
@@ -49,8 +50,6 @@
 		#region methods
 		private void Application_Startup(object sender, StartupEventArgs e)
 		{
-			LayoutLoaded.LoadLayout();
-
 			// Set shutdown mode here (and reset further below) to enable showing custom dialogs (messageboxes)
 			// durring start-up without shutting down application when the custom dialogs (messagebox) closes
 			ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown;
@@ -107,7 +106,7 @@
 				ConstructMainWindowSession(_appVM, _mainWindow, settings);
 
 				// and show it to the user ...
-				MainWindow.Loaded += MainWindow_Loaded;
+				MainWindow.Loaded += MainWindow_LoadedAsync;
 				MainWindow.Closing += OnClosing;
 
 				// When the ViewModel asks to be closed, close the window.
@@ -122,9 +121,7 @@
 						dispose.Dispose();
 
 					_mainWindow.DataContext = null;
-					// _appVM = null;     readonly property
-					//_mainWindow = null; readonly property
-				};
+ 				};
 
 				MainWindow.Show();
 			}
@@ -137,7 +134,7 @@
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+		private async void MainWindow_LoadedAsync(object sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -147,6 +144,8 @@
 			{
 				Debug.WriteLine(exp);
 			}
+
+			await LayoutLoaded.LoadLayoutAsync();
 
 			// Load and layout AvalonDock elements when MainWindow has loaded
 			_mainWindow.OnLoadLayoutAsync();

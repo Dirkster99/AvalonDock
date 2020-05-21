@@ -9,23 +9,34 @@ using System.Windows;
 
 namespace AvalonDock.MVVMTestApp
 {
-	class Workspace : ViewModelBase
+	internal class Workspace : ViewModelBase
 	{
-		protected Workspace()
-		{
-
-		}
-
+		#region fields
 		static Workspace _this = new Workspace();
 
-		public static Workspace This
+		ToolViewModel[] _tools = null;
+		private ObservableCollection<FileViewModel> _files = new ObservableCollection<FileViewModel>();
+		private ReadOnlyObservableCollection<FileViewModel> _readonyFiles = null;
+		private FileViewModel _activeDocument = null;
+		FileStatsViewModel _fileStats = null;
+		RelayCommand _openCommand = null;
+		RelayCommand _newCommand = null;
+		#endregion fields
+
+		#region constructors
+		/// <summary>
+		/// Class constructor
+		/// </summary>
+		protected Workspace()
 		{
-			get { return _this; }
 		}
+		#endregion constructors
 
+		public event EventHandler ActiveDocumentChanged;
 
-		ObservableCollection<FileViewModel> _files = new ObservableCollection<FileViewModel>();
-		ReadOnlyObservableCollection<FileViewModel> _readonyFiles = null;
+		#region properties
+		public static Workspace This => _this;
+
 		public ReadOnlyObservableCollection<FileViewModel> Files
 		{
 			get
@@ -37,8 +48,6 @@ namespace AvalonDock.MVVMTestApp
 			}
 		}
 
-		ToolViewModel[] _tools = null;
-
 		public IEnumerable<ToolViewModel> Tools
 		{
 			get
@@ -49,7 +58,6 @@ namespace AvalonDock.MVVMTestApp
 			}
 		}
 
-		FileStatsViewModel _fileStats = null;
 		public FileStatsViewModel FileStats
 		{
 			get
@@ -61,8 +69,6 @@ namespace AvalonDock.MVVMTestApp
 			}
 		}
 
-		#region OpenCommand
-		RelayCommand _openCommand = null;
 		public ICommand OpenCommand
 		{
 			get
@@ -76,36 +82,6 @@ namespace AvalonDock.MVVMTestApp
 			}
 		}
 
-		private bool CanOpen(object parameter)
-		{
-			return true;
-		}
-
-		private void OnOpen(object parameter)
-		{
-			var dlg = new OpenFileDialog();
-			if (dlg.ShowDialog().GetValueOrDefault())
-			{
-				var fileViewModel = Open(dlg.FileName);
-				ActiveDocument = fileViewModel;
-			}
-		}
-
-		public FileViewModel Open(string filepath)
-		{
-			var fileViewModel = _files.FirstOrDefault(fm => fm.FilePath == filepath);
-			if (fileViewModel != null)
-				return fileViewModel;
-
-			fileViewModel = new FileViewModel(filepath);
-			_files.Add(fileViewModel);
-			return fileViewModel;
-		}
-
-		#endregion
-
-		#region NewCommand
-		RelayCommand _newCommand = null;
 		public ICommand NewCommand
 		{
 			get
@@ -119,42 +95,23 @@ namespace AvalonDock.MVVMTestApp
 			}
 		}
 
-		private bool CanNew(object parameter)
-		{
-			return true;
-		}
-
-		private void OnNew(object parameter)
-		{
-			_files.Add(new FileViewModel());
-			ActiveDocument = _files.Last();
-		}
-
-		#endregion
-
-		#region ActiveDocument
-
-		private FileViewModel _activeDocument = null;
 		public FileViewModel ActiveDocument
 		{
-			get { return _activeDocument; }
+			get => _activeDocument;
 			set
 			{
 				if (_activeDocument != value)
 				{
 					_activeDocument = value;
-					RaisePropertyChanged("ActiveDocument");
+					RaisePropertyChanged(nameof(ActiveDocument));
 					if (ActiveDocumentChanged != null)
 						ActiveDocumentChanged(this, EventArgs.Empty);
 				}
 			}
 		}
+		#endregion properties
 
-		public event EventHandler ActiveDocumentChanged;
-
-		#endregion
-
-
+		#region methods
 		internal void Close(FileViewModel fileToClose)
 		{
 			if (fileToClose.IsDirty)
@@ -184,7 +141,43 @@ namespace AvalonDock.MVVMTestApp
 			ActiveDocument.IsDirty = false;
 		}
 
+		internal FileViewModel Open(string filepath)
+		{
+			var fileViewModel = _files.FirstOrDefault(fm => fm.FilePath == filepath);
+			if (fileViewModel != null)
+				return fileViewModel;
 
+			fileViewModel = new FileViewModel(filepath);
+			_files.Add(fileViewModel);
+			return fileViewModel;
+		}
 
+		#region OpenCommand
+		private bool CanOpen(object parameter) => true;
+
+		private void OnOpen(object parameter)
+		{
+			var dlg = new OpenFileDialog();
+			if (dlg.ShowDialog().GetValueOrDefault())
+			{
+				var fileViewModel = Open(dlg.FileName);
+				ActiveDocument = fileViewModel;
+			}
+		}
+		#endregion OpenCommand
+
+		#region NewCommand
+		private bool CanNew(object parameter)
+		{
+			return true;
+		}
+
+		private void OnNew(object parameter)
+		{
+			_files.Add(new FileViewModel());
+			ActiveDocument = _files.Last();
+		}
+		#endregion
+		#endregion methods
 	}
 }

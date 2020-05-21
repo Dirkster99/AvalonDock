@@ -37,8 +37,8 @@ namespace AvalonDock.Themes.Controls
 		/// </summary>
 		public double Thickness
 		{
-			get { return (double)GetValue(ThicknessProperty); }
-			set { SetValue(ThicknessProperty, value); }
+			get => (double)GetValue(ThicknessProperty);
+			set => SetValue(ThicknessProperty, value);
 		}
 
 		#endregion
@@ -58,8 +58,8 @@ namespace AvalonDock.Themes.Controls
 		/// </summary>
 		public Brush Fill
 		{
-			get { return (Brush)GetValue(FillProperty); }
-			set { SetValue(FillProperty, value); }
+			get => (Brush)GetValue(FillProperty);
+			set => SetValue(FillProperty, value);
 		}
 
 		#endregion
@@ -79,8 +79,8 @@ namespace AvalonDock.Themes.Controls
 		/// </summary>
 		public Brush Stroke
 		{
-			get { return (Brush)GetValue(StrokeProperty); }
-			set { SetValue(StrokeProperty, value); }
+			get => (Brush)GetValue(StrokeProperty);
+			set => SetValue(StrokeProperty, value);
 		}
 
 		#endregion
@@ -100,13 +100,11 @@ namespace AvalonDock.Themes.Controls
 		/// </summary>
 		public double BottomBorderMargin
 		{
-			get { return (double)GetValue(BottomBorderMarginProperty); }
-			set { SetValue(BottomBorderMarginProperty, value); }
+			get => (double)GetValue(BottomBorderMarginProperty);
+			set => SetValue(BottomBorderMarginProperty, value);
 		}
 
 		#endregion
-
-
 
 		protected override void OnRender(DrawingContext drawingContext)
 		{

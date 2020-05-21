@@ -55,11 +55,11 @@ namespace Standard
 
 			NativeMethods.RegisterClassEx(ref wc);
 
-			GCHandle gcHandle = default(GCHandle);
+			var gcHandle = default(GCHandle);
 			try
 			{
 				gcHandle = GCHandle.Alloc(this);
-				IntPtr pinnedThisPtr = (IntPtr)gcHandle;
+				var pinnedThisPtr = (IntPtr)gcHandle;
 
 				Handle = NativeMethods.CreateWindowEx(
 					exStyle,
@@ -97,35 +97,22 @@ namespace Standard
 		[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "disposing")]
 		private void _Dispose(bool disposing, bool isHwndBeingDestroyed)
 		{
-			if (_isDisposed)
-			{
-				// Block against reentrancy.
-				return;
-			}
-
+			// Block against reentrancy.
+			if (_isDisposed) return;
 			_isDisposed = true;
-
-			IntPtr hwnd = Handle;
-			string className = _className;
+			var hwnd = Handle;
+			var className = _className;
 
 			if (isHwndBeingDestroyed)
-			{
-				Dispatcher.BeginInvoke(DispatcherPriority.Normal, (DispatcherOperationCallback)(arg => _DestroyWindow(IntPtr.Zero, className)));
-			}
+				Dispatcher.BeginInvoke(DispatcherPriority.Normal, (DispatcherOperationCallback) (arg => _DestroyWindow(IntPtr.Zero, className)));
 			else if (Handle != IntPtr.Zero)
 			{
 				if (CheckAccess())
-				{
 					_DestroyWindow(hwnd, className);
-				}
 				else
-				{
-					Dispatcher.BeginInvoke(DispatcherPriority.Normal, (DispatcherOperationCallback)(arg => _DestroyWindow(hwnd, className)));
-				}
+					Dispatcher.BeginInvoke(DispatcherPriority.Normal, (DispatcherOperationCallback) (arg => _DestroyWindow(hwnd, className)));
 			}
-
 			s_windowLookup.Remove(hwnd);
-
 			_className = null;
 			Handle = IntPtr.Zero;
 		}
@@ -133,34 +120,28 @@ namespace Standard
 		[SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")]
 		private static IntPtr _WndProc(IntPtr hwnd, WM msg, IntPtr wParam, IntPtr lParam)
 		{
-			IntPtr ret = IntPtr.Zero;
+			var ret = IntPtr.Zero;
 			MessageWindow hwndWrapper = null;
 
 			if (msg == WM.CREATE)
 			{
 				var createStruct = (CREATESTRUCT)Marshal.PtrToStructure(lParam, typeof(CREATESTRUCT));
-				GCHandle gcHandle = GCHandle.FromIntPtr(createStruct.lpCreateParams);
+				var gcHandle = GCHandle.FromIntPtr(createStruct.lpCreateParams);
 				hwndWrapper = (MessageWindow)gcHandle.Target;
 				s_windowLookup.Add(hwnd, hwndWrapper);
 			}
 			else
 			{
 				if (!s_windowLookup.TryGetValue(hwnd, out hwndWrapper))
-				{
 					return NativeMethods.DefWindowProc(hwnd, msg, wParam, lParam);
-				}
 			}
 			Assert.IsNotNull(hwndWrapper);
 
-			WndProc callback = hwndWrapper._wndProcCallback;
+			var callback = hwndWrapper._wndProcCallback;
 			if (callback != null)
-			{
 				ret = callback(hwnd, msg, wParam, lParam);
-			}
 			else
-			{
 				ret = NativeMethods.DefWindowProc(hwnd, msg, wParam, lParam);
-			}
 
 			if (msg == WM.NCDESTROY)
 			{

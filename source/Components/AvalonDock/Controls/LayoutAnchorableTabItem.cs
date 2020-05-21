@@ -111,6 +111,14 @@ namespace AvalonDock.Controls
 		protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonDown(e);
+
+			// Start a drag & drop action for a LayoutAnchorable
+			var anchorAble = this.Model as LayoutAnchorable;
+			if (anchorAble != null)
+			{
+				if (anchorAble.CanMove == false) return;
+			}
+
 			_isMouseDown = true;
 			_draggingItem = this;
 		}

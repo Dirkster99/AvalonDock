@@ -257,9 +257,14 @@ namespace AvalonDock.Controls
 					var paneModel = targetModel as LayoutDocumentPane;
 					var layoutDocumentPaneGroup = floatingWindow.RootPanel as LayoutDocumentPaneGroup;
 
+					// A LayoutFloatingDocumentWindow can contain multiple instances of both Anchorables or Documents
+					// and we should drop these back into the DocumentPane if they are available
+					var allowedDropTypes = new[] { typeof(LayoutDocument), typeof(LayoutAnchorable) };
+
 					int i = _tabIndex == -1 ? 0 : _tabIndex;
 					foreach (var anchorableToImport in
-						layoutDocumentPaneGroup.Descendents().OfType<LayoutDocument>().ToArray())
+						layoutDocumentPaneGroup.Descendents().OfType<LayoutContent>()
+							.Where(item => allowedDropTypes.Contains(item.GetType())).ToArray())
 					{
 						paneModel.Children.Insert(i, anchorableToImport);
 						i++;
@@ -269,7 +274,10 @@ namespace AvalonDock.Controls
 				#endregion DropTargetType.DocumentPaneDockInside
 			}
 
-			documentActive.IsActive = true;
+			if (documentActive != null)
+			{
+				documentActive.IsActive = true;
+			}
 
 			base.Drop(floatingWindow);
 		}

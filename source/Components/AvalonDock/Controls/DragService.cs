@@ -46,7 +46,10 @@ namespace AvalonDock.Controls
 		#region fields
 		private DockingManager _manager;
 		private LayoutFloatingWindowControl _floatingWindow;
+
+		// A list of hosts that can display an overlaywindow and offer a drop target (docking position)
 		private List<IOverlayWindowHost> _overlayWindowHosts = new List<IOverlayWindowHost>();
+
 		private IOverlayWindowHost _currentHost;
 		private IOverlayWindow _currentWindow;
 		private List<IDropArea> _currentWindowAreas = new List<IDropArea>();
@@ -55,10 +58,10 @@ namespace AvalonDock.Controls
 
 		#region Constructors
 		/// <summary>
-		/// Class constructor from <see cref="LayoutFloatingWindow"/> control that is using this
+		/// Class constructor from <see cref="LayoutFloatingWindowControl"/> that is using this
 		/// service to implement its drag and drop (dock) behavior.
 		/// </summary>
-		/// <param name="floatingWindow"></param>
+		/// <param name="floatingWindow">Floating window manipulated by this drag service.</param>
 		public DragService(LayoutFloatingWindowControl floatingWindow)
 		{
 			_floatingWindow = floatingWindow;
