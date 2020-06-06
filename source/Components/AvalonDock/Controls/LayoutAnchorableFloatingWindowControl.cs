@@ -80,6 +80,9 @@ namespace AvalonDock.Controls
 
 		#region Properties
 
+		/// <inheritdoc />
+		public override ILayoutElement Model => _model;
+
 		#region SingleContentLayoutItem
 
 		/// <summary><see cref="SingleContentLayoutItem"/> dependency property.</summary>
@@ -176,10 +179,6 @@ namespace AvalonDock.Controls
 		#endregion Public Methods
 
 		#region Overrides
-
-		/// <inheritdoc />
-		public override ILayoutElement Model => _model;
-
 		/// <inheritdoc />
 		protected override void OnInitialized(EventArgs e)
 		{

@@ -356,6 +356,7 @@ namespace AvalonDock.Controls
 				{
 					case DropAreaType.DockingManager:
 						{
+							// Dragging over DockingManager -> Add DropTarget Area
 							var dropAreaDockingManager = visibleArea as DropArea<DockingManager>;
 							yield return new DockingManagerDropTarget(dropAreaDockingManager.AreaElement, _dockingManagerDropTargetLeft.GetScreenArea(), DropTargetType.DockingManagerDockLeft);
 							yield return new DockingManagerDropTarget(dropAreaDockingManager.AreaElement, _dockingManagerDropTargetTop.GetScreenArea(), DropTargetType.DockingManagerDockTop);
@@ -365,6 +366,7 @@ namespace AvalonDock.Controls
 						break;
 					case DropAreaType.AnchorablePane:
 						{
+							// Dragging over AnchorablePane -> Add DropTarget Area
 							var dropAreaAnchorablePane = visibleArea as DropArea<LayoutAnchorablePaneControl>;
 							yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetLeft.GetScreenArea(), DropTargetType.AnchorablePaneDockLeft);
 							yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetTop.GetScreenArea(), DropTargetType.AnchorablePaneDockTop);
@@ -399,6 +401,7 @@ namespace AvalonDock.Controls
 						break;
 					case DropAreaType.DocumentPane:
 						{
+							// Dragging over DocumentPane -> Add DropTarget Area
 							bool isDraggingAnchorables = _floatingWindow.Model is LayoutAnchorableFloatingWindow;
 							if (isDraggingAnchorables && _gridDocumentPaneFullDropTargets != null)
 							{
@@ -483,6 +486,7 @@ namespace AvalonDock.Controls
 						break;
 					case DropAreaType.DocumentPaneGroup:
 						{
+							// Dragging over DocumentPaneGroup -> Add DropTarget Area
 							var dropAreaDocumentPane = visibleArea as DropArea<LayoutDocumentPaneGroupControl>;
 							if (_documentPaneDropTargetInto.IsVisible)
 								yield return new DocumentPaneGroupDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetInto.GetScreenArea(), DropTargetType.DocumentPaneGroupDockInside);

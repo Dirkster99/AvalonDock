@@ -548,10 +548,10 @@ namespace AvalonDock.Layout
 				return;
 			}
 
-			var layoutPanelElements = ReadRootPanel(reader, out var orientation);
+			var layoutPanelElements = ReadRootPanel(reader, out var orientation, out var canDock);
 			if (layoutPanelElements != null)
 			{
-				RootPanel = new LayoutPanel { Orientation = orientation };
+				RootPanel = new LayoutPanel { Orientation = orientation, CanDock = canDock };
 				//Add all children to RootPanel
 				foreach (var panel in layoutPanelElements) RootPanel.Children.Add(panel);
 			}
@@ -786,9 +786,20 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		private List<ILayoutPanelElement> ReadRootPanel(XmlReader reader, out Orientation orientation)
+		/// <summary>
+		/// Reads all properties of the <see cref="LayoutPanel"/> and returns them.
+		/// </summary>
+		/// <param name="reader"></param>
+		/// <param name="orientation"></param>
+		/// <param name="canDock"></param>
+		/// <returns></returns>
+		private List<ILayoutPanelElement> ReadRootPanel(XmlReader reader
+			, out Orientation orientation
+			, out bool canDock)
 		{
 			orientation = Orientation.Horizontal;
+			canDock = true;
+
 			var result = new List<ILayoutPanelElement>();
 			var startElementName = reader.LocalName;
 			reader.Read();
@@ -799,6 +810,11 @@ namespace AvalonDock.Layout
 			if (reader.LocalName.Equals(nameof(RootPanel)))
 			{
 				orientation = (Orientation)Enum.Parse(typeof(Orientation),reader.GetAttribute(nameof(Orientation)), true);
+
+				var canDockStr = reader.GetAttribute("CanDock");
+				if (canDockStr != null)
+					canDock = bool.Parse(canDockStr);
+
 				reader.Read();
 				while (true)
 				{
