@@ -26,7 +26,9 @@ namespace AvalonDock.Layout
 
 		#region Properties
 
-		/// <summary>Gets/sets whether a document can be dragged (to be dropped in a different location) or not. Use this property in conjunction with <see cref="CanMove"/> and <see cref="CanClose"/> to lock a document in its layout position.</summary>
+		/// <summary>Gets/sets whether a document can be dragged (to be dropped in a different location) or not.
+		/// Use this property in conjunction with <see cref="CanMove"/> and <see cref="CanClose"/> and <see cref="LayoutPanel.CanDock"/>
+		/// to lock a document in its layout position.</summary>
 		public bool CanMove
 		{
 			get => _canMove;

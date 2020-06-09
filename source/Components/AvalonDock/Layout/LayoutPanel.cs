@@ -11,6 +11,7 @@ using System;
 using System.Linq;
 using System.Windows.Markup;
 using System.Windows.Controls;
+using System.Windows;
 
 namespace AvalonDock.Layout
 {
@@ -52,6 +53,32 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		#region CanDock
+		/// <summary>
+		/// Using a DependencyProperty as the backing store for thhe <see cref="CanDock"/> property.
+		/// </summary>
+		public static readonly DependencyProperty CanDockProperty =
+			DependencyProperty.Register("CanDock", typeof(bool),
+				typeof(LayoutPanel), new PropertyMetadata(true));
+
+		/// <summary>
+		/// Gets/sets dependency property that determines whether docking of dragged items
+		/// is enabled or not. This property can be used disable/enable docking of
+		/// dragged FloatingWindowControls.
+		/// 
+		/// This property should only be set to false if:
+		/// <see cref="LayoutAnchorable.CanMove"/> and <see cref="LayoutDocument.CanMove"/>
+		/// are false since users will otherwise be able to:
+		/// 1) Drag an item away
+		/// 2) But won't be able to dock it agin.
+		/// </summary>
+		public bool CanDock
+		{
+			get { return (bool)GetValue(CanDockProperty); }
+			set { SetValue(CanDockProperty, value); }
+		}
+		#endregion CanDock
+
 		#endregion Properties
 
 		#region Overrides
@@ -63,14 +90,28 @@ namespace AvalonDock.Layout
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{
 			writer.WriteAttributeString(nameof(Orientation), Orientation.ToString());
+
+			if (CanDock == false)
+				writer.WriteAttributeString(nameof(CanDock), CanDock.ToString());
+			
 			base.WriteXml(writer);
 		}
 
 		/// <inheritdoc />
+		/// <summary>
+		/// This method is never invoked - <see cref="LayoutRoot"/>.ReadRootPanel()
+		/// for implementation of this reader.
+		/// </summary>
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
 			if (reader.MoveToAttribute(nameof(Orientation)))
 				Orientation = (Orientation)Enum.Parse(typeof(Orientation), reader.Value, true);
+			if (reader.MoveToAttribute(nameof(CanDock)))
+			{
+				var canDockStr = reader.GetAttribute("CanDock");
+				if (canDockStr != null)
+					CanDock = bool.Parse(canDockStr);
+			}
 			base.ReadXml(reader);
 		}
 
