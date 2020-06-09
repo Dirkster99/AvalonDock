@@ -122,6 +122,9 @@ to also theme standard elements, such as, button and textblock etc.
 ## Fixes & Features in master but not relased, yet
 - [#136 Layout "locking" method for Anchorables (tool windows) Part II via Style of LayoutAnchorableItem](https://github.com/Dirkster99/AvalonDock/issues/136)
 
+- [#136 Layout "locking" method for Anchorables (tool windows) Part III Added CanDock for LayoutAnchorable and LayoutDocument](https://github.com/Dirkster99/AvalonDock/issues/136)
+    [commit 6b611fa7fdce4f6dcfed1cf00c3b9193000ffe16](https://github.com/Dirkster99/AvalonDock/commit/6b611fa7fdce4f6dcfed1cf00c3b9193000ffe16)
+
 ## Fixes & Features  added in Version 4.2
 
 - [#136 Layout "locking" method for Anchorables (tool windows)](https://github.com/Dirkster99/AvalonDock/issues/136)
