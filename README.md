@@ -120,6 +120,9 @@ to also theme standard elements, such as, button and textblock etc.
 # Mile Stone History
 
 ## Fixes & Features in master but not relased, yet
+
+- [#59 InvalidOperationException when deserializing layout](https://github.com/Dirkster99/AvalonDock/issues/59#issuecomment-642934204)
+
 - [#136 Layout "locking" method for Anchorables (tool windows) Part II via Style of LayoutAnchorableItem](https://github.com/Dirkster99/AvalonDock/issues/136)
 
 - [#136 Layout "locking" method for Anchorables (tool windows) Part III Added CanDock for LayoutAnchorable and LayoutDocument](https://github.com/Dirkster99/AvalonDock/issues/136)
