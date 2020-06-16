@@ -2343,7 +2343,7 @@ namespace AvalonDock
 		private void Layout_ElementAdded(object sender, LayoutElementEventArgs e)
 		{
 			if (_suspendLayoutItemCreation) return;
-			foreach (var content in Layout.Descendents().OfType<LayoutContent>())
+			foreach (var content in Layout.Descendents().OfType<LayoutContent>().ToList())
 			{
 				if (content is LayoutDocument)
 					CreateDocumentLayoutItem(content as LayoutDocument);
