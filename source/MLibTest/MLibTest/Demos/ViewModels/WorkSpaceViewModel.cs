@@ -106,6 +106,8 @@
 		private Tool3_ViewModel _Tool3;
 
 		private DocumentViewModel _activeDocument = null;
+
+		private int _newDocumentCounter = 0;
 		#endregion fields
 
 		#region constructors
@@ -165,6 +167,13 @@
 
 				return _tools;
 			}
+		}
+
+		/// <summary>Closing all documents without user interaction to support reload of layout via menu.</summary>
+		public void CloseAllDocuments()
+		{
+			ActiveDocument = null;
+			_files.Clear();
 		}
 
 		/// <summary>
@@ -359,7 +368,7 @@
 			if (fileViewModel != null)
 				return fileViewModel;
 
-			fileViewModel = new DocumentViewModel(this as IWorkSpaceViewModel, filepath);
+			fileViewModel = new DocumentViewModel(this as IWorkSpaceViewModel, filepath, true);
 			bool result = await fileViewModel.OpenFileAsync(filepath);
 
 			if (result)
@@ -385,8 +394,11 @@
 
 		private void OnNew(object parameter)
 		{
-			_files.Add(new DocumentViewModel(this as IWorkSpaceViewModel));
-			ActiveDocument = _files.Last();
+			string path = string.Format("Untitled{0}.txt", _newDocumentCounter++);
+
+			var newFile = new DocumentViewModel(this as IWorkSpaceViewModel, path, false);
+			_files.Add(newFile);
+			ActiveDocument = newFile;
 		}
 
 		#endregion

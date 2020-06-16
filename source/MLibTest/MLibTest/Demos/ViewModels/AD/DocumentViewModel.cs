@@ -24,6 +24,7 @@
 
 		private string _initialPath;
 		private bool _isInitialized;
+		private bool _IsExistingInFileSystem;
 		#endregion fields
 
 		#region ctors
@@ -33,11 +34,20 @@
 		/// <param name="workSpaceViewModel"></param>
 		/// <param name="initialPath"></param>
 		public DocumentViewModel(IWorkSpaceViewModel workSpaceViewModel,
-								string initialPath)
+								string initialPath,
+								bool isExistingInFileSystem)
 			: this(workSpaceViewModel)
 		{
 			_initialPath = initialPath;
+
+			try
+			{
+				Title = System.IO.Path.GetFileName(initialPath);
+			}
+			catch { }
+
 			ContentId = initialPath;
+			_IsExistingInFileSystem = isExistingInFileSystem;
 		}
 
 		/// <summary>
@@ -63,9 +73,7 @@
 		#endregion ctors
 
 		#region Properties
-		/// <summary>
-		/// Gets the current path of the file being managed in this document viewmodel.
-		/// </summary>
+		/// <summary>Gets the current path of the file being managed in this document viewmodel.</summary>
 		public string FilePath
 		{
 			get => _filePath;
@@ -81,9 +89,7 @@
 			}
 		}
 
-		/// <summary>
-		/// Gets the current filename of the file being managed in this document viewmodel.
-		/// </summary>
+		/// <summary>Gets the current filename of the file being managed in this document viewmodel.</summary>
 		public string FileName
 		{
 			get
@@ -95,9 +101,7 @@
 			}
 		}
 
-		/// <summary>
-		/// Gets/sets the text content being managed in this document viewmodel.
-		/// </summary>
+		/// <summary>Gets/sets the text content being managed in this document viewmodel.</summary>
 		public string TextContent
 		{
 			get => _textContent;
@@ -112,9 +116,7 @@
 			}
 		}
 
-		/// <summary>
-		/// Gets/sets whether the documents content has been changed without saving into file system or not.
-		/// </summary>
+		/// <summary>Gets/sets whether the documents content has been changed without saving into file system or not.</summary>
 		public bool IsDirty
 		{
 			get => _isDirty;
@@ -129,9 +131,21 @@
 			}
 		}
 
-		/// <summary>
-		/// Gets a command to save this document's content into the file system.
-		/// </summary>
+		/// <summary>Gets/sets whether the documents content has been changed without saving into file system or not.</summary>
+		public bool IsExistingInFileSystem
+		{
+			get => _IsExistingInFileSystem;
+			set
+			{
+				if (_IsExistingInFileSystem != value)
+				{
+					_IsExistingInFileSystem = value;
+					RaisePropertyChanged(nameof(IsExistingInFileSystem));
+				}
+			}
+		}
+
+		/// <summary>Gets a command to save this document's content into the file system.</summary>
 		public ICommand SaveCommand
 		{
 			get
@@ -145,9 +159,7 @@
 			}
 		}
 
-		/// <summary>
-		/// Gets a command to save this document's content into another file in the file system.
-		/// </summary>
+		/// <summary>Gets a command to save this document's content into another file in the file system.</summary>
 		public ICommand SaveAsCommand
 		{
 			get
@@ -159,9 +171,7 @@
 			}
 		}
 
-		/// <summary>
-		/// Gets a command to close this document.
-		/// </summary>
+		/// <summary>Gets a command to close this document.</summary>
 		public ICommand CloseCommand
 		{
 			get
@@ -186,7 +196,7 @@
 			if (string.IsNullOrEmpty(_initialPath) && _isInitialized == false)
 				return false;
 
-			if (_isInitialized)
+			if (_isInitialized || _IsExistingInFileSystem == false)
 				return true;
 
 			bool result = await OpenFileAsync(_initialPath);

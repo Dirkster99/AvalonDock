@@ -178,6 +178,12 @@
 						}
 			***/
 		}
+
+		/// <summary>Closing all documents without user interaction to support reload of layout via menu.</summary>
+		internal void CloseAllDocuments()
+		{
+			_AD_WorkSpace.CloseAllDocuments();
+		}
 		#endregion Get/set Session Application Data
 
 		/// <summary>

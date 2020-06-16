@@ -12,24 +12,16 @@
     /// </summary>
     internal interface IWorkSpaceViewModel
 	{
-		/// <summary>
-		/// Event is raised when AvalonDock (or the user) selects a new document.
-		/// </summary>
+		/// <summary>Event is raised when AvalonDock (or the user) selects a new document.</summary>
 		event EventHandler ActiveDocumentChanged;
 
-		/// <summary>
-		/// Gets/sets the currently active document.
-		/// </summary>
+		/// <summary>Gets/sets the currently active document.</summary>
 		DocumentViewModel ActiveDocument { get; set; }
 
-		/// <summary>
-		/// Gets an enumeration of all currently available tool window viewmodels.
-		/// </summary>
+		/// <summary>Gets an enumeration of all currently available tool window viewmodels.</summary>
 		IEnumerable<ToolViewModel> Tools { get; }
 
-		/// <summary>
-		/// Gets an enumeration of all currently available document viewmodels.
-		/// </summary>
+		/// <summary>Gets an enumeration of all currently available document viewmodels.</summary>
 		IEnumerable<DocumentViewModel> Files { get; }
 
 		#region methods
@@ -59,6 +51,9 @@
 		/// <param name="filepath"></param>
 		/// <returns></returns>
 		Task<DocumentViewModel> OpenAsync(string filepath);
+
+		/// <summary>Closing all documents without user interaction to support reload of layout via menu.</summary>
+		void CloseAllDocuments();
 		#endregion methods
 	}
 }

@@ -11,6 +11,7 @@
 	using System.Windows.Input;
 	using AvalonDock.Layout.Serialization;
 	using MLibTest.Demos.ViewModels.AD;
+	using MLibTest.Demos.ViewModels;
 
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
@@ -107,10 +108,25 @@
 									return;
 								}
 
-								// Its not a tool window -> So, this could rever to a document then
+								// Its not a tool window -> So, this could refer to a document then
 								if (!string.IsNullOrWhiteSpace(e.Model.ContentId))
 								{
-									DocumentViewModel vm = new DocumentViewModel(workSpace, e.Model.ContentId);
+									try
+									{
+										// Do not re-open files that are non-existing
+										if (System.IO.File.Exists(e.Model.ContentId) == false)
+										{
+											e.Cancel = true;
+											return;
+										}
+									}
+									catch
+									{
+										e.Cancel = true;
+										return;
+									}
+
+									DocumentViewModel vm = new DocumentViewModel(workSpace, e.Model.ContentId, true);
 
 									if (vm != null)
 									{
@@ -154,6 +170,11 @@
 
 		internal async void OnLoadLayoutAsync(object parameter = null)
 		{
+			AppViewModel wspace = this.DataContext as AppViewModel;
+			
+			if (wspace != null)
+				wspace.CloseAllDocuments();
+
 			App myApp = (App)Application.Current;
 
 			LayoutLoaderResult LoaderResult = await myApp.LayoutLoaded.GetLayoutString(OnLayoutLoaded_Event);
