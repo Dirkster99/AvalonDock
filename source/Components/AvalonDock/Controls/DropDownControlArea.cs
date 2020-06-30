@@ -21,8 +21,8 @@ namespace AvalonDock.Controls
 	/// 
 	/// The content is usually displayed via ContentPresenter binding in the theme definition.
 	/// </summary>
-	/// <seealso cref="UserControl"/>
-	public class DropDownControlArea : UserControl
+	/// <seealso cref="ContentControl"/>
+	public class DropDownControlArea : ContentControl
 	{
 		#region Properties
 

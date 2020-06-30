@@ -68,7 +68,7 @@
             IsVirtualizingAnchorable="True"
             IsVirtualizingDocument="True">
             <avalonDock:DockingManager.Theme>
-                <avalonDock:Vs2013BlueTheme />
+                <avalonDock:Vs2013DarkTheme />
             </avalonDock:DockingManager.Theme>
             <avalonDock:DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
