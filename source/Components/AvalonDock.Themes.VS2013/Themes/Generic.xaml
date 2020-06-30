@@ -232,15 +232,13 @@
                                         </avalonDockControls:ContextMenuEx.ItemContainerStyle>
                                     </avalonDockControls:ContextMenuEx>
                                 </avalonDockControls:DropDownButton.DropDownContextMenu>
-                                <Rectangle
+                                <Path
                                     x:Name="MenuDropDownButtonImage"
                                     Width="12"
                                     Height="12"
-                                    Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellOverflowButtonDefaultGlyph}}">
-                                    <Rectangle.OpacityMask>
-                                        <ImageBrush ImageSource="/AvalonDock.Themes.VS2013;component/Images/PinDocMenu.png" />
-                                    </Rectangle.OpacityMask>
-                                </Rectangle>
+                                    Data="{DynamicResource PinDocMenu}"
+                                    Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellOverflowButtonDefaultGlyph}}"
+                                    Stretch="Uniform" />
                             </avalonDockControls:DropDownButton>
                         </Grid>
                         <Border
@@ -623,15 +621,13 @@
                                 Focusable="False"
                                 Style="{StaticResource AvalonDockThemeVs2013ToolButtonStyle}"
                                 ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_CxMenu_Hint}">
-                                <Rectangle
+                                <Path
                                     x:Name="PART_ImgMenuPin"
                                     Width="13"
                                     Height="13"
-                                    Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}">
-                                    <Rectangle.OpacityMask>
-                                        <ImageBrush ImageSource="/AvalonDock.Themes.VS2013;component/Images/PinMenu.png" />
-                                    </Rectangle.OpacityMask>
-                                </Rectangle>
+                                    Data="{DynamicResource PinMenu}"
+                                    Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
+                                    Stretch="Uniform" />
                             </avalonDockControls:DropDownButton>
 
                             <Button
@@ -664,8 +660,9 @@
                                 Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <Path
                                     x:Name="PART_ImgHidePin"
-                                    Width="13"
-                                    Height="13"
+                                    Width="12"
+                                    Height="12"
+                                    VerticalAlignment="Center"
                                     Data="{DynamicResource PinClose}"
                                     Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
                                     Stretch="Uniform" />
@@ -1465,14 +1462,14 @@
                                     Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                     ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
                                     Visibility="Hidden">
-                                    <Rectangle
+                                    <Path
                                         x:Name="PART_ImgPinClose"
-                                        Width="13"
-                                        Height="13">
-                                        <Rectangle.OpacityMask>
-                                            <ImageBrush ImageSource="/AvalonDock.Themes.VS2013;component/Images/PinClose.png" />
-                                        </Rectangle.OpacityMask>
-                                    </Rectangle>
+                                        Width="12"
+                                        Height="12"
+                                        VerticalAlignment="Center"
+                                        Data="{DynamicResource PinClose}"
+                                        Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
+                                        Stretch="Uniform" />
                                 </Button>
                             </Grid>
                         </Border>
@@ -1743,15 +1740,14 @@
                                             Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
                                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                                            <Rectangle
+                                            <Path
                                                 x:Name="PART_ImgPinMaximize"
-                                                Width="13"
-                                                Height="13"
-                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}">
-                                                <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="/AvalonDock.Themes.VS2013;component/Images/PinMaximize.png" />
-                                                </Rectangle.OpacityMask>
-                                            </Rectangle>
+                                                Width="12"
+                                                Height="12"
+                                                VerticalAlignment="Center"
+                                                Data="{DynamicResource PinMaximize}"
+                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
+                                                Stretch="Uniform" />
                                         </Button>
 
                                         <Button
@@ -1766,15 +1762,14 @@
                                             Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
                                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}">
-                                            <Rectangle
+                                            <Path
                                                 x:Name="PART_ImgPinRestore"
                                                 Width="13"
                                                 Height="13"
-                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}">
-                                                <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="/AvalonDock.Themes.VS2013;component/Images/PinRestore.png" />
-                                                </Rectangle.OpacityMask>
-                                            </Rectangle>
+                                                VerticalAlignment="Center"
+                                                Data="{DynamicResource PinRestore}"
+                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
+                                                Stretch="Uniform" />
                                         </Button>
 
                                         <Button
@@ -1788,15 +1783,14 @@
                                             Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
                                             Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                            <Rectangle
+                                            <Path
                                                 x:Name="PART_ImgPinClose"
-                                                Width="13"
-                                                Height="13"
-                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}">
-                                                <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="/AvalonDock.Themes.VS2013;component/Images/PinClose.png" />
-                                                </Rectangle.OpacityMask>
-                                            </Rectangle>
+                                                Width="12"
+                                                Height="12"
+                                                VerticalAlignment="Center"
+                                                Data="{DynamicResource PinClose}"
+                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
+                                                Stretch="Uniform" />
                                         </Button>
                                     </Grid>
                                 </Border>
@@ -2012,15 +2006,13 @@
                                             Style="{StaticResource AvalonDockThemeVs2013ToolButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_CxMenu_Hint}"
                                             Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}">
-                                            <Rectangle
+                                            <Path
                                                 x:Name="PART_ImgPinMenu"
                                                 Width="13"
                                                 Height="13"
-                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}">
-                                                <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="/AvalonDock.Themes.VS2013;component/Images/PinMenu.png" />
-                                                </Rectangle.OpacityMask>
-                                            </Rectangle>
+                                                Data="{DynamicResource PinMenu}"
+                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
+                                                Stretch="Uniform" />
                                         </avalonDockControls:DropDownButton>
 
                                         <Button
@@ -2037,15 +2029,14 @@
                                             Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
                                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                                            <Rectangle
+                                            <Path
                                                 x:Name="PART_ImgPinMaximize"
-                                                Width="13"
-                                                Height="13"
-                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}">
-                                                <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="/AvalonDock.Themes.VS2013;component/Images/PinMaximize.png" />
-                                                </Rectangle.OpacityMask>
-                                            </Rectangle>
+                                                Width="12"
+                                                Height="12"
+                                                VerticalAlignment="Center"
+                                                Data="{DynamicResource PinMaximize}"
+                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
+                                                Stretch="Uniform" />
                                         </Button>
 
                                         <Button
@@ -2060,15 +2051,14 @@
                                             Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
                                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}">
-                                            <Rectangle
+                                            <Path
                                                 x:Name="PART_ImgPinRestore"
                                                 Width="13"
                                                 Height="13"
-                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}">
-                                                <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="/AvalonDock.Themes.VS2013;component/Images/PinRestore.png" />
-                                                </Rectangle.OpacityMask>
-                                            </Rectangle>
+                                                VerticalAlignment="Center"
+                                                Data="{DynamicResource PinRestore}"
+                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
+                                                Stretch="Uniform" />
                                         </Button>
 
                                         <Button
@@ -2082,15 +2072,14 @@
                                             Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}"
                                             Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                            <Rectangle
+                                            <Path
                                                 x:Name="PART_ImgPinClose"
-                                                Width="13"
-                                                Height="13"
-                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}">
-                                                <Rectangle.OpacityMask>
-                                                    <ImageBrush ImageSource="/AvalonDock.Themes.VS2013;component/Images/PinClose.png" />
-                                                </Rectangle.OpacityMask>
-                                            </Rectangle>
+                                                Width="12"
+                                                Height="12"
+                                                VerticalAlignment="Center"
+                                                Data="{DynamicResource PinClose}"
+                                                Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
+                                                Stretch="Uniform" />
                                         </Button>
                                     </Grid>
                                 </Border>
