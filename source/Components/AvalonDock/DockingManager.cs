@@ -882,7 +882,7 @@ namespace AvalonDock
 		/// </summary>
 		public static readonly DependencyProperty AutoHideDelayProperty =
 			DependencyProperty.Register("AutoHideDelay", typeof(int), typeof(DockingManager),
-										new UIPropertyMetadata(0));
+										new UIPropertyMetadata(500));
 
 		/// <summary>
 		/// Gets/sets the wait time in milliseconds that is applicable when the system AutoHides
