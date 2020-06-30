@@ -21,6 +21,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/AvalonDock.Themes.VS2013;component/OverlayButtons.xaml" />
         <ResourceDictionary Source="/AvalonDock.Themes.VS2013;component/Themes/Menu/MenuItem.xaml" />
+        <ResourceDictionary Source="/AvalonDock.Themes.VS2013;component/Themes/Icons/IconGeometry.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <avalonDockConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
@@ -643,15 +644,13 @@
                                 Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                 ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnAutoHide_Hint}"
                                 Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <Rectangle
+                                <Path
                                     x:Name="PART_ImgAutoHidePin"
                                     Width="13"
                                     Height="13"
-                                    Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}">
-                                    <Rectangle.OpacityMask>
-                                        <ImageBrush ImageSource="/AvalonDock.Themes.VS2013;component/Images/PinAutoHide.png" />
-                                    </Rectangle.OpacityMask>
-                                </Rectangle>
+                                    Data="{DynamicResource PinAutoHide}"
+                                    Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
+                                    Stretch="Uniform" />
                             </Button>
                             <Button
                                 x:Name="PART_HidePin"
@@ -663,15 +662,13 @@
                                 Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                 ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}"
                                 Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                                <Rectangle
+                                <Path
                                     x:Name="PART_ImgHidePin"
                                     Width="13"
                                     Height="13"
-                                    Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}">
-                                    <Rectangle.OpacityMask>
-                                        <ImageBrush ImageSource="/AvalonDock.Themes.VS2013;component/Images/PinClose.png" />
-                                    </Rectangle.OpacityMask>
-                                </Rectangle>
+                                    Data="{DynamicResource PinClose}"
+                                    Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
+                                    Stretch="Uniform" />
                             </Button>
 
                         </Grid>
@@ -951,39 +948,15 @@
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
 
-                                    <Border
+                                    <Path
                                         Grid.Row="1"
                                         Grid.Column="1"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderThickness="0" />
-
-                                    <Border
-                                        Grid.Row="0"
-                                        Grid.Column="1"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
-                                        BorderThickness="2,2,2,0" />
-
-                                    <Border
-                                        Grid.Row="1"
-                                        Grid.Column="0"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
-                                        BorderThickness="2,2,0,2" />
-
-                                    <Border
-                                        Grid.Row="1"
-                                        Grid.Column="2"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
-                                        BorderThickness="0,2,2,2" />
-
-                                    <Border
-                                        Grid.Row="2"
-                                        Grid.Column="1"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
-                                        BorderThickness="2,0,2,2" />
+                                        Height="120"
+                                        Data="{DynamicResource DockPaneEmpty}"
+                                        Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                        Stretch="Uniform"
+                                        Stroke="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                        StrokeThickness="2" />
                                 </Grid>
 
                                 <!--  Inner 5 buttons of star shapped control  -->
@@ -1072,51 +1045,15 @@
 
                                 <!--  Gray Star Background  -->
                                 <Grid Grid.RowSpan="3" Grid.ColumnSpan="3">
-
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition />
-                                        <ColumnDefinition />
-                                        <ColumnDefinition />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-
-                                    <Border
+                                    <Path
                                         Grid.Row="1"
                                         Grid.Column="1"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderThickness="0" />
-
-                                    <Border
-                                        Grid.Row="0"
-                                        Grid.Column="1"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
-                                        BorderThickness="2,2,2,0" />
-
-                                    <Border
-                                        Grid.Row="1"
-                                        Grid.Column="0"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
-                                        BorderThickness="2,2,0,2" />
-
-                                    <Border
-                                        Grid.Row="1"
-                                        Grid.Column="2"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
-                                        BorderThickness="0,2,2,2" />
-
-                                    <Border
-                                        Grid.Row="2"
-                                        Grid.Column="1"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
-                                        BorderThickness="2,0,2,2" />
+                                        Height="120"
+                                        Data="{DynamicResource DockPaneEmpty}"
+                                        Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                        Stretch="Uniform"
+                                        Stroke="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                        StrokeThickness="2" />
                                 </Grid>
 
                                 <!--  Inner 5 buttons of star shapped control  -->
@@ -1224,43 +1161,17 @@
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
 
-                                    <Border
-                                        Grid.Row="2"
-                                        Grid.Column="2"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderThickness="0" />
-
-                                    <Border
-                                        Grid.Row="0"
-                                        Grid.RowSpan="2"
-                                        Grid.Column="2"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
-                                        BorderThickness="2,2,2,0" />
-
-                                    <Border
-                                        Grid.Row="2"
-                                        Grid.Column="0"
-                                        Grid.ColumnSpan="2"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
-                                        BorderThickness="2,2,0,2" />
-
-                                    <Border
-                                        Grid.Row="2"
-                                        Grid.Column="3"
-                                        Grid.ColumnSpan="2"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
-                                        BorderThickness="0,2,2,2" />
-
-                                    <Border
-                                        Grid.Row="3"
-                                        Grid.RowSpan="2"
-                                        Grid.Column="2"
-                                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
-                                        BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
-                                        BorderThickness="2,0,2,2" />
+                                    <Path
+                                        Grid.Row="1"
+                                        Grid.RowSpan="3"
+                                        Grid.Column="1"
+                                        Grid.ColumnSpan="3"
+                                        Width="210"
+                                        Data="{DynamicResource DockPaneLargeEmpty}"
+                                        Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
+                                        Stretch="Uniform"
+                                        Stroke="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBorderBrushKey}}"
+                                        StrokeThickness="2" />
                                 </Grid>
 
                                 <!--  Inner 5 buttons of star shapped control  -->
