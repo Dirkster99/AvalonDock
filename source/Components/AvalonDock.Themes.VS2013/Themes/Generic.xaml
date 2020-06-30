@@ -234,8 +234,10 @@
                                 </avalonDockControls:DropDownButton.DropDownContextMenu>
                                 <Path
                                     x:Name="MenuDropDownButtonImage"
-                                    Width="12"
-                                    Height="12"
+                                    Width="10"
+                                    Height="10"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
                                     Data="{DynamicResource PinDocMenu}"
                                     Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellOverflowButtonDefaultGlyph}}"
                                     Stretch="Uniform" />
@@ -616,6 +618,7 @@
                             <avalonDockControls:DropDownButton
                                 x:Name="MenuDropDownButton"
                                 Grid.Column="2"
+                                Margin="2,0"
                                 VerticalAlignment="Center"
                                 DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
                                 DropDownContextMenuDataContext="{Binding Path=LayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
@@ -624,7 +627,7 @@
                                 ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_CxMenu_Hint}">
                                 <Path
                                     x:Name="PART_ImgMenuPin"
-                                    Width="13"
+                                    Width="10"
                                     Height="13"
                                     Data="{DynamicResource PinMenu}"
                                     Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
@@ -634,6 +637,7 @@
                             <Button
                                 x:Name="PART_AutoHidePin"
                                 Grid.Column="3"
+                                Margin="2,0"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Command="{Binding Path=LayoutItem.AutoHideCommand, RelativeSource={RelativeSource TemplatedParent}}"
@@ -643,7 +647,7 @@
                                 Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <Path
                                     x:Name="PART_ImgAutoHidePin"
-                                    Width="13"
+                                    Width="10"
                                     Height="13"
                                     Data="{DynamicResource PinAutoHide}"
                                     Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
@@ -652,6 +656,7 @@
                             <Button
                                 x:Name="PART_HidePin"
                                 Grid.Column="4"
+                                Margin="2,0"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Command="{Binding Path=LayoutItem.HideCommand, RelativeSource={RelativeSource TemplatedParent}}"
@@ -661,8 +666,8 @@
                                 Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <Path
                                     x:Name="PART_ImgHidePin"
-                                    Width="12"
-                                    Height="12"
+                                    Width="10"
+                                    Height="10"
                                     VerticalAlignment="Center"
                                     Data="{DynamicResource PinClose}"
                                     Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
@@ -861,6 +866,7 @@
                                 x:Name="PART_DockingManagerDropTargetLeft"
                                 Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
                                 Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
+                                Margin="10"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
                                 HorizontalContentAlignment="Stretch"
@@ -873,6 +879,7 @@
                                 x:Name="PART_DockingManagerDropTargetRight"
                                 Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
                                 Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
+                                Margin="10"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
                                 HorizontalContentAlignment="Stretch"
@@ -885,6 +892,7 @@
                                 x:Name="PART_DockingManagerDropTargetBottom"
                                 Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
                                 Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
+                                Margin="10"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Bottom"
                                 HorizontalContentAlignment="Stretch"
@@ -897,6 +905,7 @@
                                 x:Name="PART_DockingManagerDropTargetTop"
                                 Width="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonWidthKey}}"
                                 Height="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonHeightKey}}"
+                                Margin="10"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Top"
                                 HorizontalContentAlignment="Stretch"
@@ -1384,8 +1393,8 @@
                                     Visibility="Hidden">
                                     <Path
                                         x:Name="PART_ImgPinClose"
-                                        Width="12"
-                                        Height="12"
+                                        Width="10"
+                                        Height="10"
                                         VerticalAlignment="Center"
                                         Data="{DynamicResource PinClose}"
                                         Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
@@ -1921,6 +1930,7 @@
                                         <avalonDockControls:DropDownButton
                                             x:Name="SinglePaneContextMenu"
                                             Grid.Column="1"
+                                            Margin="2,0"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
                                             HorizontalContentAlignment="Center"
@@ -1934,8 +1944,8 @@
                                             Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}">
                                             <Path
                                                 x:Name="PART_ImgPinMenu"
-                                                Width="13"
-                                                Height="13"
+                                                Width="11"
+                                                Height="11"
                                                 Data="{DynamicResource PinMenu}"
                                                 Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
                                                 Stretch="Uniform" />
@@ -1944,6 +1954,7 @@
                                         <Button
                                             x:Name="PART_PinMaximize"
                                             Grid.Column="2"
+                                            Margin="2,0"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
                                             HorizontalContentAlignment="Center"
@@ -1957,8 +1968,8 @@
                                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                                             <Path
                                                 x:Name="PART_ImgPinMaximize"
-                                                Width="12"
-                                                Height="12"
+                                                Width="11"
+                                                Height="11"
                                                 VerticalAlignment="Center"
                                                 Data="{DynamicResource PinMaximize}"
                                                 Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
@@ -1968,6 +1979,7 @@
                                         <Button
                                             x:Name="PART_PinRestore"
                                             Grid.Column="2"
+                                            Margin="2,0"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
                                             shell:WindowChrome.IsHitTestVisibleInChrome="True"
@@ -1979,8 +1991,8 @@
                                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}">
                                             <Path
                                                 x:Name="PART_ImgPinRestore"
-                                                Width="13"
-                                                Height="13"
+                                                Width="11"
+                                                Height="11"
                                                 VerticalAlignment="Center"
                                                 Data="{DynamicResource PinRestore}"
                                                 Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
@@ -1990,6 +2002,7 @@
                                         <Button
                                             x:Name="PART_PinClose"
                                             Grid.Column="3"
+                                            Margin="2,0"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
                                             shell:WindowChrome.IsHitTestVisibleInChrome="True"
@@ -2000,8 +2013,8 @@
                                             Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                                             <Path
                                                 x:Name="PART_ImgPinClose"
-                                                Width="12"
-                                                Height="12"
+                                                Width="11"
+                                                Height="11"
                                                 VerticalAlignment="Center"
                                                 Data="{DynamicResource PinClose}"
                                                 Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"

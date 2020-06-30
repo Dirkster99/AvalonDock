@@ -24,7 +24,7 @@
         Stretch="Uniform">
         <Grid Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}">
             <Border
-                Margin="5"
+                Padding="10"
                 Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
                 CornerRadius="5">
                 <Grid>
@@ -75,7 +75,7 @@
         Stretch="Uniform">
         <Grid Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}">
             <Border
-                Margin="5"
+                Padding="10"
                 Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
                 CornerRadius="5">
                 <Grid>
@@ -124,7 +124,7 @@
         Stretch="Uniform">
         <Grid Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}">
             <Border
-                Margin="5"
+                Padding="10"
                 Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
                 CornerRadius="5">
                 <Grid>
@@ -171,7 +171,7 @@
         Stretch="Uniform">
         <Grid Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}">
             <Border
-                Margin="5"
+                Padding="10"
                 Background="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonStarBackgroundBrushKey}}"
                 CornerRadius="5">
                 <Grid>
