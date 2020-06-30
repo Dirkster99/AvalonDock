@@ -62,7 +62,10 @@
                 <local:PanesTemplateSelector>
                     <local:PanesTemplateSelector.FileViewTemplate>
                         <DataTemplate>
-                            <TextBox BorderThickness="0" Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBox
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </local:PanesTemplateSelector.FileViewTemplate>
                     <local:PanesTemplateSelector.FileStatsViewTemplate>
