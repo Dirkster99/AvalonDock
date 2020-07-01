@@ -130,7 +130,7 @@
     <SolidColorBrush
         x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveGlyph}"
         options:Freeze="true"
-        Color="#000000" />
+        Color="#FFFFFF" />
 
     <!--  AccentColor  -->
     <SolidColorBrush
