@@ -1391,7 +1391,7 @@
                                     Command="{Binding Path=LayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                     Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                     ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
-                                    Visibility="Collapsed">
+                                    Visibility="Hidden">
                                     <Path
                                         x:Name="PART_ImgPinClose"
                                         Width="10"
