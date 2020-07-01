@@ -353,7 +353,7 @@ namespace AvalonDock.Controls
 
 		/// <summary>Executes to float the content of this LayoutItem in a separate <see cref="LayoutFloatingWindowControl"/>.</summary>
 		/// <param name="parameter"></param>
-		private void ExecuteFloatCommand(object parameter) => LayoutElement.Root.Manager._ExecuteFloatCommand(LayoutElement);
+		private void ExecuteFloatCommand(object parameter) => LayoutElement.Root.Manager.ExecuteFloatCommand(LayoutElement);
 
 		#endregion
 
@@ -389,7 +389,7 @@ namespace AvalonDock.Controls
 
 		private bool CanExecuteDockAsDocumentCommand(object parameter) => CanExecuteDockAsDocumentCommand();
 
-		private void ExecuteDockAsDocumentCommand(object parameter) => LayoutElement.Root.Manager._ExecuteDockAsDocumentCommand(LayoutElement);
+		private void ExecuteDockAsDocumentCommand(object parameter) => LayoutElement.Root.Manager.ExecuteDockAsDocumentCommand(LayoutElement);
 
 		#endregion
 
@@ -427,7 +427,7 @@ namespace AvalonDock.Controls
 			return LayoutElement.Root.Manager.Layout.Descendents().OfType<LayoutContent>().Any(d => d != LayoutElement && (d.Parent is LayoutDocumentPane || d.Parent is LayoutDocumentFloatingWindow));
 		}
 
-		private void ExecuteCloseAllButThisCommand(object parameter) => LayoutElement.Root.Manager._ExecuteCloseAllButThisCommand(LayoutElement);
+		private void ExecuteCloseAllButThisCommand(object parameter) => LayoutElement.Root.Manager.ExecuteCloseAllButThisCommand(LayoutElement);
 
 		#endregion
 
@@ -462,7 +462,7 @@ namespace AvalonDock.Controls
 			return LayoutElement.Root.Manager.Layout.Descendents().OfType<LayoutContent>().Any(d => d.Parent is LayoutDocumentPane || d.Parent is LayoutDocumentFloatingWindow);
 		}
 
-		private void ExecuteCloseAllCommand(object parameter) => LayoutElement.Root.Manager._ExecuteCloseAllCommand(LayoutElement);
+		private void ExecuteCloseAllCommand(object parameter) => LayoutElement.Root.Manager.ExecuteCloseAllCommand(LayoutElement);
 
 		#endregion
 
@@ -495,7 +495,7 @@ namespace AvalonDock.Controls
 
 		private bool CanExecuteActivateCommand(object parameter) => LayoutElement != null;
 
-		private void ExecuteActivateCommand(object parameter) => LayoutElement.Root.Manager._ExecuteContentActivateCommand(LayoutElement);
+		private void ExecuteActivateCommand(object parameter) => LayoutElement.Root.Manager.ExecuteContentActivateCommand(LayoutElement);
 
 		#endregion
 

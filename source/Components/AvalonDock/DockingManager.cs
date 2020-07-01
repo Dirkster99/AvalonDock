@@ -24,6 +24,7 @@ using System.Windows.Data;
 using System.Windows.Threading;
 using AvalonDock.Themes;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AvalonDock
 {
@@ -45,15 +46,15 @@ namespace AvalonDock
         private ResourceDictionary currentThemeResourceDictionary; // = null
         private AutoHideWindowManager _autoHideWindowManager;
         private FrameworkElement _autohideArea;
-        private List<LayoutFloatingWindowControl> _fwList = new List<LayoutFloatingWindowControl>();
-        private List<LayoutFloatingWindowControl> _fwHiddenList = new List<LayoutFloatingWindowControl>();
+        private readonly List<LayoutFloatingWindowControl> _fwList = new List<LayoutFloatingWindowControl>();
+        private readonly List<LayoutFloatingWindowControl> _fwHiddenList = new List<LayoutFloatingWindowControl>();
         private OverlayWindow _overlayWindow = null;
         private List<IDropArea> _areas = null;
         private bool _insideInternalSetActiveContent = false;
 
         // Collection of LayoutDocumentItems & LayoutAnchorableItems attached to their corresponding
         // LayoutDocument & LayoutAnchorable
-        private List<LayoutItem> _layoutItems = new List<LayoutItem>();
+        private readonly List<LayoutItem> _layoutItems = new List<LayoutItem>();
 
         private bool _suspendLayoutItemCreation = false;
         private DispatcherOperation _collectLayoutItemsOperations = null;
@@ -806,7 +807,7 @@ namespace AvalonDock
 
         #region LogicalChildren
 
-        List<WeakReference> _logicalChildren = new List<WeakReference>();
+        private readonly List<WeakReference> _logicalChildren = new List<WeakReference>();
 
         /// <inheritdoc />
         protected override IEnumerator LogicalChildren => _logicalChildren.Select(ch => ch.GetValueOrDefault<object>()).GetEnumerator();
@@ -1080,7 +1081,6 @@ namespace AvalonDock
         protected virtual void OnThemeChanged(DependencyPropertyChangedEventArgs e)
         {
             var oldTheme = e.OldValue as Theme;
-            var newTheme = e.NewValue as Theme;
             var resources = Resources;
             if (oldTheme != null)
             {
@@ -1102,15 +1102,15 @@ namespace AvalonDock
                 }
             }
 
-            if (newTheme != null)
+            if (e.NewValue as Theme != null)
             {
-                if (newTheme is DictionaryTheme)
+                if (e.NewValue as Theme is DictionaryTheme theme)
                 {
-                    currentThemeResourceDictionary = ((DictionaryTheme)newTheme).ThemeResourceDictionary;
+                    currentThemeResourceDictionary = theme.ThemeResourceDictionary;
                     resources.MergedDictionaries.Add(currentThemeResourceDictionary);
                 }
                 else
-                    resources.MergedDictionaries.Add(new ResourceDictionary { Source = newTheme.GetResourceUri() });
+                    resources.MergedDictionaries.Add(new ResourceDictionary { Source = (e.NewValue as Theme).GetResourceUri() });
             }
 
             foreach (var fwc in _fwList)
@@ -1442,9 +1442,8 @@ namespace AvalonDock
         {
             if (!(draggingWindow.Model is LayoutAnchorableFloatingWindow layoutAnchorableFloatingWindow)) yield break;
             //big part of code for getting type
-            var layoutAnchorablePane = layoutAnchorableFloatingWindow.SinglePane as LayoutAnchorablePane;
 
-            if (layoutAnchorablePane != null && (layoutAnchorableFloatingWindow.IsSinglePane && layoutAnchorablePane.SelectedContent != null))
+            if (layoutAnchorableFloatingWindow.SinglePane is LayoutAnchorablePane layoutAnchorablePane && (layoutAnchorableFloatingWindow.IsSinglePane && layoutAnchorablePane.SelectedContent != null))
             {
                 var layoutAnchorable = ((LayoutAnchorablePane)layoutAnchorableFloatingWindow.SinglePane).SelectedContent as LayoutAnchorable;
                 yield return layoutAnchorable;
@@ -1482,19 +1481,18 @@ namespace AvalonDock
 
         public LayoutFloatingWindowControl CreateFloatingWindow(LayoutContent contentModel, bool isContentImmutable)
         {
-            LayoutFloatingWindowControl lfwc = null;
-            if (contentModel is LayoutAnchorable)
+            if (contentModel is LayoutAnchorable anchorable)
             {
                 if (!(contentModel.Parent is ILayoutPane))
                 {
-                    var pane = new LayoutAnchorablePane((LayoutAnchorable)contentModel)
+                    var pane = new LayoutAnchorablePane(anchorable)
                     {
                         FloatingTop = contentModel.FloatingTop,
                         FloatingLeft = contentModel.FloatingLeft,
                         FloatingWidth = contentModel.FloatingWidth,
                         FloatingHeight = contentModel.FloatingHeight
                     };
-                    lfwc = CreateFloatingWindowForLayoutAnchorableWithoutParent(pane, isContentImmutable);
+                    _ = CreateFloatingWindowForLayoutAnchorableWithoutParent(pane, isContentImmutable);
                 }
             }
 
@@ -1706,7 +1704,7 @@ namespace AvalonDock
 
         internal void RemoveFloatingWindow(LayoutFloatingWindowControl floatingWindow) => _fwList.Remove(floatingWindow);
 
-        internal void _ExecuteCloseCommand(LayoutDocument document)
+        internal void ExecuteCloseCommand(LayoutDocument document)
         {
             if (DocumentClosing != null)
             {
@@ -1719,28 +1717,29 @@ namespace AvalonDock
             DocumentClosed?.Invoke(this, new DocumentClosedEventArgs(document));
         }
 
-        internal void _ExecuteCloseAllButThisCommand(LayoutContent contentSelected)
+        internal void ExecuteCloseAllButThisCommand(LayoutContent contentSelected)
         {
             foreach (var contentToClose in Layout.Descendents().OfType<LayoutContent>().Where(d => d != contentSelected && (d.Parent is LayoutDocumentPane || d.Parent is LayoutDocumentFloatingWindow)).ToArray())
                 Close(contentToClose);
         }
 
-        internal void _ExecuteCloseAllCommand(LayoutContent contentSelected)
+        [SuppressMessage("Style", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        internal void ExecuteCloseAllCommand(LayoutContent contentSelected)
         {
             foreach (var contentToClose in Layout.Descendents().OfType<LayoutContent>().Where(d => (d.Parent is LayoutDocumentPane || d.Parent is LayoutDocumentFloatingWindow)).ToArray())
                 Close(contentToClose);
         }
 
-        internal void _ExecuteCloseCommand(LayoutAnchorable anchorable)
+        internal void ExecuteCloseCommand(LayoutAnchorable anchorable)
         {
             if (!(anchorable is LayoutAnchorable model)) return;
             model.CloseAnchorable();
             RemoveViewFromLogicalChild(anchorable);
         }
 
-        internal void _ExecuteHideCommand(LayoutAnchorable anchorable) => anchorable?.Hide();
+        internal void ExecuteHideCommand(LayoutAnchorable anchorable) => anchorable?.Hide();
 
-        internal void _ExecuteAutoHideCommand(LayoutAnchorable _anchorable) => _anchorable.ToggleAutoHide();
+        internal void ExecuteAutoHideCommand(LayoutAnchorable _anchorable) => _anchorable.ToggleAutoHide();
 
         /// <summary>
         /// Method executes when the user clicks the Float button in the context menu of an <see cref="LayoutAnchorable"/>.
@@ -1749,13 +1748,13 @@ namespace AvalonDock
         /// draggable <see cref="LayoutFloatingWindowControl"/>.
         /// </summary>
         /// <param name="contentToFloat"></param>
-        internal void _ExecuteFloatCommand(LayoutContent contentToFloat) => contentToFloat.Float();
+        internal void ExecuteFloatCommand(LayoutContent contentToFloat) => contentToFloat.Float();
 
-        internal void _ExecuteDockCommand(LayoutAnchorable anchorable) => anchorable.Dock();
+        internal void ExecuteDockCommand(LayoutAnchorable anchorable) => anchorable.Dock();
 
-        internal void _ExecuteDockAsDocumentCommand(LayoutContent content) => content.DockAsDocument();
+        internal void ExecuteDockAsDocumentCommand(LayoutContent content) => content.DockAsDocument();
 
-        internal void _ExecuteContentActivateCommand(LayoutContent content) => content.IsActive = true;
+        internal void ExecuteContentActivateCommand(LayoutContent content) => content.IsActive = true;
 
         #endregion Internal Methods
 
@@ -1843,6 +1842,8 @@ namespace AvalonDock
 
         private static void OnLayoutRootUpdated(object sender, EventArgs e) => CommandManager.InvalidateRequerySuggested();
 
+
+        [SuppressMessage("Style", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
         private void OnLayoutChanging(LayoutRoot newLayout) => LayoutChanging?.Invoke(this, EventArgs.Empty);
 
         private void DockingManager_Loaded(object sender, RoutedEventArgs e)
@@ -2013,10 +2014,10 @@ namespace AvalonDock
             }
             _suspendLayoutItemCreation = false;
             if (documentsSource is INotifyCollectionChanged documentsSourceAsNotifier)
-                documentsSourceAsNotifier.CollectionChanged += documentsSourceElementsChanged;
+                documentsSourceAsNotifier.CollectionChanged += DocumentsSourceElementsChanged;
         }
 
-        private void documentsSourceElementsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void DocumentsSourceElementsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (Layout == null) return;
             //When deserializing documents are created automatically by the deserializer
@@ -2118,9 +2119,8 @@ namespace AvalonDock
                 RemoveViewFromLogicalChild(documentToRemove);
             }
 
-            var documentsSourceAsNotifier = documentsSource as INotifyCollectionChanged;
-            if (documentsSourceAsNotifier != null)
-                documentsSourceAsNotifier.CollectionChanged -= documentsSourceElementsChanged;
+            if (documentsSource is INotifyCollectionChanged documentsSourceAsNotifier)
+                documentsSourceAsNotifier.CollectionChanged -= DocumentsSourceElementsChanged;
         }
 
         private void Close(LayoutContent contentToClose)
@@ -2136,9 +2136,9 @@ namespace AvalonDock
             else
             {
                 if (contentToClose is LayoutDocument document)
-                    _ExecuteCloseCommand(document);
+                    ExecuteCloseCommand(document);
                 else if (contentToClose is LayoutAnchorable anchorable)
-                    _ExecuteCloseCommand(anchorable);
+                    ExecuteCloseCommand(anchorable);
             }
         }
 
@@ -2206,10 +2206,10 @@ namespace AvalonDock
             }
             _suspendLayoutItemCreation = false;
             if (anchorablesSource is INotifyCollectionChanged anchorablesSourceAsNotifier)
-                anchorablesSourceAsNotifier.CollectionChanged += anchorablesSourceElementsChanged;
+                anchorablesSourceAsNotifier.CollectionChanged += AnchorablesSourceElementsChanged;
         }
 
-        private void anchorablesSourceElementsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void AnchorablesSourceElementsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (Layout == null) return;
 
@@ -2315,7 +2315,7 @@ namespace AvalonDock
             }
 
             if (anchorablesSource is INotifyCollectionChanged anchorablesSourceAsNotifier)
-                anchorablesSourceAsNotifier.CollectionChanged -= anchorablesSourceElementsChanged;
+                anchorablesSourceAsNotifier.CollectionChanged -= AnchorablesSourceElementsChanged;
         }
 
         private void RemoveViewFromLogicalChild(LayoutContent layoutContent)
@@ -2480,6 +2480,7 @@ namespace AvalonDock
             _navigatorWindow = null;
         }
 
+        [SuppressMessage("Style", "IDE0056:使用索引运算符", Justification = "<挂起>")]
         private LayoutFloatingWindowControl CreateFloatingWindowForLayoutAnchorableWithoutParent(LayoutAnchorablePane paneModel, bool isContentImmutable)
         {
             if (paneModel.Children.Any(c => !c.CanFloat))

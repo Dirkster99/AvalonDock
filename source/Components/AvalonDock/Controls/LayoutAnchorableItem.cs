@@ -74,7 +74,7 @@ namespace AvalonDock.Controls
 
         private bool CanExecuteHideCommand(object parameter) => LayoutElement != null && _anchorable.CanHide;
 
-        private void ExecuteHideCommand(object parameter) => _anchorable?.Root?.Manager?._ExecuteHideCommand(_anchorable);
+        private void ExecuteHideCommand(object parameter) => _anchorable?.Root?.Manager?.ExecuteHideCommand(_anchorable);
 
         #endregion HideCommand
 
@@ -113,7 +113,7 @@ namespace AvalonDock.Controls
             return _anchorable.CanAutoHide;
         }
 
-        private void ExecuteAutoHideCommand(object parameter) => _anchorable?.Root?.Manager?._ExecuteAutoHideCommand(_anchorable);
+        private void ExecuteAutoHideCommand(object parameter) => _anchorable?.Root?.Manager?.ExecuteAutoHideCommand(_anchorable);
 
         #endregion AutoHideCommand
 
@@ -147,7 +147,7 @@ namespace AvalonDock.Controls
 
         private bool CanExecuteDockCommand(object parameter) => LayoutElement?.FindParent<LayoutAnchorableFloatingWindow>() != null;
 
-        private void ExecuteDockCommand(object parameter) => LayoutElement.Root.Manager._ExecuteDockCommand(_anchorable);
+        private void ExecuteDockCommand(object parameter) => LayoutElement.Root.Manager.ExecuteDockCommand(_anchorable);
 
         #endregion DockCommand
 
@@ -236,7 +236,7 @@ namespace AvalonDock.Controls
         {
             if (_anchorable.Root?.Manager == null) return;
             var dockingManager = _anchorable.Root.Manager;
-            dockingManager._ExecuteCloseCommand(_anchorable);
+            dockingManager.ExecuteCloseCommand(_anchorable);
         }
 
         /// <inheritdoc />

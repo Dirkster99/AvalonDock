@@ -26,8 +26,8 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public class LayoutDocumentFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
 	{
-		#region fields
-		private LayoutDocumentFloatingWindow _model;
+        #region fields
+        private readonly LayoutDocumentFloatingWindow _model;
 		private List<IDropArea> _dropAreas = null;
 		#endregion fields
 
@@ -105,7 +105,7 @@ namespace AvalonDock.Controls
 			_model.RootPanel.ChildrenCollectionChanged += RootPanelOnChildrenCollectionChanged;
 		}
 
-		void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == nameof(LayoutDocumentFloatingWindow.RootPanel) && _model.RootPanel == null) InternalClose();
 		}
@@ -159,7 +159,7 @@ namespace AvalonDock.Controls
 			}
 			base.OnClosed(e);
 			if (!CloseInitiatedByUser) root?.FloatingWindows.Remove(_model);
-			_model.PropertyChanged -= _model_PropertyChanged;
+			_model.PropertyChanged -= Model_PropertyChanged;
 		}
 
 		#endregion
@@ -240,7 +240,7 @@ namespace AvalonDock.Controls
 			var dockAsDocument = true;
 			if (!isDraggingDocuments)
 			{
-				if (draggingWindow.Model is LayoutAnchorableFloatingWindow toolWindow)
+                if (draggingWindow.Model is LayoutAnchorableFloatingWindow)
 				{
 					foreach (var item in GetAnchorableInFloatingWindow(draggingWindow))
 					{
@@ -277,18 +277,17 @@ namespace AvalonDock.Controls
 		private IEnumerable<LayoutAnchorable> GetAnchorableInFloatingWindow(LayoutFloatingWindowControl draggingWindow)
 		{
 			if (!(draggingWindow.Model is LayoutAnchorableFloatingWindow layoutAnchorableFloatingWindow)) yield break;
-			//big part of code for getting type
-			var layoutAnchorablePane = layoutAnchorableFloatingWindow.SinglePane as LayoutAnchorablePane;
+            //big part of code for getting type
 
-			if (layoutAnchorablePane != null && (layoutAnchorableFloatingWindow.IsSinglePane && layoutAnchorablePane.SelectedContent != null))
-			{
-				var layoutAnchorable = ((LayoutAnchorablePane)layoutAnchorableFloatingWindow.SinglePane).SelectedContent as LayoutAnchorable;
-				yield return layoutAnchorable;
-			}
-			else
-				foreach (var item in GetLayoutAnchorable(layoutAnchorableFloatingWindow.RootPanel))
-					yield return item;
-		}
+            if (layoutAnchorableFloatingWindow.SinglePane is LayoutAnchorablePane layoutAnchorablePane && (layoutAnchorableFloatingWindow.IsSinglePane && layoutAnchorablePane.SelectedContent != null))
+            {
+                var layoutAnchorable = ((LayoutAnchorablePane)layoutAnchorableFloatingWindow.SinglePane).SelectedContent as LayoutAnchorable;
+                yield return layoutAnchorable;
+            }
+            else
+                foreach (var item in GetLayoutAnchorable(layoutAnchorableFloatingWindow.RootPanel))
+                    yield return item;
+        }
 
 		/// <summary>
 		/// Finds all <see cref="LayoutAnchorable"/> objects (toolwindows) within a

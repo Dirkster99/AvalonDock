@@ -38,7 +38,7 @@ namespace AvalonDock.Controls
 		#region fields
 		private ResourceDictionary currentThemeResourceDictionary; // = null
 		private bool _isInternalChange; //false
-		private ILayoutElement _model;
+		private readonly ILayoutElement _model;
 		private bool _attachDrag = false;
 		private HwndSource _hwndSrc;
 		private HwndSourceHook _hwndSrcHook;
@@ -627,7 +627,7 @@ namespace AvalonDock.Controls
 		protected internal class FloatingWindowContentHost : HwndHost
 		{
 			#region fields
-			private LayoutFloatingWindowControl _owner;
+			private readonly LayoutFloatingWindowControl _owner;
 			private HwndSource _wpfContentHost = null;
 			private Border _rootPresenter = null;
 			private DockingManager _manager = null;
