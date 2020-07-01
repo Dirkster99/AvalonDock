@@ -25,39 +25,44 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Menu>
-            <MenuItem Header="File">
-                <MenuItem Command="{Binding NewCommand}" Header="New" />
-                <MenuItem Command="{Binding OpenCommand}" Header="Open" />
-                <Separator />
-                <MenuItem Command="{Binding ActiveDocument.SaveCommand}" Header="Save" />
-                <MenuItem Command="{Binding ActiveDocument.SaveAsCommand}" Header="Save As..." />
-                <Separator />
-                <MenuItem Command="{Binding ActiveDocument.CloseCommand}" Header="Close" />
-            </MenuItem>
-            <MenuItem Header="Tools">
-                <MenuItem
-                    Header="Properties"
-                    IsCheckable="True"
-                    IsChecked="{Binding FileStats.IsVisible, Mode=TwoWay}" />
-            </MenuItem>
-            <MenuItem Header="Layout">
-                <MenuItem Command="{Binding LoadLayoutCommand, ElementName=mainWindow}" Header="Load" />
-                <MenuItem Command="{Binding SaveLayoutCommand, ElementName=mainWindow}" Header="Save" />
-                <MenuItem Click="OnDumpToConsole" Header="Dump to Console" />
+        <WrapPanel Margin="5">
+            <Menu VerticalAlignment="Center">
+                <MenuItem Header="File">
+                    <MenuItem Command="{Binding NewCommand}" Header="New" />
+                    <MenuItem Command="{Binding OpenCommand}" Header="Open" />
+                    <Separator />
+                    <MenuItem Command="{Binding ActiveDocument.SaveCommand}" Header="Save" />
+                    <MenuItem Command="{Binding ActiveDocument.SaveAsCommand}" Header="Save As..." />
+                    <Separator />
+                    <MenuItem Command="{Binding ActiveDocument.CloseCommand}" Header="Close" />
+                </MenuItem>
+                <MenuItem Header="Tools">
+                    <MenuItem
+                        Header="Properties"
+                        IsCheckable="True"
+                        IsChecked="{Binding FileStats.IsVisible, Mode=TwoWay}" />
+                </MenuItem>
+                <MenuItem Header="Layout">
+                    <MenuItem Command="{Binding LoadLayoutCommand, ElementName=mainWindow}" Header="Load" />
+                    <MenuItem Command="{Binding SaveLayoutCommand, ElementName=mainWindow}" Header="Save" />
+                    <MenuItem Click="OnDumpToConsole" Header="Dump to Console" />
 
-            </MenuItem>
-        </Menu>
+                </MenuItem>
+
+            </Menu>
+            <ComboBox
+                DisplayMemberPath="Item1"
+                ItemsSource="{Binding Themes}"
+                SelectedItem="{Binding SelectedTheme}" />
+        </WrapPanel>
         <!--  AnchorablesSource="{Binding Tools}" DocumentsSource="{Binding Files}"  -->
         <avalonDock:DockingManager
             x:Name="dockManager"
             Grid.Row="1"
             ActiveContent="{Binding ActiveDocument, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
             AnchorablesSource="{Binding Tools}"
-            DocumentsSource="{Binding Files}">
-            <avalonDock:DockingManager.Theme>
-                <avalonDock1:Vs2013DarkTheme />
-            </avalonDock:DockingManager.Theme>
+            DocumentsSource="{Binding Files}"
+            Theme="{Binding SelectedTheme.Item2}">
             <avalonDock:DockingManager.LayoutItemTemplateSelector>
                 <local:PanesTemplateSelector>
                     <local:PanesTemplateSelector.FileViewTemplate>
