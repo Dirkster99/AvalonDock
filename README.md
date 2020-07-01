@@ -128,6 +128,8 @@ to also theme standard elements, such as, button and textblock etc.
 - [#136 Layout "locking" method for Anchorables (tool windows) Part III Added CanDock for LayoutAnchorable and LayoutDocument](https://github.com/Dirkster99/AvalonDock/issues/136)
     [commit 6b611fa7fdce4f6dcfed1cf00c3b9193000ffe16](https://github.com/Dirkster99/AvalonDock/commit/6b611fa7fdce4f6dcfed1cf00c3b9193000ffe16)
 
+- [#169 - Autohide LayoutAnchorable causes CPU load on idle](https://github.com/Dirkster99/AvalonDock/issues/169)
+
 ## Fixes & Features  added in Version 4.2
 
 - [#136 Layout "locking" method for Anchorables (tool windows)](https://github.com/Dirkster99/AvalonDock/issues/136)

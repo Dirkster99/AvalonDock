@@ -876,13 +876,13 @@ namespace AvalonDock
 
         #endregion AutoHideWindow
 
-        #region AutoHideDelay
-        /// <summary>
-        /// Implements the backing store of the <see cref="AutoHideDelay"/> dependency property.
-        /// </summary>
-        public static readonly DependencyProperty AutoHideDelayProperty =
-            DependencyProperty.Register("AutoHideDelay", typeof(int), typeof(DockingManager),
-                                        new UIPropertyMetadata(0));
+		#region AutoHideDelay
+		/// <summary>
+		/// Implements the backing store of the <see cref="AutoHideDelay"/> dependency property.
+		/// </summary>
+		public static readonly DependencyProperty AutoHideDelayProperty =
+			DependencyProperty.Register("AutoHideDelay", typeof(int), typeof(DockingManager),
+										new UIPropertyMetadata(500));
 
         /// <summary>
         /// Gets/sets the wait time in milliseconds that is applicable when the system AutoHides
