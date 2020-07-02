@@ -743,10 +743,10 @@ namespace AvalonDock.Layout
 		private void InternalSetActiveContent(LayoutContent currentValue, LayoutContent newActiveContent)
 		{
 			RaisePropertyChanging(nameof(ActiveContent));
-			if (currentValue != null) currentValue.IsActive = false;
+			if (currentValue != null && currentValue.IsActive) currentValue.IsActive = false;
 			_activeContent = new WeakReference(newActiveContent);
 			currentValue = ActiveContent;
-			if (currentValue != null) currentValue.IsActive = true;
+			if (currentValue != null&& !currentValue.IsActive) currentValue.IsActive = true;
 			RaisePropertyChanged(nameof(ActiveContent));
 			_activeContentSet = currentValue != null;
 			if (currentValue != null)
