@@ -125,6 +125,9 @@ to also theme standard elements, such as, button and textblock etc.
   - Improved VS 2013 Theme and ease of reusing controls  
   - [Fix Issue #85 Floating Window Title Flashing](https://github.com/Dirkster99/AvalonDock/issues/85)  
   - [Fix Issue #71 Hiding and showing anchorable in document's pane throws an exception](https://github.com/Dirkster99/AvalonDock/issues/71)  
+  - [Fix Issue #135 ActiveContent not switching correctly for floating window](https://github.com/Dirkster99/AvalonDock/issues/135)  
+  - [Fix Issue #165 ActiveContent not stable](https://github.com/Dirkster99/AvalonDock/issues/165)  
+  - [Fix Issue #170 ](https://github.com/Dirkster99/AvalonDock/issues/170)  
 
 - [#59 InvalidOperationException when deserializing layout](https://github.com/Dirkster99/AvalonDock/issues/59#issuecomment-642934204)
 
