@@ -176,10 +176,10 @@ namespace AvalonDock.Layout
 			set
 			{
 				if (value == _isActive) return;
-				if (Root.ActiveContent != this && value) Root.ActiveContent = this;
 				RaisePropertyChanging(nameof(IsActive));
 				var oldValue = _isActive;
 				_isActive = value;
+				if (Root.ActiveContent != this && value) Root.ActiveContent = this;
 				var root = Root;
 				if (root != null && _isActive && root.ActiveContent != this) root.ActiveContent = this;
 				if (_isActive) IsSelected = true;
