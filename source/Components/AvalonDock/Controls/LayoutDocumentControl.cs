@@ -134,7 +134,7 @@ namespace AvalonDock.Controls
 
 		private void SetIsActive()
 		{
-			if (Model != null) Model.IsActive = true;
+			if (Model != null && !Model.IsActive) Model.IsActive = true;
 		}
 
 		#endregion Private Methods

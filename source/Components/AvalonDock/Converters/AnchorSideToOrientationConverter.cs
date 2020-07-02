@@ -11,6 +11,7 @@ using System;
 using System.Windows.Data;
 using System.Windows.Controls;
 using AvalonDock.Layout;
+using System.Windows.Markup;
 
 namespace AvalonDock.Converters
 {
@@ -21,7 +22,7 @@ namespace AvalonDock.Converters
 	/// othrwise <see cref="Orientation.Horizontal"/> is returned.
 	/// </summary>
 	[ValueConversion(typeof(AnchorSide), typeof(Orientation))]
-	public class AnchorSideToOrientationConverter : IValueConverter
+	public class AnchorSideToOrientationConverter : MarkupExtension, IValueConverter
 	{
 		/// <summary>
 		/// Converts an <see cref="AnchorSide"/> value into a WPF <see cref="Orientation"/> value.
@@ -55,5 +56,10 @@ namespace AvalonDock.Converters
 		{
 			throw new NotImplementedException();
 		}
-	}
+
+        public override object ProvideValue(IServiceProvider serviceProvider)
+        {
+			return ConverterCreater.Get<AnchorSideToOrientationConverter>();
+		}
+    }
 }

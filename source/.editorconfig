@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# IDE0055: 修正格式
+dotnet_diagnostic.IDE0055.severity = none
