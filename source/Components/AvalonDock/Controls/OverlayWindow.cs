@@ -68,9 +68,9 @@ namespace AvalonDock.Controls
 		#endregion DocumentPaneFullDropTargets
 
 		private Path _previewBox;
-		private IOverlayWindowHost _host;
+		private readonly IOverlayWindowHost _host;
 		private LayoutFloatingWindowControl _floatingWindow = null;
-		private List<IDropArea> _visibleAreas = new List<IDropArea>();
+		private readonly List<IDropArea> _visibleAreas = new List<IDropArea>();
 		#endregion fields
 
 		#region Constructors
@@ -185,9 +185,9 @@ namespace AvalonDock.Controls
 
 			if (_host.Manager.Theme != null)
 			{
-				if (_host.Manager.Theme is DictionaryTheme)
+				if (_host.Manager.Theme is DictionaryTheme theme)
 				{
-					currentThemeResourceDictionary = ((DictionaryTheme)_host.Manager.Theme).ThemeResourceDictionary;
+					currentThemeResourceDictionary = theme.ThemeResourceDictionary;
 					Resources.MergedDictionaries.Add(currentThemeResourceDictionary);
 				}
 				else
@@ -275,73 +275,65 @@ namespace AvalonDock.Controls
 		{
 			var result = new List<LayoutContent>();
 
-			var documentFloatingWindow = source as LayoutDocumentFloatingWindow;
-			if (documentFloatingWindow != null)
-			{
-				foreach (var layoutElement in documentFloatingWindow.Children)
-				{
-					result.AddRange(GetAllLayoutContents(layoutElement));
-				}
-			}
+            if (source is LayoutDocumentFloatingWindow documentFloatingWindow)
+            {
+                foreach (var layoutElement in documentFloatingWindow.Children)
+                {
+                    result.AddRange(GetAllLayoutContents(layoutElement));
+                }
+            }
 
-			var anchorableFloatingWindow = source as LayoutAnchorableFloatingWindow;
-			if (anchorableFloatingWindow != null)
-			{
-				foreach (var layoutElement in anchorableFloatingWindow.Children)
-				{
-					result.AddRange(GetAllLayoutContents(layoutElement));
-				}
-			}
+            if (source is LayoutAnchorableFloatingWindow anchorableFloatingWindow)
+            {
+                foreach (var layoutElement in anchorableFloatingWindow.Children)
+                {
+                    result.AddRange(GetAllLayoutContents(layoutElement));
+                }
+            }
 
-			var documentPaneGroup = source as LayoutDocumentPaneGroup;
-			if (documentPaneGroup != null)
-			{
-				foreach (var layoutDocumentPane in documentPaneGroup.Children)
-				{
-					result.AddRange(GetAllLayoutContents(layoutDocumentPane));
-				}
-			}
+            if (source is LayoutDocumentPaneGroup documentPaneGroup)
+            {
+                foreach (var layoutDocumentPane in documentPaneGroup.Children)
+                {
+                    result.AddRange(GetAllLayoutContents(layoutDocumentPane));
+                }
+            }
 
-			var anchorablePaneGroup = source as LayoutAnchorablePaneGroup;
-			if (anchorablePaneGroup != null)
-			{
-				foreach (var layoutDocumentPane in anchorablePaneGroup.Children)
-				{
-					result.AddRange(GetAllLayoutContents(layoutDocumentPane));
-				}
-			}
+            if (source is LayoutAnchorablePaneGroup anchorablePaneGroup)
+            {
+                foreach (var layoutDocumentPane in anchorablePaneGroup.Children)
+                {
+                    result.AddRange(GetAllLayoutContents(layoutDocumentPane));
+                }
+            }
 
-			var documentPane = source as LayoutDocumentPane;
-			if (documentPane != null)
-			{
-				foreach (var layoutContent in documentPane.Children)
-				{
-					result.Add(layoutContent);
-				}
-			}
+            if (source is LayoutDocumentPane documentPane)
+            {
+                foreach (var layoutContent in documentPane.Children)
+                {
+                    result.Add(layoutContent);
+                }
+            }
 
-			var anchorablePane = source as LayoutAnchorablePane;
-			if (anchorablePane != null)
-			{
-				foreach (var layoutContent in anchorablePane.Children)
-				{
-					result.Add(layoutContent);
-				}
-			}
+            if (source is LayoutAnchorablePane anchorablePane)
+            {
+                foreach (var layoutContent in anchorablePane.Children)
+                {
+                    result.Add(layoutContent);
+                }
+            }
 
-			var document = source as LayoutDocument;
-			if (document != null)
-			{
-				result.Add(document);
-			}
+            if (source is LayoutDocument document)
+            {
+                result.Add(document);
+            }
 
-			var anchorable = source as LayoutAnchorable;
-			if (anchorable != null)
-			{
-				result.Add(anchorable);
-			}
+            if (source is LayoutAnchorable anchorable)
+            {
+                result.Add(anchorable);
+            }
 
-			return result;
+            return result;
 		}
 
 		#endregion

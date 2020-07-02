@@ -60,19 +60,19 @@ namespace AvalonDock.MVVMTestApp
 			{
 				if (_loadLayoutCommand == null)
 				{
-					_loadLayoutCommand = new RelayCommand((p) => OnLoadLayout(p), (p) => CanLoadLayout(p));
+					_loadLayoutCommand = new RelayCommand((p) => OnLoadLayout(), (p) => CanLoadLayout());
 				}
 
 				return _loadLayoutCommand;
 			}
 		}
 
-		private bool CanLoadLayout(object parameter)
+		private bool CanLoadLayout()
 		{
 			return File.Exists(@".\AvalonDock.Layout.config");
 		}
 
-		private void OnLoadLayout(object parameter)
+		private void OnLoadLayout()
 		{
 			var layoutSerializer = new XmlLayoutSerializer(dockManager);
 
@@ -103,19 +103,19 @@ namespace AvalonDock.MVVMTestApp
 			{
 				if (_saveLayoutCommand == null)
 				{
-					_saveLayoutCommand = new RelayCommand((p) => OnSaveLayout(p), (p) => CanSaveLayout(p));
+					_saveLayoutCommand = new RelayCommand((p) => OnSaveLayout(), (p) => CanSaveLayout());
 				}
 
 				return _saveLayoutCommand;
 			}
 		}
 
-		private bool CanSaveLayout(object parameter)
+		private bool CanSaveLayout()
 		{
 			return true;
 		}
 
-		private void OnSaveLayout(object parameter)
+		private void OnSaveLayout()
 		{
 			var layoutSerializer = new XmlLayoutSerializer(dockManager);
 			layoutSerializer.Serialize(@".\AvalonDock.Layout.config");

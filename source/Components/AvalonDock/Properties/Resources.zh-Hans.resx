@@ -53,6 +53,7 @@
     value   : The object must be serialized with 
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
             : and then encoded with base64 encoding.
+
     mimetype: application/x-microsoft.net.object.bytearray.base64
     value   : The object must be serialized into a byte array 
             : using a System.ComponentModel.TypeConverter
@@ -132,10 +133,10 @@
     <value>停靠</value>
   </data>
   <data name="Anchorable_DockAsDocument" xml:space="preserve">
-    <value>停靠成标签式文档</value>
+    <value>作为选项卡式停靠</value>
   </data>
   <data name="Anchorable_Float" xml:space="preserve">
-    <value>漂浮</value>
+    <value>浮动</value>
   </data>
   <data name="Anchorable_Hide" xml:space="preserve">
     <value>隐藏</value>
@@ -156,10 +157,10 @@
     <value>窗口位置</value>
   </data>
   <data name="Document_DockAsDocument" xml:space="preserve">
-    <value>停靠成标签式文档</value>
+    <value>作为选项卡式停靠</value>
   </data>
   <data name="Document_Float" xml:space="preserve">
-    <value>漂浮</value>
+    <value>浮动</value>
   </data>
   <data name="Document_MoveToNextTabGroup" xml:space="preserve">
     <value>移到下一标签组</value>

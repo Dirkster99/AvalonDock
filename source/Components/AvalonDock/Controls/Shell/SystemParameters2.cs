@@ -28,7 +28,7 @@ namespace Microsoft.Windows.Shell
 		private delegate void _SystemMetricUpdate(IntPtr wParam, IntPtr lParam);
 
 		[ThreadStatic]
-		private static SystemParameters2 _threadLocalSingleton;
+		private static readonly SystemParameters2 _threadLocalSingleton;
 
 		private MessageWindow _messageHwnd;
 
@@ -218,7 +218,7 @@ namespace Microsoft.Windows.Shell
 				return;
 			}
 
-			NativeMethods.GetCurrentThemeName(out var name, out var color, out var size);
+            NativeMethods.GetCurrentThemeName(out var name, out var color, out _);
 
 			// Consider whether this is the most useful way to expose this...
 			UxThemeName = System.IO.Path.GetFileNameWithoutExtension(name);
@@ -237,18 +237,18 @@ namespace Microsoft.Windows.Shell
 			// There aren't any known variations based on theme color.
 			Assert.IsNeitherNullNorEmpty(UxThemeName);
 
-			// These radii are approximate.  The way WPF does rounding is different than how
-			//     rounded-rectangle HRGNs are created, which is also different than the actual
-			//     round corners on themed Windows.  For now we're not exposing anything to
-			//     mitigate the differences.
-			var cornerRadius = default(CornerRadius);
+            // These radii are approximate.  The way WPF does rounding is different than how
+            //     rounded-rectangle HRGNs are created, which is also different than the actual
+            //     round corners on themed Windows.  For now we're not exposing anything to
+            //     mitigate the differences.
+            CornerRadius cornerRadius;
 
-			// This list is known to be incomplete and very much not future-proof.
-			// On XP there are at least a couple of shipped themes that this won't catch,
-			// "Zune" and "Royale", but WPF doesn't know about these either.
-			// If a new theme was to replace Aero, then this will fall back on "classic" behaviors.
-			// This isn't ideal, but it's not the end of the world.  WPF will generally have problems anyways.
-			switch (UxThemeName.ToUpperInvariant())
+            // This list is known to be incomplete and very much not future-proof.
+            // On XP there are at least a couple of shipped themes that this won't catch,
+            // "Zune" and "Royale", but WPF doesn't know about these either.
+            // If a new theme was to replace Aero, then this will fall back on "classic" behaviors.
+            // This isn't ideal, but it's not the end of the world.  WPF will generally have problems anyways.
+            switch (UxThemeName.ToUpperInvariant())
 			{
 				case "LUNA":
 					cornerRadius = new CornerRadius(6, 6, 0, 0);
@@ -331,7 +331,7 @@ namespace Microsoft.Windows.Shell
 			};
 		}
 
-		public static SystemParameters2 Current => _threadLocalSingleton ?? (_threadLocalSingleton = new SystemParameters2());
+		public static SystemParameters2 Current => _threadLocalSingleton ?? new SystemParameters2();
 
 		private IntPtr _WndProc(IntPtr hwnd, WM msg, IntPtr wParam, IntPtr lParam)
 		{

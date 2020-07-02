@@ -1,34 +1,32 @@
 ﻿<!--
-	************************************************************************
-	AvalonDock
-	
-	Copyright (C) 2007-2013 Xceed Software Inc.
-	
-	This program is provided to you under the terms of the Microsoft Public
-	License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
-	************************************************************************
+    ************************************************************************
+    AvalonDock
+    
+    Copyright (C) 2007-2013 Xceed Software Inc.
+    
+    This program is provided to you under the terms of the Microsoft Public
+    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
+    ************************************************************************
 -->
 
 <Application
-	x:Class="TestApp.App"
-	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	StartupUri="MainWindow.xaml">
-	<Application.Resources>
-		<ResourceDictionary
-			xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-			xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-			xmlns:avalonDockControls="clr-namespace:AvalonDock.Controls;assembly=AvalonDock">
-			<Style
-				x:Key="{x:Type avalonDockControls:LayoutAnchorableFloatingWindowControl}"
-				BasedOn="{StaticResource {x:Type avalonDockControls:LayoutAnchorableFloatingWindowControl}}"
-				TargetType="{x:Type avalonDockControls:LayoutAnchorableFloatingWindowControl}">
-				<!--
-					Set this property to true to auto-size the demo LayoutAnchorable to the size of its containing control
-					when being dragged into floating mode
-				-->
-				<Setter Property="SetWindowSizeWhenOpened" Value="False" />
-			</Style>
-		</ResourceDictionary>
-	</Application.Resources>
+    x:Class="TestApp.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    ShutdownMode="OnMainWindowClose"
+    StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+            <Style
+                x:Key="{x:Type LayoutAnchorableFloatingWindowControl}"
+                BasedOn="{StaticResource {x:Type LayoutAnchorableFloatingWindowControl}}"
+                TargetType="{x:Type LayoutAnchorableFloatingWindowControl}">
+                <!--
+                    Set this property to true to auto-size the demo LayoutAnchorable to the size of its containing control
+                    when being dragged into floating mode
+                -->
+                <Setter Property="SetWindowSizeWhenOpened" Value="False" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
 </Application>

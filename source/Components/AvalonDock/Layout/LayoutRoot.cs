@@ -367,8 +367,8 @@ namespace AvalonDock.Layout
 					foreach (var contentReferencingEmptyPane in this.Descendents().OfType<LayoutContent>()
 						.Where(c => ((ILayoutPreviousContainer)c).PreviousContainer == emptyPane && !c.IsFloating))
 					{
-						if (contentReferencingEmptyPane is LayoutAnchorable &&
-							!((LayoutAnchorable)contentReferencingEmptyPane).IsVisible)
+						if (contentReferencingEmptyPane is LayoutAnchorable anchorable &&
+							!anchorable.IsVisible)
 							continue;
 
 						((ILayoutPreviousContainer)contentReferencingEmptyPane).PreviousContainer = null;
@@ -743,10 +743,10 @@ namespace AvalonDock.Layout
 		private void InternalSetActiveContent(LayoutContent currentValue, LayoutContent newActiveContent)
 		{
 			RaisePropertyChanging(nameof(ActiveContent));
-			if (currentValue != null) currentValue.IsActive = false;
+			if (currentValue != null && currentValue.IsActive) currentValue.IsActive = false;
 			_activeContent = new WeakReference(newActiveContent);
 			currentValue = ActiveContent;
-			if (currentValue != null) currentValue.IsActive = true;
+			if (currentValue != null&& !currentValue.IsActive) currentValue.IsActive = true;
 			RaisePropertyChanged(nameof(ActiveContent));
 			_activeContentSet = currentValue != null;
 			if (currentValue != null)
@@ -850,15 +850,13 @@ namespace AvalonDock.Layout
 			{
 				if (isFloatingWindow)
 				{
-					var result = ReadElement(reader) as LayoutFloatingWindow;
-					if (result == null) break;
-					resultList.Add(result);
+                    if (!(ReadElement(reader) is LayoutFloatingWindow result)) break;
+                    resultList.Add(result);
 				}
 				else
 				{
-					var result = ReadElement(reader) as LayoutAnchorable;
-					if (result == null) break;
-					resultList.Add(result);
+                    if (!(ReadElement(reader) is LayoutAnchorable result)) break;
+                    resultList.Add(result);
 				}
 			}
 
@@ -937,13 +935,12 @@ namespace AvalonDock.Layout
 				Debug.Write($"{indent}{(indent.Length > 0 ? isLastChild ? " └─ " : " ├─ " : "")}{childID:D2} 0x{element.GetHashCode():X8} " +
 								$"{element.GetType().Name} {(shortPropertyNames ? "P" : "Parent")}:0x{element.Parent?.GetHashCode() ?? 0:X8} " +
 								$"{(shortPropertyNames ? "R" : "Root")}:0x{element.Root?.GetHashCode() ?? 0:X8}");
-				var containerElement = element as ILayoutContainer;
-				if (containerElement == null)
-				{
-					Debug.WriteLine("");
-					return;
-				}
-				Debug.WriteLine($" {(shortPropertyNames ? "C" : "Children")}:{containerElement.ChildrenCount}");
+                if (!(element is ILayoutContainer containerElement))
+                {
+                    Debug.WriteLine("");
+                    return;
+                }
+                Debug.WriteLine($" {(shortPropertyNames ? "C" : "Children")}:{containerElement.ChildrenCount}");
 				var nrChild = 0;
 				indent.Append(isLastChild ? "   " : " │ ");
 				foreach (var child in containerElement.Children)

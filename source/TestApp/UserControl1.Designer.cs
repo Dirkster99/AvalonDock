@@ -7,6 +7,8 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using System.Drawing;
+
 namespace TestApp
 {
     partial class UserControl1
@@ -65,6 +67,7 @@ namespace TestApp
             this.label1.Size = new System.Drawing.Size(52, 13);
             this.label1.TabIndex = 1;
             this.label1.Text = "TextBox1";
+            this.label1.ForeColor = Color.White;
             // 
             // label2
             // 
@@ -74,6 +77,7 @@ namespace TestApp
             this.label2.Size = new System.Drawing.Size(52, 13);
             this.label2.TabIndex = 1;
             this.label2.Text = "TextBox2";
+            this.label2.ForeColor = Color.White;
             // 
             // UserControl1
             // 
@@ -84,6 +88,7 @@ namespace TestApp
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox1);
             this.Name = "UserControl1";
+            this.BackColor = Color.Black;
             this.ResumeLayout(false);
             this.PerformLayout();
 

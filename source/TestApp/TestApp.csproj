@@ -14,6 +14,8 @@
         <Resource Include="**\*.png" />
     </ItemGroup>
     <ItemGroup>
+      <ProjectReference Include="..\Components\AvalonDock.Themes.VS2010\AvalonDock.Themes.VS2010.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj" />
       <ProjectReference Include="..\Components\AvalonDock\AvalonDock.csproj" />
     </ItemGroup>
 </Project>

@@ -22,7 +22,7 @@
 		/// </summary>
 		public const string ToolTitle = "File Stats";
 
-		private IWorkSpaceViewModel _workSpaceViewModel = null;
+		private readonly IWorkSpaceViewModel _workSpaceViewModel = null;
 
 		private DateTime _lastModified;
 		private long _fileSize;

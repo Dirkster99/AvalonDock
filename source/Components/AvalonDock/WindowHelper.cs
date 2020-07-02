@@ -18,7 +18,7 @@ namespace AvalonDock
 	{
 		public static bool IsAttachedToPresentationSource(this Visual element)
 		{
-			return PresentationSource.FromVisual(element as Visual) != null;
+			return PresentationSource.FromVisual(element) != null;
 		}
 
 		public static void SetParentToMainWindowOf(this Window window, Visual element)
@@ -28,10 +28,9 @@ namespace AvalonDock
 				window.Owner = wndParent;
 			else
 			{
-				IntPtr parentHwnd;
-				if (GetParentWindowHandle(element, out parentHwnd))
-					Win32Helper.SetOwner(new WindowInteropHelper(window).Handle, parentHwnd);
-			}
+                if (GetParentWindowHandle(element, out IntPtr parentHwnd))
+                    Win32Helper.SetOwner(new WindowInteropHelper(window).Handle, parentHwnd);
+            }
 		}
 
 		public static IntPtr GetParentWindowHandle(this Window window)
@@ -46,12 +45,11 @@ namespace AvalonDock
 		public static bool GetParentWindowHandle(this Visual element, out IntPtr hwnd)
 		{
 			hwnd = IntPtr.Zero;
-			HwndSource wpfHandle = PresentationSource.FromVisual(element) as HwndSource;
 
-			if (wpfHandle == null)
-				return false;
+            if (!(PresentationSource.FromVisual(element) is HwndSource wpfHandle))
+                return false;
 
-			hwnd = Win32Helper.GetParent(wpfHandle.Handle);
+            hwnd = Win32Helper.GetParent(wpfHandle.Handle);
 			if (hwnd == IntPtr.Zero)
 				hwnd = wpfHandle.Handle;
 			return true;
