@@ -46,9 +46,9 @@ namespace AvalonDock.Converters
             if ((values.Count() == 2)
               && (values[0] != DependencyProperty.UnsetValue)
               && (values[1] != DependencyProperty.UnsetValue)
-              && (values[1] is bool))
+              && (values[1] is bool boolean))
             {
-                var canClose = (bool)values[1];
+                var canClose = boolean;
 
                 return canClose ? Visibility.Collapsed : values[0];
             }

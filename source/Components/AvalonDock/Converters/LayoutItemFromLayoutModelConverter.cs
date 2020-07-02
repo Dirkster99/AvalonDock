@@ -35,8 +35,7 @@ namespace AvalonDock.Converters
         /// <returns>A converted value.</returns>
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            var layoutModel = value as LayoutContent;
-            if (layoutModel == null)
+            if (!(value is LayoutContent layoutModel))
                 return null;
 
             if (layoutModel.Root == null)
@@ -45,11 +44,10 @@ namespace AvalonDock.Converters
             if (layoutModel.Root.Manager == null)
                 return null;
 
-            var layoutItemModel = layoutModel.Root.Manager.GetLayoutItemFromModel(layoutModel);
-            if (layoutItemModel == null)
+            if (layoutModel.Root.Manager.GetLayoutItemFromModel(layoutModel) == null)
                 return Binding.DoNothing;
 
-            return layoutItemModel;
+            return layoutModel.Root.Manager.GetLayoutItemFromModel(layoutModel);
         }
 
         /// <summary>

@@ -28,7 +28,7 @@
         /// </summary>
         public const string ToolTitle = "Color Picker";
 
-        private IWorkSpaceViewModel _workSpaceViewModel = null;
+        private readonly IWorkSpaceViewModel _workSpaceViewModel = null;
 
         private Color _SelectedBackgroundColor;
         private Color _SelectedAccentColor;

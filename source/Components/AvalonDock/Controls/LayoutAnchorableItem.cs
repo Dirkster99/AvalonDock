@@ -32,8 +32,8 @@ namespace AvalonDock.Controls
         private ICommand _defaultHideCommand;
         private ICommand _defaultAutoHideCommand;
         private ICommand _defaultDockCommand;
-        private ReentrantFlag _visibilityReentrantFlag = new ReentrantFlag();
-        private ReentrantFlag _anchorableVisibilityReentrantFlag = new ReentrantFlag();
+        private readonly ReentrantFlag _visibilityReentrantFlag = new ReentrantFlag();
+        private readonly ReentrantFlag _anchorableVisibilityReentrantFlag = new ReentrantFlag();
         #endregion fields
 
         #region Constructors

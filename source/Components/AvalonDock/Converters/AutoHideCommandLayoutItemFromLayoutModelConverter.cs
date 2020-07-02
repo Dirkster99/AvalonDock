@@ -37,18 +37,16 @@ namespace AvalonDock.Converters
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             //when this converter is called layout could be constructing so many properties here are potentially not valid
-            var layoutModel = value as LayoutContent;
-            if (layoutModel == null)
+            if (value as LayoutContent == null)
                 return null;
 
-            if (layoutModel.Root == null)
+            if ((value as LayoutContent).Root == null)
                 return null;
 
-            if (layoutModel.Root.Manager == null)
+            if ((value as LayoutContent).Root.Manager == null)
                 return null;
 
-            var layoutItemModel = layoutModel.Root.Manager.GetLayoutItemFromModel(layoutModel) as LayoutAnchorableItem;
-            if (layoutItemModel == null)
+            if (!((value as LayoutContent).Root.Manager.GetLayoutItemFromModel(value as LayoutContent) is LayoutAnchorableItem layoutItemModel))
                 return Binding.DoNothing;
 
             return layoutItemModel.AutoHideCommand;

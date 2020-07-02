@@ -34,8 +34,7 @@ namespace AvalonDock.Converters
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             //when this converter is called layout could be constructing so many properties here are potentially not valid
-            var layoutModel = value as LayoutContent;
-            if (layoutModel == null)
+            if (!(value is LayoutContent layoutModel))
                 return null;
 
             if (layoutModel.Root == null)
