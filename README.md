@@ -121,6 +121,11 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Fixes & Features in master but not relased, yet
 
+- [#170 Several Improvements](https://github.com/Dirkster99/AvalonDock/pull/170) (thanx to [刘晓青 LyonJack](https://github.com/LyonJack))  
+  - Improved VS 2013 Theme and ease of reusing controls  
+  - [Fix Issue #85 Floating Window Title Flashing](https://github.com/Dirkster99/AvalonDock/issues/85)  
+  - [Fix Issue #71 Hiding and showing anchorable in document's pane throws an exception](https://github.com/Dirkster99/AvalonDock/issues/71)  
+
 - [#59 InvalidOperationException when deserializing layout](https://github.com/Dirkster99/AvalonDock/issues/59#issuecomment-642934204)
 
 - [#136 Layout "locking" method for Anchorables (tool windows) Part II via Style of LayoutAnchorableItem](https://github.com/Dirkster99/AvalonDock/issues/136)
