@@ -418,7 +418,7 @@ namespace Microsoft.Windows.Shell
 			if (wParam != IntPtr.Zero)
 			{
 				var client = (RECT)Marshal.PtrToStructure(lParam, typeof(RECT));
-				client.Bottom -= -1;
+				client.Bottom++;
 				Marshal.StructureToPtr(client, lParam, false);
 				return IntPtr.Zero;
 			}
