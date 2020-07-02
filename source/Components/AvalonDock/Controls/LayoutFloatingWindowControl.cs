@@ -57,9 +57,10 @@ namespace AvalonDock.Controls
 
 		static LayoutFloatingWindowControl()
 		{
-			ContentProperty.OverrideMetadata(typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(null, null, CoerceContentValue));
 			AllowsTransparencyProperty.OverrideMetadata(typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(false));
+			ContentProperty.OverrideMetadata(typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(null, null, CoerceContentValue));
 			ShowInTaskbarProperty.OverrideMetadata(typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(false));
+			WindowStyleProperty.OverrideMetadata(typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(WindowStyle.None));
 		}
 
 		protected LayoutFloatingWindowControl(ILayoutElement model)
@@ -713,7 +714,8 @@ namespace AvalonDock.Controls
 					ParentWindow = hwndParent.Handle,
 					WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_VISIBLE | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
 					Width = 1,
-					Height = 1
+					Height = 1,
+					UsesPerPixelOpacity = true,
 				});
 
 				_rootPresenter = new Border { Child = new AdornerDecorator { Child = Content }, Focusable = true };
