@@ -3,7 +3,6 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:MWindow="clr-namespace:MWindowLib;assembly=MWindowLib"
-	xmlns:advConv="clr-namespace:AvalonDock.Converters;assembly=AvalonDock"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:demos="clr-namespace:MLibTest.Demos"
 	xmlns:demoviews="clr-namespace:MLibTest.Demos.Views"
@@ -13,14 +12,11 @@
 	mc:Ignorable="d">
 	<Grid
 		xmlns:ThemeBehav="clr-namespace:MLib.Behaviors;assembly=MLib"
-		xmlns:avalonDock="clr-namespace:AvalonDock;assembly=AvalonDock"
-		xmlns:avalonDockControls="clr-namespace:AvalonDock.Controls;assembly=AvalonDock"
-		xmlns:avalonDockLayout="clr-namespace:AvalonDock.Layout;assembly=AvalonDock"
 		xmlns:bindLocal="clr-namespace:MLibTest.Demos"
 		xmlns:conv="clr-namespace:MLibTest.Demos.Demos.Converters">
 		<Grid.Resources>
 			<conv:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
-			<advConv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+			<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 		</Grid.Resources>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
@@ -103,7 +99,7 @@
 						IsIndeterminate="True"
 						Visibility="Visible" />
 
-					<avalonDock:DockingManager
+					<DockingManager
 						xmlns:views="clr-namespace:MLibTest.Demos.ViewModels.Views"
 						x:Name="dockManager"
 						Grid.Row="1"
@@ -117,7 +113,7 @@
 						<!-- avalonDock:DockingManager.Theme>
 						<avalonDock:Vs2013LightTheme/>
 					</avalonDock:DockingManager.Theme-->
-						<avalonDock:DockingManager.LayoutItemTemplateSelector>
+						<DockingManager.LayoutItemTemplateSelector>
 							<demos:PanesTemplateSelector>
 								<demos:PanesTemplateSelector.FileViewTemplate>
 									<DataTemplate>
@@ -154,13 +150,13 @@
 									</DataTemplate>
 								</demos:PanesTemplateSelector.Tooln_ViewTemplate>
 							</demos:PanesTemplateSelector>
-						</avalonDock:DockingManager.LayoutItemTemplateSelector>
+						</DockingManager.LayoutItemTemplateSelector>
 
-						<avalonDock:DockingManager.LayoutItemContainerStyleSelector>
+						<DockingManager.LayoutItemContainerStyleSelector>
 							<demos:PanesStyleSelector>
 								<demos:PanesStyleSelector.ToolStyle>
 									<!--  Define Style of a Tool Window View  -->
-									<Style TargetType="{x:Type avalonDockControls:LayoutAnchorableItem}">
+									<Style TargetType="{x:Type LayoutAnchorableItem}">
 										<Setter Property="Title" Value="{Binding Model.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 										<Setter Property="IconSource" Value="{Binding Model.IconSource, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 										<Setter Property="Visibility" Value="{Binding Model.IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}" />
@@ -172,7 +168,7 @@
 								</demos:PanesStyleSelector.ToolStyle>
 								<demos:PanesStyleSelector.FileStyle>
 									<!--  Define Style of a Document View  -->
-									<Style TargetType="{x:Type avalonDockControls:LayoutDocumentItem}">
+									<Style TargetType="{x:Type LayoutDocumentItem}">
 										<Setter Property="Title" Value="{Binding Model.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 										<Setter Property="ToolTip" Value="{Binding Model.FilePath, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 										<Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
@@ -181,19 +177,19 @@
 									</Style>
 								</demos:PanesStyleSelector.FileStyle>
 							</demos:PanesStyleSelector>
-						</avalonDock:DockingManager.LayoutItemContainerStyleSelector>
-						<avalonDock:DockingManager.LayoutUpdateStrategy>
+						</DockingManager.LayoutItemContainerStyleSelector>
+						<DockingManager.LayoutUpdateStrategy>
 							<demos:LayoutInitializer />
-						</avalonDock:DockingManager.LayoutUpdateStrategy>
+						</DockingManager.LayoutUpdateStrategy>
 
-						<avalonDockLayout:LayoutRoot>
-							<avalonDockLayout:LayoutPanel>
-								<avalonDockLayout:LayoutDocumentPane />
+						<LayoutRoot>
+							<LayoutPanel>
+								<LayoutDocumentPane />
 								<!--  Use DockMinWidth="250" to limit the size of a LayoutAnchorable  -->
-								<avalonDockLayout:LayoutAnchorablePane Name="ToolsPane" DockMinWidth="375" />
-							</avalonDockLayout:LayoutPanel>
-						</avalonDockLayout:LayoutRoot>
-					</avalonDock:DockingManager>
+								<LayoutAnchorablePane Name="ToolsPane" DockMinWidth="375" />
+							</LayoutPanel>
+						</LayoutRoot>
+					</DockingManager>
 				</Grid>
 			</TabItem>
 			<TabItem Name="tab2" Header="tab 2">

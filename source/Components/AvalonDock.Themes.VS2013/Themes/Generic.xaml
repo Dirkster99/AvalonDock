@@ -24,14 +24,6 @@
         <ResourceDictionary Source="/AvalonDock.Themes.VS2013;component/Themes/Icons/IconGeometry.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <avalonDockConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-    <avalonDockConverters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
-    <avalonDockConverters:AnchorSideToOrientationConverter x:Key="AnchorSideToOrientationConverter" />
-    <avalonDockConverters:AnchorSideToAngleConverter x:Key="AnchorSideToAngleConverter" />
-    <avalonDockConverters:NullToDoNothingConverter x:Key="NullToDoNothingConverter" />
-    <avalonDockConverters:LayoutItemFromLayoutModelConverter x:Key="LayoutItemFromLayoutModelConverter" />
-    <avalonDockConverters:ActivateCommandLayoutItemFromLayoutModelConverter x:Key="ActivateCommandLayoutItemFromLayoutModelConverter" />
-
     <Style x:Key="DropDownControlArea" TargetType="avalonDockControls:DropDownControlArea" />
 
     <!--
@@ -81,7 +73,7 @@
     <Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="{x:Type avalonDockControls:MenuItemEx}">
         <Setter Property="IconTemplate" Value="{Binding Path=Root.Manager.IconContentTemplate}" />
         <Setter Property="IconTemplateSelector" Value="{Binding Path=Root.Manager.IconContentTemplateSelector}" />
-        <Setter Property="Command" Value="{Binding Path=., Converter={StaticResource ActivateCommandLayoutItemFromLayoutModelConverter}}" />
+        <Setter Property="Command" Value="{Binding Path=., Converter={avalonDockConverters:ActivateCommandLayoutItemFromLayoutModelConverter}}" />
         <!--
             Retemplate ControlTemplate of MenuItem to get rid of blue'ish highlighting colors on menu item
             https://stackoverflow.com/questions/34888636/change-background-color-of-menuitem-on-mouseover
@@ -206,7 +198,7 @@
                         <Grid
                             Grid.Row="0"
                             Panel.ZIndex="1"
-                            Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type avalonDockControls:LayoutDocumentPaneControl}}, Path=Model.ShowHeader, Converter={StaticResource BoolToVisibilityConverter}}">
+                            Visibility="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type avalonDockControls:LayoutDocumentPaneControl}}, Path=Model.ShowHeader, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="Auto" />
@@ -583,7 +575,7 @@
                                         Viewport="0,0,4,5"
                                         ViewportUnits="Absolute">
                                         <DrawingBrush.Drawing>
-                                            <GeometryDrawing Brush="{Binding Fill, ElementName=DragHandleGeometryPlaceholder, Mode=OneWay, Converter={StaticResource NullToDoNothingConverter}}">
+                                            <GeometryDrawing Brush="{Binding Fill, ElementName=DragHandleGeometryPlaceholder, Mode=OneWay, Converter={avalonDockConverters:NullToDoNothingConverter}}">
                                                 <GeometryDrawing.Geometry>
                                                     <GeometryGroup>
                                                         <GeometryGroup.Children>
@@ -644,7 +636,7 @@
                                 Focusable="False"
                                 Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                 ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnAutoHide_Hint}"
-                                Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
                                 <Path
                                     x:Name="PART_ImgAutoHidePin"
                                     Width="10"
@@ -663,7 +655,7 @@
                                 Focusable="False"
                                 Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                 ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}"
-                                Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
                                 <Path
                                     x:Name="PART_ImgHidePin"
                                     Width="10"
@@ -786,7 +778,7 @@
                     <StackPanel
                         MinWidth="4"
                         MinHeight="4"
-                        Orientation="{Binding Path=Model.Side, RelativeSource={RelativeSource AncestorType={x:Type avalonDockControls:LayoutAnchorSideControl}, Mode=FindAncestor}, Converter={StaticResource AnchorSideToOrientationConverter}}" />
+                        Orientation="{Binding Path=Model.Side, RelativeSource={RelativeSource AncestorType={x:Type avalonDockControls:LayoutAnchorSideControl}, Mode=FindAncestor}, Converter={avalonDockConverters:AnchorSideToOrientationConverter}}" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>
@@ -795,7 +787,7 @@
     <ControlTemplate x:Key="AvalonDockThemeVs2013AnchorGroupTemplate" TargetType="{x:Type avalonDockControls:LayoutAnchorGroupControl}">
         <ItemsControl ItemsSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Children}">
             <ItemsControl.LayoutTransform>
-                <RotateTransform Angle="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Model.Parent.Side, Converter={StaticResource AnchorSideToAngleConverter}}" />
+                <RotateTransform Angle="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Model.Parent.Side, Converter={avalonDockConverters:AnchorSideToAngleConverter}}" />
             </ItemsControl.LayoutTransform>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -1246,7 +1238,7 @@
     </DataTemplate>
 
     <DataTemplate x:Key="AvalonDockThemeVs2013IconContentTemplate">
-        <Image Source="{Binding IconSource, Converter={StaticResource NullToDoNothingConverter}}" Stretch="Uniform" />
+        <Image Source="{Binding IconSource, Converter={avalonDockConverters:NullToDoNothingConverter}}" Stretch="Uniform" />
     </DataTemplate>
 
     <ContextMenu x:Key="AvalonDockThemeVs2013AnchorableContextMenu">
@@ -1257,14 +1249,14 @@
         <MenuItem
             Command="{Binding Path=HideCommand}"
             Header="{x:Static avalonDockProperties:Resources.Anchorable_Hide}"
-            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={avalonDockConverters:BoolToVisibilityConverter}}" />
     </ContextMenu>
 
     <ContextMenu x:Key="AvalonDockThemeVs2013DocumentContextMenu">
         <MenuItem
             Command="{Binding Path=CloseCommand}"
             Header="{x:Static avalonDockProperties:Resources.Document_Close}"
-            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={avalonDockConverters:BoolToVisibilityConverter}}" />
         <MenuItem Command="{Binding Path=CloseAllButThisCommand}" Header="{x:Static avalonDockProperties:Resources.Document_CloseAllButThis}" />
         <MenuItem Command="{Binding Path=CloseAllCommand}" Header="{x:Static avalonDockProperties:Resources.Document_CloseAll}" />
         <MenuItem Command="{Binding Path=FloatCommand}" Header="{x:Static avalonDockProperties:Resources.Document_Float}" />
@@ -1272,7 +1264,7 @@
         <MenuItem
             Command="{Binding Path=NewHorizontalTabGroupCommand}"
             Header="{x:Static avalonDockProperties:Resources.Document_NewHorizontalTabGroup}"
-            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
             <MenuItem.Icon>
                 <Path
                     Width="14"
@@ -1287,7 +1279,7 @@
         <MenuItem
             Command="{Binding Path=NewVerticalTabGroupCommand}"
             Header="{x:Static avalonDockProperties:Resources.Document_NewVerticalTabGroup}"
-            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
             <MenuItem.Icon>
                 <Path
                     Width="14"
@@ -1301,11 +1293,11 @@
         <MenuItem
             Command="{Binding Path=MoveToNextTabGroupCommand}"
             Header="{x:Static avalonDockProperties:Resources.Document_MoveToNextTabGroup}"
-            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={avalonDockConverters:BoolToVisibilityConverter}}" />
         <MenuItem
             Command="{Binding Path=MoveToPreviousTabGroupCommand}"
             Header="{x:Static avalonDockProperties:Resources.Document_MoveToPreviousTabGroup}"
-            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={avalonDockConverters:BoolToVisibilityConverter}}" />
     </ContextMenu>
 
     <!--  DockingManager  -->
@@ -1673,7 +1665,7 @@
                                             Focusable="False"
                                             Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
-                                            Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                            Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={avalonDockConverters:InverseBoolToVisibilityConverter}}">
                                             <Path
                                                 x:Name="PART_ImgPinMaximize"
                                                 Width="12"
@@ -1696,7 +1688,7 @@
                                             Focusable="False"
                                             Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
-                                            Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
                                             <Path
                                                 x:Name="PART_ImgPinRestore"
                                                 Width="13"
@@ -1717,7 +1709,7 @@
                                             Focusable="False"
                                             Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
-                                            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
                                             <Path
                                                 x:Name="PART_ImgPinClose"
                                                 Width="12"
@@ -1918,7 +1910,7 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
-                                        <Border Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}">
+                                        <Border Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
                                             <avalonDockControls:DropDownControlArea
                                                 DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
                                                 DropDownContextMenuDataContext="{Binding Path=SingleContentLayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
@@ -1944,7 +1936,7 @@
                                             Focusable="False"
                                             Style="{StaticResource AvalonDockThemeVs2013ToolButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_CxMenu_Hint}"
-                                            Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            Visibility="{Binding Path=Model.IsSinglePane, RelativeSource={RelativeSource TemplatedParent}, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
                                             <Path
                                                 x:Name="PART_ImgPinMenu"
                                                 Width="11"
@@ -1968,7 +1960,7 @@
                                             Focusable="False"
                                             Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
-                                            Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                            Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={avalonDockConverters:InverseBoolToVisibilityConverter}}">
                                             <Path
                                                 x:Name="PART_ImgPinMaximize"
                                                 Width="11"
@@ -1991,7 +1983,7 @@
                                             Focusable="False"
                                             Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
-                                            Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
                                             <Path
                                                 x:Name="PART_ImgPinRestore"
                                                 Width="11"
@@ -2013,7 +2005,7 @@
                                             Focusable="False"
                                             Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}"
-                                            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
                                             <Path
                                                 x:Name="PART_ImgPinClose"
                                                 Width="11"
@@ -2346,9 +2338,9 @@
                                             <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
                                         <Image
-                                            Source="{Binding SelectedDocument.LayoutElement.IconSource, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource NullToDoNothingConverter}}"
+                                            Source="{Binding SelectedDocument.LayoutElement.IconSource, RelativeSource={RelativeSource TemplatedParent}, Converter={avalonDockConverters:NullToDoNothingConverter}}"
                                             Stretch="None"
-                                            Visibility="{Binding SelectedDocument.LayoutElement.IconSource, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                            Visibility="{Binding SelectedDocument.LayoutElement.IconSource, RelativeSource={RelativeSource TemplatedParent}, Converter={avalonDockConverters:BoolToVisibilityConverter}}" />
                                         <TextBlock
                                             x:Name="selectedElementTitle"
                                             Grid.Column="1"
@@ -2402,7 +2394,7 @@
                                                                 <ColumnDefinition Width="16" />
                                                                 <ColumnDefinition Width="150" />
                                                             </Grid.ColumnDefinitions>
-                                                            <Image Source="{Binding LayoutElement.IconSource, Converter={StaticResource NullToDoNothingConverter}}" Stretch="None" />
+                                                            <Image Source="{Binding LayoutElement.IconSource, Converter={avalonDockConverters:NullToDoNothingConverter}}" Stretch="None" />
                                                             <TextBlock
                                                                 Grid.Column="1"
                                                                 Margin="4,0,0,0"
@@ -2439,7 +2431,7 @@
                                                                 <ColumnDefinition Width="16" />
                                                                 <ColumnDefinition Width="150" />
                                                             </Grid.ColumnDefinitions>
-                                                            <Image Source="{Binding LayoutElement.IconSource, Converter={StaticResource NullToDoNothingConverter}}" Stretch="None" />
+                                                            <Image Source="{Binding LayoutElement.IconSource, Converter={avalonDockConverters:NullToDoNothingConverter}}" Stretch="None" />
                                                             <TextBlock
                                                                 Grid.Column="1"
                                                                 Margin="4,0,0,0"
