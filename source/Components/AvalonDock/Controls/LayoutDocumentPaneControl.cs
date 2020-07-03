@@ -96,7 +96,7 @@ namespace AvalonDock.Controls
 			{
 				foreach (var item in e.OldItems)
 				{
-					if (item is LayoutContent layoutContent)
+					if (item is LayoutContent layoutContent && layoutContent.TabItem != null)
 					{
 						layoutContent.TabItem.Model = null;
 						layoutContent.TabItem.ContextMenu = null;
