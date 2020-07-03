@@ -34,7 +34,7 @@ namespace AvalonDock.Controls
 		private LayoutAnchorable _model;
 		private HwndSource _internalHwndSource = null;
 		private IntPtr parentWindowHandle;
-		private ContentPresenter _internalHostPresenter = new ContentPresenter();
+		private readonly ContentPresenter _internalHostPresenter = new ContentPresenter();
 		private Grid _internalGrid = null;
 		private AnchorSide _side;
 		private LayoutGridResizerControl _resizer = null;
@@ -144,8 +144,8 @@ namespace AvalonDock.Controls
 				var rectWindow = this.GetScreenArea();
 				if (rectWindow.Contains(new Point(ptMouse.X, ptMouse.Y))) return true;
 
-				var manager = Model.Root.Manager;
-				var anchor = manager.FindVisualChildren<LayoutAnchorControl>().Where(c => c.Model == Model).FirstOrDefault();
+				var manager = Model?.Root.Manager;
+				var anchor = manager?.FindVisualChildren<LayoutAnchorControl>().Where(c => c.Model == Model).FirstOrDefault();
 
 				return anchor != null && anchor.IsMouseOver;
 				//location = anchor.PointToScreenDPI(new Point());

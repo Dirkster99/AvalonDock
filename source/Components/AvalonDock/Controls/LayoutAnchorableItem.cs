@@ -242,9 +242,9 @@ namespace AvalonDock.Controls
         /// <inheritdoc />
         protected override void InitDefaultCommands()
         {
-            _defaultHideCommand = new RelayCommand(ExecuteHideCommand, CanExecuteHideCommand);
-            _defaultAutoHideCommand = new RelayCommand(ExecuteAutoHideCommand, CanExecuteAutoHideCommand);
-            _defaultDockCommand = new RelayCommand(ExecuteDockCommand, CanExecuteDockCommand);
+            _defaultHideCommand = new RelayCommand<object>(ExecuteHideCommand, CanExecuteHideCommand);
+            _defaultAutoHideCommand = new RelayCommand<object>(ExecuteAutoHideCommand, CanExecuteAutoHideCommand);
+            _defaultDockCommand = new RelayCommand<object>(ExecuteDockCommand, CanExecuteDockCommand);
             base.InitDefaultCommands();
         }
 

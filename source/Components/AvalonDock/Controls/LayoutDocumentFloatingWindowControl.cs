@@ -47,8 +47,8 @@ namespace AvalonDock.Controls
 			: base(model, isContentImmutable)
 		{
 			_model = model;
-			HideWindowCommand = new RelayCommand(OnExecuteHideWindowCommand, CanExecuteHideWindowCommand);
-			CloseWindowCommand = new RelayCommand(OnExecuteCloseWindowCommand, CanExecuteCloseWindowCommand);
+			HideWindowCommand = new RelayCommand<object>(OnExecuteHideWindowCommand, CanExecuteHideWindowCommand);
+			CloseWindowCommand = new RelayCommand<object>(OnExecuteCloseWindowCommand, CanExecuteCloseWindowCommand);
 			Closed += (sender, args) => { Owner?.Focus(); };
 			UpdateThemeResources();
 		}

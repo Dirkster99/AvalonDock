@@ -179,9 +179,12 @@ namespace AvalonDock.Layout
 				RaisePropertyChanging(nameof(IsActive));
 				var oldValue = _isActive;
 				_isActive = value;
-				if (Root?.ActiveContent != this && value) Root.ActiveContent = this;
 				var root = Root;
-				if (root != null && _isActive && root.ActiveContent != this) root.ActiveContent = this;
+				if (root != null)
+				{
+					if (root.ActiveContent != this && value) Root.ActiveContent = this;
+					if (_isActive && root.ActiveContent != this) root.ActiveContent = this;
+				}
 				if (_isActive) IsSelected = true;
 				OnIsActiveChanged(oldValue, value);
 				RaisePropertyChanged(nameof(IsActive));
@@ -459,6 +462,11 @@ namespace AvalonDock.Layout
 
 		#endregion IsEnabled
 
+		#region TabItem
+		public LayoutDocumentTabItem TabItem { get; internal set; }
+
+		#endregion TabItem
+
 		#endregion Properties
 
 		#region Public Methods
@@ -720,6 +728,7 @@ namespace AvalonDock.Layout
 
 			parentAsContainer.RemoveChild(this);
 			root?.CollectGarbage();
+			this.Content = null;
 			OnClosed();
 		}
 

@@ -1714,6 +1714,8 @@ namespace AvalonDock
             }
             if (!document.CloseDocument()) return;
             RemoveViewFromLogicalChild(document);
+            if (document.Content is UIElement uIElement)
+                RemoveLogicalChild(uIElement);
             DocumentClosed?.Invoke(this, new DocumentClosedEventArgs(document));
         }
 
@@ -1723,7 +1725,6 @@ namespace AvalonDock
                 Close(contentToClose);
         }
 
-        [SuppressMessage("Style", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
         internal void ExecuteCloseAllCommand(LayoutContent contentSelected)
         {
             foreach (var contentToClose in Layout.Descendents().OfType<LayoutContent>().Where(d => (d.Parent is LayoutDocumentPane || d.Parent is LayoutDocumentFloatingWindow)).ToArray())
@@ -1842,8 +1843,6 @@ namespace AvalonDock
 
         private static void OnLayoutRootUpdated(object sender, EventArgs e) => CommandManager.InvalidateRequerySuggested();
 
-
-        [SuppressMessage("Style", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
         private void OnLayoutChanging(LayoutRoot newLayout) => LayoutChanging?.Invoke(this, EventArgs.Empty);
 
         private void DockingManager_Loaded(object sender, RoutedEventArgs e)
@@ -2480,7 +2479,6 @@ namespace AvalonDock
             _navigatorWindow = null;
         }
 
-        [SuppressMessage("Style", "IDE0056:使用索引运算符", Justification = "<挂起>")]
         private LayoutFloatingWindowControl CreateFloatingWindowForLayoutAnchorableWithoutParent(LayoutAnchorablePane paneModel, bool isContentImmutable)
         {
             if (paneModel.Children.Any(c => !c.CanFloat))

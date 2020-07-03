@@ -99,7 +99,7 @@
     <SolidColorBrush
         x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabSelectedActiveText}"
         options:Freeze="true"
-        Color="#FF000000" />
+        Color="#F1F1F1" />
     <SolidColorBrush
         x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabSelectedInactiveBackground}"
         options:Freeze="true"

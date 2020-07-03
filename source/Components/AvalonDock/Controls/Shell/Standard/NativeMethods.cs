@@ -1907,9 +1907,11 @@ namespace Standard
 		{
 			get
 			{
-				var ncm = new NONCLIENTMETRICS();
-				ncm.cbSize = Marshal.SizeOf(typeof(NONCLIENTMETRICS));
-				return ncm;
+                var ncm = new NONCLIENTMETRICS
+                {
+                    cbSize = Marshal.SizeOf(typeof(NONCLIENTMETRICS))
+                };
+                return ncm;
 			}
 		}
 
@@ -1918,10 +1920,12 @@ namespace Standard
 		{
 			get
 			{
-				var ncm = new NONCLIENTMETRICS();
-				// Account for the missing iPaddedBorderWidth
-				ncm.cbSize = Marshal.SizeOf(typeof(NONCLIENTMETRICS)) - sizeof(int);
-				return ncm;
+                var ncm = new NONCLIENTMETRICS
+                {
+                    // Account for the missing iPaddedBorderWidth
+                    cbSize = Marshal.SizeOf(typeof(NONCLIENTMETRICS)) - sizeof(int)
+                };
+                return ncm;
 			}
 		}
 	}

@@ -93,7 +93,7 @@
 	internal class WorkSpaceViewModel : MLibTest.ViewModels.Base.ViewModelBase, IWorkSpaceViewModel
 	{
 		#region fields
-		private ObservableCollection<DocumentViewModel> _files = new ObservableCollection<DocumentViewModel>();
+		private readonly ObservableCollection<DocumentViewModel> _files = new ObservableCollection<DocumentViewModel>();
 		private ToolViewModel[] _tools = null;
 
 		private ICommand _openCommand = null;
@@ -138,9 +138,8 @@
 					_activeDocument = value;
 					RaisePropertyChanged(nameof(ActiveDocument));
 
-					if (ActiveDocumentChanged != null)
-						ActiveDocumentChanged(this, EventArgs.Empty);
-				}
+                    ActiveDocumentChanged?.Invoke(this, EventArgs.Empty);
+                }
 			}
 		}
 

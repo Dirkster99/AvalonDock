@@ -170,12 +170,10 @@
 
 		internal async void OnLoadLayoutAsync(object parameter = null)
 		{
-			AppViewModel wspace = this.DataContext as AppViewModel;
-			
-			if (wspace != null)
-				wspace.CloseAllDocuments();
+            if (this.DataContext is AppViewModel wspace)
+                wspace.CloseAllDocuments();
 
-			App myApp = (App)Application.Current;
+            App myApp = (App)Application.Current;
 
 			LayoutLoaderResult LoaderResult = await myApp.LayoutLoaded.GetLayoutString(OnLayoutLoaded_Event);
 

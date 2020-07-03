@@ -28,8 +28,8 @@ namespace AvalonDock.Controls
 			for (var i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
 			{
 				var child = VisualTreeHelper.GetChild(depObj, i);
-				if (child is T)
-					yield return (T) child;
+				if (child is T t)
+					yield return t;
 				foreach (var childOfChild in FindVisualChildren<T>(child))
 					yield return childOfChild;
 			}
@@ -45,8 +45,8 @@ namespace AvalonDock.Controls
 			if (depObj == null) yield break;
 			foreach (var child in LogicalTreeHelper.GetChildren(depObj).OfType<DependencyObject>())
 			{
-				if (child is T)
-					yield return (T) child;
+				if (child is T t)
+					yield return t;
 				foreach (var childOfChild in FindLogicalChildren<T>(child))
 					yield return childOfChild;
 			}

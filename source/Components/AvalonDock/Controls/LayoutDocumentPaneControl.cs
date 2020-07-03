@@ -8,6 +8,8 @@
  ************************************************************************/
 
 using System;
+using System.Collections;
+using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -27,7 +29,7 @@ namespace AvalonDock.Controls
 	public class LayoutDocumentPaneControl : TabControlEx, ILayoutControl//, ILogicalChildrenContainer
 	{
 		#region fields
-		private LayoutDocumentPane _model;
+		private readonly LayoutDocumentPane _model;
 		#endregion fields
 
 		#region Constructors
@@ -87,11 +89,31 @@ namespace AvalonDock.Controls
 				_model.SelectedContent.IsActive = true;
 		}
 
-		#endregion Overrides
+        protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
+        {
+            base.OnItemsChanged(e);
+			if (e.Action == NotifyCollectionChangedAction.Remove)
+			{
+				foreach (var item in e.OldItems)
+				{
+					if (item is LayoutContent layoutContent && layoutContent.TabItem != null)
+					{
+						layoutContent.TabItem.Model = null;
+						layoutContent.TabItem.ContextMenu = null;
+						layoutContent.TabItem.Content = null;
+						var panel = layoutContent.TabItem.FindVisualAncestor<Panel>();
+						if (panel != null) panel.Children.Remove(layoutContent.TabItem);
+						layoutContent.TabItem = null;
+					}
+				}
+			}
+		}
 
-		#region Private Methods
+        #endregion Overrides
 
-		private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        #region Private Methods
+
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			var modelWithAtcualSize = _model as ILayoutPositionableElementWithActualSize;
 			modelWithAtcualSize.ActualWidth = ActualWidth;

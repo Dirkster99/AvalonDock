@@ -24,7 +24,7 @@ namespace AvalonDock.Controls
 	/// document from its docking position.
 	/// </summary>
 	/// <seealso cref="Control"/>
-	public class LayoutDocumentTabItem : Control
+	public class LayoutDocumentTabItem : ContentControl
 	{
 		#region fields
 		private List<Rect> _otherTabsScreenArea = null;
@@ -69,8 +69,10 @@ namespace AvalonDock.Controls
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Model"/> property.</summary>
 		protected virtual void OnModelChanged(DependencyPropertyChangedEventArgs e)
 		{
-			DockingManager manager = Model?.Root?.Manager;
-			SetLayoutItem(manager != null ? manager.GetLayoutItemFromModel(Model) : null);
+            var layoutItem = (Model?.Root?.Manager)?.GetLayoutItemFromModel(Model);
+			SetLayoutItem(layoutItem);
+			if (layoutItem != null)
+				Model.TabItem = this;
 			//UpdateLogicalParent();
 		}
 
