@@ -462,6 +462,11 @@ namespace AvalonDock.Layout
 
 		#endregion IsEnabled
 
+		#region TabItem
+		public LayoutDocumentTabItem TabItem { get; internal set; }
+
+		#endregion TabItem
+
 		#endregion Properties
 
 		#region Public Methods
@@ -723,6 +728,7 @@ namespace AvalonDock.Layout
 
 			parentAsContainer.RemoveChild(this);
 			root?.CollectGarbage();
+			this.Content = null;
 			OnClosed();
 		}
 

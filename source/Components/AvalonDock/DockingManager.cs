@@ -1714,6 +1714,8 @@ namespace AvalonDock
             }
             if (!document.CloseDocument()) return;
             RemoveViewFromLogicalChild(document);
+            if (document.Content is UIElement uIElement)
+                RemoveLogicalChild(uIElement);
             DocumentClosed?.Invoke(this, new DocumentClosedEventArgs(document));
         }
 

@@ -27,10 +27,13 @@ namespace AvalonDocPanelMemoryLeaks
             InitializeComponent();
         }
 
+        public HeavyLoad HeavyLoad { get; private set; }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             UserControl content = new UserControl();
-            content.DataContext = new HeavyLoad();
+            HeavyLoad = new HeavyLoad();
+            content.DataContext = HeavyLoad;
             LayoutDocument docDocument = new LayoutDocument();
             docDocument.Content = content;
             docGrup.Children.Add(docDocument);
@@ -39,6 +42,7 @@ namespace AvalonDocPanelMemoryLeaks
 
         private void DocClosed(object sender, EventArgs e)
         {
+            HeavyLoad.Load = null;
             GC.Collect();
         }
     }
