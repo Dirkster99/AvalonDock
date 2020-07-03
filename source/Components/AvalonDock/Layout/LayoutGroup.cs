@@ -25,7 +25,7 @@ namespace AvalonDock.Layout
 	public abstract class LayoutGroup<T> : LayoutGroupBase, ILayoutGroup, IXmlSerializable where T : class, ILayoutElement
 	{
 		#region fields
-		private ObservableCollection<T> _children = new ObservableCollection<T>();
+		private readonly ObservableCollection<T> _children = new ObservableCollection<T>();
 		private bool _isVisible = true;
 		#endregion fields
 

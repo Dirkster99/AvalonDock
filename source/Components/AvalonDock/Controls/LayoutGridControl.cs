@@ -34,11 +34,11 @@ namespace AvalonDock.Controls
 	public abstract class LayoutGridControl<T> : Grid, ILayoutControl, IAdjustableSizeLayout where T : class, ILayoutPanelElement
 	{
 		#region fields
-		private LayoutPositionableGroup<T> _model;
-		private Orientation _orientation;
+		private readonly LayoutPositionableGroup<T> _model;
+		private readonly Orientation _orientation;
 		private bool _initialized;
 		private ChildrenTreeChange? _asyncRefreshCalled;
-		private ReentrantFlag _fixingChildrenDockLengths = new ReentrantFlag();
+		private readonly ReentrantFlag _fixingChildrenDockLengths = new ReentrantFlag();
 		private Border _resizerGhost = null;
 		private Window _resizerWindowHost = null;
 		private Vector _initialStartPoint;

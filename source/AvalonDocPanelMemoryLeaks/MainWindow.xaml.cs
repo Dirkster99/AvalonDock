@@ -34,8 +34,10 @@ namespace AvalonDocPanelMemoryLeaks
             UserControl content = new UserControl();
             HeavyLoad = new HeavyLoad();
             content.DataContext = HeavyLoad;
-            LayoutDocument docDocument = new LayoutDocument();
-            docDocument.Content = content;
+            LayoutDocument docDocument = new LayoutDocument
+            {
+                Content = content
+            };
             docGrup.Children.Add(docDocument);
             docDocument.Closed += DocClosed;
         }

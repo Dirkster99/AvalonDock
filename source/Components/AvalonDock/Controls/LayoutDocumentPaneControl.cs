@@ -29,7 +29,7 @@ namespace AvalonDock.Controls
 	public class LayoutDocumentPaneControl : TabControlEx, ILayoutControl//, ILogicalChildrenContainer
 	{
 		#region fields
-		private LayoutDocumentPane _model;
+		private readonly LayoutDocumentPane _model;
 		#endregion fields
 
 		#region Constructors

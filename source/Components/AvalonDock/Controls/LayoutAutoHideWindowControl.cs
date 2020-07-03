@@ -34,7 +34,7 @@ namespace AvalonDock.Controls
 		private LayoutAnchorable _model;
 		private HwndSource _internalHwndSource = null;
 		private IntPtr parentWindowHandle;
-		private ContentPresenter _internalHostPresenter = new ContentPresenter();
+		private readonly ContentPresenter _internalHostPresenter = new ContentPresenter();
 		private Grid _internalGrid = null;
 		private AnchorSide _side;
 		private LayoutGridResizerControl _resizer = null;

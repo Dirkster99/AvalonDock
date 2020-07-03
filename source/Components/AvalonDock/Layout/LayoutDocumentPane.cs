@@ -29,7 +29,7 @@ namespace AvalonDock.Layout
 		string _id;
 
 		[XmlIgnore]
-		bool _autoFixSelectedContent = true;
+        readonly bool _autoFixSelectedContent = true;
 		#endregion fields
 
 		#region Constructors
@@ -111,7 +111,7 @@ namespace AvalonDock.Layout
 		protected override bool GetVisibility()
 		{
 			if (Parent is LayoutDocumentPaneGroup)
-				return ChildrenCount > 0 && Children.Any(c => c is LayoutDocument && ((LayoutDocument)c).IsVisible || c is LayoutAnchorable);
+				return ChildrenCount > 0 && Children.Any(c => (c is LayoutDocument document && document.IsVisible) || c is LayoutAnchorable);
 			return true;
 		}
 
@@ -200,9 +200,8 @@ namespace AvalonDock.Layout
 		/// <returns></returns>
 		public int IndexOf(LayoutContent content)
 		{
-			var documentChild = content as LayoutDocument;
-			return documentChild == null ? -1 : Children.IndexOf(documentChild);
-		}
+            return !(content is LayoutDocument documentChild) ? -1 : Children.IndexOf(documentChild);
+        }
 
 		/// <summary>Invalidates the current <see cref="SelectedContentIndex"/> and sets the index for the next avialable child with IsEnabled == true.</summary>
 		internal void SetNextSelectedIndex()

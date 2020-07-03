@@ -39,8 +39,8 @@ namespace AvalonDock.Controls
 		private ICommand _defaultMoveToNextTabGroupCommand;
 		private ICommand _defaultMoveToPreviousTabGroupCommand;
 		private ContentPresenter _view = null;
-		private ReentrantFlag _isSelectedReentrantFlag = new ReentrantFlag();
-		private ReentrantFlag _isActiveReentrantFlag = new ReentrantFlag();
+		private readonly ReentrantFlag _isSelectedReentrantFlag = new ReentrantFlag();
+		private readonly ReentrantFlag _isActiveReentrantFlag = new ReentrantFlag();
 		#endregion fields
 
 		#region Constructors
