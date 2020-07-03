@@ -718,16 +718,16 @@ namespace AvalonDock.Controls
 
 		protected virtual void InitDefaultCommands()
 		{
-			_defaultCloseCommand = new RelayCommand(ExecuteCloseCommand, CanExecuteCloseCommand);
-			_defaultFloatCommand = new RelayCommand(ExecuteFloatCommand, CanExecuteFloatCommand);
-			_defaultDockAsDocumentCommand = new RelayCommand(ExecuteDockAsDocumentCommand, CanExecuteDockAsDocumentCommand);
-			_defaultCloseAllButThisCommand = new RelayCommand(ExecuteCloseAllButThisCommand, CanExecuteCloseAllButThisCommand);
-			_defaultCloseAllCommand = new RelayCommand(ExecuteCloseAllCommand, CanExecuteCloseAllCommand);
-			_defaultActivateCommand = new RelayCommand(ExecuteActivateCommand, CanExecuteActivateCommand);
-			_defaultNewVerticalTabGroupCommand = new RelayCommand(ExecuteNewVerticalTabGroupCommand, CanExecuteNewVerticalTabGroupCommand);
-			_defaultNewHorizontalTabGroupCommand = new RelayCommand(ExecuteNewHorizontalTabGroupCommand, CanExecuteNewHorizontalTabGroupCommand);
-			_defaultMoveToNextTabGroupCommand = new RelayCommand(ExecuteMoveToNextTabGroupCommand, CanExecuteMoveToNextTabGroupCommand);
-			_defaultMoveToPreviousTabGroupCommand = new RelayCommand(ExecuteMoveToPreviousTabGroupCommand, CanExecuteMoveToPreviousTabGroupCommand);
+			_defaultCloseCommand = new RelayCommand<object>(ExecuteCloseCommand, CanExecuteCloseCommand);
+			_defaultFloatCommand = new RelayCommand<object>(ExecuteFloatCommand, CanExecuteFloatCommand);
+			_defaultDockAsDocumentCommand = new RelayCommand<object>(ExecuteDockAsDocumentCommand, CanExecuteDockAsDocumentCommand);
+			_defaultCloseAllButThisCommand = new RelayCommand<object>(ExecuteCloseAllButThisCommand, CanExecuteCloseAllButThisCommand);
+			_defaultCloseAllCommand = new RelayCommand<object>(ExecuteCloseAllCommand, CanExecuteCloseAllCommand);
+			_defaultActivateCommand = new RelayCommand<object>(ExecuteActivateCommand, CanExecuteActivateCommand);
+			_defaultNewVerticalTabGroupCommand = new RelayCommand<object>(ExecuteNewVerticalTabGroupCommand, CanExecuteNewVerticalTabGroupCommand);
+			_defaultNewHorizontalTabGroupCommand = new RelayCommand<object>(ExecuteNewHorizontalTabGroupCommand, CanExecuteNewHorizontalTabGroupCommand);
+			_defaultMoveToNextTabGroupCommand = new RelayCommand<object>(ExecuteMoveToNextTabGroupCommand, CanExecuteMoveToNextTabGroupCommand);
+			_defaultMoveToPreviousTabGroupCommand = new RelayCommand<object>(ExecuteMoveToPreviousTabGroupCommand, CanExecuteMoveToPreviousTabGroupCommand);
 		}
 
 		protected virtual void ClearDefaultBindings()

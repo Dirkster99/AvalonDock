@@ -47,8 +47,8 @@ namespace AvalonDock.Controls
 		   : base(model, isContentImmutable)
 		{
 			_model = model;
-			HideWindowCommand = new RelayCommand((p) => OnExecuteHideWindowCommand(p), (p) => CanExecuteHideWindowCommand(p));
-			CloseWindowCommand = new RelayCommand((p) => OnExecuteCloseWindowCommand(p), (p) => CanExecuteCloseWindowCommand(p));
+			HideWindowCommand = new RelayCommand<object>((p) => OnExecuteHideWindowCommand(p), (p) => CanExecuteHideWindowCommand(p));
+			CloseWindowCommand = new RelayCommand<object>((p) => OnExecuteCloseWindowCommand(p), (p) => CanExecuteCloseWindowCommand(p));
 			Activated += LayoutAnchorableFloatingWindowControl_Activated;
 			UpdateThemeResources();
 			MinWidth = _model.RootPanel.CalculatedDockMinWidth();
