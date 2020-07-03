@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
 using System.Xml.Serialization;
+using System.Collections.Specialized;
 
 namespace AvalonDock.Layout
 {
@@ -212,17 +213,17 @@ namespace AvalonDock.Layout
 
 		#region Private Methods
 
-		private void _children_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		private void _children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
-			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove || e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+			if (e.Action == NotifyCollectionChangedAction.Remove || e.Action == NotifyCollectionChangedAction.Replace)
 			{
 				if (e.OldItems != null)
 				{
 					foreach (LayoutElement element in e.OldItems)
-						if (element.Parent == this) element.Parent = null;
+						if (element.Parent == this || e.Action == NotifyCollectionChangedAction.Remove) element.Parent = null;
 				}
 			}
-			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add || e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+			if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Replace)
 			{
 				if (e.NewItems != null)
 				{
@@ -238,7 +239,7 @@ namespace AvalonDock.Layout
 			ComputeVisibility();
 			OnChildrenCollectionChanged();
 
-			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+			if (e.Action == NotifyCollectionChangedAction.Add)
 				// #81 - Make parents update their children up the tree. Otherwise, they will not be redrawn.
 				RaiseChildrenTreeChanged();
 			else
