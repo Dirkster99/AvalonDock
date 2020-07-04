@@ -64,6 +64,7 @@
             x:Name="dockManager"
             Grid.Row="1"
             AllowMixedOrientation="True"
+            AutoWindowSizeWhenOpened="True"
             DocumentClosing="DockManager_DocumentClosing"
             IsVirtualizingAnchorable="True"
             IsVirtualizingDocument="True">
