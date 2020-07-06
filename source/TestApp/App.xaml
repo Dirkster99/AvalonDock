@@ -25,7 +25,7 @@
                     Set this property to true to auto-size the demo LayoutAnchorable to the size of its containing control
                     when being dragged into floating mode
                 -->
-                <Setter Property="SetWindowSizeWhenOpened" Value="False" />
+                <!--<Setter Property="SetWindowSizeWhenOpened" Value="True" />-->
             </Style>
         </ResourceDictionary>
     </Application.Resources>
