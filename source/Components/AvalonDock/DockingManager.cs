@@ -1341,6 +1341,25 @@ namespace AvalonDock
 
         #endregion IsVirtualizingLayoutDocument IsVirtualizingLayoutAnchorable
 
+
+        #region AutoWindowSizeWhenOpened
+
+        /// <summary>
+        /// Gets/sets the float window <see cref="LayoutFloatingWindowControl"/> is auto size when dragged out
+        /// </summary>
+        [Bindable(true), Description("Gets/sets the floating window is auto size when floated out"), Category("FloatingWindow")]
+        public bool AutoWindowSizeWhenOpened
+        {
+            get { return (bool)GetValue(AutoWindowSizeWhenOpenedProperty); }
+            set { SetValue(AutoWindowSizeWhenOpenedProperty, value); }
+        }
+
+        public static readonly DependencyProperty AutoWindowSizeWhenOpenedProperty =
+            DependencyProperty.Register("AutoWindowSizeWhenOpened", typeof(bool), typeof(DockingManager), new PropertyMetadata(false));
+
+
+        #endregion AutoWindowSizeWhenOpened
+
         #endregion Public Properties
 
         #region Private Properties

@@ -60,28 +60,29 @@
             </MenuItem>
         </Menu>
 
-        <avalonDock:DockingManager
+        <DockingManager
             x:Name="dockManager"
             Grid.Row="1"
             AllowMixedOrientation="True"
+            AutoWindowSizeWhenOpened="True"
             DocumentClosing="DockManager_DocumentClosing"
             IsVirtualizingAnchorable="True"
             IsVirtualizingDocument="True">
-            <avalonDock:DockingManager.Theme>
-                <avalonDock:Vs2013DarkTheme />
-            </avalonDock:DockingManager.Theme>
-            <avalonDock:DockingManager.DocumentHeaderTemplate>
+            <DockingManager.Theme>
+                <Vs2013DarkTheme />
+            </DockingManager.Theme>
+            <DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
                         <Image Margin="0,0,4,0" Source="{Binding IconSource}" />
                         <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
                     </StackPanel>
                 </DataTemplate>
-            </avalonDock:DockingManager.DocumentHeaderTemplate>
-            <avalonDock:LayoutRoot PropertyChanged="OnLayoutRootPropertyChanged">
-                <avalonDock:LayoutPanel Orientation="Horizontal">
-                    <avalonDock:LayoutAnchorablePane DockWidth="50">
-                        <avalonDock:LayoutAnchorable
+            </DockingManager.DocumentHeaderTemplate>
+            <LayoutRoot PropertyChanged="OnLayoutRootPropertyChanged">
+                <LayoutPanel Orientation="Horizontal">
+                    <LayoutAnchorablePane DockWidth="50">
+                        <LayoutAnchorable
                             x:Name="WinFormsWindow"
                             Title="WinForms Window"
                             CanClose="False"
@@ -89,11 +90,11 @@
                             ContentId="WinFormsWindow"
                             ToolTip="My WinForms Tool">
                             <winformsIntegration:WindowsFormsHost x:Name="winFormsHost" Background="White" />
-                        </avalonDock:LayoutAnchorable>
-                    </avalonDock:LayoutAnchorablePane>
-                    <avalonDock:LayoutDocumentPaneGroup>
-                        <avalonDock:LayoutDocumentPane x:Name="LayoutDocumentPane">
-                            <avalonDock:LayoutDocument
+                        </LayoutAnchorable>
+                    </LayoutAnchorablePane>
+                    <LayoutDocumentPaneGroup>
+                        <LayoutDocumentPane x:Name="LayoutDocumentPane">
+                            <LayoutDocument
                                 Title="Document 1"
                                 ContentId="document1"
                                 IconSource="/TestApp;component/Images/alarm-clock-blue.png">
@@ -101,19 +102,19 @@
                                     <TextBox Text="Document 1 Content" />
                                     <Button Click="AddTwoDocuments_click" Content="Click to add 2 documents" />
                                 </StackPanel>
-                            </avalonDock:LayoutDocument>
-                            <avalonDock:LayoutDocument Title="Document 2" ContentId="document2">
+                            </LayoutDocument>
+                            <LayoutDocument Title="Document 2" ContentId="document2">
                                 <TextBox
                                     Background="Transparent"
                                     BorderThickness="0"
                                     Foreground="White"
                                     Text="{Binding TestTimer, Mode=OneWay, StringFormat='Document 2 Attached to Timer ->\{0\}'}" />
-                            </avalonDock:LayoutDocument>
-                        </avalonDock:LayoutDocumentPane>
-                    </avalonDock:LayoutDocumentPaneGroup>
-                    <avalonDock:LayoutAnchorablePaneGroup DockWidth="50">
-                        <avalonDock:LayoutAnchorablePane>
-                            <avalonDock:LayoutAnchorable
+                            </LayoutDocument>
+                        </LayoutDocumentPane>
+                    </LayoutDocumentPaneGroup>
+                    <LayoutAnchorablePaneGroup DockWidth="50">
+                        <LayoutAnchorablePane>
+                            <LayoutAnchorable
                                 Title="Tool Window 1"
                                 ContentId="toolWindow1"
                                 Hiding="OnToolWindow1Hiding">
@@ -121,33 +122,33 @@
                                     <local:TestUserControl />
                                     <TextBox Text="{Binding TestTimer, Mode=OneWay, StringFormat='Tool Window 1 Attached to Timer ->\{0\}'}" />
                                 </StackPanel>
-                            </avalonDock:LayoutAnchorable>
-                            <avalonDock:LayoutAnchorable Title="Tool Window 2" ContentId="toolWindow2">
+                            </LayoutAnchorable>
+                            <LayoutAnchorable Title="Tool Window 2" ContentId="toolWindow2">
                                 <TextBlock Text="{Binding FocusedElement}" />
-                            </avalonDock:LayoutAnchorable>
-                        </avalonDock:LayoutAnchorablePane>
-                    </avalonDock:LayoutAnchorablePaneGroup>
-                </avalonDock:LayoutPanel>
+                            </LayoutAnchorable>
+                        </LayoutAnchorablePane>
+                    </LayoutAnchorablePaneGroup>
+                </LayoutPanel>
 
-                <avalonDock:LayoutRoot.LeftSide>
-                    <avalonDock:LayoutAnchorSide>
-                        <avalonDock:LayoutAnchorGroup>
-                            <avalonDock:LayoutAnchorable
+                <LayoutRoot.LeftSide>
+                    <LayoutAnchorSide>
+                        <LayoutAnchorGroup>
+                            <LayoutAnchorable
                                 Title="AutoHide1 Content"
                                 ContentId="AutoHide1Content"
                                 IconSource="/TestApp;component/Images/address-book--pencil.png">
                                 <TextBox Text="{Binding TestTimer, Mode=OneWay, StringFormat='AutoHide Attached to Timer ->\{0\}'}" />
-                            </avalonDock:LayoutAnchorable>
-                            <avalonDock:LayoutAnchorable Title="AutoHide2 Content" ContentId="AutoHide2Content">
+                            </LayoutAnchorable>
+                            <LayoutAnchorable Title="AutoHide2 Content" ContentId="AutoHide2Content">
                                 <StackPanel Orientation="Vertical">
                                     <TextBox />
                                     <TextBox />
                                 </StackPanel>
-                            </avalonDock:LayoutAnchorable>
-                        </avalonDock:LayoutAnchorGroup>
-                    </avalonDock:LayoutAnchorSide>
-                </avalonDock:LayoutRoot.LeftSide>
-            </avalonDock:LayoutRoot>
-        </avalonDock:DockingManager>
+                            </LayoutAnchorable>
+                        </LayoutAnchorGroup>
+                    </LayoutAnchorSide>
+                </LayoutRoot.LeftSide>
+            </LayoutRoot>
+        </DockingManager>
     </Grid>
 </Window>
