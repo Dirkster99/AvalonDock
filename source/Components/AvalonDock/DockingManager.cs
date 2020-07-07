@@ -1301,7 +1301,8 @@ namespace AvalonDock
         public static readonly DependencyProperty ShowSystemMenuProperty = DependencyProperty.Register(nameof(ShowSystemMenu), typeof(bool), typeof(DockingManager),
                 new FrameworkPropertyMetadata(true));
 
-        /// <summary>Gets or sets the <see cref="ShowSystemMenu"/> property. This dependency property indicates if floating windows should show the system menu when a custom context menu is not defined.</summary>
+        /// <summary>Gets/sets whether floating windows should show the system menu when a custom context menu is not defined.</summary>
+        [Bindable(true), Description("Gets/sets whether floating windows should show the system menu when a custom context menu is not defined."), Category("FloatingWindow")]
         public bool ShowSystemMenu
         {
             get => (bool)GetValue(ShowSystemMenuProperty);
@@ -1345,9 +1346,10 @@ namespace AvalonDock
         #region AutoWindowSizeWhenOpened
 
         /// <summary>
-        /// Gets/sets the float window <see cref="LayoutFloatingWindowControl"/> is auto size when dragged out
+        /// Gets/sets whether the floating window size of a <see cref="LayoutFloatingWindowControl"/> is auto sized when it is dragged out.
+        /// If true the MinHeight and MinWidth of the content will be used together with the margins to determine the initial size of the floating window.
         /// </summary>
-        [Bindable(true), Description("Gets/sets the floating window is auto size when floated out"), Category("FloatingWindow")]
+        [Bindable(true), Description("Gets/sets whether the floating window is auto sized when it is dragged out."), Category("FloatingWindow")]
         public bool AutoWindowSizeWhenOpened
         {
             get { return (bool)GetValue(AutoWindowSizeWhenOpenedProperty); }
