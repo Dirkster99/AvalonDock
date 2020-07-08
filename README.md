@@ -131,7 +131,8 @@ to also theme standard elements, such as, button and textblock etc.
   - [Fix Issue #135 ActiveContent not switching correctly for floating window](https://github.com/Dirkster99/AvalonDock/issues/135)  
   - [Fix Issue #165 ActiveContent not stable](https://github.com/Dirkster99/AvalonDock/issues/165)  
   - [Fix Issue #171 LayoutDocument leaks on close](https://github.com/Dirkster99/AvalonDock/issues/171)  
-  - [Fix Issue #174 The SetWindowSizeWhenOpened Feature is broken](https://github.com/Dirkster99/AvalonDock/issues/174)
+  - **Breaking Change**  
+    [Fix Issue #174 The SetWindowSizeWhenOpened Feature is broken](https://github.com/Dirkster99/AvalonDock/issues/174)
   - [Fix Issue #177 ToolBar TabItem color error](https://github.com/Dirkster99/AvalonDock/issues/177)
 
 - [#59 InvalidOperationException when deserializing layout](https://github.com/Dirkster99/AvalonDock/issues/59#issuecomment-642934204)
