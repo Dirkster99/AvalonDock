@@ -122,6 +122,8 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Fixes & Features in master but not relased, yet
 
+- Localized labels in [NavigatorWindow](https://github.com/Dirkster99/AvalonDock/wiki/NavigatorWindow)
+
 - [#170 Several Improvements](https://github.com/Dirkster99/AvalonDock/pull/170) (thanx to [刘晓青 LyonJack](https://github.com/LyonJack))  
   - Improved VS 2013 Theme and ease of reusing controls  
   - [Fix Issue #85 Floating Window Title Flashing](https://github.com/Dirkster99/AvalonDock/issues/85)  

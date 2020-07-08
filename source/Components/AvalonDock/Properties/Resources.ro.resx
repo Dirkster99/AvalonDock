@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Active_Files" xml:space="preserve">
+    <value>Fișiere active</value>
+  </data>
+  <data name="Active_ToolWindows" xml:space="preserve">
+    <value>Fereastra instrumentului active</value>
+  </data>
   <data name="Anchorable_AutoHide" xml:space="preserve">
     <value>Ascunde automat</value>
   </data>

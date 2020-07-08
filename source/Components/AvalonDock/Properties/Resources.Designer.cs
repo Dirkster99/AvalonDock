@@ -61,6 +61,24 @@ namespace AvalonDock.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Active Files.
+        /// </summary>
+        public static string Active_Files {
+            get {
+                return ResourceManager.GetString("Active_Files", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Active Tool Windows.
+        /// </summary>
+        public static string Active_ToolWindows {
+            get {
+                return ResourceManager.GetString("Active_ToolWindows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Auto Hide.
         /// </summary>
         public static string Anchorable_AutoHide {
