@@ -15,15 +15,16 @@ namespace AvalonDock.Layout.Serialization
 	/// Implements an event that can be used to communicate between deserialization method
 	/// and client application that a new item (LayoutAnchorable or Document) is about to
 	/// be constructed and should be attached to a corresponding viewmodel.
-	/// 
+	///
 	/// The client application can use this event to Cancel reloading the item or
 	/// attach (a viewmodel) content to the view item that is about to be reloaded and presented in the UI.
-	/// 
+	///
 	/// Use the Cancel property to indicate the case in which an item should not be deserialized.
 	/// </summary>
 	public class LayoutSerializationCallbackEventArgs : CancelEventArgs
 	{
 		#region constructors
+
 		/// <summary>
 		/// Class constructor from <see cref="LayoutContent"/> and <paramref name="previousContent"/> object.
 		/// </summary>
@@ -39,6 +40,7 @@ namespace AvalonDock.Layout.Serialization
 		#endregion constructors
 
 		#region Properties
+
 		/// <summary>
 		/// Gets the model of the view that is about to be deserialized.
 		/// </summary>

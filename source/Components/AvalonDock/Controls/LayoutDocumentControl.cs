@@ -7,12 +7,12 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -23,6 +23,7 @@ namespace AvalonDock.Controls
 	public class LayoutDocumentControl : Control
 	{
 		#region Constructors
+
 		/// <summary>
 		/// Static class constructor
 		/// </summary>
@@ -58,7 +59,7 @@ namespace AvalonDock.Controls
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Model"/> property.</summary>
 		protected virtual void OnModelChanged(DependencyPropertyChangedEventArgs e)
 		{
-			if (e.OldValue != null) ((LayoutContent) e.OldValue).PropertyChanged -= Model_PropertyChanged;
+			if (e.OldValue != null) ((LayoutContent)e.OldValue).PropertyChanged -= Model_PropertyChanged;
 			if (Model != null)
 			{
 				Model.PropertyChanged += Model_PropertyChanged;
@@ -88,13 +89,13 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
 		/// <summary>
-		/// Gets the <see cref="LayoutItem"/> property. This dependency property 
+		/// Gets the <see cref="LayoutItem"/> property. This dependency property
 		/// indicates the LayoutItem attached to this tag item.
 		/// </summary>
 		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
 
 		/// <summary>
-		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.  
+		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.
 		/// This dependency property indicates the LayoutItem attached to this tag item.
 		/// </summary>
 		/// <param name="value">The new value for the property.</param>
@@ -127,7 +128,7 @@ namespace AvalonDock.Controls
 			SetIsActive();
 			base.OnMouseLeftButtonDown(e);
 		}
-		
+
 		#endregion Overrides
 
 		#region Private Methods

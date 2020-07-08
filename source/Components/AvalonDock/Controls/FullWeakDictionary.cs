@@ -13,7 +13,7 @@ using System.Collections.Generic;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a dictionary class that uses weak references for keys and values - 
+	/// Implements a dictionary class that uses weak references for keys and values -
 	/// that is, this dictionary uses weak references only.
 	/// </summary>
 	/// <typeparam name="K"></typeparam>
@@ -21,8 +21,10 @@ namespace AvalonDock.Controls
 	internal class FullWeakDictionary<K, V> where K : class
 	{
 		#region fields
+
 		private List<WeakReference> _keys = new List<WeakReference>();
 		private List<WeakReference> _values = new List<WeakReference>();
+
 		#endregion fields
 
 		#region Public Methods
@@ -103,7 +105,7 @@ namespace AvalonDock.Controls
 		/// Removes all entries where either the key or the value (or both)
 		/// have already been garbage collected.
 		/// </summary>
-		void CollectGarbage()
+		private void CollectGarbage()
 		{
 			int vIndex = 0;
 

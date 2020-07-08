@@ -19,7 +19,7 @@ namespace AvalonDock
 		/// <summary>
 		/// Ensures that <paramref name="min"/> is greater <paramref name="max"/> via Exception (if not)
 		/// and returns a valid value inside the given bounds.
-		/// 
+		///
 		/// That is, (<paramref name="min"/> or <paramref name="max"/> is returned if
 		/// <paramref name="value"/> is out of bounds, <paramref name="value"/> is returned otherwise.
 		/// </summary>

@@ -7,10 +7,10 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using AvalonDock.Layout;
 using System.Windows.Threading;
 
 namespace AvalonDock.Controls
@@ -22,8 +22,10 @@ namespace AvalonDock.Controls
 	public class LayoutAnchorControl : Control, ILayoutControl
 	{
 		#region fields
+
 		private LayoutAnchorable _model;
 		private DispatcherTimer _openUpTimer = null;
+
 		#endregion fields
 
 		#region Constructors
@@ -66,7 +68,7 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty SideProperty = SidePropertyKey.DependencyProperty;
 
 		/// <summary>
-		/// Gets the Side property.  This dependency property 
+		/// Gets the Side property.  This dependency property
 		/// indicates the anchor side of the control.
 		/// </summary>
 		public AnchorSide Side
@@ -78,7 +80,7 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Provides a secure method for setting the Side property.  
+		/// Provides a secure method for setting the Side property.
 		/// This dependency property indicates the anchor side of the control.
 		/// </summary>
 		/// <param name="value">The new value for the property.</param>
@@ -122,7 +124,6 @@ namespace AvalonDock.Controls
 		//    }
 		//}
 
-
 		protected override void OnMouseDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseDown(e);
@@ -157,7 +158,6 @@ namespace AvalonDock.Controls
 			}
 			base.OnMouseLeave(e);
 		}
-
 
 		#endregion Overrides
 

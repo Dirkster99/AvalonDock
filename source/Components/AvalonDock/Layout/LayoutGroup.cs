@@ -9,10 +9,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Collections.ObjectModel;
-using System.Xml.Serialization;
 using System.Collections.Specialized;
+using System.Linq;
+using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
@@ -25,11 +25,14 @@ namespace AvalonDock.Layout
 	public abstract class LayoutGroup<T> : LayoutGroupBase, ILayoutGroup, IXmlSerializable where T : class, ILayoutElement
 	{
 		#region fields
+
 		private readonly ObservableCollection<T> _children = new ObservableCollection<T>();
 		private bool _isVisible = true;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Class constructor.</summary>
 		internal LayoutGroup()
 		{
@@ -39,6 +42,7 @@ namespace AvalonDock.Layout
 		#endregion Constructors
 
 		#region Properties
+
 		/// <summary>Gets a collection of children objects below this object.</summary>
 		public ObservableCollection<T> Children => _children;
 
@@ -65,6 +69,7 @@ namespace AvalonDock.Layout
 		#endregion Properties
 
 		#region Public Methods
+
 		/// <inheritdoc cref="ILayoutElementWithVisibility" />
 		public void ComputeVisibility() => IsVisible = GetVisibility();
 

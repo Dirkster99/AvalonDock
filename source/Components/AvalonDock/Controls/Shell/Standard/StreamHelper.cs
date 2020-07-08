@@ -52,11 +52,12 @@ namespace Standard
 		}
 
 		// Comments are taken from MSDN IStream documentation.
+
 		#region IStream Members
 
 		/// <summary>
 		/// Creates a new stream object with its own seek pointer that
-		/// references the same bytes as the original stream. 
+		/// references the same bytes as the original stream.
 		/// </summary>
 		/// <param name="ppstm">
 		/// When this method returns, contains the new stream object. This parameter is passed uninitialized.
@@ -75,10 +76,10 @@ namespace Standard
 
 		/// <summary>
 		/// Ensures that any changes made to a stream object that is open in transacted
-		/// mode are reflected in the parent storage. 
+		/// mode are reflected in the parent storage.
 		/// </summary>
 		/// <param name="grfCommitFlags">
-		/// A value that controls how the changes for the stream object are committed. 
+		/// A value that controls how the changes for the stream object are committed.
 		/// </param>
 		/// <remarks>
 		/// For more information, see the existing documentation for IStream::Commit in the MSDN library.
@@ -91,13 +92,13 @@ namespace Standard
 
 		/// <summary>
 		/// Copies a specified number of bytes from the current seek pointer in the
-		/// stream to the current seek pointer in another stream. 
+		/// stream to the current seek pointer in another stream.
 		/// </summary>
 		/// <param name="pstm">
-		/// A reference to the destination stream. 
+		/// A reference to the destination stream.
 		/// </param>
 		/// <param name="cb">
-		/// The number of bytes to copy from the source stream. 
+		/// The number of bytes to copy from the source stream.
 		/// </param>
 		/// <param name="pcbRead">
 		/// On successful return, contains the actual number of bytes read from the source.
@@ -134,10 +135,10 @@ namespace Standard
 		}
 
 		/// <summary>
-		/// Restricts access to a specified range of bytes in the stream. 
+		/// Restricts access to a specified range of bytes in the stream.
 		/// </summary>
 		/// <param name="libOffset">
-		/// The byte offset for the beginning of the range. 
+		/// The byte offset for the beginning of the range.
 		/// </param>
 		/// <param name="cb">
 		/// The length of the range, in bytes, to restrict.
@@ -153,13 +154,13 @@ namespace Standard
 		public void LockRegion(long libOffset, long cb, int dwLockType) => HRESULT.STG_E_INVALIDFUNCTION.ThrowIfFailed("The method is not implemented.");
 
 		/// <summary>
-		/// Reads a specified number of bytes from the stream object into memory starting at the current seek pointer. 
+		/// Reads a specified number of bytes from the stream object into memory starting at the current seek pointer.
 		/// </summary>
 		/// <param name="pv">
 		/// When this method returns, contains the data read from the stream. This parameter is passed uninitialized.
 		/// </param>
 		/// <param name="cb">
-		/// The number of bytes to read from the stream object. 
+		/// The number of bytes to read from the stream object.
 		/// </param>
 		/// <param name="pcbRead">
 		/// A pointer to a ULONG variable that receives the actual number of bytes read from the stream object.
@@ -174,7 +175,6 @@ namespace Standard
 			var cbRead = _source.Read(pv, 0, cb);
 			if (pcbRead != IntPtr.Zero) Marshal.WriteInt32(pcbRead, cbRead);
 		}
-
 
 		/// <summary>
 		/// Discards all changes that have been made to a transacted stream since the last Commit call.
@@ -193,7 +193,7 @@ namespace Standard
 		/// The displacement to add to dwOrigin.
 		/// </param>
 		/// <param name="dwOrigin">
-		/// The origin of the seek. The origin can be the beginning of the file, the current seek pointer, or the end of the file. 
+		/// The origin of the seek. The origin can be the beginning of the file, the current seek pointer, or the end of the file.
 		/// </param>
 		/// <param name="plibNewPosition">
 		/// On successful return, contains the offset of the seek pointer from the beginning of the stream.
@@ -212,10 +212,10 @@ namespace Standard
 		}
 
 		/// <summary>
-		/// Changes the size of the stream object. 
+		/// Changes the size of the stream object.
 		/// </summary>
 		/// <param name="libNewSize">
-		/// The new size of the stream as a number of bytes. 
+		/// The new size of the stream as a number of bytes.
 		/// </param>
 		/// <remarks>
 		/// For more information, see the existing documentation for IStream::SetSize in the MSDN library.
@@ -227,14 +227,14 @@ namespace Standard
 		}
 
 		/// <summary>
-		/// Retrieves the STATSTG structure for this stream. 
+		/// Retrieves the STATSTG structure for this stream.
 		/// </summary>
 		/// <param name="pstatstg">
 		/// When this method returns, contains a STATSTG structure that describes this stream object.
 		/// This parameter is passed uninitialized.
 		/// </param>
 		/// <param name="grfStatFlag">
-		/// Members in the STATSTG structure that this method does not return, thus saving some memory allocation operations. 
+		/// Members in the STATSTG structure that this method does not return, thus saving some memory allocation operations.
 		/// </param>
 		public void Stat(out STATSTG pstatstg, int grfStatFlag)
 		{
@@ -272,10 +272,10 @@ namespace Standard
 		/// The buffer to write this stream to.
 		/// </param>
 		/// <param name="cb">
-		/// The number of bytes to write to the stream. 
+		/// The number of bytes to write to the stream.
 		/// </param>
 		/// <param name="pcbWritten">
-		/// On successful return, contains the actual number of bytes written to the stream object. 
+		/// On successful return, contains the actual number of bytes written to the stream object.
 		/// If the caller sets this pointer to null, this method does not provide the actual number
 		/// of bytes written.
 		/// </param>
@@ -294,6 +294,6 @@ namespace Standard
 		/// <inheritdoc />
 		public void Dispose() => _source = null;
 
-		#endregion
+		#endregion IDisposable Members
 	}
 }

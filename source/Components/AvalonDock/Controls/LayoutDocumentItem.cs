@@ -16,7 +16,7 @@ namespace AvalonDock.Controls
 	/// <summary>
 	/// This is a wrapper for around the custom document content view of <see cref="LayoutElement"/>.
 	/// Implements the <see cref="AvalonDock.Controls.LayoutItem" />
-	/// 
+	///
 	/// All DPs implemented here can be bound in a corresponding style to control parameters
 	/// in dependency properties via binding in MVVM.
 	/// </summary>
@@ -24,14 +24,18 @@ namespace AvalonDock.Controls
 	public class LayoutDocumentItem : LayoutItem
 	{
 		#region fields
+
 		private LayoutDocument _document;   // The content of this item
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Class constructor</summary>
 		internal LayoutDocumentItem()
 		{
 		}
+
 		#endregion Constructors
 
 		#region Properties
@@ -43,7 +47,7 @@ namespace AvalonDock.Controls
 					new FrameworkPropertyMetadata(null, OnDescriptionChanged));
 
 		/// <summary>
-		/// Gets or sets the <see cref="Description"/> property.  This dependency property 
+		/// Gets or sets the <see cref="Description"/> property.  This dependency property
 		/// indicates the description to display (in the <see cref="NavigatorWindow"/>) for the document item.
 		/// </summary>
 		public string Description

@@ -7,15 +7,15 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Commands;
+using AvalonDock.Layout;
+using Microsoft.Windows.Shell;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AvalonDock.Layout;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using AvalonDock.Commands;
-using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
@@ -26,12 +26,15 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public class LayoutDocumentFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
 	{
-        #region fields
-        private readonly LayoutDocumentFloatingWindow _model;
+		#region fields
+
+		private readonly LayoutDocumentFloatingWindow _model;
 		private List<IDropArea> _dropAreas = null;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Static class constructor</summary>
 		static LayoutDocumentFloatingWindowControl()
 		{
@@ -62,7 +65,7 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Overrides
 
@@ -76,7 +79,7 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata(null, OnSingleContentLayoutItemChanged));
 
 		/// <summary>
-		/// Gets or sets the <see cref="SingleContentLayoutItem"/> property.  This dependency property 
+		/// Gets or sets the <see cref="SingleContentLayoutItem"/> property.  This dependency property
 		/// indicates the layout item of the selected content when is shown a single document pane.
 		/// </summary>
 		public LayoutItem SingleContentLayoutItem
@@ -93,7 +96,7 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion
+		#endregion SingleContentLayoutItem
 
 		protected override void OnInitialized(EventArgs e)
 		{
@@ -105,7 +108,7 @@ namespace AvalonDock.Controls
 			_model.RootPanel.ChildrenCollectionChanged += RootPanelOnChildrenCollectionChanged;
 		}
 
-		void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == nameof(LayoutDocumentFloatingWindow.RootPanel) && _model.RootPanel == null) InternalClose();
 		}
@@ -127,6 +130,7 @@ namespace AvalonDock.Controls
 						handled = true;
 					}
 					break;
+
 				case Win32Helper.WM_NCRBUTTONUP:
 					if (wParam.ToInt32() == Win32Helper.HT_CAPTION)
 					{
@@ -162,7 +166,7 @@ namespace AvalonDock.Controls
 			_model.PropertyChanged -= Model_PropertyChanged;
 		}
 
-		#endregion
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -202,9 +206,9 @@ namespace AvalonDock.Controls
 
 		DockingManager IOverlayWindowHost.Manager => _model.Root.Manager;
 
-		OverlayWindow _overlayWindow = null;
+		private OverlayWindow _overlayWindow = null;
 
-		void CreateOverlayWindow()
+		private void CreateOverlayWindow()
 		{
 			if (_overlayWindow == null) _overlayWindow = new OverlayWindow(this);
 			var rectWindow = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
@@ -240,7 +244,7 @@ namespace AvalonDock.Controls
 			var dockAsDocument = true;
 			if (!isDraggingDocuments)
 			{
-                if (draggingWindow.Model is LayoutAnchorableFloatingWindow)
+				if (draggingWindow.Model is LayoutAnchorableFloatingWindow)
 				{
 					foreach (var item in GetAnchorableInFloatingWindow(draggingWindow))
 					{
@@ -277,17 +281,17 @@ namespace AvalonDock.Controls
 		private IEnumerable<LayoutAnchorable> GetAnchorableInFloatingWindow(LayoutFloatingWindowControl draggingWindow)
 		{
 			if (!(draggingWindow.Model is LayoutAnchorableFloatingWindow layoutAnchorableFloatingWindow)) yield break;
-            //big part of code for getting type
+			//big part of code for getting type
 
-            if (layoutAnchorableFloatingWindow.SinglePane is LayoutAnchorablePane layoutAnchorablePane && (layoutAnchorableFloatingWindow.IsSinglePane && layoutAnchorablePane.SelectedContent != null))
-            {
-                var layoutAnchorable = ((LayoutAnchorablePane)layoutAnchorableFloatingWindow.SinglePane).SelectedContent as LayoutAnchorable;
-                yield return layoutAnchorable;
-            }
-            else
-                foreach (var item in GetLayoutAnchorable(layoutAnchorableFloatingWindow.RootPanel))
-                    yield return item;
-        }
+			if (layoutAnchorableFloatingWindow.SinglePane is LayoutAnchorablePane layoutAnchorablePane && (layoutAnchorableFloatingWindow.IsSinglePane && layoutAnchorablePane.SelectedContent != null))
+			{
+				var layoutAnchorable = ((LayoutAnchorablePane)layoutAnchorableFloatingWindow.SinglePane).SelectedContent as LayoutAnchorable;
+				yield return layoutAnchorable;
+			}
+			else
+				foreach (var item in GetLayoutAnchorable(layoutAnchorableFloatingWindow.RootPanel))
+					yield return item;
+		}
 
 		/// <summary>
 		/// Finds all <see cref="LayoutAnchorable"/> objects (toolwindows) within a
@@ -305,6 +309,7 @@ namespace AvalonDock.Controls
 		}
 
 		#region HideWindowCommand
+
 		public ICommand HideWindowCommand { get; }
 
 		private bool CanExecuteHideWindowCommand(object parameter)
@@ -346,13 +351,15 @@ namespace AvalonDock.Controls
 			foreach (var anchorable in this.Model.Descendents().OfType<LayoutContent>().ToArray())
 			{
 				//if (manager.GetLayoutItemFromModel(anchorable) is LayoutAnchorableItem layoutAnchorableItem) layoutAnchorableItem.HideCommand.Execute(parameter);
-				//else 
+				//else
 				if (manager.GetLayoutItemFromModel(anchorable) is LayoutItem layoutItem) layoutItem.CloseCommand.Execute(parameter);
 			}
 		}
-		#endregion
+
+		#endregion HideWindowCommand
 
 		#region CloseWindowCommand
+
 		public ICommand CloseWindowCommand { get; }
 
 		private bool CanExecuteCloseWindowCommand(object parameter)
@@ -389,8 +396,8 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion CloseWindowCommand
 
-		#endregion
+		#endregion Private Methods
 	}
 }

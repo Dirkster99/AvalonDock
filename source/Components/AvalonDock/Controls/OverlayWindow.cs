@@ -7,13 +7,13 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
+using AvalonDock.Themes;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
-using AvalonDock.Layout;
-using AvalonDock.Themes;
 
 namespace AvalonDock.Controls
 {
@@ -24,7 +24,7 @@ namespace AvalonDock.Controls
 	public class OverlayWindow : Window, IOverlayWindow
 	{
 		#region fields
-		private ResourceDictionary currentThemeResourceDictionary; // = null
+
 		private Canvas _mainCanvasPanel;
 		private Grid _gridDockingManagerDropTargets;    // Showing and activating 4 outer drop taget buttons over DockingManager
 		private Grid _gridAnchorablePaneDropTargets;    // Showing and activating 5 inner drop target buttons over layout anchorable pane
@@ -32,29 +32,36 @@ namespace AvalonDock.Controls
 		private Grid _gridDocumentPaneFullDropTargets;  // Showing and activating 9 inner drop target buttons over document pane
 
 		#region DockingManagerDropTargets
+
 		private FrameworkElement _dockingManagerDropTargetBottom; // 4 outer drop taget buttons over DockingManager
 		private FrameworkElement _dockingManagerDropTargetTop;
 		private FrameworkElement _dockingManagerDropTargetLeft;
 		private FrameworkElement _dockingManagerDropTargetRight;
+
 		#endregion DockingManagerDropTargets
 
 		#region AnchorablePaneDropTargets
+
 		private FrameworkElement _anchorablePaneDropTargetBottom; // 5 inner drop target buttons over layout anchorable pane
 		private FrameworkElement _anchorablePaneDropTargetTop;
 		private FrameworkElement _anchorablePaneDropTargetLeft;
 		private FrameworkElement _anchorablePaneDropTargetRight;
 		private FrameworkElement _anchorablePaneDropTargetInto;
+
 		#endregion AnchorablePaneDropTargets
 
 		#region DocumentPaneDropTargets
+
 		private FrameworkElement _documentPaneDropTargetBottom;   // 5 inner drop target buttons over document pane
 		private FrameworkElement _documentPaneDropTargetTop;
 		private FrameworkElement _documentPaneDropTargetLeft;
 		private FrameworkElement _documentPaneDropTargetRight;
 		private FrameworkElement _documentPaneDropTargetInto;
+
 		#endregion DocumentPaneDropTargets
 
 		#region DocumentPaneFullDropTargets
+
 		private FrameworkElement _documentPaneDropTargetBottomAsAnchorablePane; // 9 inner drop target buttons over document pane
 		private FrameworkElement _documentPaneDropTargetTopAsAnchorablePane;
 		private FrameworkElement _documentPaneDropTargetLeftAsAnchorablePane;
@@ -65,12 +72,14 @@ namespace AvalonDock.Controls
 		private FrameworkElement _documentPaneFullDropTargetLeft;
 		private FrameworkElement _documentPaneFullDropTargetRight;
 		private FrameworkElement _documentPaneFullDropTargetInto;
+
 		#endregion DocumentPaneFullDropTargets
 
 		private Path _previewBox;
 		private readonly IOverlayWindowHost _host;
 		private LayoutFloatingWindowControl _floatingWindow = null;
 		private readonly List<IDropArea> _visibleAreas = new List<IDropArea>();
+
 		#endregion fields
 
 		#region Constructors
@@ -92,7 +101,7 @@ namespace AvalonDock.Controls
 			UpdateThemeResources();
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties.
 
@@ -101,7 +110,7 @@ namespace AvalonDock.Controls
 		/// </summary>
 		public bool IsHostedInFloatingWindow => _host is LayoutDocumentFloatingWindowControl || _host is LayoutAnchorableFloatingWindowControl;
 
-		#endregion
+		#endregion Properties.
 
 		#region Overrides
 
@@ -157,7 +166,7 @@ namespace AvalonDock.Controls
 			base.OnClosing(e);
 		}
 
-		#endregion
+		#endregion Overrides
 
 		#region Internal Methods
 
@@ -165,35 +174,16 @@ namespace AvalonDock.Controls
 		{
 			if (oldTheme != null)
 			{
-				if (oldTheme is DictionaryTheme)
-				{
-					if (currentThemeResourceDictionary != null)
-					{
-						Resources.MergedDictionaries.Remove(currentThemeResourceDictionary);
-						currentThemeResourceDictionary = null;
-					}
-				}
-				else
-				{
-					var resourceDictionaryToRemove =
-						Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
-					if (resourceDictionaryToRemove != null)
-						Resources.MergedDictionaries.Remove(
-							resourceDictionaryToRemove);
-				}
+				var resourceDictionaryToRemove =
+					Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
+				if (resourceDictionaryToRemove != null)
+					Resources.MergedDictionaries.Remove(
+						resourceDictionaryToRemove);
 			}
 
 			if (_host.Manager.Theme != null)
 			{
-				if (_host.Manager.Theme is DictionaryTheme theme)
-				{
-					currentThemeResourceDictionary = theme.ThemeResourceDictionary;
-					Resources.MergedDictionaries.Add(currentThemeResourceDictionary);
-				}
-				else
-				{
-					Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = _host.Manager.Theme.GetResourceUri() });
-				}
+				Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = _host.Manager.Theme.GetResourceUri() });
 			}
 		}
 
@@ -207,10 +197,9 @@ namespace AvalonDock.Controls
 		{
 			if (_mainCanvasPanel != null)
 				_mainCanvasPanel.Visibility = System.Windows.Visibility.Hidden;
-
 		}
 
-		#endregion
+		#endregion Internal Methods
 
 		#region Private Methods
 
@@ -275,70 +264,71 @@ namespace AvalonDock.Controls
 		{
 			var result = new List<LayoutContent>();
 
-            if (source is LayoutDocumentFloatingWindow documentFloatingWindow)
-            {
-                foreach (var layoutElement in documentFloatingWindow.Children)
-                {
-                    result.AddRange(GetAllLayoutContents(layoutElement));
-                }
-            }
+			if (source is LayoutDocumentFloatingWindow documentFloatingWindow)
+			{
+				foreach (var layoutElement in documentFloatingWindow.Children)
+				{
+					result.AddRange(GetAllLayoutContents(layoutElement));
+				}
+			}
 
-            if (source is LayoutAnchorableFloatingWindow anchorableFloatingWindow)
-            {
-                foreach (var layoutElement in anchorableFloatingWindow.Children)
-                {
-                    result.AddRange(GetAllLayoutContents(layoutElement));
-                }
-            }
+			if (source is LayoutAnchorableFloatingWindow anchorableFloatingWindow)
+			{
+				foreach (var layoutElement in anchorableFloatingWindow.Children)
+				{
+					result.AddRange(GetAllLayoutContents(layoutElement));
+				}
+			}
 
-            if (source is LayoutDocumentPaneGroup documentPaneGroup)
-            {
-                foreach (var layoutDocumentPane in documentPaneGroup.Children)
-                {
-                    result.AddRange(GetAllLayoutContents(layoutDocumentPane));
-                }
-            }
+			if (source is LayoutDocumentPaneGroup documentPaneGroup)
+			{
+				foreach (var layoutDocumentPane in documentPaneGroup.Children)
+				{
+					result.AddRange(GetAllLayoutContents(layoutDocumentPane));
+				}
+			}
 
-            if (source is LayoutAnchorablePaneGroup anchorablePaneGroup)
-            {
-                foreach (var layoutDocumentPane in anchorablePaneGroup.Children)
-                {
-                    result.AddRange(GetAllLayoutContents(layoutDocumentPane));
-                }
-            }
+			if (source is LayoutAnchorablePaneGroup anchorablePaneGroup)
+			{
+				foreach (var layoutDocumentPane in anchorablePaneGroup.Children)
+				{
+					result.AddRange(GetAllLayoutContents(layoutDocumentPane));
+				}
+			}
 
-            if (source is LayoutDocumentPane documentPane)
-            {
-                foreach (var layoutContent in documentPane.Children)
-                {
-                    result.Add(layoutContent);
-                }
-            }
+			if (source is LayoutDocumentPane documentPane)
+			{
+				foreach (var layoutContent in documentPane.Children)
+				{
+					result.Add(layoutContent);
+				}
+			}
 
-            if (source is LayoutAnchorablePane anchorablePane)
-            {
-                foreach (var layoutContent in anchorablePane.Children)
-                {
-                    result.Add(layoutContent);
-                }
-            }
+			if (source is LayoutAnchorablePane anchorablePane)
+			{
+				foreach (var layoutContent in anchorablePane.Children)
+				{
+					result.Add(layoutContent);
+				}
+			}
 
-            if (source is LayoutDocument document)
-            {
-                result.Add(document);
-            }
+			if (source is LayoutDocument document)
+			{
+				result.Add(document);
+			}
 
-            if (source is LayoutAnchorable anchorable)
-            {
-                result.Add(anchorable);
-            }
+			if (source is LayoutAnchorable anchorable)
+			{
+				result.Add(anchorable);
+			}
 
-            return result;
+			return result;
 		}
 
-		#endregion
+		#endregion Private Methods
 
 		#region IOverlayWindow
+
 		/// <inheritdoc cref="IOverlayWindow"/>
 		IEnumerable<IDropTarget> IOverlayWindow.GetTargets()
 		{
@@ -356,6 +346,7 @@ namespace AvalonDock.Controls
 							yield return new DockingManagerDropTarget(dropAreaDockingManager.AreaElement, _dockingManagerDropTargetRight.GetScreenArea(), DropTargetType.DockingManagerDockRight);
 						}
 						break;
+
 					case DropAreaType.AnchorablePane:
 						{
 							// Dragging over AnchorablePane -> Add DropTarget Area
@@ -391,6 +382,7 @@ namespace AvalonDock.Controls
 								yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, dropAreaTitle.GetScreenArea(), DropTargetType.AnchorablePaneDockInside);
 						}
 						break;
+
 					case DropAreaType.DocumentPane:
 						{
 							// Dragging over DocumentPane -> Add DropTarget Area
@@ -476,6 +468,7 @@ namespace AvalonDock.Controls
 							}
 						}
 						break;
+
 					case DropAreaType.DocumentPaneGroup:
 						{
 							// Dragging over DocumentPaneGroup -> Add DropTarget Area
@@ -485,7 +478,6 @@ namespace AvalonDock.Controls
 						}
 						break;
 				}
-
 			}
 			yield break;
 		}
@@ -523,6 +515,7 @@ namespace AvalonDock.Controls
 					}
 					areaElement = _gridDockingManagerDropTargets;
 					break;
+
 				case DropAreaType.AnchorablePane:
 					areaElement = _gridAnchorablePaneDropTargets;
 
@@ -535,6 +528,7 @@ namespace AvalonDock.Controls
 					}
 					SetDropTargetIntoVisibility(layoutAnchorablePane);
 					break;
+
 				case DropAreaType.DocumentPaneGroup:
 					{
 						areaElement = _gridDocumentPaneDropTargets;
@@ -552,6 +546,7 @@ namespace AvalonDock.Controls
 						_documentPaneDropTargetBottom.Visibility = Visibility.Hidden;
 					}
 					break;
+
 				case DropAreaType.DocumentPane:
 				default:
 					{
@@ -615,7 +610,6 @@ namespace AvalonDock.Controls
 								_documentPaneDropTargetRightAsAnchorablePane.Visibility = System.Windows.Visibility.Collapsed;
 								_documentPaneDropTargetTopAsAnchorablePane.Visibility = System.Windows.Visibility.Collapsed;
 							}
-
 							else if (parentDocumentPaneGroup != null &&
 								parentDocumentPaneGroup.Children.Where(c => c.IsVisible).Count() > 1)
 							{
@@ -639,7 +633,6 @@ namespace AvalonDock.Controls
 										parentDocumentPaneGroup.Orientation == Orientation.Horizontal ?
 											(isFirstChild ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden) :
 											System.Windows.Visibility.Hidden;
-
 
 									_documentPaneDropTargetRightAsAnchorablePane.Visibility =
 										parentDocumentPaneGroup.Orientation == Orientation.Horizontal ?
@@ -695,7 +688,6 @@ namespace AvalonDock.Controls
 									_documentPaneDropTargetTop.Visibility = Visibility.Visible;
 									_documentPaneDropTargetBottom.Visibility = Visibility.Visible;
 								}
-
 							}
 							else if (parentDocumentPaneGroup == null &&
 								layoutDocumentPane != null &&
@@ -736,12 +728,15 @@ namespace AvalonDock.Controls
 				case DropAreaType.DockingManager:
 					areaElement = _gridDockingManagerDropTargets;
 					break;
+
 				case DropAreaType.AnchorablePane:
 					areaElement = _gridAnchorablePaneDropTargets;
 					break;
+
 				case DropAreaType.DocumentPaneGroup:
 					areaElement = _gridDocumentPaneDropTargets;
 					break;
+
 				case DropAreaType.DocumentPane:
 				default:
 					{
@@ -780,6 +775,6 @@ namespace AvalonDock.Controls
 			target.Drop(_floatingWindow.Model as LayoutFloatingWindow);
 		}
 
-		#endregion
+		#endregion IOverlayWindow
 	}
 }

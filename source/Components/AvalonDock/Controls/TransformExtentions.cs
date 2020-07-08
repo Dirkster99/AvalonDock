@@ -108,6 +108,5 @@ namespace AvalonDock.Controls
 			var parentWindow = PresentationSource.FromVisual(element).RootVisual;
 			return element.TransformToAncestor(parentWindow);
 		}
-
 	}
 }

@@ -88,6 +88,7 @@ namespace Standard
 		DISMISSONCLICK = 0x0002,
 		NOBACKGROUND = 0x0004,
 		HIDDEN = 0x0008,
+
 		// Added post-beta
 		NONINTERACTIVE = 0x0010,
 	}
@@ -112,6 +113,7 @@ namespace Standard
 		//
 		// Specifying other GPS_ flags modifies the store that is returned
 		DEFAULT = 0x00000000,
+
 		HANDLERPROPERTIESONLY = 0x00000001,   // only include properties directly from the file's property handler
 		READWRITE = 0x00000002,   // Writable stores will only include handler properties
 		TEMPORARY = 0x00000004,   // A read/write store that only holds properties for the lifetime of the IShellItem object
@@ -139,13 +141,15 @@ namespace Standard
 		/// <summary>Objects can be copied</summary>
 		/// <remarks>DROPEFFECT_COPY</remarks>
 		CANCOPY = 0x1,
+
 		/// <summary>Objects can be moved</summary>
 		/// <remarks>DROPEFFECT_MOVE</remarks>
 		CANMOVE = 0x2,
+
 		/// <summary>Objects can be linked</summary>
 		/// <remarks>
 		/// DROPEFFECT_LINK.
-		/// 
+		///
 		/// If this bit is set on an item in the shell folder, a
 		/// 'Create Shortcut' menu item will be added to the File
 		/// menu and context menus for the item.  If the user selects
@@ -156,12 +160,16 @@ namespace Standard
 		/// folder.
 		/// </remarks>
 		CANLINK = 0x4,
+
 		/// <summary>supports BindToObject(IID_IStorage)</summary>
 		STORAGE = 0x00000008,
+
 		/// <summary>Objects can be renamed</summary>
 		CANRENAME = 0x00000010,
+
 		/// <summary>Objects can be deleted</summary>
 		CANDELETE = 0x00000020,
+
 		/// <summary>Objects have property sheets</summary>
 		HASPROPSHEET = 0x00000040,
 
@@ -169,57 +177,83 @@ namespace Standard
 
 		/// <summary>Objects are drop target</summary>
 		DROPTARGET = 0x00000100,
+
 		CAPABILITYMASK = 0x00000177,
+
 		// unused = 0x00000200,
 		// unused = 0x00000400,
 		// unused = 0x00000800,
 		// unused = 0x00001000,
 		/// <summary>Object is encrypted (use alt color)</summary>
 		ENCRYPTED = 0x00002000,
+
 		/// <summary>'Slow' object</summary>
 		ISSLOW = 0x00004000,
+
 		/// <summary>Ghosted icon</summary>
 		GHOSTED = 0x00008000,
+
 		/// <summary>Shortcut (link)</summary>
 		LINK = 0x00010000,
+
 		/// <summary>Shared</summary>
 		SHARE = 0x00020000,
+
 		/// <summary>Read-only</summary>
 		READONLY = 0x00040000,
+
 		/// <summary> Hidden object</summary>
 		HIDDEN = 0x00080000,
+
 		DISPLAYATTRMASK = 0x000FC000,
+
 		/// <summary> May contain children with SFGAO_FILESYSTEM</summary>
 		FILESYSANCESTOR = 0x10000000,
+
 		/// <summary>Support BindToObject(IID_IShellFolder)</summary>
 		FOLDER = 0x20000000,
+
 		/// <summary>Is a win32 file system object (file/folder/root)</summary>
 		FILESYSTEM = 0x40000000,
+
 		/// <summary>May contain children with SFGAO_FOLDER (may be slow)</summary>
 		HASSUBFOLDER = 0x80000000,
+
 		CONTENTSMASK = 0x80000000,
+
 		/// <summary>Invalidate cached information (may be slow)</summary>
 		VALIDATE = 0x01000000,
+
 		/// <summary>Is this removeable media?</summary>
 		REMOVABLE = 0x02000000,
+
 		/// <summary> Object is compressed (use alt color)</summary>
 		COMPRESSED = 0x04000000,
+
 		/// <summary>Supports IShellFolder, but only implements CreateViewObject() (non-folder view)</summary>
 		BROWSABLE = 0x08000000,
+
 		/// <summary>Is a non-enumerated object (should be hidden)</summary>
 		NONENUMERATED = 0x00100000,
+
 		/// <summary>Should show bold in explorer tree</summary>
 		NEWCONTENT = 0x00200000,
+
 		/// <summary>Obsolete</summary>
 		CANMONIKER = 0x00400000,
+
 		/// <summary>Obsolete</summary>
 		HASSTORAGE = 0x00400000,
+
 		/// <summary>Supports BindToObject(IID_IStream)</summary>
 		STREAM = 0x00400000,
+
 		/// <summary>May contain children with SFGAO_STORAGE or SFGAO_STREAM</summary>
 		STORAGEANCESTOR = 0x00800000,
+
 		/// <summary>For determining storage capabilities, ie for open/save semantics</summary>
 		STORAGECAPMASK = 0x70C50008,
+
 		/// <summary>
 		/// Attributes that are masked out for PKEY_SFGAOFlags because they are considered
 		/// to cause slow calculations or lack context
@@ -270,10 +304,13 @@ namespace Standard
 	{
 		/// <summary>iOrder based on display in a folder view</summary>
 		DISPLAY = 0x00000000,
+
 		/// <summary>exact instance compare</summary>
 		ALLFIELDS = 0x80000000,
+
 		/// <summary>iOrder based on canonical name (better performance)</summary>
 		CANONICAL = 0x10000000,
+
 		TEST_FILESYSPATH_IF_NOT_EQUAL = 0x20000000,
 	};
 
@@ -321,7 +358,7 @@ namespace Standard
 		public const string NO_OPLOCK = "GPS_NO_OPLOCK";
 	}
 
-	#endregion
+	#endregion Enums and Static Property Classes
 
 	#region Structs
 
@@ -337,17 +374,19 @@ namespace Standard
 		public uint iId;
 		public uint iBitmap;
 		public IntPtr hIcon;
+
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
 		public string szTip;
+
 		public THBF dwFlags;
 	}
-
 
 	[StructLayout(LayoutKind.Sequential, Pack = 4)]
 	internal struct PKEY
 	{
 		/// <summary>fmtid</summary>
 		private readonly Guid _fmtid;
+
 		/// <summary>pid</summary>
 		private readonly uint _pid;
 
@@ -359,19 +398,24 @@ namespace Standard
 
 		/// <summary>PKEY_Title</summary>
 		public static readonly PKEY Title = new PKEY(new Guid("F29F85E0-4FF9-1068-AB91-08002B27B3D9"), 2);
+
 		/// <summary>PKEY_AppUserModel_ID</summary>
 		public static readonly PKEY AppUserModel_ID = new PKEY(new Guid("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3"), 5);
+
 		/// <summary>PKEY_AppUserModel_IsDestListSeparator</summary>
 		public static readonly PKEY AppUserModel_IsDestListSeparator = new PKEY(new Guid("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3"), 6);
+
 		/// <summary>PKEY_AppUserModel_RelaunchCommand</summary>
 		public static readonly PKEY AppUserModel_RelaunchCommand = new PKEY(new Guid("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3"), 2);
+
 		/// <summary>PKEY_AppUserModel_RelaunchDisplayNameResource</summary>
 		public static readonly PKEY AppUserModel_RelaunchDisplayNameResource = new PKEY(new Guid("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3"), 4);
+
 		/// <summary>PKEY_AppUserModel_RelaunchIconResource</summary>
 		public static readonly PKEY AppUserModel_RelaunchIconResource = new PKEY(new Guid("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3"), 3);
 	}
 
-	#endregion
+	#endregion Structs
 
 	#region Interfaces
 
@@ -384,9 +428,12 @@ namespace Standard
 	{
 		[PreserveSig()]
 		HRESULT Next(uint celt, out IntPtr rgelt, out int pceltFetched);
+
 		[PreserveSig()]
 		HRESULT Skip(uint celt);
+
 		void Reset();
+
 		void Clone([Out, MarshalAs(UnmanagedType.Interface)] out IEnumIDList ppenum);
 	}
 
@@ -425,6 +472,7 @@ namespace Standard
 	internal interface IObjectArray
 	{
 		uint GetCount();
+
 		[return: MarshalAs(UnmanagedType.IUnknown)]
 		object GetAt([In] uint uiIndex, [In] ref Guid riid);
 	}
@@ -434,17 +482,23 @@ namespace Standard
 		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
 		Guid(IID.ObjectArray),
 	]
-	interface IObjectCollection : IObjectArray
+	internal interface IObjectCollection : IObjectArray
 	{
 		#region IObjectArray redeclarations
+
 		new uint GetCount();
+
 		[return: MarshalAs(UnmanagedType.IUnknown)]
 		new object GetAt([In] uint uiIndex, [In] ref Guid riid);
-		#endregion
+
+		#endregion IObjectArray redeclarations
 
 		void AddObject([MarshalAs(UnmanagedType.IUnknown)] object punk);
+
 		void AddFromArray(IObjectArray poaSource);
+
 		void RemoveObjectAt(uint uiIndex);
+
 		void Clear();
 	}
 
@@ -456,9 +510,13 @@ namespace Standard
 	internal interface IPropertyStore
 	{
 		uint GetCount();
+
 		PKEY GetAt(uint iProp);
+
 		void GetValue([In] ref PKEY pkey, [In, Out] PROPVARIANT pv);
+
 		void SetValue([In] ref PKEY pkey, PROPVARIANT pv);
+
 		void Commit();
 	}
 
@@ -613,17 +671,23 @@ namespace Standard
 		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
 		Guid(IID.ShellItem2),
 	]
-	interface IShellItem2 : IShellItem
+	internal interface IShellItem2 : IShellItem
 	{
 		#region IShellItem redeclarations
+
 		[return: MarshalAs(UnmanagedType.Interface)]
 		new object BindToHandler([In] IBindCtx pbc, [In] ref Guid bhid, [In] ref Guid riid);
+
 		new IShellItem GetParent();
+
 		[return: MarshalAs(UnmanagedType.LPWStr)]
 		new string GetDisplayName(SIGDN sigdnName);
+
 		new SFGAO GetAttributes(SFGAO sfgaoMask);
+
 		new int Compare(IShellItem psi, SICHINT hint);
-		#endregion
+
+		#endregion IShellItem redeclarations
 
 		[return: MarshalAs(UnmanagedType.Interface)]
 		object GetPropertyStore(
@@ -678,22 +742,39 @@ namespace Standard
 	internal interface IShellLinkW
 	{
 		void GetPath([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxPath, [In, Out] WIN32_FIND_DATAW pfd, SLGP fFlags);
+
 		void GetIDList(out IntPtr ppidl);
+
 		void SetIDList(IntPtr pidl);
+
 		void GetDescription([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxName);
+
 		void SetDescription([MarshalAs(UnmanagedType.LPWStr)] string pszName);
+
 		void GetWorkingDirectory([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszDir, int cchMaxPath);
+
 		void SetWorkingDirectory([MarshalAs(UnmanagedType.LPWStr)] string pszDir);
+
 		void GetArguments([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszArgs, int cchMaxPath);
+
 		void SetArguments([MarshalAs(UnmanagedType.LPWStr)] string pszArgs);
+
 		short GetHotKey();
+
 		void SetHotKey(short wHotKey);
+
 		uint GetShowCmd();
+
 		void SetShowCmd(uint iShowCmd);
+
 		void GetIconLocation([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszIconPath, int cchIconPath, out int piIcon);
+
 		void SetIconLocation([MarshalAs(UnmanagedType.LPWStr)] string pszIconPath, int iIcon);
+
 		void SetRelativePath([MarshalAs(UnmanagedType.LPWStr)] string pszPathRel, uint dwReserved);
+
 		void Resolve(IntPtr hwnd, uint fFlags);
+
 		void SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
 	}
 
@@ -742,12 +823,18 @@ namespace Standard
 	internal interface ITaskbarList2 : ITaskbarList
 	{
 		#region ITaskbarList redeclaration
+
 		new void HrInit();
+
 		new void AddTab(IntPtr hwnd);
+
 		new void DeleteTab(IntPtr hwnd);
+
 		new void ActivateTab(IntPtr hwnd);
+
 		new void SetActiveAlt(IntPtr hwnd);
-		#endregion
+
+		#endregion ITaskbarList redeclaration
 
 		/// <summary>
 		/// Marks a window as full-screen.
@@ -772,7 +859,7 @@ namespace Standard
 	]
 	internal interface IApplicationDestinations
 	{
-		// Set the App User Model ID for the application removing destinations from its list.  If an AppID is not provided 
+		// Set the App User Model ID for the application removing destinations from its list.  If an AppID is not provided
 		// via this method, the system will use a heuristically determined ID.  This method must be called before
 		// RemoveDestination or RemoveAllDestinations.
 		void SetAppID([In, MarshalAs(UnmanagedType.LPWStr)] string pszAppID);
@@ -796,14 +883,14 @@ namespace Standard
 	{
 		/// <summary>
 		/// Set the App User Model ID for the application retrieving this list.  If an AppID is not provided via this method,
-		/// the system will use a heuristically determined ID.  This method must be called before GetList. 
+		/// the system will use a heuristically determined ID.  This method must be called before GetList.
 		/// </summary>
 		/// <param name="pszAppID">App Id.</param>
 		void SetAppID([MarshalAs(UnmanagedType.LPWStr)] string pszAppID);
 
 		/// <summary>
-		/// Retrieve an IEnumObjects or IObjectArray for IShellItems and/or IShellLinks. 
-		/// Items may appear in both the frequent and recent lists.  
+		/// Retrieve an IEnumObjects or IObjectArray for IShellItems and/or IShellLinks.
+		/// Items may appear in both the frequent and recent lists.
 		/// </summary>
 		/// <param name="?"></param>
 		/// <returns></returns>
@@ -829,15 +916,20 @@ namespace Standard
 		// Can't readily detect that case without just trying to append it.
 		[PreserveSig]
 		HRESULT AppendCategory([MarshalAs(UnmanagedType.LPWStr)] string pszCategory, IObjectArray poa);
+
 		void AppendKnownCategory(KDC category);
+
 		[PreserveSig]
 		HRESULT AddUserTasks(IObjectArray poa);
+
 		void CommitList();
 
 		// Retrieve IObjectCollection of IShellItems
 		[return: MarshalAs(UnmanagedType.Interface)]
 		object GetRemovedDestinations([In] ref Guid riid);
+
 		void DeleteList([MarshalAs(UnmanagedType.LPWStr)] string pszAppID);
+
 		void AbortList();
 	}
 
@@ -852,12 +944,13 @@ namespace Standard
 	internal interface IObjectWithAppUserModelId
 	{
 		void SetAppID([MarshalAs(UnmanagedType.LPWStr)] string pszAppID);
+
 		[return: MarshalAs(UnmanagedType.LPWStr)]
 		string GetAppID();
 	};
 
 	/// <summary>
-	/// Provides access to the ProgID associated with an object 
+	/// Provides access to the ProgID associated with an object
 	/// </summary>
 	[
 		ComImport,
@@ -867,6 +960,7 @@ namespace Standard
 	internal interface IObjectWithProgId
 	{
 		void SetProgID([MarshalAs(UnmanagedType.LPWStr)] string pszProgID);
+
 		[return: MarshalAs(UnmanagedType.LPWStr)]
 		string GetProgID();
 	};
@@ -881,16 +975,22 @@ namespace Standard
 		#region ITaskbarList2 redeclaration
 
 		#region ITaskbarList redeclaration
+
 		new void HrInit();
+
 		new void AddTab(IntPtr hwnd);
+
 		new void DeleteTab(IntPtr hwnd);
+
 		new void ActivateTab(IntPtr hwnd);
+
 		new void SetActiveAlt(IntPtr hwnd);
-		#endregion
+
+		#endregion ITaskbarList redeclaration
 
 		new void MarkFullscreenWindow(IntPtr hwnd, [MarshalAs(UnmanagedType.Bool)] bool fFullscreen);
 
-		#endregion
+		#endregion ITaskbarList2 redeclaration
 
 		[PreserveSig]
 		HRESULT SetProgressValue(IntPtr hwnd, ulong ullCompleted, ulong ullTotal);
@@ -942,47 +1042,64 @@ namespace Standard
 		#region ITaskbarList2 redeclaration
 
 		#region ITaskbarList redeclaration
+
 		new void HrInit();
+
 		new void AddTab(IntPtr hwnd);
+
 		new void DeleteTab(IntPtr hwnd);
+
 		new void ActivateTab(IntPtr hwnd);
+
 		new void SetActiveAlt(IntPtr hwnd);
-		#endregion
+
+		#endregion ITaskbarList redeclaration
 
 		new void MarkFullscreenWindow(IntPtr hwnd, [MarshalAs(UnmanagedType.Bool)] bool fFullscreen);
 
-		#endregion
+		#endregion ITaskbarList2 redeclaration
 
 		[PreserveSig]
 		new HRESULT SetProgressValue(IntPtr hwnd, ulong ullCompleted, ulong ullTotal);
+
 		[PreserveSig]
 		new HRESULT SetProgressState(IntPtr hwnd, TBPF tbpFlags);
+
 		[PreserveSig]
 		new HRESULT RegisterTab(IntPtr hwndTab, IntPtr hwndMDI);
+
 		[PreserveSig]
 		new HRESULT UnregisterTab(IntPtr hwndTab);
+
 		[PreserveSig]
 		new HRESULT SetTabOrder(IntPtr hwndTab, IntPtr hwndInsertBefore);
+
 		[PreserveSig]
 		new HRESULT SetTabActive(IntPtr hwndTab, IntPtr hwndMDI, uint dwReserved);
+
 		[PreserveSig]
 		new HRESULT ThumbBarAddButtons(IntPtr hwnd, uint cButtons, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] THUMBBUTTON[] pButtons);
+
 		[PreserveSig]
 		new HRESULT ThumbBarUpdateButtons(IntPtr hwnd, uint cButtons, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] THUMBBUTTON[] pButtons);
+
 		[PreserveSig]
 		new HRESULT ThumbBarSetImageList(IntPtr hwnd, [MarshalAs(UnmanagedType.IUnknown)] object himl);
+
 		[PreserveSig]
 		new HRESULT SetOverlayIcon(IntPtr hwnd, IntPtr hIcon, [MarshalAs(UnmanagedType.LPWStr)] string pszDescription);
+
 		[PreserveSig]
 		new HRESULT SetThumbnailTooltip(IntPtr hwnd, [MarshalAs(UnmanagedType.LPWStr)] string pszTip);
+
 		// Using RefRECT to making passing NULL possible.  Removes clipping from the HWND.
 		[PreserveSig]
 		new HRESULT SetThumbnailClip(IntPtr hwnd, RefRECT prcClip);
 
-		#endregion
+		#endregion ITaskbarList3 redeclaration
 
 		void SetTabProperties(IntPtr hwndTab, STPF stpFlags);
 	}
 
-	#endregion
+	#endregion Interfaces
 }

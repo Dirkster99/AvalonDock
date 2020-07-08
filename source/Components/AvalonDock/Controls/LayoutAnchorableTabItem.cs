@@ -7,11 +7,11 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -25,9 +25,11 @@ namespace AvalonDock.Controls
 	public class LayoutAnchorableTabItem : Control
 	{
 		#region fields
+
 		private bool _isMouseDown = false;
 		private static LayoutAnchorableTabItem _draggingItem = null;
 		private static bool _cancelMouseLeave = false;
+
 		#endregion fields
 
 		#region Constructors
@@ -48,7 +50,7 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata(null, OnModelChanged));
 
 		/// <summary>
-		/// Gets or sets the <see cref="Model"/> property. This dependency property 
+		/// Gets or sets the <see cref="Model"/> property. This dependency property
 		/// indicates model attached to the anchorable tab item.
 		/// </summary>
 		public LayoutContent Model
@@ -78,13 +80,13 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
 		/// <summary>
-		/// Gets the <see cref="LayoutItem"/> property. This dependency property 
+		/// Gets the <see cref="LayoutItem"/> property. This dependency property
 		/// indicates the LayoutItem attached to this tag item.
 		/// </summary>
 		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
 
 		/// <summary>
-		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.  
+		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.
 		/// This dependency property indicates the LayoutItem attached to this tag item.
 		/// </summary>
 		/// <param name="value">The new value for the property.</param>
@@ -107,6 +109,7 @@ namespace AvalonDock.Controls
 		#endregion Internal Methods
 
 		#region Overrides
+
 		/// <inheritdoc />
 		protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
 		{

@@ -7,15 +7,15 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System;
-using System.Linq;
-using System.Windows.Markup;
-using System.Xml.Serialization;
-using System.Windows;
-using System.Globalization;
-using System.Windows.Media;
-using System.ComponentModel;
 using AvalonDock.Controls;
+using System;
+using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
+using System.Windows;
+using System.Windows.Markup;
+using System.Windows.Media;
+using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
@@ -28,6 +28,7 @@ namespace AvalonDock.Layout
 	public abstract class LayoutContent : LayoutElement, IXmlSerializable, ILayoutElementForFloatingWindow, IComparable<LayoutContent>, ILayoutPreviousContainer
 	{
 		#region Constructors
+
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -45,7 +46,7 @@ namespace AvalonDock.Layout
 		/// <summary>
 		/// Event fired when the content is about to be closed (i.e. removed definitely from the layout)
 		/// </summary>
-		/// <remarks>Please note that <see cref="LayoutAnchorable"/> also can be hidden. Usually user hide anchorables when click the 'X' button. To completely close 
+		/// <remarks>Please note that <see cref="LayoutAnchorable"/> also can be hidden. Usually user hide anchorables when click the 'X' button. To completely close
 		/// an anchorable the user should click the 'Close' menu item from the context menu. When an <see cref="LayoutAnchorable"/> is hidden its visibility changes to false and
 		/// <see cref="LayoutAnchorable.IsHidden"/> property is set to true.
 		/// Handle the Hiding event for the <see cref="LayoutAnchorable"/> to cancel the hide operation.</remarks>
@@ -82,6 +83,7 @@ namespace AvalonDock.Layout
 		#endregion Title
 
 		#region Content
+
 		[NonSerialized]
 		private object _content = null;
 
@@ -98,6 +100,7 @@ namespace AvalonDock.Layout
 				if (ContentId == null) SetContentIdFromContent();
 			}
 		}
+
 		#endregion Content
 
 		#region ContentId
@@ -119,7 +122,7 @@ namespace AvalonDock.Layout
 
 		private static void OnContentIdPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
 		{
-			if (obj is LayoutContent layoutContent) layoutContent.OnContentIdPropertyChanged((string) args.OldValue, (string) args.NewValue);
+			if (obj is LayoutContent layoutContent) layoutContent.OnContentIdPropertyChanged((string)args.OldValue, (string)args.NewValue);
 		}
 
 		private void OnContentIdPropertyChanged(string oldValue, string newValue)
@@ -207,6 +210,7 @@ namespace AvalonDock.Layout
 		#region IsLastFocusedDocument
 
 		private bool _isLastFocusedDocument = false;
+
 		public bool IsLastFocusedDocument
 		{
 			get => _isLastFocusedDocument;
@@ -258,6 +262,7 @@ namespace AvalonDock.Layout
 		#endregion PreviousContainer
 
 		#region PreviousContainerIndex
+
 		[field: NonSerialized]
 		private int _previousContainerIndex = -1;
 
@@ -295,6 +300,7 @@ namespace AvalonDock.Layout
 		#region FloatingWidth
 
 		private double _floatingWidth = 0.0;
+
 		public double FloatingWidth
 		{
 			get => _floatingWidth;
@@ -330,6 +336,7 @@ namespace AvalonDock.Layout
 		#region FloatingLeft
 
 		private double _floatingLeft = 0.0;
+
 		public double FloatingLeft
 		{
 			get => _floatingLeft;
@@ -347,6 +354,7 @@ namespace AvalonDock.Layout
 		#region FloatingTop
 
 		private double _floatingTop = 0.0;
+
 		public double FloatingTop
 		{
 			get => _floatingTop;
@@ -401,6 +409,7 @@ namespace AvalonDock.Layout
 		#region IconSource
 
 		private ImageSource _iconSource = null;
+
 		public ImageSource IconSource
 		{
 			get => _iconSource;
@@ -417,6 +426,7 @@ namespace AvalonDock.Layout
 		#region CanClose
 
 		internal bool _canClose = true;
+
 		public bool CanClose
 		{
 			get => _canClose;
@@ -433,6 +443,7 @@ namespace AvalonDock.Layout
 		#region CanFloat
 
 		private bool _canFloat = true;
+
 		public bool CanFloat
 		{
 			get => _canFloat;
@@ -449,6 +460,7 @@ namespace AvalonDock.Layout
 		#region IsEnabled
 
 		private bool _isEnabled = true;
+
 		public bool IsEnabled
 		{
 			get => _isEnabled;
@@ -463,6 +475,7 @@ namespace AvalonDock.Layout
 		#endregion IsEnabled
 
 		#region TabItem
+
 		public LayoutDocumentTabItem TabItem { get; internal set; }
 
 		#endregion TabItem
@@ -535,8 +548,8 @@ namespace AvalonDock.Layout
 			if (!string.IsNullOrWhiteSpace(ContentId))
 				writer.WriteAttributeString(nameof(ContentId), ContentId);
 
-			if (ToolTip is string toolTip &&!string.IsNullOrWhiteSpace(toolTip))
-					writer.WriteAttributeString(nameof(ToolTip), toolTip);
+			if (ToolTip is string toolTip && !string.IsNullOrWhiteSpace(toolTip))
+				writer.WriteAttributeString(nameof(ToolTip), toolTip);
 
 			if (FloatingLeft != 0.0) writer.WriteAttributeString(nameof(FloatingLeft), FloatingLeft.ToString(CultureInfo.InvariantCulture));
 			if (FloatingTop != 0.0) writer.WriteAttributeString(nameof(FloatingTop), FloatingTop.ToString(CultureInfo.InvariantCulture));

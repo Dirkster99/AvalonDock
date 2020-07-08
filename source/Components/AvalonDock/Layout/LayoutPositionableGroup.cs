@@ -8,10 +8,9 @@
  ************************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Windows;
 using System.Globalization;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace AvalonDock.Layout
@@ -22,14 +21,17 @@ namespace AvalonDock.Layout
 	public abstract class LayoutPositionableGroup<T> : LayoutGroup<T>, ILayoutPositionableElementWithActualSize where T : class, ILayoutElement
 	{
 		#region fields
+
 		private static GridLengthConverter _gridLengthConverter = new GridLengthConverter();
 
 		// DockWidth fields
 		private GridLength _dockWidth = new GridLength(1.0, GridUnitType.Star);
+
 		private double? _resizableAbsoluteDockWidth;
 
 		// DockHeight fields
 		private GridLength _dockHeight = new GridLength(1.0, GridUnitType.Star);
+
 		private double? _resizableAbsoluteDockHeight;
 
 		private bool _allowDuplicateContent = true;
@@ -49,6 +51,7 @@ namespace AvalonDock.Layout
 
 		[NonSerialized]
 		private double _actualHeight;
+
 		#endregion fields
 
 		#region Events
@@ -63,6 +66,7 @@ namespace AvalonDock.Layout
 		#region Properties
 
 		#region DockWidth
+
 		public GridLength DockWidth
 		{
 			get => _dockWidth.IsAbsolute && _resizableAbsoluteDockWidth < _dockWidth.Value && _resizableAbsoluteDockWidth.HasValue ?
@@ -101,6 +105,7 @@ namespace AvalonDock.Layout
 		#endregion DockWidth
 
 		#region DockHeight
+
 		public GridLength DockHeight
 		{
 			get => _dockHeight.IsAbsolute && _resizableAbsoluteDockHeight < _dockHeight.Value && _resizableAbsoluteDockHeight.HasValue ?
@@ -184,7 +189,7 @@ namespace AvalonDock.Layout
 
 		/// <summary>
 		/// Defines the smallest available width that can be applied to a deriving element.
-		/// 
+		///
 		/// The system ensures the minimum width by blocking/limiting <see cref="GridSplitter"/>
 		/// movement when the user resizes a deriving element or resizes the main window.
 		/// </summary>
@@ -217,7 +222,7 @@ namespace AvalonDock.Layout
 
 		/// <summary>
 		/// Defines the smallest available height that can be applied to a deriving element.
-		/// 
+		///
 		/// The system ensures the minimum height by blocking/limiting <see cref="GridSplitter"/>
 		/// movement when the user resizes a deriving element or resizes the main window.
 		/// </summary>
@@ -308,9 +313,10 @@ namespace AvalonDock.Layout
 		#endregion Properties
 
 		#region Internal Methods
+
 		void ILayoutElementForFloatingWindow.RaiseFloatingPropertiesUpdated() => FloatingPropertiesUpdated?.Invoke(this, EventArgs.Empty);
 
-		#endregion Methods
+		#endregion Internal Methods
 
 		#region Overrides
 
@@ -329,7 +335,6 @@ namespace AvalonDock.Layout
 			if (IsMaximized) writer.WriteAttributeString(nameof(IsMaximized), IsMaximized.ToString());
 			base.WriteXml(writer);
 		}
-
 
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{

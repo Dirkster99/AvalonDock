@@ -13,6 +13,7 @@
 
 namespace Microsoft.Windows.Shell
 {
+	using Standard;
 	using System;
 	using System.Collections.Generic;
 	using System.ComponentModel;
@@ -20,7 +21,6 @@ namespace Microsoft.Windows.Shell
 	using System.Runtime.InteropServices;
 	using System.Windows;
 	using System.Windows.Media;
-	using Standard;
 
 	[SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
 	public class SystemParameters2 : INotifyPropertyChanged
@@ -218,7 +218,7 @@ namespace Microsoft.Windows.Shell
 				return;
 			}
 
-            NativeMethods.GetCurrentThemeName(out var name, out var color, out _);
+			NativeMethods.GetCurrentThemeName(out var name, out var color, out _);
 
 			// Consider whether this is the most useful way to expose this...
 			UxThemeName = System.IO.Path.GetFileNameWithoutExtension(name);
@@ -237,22 +237,23 @@ namespace Microsoft.Windows.Shell
 			// There aren't any known variations based on theme color.
 			Assert.IsNeitherNullNorEmpty(UxThemeName);
 
-            // These radii are approximate.  The way WPF does rounding is different than how
-            //     rounded-rectangle HRGNs are created, which is also different than the actual
-            //     round corners on themed Windows.  For now we're not exposing anything to
-            //     mitigate the differences.
-            CornerRadius cornerRadius;
+			// These radii are approximate.  The way WPF does rounding is different than how
+			//     rounded-rectangle HRGNs are created, which is also different than the actual
+			//     round corners on themed Windows.  For now we're not exposing anything to
+			//     mitigate the differences.
+			CornerRadius cornerRadius;
 
-            // This list is known to be incomplete and very much not future-proof.
-            // On XP there are at least a couple of shipped themes that this won't catch,
-            // "Zune" and "Royale", but WPF doesn't know about these either.
-            // If a new theme was to replace Aero, then this will fall back on "classic" behaviors.
-            // This isn't ideal, but it's not the end of the world.  WPF will generally have problems anyways.
-            switch (UxThemeName.ToUpperInvariant())
+			// This list is known to be incomplete and very much not future-proof.
+			// On XP there are at least a couple of shipped themes that this won't catch,
+			// "Zune" and "Royale", but WPF doesn't know about these either.
+			// If a new theme was to replace Aero, then this will fall back on "classic" behaviors.
+			// This isn't ideal, but it's not the end of the world.  WPF will generally have problems anyways.
+			switch (UxThemeName.ToUpperInvariant())
 			{
 				case "LUNA":
 					cornerRadius = new CornerRadius(6, 6, 0, 0);
 					break;
+
 				case "AERO":
 					// Aero has two cases.  One with glass and one without...
 					if (NativeMethods.DwmIsCompositionEnabled())
@@ -264,6 +265,7 @@ namespace Microsoft.Windows.Shell
 						cornerRadius = new CornerRadius(6, 6, 0, 0);
 					}
 					break;
+
 				case "CLASSIC":
 				case "ZUNE":
 				case "ROYALE":

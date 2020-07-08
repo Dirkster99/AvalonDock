@@ -51,7 +51,6 @@ namespace AvalonDock.Layout
 		double CalculatedDockMinHeight();
 	}
 
-
 	/// <summary>Defines a layout element that supports actual width and height properties.</summary>
 	internal interface ILayoutPositionableElementWithActualSize : ILayoutPositionableElement
 	{

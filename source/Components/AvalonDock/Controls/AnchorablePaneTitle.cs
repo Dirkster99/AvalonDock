@@ -7,11 +7,11 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System.Linq;
-using System.Windows.Controls;
-using System.Windows;
-using System.Windows.Input;
 using AvalonDock.Layout;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace AvalonDock.Controls
 {
@@ -23,10 +23,13 @@ namespace AvalonDock.Controls
 	public class AnchorablePaneTitle : Control
 	{
 		#region fields
+
 		private bool _isMouseDown = false;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>
 		/// Static class constructor
 		/// </summary>
@@ -122,7 +125,7 @@ namespace AvalonDock.Controls
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonDown(e);
-			
+
 			// Start a drag & drop action for a LayoutAnchorable
 			if (e.Handled || Model.CanMove == false) return;
 			var attachFloatingWindow = false;

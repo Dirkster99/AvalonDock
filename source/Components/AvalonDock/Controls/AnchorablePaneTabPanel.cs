@@ -7,16 +7,16 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
 using System;
 using System.Linq;
-using System.Windows.Controls;
 using System.Windows;
-using AvalonDock.Layout;
+using System.Windows.Controls;
 
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// provides a <see cref="Panel"/> that contains the TabItem Headers of the <see cref="LayoutAnchorablePaneControl"/>. 
+	/// provides a <see cref="Panel"/> that contains the TabItem Headers of the <see cref="LayoutAnchorablePaneControl"/>.
 	/// </summary>
 	public class AnchorablePaneTabPanel : Panel
 	{
@@ -58,7 +58,6 @@ namespace AvalonDock.Controls
 		protected override Size ArrangeOverride(Size finalSize)
 		{
 			var visibleChildren = Children.Cast<UIElement>().Where(ch => ch.Visibility != System.Windows.Visibility.Collapsed);
-
 
 			double finalWidth = finalSize.Width;
 			double desideredWidth = visibleChildren.Sum(ch => ch.DesiredSize.Width);

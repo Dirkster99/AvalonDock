@@ -7,15 +7,15 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows;
-using System.Diagnostics;
-using AvalonDock.Layout;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -92,7 +92,6 @@ namespace AvalonDock.Controls
 					_windowHandler = null;
 				}
 			}
-
 		}
 
 		/// <summary>
@@ -108,7 +107,6 @@ namespace AvalonDock.Controls
 
 			return null;
 		}
-
 
 		/// <summary>
 		/// Get the last window handle focused before user left the element passed as argument
@@ -141,12 +139,10 @@ namespace AvalonDock.Controls
 			if (_modelFocusedWindowHandle.GetValue(model, out handleToFocus))
 				focused = IntPtr.Zero != Win32Helper.SetFocus(handleToFocus);
 
-
 			if (focused)
 			{
 				_lastFocusedElement = new WeakReference(model);
 			}
-
 		}
 
 		#endregion Internal Methods
@@ -268,6 +264,7 @@ namespace AvalonDock.Controls
 
 			_lastFocusedElementBeforeEnterMenuMode = new WeakReference(Keyboard.FocusedElement);
 		}
+
 		private static void InputManager_LeaveMenuMode(object sender, EventArgs e)
 		{
 			if (_lastFocusedElementBeforeEnterMenuMode != null &&

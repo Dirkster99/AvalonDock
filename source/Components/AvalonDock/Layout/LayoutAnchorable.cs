@@ -8,12 +8,12 @@
  ************************************************************************/
 
 using System;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
-using System.Xml.Serialization;
 using System.Windows.Controls;
-using System.Globalization;
-using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
@@ -26,6 +26,7 @@ namespace AvalonDock.Layout
 	public class LayoutAnchorable : LayoutContent
 	{
 		#region fields
+
 		private double _autohideWidth = 0.0;
 		private double _autohideMinWidth = 100.0;
 		private double _autohideHeight = 0.0;
@@ -35,9 +36,11 @@ namespace AvalonDock.Layout
 		private bool _canDockAsTabbedDocument = true;
 		private bool _canCloseValueBeforeInternalSet;
 		private bool _canMove = true;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Class constructor</summary>
 		public LayoutAnchorable()
 		{
@@ -183,6 +186,7 @@ namespace AvalonDock.Layout
 		#endregion Properties
 
 		#region Overrides
+
 		/// <inheritdoc />
 		protected override void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
@@ -207,7 +211,7 @@ namespace AvalonDock.Layout
 			//look for an available pane
 			if (anchorablePane == null) anchorablePane = root.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault();
 			var added = false;
-			if (root.Manager.LayoutUpdateStrategy != null) 
+			if (root.Manager.LayoutUpdateStrategy != null)
 				added = root.Manager.LayoutUpdateStrategy.BeforeInsertAnchorable(root, this, anchorablePane);
 
 			if (!added)
@@ -420,6 +424,7 @@ namespace AvalonDock.Layout
 		public void ToggleAutoHide()
 		{
 			#region Anchorable is already auto hidden
+
 			if (IsAutoHidden)
 			{
 				var parentGroup = Parent as LayoutAnchorGroup;
@@ -448,6 +453,7 @@ namespace AvalonDock.Layout
 								panel.Children.Add(previousContainer);
 							}
 							break;
+
 						case AnchorSide.Left:
 							if (parentGroup.Root.RootPanel.Orientation == Orientation.Horizontal)
 							{
@@ -465,10 +471,11 @@ namespace AvalonDock.Layout
 								panel.Children.Add(oldRootPanel);
 							}
 							break;
+
 						case AnchorSide.Top:
 							if (parentGroup.Root.RootPanel.Orientation == Orientation.Vertical)
 							{
-								previousContainer = new LayoutAnchorablePane {DockMinHeight = AutoHideMinHeight};
+								previousContainer = new LayoutAnchorablePane { DockMinHeight = AutoHideMinHeight };
 								parentGroup.Root.RootPanel.Children.Insert(0, previousContainer);
 							}
 							else
@@ -482,14 +489,15 @@ namespace AvalonDock.Layout
 								panel.Children.Add(oldRootPanel);
 							}
 							break;
+
 						case AnchorSide.Bottom:
 							if (parentGroup.Root.RootPanel.Orientation == Orientation.Vertical)
 							{
-                                previousContainer = new LayoutAnchorablePane
-                                {
-                                    DockMinHeight = AutoHideMinHeight
-                                };
-                                parentGroup.Root.RootPanel.Children.Add(previousContainer);
+								previousContainer = new LayoutAnchorablePane
+								{
+									DockMinHeight = AutoHideMinHeight
+								};
+								parentGroup.Root.RootPanel.Children.Add(previousContainer);
 							}
 							else
 							{
@@ -509,11 +517,11 @@ namespace AvalonDock.Layout
 					//I'm about to remove parentGroup, redirect any content (ie hidden contents) that point to it
 					//to previousContainer
 					var root = parentGroup.Root as LayoutRoot;
-					foreach (var cnt in root.Descendents().OfType<ILayoutPreviousContainer>().Where(c => c.PreviousContainer == parentGroup)) 
+					foreach (var cnt in root.Descendents().OfType<ILayoutPreviousContainer>().Where(c => c.PreviousContainer == parentGroup))
 						cnt.PreviousContainer = previousContainer;
 				}
 
-				foreach (var anchorableToToggle in parentGroup.Children.ToArray()) 
+				foreach (var anchorableToToggle in parentGroup.Children.ToArray())
 					previousContainer.Children.Add(anchorableToToggle);
 
 				parentSide.Children.Remove(parentGroup);
@@ -521,14 +529,16 @@ namespace AvalonDock.Layout
 				var parent = previousContainer.Parent as LayoutGroupBase;
 				while (parent != null)
 				{
-					if (parent is LayoutGroup<ILayoutPanelElement> layoutGroup) 
+					if (parent is LayoutGroup<ILayoutPanelElement> layoutGroup)
 						layoutGroup.ComputeVisibility();
 					parent = parent.Parent as LayoutGroupBase;
 				}
 			}
+
 			#endregion Anchorable is already auto hidden
 
 			#region Anchorable is docked
+
 			else if (Parent is LayoutAnchorablePane)
 			{
 				var root = Root;
@@ -550,6 +560,7 @@ namespace AvalonDock.Layout
 					case AnchorSide.Bottom: root.BottomSide?.Children.Add(newAnchorGroup); break;
 				}
 			}
+
 			#endregion Anchorable is docked
 		}
 

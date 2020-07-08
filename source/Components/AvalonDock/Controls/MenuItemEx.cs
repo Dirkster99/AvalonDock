@@ -7,8 +7,8 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System.Windows.Controls;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace AvalonDock.Controls
 {
@@ -21,7 +21,9 @@ namespace AvalonDock.Controls
 	public class MenuItemEx : MenuItem
 	{
 		#region fields
+
 		private bool _reentrantFlag = false;
+
 		#endregion fields
 
 		#region Constructors
@@ -31,7 +33,7 @@ namespace AvalonDock.Controls
 			IconProperty.OverrideMetadata(typeof(MenuItemEx), new FrameworkPropertyMetadata(OnIconPropertyChanged));
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -42,7 +44,7 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata(null, OnIconTemplateChanged));
 
 		/// <summary>
-		/// Gets or sets the <see cref="IconTemplate "/> property. This dependency property 
+		/// Gets or sets the <see cref="IconTemplate "/> property. This dependency property
 		/// indicates the data template for the icon.
 		/// </summary>
 		public DataTemplate IconTemplate
@@ -57,7 +59,7 @@ namespace AvalonDock.Controls
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="IconTemplate "/> property.</summary>
 		protected virtual void OnIconTemplateChanged(DependencyPropertyChangedEventArgs e) => UpdateIcon();
 
-		#endregion
+		#endregion IconTemplate
 
 		#region IconTemplateSelector
 
@@ -66,7 +68,7 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata(null, OnIconTemplateSelectorChanged));
 
 		/// <summary>
-		/// Gets or sets the <see cref="IconTemplateSelector"/> property. This dependency property 
+		/// Gets or sets the <see cref="IconTemplateSelector"/> property. This dependency property
 		/// indicates the DataTemplateSelector for the Icon.
 		/// </summary>
 		public DataTemplateSelector IconTemplateSelector
@@ -81,15 +83,15 @@ namespace AvalonDock.Controls
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="IconTemplateSelector"/> property.</summary>
 		protected virtual void OnIconTemplateSelectorChanged(DependencyPropertyChangedEventArgs e) => UpdateIcon();
 
-		#endregion
+		#endregion IconTemplateSelector
 
-		#endregion
+		#endregion Properties
 
 		#region Private Mehods
 
 		private static void OnIconPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
 		{
-			if (e.NewValue != null) ((MenuItemEx) sender).UpdateIcon();
+			if (e.NewValue != null) ((MenuItemEx)sender).UpdateIcon();
 		}
 
 		private void UpdateIcon()
@@ -106,6 +108,6 @@ namespace AvalonDock.Controls
 			_reentrantFlag = false;
 		}
 
-		#endregion
+		#endregion Private Mehods
 	}
 }

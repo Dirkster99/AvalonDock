@@ -13,6 +13,7 @@
 
 namespace Standard
 {
+	using Microsoft.Win32.SafeHandles;
 	using System;
 	using System.ComponentModel;
 	using System.Diagnostics.CodeAnalysis;
@@ -22,12 +23,9 @@ namespace Standard
 	using System.Runtime.InteropServices.ComTypes;
 	using System.Security.Permissions;
 	using System.Text;
-	using Microsoft.Win32.SafeHandles;
 
 	// Some COM interfaces and Win32 structures are already declared in the framework.
 	// Interesting ones to remember in System.Runtime.InteropServices.ComTypes are:
-	using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
-	using IPersistFile = System.Runtime.InteropServices.ComTypes.IPersistFile;
 	using IStream = System.Runtime.InteropServices.ComTypes.IStream;
 
 	#region Native Values
@@ -75,18 +73,22 @@ namespace Standard
 		/// Creates the intersection of the two combined regions.
 		/// </summary>
 		AND = 1,
+
 		/// <summary>
 		/// Creates the union of two combined regions.
 		/// </summary>
 		OR = 2,
+
 		/// <summary>
 		/// Creates the union of two combined regions except for any overlapping areas.
 		/// </summary>
 		XOR = 3,
+
 		/// <summary>
 		/// Combines the parts of hrgnSrc1 that are not part of hrgnSrc2.
 		/// </summary>
 		DIFF = 4,
+
 		/// <summary>
 		/// Creates a copy of the region identified by hrgnSrc1.
 		/// </summary>
@@ -192,7 +194,7 @@ namespace Standard
 	/// <summary>
 	/// For IWebBrowser2.  READYSTATE_*
 	/// </summary>
-	enum READYSTATE
+	internal enum READYSTATE
 	{
 		UNINITIALIZED = 0,
 		LOADING = 1,
@@ -224,25 +226,29 @@ namespace Standard
 	{
 		/// <summary>Use the system default, which is to display all error dialog boxes.</summary>
 		Default = 0x0,
+
 		/// <summary>
-		/// The system does not display the critical-error-handler message box. 
+		/// The system does not display the critical-error-handler message box.
 		/// Instead, the system sends the error to the calling process.
 		/// </summary>
 		FailCriticalErrors = 0x1,
+
 		/// <summary>
-		/// 64-bit Windows:  The system automatically fixes memory alignment faults and makes them 
+		/// 64-bit Windows:  The system automatically fixes memory alignment faults and makes them
 		/// invisible to the application. It does this for the calling process and any descendant processes.
 		/// After this value is set for a process, subsequent attempts to clear the value are ignored.
 		/// </summary>
 		NoGpFaultErrorBox = 0x2,
+
 		/// <summary>
-		/// The system does not display the general-protection-fault message box. 
-		/// This flag should only be set by debugging applications that handle general 
+		/// The system does not display the general-protection-fault message box.
+		/// This flag should only be set by debugging applications that handle general
 		/// protection (GP) faults themselves with an exception handler.
 		/// </summary>
 		NoAlignmentFaultExcept = 0x4,
+
 		/// <summary>
-		/// The system does not display a message box when it fails to find a file. 
+		/// The system does not display a message box when it fails to find a file.
 		/// Instead, the error is returned to the calling process.
 		/// </summary>
 		NoOpenFileErrorBox = 0x8000
@@ -905,16 +911,20 @@ namespace Standard
 		DWMWINDOWMAXIMIZEDCHANGE = 0x0321,
 
 		GETTITLEBARINFOEX = 0x033F,
+
 		#region Windows 7
+
 		DWMSENDICONICTHUMBNAIL = 0x0323,
 		DWMSENDICONICLIVEPREVIEWBITMAP = 0x0326,
-		#endregion
+
+		#endregion Windows 7
 
 		USER = 0x0400,
 
 		// This is the hard-coded message value used by WinForms for Shell_NotifyIcon.
 		// It's relatively safe to reuse.
 		TRAYMOUSEMESSAGE = 0x800, //WM_USER + 1024
+
 		APP = 0x8000,
 	}
 
@@ -961,14 +971,17 @@ namespace Standard
 		/// <summary>Number of bits per pixel
 		/// </summary>
 		BITSPIXEL = 12,
+
 		/// <summary>
 		/// Number of planes
 		/// </summary>
 		PLANES = 14,
+
 		/// <summary>
 		/// Logical pixels inch in X
 		/// </summary>
 		LOGPIXELSX = 88,
+
 		/// <summary>
 		/// Logical pixels inch in Y
 		/// </summary>
@@ -1016,6 +1029,7 @@ namespace Standard
 		/// Possible return value for EnableMenuItem
 		/// </summary>
 		DOES_NOT_EXIST = unchecked((uint)-1),
+
 		ENABLED = 0,
 		BYCOMMAND = 0,
 		GRAYED = 1,
@@ -1083,19 +1097,21 @@ namespace Standard
 	{
 		/// <summary>Prevents the window caption from being drawn.</summary>
 		NODRAWCAPTION = 0x00000001,
+
 		/// <summary>Prevents the system icon from being drawn.</summary>
 		NODRAWICON = 0x00000002,
+
 		/// <summary>Prevents the system icon menu from appearing.</summary>
 		NOSYSMENU = 0x00000004,
+
 		/// <summary>Prevents mirroring of the question mark, even in right-to-left (RTL) layout.</summary>
 		NOMIRRORHELP = 0x00000008,
+
 		/// <summary> A mask that contains all the valid bits.</summary>
 		VALIDBITS = NODRAWCAPTION | NODRAWICON | NOMIRRORHELP | NOSYSMENU,
 	}
 
-	/// <summary>
-	/// SetWindowPos options
-	/// </summary>
+	/// <summary>SetWindowPos options</summary>
 	[Flags]
 	internal enum SWP
 	{
@@ -1159,17 +1175,15 @@ namespace Standard
 		MONITORPOWER = 0xF170,
 		CONTEXTHELP = 0xF180,
 		SEPARATOR = 0xF00F,
-		/// <summary>
-		/// SCF_ISSECURE
-		/// </summary>
+
+		/// <summary>SCF_ISSECURE</summary>
 		F_ISSECURE = 0x00000001,
+
 		ICON = MINIMIZE,
 		ZOOM = MAXIMIZE,
 	}
 
-	/// <summary>
-	/// GDI+ Status codes
-	/// </summary>
+	/// <summary>GDI+ Status codes</summary>
 	internal enum Status
 	{
 		Ok = 0,
@@ -1200,6 +1214,7 @@ namespace Standard
 	{
 		//mouse event constants
 		LEFTDOWN = 2,
+
 		LEFTUP = 4
 	}
 
@@ -1210,6 +1225,7 @@ namespace Standard
 	{
 		// Win7 versions of this enum:
 		RESET = 0,
+
 		ALLOW = 1,
 		DISALLOW = 2,
 
@@ -1231,9 +1247,7 @@ namespace Standard
 		MOUSE = 0,
 	}
 
-	/// <summary>
-	/// Shell_NotifyIcon messages.  NIM_*
-	/// </summary>
+	/// <summary>Shell_NotifyIcon messages.  NIM_*</summary>
 	internal enum NIM : uint
 	{
 		ADD = 0,
@@ -1243,9 +1257,7 @@ namespace Standard
 		SETVERSION = 4,
 	}
 
-	/// <summary>
-	/// SHAddToRecentDocuments flags.  SHARD_*
-	/// </summary>
+	/// <summary>SHAddToRecentDocuments flags.  SHARD_*</summary>
 	internal enum SHARD
 	{
 		PIDL = 0x00000001,
@@ -1254,20 +1266,18 @@ namespace Standard
 		APPIDINFO = 0x00000004, // indicates the data type is a pointer to a SHARDAPPIDINFO structure
 		APPIDINFOIDLIST = 0x00000005, // indicates the data type is a pointer to a SHARDAPPIDINFOIDLIST structure
 		LINK = 0x00000006, // indicates the data type is a pointer to an IShellLink instance
-		APPIDINFOLINK = 0x00000007, // indicates the data type is a pointer to a SHARDAPPIDINFOLINK structure 
+		APPIDINFOLINK = 0x00000007, // indicates the data type is a pointer to a SHARDAPPIDINFOLINK structure
 	}
 
 	[Flags]
-	enum SLGP
+	internal enum SLGP
 	{
 		SHORTPATH = 0x1,
 		UNCPRIORITY = 0x2,
 		RAWPATH = 0x4
 	}
 
-	/// <summary>
-	/// Shell_NotifyIcon flags.  NIF_*
-	/// </summary>
+	/// <summary>Shell_NotifyIcon flags.  NIF_*</summary>
 	[Flags]
 	internal enum NIF : uint
 	{
@@ -1282,6 +1292,7 @@ namespace Standard
 		/// Vista only.
 		/// </summary>
 		REALTIME = 0x0040,
+
 		/// <summary>
 		/// Vista only.
 		/// </summary>
@@ -1300,14 +1311,19 @@ namespace Standard
 		INFO = 0x00000001,
 		WARNING = 0x00000002,
 		ERROR = 0x00000003,
+
 		/// <summary>XP SP2 and later.</summary>
 		USER = 0x00000004,
+
 		/// <summary>XP and later.</summary>
 		NOSOUND = 0x00000010,
+
 		/// <summary>Vista and later.</summary>
 		LARGE_ICON = 0x00000020,
+
 		/// <summary>Windows 7 and later</summary>
 		NIIF_RESPECT_QUIET_TIME = 0x00000080,
+
 		/// <summary>XP and later.  Native version called NIIF_ICON_MASK.</summary>
 		XP_ICON_MASK = 0x0000000F,
 	}
@@ -1340,7 +1356,7 @@ namespace Standard
 		REDRAW = HREDRAW | VREDRAW,
 	}
 
-	#endregion
+	#endregion Native Values
 
 	#region SafeHandles
 
@@ -1392,7 +1408,9 @@ namespace Standard
 			}
 		}
 
-		private SafeDC() : base(true) { }
+		private SafeDC() : base(true)
+		{
+		}
 
 		/// <inheritdoc />
 		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
@@ -1468,13 +1486,15 @@ namespace Standard
 		public static SafeDC WrapDC(IntPtr hdc)
 		{
 			// This won't actually get released by the class, but it allows an IntPtr to be converted for signatures.
-			return new SafeDC {handle = hdc, _created = false, _hwnd = IntPtr.Zero};
+			return new SafeDC { handle = hdc, _created = false, _hwnd = IntPtr.Zero };
 		}
 	}
 
 	internal sealed class SafeHBITMAP : SafeHandleZeroOrMinusOneIsInvalid
 	{
-		private SafeHBITMAP() : base(true) { }
+		private SafeHBITMAP() : base(true)
+		{
+		}
 
 		/// <inheritdoc />
 		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
@@ -1483,7 +1503,9 @@ namespace Standard
 
 	internal sealed class SafeGdiplusStartupToken : SafeHandleZeroOrMinusOneIsInvalid
 	{
-		private SafeGdiplusStartupToken() : base(true) { }
+		private SafeGdiplusStartupToken() : base(true)
+		{
+		}
 
 		/// <inheritdoc />
 		[ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
@@ -1573,7 +1595,7 @@ namespace Standard
 		}
 	}
 
-	#endregion
+	#endregion SafeHandles
 
 	#region Native Types
 
@@ -1582,10 +1604,13 @@ namespace Standard
 	{
 		// Must be AC_SRC_OVER
 		public AC BlendOp;
+
 		// Must be 0.
 		public byte BlendFlags;
+
 		// Alpha transparency between 0 (transparent) - 255 (opaque)
 		public byte SourceConstantAlpha;
+
 		// Must be AC_SRC_ALPHA
 		public AC AlphaFormat;
 	}
@@ -1595,6 +1620,7 @@ namespace Standard
 	{
 		public int cbSize;
 		public HCF dwFlags;
+
 		//[MarshalAs(UnmanagedType.LPWStr, SizeConst=80)]
 		//public String lpszDefaultScheme;
 		public IntPtr lpszDefaultScheme;
@@ -1652,10 +1678,13 @@ namespace Standard
 		public int y;
 		public int x;
 		public WS style;
+
 		[MarshalAs(UnmanagedType.LPWStr)]
 		public string lpszName;
+
 		[MarshalAs(UnmanagedType.LPWStr)]
 		public string lpszClass;
+
 		public WS_EX dwExStyle;
 	}
 
@@ -1663,15 +1692,21 @@ namespace Standard
 	internal struct SHFILEOPSTRUCT
 	{
 		public IntPtr hwnd;
+
 		[MarshalAs(UnmanagedType.U4)]
 		public FO wFunc;
+
 		// double-null terminated arrays of LPWSTRS
 		public string pFrom;
+
 		public string pTo;
+
 		[MarshalAs(UnmanagedType.U2)]
 		public FOF fFlags;
+
 		[MarshalAs(UnmanagedType.Bool)]
 		public int fAnyOperationsAborted;
+
 		public IntPtr hNameMappings;
 		public string lpszProgressTitle;
 	}
@@ -1719,25 +1754,33 @@ namespace Standard
 		public NIF uFlags;
 		public int uCallbackMessage;
 		public IntPtr hIcon;
+
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
 		public char[] szTip = new char[128];
+
 		/// <summary>
 		/// The state of the icon.  There are two flags that can be set independently.
 		/// NIS_HIDDEN = 1.  The icon is hidden.
 		/// NIS_SHAREDICON = 2.  The icon is shared.
 		/// </summary>
 		public uint dwState;
+
 		public uint dwStateMask;
+
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
 		public char[] szInfo = new char[256];
+
 		// Prior to Vista this was a union of uTimeout and uVersion.  As of Vista, uTimeout has been deprecated.
 		public uint uVersion;  // Used with Shell_NotifyIcon flag NIM_SETVERSION.
+
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
 		public char[] szInfoTitle = new char[64];
+
 		public uint dwInfoFlags;
 		public Guid guidItem;
+
 		// Vista only
-		IntPtr hBalloonIcon;
+		private IntPtr hBalloonIcon;
 	}
 
 	[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
@@ -1753,16 +1796,20 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		[FieldOffset(0)]
 		private ushort vt;
+
 		[SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources")]
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		[FieldOffset(8)]
 		private IntPtr pointerVal;
+
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		[FieldOffset(8)]
 		private byte byteVal;
+
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		[FieldOffset(8)]
 		private long longVal;
+
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		[FieldOffset(8)]
 		private short boolVal;
@@ -1815,7 +1862,7 @@ namespace Standard
 			Clear();
 		}
 
-		#endregion
+		#endregion IDisposable Pattern
 	}
 
 	[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
@@ -1823,9 +1870,10 @@ namespace Standard
 	internal class SHARDAPPIDINFO
 	{
 		[MarshalAs(UnmanagedType.Interface)]
-		object psi;    // The namespace location of the the item that should be added to the recent docs folder.
+		private object psi;    // The namespace location of the the item that should be added to the recent docs folder.
+
 		[MarshalAs(UnmanagedType.LPWStr)]
-		string pszAppID;  // The id of the application that should be associated with this recent doc.
+		private string pszAppID;  // The id of the application that should be associated with this recent doc.
 	}
 
 	[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
@@ -1833,23 +1881,24 @@ namespace Standard
 	internal class SHARDAPPIDINFOIDLIST
 	{
 		/// <summary>The idlist for the shell item that should be added to the recent docs folder.</summary>
-		IntPtr pidl;
+		private IntPtr pidl;
+
 		/// <summary>The id of the application that should be associated with this recent doc.</summary>
 		[MarshalAs(UnmanagedType.LPWStr)]
-		string pszAppID;
+		private string pszAppID;
 	}
 
 	[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 	[StructLayout(LayoutKind.Sequential, Pack = 4)]
 	internal class SHARDAPPIDINFOLINK
 	{
-		IntPtr psl;     // An IShellLink instance that when launched opens a recently used item in the specified 
-						// application. This link is not added to the recent docs folder, but will be added to the
-						// specified application's destination list.
-		[MarshalAs(UnmanagedType.LPWStr)]
-		string pszAppID;  // The id of the application that should be associated with this recent doc.
-	}
+		private IntPtr psl;     // An IShellLink instance that when launched opens a recently used item in the specified
 
+		// application. This link is not added to the recent docs folder, but will be added to the
+		// specified application's destination list.
+		[MarshalAs(UnmanagedType.LPWStr)]
+		private string pszAppID;  // The id of the application that should be associated with this recent doc.
+	}
 
 	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
 	internal struct LOGFONT
@@ -1867,6 +1916,7 @@ namespace Standard
 		public byte lfClipPrecision;
 		public byte lfQuality;
 		public byte lfPitchAndFamily;
+
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
 		public string lfFaceName;
 	}
@@ -1899,6 +1949,7 @@ namespace Standard
 		public LOGFONT lfMenuFont;
 		public LOGFONT lfStatusFont;
 		public LOGFONT lfMessageFont;
+
 		// Vista only
 		public int iPaddedBorderWidth;
 
@@ -1907,11 +1958,11 @@ namespace Standard
 		{
 			get
 			{
-                var ncm = new NONCLIENTMETRICS
-                {
-                    cbSize = Marshal.SizeOf(typeof(NONCLIENTMETRICS))
-                };
-                return ncm;
+				var ncm = new NONCLIENTMETRICS
+				{
+					cbSize = Marshal.SizeOf(typeof(NONCLIENTMETRICS))
+				};
+				return ncm;
 			}
 		}
 
@@ -1920,12 +1971,12 @@ namespace Standard
 		{
 			get
 			{
-                var ncm = new NONCLIENTMETRICS
-                {
-                    // Account for the missing iPaddedBorderWidth
-                    cbSize = Marshal.SizeOf(typeof(NONCLIENTMETRICS)) - sizeof(int)
-                };
-                return ncm;
+				var ncm = new NONCLIENTMETRICS
+				{
+					// Account for the missing iPaddedBorderWidth
+					cbSize = Marshal.SizeOf(typeof(NONCLIENTMETRICS)) - sizeof(int)
+				};
+				return ncm;
 			}
 		}
 	}
@@ -1960,10 +2011,13 @@ namespace Standard
 	{
 		/// <summary>Width of left border that retains its size.</summary>
 		public int cxLeftWidth;
+
 		/// <summary>Width of right border that retains its size.</summary>
 		public int cxRightWidth;
+
 		/// <summary>Height of top border that retains its size.</summary>
 		public int cyTopHeight;
+
 		/// <summary>Height of bottom border that retains its size.</summary>
 		public int cyBottomHeight;
 	};
@@ -2019,7 +2073,7 @@ namespace Standard
 		public int Top { get => _top; set => _top = value; }
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public int Bottom { get => _bottom; set => _bottom = value;		}
+		public int Bottom { get => _bottom; set => _bottom = value; }
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public int Width => _right - _left;
@@ -2149,8 +2203,10 @@ namespace Standard
 		public int nFileSizeLow;
 		public int dwReserved0;
 		public int dwReserved1;
+
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
 		public string cFileName;
+
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)]
 		public string cAlternateFileName;
 	}
@@ -2190,10 +2246,13 @@ namespace Standard
 		public IntPtr hIcon;
 		public IntPtr hCursor;
 		public IntPtr hbrBackground;
+
 		[MarshalAs(UnmanagedType.LPWStr)]
 		public string lpszMenuName;
+
 		[MarshalAs(UnmanagedType.LPWStr)]
 		public string lpszClassName;
+
 		public IntPtr hIconSm;
 	}
 
@@ -2267,7 +2326,7 @@ namespace Standard
 		public ulong cBuffersEmpty;
 	}
 
-	#endregion
+	#endregion Native Types
 
 	/// <summary>Delegate declaration that matches native WndProc signatures.</summary>
 	internal delegate IntPtr WndProc(IntPtr hwnd, WM uMsg, IntPtr wParam, IntPtr lParam);
@@ -2324,12 +2383,12 @@ namespace Standard
 			{
 				// Note that the Win7 MSGFLT_ALLOW/DISALLOW enum values map to the Vista MSGFLT_ADD/REMOVE
 				ret = _ChangeWindowMessageFilter(message, action);
-				return !ret ? (HRESULT) Win32Error.GetLastError() : HRESULT.S_OK;
+				return !ret ? (HRESULT)Win32Error.GetLastError() : HRESULT.S_OK;
 			}
 
 			var filterstruct = new CHANGEFILTERSTRUCT { cbSize = (uint)Marshal.SizeOf(typeof(CHANGEFILTERSTRUCT)) };
 			ret = _ChangeWindowMessageFilterEx(hwnd, message, action, ref filterstruct);
-			if (!ret) return (HRESULT) Win32Error.GetLastError();
+			if (!ret) return (HRESULT)Win32Error.GetLastError();
 
 			filterInfo = filterstruct.ExtStatus;
 			return HRESULT.S_OK;
@@ -2635,7 +2694,7 @@ namespace Standard
 
 		public static void GetCurrentThemeName(out string themeFileName, out string color, out string size)
 		{
-			// Not expecting strings longer than MAX_PATH.  We will return the error 
+			// Not expecting strings longer than MAX_PATH.  We will return the error
 			var fileNameBuilder = new StringBuilder((int)Win32Value.MAX_PATH);
 			var colorBuilder = new StringBuilder((int)Win32Value.MAX_PATH);
 			var sizeBuilder = new StringBuilder((int)Win32Value.MAX_PATH);
@@ -2926,7 +2985,7 @@ namespace Standard
 
 		// This is aliased as a macro in 32bit Windows.
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static IntPtr SetWindowLongPtr(IntPtr hwnd, GWL nIndex, IntPtr dwNewLong) 
+		public static IntPtr SetWindowLongPtr(IntPtr hwnd, GWL nIndex, IntPtr dwNewLong)
 			=> IntPtr.Size == 8 ? SetWindowLongPtr64(hwnd, nIndex, dwNewLong) : new IntPtr(SetWindowLongPtr32(hwnd, nIndex, dwNewLong.ToInt32()));
 
 		[SuppressMessage("Microsoft.Interoperability", "CA1400:PInvokeEntryPointsShouldExist")]
@@ -2955,7 +3014,7 @@ namespace Standard
 		private static extern bool _SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, SWP uFlags);
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, SWP uFlags) 
+		public static bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, SWP uFlags)
 			=> _SetWindowPos(hWnd, hWndInsertAfter, x, y, cx, cy, uFlags);
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
@@ -3109,7 +3168,7 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void UpdateLayeredWindow(IntPtr hwnd, int crKey, ref BLENDFUNCTION pblend, ULW dwFlags)
 		{
-			if (!_UpdateLayeredWindowIntPtr(hwnd, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, crKey, ref pblend, dwFlags)) 
+			if (!_UpdateLayeredWindowIntPtr(hwnd, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, crKey, ref pblend, dwFlags))
 				HRESULT.ThrowLastError();
 		}
 
@@ -3127,7 +3186,7 @@ namespace Standard
 
 		// Win7 only.
 		public static void SHAddToRecentDocs(IShellLinkW shellLink) => _SHAddToRecentDocs_ShellLink(SHARD.LINK, shellLink);
-		
+
 		// #define DWM_SIT_DISPLAYFRAME    0x00000001  // Display a window frame around the provided bitmap
 
 		[DllImport("dwmapi.dll", EntryPoint = "DwmGetCompositionTimingInfo")]
@@ -3184,6 +3243,6 @@ namespace Standard
 		[DllImport("shell32.dll")]
 		public static extern HRESULT GetCurrentProcessExplicitAppUserModelID([Out, MarshalAs(UnmanagedType.LPWStr)] out string AppID);
 
-		#endregion
+		#endregion Win7 declarations
 	}
 }

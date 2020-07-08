@@ -18,7 +18,7 @@ namespace AvalonDock.Controls
 	/// Implements the title display for various items: <see cref="LayoutAnchorablePaneControl"/>,
 	/// <see cref="LayoutDocumentTabItem"/>, <see cref="LayoutAnchorableTabItem"/>,
 	/// <see cref="LayoutDocumentFloatingWindowControl"/>, and <see cref="LayoutAnchorableFloatingWindowControl"/>.
-	/// 
+	///
 	/// The content is usually displayed via ContentPresenter binding in the theme definition.
 	/// </summary>
 	/// <seealso cref="ContentControl"/>
@@ -33,7 +33,7 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata(null));
 
 		/// <summary>
-		/// Gets or sets the <see cref="DropDownContextMenu"/> property. This dependency property 
+		/// Gets or sets the <see cref="DropDownContextMenu"/> property. This dependency property
 		/// indicates context menu to show when a right click is detected over the area occupied by the control.
 		/// </summary>
 		public ContextMenu DropDownContextMenu
@@ -51,7 +51,7 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata(null));
 
 		/// <summary>
-		/// Gets or sets the <see cref="DropDownContextMenuDataContext"/> property. This dependency property 
+		/// Gets or sets the <see cref="DropDownContextMenuDataContext"/> property. This dependency property
 		/// indicates data context to attach when context menu is shown.
 		/// </summary>
 		public object DropDownContextMenuDataContext

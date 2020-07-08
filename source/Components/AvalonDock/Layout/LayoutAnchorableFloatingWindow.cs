@@ -23,10 +23,12 @@ namespace AvalonDock.Layout
 	public class LayoutAnchorableFloatingWindow : LayoutFloatingWindow, ILayoutElementWithVisibility
 	{
 		#region fields
+
 		private LayoutAnchorablePaneGroup _rootPanel;
 
 		[NonSerialized]
 		private bool _isVisible = true;
+
 		#endregion fields
 
 		#region Events
@@ -34,7 +36,7 @@ namespace AvalonDock.Layout
 		/// <summary>Event is invoked when the visibility of this object has changed.</summary>
 		public event EventHandler IsVisibleChanged;
 
-		#endregion
+		#endregion Events
 
 		#region Properties
 

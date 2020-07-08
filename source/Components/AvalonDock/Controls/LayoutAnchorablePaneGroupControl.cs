@@ -7,25 +7,28 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System.Windows.Controls;
-using System.Windows;
 using AvalonDock.Layout;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace AvalonDock.Controls
 {
 	/// <summary>
 	/// Implements a group control that hosts a <see cref="LayoutAnchorablePaneGroup"/> model.
-	/// 
+	///
 	/// This Grid based control can host multiple other controls in its Children collection
 	/// (<see cref="LayoutAnchorableControl"/>).
 	/// </summary>
 	public class LayoutAnchorablePaneGroupControl : LayoutGridControl<ILayoutAnchorablePane>, ILayoutControl
 	{
 		#region fields
+
 		private LayoutAnchorablePaneGroup _model;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>
 		/// Class constructor from layout model.
 		/// </summary>

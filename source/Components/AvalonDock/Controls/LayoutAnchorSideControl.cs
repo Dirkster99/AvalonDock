@@ -7,12 +7,12 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System;
-using System.Linq;
-using System.Windows.Controls;
-using System.Windows;
-using System.Collections.ObjectModel;
 using AvalonDock.Layout;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace AvalonDock.Controls
 {
@@ -27,11 +27,14 @@ namespace AvalonDock.Controls
 	public class LayoutAnchorSideControl : Control, ILayoutControl
 	{
 		#region fields
+
 		private readonly LayoutAnchorSide _model = null;
 		private readonly ObservableCollection<LayoutAnchorGroupControl> _childViews = new ObservableCollection<LayoutAnchorGroupControl>();
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Static class constructor</summary>
 		static LayoutAnchorSideControl()
 		{
@@ -48,6 +51,7 @@ namespace AvalonDock.Controls
 
 			Unloaded += LayoutAnchorSideControl_Unloaded;
 		}
+
 		#endregion Constructors
 
 		#region Properties
@@ -127,6 +131,7 @@ namespace AvalonDock.Controls
 		#endregion Properties
 
 		#region Private Methods
+
 		/// <summary>
 		/// Executes when the element is removed from within an element tree of loaded elements.
 		/// </summary>

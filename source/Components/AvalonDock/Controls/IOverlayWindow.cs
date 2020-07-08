@@ -17,7 +17,7 @@ namespace AvalonDock.Controls
 	/// drags a:
 	/// - documents (<see cref="LayoutDocumentControl"/>) or
 	/// - tool window (<see cref="LayoutAnchorableControl"/>) to a new docking location.
-	/// 
+	///
 	/// Docking buttons are (depending on the state of the framework) usually shown on the
 	/// center, left, right, top, and bottom side of an <see cref="OverlayWindow"/>.
 	/// </summary>
@@ -65,10 +65,10 @@ namespace AvalonDock.Controls
 		/// This method is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>,
 		/// if the mouse enters a drop area (which can be a part of a FrameworkElement that implements
 		/// the <see cref="IOverlayWindow"/> interface.
-		/// 
+		///
 		/// A drop area can contain multiple drop targets (eg.: the <see cref="DockingManager"/> contains side panels
 		/// (top, bottom, left, right) and each of them is an individual drop target.
-		/// 
+		///
 		/// The implementing control can use this method call to decide whether the drop area should
 		/// be enabled as such and whether there are any drop targets that are available as a specific
 		/// docking position.
@@ -83,10 +83,10 @@ namespace AvalonDock.Controls
 		/// This method is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>,
 		/// if the mouse leaves a drop area (which can be a part of a <see cref="System.Windows.FrameworkElement"/> that implements
 		/// the <see cref="IOverlayWindow"/> interface.
-		/// 
+		///
 		/// A drop area can contain multiple drop targets (eg.: the <see cref="DockingManager"/> contains side panels
 		/// (top, bottom, left, right) and each of them is an individual drop target.
-		/// 
+		///
 		/// The implementing control can use this method call to disable the drop area and hide
 		/// its drop targets (<see cref="IDropTarget"/>) that may have been available as a specific
 		/// docking position.
@@ -100,10 +100,10 @@ namespace AvalonDock.Controls
 		/// <summary>
 		/// This method is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>,
 		/// if the mouse enters a drop target (which is typically a part of a <see cref="IDropArea"/>).
-		/// 
+		///
 		/// A drop target is an individual/specific docking position
 		/// where a user can drop an item to dock it.
-		/// 
+		///
 		/// The implementing control can use this method call to show a preview (Highlighting PreviewBox Geometry)
 		/// of the final docking position while the user hovers the mouse of a drop target (drop target button).
 		/// </summary>
@@ -115,10 +115,10 @@ namespace AvalonDock.Controls
 		/// <summary>
 		/// This method is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>,
 		/// if the mouse leaves a drop target (which is typically a part of a <see cref="IDropArea"/>).
-		/// 
+		///
 		/// A drop target is an individual/specific docking position
 		/// where a user can drop an item to dock it.
-		/// 
+		///
 		/// The implementing control can use this method call to hide a preview (Highlighting PreviewBox Geometry)
 		/// of the final docking position while the drags the mouse away from a drop target (drop target button).
 		/// </summary>
@@ -131,7 +131,7 @@ namespace AvalonDock.Controls
 		/// This method is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>,
 		/// if a drag & drop operation is completed to display the <see cref="LayoutFloatingWindowControl"/> in a
 		/// new docking position.
-		/// 
+		///
 		/// The implementing control can use this method call to:
 		/// - hide available drop areas and their current drop targets preview (Highlighting PreviewBox Geometry)
 		/// - and re-positioning the dragged control to complete the new docking position.

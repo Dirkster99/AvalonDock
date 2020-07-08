@@ -19,9 +19,11 @@ namespace AvalonDock.Layout
 	public class LayoutDocument : LayoutContent
 	{
 		#region fields
+
 		private bool _canMove = true;
 		private bool _isVisible = true;
 		private string _description = null;
+
 		#endregion fields
 
 		#region Properties
@@ -72,7 +74,7 @@ namespace AvalonDock.Layout
 			return true;
 		}
 
-		#endregion
+		#endregion Internal Methods
 
 		#region Overrides
 

@@ -69,7 +69,6 @@ namespace Standard
 		/// <returns>A Color representation of the parameter.</returns>
 		public static Color ColorFromArgbDword(uint color) => Color.FromArgb((byte)((color & 0xFF000000) >> 24), (byte)((color & 0x00FF0000) >> 16), (byte)((color & 0x0000FF00) >> 8), (byte)((color & 0x000000FF) >> 0));
 
-
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static int GET_X_LPARAM(IntPtr lParam) => LOWORD(lParam.ToInt32());
 
@@ -311,6 +310,7 @@ namespace Standard
 
 		// This can be cached.  It's not going to change under reasonable circumstances.
 		private static int s_bitDepth; // = 0;
+
 		private static int _GetBitDepth()
 		{
 			if (s_bitDepth != 0) return s_bitDepth;
@@ -357,7 +357,6 @@ namespace Standard
 			hwnd = IntPtr.Zero;
 			if (NativeMethods.IsWindow(p)) NativeMethods.DestroyWindow(p);
 		}
-
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SafeDispose<T>(ref T disposable) where T : IDisposable
@@ -466,7 +465,7 @@ namespace Standard
 			if (source.CanSeek)
 			{
 				source.Position = 0;
-				// Consider that this could throw because 
+				// Consider that this could throw because
 				// the source stream doesn't know it's size...
 				destination.SetLength(source.Length);
 			}
@@ -693,6 +692,7 @@ namespace Standard
 				case '(':
 				case ')':
 					return true;
+
 				default: return false;
 			}
 		}
@@ -757,6 +757,6 @@ namespace Standard
 
 		public static bool IsDoubleFiniteAndNonNegative(double d) => !double.IsNaN(d) && !double.IsInfinity(d) && !(d < 0);
 
-		#endregion
+		#endregion Extension Methods
 	}
 }

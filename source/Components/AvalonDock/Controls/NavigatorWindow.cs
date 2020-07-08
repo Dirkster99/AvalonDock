@@ -7,11 +7,11 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
+using AvalonDock.Themes;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using AvalonDock.Layout;
-using AvalonDock.Themes;
 using System.Windows.Controls;
 
 namespace AvalonDock.Controls
@@ -27,16 +27,17 @@ namespace AvalonDock.Controls
 	public class NavigatorWindow : Window
 	{
 		#region fields
+
 		private const string PART_AnchorableListBox = "PART_AnchorableListBox";
 		private const string PART_DocumentListBox = "PART_DocumentListBox";
 
-		private ResourceDictionary currentThemeResourceDictionary; // = null
 		private DockingManager _manager;
 		private bool _isSelectingDocument;
 		private ListBox _anchorableListBox;
 		private ListBox _documentListBox;
 		private bool _internalSetSelectedDocument = false;
 		private bool _internalSetSelectedAnchorable = false;
+
 		#endregion fields
 
 		#region Constructors
@@ -71,7 +72,7 @@ namespace AvalonDock.Controls
 			UpdateThemeResources();
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -84,12 +85,12 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty DocumentsProperty = DocumentsPropertyKey.DependencyProperty;
 
 		/// <summary>
-		/// Gets the <see cref="Documents"/> property. This dependency property 
+		/// Gets the <see cref="Documents"/> property. This dependency property
 		/// indicates the list of documents.
 		/// </summary>
 		public LayoutDocumentItem[] Documents => (LayoutDocumentItem[])GetValue(DocumentsProperty);
 
-		#endregion
+		#endregion Documents
 
 		#region Anchorables
 
@@ -100,12 +101,12 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty AnchorablesProperty = AnchorablesPropertyKey.DependencyProperty;
 
 		/// <summary>
-		/// Gets the <see cref="Anchorables"/> property. This dependency property 
+		/// Gets the <see cref="Anchorables"/> property. This dependency property
 		/// indicates the list of anchorables.
 		/// </summary>
 		public IEnumerable<LayoutAnchorableItem> Anchorables => (IEnumerable<LayoutAnchorableItem>)GetValue(AnchorablesProperty);
 
-		#endregion
+		#endregion Anchorables
 
 		#region SelectedDocument
 
@@ -114,7 +115,7 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata(null, OnSelectedDocumentChanged));
 
 		/// <summary>
-		/// Gets or sets the <see cref="SelectedDocument"/> property.  This dependency property 
+		/// Gets or sets the <see cref="SelectedDocument"/> property.  This dependency property
 		/// indicates the selected document.
 		/// </summary>
 		public LayoutDocumentItem SelectedDocument
@@ -129,12 +130,12 @@ namespace AvalonDock.Controls
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="SelectedDocument"/> property.</summary>
 		protected virtual void OnSelectedDocumentChanged(DependencyPropertyChangedEventArgs e)
 		{
-			if (_internalSetSelectedDocument|| SelectedDocument == null || !SelectedDocument.ActivateCommand.CanExecute(null)) return;
+			if (_internalSetSelectedDocument || SelectedDocument == null || !SelectedDocument.ActivateCommand.CanExecute(null)) return;
 			Hide();
 			SelectedDocument.ActivateCommand.Execute(null);
 		}
 
-		#endregion
+		#endregion SelectedDocument
 
 		#region SelectedAnchorable
 
@@ -143,7 +144,7 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata(null, OnSelectedAnchorableChanged));
 
 		/// <summary>
-		/// Gets or sets the <see cref="SelectedAnchorable"/> property. This dependency property 
+		/// Gets or sets the <see cref="SelectedAnchorable"/> property. This dependency property
 		/// indicates the selected anchorable.
 		/// </summary>
 		public LayoutAnchorableItem SelectedAnchorable
@@ -168,11 +169,11 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion SelectedAnchorable
 
-		#endregion
+		#endregion Properties
 
-		#region Overrides   
+		#region Overrides
 
 		/// <inheritdoc />
 		public override void OnApplyTemplate()
@@ -274,20 +275,19 @@ namespace AvalonDock.Controls
 			base.OnPreviewKeyUp(e);
 		}
 
-
-		#endregion
+		#endregion Overrides
 
 		#region Internal Methods
 
 		/// <summary>
-		/// Provides a secure method for setting the Anchorables property.  
+		/// Provides a secure method for setting the Anchorables property.
 		/// This dependency property indicates the list of anchorables.
 		/// </summary>
 		/// <param name="value">The new value for the property.</param>
 		protected void SetAnchorables(IEnumerable<LayoutAnchorableItem> value) => SetValue(AnchorablesPropertyKey, value);
 
 		/// <summary>
-		/// Provides a secure method for setting the Documents property.  
+		/// Provides a secure method for setting the Documents property.
 		/// This dependency property indicates the list of documents.
 		/// </summary>
 		/// <param name="value">The new value for the property.</param>
@@ -297,29 +297,13 @@ namespace AvalonDock.Controls
 		{
 			if (oldTheme != null)
 			{
-				if (oldTheme is DictionaryTheme)
-				{
-					if (currentThemeResourceDictionary != null)
-					{
-						Resources.MergedDictionaries.Remove(currentThemeResourceDictionary);
-						currentThemeResourceDictionary = null;
-					}
-				}
-				else
-				{
-					var resourceDictionaryToRemove = Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
-					if (resourceDictionaryToRemove != null) Resources.MergedDictionaries.Remove(resourceDictionaryToRemove);
-				}
+				var resourceDictionaryToRemove = Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
+				if (resourceDictionaryToRemove != null) Resources.MergedDictionaries.Remove(resourceDictionaryToRemove);
 			}
 
 			if (_manager.Theme == null) return;
-			if (_manager.Theme is DictionaryTheme dictionaryTheme)
-			{
-				currentThemeResourceDictionary = dictionaryTheme.ThemeResourceDictionary;
-				Resources.MergedDictionaries.Add(currentThemeResourceDictionary);
-			}
-			else
-				Resources.MergedDictionaries.Add(new ResourceDictionary() {Source = _manager.Theme.GetResourceUri()});
+
+			Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = _manager.Theme.GetResourceUri() });
 		}
 
 		internal void SelectNextDocument()
@@ -341,7 +325,7 @@ namespace AvalonDock.Controls
 			InternalSetSelectedAnchorable(anchorablesArray[anchorableIndex]);
 		}
 
-		#endregion
+		#endregion Internal Methods
 
 		#region Private Methods
 
@@ -371,6 +355,6 @@ namespace AvalonDock.Controls
 
 		private void OnUnloaded(object sender, RoutedEventArgs e) => Unloaded -= OnUnloaded;
 
-		#endregion
+		#endregion Private Methods
 	}
 }
