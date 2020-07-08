@@ -20,7 +20,8 @@
 				<TextBlock FontWeight="Bold">This Comtrol demos an Auto-Size FloatingWindow</TextBlock>
 				<TextBlock TextWrapping="WrapWithOverflow">
 					This content can initially be sized to the content of a containing user control when dragging
-					the LayoutAnchorable into floating mode using the SetWindowSizeWhenOpened property (see App.xaml of this demo app).
+					the LayoutAnchorable into floating mode using the DockingManager's AutoWindowSizeWhenOpened
+					dependency property.
 				</TextBlock>
 			</TextBlock>
 		</StackPanel>

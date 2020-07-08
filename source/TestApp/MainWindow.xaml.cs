@@ -246,8 +246,8 @@ namespace TestApp
 
 		/// <summary>
 		/// Method create a new anchorable window to test whether a floating window will auto-adjust its size to the
-		/// containing control. See SetWindowSizeWhenOpened property in <seealso cref="LayoutAnchorableFloatingWindow"/>
-		/// and App.xaml in this demo App for more details.
+		/// containing control. See <see cref="DockingManager.AutoWindowSizeWhenOpened"/> dependency property.
+		/// and TestUserControl in this demo App for more details.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
