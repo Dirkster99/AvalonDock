@@ -7,6 +7,7 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using System.ComponentModel;
 using System.Windows;
 
 namespace AvalonDock.Controls
@@ -73,10 +74,8 @@ namespace AvalonDock.Controls
 
 		#region Properties
 
-		/// <summary>
-		/// Gets the <see cref="FrameworkElement"/> that implements a drop target
-		/// for a drag & drop (dock) operation.
-		/// </summary>
+		/// <summary>Gets the <see cref="FrameworkElement"/> that implements a drop target for a drag & drop (dock) operation.</summary>
+		[Bindable(false), Description("Gets the FrameworkElement that implements a drop target for a drag & drop (dock) operation."), Category("Other")]
 		public T AreaElement { get; }
 
 		#endregion Properties

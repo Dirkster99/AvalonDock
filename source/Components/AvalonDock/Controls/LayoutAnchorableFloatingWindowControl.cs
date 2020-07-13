@@ -13,6 +13,7 @@ using AvalonDock.Layout;
 using Microsoft.Windows.Shell;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls.Primitives;
@@ -91,10 +92,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty SingleContentLayoutItemProperty = DependencyProperty.Register(nameof(SingleContentLayoutItem), typeof(LayoutItem), typeof(LayoutAnchorableFloatingWindowControl),
 				new FrameworkPropertyMetadata(null, OnSingleContentLayoutItemChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="SingleContentLayoutItem"/> property. This dependency property
-		/// indicates the layout item of the selected content when is shown a single anchorable pane.
-		/// </summary>
+		/// <summary>Gets/sets the layout item of the selected content when shown in a single anchorable pane.</summary>
+		[Bindable(true), Description("Gets/sets the layout item of the selected content when shown in a single anchorable pane."), Category("Anchorable")]
 		public LayoutItem SingleContentLayoutItem
 		{
 			get => (LayoutItem)GetValue(SingleContentLayoutItemProperty);

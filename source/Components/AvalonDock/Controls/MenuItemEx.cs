@@ -7,6 +7,7 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -43,10 +44,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty IconTemplateProperty = DependencyProperty.Register(nameof(IconTemplate), typeof(DataTemplate), typeof(MenuItemEx),
 				new FrameworkPropertyMetadata(null, OnIconTemplateChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="IconTemplate "/> property. This dependency property
-		/// indicates the data template for the icon.
-		/// </summary>
+		/// <summary>Gets/sets the <see cref="DataTemplate"/> for the icon in the menu item.</summary>
+		[Bindable(true), Description("Gets/sets the data template for the icon in the menu item.."), Category("Menu")]
 		public DataTemplate IconTemplate
 		{
 			get => (DataTemplate)GetValue(IconTemplateProperty);
@@ -67,10 +66,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty IconTemplateSelectorProperty = DependencyProperty.Register(nameof(IconTemplateSelector), typeof(DataTemplateSelector), typeof(MenuItemEx),
 				new FrameworkPropertyMetadata(null, OnIconTemplateSelectorChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="IconTemplateSelector"/> property. This dependency property
-		/// indicates the DataTemplateSelector for the Icon.
-		/// </summary>
+		/// <summary>Gets/sets the <see cref="DataTemplateSelector"/> for the icon in the menu item.</summary>
+		[Bindable(true), Description("Gets/sets the DataTemplateSelector for the icon in the menu item."), Category("Menu")]
 		public DataTemplateSelector IconTemplateSelector
 		{
 			get => (DataTemplateSelector)GetValue(IconTemplateSelectorProperty);

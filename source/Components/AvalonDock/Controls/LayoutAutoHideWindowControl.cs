@@ -9,6 +9,7 @@
 
 using AvalonDock.Layout;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -70,10 +71,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty AnchorableStyleProperty = DependencyProperty.Register(nameof(AnchorableStyle), typeof(Style), typeof(LayoutAutoHideWindowControl),
 				new FrameworkPropertyMetadata(null));
 
-		/// <summary>
-		/// Gets or sets the <see cref="AnchorableStyle"/> property. This dependency property
-		/// indicates the style to apply to the LayoutAnchorableControl hosted in this auto hide window.
-		/// </summary>
+		/// <summary>Gets/sets the style to apply to the <see cref="LayoutAnchorableControl"/> hosted in this auto hide window.</summary>
+		[Bindable(true), Description("Gets/sets the style to apply to the LayoutAnchorableControl hosted in this auto hide window."), Category("Style")]
 		public Style AnchorableStyle
 		{
 			get => (Style)GetValue(AnchorableStyleProperty);
@@ -88,10 +87,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register(nameof(Background), typeof(Brush), typeof(LayoutAutoHideWindowControl),
 				new FrameworkPropertyMetadata(null));
 
-		/// <summary>
-		/// Gets or sets the <see cref="Background"/> property. This dependency property
-		/// indicates background of the autohide childwindow.
-		/// </summary>
+		/// <summary>Gets/sets the background brush of the autohide childwindow.</summary>
+		[Bindable(true), Description("Gets/sets the background brush of the autohide childwindow."), Category("Other")]
 		public Brush Background
 		{
 			get => (Brush)GetValue(BackgroundProperty);

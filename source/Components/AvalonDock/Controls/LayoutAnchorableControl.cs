@@ -8,6 +8,7 @@
  ************************************************************************/
 
 using AvalonDock.Layout;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -48,7 +49,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(nameof(Model), typeof(LayoutAnchorable), typeof(LayoutAnchorableControl),
 				new FrameworkPropertyMetadata(null, OnModelChanged));
 
-		/// <summary>Gets or sets the <see cref="Model"/> property. This dependency property indicates the model attached to this view.</summary>
+		/// <summary>Gets/sets the model attached to this view.</summary>
+		[Bindable(true), Description("Gets/sets the model attached to this view."), Category("Other")]
 		public LayoutAnchorable Model
 		{
 			get => (LayoutAnchorable)GetValue(ModelProperty);
@@ -91,7 +93,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
-		/// <summary> Gets the <see cref="LayoutItem"/> property. This dependency property indicates the LayoutItem attached to this tag item.</summary>
+		/// <summary>Gets the the LayoutItem attached to this tag item.</summary>
+		[Bindable(true), Description("Gets the the LayoutItem attached to this tag item."), Category("Other")]
 		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
 
 		/// <summary>

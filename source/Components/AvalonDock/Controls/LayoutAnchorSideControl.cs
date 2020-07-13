@@ -10,6 +10,7 @@
 using AvalonDock.Layout;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -68,7 +69,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty IsLeftSideProperty = IsLeftSidePropertyKey.DependencyProperty;
 
-		/// <summary>Gets the <see cref="IsLeftSide"/> property. This dependency property indicates this control is anchored to left side.</summary>
+		/// <summary>Gets wether the control is anchored to left side.</summary>
+		[Bindable(true), Description("Gets wether the control is anchored to left side."), Category("Anchor")]
 		public bool IsLeftSide => (bool)GetValue(IsLeftSideProperty);
 
 		/// <summary>Provides a secure method for setting the <see cref="IsLeftSide"/> property. This dependency property indicates this control is anchored to left side.</summary>
@@ -85,7 +87,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty IsTopSideProperty = IsTopSidePropertyKey.DependencyProperty;
 
-		/// <summary>Gets the <see cref="IsTopSide"/> property. This dependency property indicates this control is anchored to top side.</summary>
+		/// <summary>Gets wether the control is anchored to top side.</summary>
+		[Bindable(true), Description("Gets wether the control is anchored to top side."), Category("Anchor")]
 		public bool IsTopSide => (bool)GetValue(IsTopSideProperty);
 
 		/// <summary>Provides a secure method for setting the <see cref="IsTopSide"/> property. This dependency property indicates this control is anchored to top side.</summary>
@@ -102,7 +105,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty IsRightSideProperty = IsRightSidePropertyKey.DependencyProperty;
 
-		/// <summary>Gets the <see cref="IsRightSide"/> property. This dependency property indicates this control is anchored to right side.</summary>
+		/// <summary>Gets wether the control is anchored to right side.</summary>
+		[Bindable(true), Description("Gets wether the control is anchored to right side."), Category("Anchor")]
 		public bool IsRightSide => (bool)GetValue(IsRightSideProperty);
 
 		/// <summary>Provides a secure method for setting the <see cref="IsRightSide"/> property. This dependency property indicates this control is anchored to right side.</summary>
@@ -119,7 +123,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty IsBottomSideProperty = IsBottomSidePropertyKey.DependencyProperty;
 
-		/// <summary>Gets the <see cref="IsBottomSide"/> property. This dependency property indicates if this panel is anchored to bottom side.</summary>
+		/// <summary>Gets whether the control is anchored to bottom side.</summary>
+		[Bindable(true), Description("Gets whether the control is anchored to bottom side."), Category("Anchor")]
 		public bool IsBottomSide => (bool)GetValue(IsBottomSideProperty);
 
 		/// <summary>Provides a secure method for setting the <see cref="IsBottomSide"/> property. This dependency property indicates if this panel is anchored to bottom side.</summary>

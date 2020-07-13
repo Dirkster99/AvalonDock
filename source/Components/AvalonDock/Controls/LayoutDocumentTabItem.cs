@@ -10,6 +10,7 @@
 using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -56,10 +57,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(nameof(Model), typeof(LayoutContent), typeof(LayoutDocumentTabItem),
 				new FrameworkPropertyMetadata(null, OnModelChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="Model"/> property.  This dependency property
-		/// indicates the layout content model attached to the tab item.
-		/// </summary>
+		/// <summary>Gets/sets the layout content model attached to the tab item.</summary>
+		[Bindable(true), Description("Gets wether this floating window is being dragged."), Category("Other")]
 		public LayoutContent Model
 		{
 			get => (LayoutContent)GetValue(ModelProperty);
@@ -89,11 +88,15 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
-		/// <summary>
-		/// Gets the <see cref="LayoutItem"/> property. This dependency property
-		/// indicates the LayoutItem attached to this tag item.
-		/// </summary>
+		/// <summary>Gets the LayoutItem attached to this tag item.</summary>
+		[Bindable(true), Description("Gets the LayoutItem attached to this tag item."), Category("Other")]
 		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
+
+		#endregion LayoutItem
+
+		#endregion Properties
+
+		#region Overrides
 
 		/// <summary>
 		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.
@@ -101,12 +104,6 @@ namespace AvalonDock.Controls
 		/// </summary>
 		/// <param name="value">The new value for the property.</param>
 		protected void SetLayoutItem(LayoutItem value) => SetValue(LayoutItemPropertyKey, value);
-
-		#endregion LayoutItem
-
-		#endregion Properties
-
-		#region Overrides
 
 		/// <inheritdoc />
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)

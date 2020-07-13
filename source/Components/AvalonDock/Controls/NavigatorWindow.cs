@@ -10,6 +10,7 @@
 using AvalonDock.Layout;
 using AvalonDock.Themes;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -84,10 +85,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty DocumentsProperty = DocumentsPropertyKey.DependencyProperty;
 
-		/// <summary>
-		/// Gets the <see cref="Documents"/> property. This dependency property
-		/// indicates the list of documents.
-		/// </summary>
+		/// <summary>Gets the list of documents managed in this framework.</summary>
+		[Bindable(true), Description("Gets the list of documents managed in this framework."), Category("Document")]
 		public LayoutDocumentItem[] Documents => (LayoutDocumentItem[])GetValue(DocumentsProperty);
 
 		#endregion Documents
@@ -100,10 +99,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty AnchorablesProperty = AnchorablesPropertyKey.DependencyProperty;
 
-		/// <summary>
-		/// Gets the <see cref="Anchorables"/> property. This dependency property
-		/// indicates the list of anchorables.
-		/// </summary>
+		/// <summary>Gets the list of anchorables managed in the framework.</summary>
+		[Bindable(true), Description("Gets the list of anchorables managed in the framework."), Category("Anchorable")]
 		public IEnumerable<LayoutAnchorableItem> Anchorables => (IEnumerable<LayoutAnchorableItem>)GetValue(AnchorablesProperty);
 
 		#endregion Anchorables
@@ -114,10 +111,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty SelectedDocumentProperty = DependencyProperty.Register(nameof(SelectedDocument), typeof(LayoutDocumentItem), typeof(NavigatorWindow),
 				new FrameworkPropertyMetadata(null, OnSelectedDocumentChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="SelectedDocument"/> property.  This dependency property
-		/// indicates the selected document.
-		/// </summary>
+		/// <summary>Gets/sets the currently selected document.</summary>
+		[Bindable(true), Description("Gets/sets the currently selected document."), Category("Document")]
 		public LayoutDocumentItem SelectedDocument
 		{
 			get => (LayoutDocumentItem)GetValue(SelectedDocumentProperty);
@@ -143,10 +138,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty SelectedAnchorableProperty = DependencyProperty.Register(nameof(SelectedAnchorable), typeof(LayoutAnchorableItem), typeof(NavigatorWindow),
 				new FrameworkPropertyMetadata(null, OnSelectedAnchorableChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="SelectedAnchorable"/> property. This dependency property
-		/// indicates the selected anchorable.
-		/// </summary>
+		/// <summary>Gets/sets the currently selected anchorable.</summary>
+		[Bindable(true), Description("Gets/sets the currently selected anchorable."), Category("Anchorable")]
 		public LayoutAnchorableItem SelectedAnchorable
 		{
 			get => (LayoutAnchorableItem)GetValue(SelectedAnchorableProperty);

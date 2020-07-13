@@ -9,6 +9,7 @@
 
 using AvalonDock.Layout;
 using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -67,10 +68,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty SideProperty = SidePropertyKey.DependencyProperty;
 
-		/// <summary>
-		/// Gets the Side property.  This dependency property
-		/// indicates the anchor side of the control.
-		/// </summary>
+		/// <summary>Gets the anchor side of the control.</summary>
+		[Bindable(true), Description("Gets the anchor side of the control."), Category("Anchor")]
 		public AnchorSide Side
 		{
 			get

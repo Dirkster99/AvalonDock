@@ -10,6 +10,7 @@
 using AvalonDock.Layout;
 using AvalonDock.Themes;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -105,9 +106,8 @@ namespace AvalonDock.Controls
 
 		#region Properties.
 
-		/// <summary>
-		/// Gets whether the window is hosted in a floating window.
-		/// </summary>
+		/// <summary>Gets whether the window is hosted in a floating window.</summary>
+		[Bindable(false), Description("Gets whether the window is hosted in a floating window."), Category("FloatingWindow")]
 		public bool IsHostedInFloatingWindow => _host is LayoutDocumentFloatingWindowControl || _host is LayoutAnchorableFloatingWindowControl;
 
 		#endregion Properties.

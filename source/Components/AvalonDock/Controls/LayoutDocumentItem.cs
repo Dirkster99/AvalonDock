@@ -8,6 +8,7 @@
  ************************************************************************/
 
 using AvalonDock.Layout;
+using System.ComponentModel;
 using System.Windows;
 
 namespace AvalonDock.Controls
@@ -46,10 +47,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register(nameof(Description), typeof(string), typeof(LayoutDocumentItem),
 					new FrameworkPropertyMetadata(null, OnDescriptionChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="Description"/> property.  This dependency property
-		/// indicates the description to display (in the <see cref="NavigatorWindow"/>) for the document item.
-		/// </summary>
+		/// <summary>Gets/sets the description to display (in the <see cref="NavigatorWindow"/>) for the document item.</summary>
+		[Bindable(true), Description("Gets/sets the description to display (in the NavigatorWindow) for the document item."), Category("Other")]
 		public string Description
 		{
 			get => (string)GetValue(DescriptionProperty);

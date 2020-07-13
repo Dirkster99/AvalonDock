@@ -10,6 +10,7 @@
 using AvalonDock.Layout;
 using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -60,6 +61,7 @@ namespace AvalonDock.Controls
 		#region Properties
 
 		/// <summary>Gets the layout model of this control.</summary>
+		[Bindable(false), Description("Gets the layout model of this control."), Category("Other")]
 		public ILayoutElement Model => _model;
 
 		#endregion Properties

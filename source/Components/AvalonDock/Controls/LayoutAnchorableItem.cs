@@ -10,6 +10,7 @@
 using AvalonDock.Commands;
 using AvalonDock.Layout;
 using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -55,10 +56,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty HideCommandProperty = DependencyProperty.Register(nameof(HideCommand), typeof(ICommand), typeof(LayoutAnchorableItem),
 				new FrameworkPropertyMetadata(null, OnHideCommandChanged, CoerceHideCommandValue));
 
-		/// <summary>
-		/// Gets or sets the <see cref="HideCommand"/> property. This dependency property
-		/// indicates the command to execute when an anchorable is hidden.
-		/// </summary>
+		/// <summary>Gets/sets the the command to execute when an anchorable is hidden.</summary>
+		[Bindable(true), Description("Gets/sets the the command to execute when an anchorable is hidden."), Category("Other")]
 		public ICommand HideCommand
 		{
 			get => (ICommand)GetValue(HideCommandProperty);
@@ -88,11 +87,9 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty AutoHideCommandProperty = DependencyProperty.Register(nameof(AutoHideCommand), typeof(ICommand), typeof(LayoutAnchorableItem),
 				new FrameworkPropertyMetadata(null, OnAutoHideCommandChanged, CoerceAutoHideCommandValue));
 
-		/// <summary>
-		/// Gets or sets the <see cref="AutoHideCommand"/> property. This dependency property
-		/// indicates the command to execute when user click the auto hide button.
-		/// </summary>
+		/// <summary>Gets/sets the command to execute when user click the auto hide button.</summary>
 		/// <remarks>By default this command toggles auto hide state for an anchorable.</remarks>
+		[Bindable(true), Description("Gets/sets the command to execute when user click the auto hide button."), Category("Other")]
 		public ICommand AutoHideCommand
 		{
 			get => (ICommand)GetValue(AutoHideCommandProperty);
@@ -127,11 +124,9 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty DockCommandProperty = DependencyProperty.Register(nameof(DockCommand), typeof(ICommand), typeof(LayoutAnchorableItem),
 				new FrameworkPropertyMetadata(null, OnDockCommandChanged, CoerceDockCommandValue));
 
-		/// <summary>
-		/// Gets or sets the <see cref="DockCommand"/> property.  This dependency property
-		/// indicates the command to execute when user click the Dock button.
-		/// </summary>
+		/// <summary>Gets/sets the command to execute when user click the Dock button.</summary>
 		/// <remarks>By default this command moves the anchorable inside the container pane which previously hosted the object.</remarks>
+		[Bindable(true), Description("Gets/sets the command to execute when user click the Dock button."), Category("Other")]
 		public ICommand DockCommand
 		{
 			get => (ICommand)GetValue(DockCommandProperty);
@@ -161,10 +156,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty CanHideProperty = DependencyProperty.Register(nameof(CanHide), typeof(bool), typeof(LayoutAnchorableItem), new FrameworkPropertyMetadata((bool)true,
 					OnCanHideChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="CanHide"/> property. This dependency property
-		/// indicates if user can hide the anchorable item.
-		/// </summary>
+		/// <summary>Gets/sets wether the user can hide the anchorable item.</summary>
+		[Bindable(true), Description("Gets/sets wether the user can hide the anchorable item."), Category("Anchorable")]
 		public bool CanHide
 		{
 			get => (bool)GetValue(CanHideProperty);
@@ -188,10 +181,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty CanMoveProperty = DependencyProperty.Register(nameof(CanMove), typeof(bool), typeof(LayoutAnchorableItem), new FrameworkPropertyMetadata((bool)true,
 					OnCanMoveChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="CanMove"/> property. This dependency property
-		/// indicates if user can hide the anchorable item.
-		/// </summary>
+		/// <summary>Gets/sets wether the user can hide the anchorable item.</summary>
+		[Bindable(true), Description("Gets/sets wether the user can hide the anchorable item."), Category("Anchorable")]
 		public bool CanMove
 		{
 			get => (bool)GetValue(CanMoveProperty);

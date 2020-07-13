@@ -102,10 +102,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty IsContentImmutableProperty = DependencyProperty.Register(nameof(IsContentImmutable), typeof(bool), typeof(LayoutFloatingWindowControl),
 				  new FrameworkPropertyMetadata(false));
 
-		/// <summary>
-		/// Gets/sets the <see cref="IsContentImmutable"/> property.  This dependency property
-		/// indicates if the content can be modified.
-		/// </summary>
+		/// <summary>Gets/sets wether the content can be modified.</summary>
+		[Bindable(true), Description("Gets/sets wether the content can be modified."), Category("Other")]
 		public bool IsContentImmutable
 		{
 			get => (bool)GetValue(IsContentImmutableProperty);
@@ -122,10 +120,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty IsDraggingProperty = IsDraggingPropertyKey.DependencyProperty;
 
-		/// <summary>
-		/// Gets the <see cref="IsDragging"/> property. This dependency property
-		/// indicates that this floating window is being dragged.
-		/// </summary>
+		/// <summary>Gets wether this floating window is being dragged.</summary>
+		[Bindable(true), Description("Gets wether this floating window is being dragged."), Category("FloatingWindow")]
 		public bool IsDragging => (bool)GetValue(IsDraggingProperty);
 
 		/// <summary>

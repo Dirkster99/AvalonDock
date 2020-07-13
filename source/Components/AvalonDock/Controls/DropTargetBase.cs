@@ -7,29 +7,24 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using System.ComponentModel;
 using System.Windows;
 
 namespace AvalonDock.Controls
 {
-	/// <summary>
-	/// Implements a base implementation for the abstract <see cref="DropTarget{T}"/> class.
-	/// </summary>
+	/// <summary>Implements a base implementation for the abstract <see cref="DropTarget{T}"/> class.</summary>
 	internal abstract class DropTargetBase : DependencyObject
 	{
 		#region Properties
 
 		#region IsDraggingOver
 
-		/// <summary>
-		/// IsDraggingOver Attached Dependency Property
-		/// </summary>
+		/// <summary>IsDraggingOver Attached Dependency Property</summary>
 		public static readonly DependencyProperty IsDraggingOverProperty = DependencyProperty.RegisterAttached("IsDraggingOver", typeof(bool), typeof(DropTargetBase),
 				new FrameworkPropertyMetadata((bool)false));
 
-		/// <summary>
-		/// Gets the IsDraggingOver property.
-		/// This dependency property indicates if user is dragging a window over the target element.
-		/// </summary>
+		/// <summary>Gets wether the user is dragging a window over the target element.</summary>
+		[Bindable(true), Description("Gets wether the user is dragging a window over the target element."), Category("Other")]
 		public static bool GetIsDraggingOver(DependencyObject d)
 		{
 			return (bool)d.GetValue(IsDraggingOverProperty);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -52,9 +53,8 @@ namespace AvalonDock.Controls
 
 		#region properties
 
-		/// <summary>
-		/// Gets whether the control and its inheriting classes are virtualizing their items or not.
-		/// </summary>
+		/// <summary>Gets whether the control and its inheriting classes are virtualizing their items or not.</summary>
+		[Bindable(false), Description("Gets whether the control and its inheriting classes are virtualizing their items or not."), Category("Other")]
 		public bool IsVirtualiting => _IsVirtualizing;
 
 		#endregion properties
