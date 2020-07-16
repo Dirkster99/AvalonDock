@@ -120,7 +120,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## Fixes & Features in master but not relased, yet
+## Fixes & Features  added in Version 4.3
 
 - Localized labels in [NavigatorWindow](https://github.com/Dirkster99/AvalonDock/wiki/NavigatorWindow)
 
