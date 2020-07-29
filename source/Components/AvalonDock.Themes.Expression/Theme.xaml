@@ -448,6 +448,10 @@
 								</Setter.Value>
 							</Setter>
 						</DataTrigger>
+						<DataTrigger Binding="{Binding Model.CanClose, RelativeSource={RelativeSource Mode=Self}}" Value="True">
+							<Setter TargetName="PART_HidePin" Property="Command" Value="{Binding Path=LayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+							<Setter TargetName="PART_HidePin" Property="ToolTip" Value="{x:Static avalonDockProperties:Resources.Document_Close}" />
+						</DataTrigger>
 						<Trigger SourceName="MenuDropDownButton" Property="IsMouseOver" Value="True">
 							<Setter TargetName="PART_ImgMenuPin" Property="Source" Value="/AvalonDock.Themes.Expression;component/Images/PinMenu_Light.png" />
 						</Trigger>
@@ -1212,6 +1216,23 @@
 										Width="13"
 										Source="/AvalonDock.Themes.Expression;component/Images/PinRestore.png" />
 								</Button>
+
+								<Button
+									x:Name="PART_PinClose"
+									Grid.Column="3"
+									HorizontalAlignment="Right"
+									VerticalAlignment="Center"
+									shell:WindowChrome.IsHitTestVisibleInChrome="True"
+									Command="{Binding HideWindowCommand, RelativeSource={RelativeSource TemplatedParent}}"
+									Focusable="False"
+									Style="{StaticResource AvalonDock_Expression_ButtonStyle}"
+									ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}"
+									Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
+									<Image
+										x:Name="PART_ImgPinClose"
+										Width="13"
+										Source="/AvalonDock.Themes.Expression;component/Images/PinClose.png" />
+								</Button>
 							</Grid>
 						</Border>
 					</Grid>
@@ -1219,6 +1240,10 @@
 						<Trigger Property="WindowState" Value="Maximized">
 							<Setter TargetName="WindowBorder" Property="Padding" Value="5" />
 						</Trigger>
+						<DataTrigger Binding="{Binding Model.SinglePane.SelectedContent.CanClose, RelativeSource={RelativeSource Mode=Self}}" Value="True">
+							<Setter TargetName="PART_PinClose" Property="Command" Value="{Binding CloseWindowCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+							<Setter TargetName="PART_PinClose" Property="ToolTip" Value="{x:Static avalonDockProperties:Resources.Document_Close}" />
+						</DataTrigger>
 						<Trigger SourceName="PART_PinMaximize" Property="IsMouseOver" Value="True">
 							<Setter TargetName="PART_ImgPinMaximize" Property="Source" Value="/AvalonDock.Themes.Expression;component/Images/PinMaximize_Light.png" />
 						</Trigger>
