@@ -120,7 +120,11 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## Fixes & Features  added in Version 4.3
+## Fixes & Features in Master branch (not yet released to NuGeT)
+
+- [#182 CanClose property of new LayoutAnchorableItem is different from its LayoutAnchorable](https://github.com/Dirkster99/AvalonDock/pull/183)
+
+## Fixes & Features added in Version 4.3
 
 - Localized labels in [NavigatorWindow](https://github.com/Dirkster99/AvalonDock/wiki/NavigatorWindow)
 
