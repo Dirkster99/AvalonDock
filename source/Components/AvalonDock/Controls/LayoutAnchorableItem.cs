@@ -40,7 +40,12 @@ namespace AvalonDock.Controls
 		#endregion fields
 
 		#region Constructors
-
+		static LayoutAnchorableItem()
+		{
+			// #182: LayoutAnchorable initializes with CanClose == false. We therefore also override the metadata for LayoutAnchorableItem to match this.
+			// Only the default value will be overriden. PropertyChangedCallbacks, etc should be unaffected.
+			CanCloseProperty.OverrideMetadata(typeof(LayoutAnchorableItem), new FrameworkPropertyMetadata(false));
+		}
 		/// <summary>Class constructor</summary>
 		internal LayoutAnchorableItem()
 		{
