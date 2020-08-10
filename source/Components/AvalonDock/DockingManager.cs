@@ -27,17 +27,17 @@ using System.Windows.Threading;
 
 namespace AvalonDock
 {
-	/// <inheritdoc cref="Control"/>
-	/// <inheritdoc cref="IOverlayWindowHost"/>
-	/// <summary>
-	/// The <see cref="DockingManager"/> is the custom control at the root of the visual tree.
-	/// This control is the core control of AvalonDock.
-	/// It contains core dependency properties, events, and methods to customize and
-	/// manage many aspects of the docking framework.
-	/// </summary>
-	/// <seealso cref="Control"/>
-	/// <seealso cref="IOverlayWindowHost"/>
-	[ContentProperty(nameof(Layout))]
+    /// <inheritdoc cref="Control"/>
+    /// <inheritdoc cref="IOverlayWindowHost"/>
+    /// <summary>
+    /// The <see cref="DockingManager"/> is the custom control at the root of the visual tree.
+    /// This control is the core control of AvalonDock.
+    /// It contains core dependency properties, events, and methods to customize and
+    /// manage many aspects of the docking framework.
+    /// </summary>
+    /// <seealso cref="Control"/>
+    /// <seealso cref="IOverlayWindowHost"/>
+    [ContentProperty(nameof(Layout))]
 	[TemplatePart(Name = "PART_AutoHideArea")]
 	public class DockingManager : Control, IOverlayWindowHost//, ILogicalChildrenContainer
 	{
@@ -87,7 +87,7 @@ namespace AvalonDock
 #if !VS2008
 			Layout = new LayoutRoot { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) };
 #else
-          this.SetCurrentValue( DockingManager.LayoutProperty, new LayoutRoot() { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) } );
+		  this.SetCurrentValue( DockingManager.LayoutProperty, new LayoutRoot() { RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())) } );
 #endif
 			Loaded += DockingManager_Loaded;
 			Unloaded += DockingManager_Unloaded;
@@ -2075,9 +2075,8 @@ namespace AvalonDock
 
 			if (e.Action == NotifyCollectionChangedAction.Reset)
 			{
-				//NOTE: I'm going to clear every document present in layout but
-				//some documents may have been added directly to the layout, for now I clear them too
-				var documentsToRemove = Layout.Descendents().OfType<LayoutDocument>().ToArray();
+				//Remove documents that are no longer in the DocumentSource.
+				var documentsToRemove = GetItemsToRemoveAfterReset<LayoutDocument>(DocumentsSource);
 				foreach (var documentToRemove in documentsToRemove)
 				{
 					(documentToRemove.Parent as ILayoutContainer).RemoveChild(
@@ -2087,6 +2086,29 @@ namespace AvalonDock
 			}
 
 			Layout?.CollectGarbage();
+		}
+
+		/// <summary>
+		/// Iterate through source to find only the items that need to be removed.
+		/// </summary>
+		/// <remarks>
+		/// Previous implementations cleared all documents from the layout. The current
+		/// guidance is that the collection has changed signficantly, so only remove the
+		/// documents that are no longer in the DocumentSource.
+		/// </remarks>
+		/// <typeparam name="TLayoutType"></typeparam>
+		/// <param name="source">Either DocumentsSource or AnchorablesSource</param>
+		/// <returns></returns>
+		private TLayoutType[] GetItemsToRemoveAfterReset<TLayoutType>(IEnumerable source)
+			where TLayoutType : LayoutContent
+		{
+			//Find remaining items in source
+			var itemsThatRemain = new HashSet<object>(source.Cast<object>(), ReferenceEqualityComparer.Default);
+			//Find the removed items that are not in the remaining collection
+			return Layout.Descendents()
+			             .OfType<TLayoutType>()
+			             .Where(x => !itemsThatRemain.Contains(x.Content))
+			             .ToArray();
 		}
 
 		private void DetachDocumentsSource(LayoutRoot layout, IEnumerable documentsSource)
@@ -2271,9 +2293,8 @@ namespace AvalonDock
 
 			if (e.Action == NotifyCollectionChangedAction.Reset)
 			{
-				//NOTE: I'm going to clear every anchorable present in layout but
-				//some anchorable may have been added directly to the layout, for now I clear them too
-				var anchorablesToRemove = Layout.Descendents().OfType<LayoutAnchorable>().ToArray();
+				//Remove anchorables that are no longer in the AnchorablesSource.
+				var anchorablesToRemove = GetItemsToRemoveAfterReset<LayoutAnchorable>(AnchorablesSource);
 				foreach (var anchorableToRemove in anchorablesToRemove)
 				{
 					(anchorableToRemove.Parent as ILayoutContainer).RemoveChild(
