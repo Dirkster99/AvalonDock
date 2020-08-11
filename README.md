@@ -123,6 +123,7 @@ to also theme standard elements, such as, button and textblock etc.
 ## Fixes & Features in Master branch (not yet released to NuGeT)
 
 - [#182 CanClose property of new LayoutAnchorableItem is different from its LayoutAnchorable](https://github.com/Dirkster99/AvalonDock/pull/183)  (thanx to [skyneps](https://github.com/skyneps))
+- [#184 All documents disappear if document stops close application in Caliburn.Micro](https://github.com/Dirkster99/AvalonDock/issues/184)
 
 ## Fixes & Features added in Version 4.3
 
