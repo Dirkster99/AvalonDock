@@ -1,4 +1,11 @@
-﻿[*.cs]
+root = true
+
+[*]
+end_of_line = lf
+indent_style = tab
+charset = utf-8
+
+[*.cs]
 
 # IDE0055: 修正格式
 dotnet_diagnostic.IDE0055.severity = none
