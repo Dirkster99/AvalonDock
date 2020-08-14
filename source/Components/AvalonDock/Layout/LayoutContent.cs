@@ -604,10 +604,13 @@ namespace AvalonDock.Layout
 				IsSelected = true;
 				IsActive = true;
 			}
-		}
 
-		/// <summary>Dock the content as document.</summary>
-		public void DockAsDocument()
+            // BD: 14.08.2020 raise IsFloating property changed
+            RaisePropertyChanged(nameof(IsFloating));
+        }
+
+        /// <summary>Dock the content as document.</summary>
+        public void DockAsDocument()
 		{
 			if (!(Root is LayoutRoot root)) throw new InvalidOperationException();
 			if (Parent is LayoutDocumentPane) return;
@@ -631,12 +634,15 @@ namespace AvalonDock.Layout
 			}
 			IsSelected = true;
 			IsActive = true;
-		}
 
-		/// <summary>
-		/// Re-dock the content to its previous container
-		/// </summary>
-		public void Dock()
+			// BD: 14.08.2020 raise IsFloating property changed
+			RaisePropertyChanged(nameof(IsFloating));
+        }
+
+        /// <summary>
+        /// Re-dock the content to its previous container
+        /// </summary>
+        public void Dock()
 		{
 			if (PreviousContainer != null)
 			{
@@ -667,13 +673,16 @@ namespace AvalonDock.Layout
 				InternalDock();
 
 			Root.CollectGarbage();
-		}
 
-		#endregion Public Methods
+			// BD: 14.08.2020 raise IsFloating property changed
+			RaisePropertyChanged(nameof(IsFloating));
+        }
 
-		#region Overrides
+        #endregion Public Methods
 
-		protected override void OnParentChanging(ILayoutContainer oldValue, ILayoutContainer newValue)
+        #region Overrides
+
+        protected override void OnParentChanging(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
 			if (oldValue != null) IsSelected = false;
 			//var root = Root;
