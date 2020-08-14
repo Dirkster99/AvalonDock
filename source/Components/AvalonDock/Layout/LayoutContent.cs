@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -404,6 +404,8 @@ namespace AvalonDock.Layout
 
 		#endregion ToolTip
 
+		/// <summary>Gets whether the content is currently floating or not.</summary>
+		[Bindable(true), Description("Gets whether the content is currently floating or not."), Category("Other")]
 		public bool IsFloating => this.FindParent<LayoutFloatingWindow>() != null;
 
 		#region IconSource
@@ -484,15 +486,14 @@ namespace AvalonDock.Layout
 
 		#region Public Methods
 
-		/// <summary>
-		/// Close the content
-		/// </summary>
-		/// <remarks>Please note that usually the anchorable is only hidden (not closed). By default when user click the X button it only hides the content.</remarks>
+		/// <summary>Close the content</summary>
+		/// <remarks>Note that the anchorable is only hidden (not closed). By default when user click the X button it only hides the content.</remarks>
 		public abstract void Close();
 
 		/// <inheritdoc />
 		public System.Xml.Schema.XmlSchema GetSchema() => null;
 
+		/// <inheritdoc />
 		public virtual void ReadXml(System.Xml.XmlReader reader)
 		{
 			if (reader.MoveToAttribute(nameof(Title)))
@@ -531,6 +532,7 @@ namespace AvalonDock.Layout
 			reader.Read();
 		}
 
+		/// <inheritdoc />
 		public virtual void WriteXml(System.Xml.XmlWriter writer)
 		{
 			if (!string.IsNullOrWhiteSpace(Title))
@@ -576,9 +578,7 @@ namespace AvalonDock.Layout
 			return string.Compare(Title, other.Title);
 		}
 
-		/// <summary>
-		/// Float the content in a popup window
-		/// </summary>
+		/// <summary>Float the content in a popup window</summary>
 		public void Float()
 		{
 			if (PreviousContainer != null && PreviousContainer.FindParent<LayoutFloatingWindow>() != null)
@@ -639,9 +639,7 @@ namespace AvalonDock.Layout
 			RaisePropertyChanged(nameof(IsFloating));
         }
 
-        /// <summary>
-        /// Re-dock the content to its previous container
-        /// </summary>
+        /// <summary>Re-dock the content to its previous container</summary>
         public void Dock()
 		{
 			if (PreviousContainer != null)
@@ -678,19 +676,19 @@ namespace AvalonDock.Layout
 			RaisePropertyChanged(nameof(IsFloating));
         }
 
-        #endregion Public Methods
+		#endregion Public Methods
 
-        #region Overrides
+		#region Overrides
 
-        protected override void OnParentChanging(ILayoutContainer oldValue, ILayoutContainer newValue)
+		/// <inheritdoc />
+		protected override void OnParentChanging(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
 			if (oldValue != null) IsSelected = false;
-			//var root = Root;
-			//if (root != null && _isActive && newValue == null)
-			//    root.ActiveContent = null;
+
 			base.OnParentChanging(oldValue, newValue);
 		}
 
+		/// <inheritdoc />
 		protected override void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
 			if (IsSelected && Parent is ILayoutContentSelector)
@@ -698,10 +696,6 @@ namespace AvalonDock.Layout
 				var parentSelector = Parent as ILayoutContentSelector;
 				parentSelector.SelectedContentIndex = parentSelector.IndexOf(this);
 			}
-
-			//var root = Root;
-			//if (root != null && _isActive)
-			//    root.ActiveContent = this;
 
 			base.OnParentChanged(oldValue, newValue);
 		}
