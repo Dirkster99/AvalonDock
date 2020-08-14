@@ -128,6 +128,8 @@ to also theme standard elements, such as, button and textblock etc.
 - Thanx to [bdachev](https://github.com/bdachev):  
   - [#186 Raise PropertyChanged notification when LayoutContent.IsFloating changes](https://github.com/Dirkster99/AvalonDock/pull/186) (ensure change of the [IsFloating](https://github.com/Dirkster99/AvalonDock/wiki/LayoutContent#properties) property when the Documents state changes)
 
+- Removed the additional [ToolTip](https://github.com/Dirkster99/AvalonDock/commit/5554de5c4bfadc37f974ba29803dc792b54f00d0) and [ContextMenu](https://github.com/Dirkster99/AvalonDock/commit/103e1068bc9f5bae8fef275a0e785393b4115764) styles from the Generic.xaml in VS2013 [more details here](https://github.com/Dirkster99/AvalonDock/pull/170#issuecomment-674253874)
+
 ## Fixes & Features added in Version 4.3
 
 - Localized labels in [NavigatorWindow](https://github.com/Dirkster99/AvalonDock/wiki/NavigatorWindow)
