@@ -99,7 +99,8 @@ namespace AvalonDock.Controls
 						int i = 0;
 						foreach (var anchorableToImport in layoutAnchorablePaneGroup.Descendents().OfType<LayoutAnchorable>().ToArray())
 						{
-							anchorableToImport.SetCanCloseInternal(true);
+							// BD: 18.07.2020 Remove that bodge and handle CanClose=false && CanHide=true in XAML
+							//anchorableToImport.SetCanCloseInternal(true);
 
 							paneModel.Children.Insert(i, anchorableToImport);
 							i++;

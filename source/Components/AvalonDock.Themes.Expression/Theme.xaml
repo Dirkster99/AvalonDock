@@ -926,9 +926,22 @@
 						<Trigger Property="IsMouseOver" Value="True">
 							<Setter TargetName="DocumentCloseButton" Property="Visibility" Value="Visible" />
 						</Trigger>
-						<DataTrigger Binding="{Binding Path=CanClose}" Value="false">
+						<!--BD: 17.08.2020 use HideCommand if CanClose=false but CanHide=true-->
+						<MultiDataTrigger>
+							<MultiDataTrigger.Conditions>
+								<Condition Binding="{Binding Path=CanClose}" Value="false" />
+								<Condition Binding="{Binding Path=CanHide}" Value="true" />
+							</MultiDataTrigger.Conditions>
+							<Setter TargetName="DocumentCloseButton" Property="Command" Value="{Binding Path=LayoutItem.HideCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+						</MultiDataTrigger>
+						<!--BD: 17.08.2020 hide button if both CanClose=false and CanHide=false-->
+						<MultiDataTrigger>
+							<MultiDataTrigger.Conditions>
+								<Condition Binding="{Binding Path=CanClose}" Value="false" />
+								<Condition Binding="{Binding Path=CanHide}" Value="false" />
+							</MultiDataTrigger.Conditions>
 							<Setter TargetName="DocumentCloseButton" Property="Visibility" Value="Collapsed" />
-						</DataTrigger>
+						</MultiDataTrigger>
 						<Trigger SourceName="DocumentCloseButton" Property="IsMouseOver" Value="True">
 							<Setter TargetName="PART_ImgPinClose" Property="Source" Value="/AvalonDock.Themes.Expression;component/Images/PinClose_Light.png" />
 						</Trigger>
