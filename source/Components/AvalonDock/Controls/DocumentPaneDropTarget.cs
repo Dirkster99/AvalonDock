@@ -506,7 +506,8 @@ namespace AvalonDock.Controls
 								checkPreviousContainer = false;
 							}
 
-							anchorableToImport.SetCanCloseInternal(true);
+							// BD: 17.08.2020 Remove that bodge and handle CanClose=false && CanHide=true in XAML
+							//anchorableToImport.SetCanCloseInternal(true);
 
 							paneModel.Children.Insert(i, anchorableToImport);
 							i++;
