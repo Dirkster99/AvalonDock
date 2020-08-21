@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -34,7 +34,8 @@ namespace AvalonDock.Layout
 		private bool _canHide = true;
 		private bool _canAutoHide = true;
 		private bool _canDockAsTabbedDocument = true;
-		private bool _canCloseValueBeforeInternalSet;
+		// BD: 17.08.2020 Remove that bodge and handle CanClose=false && CanHide=true in XAML
+		//private bool _canCloseValueBeforeInternalSet;
 		private bool _canMove = true;
 
 		#endregion fields
@@ -45,7 +46,9 @@ namespace AvalonDock.Layout
 		public LayoutAnchorable()
 		{
 			// LayoutAnchorable will hide by default, not close.
-			_canClose = false;
+			// BD: 14.08.2020 Inverting both _canClose and _canCloseDefault to false as anchorables are only hidden but not closed
+			//     That would allow CanClose to be properly serialized if set to true for an instance of LayoutAnchorable
+			_canClose = _canCloseDefault = false;
 		}
 
 		#endregion Constructors
@@ -575,16 +578,17 @@ namespace AvalonDock.Layout
 			CloseInternal();
 		}
 
-		internal void SetCanCloseInternal(bool canClose)
-		{
-			_canCloseValueBeforeInternalSet = _canClose;
-			_canClose = canClose;
-		}
+		// BD: 17.08.2020 Remove that bodge and handle CanClose=false && CanHide=true in XAML
+		//internal void SetCanCloseInternal(bool canClose)
+		//{
+		//	_canCloseValueBeforeInternalSet = _canClose;
+		//	_canClose = canClose;
+		//}
 
-		internal void ResetCanCloseInternal()
-		{
-			_canClose = _canCloseValueBeforeInternalSet;
-		}
+		//internal void ResetCanCloseInternal()
+		//{
+		//	_canClose = _canCloseValueBeforeInternalSet;
+		//}
 
 		#endregion Internal Methods
 
