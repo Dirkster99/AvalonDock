@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -26,5 +26,10 @@ namespace TestApp
             label1.Text = textBox1.Handle.ToString();
             label2.Text = textBox2.Handle.ToString();
         }
-    }
+
+		private void label1_Click(object sender, EventArgs e)
+		{
+
+		}
+	}
 }

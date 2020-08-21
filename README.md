@@ -126,7 +126,9 @@ to also theme standard elements, such as, button and textblock etc.
 - [#184 All documents disappear if document stops close application in Caliburn.Micro](https://github.com/Dirkster99/AvalonDock/issues/184)  (thanx to [ryanvs](https://github.com/ryanvs))
 
 - Thanx to [bdachev](https://github.com/bdachev):  
-  - [#186 Raise PropertyChanged notification when LayoutContent.IsFloating changes](https://github.com/Dirkster99/AvalonDock/pull/186) (ensure change of the [IsFloating](https://github.com/Dirkster99/AvalonDock/wiki/LayoutContent#properties) property when the Documents state changes)
+  - [#186 Raise PropertyChanged notification when LayoutContent.IsFloating changes](https://github.com/Dirkster99/AvalonDock/pull/186) (ensure change of the [IsFloating](https://github.com/Dirkster99/AvalonDock/wiki/LayoutContent#properties) property when the Documents state changes)  
+  - [#187 Allow to serialize CanClose if set to true for LayoutAnchorable instance](https://github.com/Dirkster99/AvalonDock/pull/187)  
+  - [#188 Handle CanClose and CanHide in XAML](https://github.com/Dirkster99/AvalonDock/pull/188)  
 
 ## Fixes & Features added in Version 4.3
 
