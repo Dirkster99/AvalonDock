@@ -427,7 +427,10 @@ namespace AvalonDock.Layout
 
 		#region CanClose
 
-		internal bool _canClose = true;
+		// BD: 14.08.2020 added _canCloseDefault to properly implement inverting _canClose default value in inheritors (e.g. LayoutAnchorable)
+		//     Thus CanClose property will be serialized only when not equal to its default for given class
+		//     With previous code it was not possible to serialize CanClose if set to true for LayoutAnchorable instance
+		internal bool _canClose = true, _canCloseDefault = true;
 
 		public bool CanClose
 		{
@@ -559,7 +562,10 @@ namespace AvalonDock.Layout
 			if (FloatingHeight != 0.0) writer.WriteAttributeString(nameof(FloatingHeight), FloatingHeight.ToString(CultureInfo.InvariantCulture));
 
 			if (IsMaximized) writer.WriteAttributeString(nameof(IsMaximized), IsMaximized.ToString());
-			if (!CanClose) writer.WriteAttributeString(nameof(CanClose), CanClose.ToString());
+			// BD: 14.08.2020 changed to check CanClose value against the default in _canCloseDefault
+			//     thus CanClose property will be serialized only when not equal to its default for given class
+			//     With previous code it was not possible to serialize CanClose if set to true for LayoutAnchorable instance
+			if (CanClose != _canCloseDefault) writer.WriteAttributeString(nameof(CanClose), CanClose.ToString());
 			if (!CanFloat) writer.WriteAttributeString(nameof(CanFloat), CanFloat.ToString());
 
 			if (LastActivationTimeStamp != null) writer.WriteAttributeString(nameof(LastActivationTimeStamp), LastActivationTimeStamp.Value.ToString(CultureInfo.InvariantCulture));
