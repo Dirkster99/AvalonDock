@@ -20,6 +20,9 @@ ECHO Components\AvalonDock.Themes.VS2013
 ECHO Components\AvalonDock.Themes.VS2010
 ECHO Components\AvalonDock.Themes.Metro
 ECHO.
+ECHO AutomationTest\AvalonDockTest
+ECHO CaliburnDockTestApp
+ECHO AvalonDocPanelMemoryLeaks
 ECHO.
 REM Ask the user if hes really sure to continue beyond this point XXXXXXXX
 set /p choice=Are you sure to continue (Y/N)?
@@ -96,7 +99,20 @@ ECHO.
 RMDIR /S /Q Components\AvalonDock.Themes.Metro\bin
 RMDIR /S /Q Components\AvalonDock.Themes.Metro\obj
 
+ECHO Deleting BIN and OBJ Folders in AutomationTest\AvalonDockTest
+ECHO.
+RMDIR /S /Q AutomationTest\AvalonDockTest\bin
+RMDIR /S /Q AutomationTest\AvalonDockTest\obj
 
+ECHO Deleting BIN and OBJ Folders in CaliburnDockTestApp
+ECHO.
+RMDIR /S /Q CaliburnDockTestApp\bin
+RMDIR /S /Q CaliburnDockTestApp\obj
+
+ECHO Deleting BIN and OBJ Folders in AvalonDocPanelMemoryLeaks
+ECHO.
+RMDIR /S /Q AvalonDocPanelMemoryLeaks\bin
+RMDIR /S /Q AvalonDocPanelMemoryLeaks\obj
 
 PAUSE
 
