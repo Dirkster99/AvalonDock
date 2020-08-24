@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -209,7 +209,8 @@ namespace AvalonDock.Controls
 			{
 				var iColumn = 0;
 				var iChild = 0;
-				for (var iChildModel = 0; iChildModel < _model.Children.Count; iChildModel++, iColumn++, iChild++)
+				// BD: 24.08.2020 added check for iChild against InternalChildren.Count
+				for (var iChildModel = 0; iChildModel < _model.Children.Count && iChild < InternalChildren.Count; iChildModel++, iColumn++, iChild++)
 				{
 					var childModel = _model.Children[iChildModel] as ILayoutPositionableElement;
 					ColumnDefinitions.Add(new ColumnDefinition
@@ -244,7 +245,8 @@ namespace AvalonDock.Controls
 			{
 				var iRow = 0;
 				var iChild = 0;
-				for (var iChildModel = 0; iChildModel < _model.Children.Count; iChildModel++, iRow++, iChild++)
+				// BD: 24.08.2020 added check for iChild against InternalChildren.Count
+				for (var iChildModel = 0; iChildModel < _model.Children.Count && iChild < InternalChildren.Count; iChildModel++, iRow++, iChild++)
 				{
 					var childModel = _model.Children[iChildModel] as ILayoutPositionableElement;
 					RowDefinitions.Add(new RowDefinition
