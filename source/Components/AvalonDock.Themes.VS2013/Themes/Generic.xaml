@@ -68,14 +68,14 @@
 		Re-styling this in AvalonDock since the menu on the drop-down button for more documents is otherwise black
 		BugFix for Issue http://avalondock.codeplex.com/workitem/15743
 	-->
-	<Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="{x:Type MenuItem}">
+	<Style x:Key="AvalonDockThemeVs2013MenuItemStyle" BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="{x:Type MenuItem}">
 		<Setter Property="HeaderTemplate" Value="{Binding Path=Root.Manager.DocumentPaneMenuItemHeaderTemplate}" />
 		<Setter Property="HeaderTemplateSelector" Value="{Binding Path=Root.Manager.DocumentPaneMenuItemHeaderTemplateSelector}" />
 		<Setter Property="BorderThickness" Value="0" />
 		<Setter Property="Template" Value="{StaticResource MLibMenuItem}" />
 	</Style>
 
-	<Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="{x:Type avalonDockControls:MenuItemEx}">
+	<Style BasedOn="{StaticResource AvalonDockThemeVs2013MenuItemStyle}" TargetType="{x:Type avalonDockControls:MenuItemEx}">
 		<Setter Property="IconTemplate" Value="{Binding Path=Root.Manager.IconContentTemplate}" />
 		<Setter Property="IconTemplateSelector" Value="{Binding Path=Root.Manager.IconContentTemplateSelector}" />
 		<Setter Property="Command" Value="{Binding Path=., Converter={avalonDockConverters:ActivateCommandLayoutItemFromLayoutModelConverter}}" />
