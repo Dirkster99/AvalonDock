@@ -129,7 +129,9 @@ to also theme standard elements, such as, button and textblock etc.
   - [#186 Raise PropertyChanged notification when LayoutContent.IsFloating changes](https://github.com/Dirkster99/AvalonDock/pull/186) (ensure change of the [IsFloating](https://github.com/Dirkster99/AvalonDock/wiki/LayoutContent#properties) property when the Documents state changes)  
   - [#187 Allow to serialize CanClose if set to true for LayoutAnchorable instance](https://github.com/Dirkster99/AvalonDock/pull/187)  
   - [#188 Handle CanClose and CanHide in XAML](https://github.com/Dirkster99/AvalonDock/pull/188)  
-  - [#190 Added additional check in LayoutGridControl.UpdateRowColDefinitions to avoid exception.](https://github.com/Dirkster99/AvalonDock/pull/190)
+  - [#190 Added additional check in LayoutGridControl.UpdateRowColDefinitions to avoid exception.](https://github.com/Dirkster99/AvalonDock/pull/190)  
+  - [#192 Default MenuItem style not changed by VS2013 Theme](https://github.com/Dirkster99/AvalonDock/pull/192)
+
 
 - Removed the additional [ToolTip](https://github.com/Dirkster99/AvalonDock/commit/5554de5c4bfadc37f974ba29803dc792b54f00d0) and [ContextMenu](https://github.com/Dirkster99/AvalonDock/commit/103e1068bc9f5bae8fef275a0e785393b4115764) styles from the Generic.xaml in VS2013 [more details here](https://github.com/Dirkster99/AvalonDock/pull/170#issuecomment-674253874)
 
