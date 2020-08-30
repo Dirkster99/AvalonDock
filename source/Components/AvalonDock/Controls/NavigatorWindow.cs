@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -28,6 +28,7 @@ namespace AvalonDock.Controls
 	public class NavigatorWindow : Window
 	{
 		#region fields
+		private ResourceDictionary currentThemeResourceDictionary; // = null
 
 		private const string PART_AnchorableListBox = "PART_AnchorableListBox";
 		private const string PART_DocumentListBox = "PART_DocumentListBox";
@@ -286,17 +287,36 @@ namespace AvalonDock.Controls
 		/// <param name="value">The new value for the property.</param>
 		protected void SetDocuments(LayoutDocumentItem[] value) => SetValue(DocumentsPropertyKey, value);
 
+		/// <summary>Is Invoked when AvalonDock's WPF Theme changes via the <see cref="DockingManager.OnThemeChanged()"/> method.</summary>
+		/// <param name="oldTheme"></param>
 		internal void UpdateThemeResources(Theme oldTheme = null)
 		{
-			if (oldTheme != null)
+			if (oldTheme != null) // Remove the old theme if present
 			{
-				var resourceDictionaryToRemove = Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
-				if (resourceDictionaryToRemove != null) Resources.MergedDictionaries.Remove(resourceDictionaryToRemove);
+				if (oldTheme is DictionaryTheme)
+				{
+					if (currentThemeResourceDictionary != null)
+					{
+						Resources.MergedDictionaries.Remove(currentThemeResourceDictionary);
+						currentThemeResourceDictionary = null;
+					}
+				}
+				else
+				{
+					var resourceDictionaryToRemove = Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
+					if (resourceDictionaryToRemove != null) Resources.MergedDictionaries.Remove(resourceDictionaryToRemove);
+				}
 			}
 
+			// Implicit parameter to this method is the new theme already set here
 			if (_manager.Theme == null) return;
-
-			Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = _manager.Theme.GetResourceUri() });
+			if (_manager.Theme is DictionaryTheme dictionaryTheme)
+			{
+				currentThemeResourceDictionary = dictionaryTheme.ThemeResourceDictionary;
+				Resources.MergedDictionaries.Add(currentThemeResourceDictionary);
+			}
+			else
+				Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = _manager.Theme.GetResourceUri() });
 		}
 
 		internal void SelectNextDocument()

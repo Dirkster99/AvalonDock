@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -42,6 +42,9 @@ namespace AvalonDock
 	public class DockingManager : Control, IOverlayWindowHost//, ILogicalChildrenContainer
 	{
 		#region fields
+		// ShortCut to current AvalonDock theme if OnThemeChanged() is invoked with DictionaryTheme instance
+		// in e.OldValue and e.NewValue of the passed event
+		private ResourceDictionary currentThemeResourceDictionary;
 
 		private AutoHideWindowManager _autoHideWindowManager;
 		private FrameworkElement _autohideArea;
@@ -1029,24 +1032,41 @@ namespace AvalonDock
 		{
 			var oldTheme = e.OldValue as Theme;
 			var resources = Resources;
-			if (oldTheme != null)
+			if (oldTheme != null)        // remove old theme from resource dictionary if present
 			{
-				var resourceDictionaryToRemove =
-					resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
-				if (resourceDictionaryToRemove != null)
-					resources.MergedDictionaries.Remove(
-						resourceDictionaryToRemove);
+				if (oldTheme is DictionaryTheme)  // We are using AvalonDock's own DictionaryTheme class
+				{
+					if (currentThemeResourceDictionary != null)
+					{
+						resources.MergedDictionaries.Remove(currentThemeResourceDictionary);
+						currentThemeResourceDictionary = null;
+					}
+				}
+				else                              // We are using standard ResourceDictionaries
+				{                                // Lockup the old theme and remove it from resource dictionary
+					var resourceDictionaryToRemove =
+						resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
+					if (resourceDictionaryToRemove != null)
+						resources.MergedDictionaries.Remove(
+							resourceDictionaryToRemove);
+				}
 			}
 
-			if (e.NewValue as Theme != null)
+			if (e.NewValue as Theme != null) // Add new theme into resource dictionary if present
 			{
-				resources.MergedDictionaries.Add(new ResourceDictionary { Source = (e.NewValue as Theme).GetResourceUri() });
+				if (e.NewValue as Theme is DictionaryTheme theme)
+				{
+					currentThemeResourceDictionary = theme.ThemeResourceDictionary;
+					resources.MergedDictionaries.Add(currentThemeResourceDictionary);
+				}
+				else                              // We are using standard ResourceDictionaries -> Add new theme resource
+					resources.MergedDictionaries.Add(new ResourceDictionary { Source = (e.NewValue as Theme).GetResourceUri() });
 			}
 
-			foreach (var fwc in _fwList)
+			foreach (var fwc in _fwList)               // Update theme resources in floating window controls
 				fwc.UpdateThemeResources(oldTheme);
 
-			_navigatorWindow?.UpdateThemeResources();
+			_navigatorWindow?.UpdateThemeResources();  // Update theme resources in related AvalonDock controls
 			_overlayWindow?.UpdateThemeResources();
 		}
 

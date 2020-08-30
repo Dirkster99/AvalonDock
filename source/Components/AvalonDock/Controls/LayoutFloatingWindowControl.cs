@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -36,7 +36,7 @@ namespace AvalonDock.Controls
 	public abstract class LayoutFloatingWindowControl : Window, ILayoutControl
 	{
 		#region fields
-
+		private ResourceDictionary currentThemeResourceDictionary; // = null
 		private bool _isInternalChange; //false
 		private readonly ILayoutElement _model;
 		private bool _attachDrag = false;
@@ -246,22 +246,40 @@ namespace AvalonDock.Controls
 		#endregion Properties
 
 		#region Internal Methods
-
+		/// <summary>Is Invoked when AvalonDock's WPF Theme changes via the <see cref="DockingManager.OnThemeChanged()"/> method.</summary>
+		/// <param name="oldTheme"></param>
 		internal virtual void UpdateThemeResources(Theme oldTheme = null)
 		{
-			if (oldTheme != null)
+			if (oldTheme != null) // Remove the old theme if present
 			{
-				var resourceDictionaryToRemove =
-					Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
-				if (resourceDictionaryToRemove != null)
-					Resources.MergedDictionaries.Remove(
-						resourceDictionaryToRemove);
+				if (oldTheme is DictionaryTheme)
+				{
+					if (currentThemeResourceDictionary != null)
+					{
+						Resources.MergedDictionaries.Remove(currentThemeResourceDictionary);
+						currentThemeResourceDictionary = null;
+					}
+				}
+				else
+				{
+					var resourceDictionaryToRemove =
+						Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
+					if (resourceDictionaryToRemove != null)
+						Resources.MergedDictionaries.Remove(
+							resourceDictionaryToRemove);
+				}
 			}
 
+			// Implicit parameter to this method is the new theme already set here
 			var manager = _model.Root?.Manager;
 			if (manager?.Theme == null) return;
-
-			Resources.MergedDictionaries.Add(new ResourceDictionary { Source = manager.Theme.GetResourceUri() });
+			if (manager.Theme is DictionaryTheme dictionaryTheme)
+			{
+				currentThemeResourceDictionary = dictionaryTheme.ThemeResourceDictionary;
+				Resources.MergedDictionaries.Add(currentThemeResourceDictionary);
+			}
+			else
+				Resources.MergedDictionaries.Add(new ResourceDictionary { Source = manager.Theme.GetResourceUri() });
 		}
 
 		internal void AttachDrag(bool onActivated = true)
