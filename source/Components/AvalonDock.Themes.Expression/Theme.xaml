@@ -926,20 +926,20 @@
 						<Trigger Property="IsMouseOver" Value="True">
 							<Setter TargetName="DocumentCloseButton" Property="Visibility" Value="Visible" />
 						</Trigger>
-						<!--BD: 17.08.2020 use HideCommand if CanClose=false but CanHide=true-->
+						<!--  BD: 17.08.2020 use HideCommand if CanClose=false but CanHide=true  -->
 						<MultiDataTrigger>
 							<MultiDataTrigger.Conditions>
 								<Condition Binding="{Binding Path=CanClose}" Value="false" />
-								<Condition Binding="{Binding Path=CanHide}" Value="true" />
+								<Condition Binding="{Binding Path=CanHide, FallbackValue=false}" Value="true" />
 							</MultiDataTrigger.Conditions>
 							<Setter TargetName="DocumentCloseButton" Property="Command" Value="{Binding Path=LayoutItem.HideCommand, RelativeSource={RelativeSource TemplatedParent}}" />
 							<Setter TargetName="DocumentCloseButton" Property="ToolTip" Value="{x:Static avalonDockProperties:Resources.Anchorable_Hide}" />
 						</MultiDataTrigger>
-						<!--BD: 17.08.2020 hide button if both CanClose=false and CanHide=false-->
+						<!--  BD: 17.08.2020 hide button if both CanClose=false and CanHide=false  -->
 						<MultiDataTrigger>
 							<MultiDataTrigger.Conditions>
 								<Condition Binding="{Binding Path=CanClose}" Value="false" />
-								<Condition Binding="{Binding Path=CanHide}" Value="false" />
+								<Condition Binding="{Binding Path=CanHide, FallbackValue=false}" Value="false" />
 							</MultiDataTrigger.Conditions>
 							<Setter TargetName="DocumentCloseButton" Property="Visibility" Value="Collapsed" />
 						</MultiDataTrigger>
