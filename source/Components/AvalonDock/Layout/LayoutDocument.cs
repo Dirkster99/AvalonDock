@@ -42,6 +42,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>Documents can't be just hidden so always return false.</summary>
+		public bool CanHide => false;
+
 		/// <summary>Gets whether a document is visible or not.</summary>
 		public bool IsVisible
 		{
