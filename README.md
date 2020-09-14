@@ -120,6 +120,10 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
+## In master branch, but not yet released to NuGet
+
+- [#199 Add to LayoutDocument CanHide property returning false](https://github.com/Dirkster99/AvalonDock/pull/199)  ([bdachev](https://github.com/bdachev)
+
 ## Fixes & Features added in Version 4.4
 
 - [#182 CanClose property of new LayoutAnchorableItem is different from its LayoutAnchorable](https://github.com/Dirkster99/AvalonDock/pull/183)  (thanx to [skyneps](https://github.com/skyneps))
