@@ -1,4 +1,4 @@
-﻿<!--
+<!--
 	************************************************************************
 	This program is provided to you under the terms of the Microsoft Public
 	License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
@@ -17,7 +17,7 @@
 	<Grid>
 		<StackPanel Margin="0">
 			<TextBlock TextWrapping="WrapWithOverflow">
-				<TextBlock FontWeight="Bold">This Comtrol demos an Auto-Size FloatingWindow</TextBlock>
+				<TextBlock FontWeight="Bold">This Control demos an Auto-Size FloatingWindow</TextBlock>
 				<TextBlock TextWrapping="WrapWithOverflow">
 					This content can initially be sized to the content of a containing user control when dragging
 					the LayoutAnchorable into floating mode using the DockingManager's AutoWindowSizeWhenOpened
