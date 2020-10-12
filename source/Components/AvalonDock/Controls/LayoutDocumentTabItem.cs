@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -121,6 +121,7 @@ namespace AvalonDock.Controls
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			base.OnMouseMove(e);
+			_isMouseDown = Mouse.LeftButton == MouseButtonState.Pressed;
 			if (_isMouseDown)
 			{
 				var ptMouseMove = e.GetPosition(this);
