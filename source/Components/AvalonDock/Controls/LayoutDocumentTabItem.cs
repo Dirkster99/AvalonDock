@@ -121,7 +121,7 @@ namespace AvalonDock.Controls
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			base.OnMouseMove(e);
-			_isMouseDown = Mouse.LeftButton == MouseButtonState.Pressed;
+			_isMouseDown = Mouse.LeftButton == MouseButtonState.Pressed && _isMouseDown;
 			if (_isMouseDown)
 			{
 				var ptMouseMove = e.GetPosition(this);
