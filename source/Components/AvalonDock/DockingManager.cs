@@ -1497,7 +1497,7 @@ namespace AvalonDock
 						FloatingWidth = contentModel.FloatingWidth,
 						FloatingHeight = contentModel.FloatingHeight
 					};
-					_ = CreateFloatingWindowForLayoutAnchorableWithoutParent(pane, isContentImmutable);
+					return CreateFloatingWindowForLayoutAnchorableWithoutParent(pane, isContentImmutable);
 				}
 			}
 
