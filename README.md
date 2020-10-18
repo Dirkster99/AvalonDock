@@ -122,7 +122,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## In master branch, but not yet released to NuGet
 
-- [Bug fix for issue #194 App doesn't close after LayoutAnchorable AutoHide and docking it again](https://github.com/Dirkster99/AvalonDock/pull/203) (thanx to [bdachev](https://github.com/https://github.com/sphet))
+- [Bug fix for issue #194 App doesn't close after LayoutAnchorable AutoHide and docking it again](https://github.com/Dirkster99/AvalonDock/pull/203) (thanx to [sphet](https://github.com/https://github.com/sphet))
 
 - [#199 Add to LayoutDocument CanHide property returning false](https://github.com/Dirkster99/AvalonDock/pull/199) (thanx to [bdachev](https://github.com/bdachev))
 - [#138 Trying dock a floating window inside a document pane leads to its disappearing of window's content.](https://github.com/Dirkster99/AvalonDock/pull/138) (thanx to [cuellius](https://github.com/https://github.com/cuellius))
