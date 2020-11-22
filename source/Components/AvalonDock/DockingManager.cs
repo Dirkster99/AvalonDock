@@ -1718,11 +1718,83 @@ namespace AvalonDock
 				DocumentClosing(this, argsClosing);
 				if (argsClosing.Cancel) return;
 			}
+
+			//
+			// Determine the index of the document that will be removed.
+			//
+			int indexOfDocumentToRemove = GetIndexOfDocument(document);
+
 			if (!document.CloseDocument()) return;
+
 			RemoveViewFromLogicalChild(document);
 			if (document.Content is UIElement uIElement)
 				RemoveLogicalChild(uIElement);
 			DocumentClosed?.Invoke(this, new DocumentClosedEventArgs(document));
+
+			int indexOfDocumentToSelect = indexOfDocumentToRemove - 1;
+
+			if (indexOfDocumentToSelect < 0)
+			{
+				indexOfDocumentToSelect = 0;
+			}
+
+			//
+			// Determine the new active document and activate it.
+			// This doesn't only update the layout, but also all related (dependency) properties.
+			//
+			LayoutDocument layoutDocument = GetDocumentOnIndex(indexOfDocumentToSelect);
+
+			if (layoutDocument != null)
+			{
+				layoutDocument.IsActive = true;
+			}
+		}
+
+		private LayoutDocument GetDocumentOnIndex(int indexToFind)
+		{
+			if (indexToFind < 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(indexToFind));
+			}
+
+			int index = 0;
+
+			foreach (LayoutDocument layoutDocument in this.Layout.Descendents().OfType<LayoutDocument>())
+			{
+				if (index == indexToFind)
+				{
+					return layoutDocument;
+				}
+
+				index++;
+			}
+
+			return null;
+		}
+
+		private int GetIndexOfDocument(LayoutDocument documentToFind)
+		{
+			if (documentToFind == null)
+			{
+				throw new ArgumentNullException(nameof(documentToFind));
+			}
+
+			int index = 0;
+
+			foreach (LayoutDocument layoutDocument in this.Layout.Descendents().OfType<LayoutDocument>())
+			{
+				if (layoutDocument == documentToFind)
+				{
+					return index;
+				}
+
+				index++;
+			}
+
+			//
+			// Not found.
+			//
+			return -1;
 		}
 
 		internal void ExecuteCloseAllButThisCommand(LayoutContent contentSelected)
