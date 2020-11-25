@@ -1424,13 +1424,13 @@ namespace AvalonDock
 			{
 				foreach (var areaHost in this.FindVisualChildren<LayoutDocumentPaneControl>())
 					_areas.Add(new DropArea<LayoutDocumentPaneControl>(areaHost, DropAreaType.DocumentPane));
-			}
 
-			foreach (var areaHost in this.FindVisualChildren<LayoutDocumentPaneGroupControl>())
-			{
-				var documentGroupModel = areaHost.Model as LayoutDocumentPaneGroup;
-				if (!documentGroupModel.Children.Any(c => c.IsVisible))
-					_areas.Add(new DropArea<LayoutDocumentPaneGroupControl>(areaHost, DropAreaType.DocumentPaneGroup));
+				foreach (var areaHost in this.FindVisualChildren<LayoutDocumentPaneGroupControl>())
+				{
+					var documentGroupModel = areaHost.Model as LayoutDocumentPaneGroup;
+					if (!documentGroupModel.Children.Any(c => c.IsVisible))
+						_areas.Add(new DropArea<LayoutDocumentPaneGroupControl>(areaHost, DropAreaType.DocumentPaneGroup));
+				}
 			}
 
 			return _areas;
