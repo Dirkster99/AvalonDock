@@ -27,17 +27,17 @@ using System.Windows.Threading;
 
 namespace AvalonDock
 {
-    /// <inheritdoc cref="Control"/>
-    /// <inheritdoc cref="IOverlayWindowHost"/>
-    /// <summary>
-    /// The <see cref="DockingManager"/> is the custom control at the root of the visual tree.
-    /// This control is the core control of AvalonDock.
-    /// It contains core dependency properties, events, and methods to customize and
-    /// manage many aspects of the docking framework.
-    /// </summary>
-    /// <seealso cref="Control"/>
-    /// <seealso cref="IOverlayWindowHost"/>
-    [ContentProperty(nameof(Layout))]
+	/// <inheritdoc cref="Control"/>
+	/// <inheritdoc cref="IOverlayWindowHost"/>
+	/// <summary>
+	/// The <see cref="DockingManager"/> is the custom control at the root of the visual tree.
+	/// This control is the core control of AvalonDock.
+	/// It contains core dependency properties, events, and methods to customize and
+	/// manage many aspects of the docking framework.
+	/// </summary>
+	/// <seealso cref="Control"/>
+	/// <seealso cref="IOverlayWindowHost"/>
+	[ContentProperty(nameof(Layout))]
 	[TemplatePart(Name = "PART_AutoHideArea")]
 	public class DockingManager : Control, IOverlayWindowHost//, ILogicalChildrenContainer
 	{
@@ -1731,6 +1731,9 @@ namespace AvalonDock
 				RemoveLogicalChild(uIElement);
 			DocumentClosed?.Invoke(this, new DocumentClosedEventArgs(document));
 
+			//get rid of the closed document content
+			document.Content = null;
+
 			int indexOfDocumentToSelect = indexOfDocumentToRemove - 1;
 
 			if (indexOfDocumentToSelect < 0)
@@ -2198,9 +2201,9 @@ namespace AvalonDock
 			var itemsThatRemain = new HashSet<object>(source.Cast<object>(), ReferenceEqualityComparer.Default);
 			//Find the removed items that are not in the remaining collection
 			return Layout.Descendents()
-			             .OfType<TLayoutType>()
-			             .Where(x => !itemsThatRemain.Contains(x.Content))
-			             .ToArray();
+						 .OfType<TLayoutType>()
+						 .Where(x => !itemsThatRemain.Contains(x.Content))
+						 .ToArray();
 		}
 
 		private void DetachDocumentsSource(LayoutRoot layout, IEnumerable documentsSource)
