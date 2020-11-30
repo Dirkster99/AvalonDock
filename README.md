@@ -122,6 +122,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Fixes added in Master but not yet released to NuGet
 
+- [#195 DocumentClosed event issue](https://github.com/Dirkster99/AvalonDock/issues/195) (thanx to [Skaptor](https://github.com/Skaptor))
 - [#205 Fix issue where the ActiveContent binding doesn't update two ways when removing a document.](https://github.com/Dirkster99/AvalonDock/pull/205) (thanx to [PatrickHofman](https://github.com/PatrickHofman))
 
 ## Fixes added in Version 4.5
