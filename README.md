@@ -122,6 +122,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Fixes added in Master but not yet released to NuGet
 
+- [#210 LayoutAnchorable with CanDockAsTabbedDocument="False" docks to LayoutDocumentPane when Pane is empty](https://github.com/Dirkster99/AvalonDock/issues/210) (thanx to [Łukasz Holetzke](https://github.com/goldie83))
 - [#195 DocumentClosed event issue](https://github.com/Dirkster99/AvalonDock/issues/195) (thanx to [Skaptor](https://github.com/Skaptor))
 - [#205 Fix issue where the ActiveContent binding doesn't update two ways when removing a document.](https://github.com/Dirkster99/AvalonDock/pull/205) (thanx to [PatrickHofman](https://github.com/PatrickHofman))
 
