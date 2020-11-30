@@ -749,8 +749,7 @@ namespace AvalonDock.Layout
 			}
 
 			parentAsContainer.RemoveChild(this);
-			root?.CollectGarbage();
-			this.Content = null;
+			root?.CollectGarbage();			
 			OnClosed();
 		}
 
