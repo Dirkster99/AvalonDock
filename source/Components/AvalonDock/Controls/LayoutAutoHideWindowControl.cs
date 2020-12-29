@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -318,6 +318,7 @@ namespace AvalonDock.Controls
 			panelHostResizer.Children.Add(_resizerGhost);
 			_resizerWindowHost = new Window
 			{
+				Style = new Style(typeof(Window), null),
 				ResizeMode = ResizeMode.NoResize,
 				WindowStyle = WindowStyle.None,
 				ShowInTaskbar = false,

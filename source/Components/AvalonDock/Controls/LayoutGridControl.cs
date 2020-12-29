@@ -609,6 +609,7 @@ namespace AvalonDock.Controls
 
 			_resizerWindowHost = new Window
 			{
+				Style = new Style(typeof(Window), null),
 				SizeToContent = System.Windows.SizeToContent.Manual,
 				ResizeMode = ResizeMode.NoResize,
 				WindowStyle = System.Windows.WindowStyle.None,
