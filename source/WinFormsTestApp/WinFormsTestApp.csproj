@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net5.0-windows;net4.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;net5.0-windows;net40</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
     <StartupObject>AvalonDock.WinFormsTestApp.Program</StartupObject>

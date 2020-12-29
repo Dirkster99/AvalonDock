@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net5.0-windows;net4.5.2</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;net5.0-windows;net452</TargetFrameworks>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
@@ -20,6 +20,12 @@
       <Version>1.1.19</Version>
     </PackageReference>
   </ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
+		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
+			<Version>1.1.19</Version>
+		</PackageReference>
+	</ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Dirkster.ColorPickerLib" Version="1.6.0" />
