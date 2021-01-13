@@ -17,17 +17,20 @@ namespace AvalonDock.Layout
 	/// <summary>
 	/// Implements an element in the layout model tree that can contain and arrange multiple
 	/// <see cref="LayoutAnchorablePane"/> elements in x or y directions, which in turn contain
-	/// <see cref="LayoutAnchorable"/> elements. 
+	/// <see cref="LayoutAnchorable"/> elements.
 	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
 	public class LayoutAnchorablePaneGroup : LayoutPositionableGroup<ILayoutAnchorablePane>, ILayoutAnchorablePane, ILayoutOrientableGroup
 	{
 		#region fields
+
 		private Orientation _orientation;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Class constructor</summary>
 		public LayoutAnchorablePaneGroup()
 		{
@@ -39,9 +42,10 @@ namespace AvalonDock.Layout
 			Children.Add(firstChild);
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
+
 		/// <summary>
 		/// Gets/sets the <see cref="System.Windows.Controls.Orientation"/> of this object.
 		/// </summary>
@@ -56,6 +60,7 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(Orientation));
 			}
 		}
+
 		#endregion Properties
 
 		#region Overrides
@@ -123,7 +128,7 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -132,6 +137,6 @@ namespace AvalonDock.Layout
 			if (Parent is ILayoutElementWithVisibility parentPane) parentPane.ComputeVisibility();
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

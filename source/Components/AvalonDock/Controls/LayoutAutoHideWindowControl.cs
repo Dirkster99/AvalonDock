@@ -7,16 +7,17 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
 using System;
+using System.ComponentModel;
 using System.Linq;
-using System.Windows.Interop;
-using System.Windows.Controls;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Input;
+using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
-using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -28,6 +29,7 @@ namespace AvalonDock.Controls
 	public class LayoutAutoHideWindowControl : HwndHost, ILayoutControl
 	{
 		#region fields
+
 		internal LayoutAnchorableControl _internalHost = null;
 
 		private LayoutAnchorControl _anchor;
@@ -42,6 +44,7 @@ namespace AvalonDock.Controls
 		private Border _resizerGhost = null;
 		private Window _resizerWindowHost = null;
 		private Vector _initialStartPoint;
+
 		#endregion fields
 
 		#region Constructors
@@ -68,10 +71,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty AnchorableStyleProperty = DependencyProperty.Register(nameof(AnchorableStyle), typeof(Style), typeof(LayoutAutoHideWindowControl),
 				new FrameworkPropertyMetadata(null));
 
-		/// <summary>
-		/// Gets or sets the <see cref="AnchorableStyle"/> property. This dependency property 
-		/// indicates the style to apply to the LayoutAnchorableControl hosted in this auto hide window.
-		/// </summary>
+		/// <summary>Gets/sets the style to apply to the <see cref="LayoutAnchorableControl"/> hosted in this auto hide window.</summary>
+		[Bindable(true), Description("Gets/sets the style to apply to the LayoutAnchorableControl hosted in this auto hide window."), Category("Style")]
 		public Style AnchorableStyle
 		{
 			get => (Style)GetValue(AnchorableStyleProperty);
@@ -86,10 +87,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register(nameof(Background), typeof(Brush), typeof(LayoutAutoHideWindowControl),
 				new FrameworkPropertyMetadata(null));
 
-		/// <summary>
-		/// Gets or sets the <see cref="Background"/> property. This dependency property 
-		/// indicates background of the autohide childwindow.
-		/// </summary>
+		/// <summary>Gets/sets the background brush of the autohide childwindow.</summary>
+		[Bindable(true), Description("Gets/sets the background brush of the autohide childwindow."), Category("Other")]
 		public Brush Background
 		{
 			get => (Brush)GetValue(BackgroundProperty);
@@ -208,6 +207,7 @@ namespace AvalonDock.Controls
 		#endregion Overrides
 
 		#region Private Methods
+
 		private void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName != nameof(LayoutAnchorable.IsAutoHidden)) return;
@@ -218,7 +218,6 @@ namespace AvalonDock.Controls
 		{
 			_internalGrid = new Grid { FlowDirection = FlowDirection.LeftToRight };
 			_internalGrid.SetBinding(Panel.BackgroundProperty, new Binding(nameof(Grid.Background)) { Source = this });
-
 
 			_internalHost = new LayoutAnchorableControl { Model = _model, Style = AnchorableStyle };
 			_internalHost.SetBinding(FlowDirectionProperty, new Binding("Model.Root.Manager.FlowDirection") { Source = this });
@@ -234,13 +233,14 @@ namespace AvalonDock.Controls
 			{
 				case AnchorSide.Right:
 					_internalGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(_manager.GridSplitterWidth) });
-					_internalGrid.ColumnDefinitions.Add(new ColumnDefinition {Width = _model.AutoHideWidth == 0.0 ? new GridLength(_model.AutoHideMinWidth) : new GridLength(_model.AutoHideWidth, GridUnitType.Pixel)});
+					_internalGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = _model.AutoHideWidth == 0.0 ? new GridLength(_model.AutoHideMinWidth) : new GridLength(_model.AutoHideWidth, GridUnitType.Pixel) });
 					Grid.SetColumn(_resizer, 0);
 					Grid.SetColumn(_internalHost, 1);
 					_resizer.Cursor = Cursors.SizeWE;
 					HorizontalAlignment = HorizontalAlignment.Right;
 					VerticalAlignment = VerticalAlignment.Stretch;
 					break;
+
 				case AnchorSide.Left:
 					_internalGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = _model.AutoHideWidth == 0.0 ? new GridLength(_model.AutoHideMinWidth) : new GridLength(_model.AutoHideWidth, GridUnitType.Pixel) });
 					_internalGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(_manager.GridSplitterWidth) });
@@ -250,8 +250,9 @@ namespace AvalonDock.Controls
 					HorizontalAlignment = HorizontalAlignment.Left;
 					VerticalAlignment = VerticalAlignment.Stretch;
 					break;
+
 				case AnchorSide.Top:
-					_internalGrid.RowDefinitions.Add(new RowDefinition {Height = _model.AutoHideHeight == 0.0 ? new GridLength(_model.AutoHideMinHeight) : new GridLength(_model.AutoHideHeight, GridUnitType.Pixel),});
+					_internalGrid.RowDefinitions.Add(new RowDefinition { Height = _model.AutoHideHeight == 0.0 ? new GridLength(_model.AutoHideMinHeight) : new GridLength(_model.AutoHideHeight, GridUnitType.Pixel), });
 					_internalGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(_manager.GridSplitterHeight) });
 					Grid.SetRow(_internalHost, 0);
 					Grid.SetRow(_resizer, 1);
@@ -259,9 +260,10 @@ namespace AvalonDock.Controls
 					VerticalAlignment = VerticalAlignment.Top;
 					HorizontalAlignment = HorizontalAlignment.Stretch;
 					break;
+
 				case AnchorSide.Bottom:
 					_internalGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(_manager.GridSplitterHeight) });
-					_internalGrid.RowDefinitions.Add(new RowDefinition {Height = _model.AutoHideHeight == 0.0 ? new GridLength(_model.AutoHideMinHeight) : new GridLength(_model.AutoHideHeight, GridUnitType.Pixel),});
+					_internalGrid.RowDefinitions.Add(new RowDefinition { Height = _model.AutoHideHeight == 0.0 ? new GridLength(_model.AutoHideMinHeight) : new GridLength(_model.AutoHideHeight, GridUnitType.Pixel), });
 					Grid.SetRow(_resizer, 0);
 					Grid.SetRow(_internalHost, 1);
 					_resizer.Cursor = Cursors.SizeNS;
@@ -284,7 +286,7 @@ namespace AvalonDock.Controls
 
 		private void ShowResizerOverlayWindow(LayoutGridResizerControl splitter)
 		{
-			_resizerGhost = new Border {Background = splitter.BackgroundWhileDragging, Opacity = splitter.OpacityWhileDragging};
+			_resizerGhost = new Border { Background = splitter.BackgroundWhileDragging, Opacity = splitter.OpacityWhileDragging };
 			var areaElement = _manager.GetAutoHideAreaElement();
 			//var modelControlActualSize = this._internalHost.TransformActualSizeToAncestor();
 			var ptTopLeftScreen = areaElement.PointToScreenDPIWithoutFlowDirection(new Point());
@@ -312,7 +314,7 @@ namespace AvalonDock.Controls
 			else
 				Canvas.SetTop(_resizerGhost, _initialStartPoint.Y);
 
-			var panelHostResizer = new Canvas {HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch};
+			var panelHostResizer = new Canvas { HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Stretch };
 			panelHostResizer.Children.Add(_resizerGhost);
 			_resizerWindowHost = new Window
 			{
@@ -357,33 +359,33 @@ namespace AvalonDock.Controls
 			switch (_side)
 			{
 				case AnchorSide.Right:
-				{
-					if (_model.AutoHideWidth == 0.0) _model.AutoHideWidth = _internalHost.ActualWidth - delta;
-					else _model.AutoHideWidth -= delta;
-					_internalGrid.ColumnDefinitions[1].Width = new GridLength(_model.AutoHideWidth, GridUnitType.Pixel);
-					break;
-				}
+					{
+						if (_model.AutoHideWidth == 0.0) _model.AutoHideWidth = _internalHost.ActualWidth - delta;
+						else _model.AutoHideWidth -= delta;
+						_internalGrid.ColumnDefinitions[1].Width = new GridLength(_model.AutoHideWidth, GridUnitType.Pixel);
+						break;
+					}
 				case AnchorSide.Left:
-				{
-					if (_model.AutoHideWidth == 0.0) _model.AutoHideWidth = _internalHost.ActualWidth + delta;
-					else _model.AutoHideWidth += delta;
-					_internalGrid.ColumnDefinitions[0].Width = new GridLength(_model.AutoHideWidth, GridUnitType.Pixel);
-					break;
-				}
+					{
+						if (_model.AutoHideWidth == 0.0) _model.AutoHideWidth = _internalHost.ActualWidth + delta;
+						else _model.AutoHideWidth += delta;
+						_internalGrid.ColumnDefinitions[0].Width = new GridLength(_model.AutoHideWidth, GridUnitType.Pixel);
+						break;
+					}
 				case AnchorSide.Top:
-				{
-					if (_model.AutoHideHeight == 0.0) _model.AutoHideHeight = _internalHost.ActualHeight + delta;
-					else _model.AutoHideHeight += delta;
-					_internalGrid.RowDefinitions[0].Height = new GridLength(_model.AutoHideHeight, GridUnitType.Pixel);
-					break;
-				}
+					{
+						if (_model.AutoHideHeight == 0.0) _model.AutoHideHeight = _internalHost.ActualHeight + delta;
+						else _model.AutoHideHeight += delta;
+						_internalGrid.RowDefinitions[0].Height = new GridLength(_model.AutoHideHeight, GridUnitType.Pixel);
+						break;
+					}
 				case AnchorSide.Bottom:
-				{
-					if (_model.AutoHideHeight == 0.0) _model.AutoHideHeight = _internalHost.ActualHeight - delta;
-					else _model.AutoHideHeight -= delta;
-					_internalGrid.RowDefinitions[1].Height = new GridLength(_model.AutoHideHeight, GridUnitType.Pixel);
-					break;
-				}
+					{
+						if (_model.AutoHideHeight == 0.0) _model.AutoHideHeight = _internalHost.ActualHeight - delta;
+						else _model.AutoHideHeight -= delta;
+						_internalGrid.RowDefinitions[1].Height = new GridLength(_model.AutoHideHeight, GridUnitType.Pixel);
+						break;
+					}
 			}
 			HideResizerOverlayWindow();
 			IsResizing = false;

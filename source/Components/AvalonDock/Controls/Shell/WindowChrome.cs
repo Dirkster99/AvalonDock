@@ -13,12 +13,12 @@
 
 namespace Microsoft.Windows.Shell
 {
+	using Standard;
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics.CodeAnalysis;
 	using System.Windows;
 	using System.Windows.Data;
-	using Standard;
 
 	public class WindowChrome : Freezable
 	{
@@ -153,7 +153,7 @@ namespace Microsoft.Windows.Shell
 
 		private static object _CoerceGlassFrameThickness(Thickness thickness)
 		{
-			// If it's explicitly set, but set to a thickness with at least one negative side then 
+			// If it's explicitly set, but set to a thickness with at least one negative side then
 			// coerce the value to the stock GlassFrameCompleteThickness.
 			return !Utility.IsThicknessNonNegative(thickness) ? GlassFrameCompleteThickness : thickness;
 		}

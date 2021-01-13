@@ -9,15 +9,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
+using System.Windows.Controls;
 using System.Windows.Markup;
-using System.Xml.Serialization;
 using System.Xml;
 using System.Xml.Schema;
-using System.Windows.Controls;
+using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
@@ -25,7 +25,7 @@ namespace AvalonDock.Layout
 	/// Implements the root of the layout viewmodel (see  <see cref="DockingManager.Layout"/> property).
 	/// This root includes a  <see cref="RootPanel"/> property for binding content, side panel properties
 	/// and many other layout related root items.
-	/// 
+	///
 	/// This class implements <see cref="LayoutElement.PropertyChanged"/> and
 	/// <see cref="LayoutElement.PropertyChanging"/> to support direct UI binding scenarios
 	/// with view updates supported.
@@ -35,6 +35,7 @@ namespace AvalonDock.Layout
 	public class LayoutRoot : LayoutElement, ILayoutContainer, ILayoutRoot, IXmlSerializable
 	{
 		#region fields
+
 		private LayoutPanel _rootPanel;
 		private LayoutAnchorSide _topSide = null;
 		private LayoutAnchorSide _rightSide;
@@ -46,6 +47,7 @@ namespace AvalonDock.Layout
 
 		[field: NonSerialized]
 		private WeakReference _activeContent = null;
+
 		private bool _activeContentSet = false;
 
 		[field: NonSerialized]
@@ -53,9 +55,11 @@ namespace AvalonDock.Layout
 
 		[NonSerialized]
 		private DockingManager _manager = null;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Standard class constructor</summary>
 		public LayoutRoot()
 		{
@@ -69,6 +73,7 @@ namespace AvalonDock.Layout
 		#endregion Constructors
 
 		#region Events
+
 		/// <summary>
 		/// Raised when the layout is updated. This event is raised via <see cref="FireLayoutUpdated()"/> method
 		/// when a parent of a LayoutElement has changed.
@@ -80,9 +85,11 @@ namespace AvalonDock.Layout
 
 		/// <summary>Raised when an element is removed from the layout.</summary>
 		public event EventHandler<LayoutElementEventArgs> ElementRemoved;
+
 		#endregion Events
 
 		#region Properties
+
 		/// <summary>Gets/sets the root layout panel that contains the <see cref="LayoutDocumentPane"/>.</summary>
 		public LayoutPanel RootPanel
 		{
@@ -269,6 +276,7 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(Manager));
 			}
 		}
+
 		#endregion Properties
 
 		#region Overrides
@@ -294,6 +302,7 @@ namespace AvalonDock.Layout
 				hidden.ConsoleDump(tab + 1);
 		}
 #endif
+
 		#endregion Overrides
 
 		#region Public Methods
@@ -314,7 +323,6 @@ namespace AvalonDock.Layout
 				BottomSide = null;
 			else if (element == LeftSide)
 				LeftSide = null;
-
 		}
 
 		public void ReplaceChild(ILayoutElement oldElement, ILayoutElement newElement)
@@ -349,6 +357,7 @@ namespace AvalonDock.Layout
 			var exitFlag = true;
 
 			#region collect empty panes
+
 			do
 			{
 				exitFlag = true;
@@ -458,9 +467,11 @@ namespace AvalonDock.Layout
 				}
 			}
 			while (!exitFlag);
+
 			#endregion collect empty panes
 
 			#region collapse single child anchorable pane groups
+
 			do
 			{
 				exitFlag = true;
@@ -477,9 +488,11 @@ namespace AvalonDock.Layout
 				}
 			}
 			while (!exitFlag);
+
 			#endregion collapse single child anchorable pane groups
 
 			#region collapse single child document pane groups
+
 			do
 			{
 				exitFlag = true;
@@ -494,9 +507,9 @@ namespace AvalonDock.Layout
 					exitFlag = false;
 					break;
 				}
-
 			}
 			while (!exitFlag);
+
 			#endregion collapse single child document pane groups
 
 			////do
@@ -535,6 +548,7 @@ namespace AvalonDock.Layout
 		}
 
 		#region IXmlSerializable interface members
+
 		/// <inheritdoc />
 		XmlSchema IXmlSerializable.GetSchema() => null;
 
@@ -573,7 +587,7 @@ namespace AvalonDock.Layout
 			var hidden = ReadElementList(reader, false);
 			foreach (var hiddenObject in hidden) Hidden.Add((LayoutAnchorable)hiddenObject);
 
-			//Read the closing end element of LayoutRoot 
+			//Read the closing end element of LayoutRoot
 			reader.ReadEndElement();
 		}
 
@@ -620,6 +634,7 @@ namespace AvalonDock.Layout
 			}
 			writer.WriteEndElement();
 		}
+
 		#endregion IXmlSerializable interface members
 
 		#endregion Public Methods
@@ -685,6 +700,7 @@ namespace AvalonDock.Layout
 					RaisePropertyChanged(nameof(Children));
 					RaisePropertyChanged(nameof(ChildrenCount));
 					break;
+
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
 					RaisePropertyChanged(nameof(Children));
 					break;
@@ -718,7 +734,6 @@ namespace AvalonDock.Layout
 						element.Parent?.RemoveChild(element);
 						element.Parent = this;
 						bNotifyChildren = true;
-
 					}
 				}
 			}
@@ -734,6 +749,7 @@ namespace AvalonDock.Layout
 					RaisePropertyChanged(nameof(Children));
 					RaisePropertyChanged(nameof(ChildrenCount));
 					break;
+
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
 					RaisePropertyChanged(nameof(Children));
 					break;
@@ -746,7 +762,7 @@ namespace AvalonDock.Layout
 			if (currentValue != null && currentValue.IsActive) currentValue.IsActive = false;
 			_activeContent = new WeakReference(newActiveContent);
 			currentValue = ActiveContent;
-			if (currentValue != null&& !currentValue.IsActive) currentValue.IsActive = true;
+			if (currentValue != null && !currentValue.IsActive) currentValue.IsActive = true;
 			RaisePropertyChanged(nameof(ActiveContent));
 			_activeContentSet = currentValue != null;
 			if (currentValue != null)
@@ -809,7 +825,7 @@ namespace AvalonDock.Layout
 
 			if (reader.LocalName.Equals(nameof(RootPanel)))
 			{
-				orientation = (Orientation)Enum.Parse(typeof(Orientation),reader.GetAttribute(nameof(Orientation)), true);
+				orientation = (Orientation)Enum.Parse(typeof(Orientation), reader.GetAttribute(nameof(Orientation)), true);
 
 				var canDockStr = reader.GetAttribute("CanDock");
 				if (canDockStr != null)
@@ -850,13 +866,13 @@ namespace AvalonDock.Layout
 			{
 				if (isFloatingWindow)
 				{
-                    if (!(ReadElement(reader) is LayoutFloatingWindow result)) break;
-                    resultList.Add(result);
+					if (!(ReadElement(reader) is LayoutFloatingWindow result)) break;
+					resultList.Add(result);
 				}
 				else
 				{
-                    if (!(ReadElement(reader) is LayoutAnchorable result)) break;
-                    resultList.Add(result);
+					if (!(ReadElement(reader) is LayoutAnchorable result)) break;
+					resultList.Add(result);
 				}
 			}
 
@@ -875,33 +891,43 @@ namespace AvalonDock.Layout
 				case nameof(LayoutAnchorablePaneGroup):
 					serializer = new XmlSerializer(typeof(LayoutAnchorablePaneGroup));
 					break;
+
 				case nameof(LayoutAnchorablePane):
 					serializer = new XmlSerializer(typeof(LayoutAnchorablePane));
 					break;
+
 				case nameof(LayoutAnchorable):
 					serializer = new XmlSerializer(typeof(LayoutAnchorable));
 					break;
+
 				case nameof(LayoutDocumentPaneGroup):
 					serializer = new XmlSerializer(typeof(LayoutDocumentPaneGroup));
 					break;
+
 				case nameof(LayoutDocumentPane):
 					serializer = new XmlSerializer(typeof(LayoutDocumentPane));
 					break;
+
 				case nameof(LayoutDocument):
 					serializer = new XmlSerializer(typeof(LayoutDocument));
 					break;
+
 				case nameof(LayoutAnchorGroup):
 					serializer = new XmlSerializer(typeof(LayoutAnchorGroup));
 					break;
+
 				case nameof(LayoutPanel):
 					serializer = new XmlSerializer(typeof(LayoutPanel));
 					break;
+
 				case nameof(LayoutDocumentFloatingWindow):
 					serializer = new XmlSerializer(typeof(LayoutDocumentFloatingWindow));
 					break;
+
 				case nameof(LayoutAnchorableFloatingWindow):
 					serializer = new XmlSerializer(typeof(LayoutAnchorableFloatingWindow));
 					break;
+
 				case nameof(LeftSide):
 				case nameof(RightSide):
 				case nameof(TopSide):
@@ -912,6 +938,7 @@ namespace AvalonDock.Layout
 						return null;
 					}
 					return reader.Read();
+
 				default:
 					var type = FindType(reader.LocalName);
 					if (type == null)
@@ -928,6 +955,7 @@ namespace AvalonDock.Layout
 		#region Diagnostic tools
 
 #if DEBUG
+
 		public void DumpTree(bool shortPropertyNames = false)
 		{
 			void DumpElement(ILayoutElement element, StringBuilder indent, int childID, bool isLastChild)
@@ -935,12 +963,12 @@ namespace AvalonDock.Layout
 				Debug.Write($"{indent}{(indent.Length > 0 ? isLastChild ? " └─ " : " ├─ " : "")}{childID:D2} 0x{element.GetHashCode():X8} " +
 								$"{element.GetType().Name} {(shortPropertyNames ? "P" : "Parent")}:0x{element.Parent?.GetHashCode() ?? 0:X8} " +
 								$"{(shortPropertyNames ? "R" : "Root")}:0x{element.Root?.GetHashCode() ?? 0:X8}");
-                if (!(element is ILayoutContainer containerElement))
-                {
-                    Debug.WriteLine("");
-                    return;
-                }
-                Debug.WriteLine($" {(shortPropertyNames ? "C" : "Children")}:{containerElement.ChildrenCount}");
+				if (!(element is ILayoutContainer containerElement))
+				{
+					Debug.WriteLine("");
+					return;
+				}
+				Debug.WriteLine($" {(shortPropertyNames ? "C" : "Children")}:{containerElement.ChildrenCount}");
 				var nrChild = 0;
 				indent.Append(isLastChild ? "   " : " │ ");
 				foreach (var child in containerElement.Children)
@@ -953,6 +981,7 @@ namespace AvalonDock.Layout
 
 			DumpElement(this, new StringBuilder(), 0, true);
 		}
+
 #endif
 
 		#endregion Diagnostic tools

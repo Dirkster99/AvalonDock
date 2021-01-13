@@ -1,215 +1,225 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
+﻿using AvalonDock.Themes;
 using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
-using AvalonDock.Themes;
+using System.Windows.Input;
 
 namespace AvalonDock.MVVMTestApp
 {
-    internal class Workspace : ViewModelBase
-    {
-        #region fields
-        static Workspace _this = new Workspace();
+	internal class Workspace : ViewModelBase
+	{
+		#region fields
 
-        ToolViewModel[] _tools = null;
-        private ObservableCollection<FileViewModel> _files = new ObservableCollection<FileViewModel>();
-        private ReadOnlyObservableCollection<FileViewModel> _readonyFiles = null;
-        private FileViewModel _activeDocument = null;
-        FileStatsViewModel _fileStats = null;
-        RelayCommand _openCommand = null;
-        RelayCommand _newCommand = null;
-        private Tuple<string, Theme> selectedTheme;
-        #endregion fields
+		private static Workspace _this = new Workspace();
 
-        #region constructors
-        /// <summary>
-        /// Class constructor
-        /// </summary>
-        protected Workspace()
-        {
-            this.Themes = new List<Tuple<string, Theme>>
-            {
-                new Tuple<string, Theme>(nameof(AeroTheme),new AeroTheme()),
-                new Tuple<string, Theme>(nameof(ExpressionDarkTheme),new ExpressionDarkTheme()),
-                new Tuple<string, Theme>(nameof(ExpressionLightTheme),new ExpressionLightTheme()),
-                new Tuple<string, Theme>(nameof(MetroTheme),new MetroTheme()),
-                new Tuple<string, Theme>(nameof(VS2010Theme),new VS2010Theme()),
-                new Tuple<string, Theme>(nameof(Vs2013BlueTheme),new Vs2013BlueTheme()),
-                new Tuple<string, Theme>(nameof(Vs2013DarkTheme),new Vs2013DarkTheme()),
-                new Tuple<string, Theme>(nameof(Vs2013LightTheme),new Vs2013LightTheme()),
-            };
-            this.SelectedTheme = Themes.First();
-        }
-        #endregion constructors
+		private ToolViewModel[] _tools = null;
+		private ObservableCollection<FileViewModel> _files = new ObservableCollection<FileViewModel>();
+		private ReadOnlyObservableCollection<FileViewModel> _readonyFiles = null;
+		private FileViewModel _activeDocument = null;
+		private FileStatsViewModel _fileStats = null;
+		private RelayCommand _openCommand = null;
+		private RelayCommand _newCommand = null;
+		private Tuple<string, Theme> selectedTheme;
 
-        public event EventHandler ActiveDocumentChanged;
+		#endregion fields
 
-        #region properties
-        public static Workspace This => _this;
+		#region constructors
 
-        public ReadOnlyObservableCollection<FileViewModel> Files
-        {
-            get
-            {
-                if (_readonyFiles == null)
-                    _readonyFiles = new ReadOnlyObservableCollection<FileViewModel>(_files);
+		/// <summary>
+		/// Class constructor
+		/// </summary>
+		protected Workspace()
+		{
+			this.Themes = new List<Tuple<string, Theme>>
+			{
+				new Tuple<string, Theme>(nameof(GenericTheme), new GenericTheme()),
+				new Tuple<string, Theme>(nameof(AeroTheme),new AeroTheme()),
+				new Tuple<string, Theme>(nameof(ExpressionDarkTheme),new ExpressionDarkTheme()),
+				new Tuple<string, Theme>(nameof(ExpressionLightTheme),new ExpressionLightTheme()),
+				new Tuple<string, Theme>(nameof(MetroTheme),new MetroTheme()),
+				new Tuple<string, Theme>(nameof(VS2010Theme),new VS2010Theme()),
+				new Tuple<string, Theme>(nameof(Vs2013BlueTheme),new Vs2013BlueTheme()),
+				new Tuple<string, Theme>(nameof(Vs2013DarkTheme),new Vs2013DarkTheme()),
+				new Tuple<string, Theme>(nameof(Vs2013LightTheme),new Vs2013LightTheme()),
+			};
+			this.SelectedTheme = Themes.First();
+		}
 
-                return _readonyFiles;
-            }
-        }
+		#endregion constructors
 
-        public IEnumerable<ToolViewModel> Tools
-        {
-            get
-            {
-                if (_tools == null)
-                    _tools = new ToolViewModel[] { FileStats };
-                return _tools;
-            }
-        }
+		public event EventHandler ActiveDocumentChanged;
 
-        public FileStatsViewModel FileStats
-        {
-            get
-            {
-                if (_fileStats == null)
-                    _fileStats = new FileStatsViewModel();
+		#region properties
 
-                return _fileStats;
-            }
-        }
+		public static Workspace This => _this;
 
-        public ICommand OpenCommand
-        {
-            get
-            {
-                if (_openCommand == null)
-                {
-                    _openCommand = new RelayCommand((p) => OnOpen(p), (p) => CanOpen(p));
-                }
+		public ReadOnlyObservableCollection<FileViewModel> Files
+		{
+			get
+			{
+				if (_readonyFiles == null)
+					_readonyFiles = new ReadOnlyObservableCollection<FileViewModel>(_files);
 
-                return _openCommand;
-            }
-        }
+				return _readonyFiles;
+			}
+		}
 
-        public ICommand NewCommand
-        {
-            get
-            {
-                if (_newCommand == null)
-                {
-                    _newCommand = new RelayCommand((p) => OnNew(p), (p) => CanNew(p));
-                }
+		public IEnumerable<ToolViewModel> Tools
+		{
+			get
+			{
+				if (_tools == null)
+					_tools = new ToolViewModel[] { FileStats };
+				return _tools;
+			}
+		}
 
-                return _newCommand;
-            }
-        }
+		public FileStatsViewModel FileStats
+		{
+			get
+			{
+				if (_fileStats == null)
+					_fileStats = new FileStatsViewModel();
 
-        public FileViewModel ActiveDocument
-        {
-            get => _activeDocument;
-            set
-            {
-                if (_activeDocument != value)
-                {
-                    _activeDocument = value;
-                    RaisePropertyChanged(nameof(ActiveDocument));
-                    if (ActiveDocumentChanged != null)
-                        ActiveDocumentChanged(this, EventArgs.Empty);
-                }
-            }
-        }
+				return _fileStats;
+			}
+		}
 
+		public ICommand OpenCommand
+		{
+			get
+			{
+				if (_openCommand == null)
+				{
+					_openCommand = new RelayCommand((p) => OnOpen(p), (p) => CanOpen(p));
+				}
 
-        public List<Tuple<string, Theme>> Themes { get; set; }
+				return _openCommand;
+			}
+		}
 
+		public ICommand NewCommand
+		{
+			get
+			{
+				if (_newCommand == null)
+				{
+					_newCommand = new RelayCommand((p) => OnNew(p), (p) => CanNew(p));
+				}
 
-        public Tuple<string, Theme> SelectedTheme
-        {
-            get { return selectedTheme; }
-            set
-            {
-                selectedTheme = value;
-                RaisePropertyChanged(nameof(SelectedTheme));
-            }
-        }
+				return _newCommand;
+			}
+		}
 
-        #endregion properties
+		public FileViewModel ActiveDocument
+		{
+			get => _activeDocument;
+			set
+			{
+				if (_activeDocument != value)
+				{
+					_activeDocument = value;
+					RaisePropertyChanged(nameof(ActiveDocument));
+					if (ActiveDocumentChanged != null)
+						ActiveDocumentChanged(this, EventArgs.Empty);
+				}
+			}
+		}
 
-        #region methods
-        internal void Close(FileViewModel fileToClose)
-        {
-            if (fileToClose.IsDirty)
-            {
-                var res = MessageBox.Show(string.Format("Save changes for file '{0}'?", fileToClose.FileName), "AvalonDock Test App", MessageBoxButton.YesNoCancel);
-                if (res == MessageBoxResult.Cancel)
-                    return;
-                if (res == MessageBoxResult.Yes)
-                {
-                    Save(fileToClose);
-                }
-            }
+		public List<Tuple<string, Theme>> Themes { get; set; }
 
-            _files.Remove(fileToClose);
-        }
+		public Tuple<string, Theme> SelectedTheme
+		{
+			get { return selectedTheme; }
+			set
+			{
+				selectedTheme = value;
+				RaisePropertyChanged(nameof(SelectedTheme));
+			}
+		}
 
-        internal void Save(FileViewModel fileToSave, bool saveAsFlag = false)
-        {
-            if (fileToSave.FilePath == null || saveAsFlag)
-            {
-                var dlg = new SaveFileDialog();
-                if (dlg.ShowDialog().GetValueOrDefault())
-                    fileToSave.FilePath = dlg.SafeFileName;
-            }
-            if (fileToSave.FilePath == null)
-            {
-                return;
-            }
-            File.WriteAllText(fileToSave.FilePath, fileToSave.TextContent);
-            ActiveDocument.IsDirty = false;
-        }
+		#endregion properties
 
-        internal FileViewModel Open(string filepath)
-        {
-            var fileViewModel = _files.FirstOrDefault(fm => fm.FilePath == filepath);
-            if (fileViewModel != null)
-                return fileViewModel;
+		#region methods
 
-            fileViewModel = new FileViewModel(filepath);
-            _files.Add(fileViewModel);
-            return fileViewModel;
-        }
+		internal void Close(FileViewModel fileToClose)
+		{
+			if (fileToClose.IsDirty)
+			{
+				var res = MessageBox.Show(string.Format("Save changes for file '{0}'?", fileToClose.FileName), "AvalonDock Test App", MessageBoxButton.YesNoCancel);
+				if (res == MessageBoxResult.Cancel)
+					return;
+				if (res == MessageBoxResult.Yes)
+				{
+					Save(fileToClose);
+				}
+			}
 
-        #region OpenCommand
-        private bool CanOpen(object parameter) => true;
+			_files.Remove(fileToClose);
+		}
 
-        private void OnOpen(object parameter)
-        {
-            var dlg = new OpenFileDialog();
-            if (dlg.ShowDialog().GetValueOrDefault())
-            {
-                var fileViewModel = Open(dlg.FileName);
-                ActiveDocument = fileViewModel;
-            }
-        }
-        #endregion OpenCommand
+		internal void Save(FileViewModel fileToSave, bool saveAsFlag = false)
+		{
+			if (fileToSave.FilePath == null || saveAsFlag)
+			{
+				var dlg = new SaveFileDialog();
+				if (dlg.ShowDialog().GetValueOrDefault())
+					fileToSave.FilePath = dlg.SafeFileName;
+			}
+			if (fileToSave.FilePath == null)
+			{
+				return;
+			}
+			File.WriteAllText(fileToSave.FilePath, fileToSave.TextContent);
+			ActiveDocument.IsDirty = false;
+		}
 
-        #region NewCommand
-        private bool CanNew(object parameter)
-        {
-            return true;
-        }
+		internal FileViewModel Open(string filepath)
+		{
+			var fileViewModel = _files.FirstOrDefault(fm => fm.FilePath == filepath);
+			if (fileViewModel != null)
+				return fileViewModel;
 
-        private void OnNew(object parameter)
-        {
-            _files.Add(new FileViewModel());
-            ActiveDocument = _files.Last();
-        }
-        #endregion
-        #endregion methods
-    }
+			fileViewModel = new FileViewModel(filepath);
+			_files.Add(fileViewModel);
+			return fileViewModel;
+		}
+
+		#region OpenCommand
+
+		private bool CanOpen(object parameter) => true;
+
+		private void OnOpen(object parameter)
+		{
+			var dlg = new OpenFileDialog();
+			if (dlg.ShowDialog().GetValueOrDefault())
+			{
+				var fileViewModel = Open(dlg.FileName);
+				ActiveDocument = fileViewModel;
+			}
+		}
+
+		#endregion OpenCommand
+
+		#region NewCommand
+
+		private bool CanNew(object parameter)
+		{
+			return true;
+		}
+
+		private void OnNew(object parameter)
+		{
+			_files.Add(new FileViewModel());
+			ActiveDocument = _files.Last();
+		}
+
+		#endregion NewCommand
+
+		#endregion methods
+	}
 }

@@ -7,15 +7,16 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Commands;
+using AvalonDock.Layout;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using AvalonDock.Layout;
-using System.Windows.Input;
-using AvalonDock.Commands;
-using System.Windows.Data;
-using System.Windows.Media;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace AvalonDock.Controls
 {
@@ -28,6 +29,7 @@ namespace AvalonDock.Controls
 	public abstract class LayoutItem : FrameworkElement
 	{
 		#region fields
+
 		private ICommand _defaultCloseCommand;
 		private ICommand _defaultFloatCommand;
 		private ICommand _defaultDockAsDocumentCommand;
@@ -41,6 +43,7 @@ namespace AvalonDock.Controls
 		private ContentPresenter _view = null;
 		private readonly ReentrantFlag _isSelectedReentrantFlag = new ReentrantFlag();
 		private readonly ReentrantFlag _isActiveReentrantFlag = new ReentrantFlag();
+
 		#endregion fields
 
 		#region Constructors
@@ -55,7 +58,7 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -63,13 +66,13 @@ namespace AvalonDock.Controls
 
 		public LayoutContent LayoutElement { get; private set; }
 
-		#endregion
+		#endregion LayoutElement
 
 		#region Model
 
 		public object Model { get; private set; }
 
-		#endregion
+		#endregion Model
 
 		#region View
 
@@ -88,7 +91,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion View
 
 		#region Title
 
@@ -96,10 +99,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title), typeof(string), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnTitleChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="Title"/> property.  This dependency property 
-		/// indicates the title of the element.
-		/// </summary>
+		/// <summary>Gets/sets the the title of the element.</summary>
+		[Bindable(true), Description("Gets/sets the the title of the element."), Category("Other")]
 		public string Title
 		{
 			get => (string)GetValue(TitleProperty);
@@ -115,7 +116,7 @@ namespace AvalonDock.Controls
 			if (LayoutElement != null) LayoutElement.Title = (string)e.NewValue;
 		}
 
-		#endregion
+		#endregion Title
 
 		#region IconSource
 
@@ -123,10 +124,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty IconSourceProperty = DependencyProperty.Register(nameof(IconSource), typeof(ImageSource), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnIconSourceChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="IconSource"/> property. This dependency property 
-		/// indicates icon associated with the item.
-		/// </summary>
+		/// <summary>Gets/sets the icon associated with the item.</summary>
+		[Bindable(true), Description("Gets/sets the icon associated with the item."), Category("Other")]
 		public ImageSource IconSource
 		{
 			get => (ImageSource)GetValue(IconSourceProperty);
@@ -142,7 +141,7 @@ namespace AvalonDock.Controls
 			if (LayoutElement != null) LayoutElement.IconSource = IconSource;
 		}
 
-		#endregion
+		#endregion IconSource
 
 		#region ContentId
 
@@ -150,10 +149,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty ContentIdProperty = DependencyProperty.Register(nameof(ContentId), typeof(string), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnContentIdChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="ContentId"/> property. This dependency property 
-		/// indicates the content id used to retrieve content when deserializing layouts.
-		/// </summary>
+		/// <summary>Gets/sets the content id used to retrieve content when deserializing layouts.</summary>
+		[Bindable(true), Description("Gets/sets the content id used to retrieve content when deserializing layouts."), Category("Other")]
 		public string ContentId
 		{
 			get => (string)GetValue(ContentIdProperty);
@@ -169,7 +166,7 @@ namespace AvalonDock.Controls
 			if (LayoutElement != null) LayoutElement.ContentId = (string)e.NewValue;
 		}
 
-		#endregion
+		#endregion ContentId
 
 		#region IsSelected
 
@@ -177,10 +174,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(nameof(IsSelected), typeof(bool), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(false, OnIsSelectedChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="IsSelected"/> property. This dependency property 
-		/// indicates if the item is selected inside its container.
-		/// </summary>
+		/// <summary>Gets/sets wether the item is selected inside its container or not.</summary>
+		[Bindable(true), Description("Gets/sets wether the item is selected inside its container or not."), Category("Other")]
 		public bool IsSelected
 		{
 			get => (bool)GetValue(IsSelectedProperty);
@@ -200,18 +195,16 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion IsSelected
 
-		#region IsActive  
+		#region IsActive
 
 		/// <summary><see cref="IsActive"/> dependency property.</summary>
 		public static readonly DependencyProperty IsActiveProperty = DependencyProperty.Register(nameof(IsActive), typeof(bool), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(false, OnIsActiveChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="IsActive"/> property.  This dependency property 
-		/// indicates if the item is active in the UI.
-		/// </summary>
+		/// <summary>Gets/sets wether the item is active in the UI or not.</summary>
+		[Bindable(true), Description("Gets/sets wether the item is active in the UI or not."), Category("Other")]
 		public bool IsActive
 		{
 			get => (bool)GetValue(IsActiveProperty);
@@ -231,7 +224,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
+		#endregion IsActive
 
 		#region CanClose
 
@@ -239,10 +232,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty CanCloseProperty = DependencyProperty.Register(nameof(CanClose), typeof(bool), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(true, OnCanCloseChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="CanClose"/> property. This dependency property 
-		/// indicates if the item can be closed.
-		/// </summary>
+		/// <summary>Gets/sets wetherthe item can be closed or not.</summary>
+		[Bindable(true), Description("Gets/sets wetherthe item can be closed or not."), Category("Other")]
 		public bool CanClose
 		{
 			get => (bool)GetValue(CanCloseProperty);
@@ -258,7 +249,7 @@ namespace AvalonDock.Controls
 			if (LayoutElement != null) LayoutElement.CanClose = (bool)e.NewValue;
 		}
 
-		#endregion
+		#endregion CanClose
 
 		#region CanFloat
 
@@ -266,10 +257,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty CanFloatProperty = DependencyProperty.Register(nameof(CanFloat), typeof(bool), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(true, OnCanFloatChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="CanFloat"/> property. This dependency property 
-		/// indicates if user can move the layout element dragging it to another position.
-		/// </summary>
+		/// <summary>Gets/sets wether the user can move the layout element dragging it to another position.</summary>
+		[Bindable(true), Description("Gets/sets wether the user can move the layout element dragging it to another position."), Category("Other")]
 		public bool CanFloat
 		{
 			get => (bool)GetValue(CanFloatProperty);
@@ -285,7 +274,7 @@ namespace AvalonDock.Controls
 			if (LayoutElement != null) LayoutElement.CanFloat = (bool)e.NewValue;
 		}
 
-		#endregion
+		#endregion CanFloat
 
 		#region CloseCommand
 
@@ -293,10 +282,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty CloseCommandProperty = DependencyProperty.Register(nameof(CloseCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnCloseCommandChanged, CoerceCloseCommandValue));
 
-		/// <summary>
-		/// Gets or sets the <see cref="CloseCommand"/>  property. This dependency property 
-		/// indicates the command to execute when user click the document close button.
-		/// </summary>
+		/// <summary>Gets/sets the command to execute when user click the document close button.</summary>
+		[Bindable(true), Description("Gets/sets the command to execute when user click the document close button."), Category("Other")]
 		public ICommand CloseCommand
 		{
 			get => (ICommand)GetValue(CloseCommandProperty);
@@ -320,18 +307,18 @@ namespace AvalonDock.Controls
 
 		protected abstract void Close();
 
-		#endregion
+		#endregion CloseCommand
 
 		#region FloatCommand
+
 		/// <summary><see cref="FloatCommand"/> dependency property.</summary>
 		public static readonly DependencyProperty FloatCommandProperty = DependencyProperty.Register(nameof(FloatCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnFloatCommandChanged, CoerceFloatCommandValue));
 
 		/// <summary>
-		/// Gets or sets the <see cref="FloatCommand"/> property.
-		/// This dependency property indicates the command to execute when user click the float button.
-		/// </summary>
+		/// Gets/sets the command to execute when the user clicks the float button.</summary>
 		/// <remarks>By default this command move the anchorable inside new floating window.</remarks>
+		[Bindable(true), Description("Gets/sets the command to execute when the user clicks the float button."), Category("Other")]
 		public ICommand FloatCommand
 		{
 			get => (ICommand)GetValue(FloatCommandProperty);
@@ -355,7 +342,7 @@ namespace AvalonDock.Controls
 		/// <param name="parameter"></param>
 		private void ExecuteFloatCommand(object parameter) => LayoutElement.Root.Manager.ExecuteFloatCommand(LayoutElement);
 
-		#endregion
+		#endregion FloatCommand
 
 		#region DockAsDocumentCommand
 
@@ -363,11 +350,9 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty DockAsDocumentCommandProperty = DependencyProperty.Register(nameof(DockAsDocumentCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnDockAsDocumentCommandChanged, CoerceDockAsDocumentCommandValue));
 
-		/// <summary>
-		/// Gets or sets the <see cref="DockAsDocumentCommand"/> property. This dependency property 
-		/// indicates the command to execute when user click the DockAsDocument button.
-		/// </summary>
+		/// <summary>Gets/sets the command to execute when user click the DockAsDocument button.</summary>
 		/// <remarks>By default this command move the anchorable inside the last focused document pane.</remarks>
+		[Bindable(true), Description("Gets/sets the command to execute when user click the DockAsDocument button."), Category("Other")]
 		public ICommand DockAsDocumentCommand
 		{
 			get => (ICommand)GetValue(DockAsDocumentCommandProperty);
@@ -391,7 +376,7 @@ namespace AvalonDock.Controls
 
 		private void ExecuteDockAsDocumentCommand(object parameter) => LayoutElement.Root.Manager.ExecuteDockAsDocumentCommand(LayoutElement);
 
-		#endregion
+		#endregion DockAsDocumentCommand
 
 		#region CloseAllButThisCommand
 
@@ -399,10 +384,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty CloseAllButThisCommandProperty = DependencyProperty.Register(nameof(CloseAllButThisCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnCloseAllButThisCommandChanged, CoerceCloseAllButThisCommandValue));
 
-		/// <summary>
-		/// Gets or sets the <see cref="CloseAllButThisCommand"/> property.  This dependency property 
-		/// indicates the 'Close All But This' command.
-		/// </summary>
+		/// <summary>Gets/sets the the 'Close All But This' command.</summary>
+		[Bindable(true), Description("Gets/sets the the 'Close All But This' command."), Category("Other")]
 		public ICommand CloseAllButThisCommand
 		{
 			get => (ICommand)GetValue(CloseAllButThisCommandProperty);
@@ -429,7 +412,7 @@ namespace AvalonDock.Controls
 
 		private void ExecuteCloseAllButThisCommand(object parameter) => LayoutElement.Root.Manager.ExecuteCloseAllButThisCommand(LayoutElement);
 
-		#endregion
+		#endregion CloseAllButThisCommand
 
 		#region CloseAllCommand
 
@@ -437,7 +420,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty CloseAllCommandProperty = DependencyProperty.Register(nameof(CloseAllCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnCloseAllCommandChanged, CoerceCloseAllCommandValue));
 
-		/// <summary>Gets or sets the <see cref="CloseAllCommand"/> property. This dependency property indicates the 'Close All' command.</summary>
+		/// <summary>Gets/sets the 'Close All' command.</summary>
+		[Bindable(true), Description("Gets/sets the 'Close All' command."), Category("Other")]
 		public ICommand CloseAllCommand
 		{
 			get => (ICommand)GetValue(CloseAllCommandProperty);
@@ -464,7 +448,7 @@ namespace AvalonDock.Controls
 
 		private void ExecuteCloseAllCommand(object parameter) => LayoutElement.Root.Manager.ExecuteCloseAllCommand(LayoutElement);
 
-		#endregion
+		#endregion CloseAllCommand
 
 		#region ActivateCommand
 
@@ -472,10 +456,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty ActivateCommandProperty = DependencyProperty.Register(nameof(ActivateCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnActivateCommandChanged, CoerceActivateCommandValue));
 
-		/// <summary>
-		/// Gets or sets the <see cref="ActivateCommand"/> property. This dependency property 
-		/// indicates the command to execute when user wants to activate a content (either a Document or an Anchorable).
-		/// </summary>
+		/// <summary>Gets/sets the command to execute when user wants to activate a content (either a Document or an Anchorable).</summary>
+		[Bindable(true), Description("Gets/sets the command to execute when user wants to activate a content (either a Document or an Anchorable)."), Category("Other")]
 		public ICommand ActivateCommand
 		{
 			get => (ICommand)GetValue(ActivateCommandProperty);
@@ -497,7 +479,7 @@ namespace AvalonDock.Controls
 
 		private void ExecuteActivateCommand(object parameter) => LayoutElement.Root.Manager.ExecuteContentActivateCommand(LayoutElement);
 
-		#endregion
+		#endregion ActivateCommand
 
 		#region NewVerticalTabGroupCommand
 
@@ -505,10 +487,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty NewVerticalTabGroupCommandProperty = DependencyProperty.Register(nameof(NewVerticalTabGroupCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnNewVerticalTabGroupCommandChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="NewVerticalTabGroupCommand"/> property. This dependency property 
-		/// indicates the new vertical tab group command.
-		/// </summary>
+		/// <summary>Gets/sets the new vertical tab group command.</summary>
+		[Bindable(true), Description("Gets/sets the new vertical tab group command."), Category("Other")]
 		public ICommand NewVerticalTabGroupCommand
 		{
 			get => (ICommand)GetValue(NewVerticalTabGroupCommandProperty);
@@ -555,7 +535,8 @@ namespace AvalonDock.Controls
 			layoutElement.IsActive = true;
 			layoutElement.Root.CollectGarbage();
 		}
-		#endregion
+
+		#endregion NewVerticalTabGroupCommand
 
 		#region NewHorizontalTabGroupCommand
 
@@ -563,10 +544,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty NewHorizontalTabGroupCommandProperty = DependencyProperty.Register(nameof(NewHorizontalTabGroupCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnNewHorizontalTabGroupCommandChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="NewHorizontalTabGroupCommand"/> property. This dependency property 
-		/// indicates the new horizontal tab group command.
-		/// </summary>
+		/// <summary>Gets/sets the new horizontal tab group command.</summary>
+		[Bindable(true), Description("Gets/sets the new horizontal tab group command."), Category("Other")]
 		public ICommand NewHorizontalTabGroupCommand
 		{
 			get => (ICommand)GetValue(NewHorizontalTabGroupCommandProperty);
@@ -613,7 +592,8 @@ namespace AvalonDock.Controls
 			layoutElement.IsActive = true;
 			layoutElement.Root.CollectGarbage();
 		}
-		#endregion
+
+		#endregion NewHorizontalTabGroupCommand
 
 		#region MoveToNextTabGroupCommand
 
@@ -621,10 +601,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty MoveToNextTabGroupCommandProperty = DependencyProperty.Register(nameof(MoveToNextTabGroupCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnMoveToNextTabGroupCommandChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="MoveToNextTabGroupCommand"/> property. This dependency property 
-		/// indicates move to next tab group command.
-		/// </summary>
+		/// <summary>Gets/sets the move to next tab group command.</summary>
+		[Bindable(true), Description("Gets/sets the move to next tab group command."), Category("Other")]
 		public ICommand MoveToNextTabGroupCommand
 		{
 			get => (ICommand)GetValue(MoveToNextTabGroupCommandProperty);
@@ -662,7 +640,7 @@ namespace AvalonDock.Controls
 			layoutElement.Root.CollectGarbage();
 		}
 
-		#endregion
+		#endregion MoveToNextTabGroupCommand
 
 		#region MoveToPreviousTabGroupCommand
 
@@ -670,10 +648,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty MoveToPreviousTabGroupCommandProperty = DependencyProperty.Register(nameof(MoveToPreviousTabGroupCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnMoveToPreviousTabGroupCommandChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="MoveToPreviousTabGroupCommand"/> property. This dependency property 
-		/// indicates move to previous tab group command.
-		/// </summary>
+		/// <summary>Gets/sets the move to previous tab group command.</summary>
+		[Bindable(true), Description("Gets/sets the move to previous tab group command."), Category("Other")]
 		public ICommand MoveToPreviousTabGroupCommand
 		{
 			get => (ICommand)GetValue(MoveToPreviousTabGroupCommandProperty);
@@ -710,9 +686,10 @@ namespace AvalonDock.Controls
 			layoutElement.IsActive = true;
 			layoutElement.Root.CollectGarbage();
 		}
-		#endregion
 
-		#endregion
+		#endregion MoveToPreviousTabGroupCommand
+
+		#endregion Properties
 
 		#region Internal Methods
 
@@ -777,7 +754,6 @@ namespace AvalonDock.Controls
 			if (MoveToPreviousTabGroupCommand == null)
 				MoveToPreviousTabGroupCommand = _defaultMoveToPreviousTabGroupCommand;
 
-
 			IsSelected = LayoutElement.IsSelected;
 			IsActive = LayoutElement.IsActive;
 			CanClose = LayoutElement.CanClose;
@@ -813,7 +789,7 @@ namespace AvalonDock.Controls
 
 		internal bool IsViewExists() => _view != null;
 
-		#endregion
+		#endregion Internal Methods
 
 		#region Private Methods
 
@@ -846,6 +822,6 @@ namespace AvalonDock.Controls
 
 		private static void OnVisibilityChanged(DependencyObject s, DependencyPropertyChangedEventArgs e) => ((LayoutItem)s).OnVisibilityChanged();
 
-		#endregion
+		#endregion Private Methods
 	}
 }

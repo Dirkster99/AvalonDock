@@ -7,9 +7,9 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System.Xml.Serialization;
 using System.IO;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace AvalonDock.Layout.Serialization
 {
@@ -17,6 +17,7 @@ namespace AvalonDock.Layout.Serialization
 	public class XmlLayoutSerializer : LayoutSerializer
 	{
 		#region Constructors
+
 		/// <summary>
 		/// Class constructor from <see cref="DockingManager"/> instance.
 		/// </summary>
@@ -25,9 +26,11 @@ namespace AvalonDock.Layout.Serialization
 			: base(manager)
 		{
 		}
+
 		#endregion Constructors
 
 		#region Public Methods
+
 		/// <summary>Serialize the layout into a <see cref="XmlWriter"/>.</summary>
 		/// <param name="writer"></param>
 		public void Serialize(XmlWriter writer)
@@ -59,7 +62,6 @@ namespace AvalonDock.Layout.Serialization
 			using (var stream = new StreamWriter(filepath))
 				Serialize(stream);
 		}
-
 
 		/// <summary>Deserialize the layout a file from a <see cref="Stream"/>.</summary>
 		/// <param name="stream"></param>

@@ -7,10 +7,10 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -21,10 +21,13 @@ namespace AvalonDock.Controls
 	internal class DocumentPaneGroupDropTarget : DropTarget<LayoutDocumentPaneGroupControl>
 	{
 		#region fields
+
 		private LayoutDocumentPaneGroupControl _targetPane;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>
 		/// Class contructor
 		/// </summary>
@@ -38,9 +41,11 @@ namespace AvalonDock.Controls
 		{
 			_targetPane = paneControl;
 		}
+
 		#endregion Constructors
 
 		#region Overrides
+
 		/// <summary>
 		/// Method is invoked to complete a drag & drop operation with a (new) docking position
 		/// by docking of the LayoutDocument <paramref name="floatingWindow"/> into this drop target.
@@ -53,16 +58,19 @@ namespace AvalonDock.Controls
 			switch (Type)
 			{
 				case DropTargetType.DocumentPaneGroupDockInside:
-				#region DropTargetType.DocumentPaneGroupDockInside
-				{
-					var paneGroupModel = targetModel as LayoutDocumentPaneGroup;
-					var paneModel = paneGroupModel as LayoutDocumentPaneGroup;
-					var sourceModel = floatingWindow.RootPanel as LayoutDocumentPaneGroup;
 
-					paneModel.Children.Insert(0, sourceModel);
-				}
-				break;
-				#endregion DropTargetType.DocumentPaneGroupDockInside
+					#region DropTargetType.DocumentPaneGroupDockInside
+
+					{
+						var paneGroupModel = targetModel as LayoutDocumentPaneGroup;
+						var paneModel = paneGroupModel as LayoutDocumentPaneGroup;
+						var sourceModel = floatingWindow.RootPanel as LayoutDocumentPaneGroup;
+
+						paneModel.Children.Insert(0, sourceModel);
+					}
+					break;
+
+					#endregion DropTargetType.DocumentPaneGroupDockInside
 			}
 
 			base.Drop(floatingWindow);
@@ -80,23 +88,27 @@ namespace AvalonDock.Controls
 			switch (Type)
 			{
 				case DropTargetType.DocumentPaneGroupDockInside:
-				#region DropTargetType.DocumentPaneGroupDockInside
-				{
-					var paneGroupModel = targetModel as LayoutDocumentPaneGroup;
-					var paneModel = paneGroupModel.Children[0] as LayoutDocumentPane;
-					var layoutAnchorablePaneGroup = floatingWindow.RootPanel as LayoutAnchorablePaneGroup;
 
-					int i = 0;
-					foreach (var anchorableToImport in layoutAnchorablePaneGroup.Descendents().OfType<LayoutAnchorable>().ToArray())
+					#region DropTargetType.DocumentPaneGroupDockInside
+
 					{
-						anchorableToImport.SetCanCloseInternal(true);
+						var paneGroupModel = targetModel as LayoutDocumentPaneGroup;
+						var paneModel = paneGroupModel.Children[0] as LayoutDocumentPane;
+						var layoutAnchorablePaneGroup = floatingWindow.RootPanel as LayoutAnchorablePaneGroup;
 
-						paneModel.Children.Insert(i, anchorableToImport);
-						i++;
+						int i = 0;
+						foreach (var anchorableToImport in layoutAnchorablePaneGroup.Descendents().OfType<LayoutAnchorable>().ToArray())
+						{
+							// BD: 18.07.2020 Remove that bodge and handle CanClose=false && CanHide=true in XAML
+							//anchorableToImport.SetCanCloseInternal(true);
+
+							paneModel.Children.Insert(i, anchorableToImport);
+							i++;
+						}
 					}
-				}
-				break;
-				#endregion DropTargetType.DocumentPaneGroupDockInside
+					break;
+
+					#endregion DropTargetType.DocumentPaneGroupDockInside
 			}
 
 			base.Drop(floatingWindow);
@@ -116,18 +128,22 @@ namespace AvalonDock.Controls
 			switch (Type)
 			{
 				case DropTargetType.DocumentPaneGroupDockInside:
-				#region DropTargetType.DocumentPaneGroupDockInside
-				{
-					var targetScreenRect = TargetElement.GetScreenArea();
-					targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
 
-					return new RectangleGeometry(targetScreenRect);
-				}
-				#endregion DropTargetType.DocumentPaneGroupDockInside
+					#region DropTargetType.DocumentPaneGroupDockInside
+
+					{
+						var targetScreenRect = TargetElement.GetScreenArea();
+						targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
+
+						return new RectangleGeometry(targetScreenRect);
+					}
+
+					#endregion DropTargetType.DocumentPaneGroupDockInside
 			}
 
 			return null;
 		}
+
 		#endregion Overrides
 	}
 }

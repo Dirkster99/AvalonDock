@@ -19,9 +19,11 @@ namespace AvalonDock.Layout
 	public class LayoutDocument : LayoutContent
 	{
 		#region fields
+
 		private bool _canMove = true;
 		private bool _isVisible = true;
 		private string _description = null;
+
 		#endregion fields
 
 		#region Properties
@@ -39,6 +41,9 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(CanMove));
 			}
 		}
+
+		/// <summary>Documents can't be just hidden so always return false.</summary>
+		public bool CanHide => false;
 
 		/// <summary>Gets whether a document is visible or not.</summary>
 		public bool IsVisible
@@ -72,7 +77,7 @@ namespace AvalonDock.Layout
 			return true;
 		}
 
-		#endregion
+		#endregion Internal Methods
 
 		#region Overrides
 

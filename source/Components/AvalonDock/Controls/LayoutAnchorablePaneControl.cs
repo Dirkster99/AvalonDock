@@ -7,11 +7,12 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System;
-using System.Windows.Controls;
-using System.Windows;
-using System.Windows.Data;
 using AvalonDock.Layout;
+using System;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace AvalonDock.Controls
 {
@@ -26,10 +27,13 @@ namespace AvalonDock.Controls
 	public class LayoutAnchorablePaneControl : TabControlEx, ILayoutControl//, ILogicalChildrenContainer
 	{
 		#region fields
+
 		private readonly LayoutAnchorablePane _model;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Static class constructor to register WPF style keys.</summary>
 		static LayoutAnchorablePaneControl()
 		{
@@ -53,12 +57,15 @@ namespace AvalonDock.Controls
 		#endregion Constructors
 
 		#region Properties
+
 		/// <summary>Gets the layout model of this control.</summary>
+		[Bindable(false), Description("Gets the layout model of this control."), Category("Other")]
 		public ILayoutElement Model => _model;
 
 		#endregion Properties
 
 		#region Overrides
+
 		/// <summary>
 		/// Invoked when an unhandled <see cref="System.Windows.Input.Keyboard.GotKeyboardFocus"/> attached
 		/// event reaches an element in its route that is derived from this class.

@@ -7,11 +7,11 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System.Linq;
-using System.Windows.Controls;
-using System.Collections.ObjectModel;
 using AvalonDock.Layout;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace AvalonDock.Controls
@@ -23,8 +23,10 @@ namespace AvalonDock.Controls
 	public class LayoutAnchorGroupControl : Control, ILayoutControl
 	{
 		#region fields
+
 		private ObservableCollection<LayoutAnchorControl> _childViews = new ObservableCollection<LayoutAnchorControl>();
 		private LayoutAnchorGroup _model;
+
 		#endregion fields
 
 		#region Constructors

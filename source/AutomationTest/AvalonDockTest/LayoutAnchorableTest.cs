@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Data;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting.STAExtensions;
 
 using AvalonDock.Controls;
 using AvalonDock.Converters;
@@ -11,10 +12,10 @@ using AvalonDock.Layout;
 
 namespace AvalonDockTest
 {
-	[TestClass]
+	[STATestClass]
 	public sealed class LayoutAnchorableTest
 	{
-		[TestMethod]
+		[STATestMethod]
 		public void ClearBindingOfHiddenWindowTest()
 		{
 			LayoutAnchorable layoutAnchorable = new LayoutAnchorable

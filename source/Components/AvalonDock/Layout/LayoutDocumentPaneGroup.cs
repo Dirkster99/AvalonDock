@@ -22,10 +22,13 @@ namespace AvalonDock.Layout
 	public class LayoutDocumentPaneGroup : LayoutPositionableGroup<ILayoutDocumentPane>, ILayoutDocumentPane, ILayoutOrientableGroup
 	{
 		#region fields
+
 		private Orientation _orientation;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Class constructor</summary>
 		public LayoutDocumentPaneGroup()
 		{
@@ -40,6 +43,7 @@ namespace AvalonDock.Layout
 		#endregion Constructors
 
 		#region Properties
+
 		/// <summary>Gets/sets the (Horizontal, Vertical) <see cref="System.Windows.Controls.Orientation"/> of this group.</summary>
 		public Orientation Orientation
 		{

@@ -7,9 +7,10 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System.Windows.Controls.Primitives;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace AvalonDock.Controls
 {
@@ -40,10 +41,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty DropDownContextMenuProperty = DependencyProperty.Register(nameof(DropDownContextMenu), typeof(ContextMenu), typeof(DropDownButton),
 				new FrameworkPropertyMetadata(null, OnDropDownContextMenuChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="DropDownContextMenu"/> property. This dependency property 
-		/// indicates drop down menu to show up when user click on an anchorable menu pin.
-		/// </summary>
+		/// <summary>Gets/sets the drop down menu to show up when user click on an anchorable menu pin.</summary>
+		[Bindable(true), Description("Gets/sets the drop down menu to show up when user click on an anchorable menu pin."), Category("Menu")]
 		public ContextMenu DropDownContextMenu
 		{
 			get => (ContextMenu)GetValue(DropDownContextMenuProperty);
@@ -68,10 +67,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty DropDownContextMenuDataContextProperty = DependencyProperty.Register(nameof(DropDownContextMenuDataContext), typeof(object), typeof(DropDownButton),
 				new FrameworkPropertyMetadata(null));
 
-		/// <summary>
-		/// Gets or sets the <see cref="DropDownContextMenuDataContext"/> property. This dependency property 
-		/// indicates data context to set for drop down context menu.
-		/// </summary>
+		/// <summary>Gets/sets the DataContext to set for the DropDownContext menu property.</summary>
+		[Bindable(true), Description("Gets/sets the DataContext to set for the DropDownContext menu property."), Category("Menu")]
 		public object DropDownContextMenuDataContext
 		{
 			get => GetValue(DropDownContextMenuDataContextProperty);

@@ -7,8 +7,8 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System.ComponentModel;
 using AvalonDock.Layout;
+using System.ComponentModel;
 
 namespace AvalonDock
 {

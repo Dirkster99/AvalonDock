@@ -7,17 +7,17 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System;
-using System.Windows.Data;
-using System.Windows.Controls;
 using AvalonDock.Layout;
+using System;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Markup;
 
 namespace AvalonDock.Converters
 {
 	/// <summary>
 	/// Converts an <see cref="AnchorSide"/> value into a WPF <see cref="Orientation"/> value.
-	/// 
+	///
 	/// Returns <see cref="Orientation.Vertical"/> for <see cref="AnchorSide.Left"/> or <see cref="AnchorSide.Right"/>,
 	/// othrwise <see cref="Orientation.Horizontal"/> is returned.
 	/// </summary>
@@ -26,7 +26,7 @@ namespace AvalonDock.Converters
 	{
 		/// <summary>
 		/// Converts an <see cref="AnchorSide"/> value into a WPF <see cref="Orientation"/> value.
-		/// 
+		///
 		/// Returns <see cref="Orientation.Vertical"/> for <see cref="AnchorSide.Left"/> or <see cref="AnchorSide.Right"/>,
 		/// othrwise <see cref="Orientation.Horizontal"/> is returned.
 		/// </summary>
@@ -57,9 +57,9 @@ namespace AvalonDock.Converters
 			throw new NotImplementedException();
 		}
 
-        public override object ProvideValue(IServiceProvider serviceProvider)
-        {
+		public override object ProvideValue(IServiceProvider serviceProvider)
+		{
 			return ConverterCreater.Get<AnchorSideToOrientationConverter>();
 		}
-    }
+	}
 }

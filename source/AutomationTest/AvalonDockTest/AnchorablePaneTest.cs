@@ -1,15 +1,16 @@
 ﻿namespace AvalonDockTest
 {
 	using Microsoft.VisualStudio.TestTools.UnitTesting;
+	using Microsoft.VisualStudio.TestTools.UnitTesting.STAExtensions;
 	using System.Threading.Tasks;
 	using AvalonDock.Layout;
 	using AvalonDockTest.TestHelpers;
 	using AvalonDockTest.views;
 
-	[TestClass]
+	[STATestClass]
 	public class AnchorablePaneTest : AutomationTestBase
 	{
-		[TestMethod]
+		[STATestMethod]
 		public void AnchorablePaneHideCloseTest()
 		{
 			TestHost.SwitchToAppThread();

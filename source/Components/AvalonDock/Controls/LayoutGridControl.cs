@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,14 +7,14 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using AvalonDock.Layout;
 using System.Windows.Threading;
 
 namespace AvalonDock.Controls
@@ -34,6 +34,7 @@ namespace AvalonDock.Controls
 	public abstract class LayoutGridControl<T> : Grid, ILayoutControl, IAdjustableSizeLayout where T : class, ILayoutPanelElement
 	{
 		#region fields
+
 		private readonly LayoutPositionableGroup<T> _model;
 		private readonly Orientation _orientation;
 		private bool _initialized;
@@ -42,9 +43,11 @@ namespace AvalonDock.Controls
 		private Border _resizerGhost = null;
 		private Window _resizerWindowHost = null;
 		private Vector _initialStartPoint;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -58,7 +61,7 @@ namespace AvalonDock.Controls
 			Unloaded += OnUnloaded;
 		}
 
-		#endregion
+		#endregion Constructors
 
 		#region Properties
 
@@ -68,9 +71,10 @@ namespace AvalonDock.Controls
 
 		private bool AsyncRefreshCalled => _asyncRefreshCalled != null;
 
-		#endregion
+		#endregion Properties
 
 		#region Overrides
+
 		/// <inheritdoc/>
 		protected override void OnInitialized(EventArgs e)
 		{
@@ -89,7 +93,7 @@ namespace AvalonDock.Controls
 			this.SizeChanged += OnSizeChanged;
 		}
 
-		#endregion
+		#endregion Overrides
 
 		#region Internal Methods
 
@@ -101,7 +105,7 @@ namespace AvalonDock.Controls
 
 		protected abstract void OnFixChildrenDockLengths();
 
-		#endregion
+		#endregion Internal Methods
 
 		#region Private Methods
 
@@ -196,14 +200,17 @@ namespace AvalonDock.Controls
 			if (manager == null) return;
 			FixChildrenDockLengths();
 			//Debug.Assert(InternalChildren.Count == _model.ChildrenCount + (_model.ChildrenCount - 1));
+
 			#region Setup GridRows/Cols
+
 			RowDefinitions.Clear();
 			ColumnDefinitions.Clear();
 			if (Orientation == Orientation.Horizontal)
 			{
 				var iColumn = 0;
 				var iChild = 0;
-				for (var iChildModel = 0; iChildModel < _model.Children.Count; iChildModel++, iColumn++, iChild++)
+				// BD: 24.08.2020 added check for iChild against InternalChildren.Count
+				for (var iChildModel = 0; iChildModel < _model.Children.Count && iChild < InternalChildren.Count; iChildModel++, iColumn++, iChild++)
 				{
 					var childModel = _model.Children[iChildModel] as ILayoutPositionableElement;
 					ColumnDefinitions.Add(new ColumnDefinition
@@ -238,7 +245,8 @@ namespace AvalonDock.Controls
 			{
 				var iRow = 0;
 				var iChild = 0;
-				for (var iChildModel = 0; iChildModel < _model.Children.Count; iChildModel++, iRow++, iChild++)
+				// BD: 24.08.2020 added check for iChild against InternalChildren.Count
+				for (var iChildModel = 0; iChildModel < _model.Children.Count && iChild < InternalChildren.Count; iChildModel++, iRow++, iChild++)
 				{
 					var childModel = _model.Children[iChildModel] as ILayoutPositionableElement;
 					RowDefinitions.Add(new RowDefinition
@@ -275,7 +283,7 @@ namespace AvalonDock.Controls
 				}
 			}
 
-			#endregion
+			#endregion Setup GridRows/Cols
 		}
 
 		private void CreateSplitters()
@@ -626,6 +634,6 @@ namespace AvalonDock.Controls
 			_resizerWindowHost = null;
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

@@ -1,16 +1,16 @@
-| Downloads                                                                                                                                               | Packages                                   | NuGet
-| :------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------- | :--------------------------------------------------------------------------------
-| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.svg)](http://nuget.org/packages/Dirkster.AvalonDock)                                      | Dirkster.AvalonDock                        | [Dirkster.AvalonDock](http://nuget.org/packages/Dirkster.AvalonDock)
-| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Aero.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Aero)              | Dirkster.AvalonDock.Themes.Aero            | [Dirkster.AvalonDock.Themes.Aero](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Aero)
-| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Expression.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Expression)  | Dirkster.AvalonDock.Themes.Expression      | [Dirkster.AvalonDock.Themes.Expression](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Expression)
-| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Metro.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Metro)            | Dirkster.AvalonDock.Themes.Metro           | [Dirkster.AvalonDock.Themes.Metro](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Metro)
-| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2010.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010)          | Dirkster.AvalonDock.Themes.VS2010          | [Dirkster.AvalonDock.Themes.VS2010](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010)
-| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2013.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013)          | [Dirkster.AvalonDock.Themes.VS2013](https://github.com/Dirkster99/AvalonDock/wiki/WPF-VS-2013-Dark-Light-Demo-Client) | [Dirkster.AvalonDock.Themes.VS2013](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013)
+| Downloads                                                                                                                                               | NuGet Packages
+| :------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------
+| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.svg)](http://nuget.org/packages/Dirkster.AvalonDock)                                      | [Dirkster.AvalonDock](http://nuget.org/packages/Dirkster.AvalonDock)
+| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Aero.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Aero)              | [Dirkster.AvalonDock.Themes.Aero](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Aero)
+| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Expression.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Expression)  | [Dirkster.AvalonDock.Themes.Expression](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Expression)
+| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Metro.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Metro)            | [Dirkster.AvalonDock.Themes.Metro](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Metro)
+| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2010.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010)          | [Dirkster.AvalonDock.Themes.VS2010](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010)
+| [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2013.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013)          | [Dirkster.AvalonDock.Themes.VS2013](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013) (see [Wiki](https://github.com/Dirkster99/AvalonDock/wiki/WPF-VS-2013-Dark-Light-Demo-Client) )
 
 ![Net4](https://badgen.net/badge/Framework/.Net&nbsp;4/blue) ![NetCore3](https://badgen.net/badge/Framework/NetCore&nbsp;3/blue)
 
 ## Master Branch
-[![Build status](https://ci.appveyor.com/api/projects/status/kq2wyupx5hm7fok2/branch/master?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock/branch/master)[![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)&nbsp;[Continues Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts)
+[![Build status](https://ci.appveyor.com/api/projects/status/kq2wyupx5hm7fok2/branch/master?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock/branch/master)[![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)&nbsp;[Continuous Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts)
 
 <a href="https://github.com/Dirkster99/AvalonDock/issues">
     <img src="https://img.shields.io/github/issues-raw/Dirkster99/AvalonDock.svg?style=flat-square">
@@ -120,7 +120,38 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## Fixes & Features in master but not relased, yet
+## Fixes added in Version 4.50.1
+
+- [#210 LayoutAnchorable with CanDockAsTabbedDocument="False" docks to LayoutDocumentPane when Pane is empty](https://github.com/Dirkster99/AvalonDock/issues/210) (thanx to [Łukasz Holetzke](https://github.com/goldie83))
+- [#195 DocumentClosed event issue](https://github.com/Dirkster99/AvalonDock/issues/195) (thanx to [Skaptor](https://github.com/Skaptor))
+- [#205 Fix issue where the ActiveContent binding doesn't update two ways when removing a document.](https://github.com/Dirkster99/AvalonDock/pull/205) (thanx to [PatrickHofman](https://github.com/PatrickHofman))
+
+## Fixes added in Version 4.5
+
+- [#199 Add to LayoutDocument CanHide property returning false](https://github.com/Dirkster99/AvalonDock/pull/199) (thanx to [bdachev](https://github.com/bdachev))
+- [#138 Trying dock a floating window inside a document pane leads to its disappearing of window's content.](https://github.com/Dirkster99/AvalonDock/pull/138) (thanx to [cuellius](https://github.com/https://github.com/cuellius))
+- [#197 [Bug] Tabs start getting dragged around if visual tree load times are too high](https://github.com/Dirkster99/AvalonDock/pull/138) (thanx to [X39](https://github.com/https://github.com/X39))
+- [Bug fix for issue #194 App doesn't close after LayoutAnchorable AutoHide and docking it again](https://github.com/Dirkster99/AvalonDock/pull/203) (thanx to [sphet](https://github.com/https://github.com/sphet))
+
+## Fixes & Features added in Version 4.4
+
+- [#182 CanClose property of new LayoutAnchorableItem is different from its LayoutAnchorable](https://github.com/Dirkster99/AvalonDock/pull/183)  (thanx to [skyneps](https://github.com/skyneps))
+- [#184 All documents disappear if document stops close application in Caliburn.Micro](https://github.com/Dirkster99/AvalonDock/issues/184)  (thanx to [ryanvs](https://github.com/ryanvs))
+
+- Thanx to [bdachev](https://github.com/bdachev):  
+  - [#186 Raise PropertyChanged notification when LayoutContent.IsFloating changes](https://github.com/Dirkster99/AvalonDock/pull/186) (ensure change of the [IsFloating](https://github.com/Dirkster99/AvalonDock/wiki/LayoutContent#properties) property when the Documents state changes)  
+  - [#187 Allow to serialize CanClose if set to true for LayoutAnchorable instance](https://github.com/Dirkster99/AvalonDock/pull/187)  
+  - [#188 Handle CanClose and CanHide in XAML](https://github.com/Dirkster99/AvalonDock/pull/188)  
+  - [#190 Added additional check in LayoutGridControl.UpdateRowColDefinitions to avoid exception.](https://github.com/Dirkster99/AvalonDock/pull/190)  
+  - [#192 Default MenuItem style not changed by VS2013 Theme](https://github.com/Dirkster99/AvalonDock/pull/192)
+
+
+- Removed the additional [ToolTip](https://github.com/Dirkster99/AvalonDock/commit/5554de5c4bfadc37f974ba29803dc792b54f00d0) and [ContextMenu](https://github.com/Dirkster99/AvalonDock/commit/103e1068bc9f5bae8fef275a0e785393b4115764) styles from the Generic.xaml in VS2013 [more details here](https://github.com/Dirkster99/AvalonDock/pull/170#issuecomment-674253874)
+- [#189 Removal of DictionaryTheme breaks my application](https://github.com/Dirkster99/AvalonDock/issues/189)  (thanx to [hamohn](https://github.com/hamohn))
+
+## Fixes & Features added in Version 4.3
+
+- Localized labels in [NavigatorWindow](https://github.com/Dirkster99/AvalonDock/wiki/NavigatorWindow)
 
 - [#170 Several Improvements](https://github.com/Dirkster99/AvalonDock/pull/170) (thanx to [刘晓青 LyonJack](https://github.com/LyonJack))  
   - Improved VS 2013 Theme and ease of reusing controls  
@@ -129,7 +160,8 @@ to also theme standard elements, such as, button and textblock etc.
   - [Fix Issue #135 ActiveContent not switching correctly for floating window](https://github.com/Dirkster99/AvalonDock/issues/135)  
   - [Fix Issue #165 ActiveContent not stable](https://github.com/Dirkster99/AvalonDock/issues/165)  
   - [Fix Issue #171 LayoutDocument leaks on close](https://github.com/Dirkster99/AvalonDock/issues/171)  
-  - [Fix Issue #174 The SetWindowSizeWhenOpened Feature is broken](https://github.com/Dirkster99/AvalonDock/issues/174)
+  - **Breaking Change**  
+    [Fix Issue #174 The SetWindowSizeWhenOpened Feature is broken](https://github.com/Dirkster99/AvalonDock/issues/174)
   - [Fix Issue #177 ToolBar TabItem color error](https://github.com/Dirkster99/AvalonDock/issues/177)
 
 - [#59 InvalidOperationException when deserializing layout](https://github.com/Dirkster99/AvalonDock/issues/59#issuecomment-642934204)

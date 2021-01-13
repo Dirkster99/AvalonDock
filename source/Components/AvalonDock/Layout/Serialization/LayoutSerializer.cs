@@ -16,11 +16,14 @@ namespace AvalonDock.Layout.Serialization
 	public abstract class LayoutSerializer
 	{
 		#region fields
+
 		private LayoutAnchorable[] _previousAnchorables = null;
 		private LayoutDocument[] _previousDocuments = null;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>
 		/// Class constructor from <see cref="DockingManager"/> instance.
 		/// </summary>
@@ -31,17 +34,21 @@ namespace AvalonDock.Layout.Serialization
 			_previousAnchorables = Manager.Layout.Descendents().OfType<LayoutAnchorable>().ToArray();
 			_previousDocuments = Manager.Layout.Descendents().OfType<LayoutDocument>().ToArray();
 		}
+
 		#endregion Constructors
 
 		#region Events
+
 		/// <summary>Raises an event when the layout serializer is about to deserialize an item to ask the
 		/// client application whether the item should be deserialized and re-displayed and what content
 		/// should be used if so.
 		/// </summary>
 		public event EventHandler<LayoutSerializationCallbackEventArgs> LayoutSerializationCallback;
+
 		#endregion Events
 
 		#region Properties
+
 		/// <summary>
 		/// Gets the <see cref="DockingManager"/> root of the docking library.
 		/// </summary>
@@ -113,7 +120,7 @@ namespace AvalonDock.Layout.Serialization
 				else if (previousDocument == null)  // No Callback and no provious document -> skip this
 					lcToFix.Close();
 				else
-				{	// No Callback but previous document available -> load content from previous document
+				{   // No Callback but previous document available -> load content from previous document
 					lcToFix.Content = previousDocument.Content;
 					lcToFix.IconSource = previousDocument.IconSource;
 				}
@@ -133,6 +140,7 @@ namespace AvalonDock.Layout.Serialization
 			Manager.SuspendDocumentsSourceBinding = false;
 			Manager.SuspendAnchorablesSourceBinding = false;
 		}
+
 		#endregion Methods
 	}
 }

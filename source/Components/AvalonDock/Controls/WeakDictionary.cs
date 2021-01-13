@@ -21,8 +21,10 @@ namespace AvalonDock.Controls
 	internal class WeakDictionary<K, V> where K : class
 	{
 		#region fields
+
 		private List<WeakReference> _keys = new List<WeakReference>();
 		private List<V> _values = new List<V>();
+
 		#endregion fields
 
 		#region Public Methods

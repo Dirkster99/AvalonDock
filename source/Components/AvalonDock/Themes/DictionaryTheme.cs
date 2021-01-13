@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -12,26 +12,23 @@ using System.Windows;
 
 namespace AvalonDock.Themes
 {
-	/// <summary>
-	/// Defines an abstract class to implement a custom AvalonDock theme
-	/// based on a <see cref="ResourceDictionary"/> object rather than an XAML Uri.
+	/// <summary>Defines a base class to implement a method for storing the current AvalonDock theme
+	/// that provides a XAML Uri pointing to a <see cref="ResourceDictionary"/>.
 	/// 
-	/// Dirk: Class is referenced in code but is never used since there is no concrete inheriting class.
-	/// ToDo: Remove this class and code references in AvalonDock?
-	/// </summary>
+	/// This class can be used to create customized themes by loading a <see cref="ResourceDictionary"/>
+	/// from an existing theme (by using theme.GetResourceUri()), and then replacing some key colors
+	/// (typically the "Accent" colors).
+	/// 
+	/// See Issue https://github.com/Dirkster99/AvalonDock/issues/189 for more details.</summary>
 	public abstract class DictionaryTheme : Theme
 	{
 		#region Constructors
-		/// <summary>
-		/// Class constructor
-		/// </summary>
+		/// <summary>Class constructor</summary>
 		public DictionaryTheme()
 		{
 		}
 
-		/// <summary>
-		/// Class constructor from theme specific resource dictionary.
-		/// </summary>
+		/// <summary>Class constructor from theme specific resource dictionary.</summary>
 		/// <param name="themeResourceDictionary"></param>
 		public DictionaryTheme(ResourceDictionary themeResourceDictionary)
 		{
@@ -39,12 +36,12 @@ namespace AvalonDock.Themes
 		}
 
 		#endregion Constructors
-		/// <summary>
-		/// Gets the resource dictionary that is associated with this AvalonDock theme.
-		/// </summary>
+
+		/// <summary>Gets the resource dictionary that is associated with this AvalonDock theme.</summary>
 		public ResourceDictionary ThemeResourceDictionary { get; private set; }
 
-		/// <inheritdoc/>
+		/// <summary>Gets the <see cref="Uri"/> of the XAML that contains the definition for this AvalonDock theme.</summary>
+		/// <returns><see cref="Uri"/> of the XAML that contains the definition for this custom AvalonDock theme</returns>
 		public override Uri GetResourceUri()
 		{
 			return null;

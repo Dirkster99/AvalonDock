@@ -9,11 +9,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Windows.Markup;
 using System.Diagnostics;
 using System.Linq;
-using System.Xml.Serialization;
+using System.Windows.Markup;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
@@ -23,10 +23,12 @@ namespace AvalonDock.Layout
 	public class LayoutDocumentFloatingWindow : LayoutFloatingWindow, ILayoutElementWithVisibility
 	{
 		#region fields
+
 		private LayoutDocumentPaneGroup _rootPanel = null;
 
 		[NonSerialized]
 		private bool _isVisible = true;
+
 		#endregion fields
 
 		public event EventHandler IsVisibleChanged;
@@ -65,6 +67,7 @@ namespace AvalonDock.Layout
 		#endregion RootPanel
 
 		#region IsSinglePane
+
 		public bool IsSinglePane => RootPanel?.Descendents().OfType<LayoutDocumentPane>().Count(p => p.IsVisible) == 1;
 
 		public LayoutDocumentPane SinglePane
@@ -77,6 +80,7 @@ namespace AvalonDock.Layout
 				return singlePane;
 			}
 		}
+
 		#endregion IsSinglePane
 
 		[XmlIgnore]
@@ -106,14 +110,14 @@ namespace AvalonDock.Layout
 		/// <inheritdoc />
 		public override void RemoveChild(ILayoutElement element)
 		{
-			Debug.Assert( element == RootPanel && element != null );
+			Debug.Assert(element == RootPanel && element != null);
 			RootPanel = null;
 		}
 
 		/// <inheritdoc />
 		public override void ReplaceChild(ILayoutElement oldElement, ILayoutElement newElement)
 		{
-			Debug.Assert( oldElement == RootPanel && oldElement != null );
+			Debug.Assert(oldElement == RootPanel && oldElement != null);
 			RootPanel = newElement as LayoutDocumentPaneGroup;
 		}
 

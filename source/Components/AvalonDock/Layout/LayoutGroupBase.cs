@@ -37,6 +37,7 @@ namespace AvalonDock.Layout
 		#endregion Events
 
 		#region Internal Methods
+
 		/// <summary>
 		/// Raises an event to make parents update their children up the tree.
 		/// Otherwise, they will not be redrawn.

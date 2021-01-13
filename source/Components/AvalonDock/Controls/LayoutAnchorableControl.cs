@@ -7,9 +7,10 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -19,6 +20,7 @@ namespace AvalonDock.Controls
 	public class LayoutAnchorableControl : Control
 	{
 		#region Constructors
+
 		/// <summary>
 		/// Static class constructor
 		/// </summary>
@@ -36,6 +38,7 @@ namespace AvalonDock.Controls
 			//SetBinding(FlowDirectionProperty, new Binding("Model.Root.Manager.FlowDirection") { Source = this });
 			Unloaded += LayoutAnchorableControl_Unloaded;
 		}
+
 		#endregion Constructors
 
 		#region Properties
@@ -46,7 +49,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(nameof(Model), typeof(LayoutAnchorable), typeof(LayoutAnchorableControl),
 				new FrameworkPropertyMetadata(null, OnModelChanged));
 
-		/// <summary>Gets or sets the <see cref="Model"/> property. This dependency property indicates the model attached to this view.</summary>
+		/// <summary>Gets/sets the model attached to this view.</summary>
+		[Bindable(true), Description("Gets/sets the model attached to this view."), Category("Other")]
 		public LayoutAnchorable Model
 		{
 			get => (LayoutAnchorable)GetValue(ModelProperty);
@@ -59,7 +63,7 @@ namespace AvalonDock.Controls
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Model"/> property.</summary>
 		protected virtual void OnModelChanged(DependencyPropertyChangedEventArgs e)
 		{
-			if (e.OldValue != null) ((LayoutContent) e.OldValue).PropertyChanged -= Model_PropertyChanged;
+			if (e.OldValue != null) ((LayoutContent)e.OldValue).PropertyChanged -= Model_PropertyChanged;
 			if (Model != null)
 			{
 				Model.PropertyChanged += Model_PropertyChanged;
@@ -89,11 +93,12 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
-		/// <summary> Gets the <see cref="LayoutItem"/> property. This dependency property indicates the LayoutItem attached to this tag item.</summary>
+		/// <summary>Gets the the LayoutItem attached to this tag item.</summary>
+		[Bindable(true), Description("Gets the the LayoutItem attached to this tag item."), Category("Other")]
 		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
 
 		/// <summary>
-		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.  
+		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.
 		/// This dependency property indicates the LayoutItem attached to this tag item.
 		/// </summary>
 		/// <param name="value">The new value for the property.</param>
@@ -104,10 +109,11 @@ namespace AvalonDock.Controls
 		#endregion Properties
 
 		#region Methods
+
 		/// <inheritdoc/>
 		protected override void OnGotKeyboardFocus(System.Windows.Input.KeyboardFocusChangedEventArgs e)
 		{
-			if (Model != null) 
+			if (Model != null)
 				Model.IsActive = true;
 			base.OnGotKeyboardFocus(e);
 		}
@@ -125,6 +131,7 @@ namespace AvalonDock.Controls
 
 			Unloaded -= LayoutAnchorableControl_Unloaded;
 		}
+
 		#endregion Methods
 	}
 }

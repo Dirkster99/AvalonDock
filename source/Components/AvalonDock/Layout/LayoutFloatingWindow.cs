@@ -9,9 +9,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
-using System.Xml.Schema;
 using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
@@ -22,6 +22,7 @@ namespace AvalonDock.Layout
 	public abstract class LayoutFloatingWindow : LayoutElement, ILayoutContainer, IXmlSerializable
 	{
 		#region Properties
+
 		/// <summary>Gets the list of <see cref="ILayoutElement"/> based children below this object.</summary>
 		public abstract IEnumerable<ILayoutElement> Children { get; }
 
@@ -33,6 +34,7 @@ namespace AvalonDock.Layout
 		#endregion Properties
 
 		#region Public Methods
+
 		/// <summary>Remove the child element from the collection of children.</summary>
 		/// <param name="element"></param>
 		public abstract void RemoveChild(ILayoutElement element);
@@ -43,6 +45,7 @@ namespace AvalonDock.Layout
 		public abstract void ReplaceChild(ILayoutElement oldElement, ILayoutElement newElement);
 
 		#region IXmlSerializable interface members
+
 		/// <inheritdoc cref="IXmlSerializable"/>
 		public XmlSchema GetSchema()
 		{
@@ -62,7 +65,9 @@ namespace AvalonDock.Layout
 				serializer.Serialize(writer, child);
 			}
 		}
+
 		#endregion IXmlSerializable interface members
+
 		#endregion Public Methods
 	}
 }

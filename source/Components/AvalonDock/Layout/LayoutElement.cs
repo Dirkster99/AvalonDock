@@ -8,32 +8,35 @@
  ************************************************************************/
 
 using System;
-using System.Windows;
 using System.ComponentModel;
+using System.Windows;
 using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
 	/// <summary>
 	/// Implements an abstract base class for almost all layout models in the AvalonDock.Layout namespace.
-	/// 
+	///
 	/// This base inherites from <see cref="DependencyObject"/> and implements <see cref="PropertyChanged"/>
 	/// and <see cref="PropertyChanging"/> events. Deriving classes can, therefore, implement
 	/// depedency object and/or viewmodel specific functionalities.
-	/// class supports both 
+	/// class supports both
 	/// </summary>
 	[Serializable]
 	public abstract class LayoutElement : DependencyObject, ILayoutElement
 	{
 		#region fields
+
 		[NonSerialized]
 		private ILayoutContainer _parent = null;
 
 		[NonSerialized]
 		private ILayoutRoot _root = null;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -44,6 +47,7 @@ namespace AvalonDock.Layout
 		#endregion Constructors
 
 		#region Events
+
 		/// <summary>Raised when a property has changed (after the change has taken place).</summary>
 		[field: NonSerialized]
 		[field: XmlIgnore]
@@ -57,6 +61,7 @@ namespace AvalonDock.Layout
 		#endregion Events
 
 		#region Properties
+
 		/// <summary>Gets or sets the parent container of the element</summary>
 		[XmlIgnore]
 		public ILayoutContainer Parent
@@ -89,6 +94,7 @@ namespace AvalonDock.Layout
 				return parent as ILayoutRoot;
 			}
 		}
+
 		#endregion Properties
 
 		#region Public Methods
@@ -118,8 +124,8 @@ namespace AvalonDock.Layout
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Root"/> property.</summary>
 		protected virtual void OnRootChanged(ILayoutRoot oldRoot, ILayoutRoot newRoot)
 		{
-			((LayoutRoot) oldRoot)?.OnLayoutElementRemoved(this);
-			((LayoutRoot) newRoot)?.OnLayoutElementAdded(this);
+			((LayoutRoot)oldRoot)?.OnLayoutElementRemoved(this);
+			((LayoutRoot)newRoot)?.OnLayoutElementAdded(this);
 		}
 
 		/// <summary>Should be invoked to raise the <see cref="PropertyChanged"/> event for the property named in <paramref name="propertyName"/>.

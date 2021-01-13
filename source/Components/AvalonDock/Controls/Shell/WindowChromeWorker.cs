@@ -13,18 +13,17 @@
 
 namespace Microsoft.Windows.Shell
 {
+	using Standard;
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics.CodeAnalysis;
 	using System.Runtime.InteropServices;
 	using System.Windows;
+	using System.Windows.Controls.Primitives;
 	using System.Windows.Interop;
 	using System.Windows.Media;
 	using System.Windows.Threading;
-	using Standard;
-
 	using HANDLE_MESSAGE = System.Collections.Generic.KeyValuePair<Standard.WM, Standard.MessageHandler>;
-	using System.Windows.Controls.Primitives;
 
 	internal class WindowChromeWorker : DependencyObject
 	{
@@ -39,13 +38,16 @@ namespace Microsoft.Windows.Shell
 
 		/// <summary>The Window that's chrome is being modified.</summary>
 		private Window _window;
+
 		/// <summary>Underlying HWND for the _window.</summary>
 		private IntPtr _hwnd;
+
 		private HwndSource _hwndSource = null;
 		private bool _isHooked = false;
 
 		// These fields are for tracking workarounds for WPF 3.5SP1 behaviors.
 		private bool _isFixedUp = false;
+
 		private bool _isUserResizing = false;
 		private bool _hasUserMovedWindow = false;
 		private Point _windowPosAtStartOfUserMove = default;
@@ -59,6 +61,7 @@ namespace Microsoft.Windows.Shell
 		// Keep track of this so we can detect when we need to apply changes.  Tracking these separately
 		// as I've seen using just one cause things to get enough out of sync that occasionally the caption will redraw.
 		private WindowState _lastRoundingState;
+
 		private WindowState _lastMenuState;
 		private bool _isGlassEnabled;
 
@@ -252,7 +255,7 @@ namespace Microsoft.Windows.Shell
 			   rcLogicalClient.Right - rcLogicalWindow.Right,
 			   rcLogicalClient.Bottom - rcLogicalWindow.Bottom);
 
-			if (rootElement != null) 
+			if (rootElement != null)
 				rootElement.Margin = new Thickness(0, 0, -(nonClientThickness.Left + nonClientThickness.Right), -(nonClientThickness.Top + nonClientThickness.Bottom));
 
 			// The negative thickness on the margin doesn't properly get applied in RTL layouts.
@@ -314,7 +317,7 @@ namespace Microsoft.Windows.Shell
 			// NativeMethods.DwmGetCompositionTimingInfo swallows E_PENDING.
 			// If the call wasn't successful, try again later.
 			if (!success)
-				Dispatcher.BeginInvoke(DispatcherPriority.Loaded, (_Action) _FixupWindows7Issues);
+				Dispatcher.BeginInvoke(DispatcherPriority.Loaded, (_Action)_FixupWindows7Issues);
 			else
 				// Reset this.  We will want to force this again if DWM composition changes.
 				_blackGlassFixupAttemptCount = 0;
@@ -545,7 +548,7 @@ namespace Microsoft.Windows.Shell
 			Assert.Implies(_window.WindowState == WindowState.Maximized, Utility.IsOSWindows7OrNewer);
 			if (_window.WindowState != WindowState.Maximized)
 			{
-				// Check for the docked window case.  The window can still be restored when it's in this position so 
+				// Check for the docked window case.  The window can still be restored when it's in this position so
 				// try to account for that and not update the start position.
 				if (!_IsWindowDocked)
 				{
@@ -612,6 +615,7 @@ namespace Microsoft.Windows.Shell
 			{
 				case SW.SHOWMINIMIZED:
 					return WindowState.Minimized;
+
 				case SW.SHOWMAXIMIZED:
 					return WindowState.Maximized;
 			}
@@ -667,6 +671,7 @@ namespace Microsoft.Windows.Shell
 						NativeMethods.EnableMenuItem(hMenu, SC.MINIMIZE, canMinimize ? mfEnabled : mfDisabled);
 						NativeMethods.EnableMenuItem(hMenu, SC.MAXIMIZE, mfDisabled);
 						break;
+
 					case WindowState.Minimized:
 						NativeMethods.EnableMenuItem(hMenu, SC.RESTORE, mfEnabled);
 						NativeMethods.EnableMenuItem(hMenu, SC.MOVE, mfDisabled);
@@ -674,6 +679,7 @@ namespace Microsoft.Windows.Shell
 						NativeMethods.EnableMenuItem(hMenu, SC.MINIMIZE, mfDisabled);
 						NativeMethods.EnableMenuItem(hMenu, SC.MAXIMIZE, canMaximize ? mfEnabled : mfDisabled);
 						break;
+
 					default:
 						NativeMethods.EnableMenuItem(hMenu, SC.RESTORE, mfDisabled);
 						NativeMethods.EnableMenuItem(hMenu, SC.MOVE, mfEnabled);
@@ -761,8 +767,8 @@ namespace Microsoft.Windows.Shell
 				Size windowSize;
 
 				// Use the size if it's specified.
-				if (null != wp && !Utility.IsFlagSet(wp.Value.flags, (int) SWP.NOSIZE))
-					windowSize = new Size((double) wp.Value.cx, (double) wp.Value.cy);
+				if (null != wp && !Utility.IsFlagSet(wp.Value.flags, (int)SWP.NOSIZE))
+					windowSize = new Size((double)wp.Value.cx, (double)wp.Value.cy);
 				else if (null != wp && (_lastRoundingState == _window.WindowState))
 					return;
 				else
@@ -831,8 +837,8 @@ namespace Microsoft.Windows.Shell
 		{
 			// Round outwards.
 			if (DoubleUtilities.AreClose(0, radius))
-				return NativeMethods.CreateRectRgn((int) Math.Floor(region.Left), (int) Math.Floor(region.Top), 
-													(int) Math.Ceiling(region.Right), (int) Math.Ceiling(region.Bottom));
+				return NativeMethods.CreateRectRgn((int)Math.Floor(region.Left), (int)Math.Floor(region.Top),
+													(int)Math.Ceiling(region.Right), (int)Math.Ceiling(region.Bottom));
 
 			// RoundedRect HRGNs require an additional pixel of padding on the bottom right to look correct.
 			return NativeMethods.CreateRoundRectRgn(
@@ -936,13 +942,13 @@ namespace Microsoft.Windows.Shell
 				onResizeBorder = (mousePosition.Y < (windowPosition.Top + _chromeInfo.ResizeBorderThickness.Top));
 				uRow = 0; // top (caption or resize border)
 			}
-			else if (mousePosition.Y < windowPosition.Bottom && mousePosition.Y >= windowPosition.Bottom - (int)_chromeInfo.ResizeBorderThickness.Bottom) 
+			else if (mousePosition.Y < windowPosition.Bottom && mousePosition.Y >= windowPosition.Bottom - (int)_chromeInfo.ResizeBorderThickness.Bottom)
 				uRow = 2; // bottom
 
 			// Determine if the point is at the left or right of the window.
-			if (mousePosition.X >= windowPosition.Left && mousePosition.X < windowPosition.Left + (int) _chromeInfo.ResizeBorderThickness.Left)
+			if (mousePosition.X >= windowPosition.Left && mousePosition.X < windowPosition.Left + (int)_chromeInfo.ResizeBorderThickness.Left)
 				uCol = 0; // left side
-			else if (mousePosition.X < windowPosition.Right && mousePosition.X >= windowPosition.Right - _chromeInfo.ResizeBorderThickness.Right) 
+			else if (mousePosition.X < windowPosition.Right && mousePosition.X >= windowPosition.Right - _chromeInfo.ResizeBorderThickness.Right)
 				uCol = 2; // right side
 
 			// If the cursor is in one of the top edges by the caption bar, but below the top resize border,

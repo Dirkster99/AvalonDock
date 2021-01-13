@@ -7,11 +7,11 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
 using System;
 using System.Linq;
-using System.Windows.Controls;
 using System.Windows;
-using AvalonDock.Layout;
+using System.Windows.Controls;
 
 namespace AvalonDock.Controls
 {
@@ -90,7 +90,6 @@ namespace AvalonDock.Controls
 				}
 			}
 			return finalSize;
-
 		}
 
 		protected override void OnMouseLeave(System.Windows.Input.MouseEventArgs e)
@@ -102,7 +101,6 @@ namespace AvalonDock.Controls
 			//    var manager = contentModel.Root.Manager;
 			//    LayoutDocumentTabItem.ResetDraggingItem();
 			//    System.Diagnostics.Trace.WriteLine("OnMouseLeave()");
-
 
 			//    manager.StartDraggingFloatingWindowForContent(contentModel);
 			//}

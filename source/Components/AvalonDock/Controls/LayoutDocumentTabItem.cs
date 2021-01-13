@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,13 +7,14 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -27,6 +28,7 @@ namespace AvalonDock.Controls
 	public class LayoutDocumentTabItem : ContentControl
 	{
 		#region fields
+
 		private List<Rect> _otherTabsScreenArea = null;
 		private List<TabItem> _otherTabs = null;
 		private Rect _parentDocumentTabPanelScreenArea;
@@ -34,9 +36,11 @@ namespace AvalonDock.Controls
 		private bool _isMouseDown = false;
 		private Point _mouseDownPoint;
 		private bool _allowDrag = false;
+
 		#endregion fields
 
 		#region Contructors
+
 		/// <summary>Static class constructor to register WPF style keys.</summary>
 		static LayoutDocumentTabItem()
 		{
@@ -53,10 +57,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(nameof(Model), typeof(LayoutContent), typeof(LayoutDocumentTabItem),
 				new FrameworkPropertyMetadata(null, OnModelChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="Model"/> property.  This dependency property 
-		/// indicates the layout content model attached to the tab item.
-		/// </summary>
+		/// <summary>Gets/sets the layout content model attached to the tab item.</summary>
+		[Bindable(true), Description("Gets wether this floating window is being dragged."), Category("Other")]
 		public LayoutContent Model
 		{
 			get => (LayoutContent)GetValue(ModelProperty);
@@ -69,7 +71,7 @@ namespace AvalonDock.Controls
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Model"/> property.</summary>
 		protected virtual void OnModelChanged(DependencyPropertyChangedEventArgs e)
 		{
-            var layoutItem = (Model?.Root?.Manager)?.GetLayoutItemFromModel(Model);
+			var layoutItem = (Model?.Root?.Manager)?.GetLayoutItemFromModel(Model);
 			SetLayoutItem(layoutItem);
 			if (layoutItem != null)
 				Model.TabItem = this;
@@ -86,24 +88,22 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
-		/// <summary>
-		/// Gets the <see cref="LayoutItem"/> property. This dependency property 
-		/// indicates the LayoutItem attached to this tag item.
-		/// </summary>
+		/// <summary>Gets the LayoutItem attached to this tag item.</summary>
+		[Bindable(true), Description("Gets the LayoutItem attached to this tag item."), Category("Other")]
 		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
-
-		/// <summary>
-		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.  
-		/// This dependency property indicates the LayoutItem attached to this tag item.
-		/// </summary>
-		/// <param name="value">The new value for the property.</param>
-		protected void SetLayoutItem(LayoutItem value) => SetValue(LayoutItemPropertyKey, value);
 
 		#endregion LayoutItem
 
 		#endregion Properties
 
 		#region Overrides
+
+		/// <summary>
+		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.
+		/// This dependency property indicates the LayoutItem attached to this tag item.
+		/// </summary>
+		/// <param name="value">The new value for the property.</param>
+		protected void SetLayoutItem(LayoutItem value) => SetValue(LayoutItemPropertyKey, value);
 
 		/// <inheritdoc />
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
@@ -121,6 +121,7 @@ namespace AvalonDock.Controls
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			base.OnMouseMove(e);
+			_isMouseDown = Mouse.LeftButton == MouseButtonState.Pressed && _isMouseDown;
 			if (_isMouseDown)
 			{
 				var ptMouseMove = e.GetPosition(this);
@@ -210,7 +211,8 @@ namespace AvalonDock.Controls
 		private void StartDraggingFloatingWindowForContent()
 		{
 			ReleaseMouseCapture();
-			if (Model is LayoutAnchorable layoutAnchorable) layoutAnchorable.ResetCanCloseInternal();
+			// BD: 17.08.2020 Remove that bodge and handle CanClose=false && CanHide=true in XAML
+			//if (Model is LayoutAnchorable layoutAnchorable) layoutAnchorable.ResetCanCloseInternal();
 			var manager = Model.Root.Manager;
 			manager.StartDraggingFloatingWindowForContent(Model);
 		}

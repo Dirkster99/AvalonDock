@@ -1,20 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Collections.ObjectModel;
-using System.Net.Sockets;
-using System.Net;
-using System.IO;
+
 namespace AvalonDock.MVVMTestApp
 {
 	using AvalonDock.Layout.Serialization;
@@ -34,7 +21,7 @@ namespace AvalonDock.MVVMTestApp
 			this.Unloaded += new RoutedEventHandler(MainWindow_Unloaded);
 		}
 
-		void MainWindow_Loaded(object sender, RoutedEventArgs e)
+		private void MainWindow_Loaded(object sender, RoutedEventArgs e)
 		{
 			var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
 			serializer.LayoutSerializationCallback += (s, args) =>
@@ -46,14 +33,16 @@ namespace AvalonDock.MVVMTestApp
 				serializer.Deserialize(@".\AvalonDock.config");
 		}
 
-		void MainWindow_Unloaded(object sender, RoutedEventArgs e)
+		private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
 		{
 			var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
 			serializer.Serialize(@".\AvalonDock.config");
 		}
 
 		#region LoadLayoutCommand
-		RelayCommand _loadLayoutCommand = null;
+
+		private RelayCommand _loadLayoutCommand = null;
+
 		public ICommand LoadLayoutCommand
 		{
 			get
@@ -93,10 +82,12 @@ namespace AvalonDock.MVVMTestApp
 			layoutSerializer.Deserialize(@".\AvalonDock.Layout.config");
 		}
 
-		#endregion
+		#endregion LoadLayoutCommand
 
 		#region SaveLayoutCommand
-		RelayCommand _saveLayoutCommand = null;
+
+		private RelayCommand _saveLayoutCommand = null;
+
 		public ICommand SaveLayoutCommand
 		{
 			get
@@ -121,14 +112,12 @@ namespace AvalonDock.MVVMTestApp
 			layoutSerializer.Serialize(@".\AvalonDock.Layout.config");
 		}
 
-		#endregion
+		#endregion SaveLayoutCommand
 
 		private void OnDumpToConsole(object sender, RoutedEventArgs e)
 		{
 			// Uncomment when TRACE is activated on AvalonDock project
 			//dockManager.Layout.ConsoleDump(0);
 		}
-
-
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -11,18 +12,21 @@ namespace AvalonDock.Controls
 	/// This control added to mitigate issue with tab (document) switching speed
 	/// See this https://stackoverflow.com/questions/2080764/how-to-preserve-control-state-within-tab-items-in-a-tabcontrol
 	/// and this https://stackoverflow.com/questions/31030293/cefsharp-in-tabcontrol-not-working/37171847#37171847
-	/// 
+	///
 	/// by implmenting an option to enable virtualization for tabbed document containers.
 	/// </summary>
 	[TemplatePart(Name = "PART_ItemsHolder", Type = typeof(Panel))]
 	public class TabControlEx : TabControl
 	{
 		#region fields
+
 		private Panel ItemsHolderPanel = null;
 		private readonly bool _IsVirtualizing;
+
 		#endregion fields
 
 		#region constructors
+
 		/// <summary>
 		/// Class constructor from virtualization parameter.
 		/// </summary>
@@ -44,16 +48,19 @@ namespace AvalonDock.Controls
 			// This is necessary so that we get the initial databound selected item
 			ItemContainerGenerator.StatusChanged += ItemContainerGenerator_StatusChanged;
 		}
+
 		#endregion constructors
 
 		#region properties
-		/// <summary>
-		/// Gets whether the control and its inheriting classes are virtualizing their items or not.
-		/// </summary>
+
+		/// <summary>Gets whether the control and its inheriting classes are virtualizing their items or not.</summary>
+		[Bindable(false), Description("Gets whether the control and its inheriting classes are virtualizing their items or not."), Category("Other")]
 		public bool IsVirtualiting => _IsVirtualizing;
+
 		#endregion properties
 
 		#region methods
+
 		/// <summary>
 		/// Get the ItemsHolder and generate any children
 		/// </summary>
@@ -88,7 +95,6 @@ namespace AvalonDock.Controls
 
 			UpdateSelectedItem();
 		}
-
 
 		/// <summary>
 		/// When the items change we remove any generated panel children and add any new ones as necessary
@@ -255,6 +261,7 @@ namespace AvalonDock.Controls
 
 			return null;
 		}
+
 		#endregion methods
 	}
 }

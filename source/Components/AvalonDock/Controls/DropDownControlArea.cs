@@ -7,6 +7,7 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -18,7 +19,7 @@ namespace AvalonDock.Controls
 	/// Implements the title display for various items: <see cref="LayoutAnchorablePaneControl"/>,
 	/// <see cref="LayoutDocumentTabItem"/>, <see cref="LayoutAnchorableTabItem"/>,
 	/// <see cref="LayoutDocumentFloatingWindowControl"/>, and <see cref="LayoutAnchorableFloatingWindowControl"/>.
-	/// 
+	///
 	/// The content is usually displayed via ContentPresenter binding in the theme definition.
 	/// </summary>
 	/// <seealso cref="ContentControl"/>
@@ -32,10 +33,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty DropDownContextMenuProperty = DependencyProperty.Register(nameof(DropDownContextMenu), typeof(ContextMenu), typeof(DropDownControlArea),
 				new FrameworkPropertyMetadata(null));
 
-		/// <summary>
-		/// Gets or sets the <see cref="DropDownContextMenu"/> property. This dependency property 
-		/// indicates context menu to show when a right click is detected over the area occupied by the control.
-		/// </summary>
+		/// <summary>Gets/sets the drop down menu to show up when user click on an anchorable menu pin.</summary>
+		[Bindable(true), Description("Gets/sets the drop down menu to show up when user click on an anchorable menu pin."), Category("Menu")]
 		public ContextMenu DropDownContextMenu
 		{
 			get => (ContextMenu)GetValue(DropDownContextMenuProperty);
@@ -50,10 +49,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty DropDownContextMenuDataContextProperty = DependencyProperty.Register(nameof(DropDownContextMenuDataContext), typeof(object), typeof(DropDownControlArea),
 				new FrameworkPropertyMetadata(null));
 
-		/// <summary>
-		/// Gets or sets the <see cref="DropDownContextMenuDataContext"/> property. This dependency property 
-		/// indicates data context to attach when context menu is shown.
-		/// </summary>
+		/// <summary>Gets/sets the DataContext to set for the DropDownContext menu property.</summary>
+		[Bindable(true), Description("Gets/sets the DataContext to set for the DropDownContext menu property."), Category("Menu")]
 		public object DropDownContextMenuDataContext
 		{
 			get => (object)GetValue(DropDownContextMenuDataContextProperty);

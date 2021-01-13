@@ -9,10 +9,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Collections.ObjectModel;
-using System.Xml.Serialization;
 using System.Collections.Specialized;
+using System.Linq;
+using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
@@ -25,20 +25,24 @@ namespace AvalonDock.Layout
 	public abstract class LayoutGroup<T> : LayoutGroupBase, ILayoutGroup, IXmlSerializable where T : class, ILayoutElement
 	{
 		#region fields
+
 		private readonly ObservableCollection<T> _children = new ObservableCollection<T>();
 		private bool _isVisible = true;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Class constructor.</summary>
 		internal LayoutGroup()
 		{
-			_children.CollectionChanged += _children_CollectionChanged;
+			_children.CollectionChanged += Children_CollectionChanged;
 		}
 
 		#endregion Constructors
 
 		#region Properties
+
 		/// <summary>Gets a collection of children objects below this object.</summary>
 		public ObservableCollection<T> Children => _children;
 
@@ -65,6 +69,7 @@ namespace AvalonDock.Layout
 		#endregion Properties
 
 		#region Public Methods
+
 		/// <inheritdoc cref="ILayoutElementWithVisibility" />
 		public void ComputeVisibility() => IsVisible = GetVisibility();
 
@@ -91,21 +96,26 @@ namespace AvalonDock.Layout
 		/// <inheritdoc cref="ILayoutGroup" />
 		public void InsertChildAt(int index, ILayoutElement element)
 		{
-			_children.Insert(index, (T)element);
+			if (element is T t)
+				_children.Insert(index, t);
 		}
 
 		/// <inheritdoc cref="ILayoutContainer" />
 		public void RemoveChild(ILayoutElement element)
 		{
-			_children.Remove((T)element);
+			if (element is T t)
+				_children.Remove(t);
 		}
 
 		/// <inheritdoc cref="ILayoutContainer" />
 		public void ReplaceChild(ILayoutElement oldElement, ILayoutElement newElement)
 		{
-			var index = _children.IndexOf((T)oldElement);
-			_children.Insert(index, (T)newElement);
-			_children.RemoveAt(index + 1);
+			if (oldElement is T oldT && newElement is T newT)
+			{
+				var index = _children.IndexOf(oldT);
+				_children.Insert(index, newT);
+				_children.RemoveAt(index + 1);
+			}
 		}
 
 		/// <inheritdoc cref="ILayoutGroup" />
@@ -213,7 +223,7 @@ namespace AvalonDock.Layout
 
 		#region Private Methods
 
-		private void _children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void Children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			if (e.Action == NotifyCollectionChangedAction.Remove || e.Action == NotifyCollectionChangedAction.Replace)
 			{

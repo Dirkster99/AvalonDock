@@ -7,17 +7,16 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System.Windows.Controls.Primitives;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
 namespace AvalonDock.Controls
 {
 	/// <inheritdoc />
-	/// <summary>
-	/// Implements a control like <see cref="System.Windows.Controls.GridSplitter"/> that can be used to resize areas
-	/// horizontally or vertically (only one of these but never both) in a grid layout.
-	/// </summary>
+	/// <summary>Implements a control like <see cref="System.Windows.Controls.GridSplitter"/> that can be used to resize areas
+	/// horizontally or vertically (only one of these but never both) in a grid layout.</summary>
 	/// <seealso cref="Thumb"/>
 	public class LayoutGridResizerControl : Thumb
 	{
@@ -44,10 +43,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty BackgroundWhileDraggingProperty = DependencyProperty.Register(nameof(BackgroundWhileDragging), typeof(Brush), typeof(LayoutGridResizerControl),
 				new FrameworkPropertyMetadata(Brushes.Black));
 
-		/// <summary>
-		/// Gets or sets the <see cref="BackgroundWhileDragging"/> property.
-		/// This dependency property indicates the background while the control is being dragged.
-		/// </summary>
+		/// <summary>Gets/sets the background brush of the control being dragged.</summary>
+		[Bindable(true), Description("Gets/sets the background brush of the control being dragged."), Category("Other")]
 		public Brush BackgroundWhileDragging
 		{
 			get => (Brush)GetValue(BackgroundWhileDraggingProperty);
@@ -62,10 +59,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty OpacityWhileDraggingProperty = DependencyProperty.Register(nameof(OpacityWhileDragging), typeof(double), typeof(LayoutGridResizerControl),
 				new FrameworkPropertyMetadata(0.5));
 
-		/// <summary>
-		/// Gets or sets the <see cref="OpacityWhileDragging"/> property.
-		/// This dependency property indicates opacity while the control is being dragged.
-		/// </summary>
+		/// <summary>Gets/sets the opacity while the control is being dragged.</summary>
+		[Bindable(true), Description("Gets/sets the opacity while the control is being dragged."), Category("Other")]
 		public double OpacityWhileDragging
 		{
 			get => (double)GetValue(OpacityWhileDraggingProperty);

@@ -7,31 +7,34 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
 using System.Windows;
 using System.Windows.Media;
-using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
 	/// <summary>
 	/// Defines relevant methods and property for a drop target in the AvalonDock library.
-	/// 
+	///
 	/// A drop target is an individual/specific docking position where a user can drop an item to dock it.
-	/// 
+	///
 	/// This drag & drop operation (which can result in new docking position) can include interaction elements
 	/// such as a preview of the new docking position while the user hovers with the mouse
 	/// (and the item being dragged) over a specific enabled drop target.
-	/// 
+	///
 	/// This interface defines the means for implementing these interaction elements.
 	/// </summary>
 	internal interface IDropTarget
 	{
 		#region Properties
+
 		/// <summary>Gets the type of a drop target that descries a specific docking position inside a <see cref="DropAreaType"/>.</summary>
 		DropTargetType Type { get; }
-		#endregion
+
+		#endregion Properties
 
 		#region Methods
+
 		/// <summary>
 		/// Gets a <see cref="Geometry"/> that is used to highlight/preview the docking position
 		/// of this drop target for a <paramref name="floatingWindowModel"/> being docked inside an
@@ -65,6 +68,7 @@ namespace AvalonDock.Controls
 		/// (while dragging a <see cref="LayoutFloatingWindow"/>) over this drop target.
 		/// </summary>
 		void DragLeave();
-		#endregion
+
+		#endregion Methods
 	}
 }

@@ -67,8 +67,8 @@ namespace AvalonDock.Controls
 					current = VisualTreeHelper.GetParent(current);
 				else
 				{
-					// If we're in Logical Land then we must walk 
-					// up the logical tree until we find a 
+					// If we're in Logical Land then we must walk
+					// up the logical tree until we find a
 					// Visual/Visual3D to get us back to Visual Land.
 					current = LogicalTreeHelper.GetParent(current);
 				}

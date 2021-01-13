@@ -21,10 +21,13 @@ namespace AvalonDock.Layout
 	public class LayoutAnchorSide : LayoutGroup<LayoutAnchorGroup>
 	{
 		#region fields
+
 		private AnchorSide _side;
+
 		#endregion fields
 
 		#region Properties
+
 		/// <summary>Gets the side (top, bottom, left, right) that this layout is anchored in the layout.</summary>
 		public AnchorSide Side
 		{
@@ -37,7 +40,8 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(Side));
 			}
 		}
-		#endregion
+
+		#endregion Properties
 
 		#region Overrides
 
@@ -51,7 +55,7 @@ namespace AvalonDock.Layout
 			UpdateSide();
 		}
 
-		#endregion
+		#endregion Overrides
 
 		#region Private Methods
 
@@ -63,6 +67,6 @@ namespace AvalonDock.Layout
 			else if (this == Root.BottomSide) Side = AnchorSide.Bottom;
 		}
 
-		#endregion
+		#endregion Private Methods
 	}
 }

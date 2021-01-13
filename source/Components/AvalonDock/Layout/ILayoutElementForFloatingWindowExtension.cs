@@ -5,7 +5,7 @@
 
 	/// <summary>
 	/// SetWindowPlacement won't correct placement for WPF tool windows
-	/// 
+	///
 	/// https://stackoverflow.com/questions/19203031/setwindowplacement-wont-correct-placement-for-wpf-tool-windows
 	/// </summary>
 	public static class ILayoutElementForFloatingWindowExtension
@@ -43,7 +43,7 @@
 				SystemParameters.PrimaryScreenHeight == SystemParameters.VirtualScreenHeight)
 			{
 				RECT primaryscreen = new RECT((int)SystemParameters.VirtualScreenLeft, (int)SystemParameters.VirtualScreenTop,
-				                              (int)SystemParameters.PrimaryScreenWidth, (int)SystemParameters.PrimaryScreenHeight);
+											  (int)SystemParameters.PrimaryScreenWidth, (int)SystemParameters.PrimaryScreenHeight);
 
 				if (!RectanglesIntersect(normalPosition, primaryscreen))
 				{
@@ -62,7 +62,7 @@
 			else
 			{
 				RECT primaryscreen = new RECT((int)SystemParameters.VirtualScreenLeft, (int)SystemParameters.VirtualScreenTop,
-				                              (int)SystemParameters.VirtualScreenWidth, (int)SystemParameters.VirtualScreenHeight);
+											  (int)SystemParameters.VirtualScreenWidth, (int)SystemParameters.VirtualScreenHeight);
 
 				if (!RectanglesIntersect(normalPosition, primaryscreen))
 				{

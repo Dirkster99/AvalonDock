@@ -7,13 +7,13 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Layout;
 using System;
-using System.Collections;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -29,10 +29,13 @@ namespace AvalonDock.Controls
 	public class LayoutDocumentPaneControl : TabControlEx, ILayoutControl//, ILogicalChildrenContainer
 	{
 		#region fields
+
 		private readonly LayoutDocumentPane _model;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Static class constructor to register WPF style keys.</summary>
 		static LayoutDocumentPaneControl()
 		{
@@ -52,15 +55,19 @@ namespace AvalonDock.Controls
 			// this.LayoutUpdated += new EventHandler( OnLayoutUpdated );
 			this.SizeChanged += OnSizeChanged;
 		}
+
 		#endregion Constructors
 
 		#region Properties
+
 		/// <summary>Gets the layout model of this control.</summary>
+		[Bindable(false), Description("Gets the layout model of this control."), Category("Other")]
 		public ILayoutElement Model => _model;
 
 		#endregion Properties
 
 		#region Overrides
+
 		/// <summary>
 		/// Invoked when an unhandled <see cref="System.Windows.UIElement.MouseLeftButtonDown"/> routed
 		/// event is raised on this element. Implement this method to add class handling
@@ -89,9 +96,9 @@ namespace AvalonDock.Controls
 				_model.SelectedContent.IsActive = true;
 		}
 
-        protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
-        {
-            base.OnItemsChanged(e);
+		protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
+		{
+			base.OnItemsChanged(e);
 			if (e.Action == NotifyCollectionChangedAction.Remove)
 			{
 				foreach (var item in e.OldItems)
@@ -109,11 +116,11 @@ namespace AvalonDock.Controls
 			}
 		}
 
-        #endregion Overrides
+		#endregion Overrides
 
-        #region Private Methods
+		#region Private Methods
 
-        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+		private void OnSizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			var modelWithAtcualSize = _model as ILayoutPositionableElementWithActualSize;
 			modelWithAtcualSize.ActualWidth = ActualWidth;

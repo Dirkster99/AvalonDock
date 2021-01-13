@@ -85,7 +85,7 @@ namespace AvalonDock.Layout
 		/// <summary>
 		/// Removed with Issue 20 since Win32 definition seems to be buggy here
 		/// (GetMonitorInfo always returns false on rectangle returned from <see cref="Win32Helper.MonitorFromRect"/>)
-		/// 
+		///
 		/// <see cref="ILayoutElementForFloatingWindowExtension"/> for replacement candidate.
 		/// </summary>
 		/// <param name="paneInsideFloatingWindow"></param>

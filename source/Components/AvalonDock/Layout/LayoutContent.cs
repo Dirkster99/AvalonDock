@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,15 +7,15 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System;
-using System.Linq;
-using System.Windows.Markup;
-using System.Xml.Serialization;
-using System.Windows;
-using System.Globalization;
-using System.Windows.Media;
-using System.ComponentModel;
 using AvalonDock.Controls;
+using System;
+using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
+using System.Windows;
+using System.Windows.Markup;
+using System.Windows.Media;
+using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
@@ -28,6 +28,7 @@ namespace AvalonDock.Layout
 	public abstract class LayoutContent : LayoutElement, IXmlSerializable, ILayoutElementForFloatingWindow, IComparable<LayoutContent>, ILayoutPreviousContainer
 	{
 		#region Constructors
+
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -45,7 +46,7 @@ namespace AvalonDock.Layout
 		/// <summary>
 		/// Event fired when the content is about to be closed (i.e. removed definitely from the layout)
 		/// </summary>
-		/// <remarks>Please note that <see cref="LayoutAnchorable"/> also can be hidden. Usually user hide anchorables when click the 'X' button. To completely close 
+		/// <remarks>Please note that <see cref="LayoutAnchorable"/> also can be hidden. Usually user hide anchorables when click the 'X' button. To completely close
 		/// an anchorable the user should click the 'Close' menu item from the context menu. When an <see cref="LayoutAnchorable"/> is hidden its visibility changes to false and
 		/// <see cref="LayoutAnchorable.IsHidden"/> property is set to true.
 		/// Handle the Hiding event for the <see cref="LayoutAnchorable"/> to cancel the hide operation.</remarks>
@@ -82,6 +83,7 @@ namespace AvalonDock.Layout
 		#endregion Title
 
 		#region Content
+
 		[NonSerialized]
 		private object _content = null;
 
@@ -98,6 +100,7 @@ namespace AvalonDock.Layout
 				if (ContentId == null) SetContentIdFromContent();
 			}
 		}
+
 		#endregion Content
 
 		#region ContentId
@@ -119,7 +122,7 @@ namespace AvalonDock.Layout
 
 		private static void OnContentIdPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
 		{
-			if (obj is LayoutContent layoutContent) layoutContent.OnContentIdPropertyChanged((string) args.OldValue, (string) args.NewValue);
+			if (obj is LayoutContent layoutContent) layoutContent.OnContentIdPropertyChanged((string)args.OldValue, (string)args.NewValue);
 		}
 
 		private void OnContentIdPropertyChanged(string oldValue, string newValue)
@@ -207,6 +210,7 @@ namespace AvalonDock.Layout
 		#region IsLastFocusedDocument
 
 		private bool _isLastFocusedDocument = false;
+
 		public bool IsLastFocusedDocument
 		{
 			get => _isLastFocusedDocument;
@@ -258,6 +262,7 @@ namespace AvalonDock.Layout
 		#endregion PreviousContainer
 
 		#region PreviousContainerIndex
+
 		[field: NonSerialized]
 		private int _previousContainerIndex = -1;
 
@@ -295,6 +300,7 @@ namespace AvalonDock.Layout
 		#region FloatingWidth
 
 		private double _floatingWidth = 0.0;
+
 		public double FloatingWidth
 		{
 			get => _floatingWidth;
@@ -330,6 +336,7 @@ namespace AvalonDock.Layout
 		#region FloatingLeft
 
 		private double _floatingLeft = 0.0;
+
 		public double FloatingLeft
 		{
 			get => _floatingLeft;
@@ -347,6 +354,7 @@ namespace AvalonDock.Layout
 		#region FloatingTop
 
 		private double _floatingTop = 0.0;
+
 		public double FloatingTop
 		{
 			get => _floatingTop;
@@ -396,11 +404,14 @@ namespace AvalonDock.Layout
 
 		#endregion ToolTip
 
+		/// <summary>Gets whether the content is currently floating or not.</summary>
+		[Bindable(true), Description("Gets whether the content is currently floating or not."), Category("Other")]
 		public bool IsFloating => this.FindParent<LayoutFloatingWindow>() != null;
 
 		#region IconSource
 
 		private ImageSource _iconSource = null;
+
 		public ImageSource IconSource
 		{
 			get => _iconSource;
@@ -416,7 +427,11 @@ namespace AvalonDock.Layout
 
 		#region CanClose
 
-		internal bool _canClose = true;
+		// BD: 14.08.2020 added _canCloseDefault to properly implement inverting _canClose default value in inheritors (e.g. LayoutAnchorable)
+		//     Thus CanClose property will be serialized only when not equal to its default for given class
+		//     With previous code it was not possible to serialize CanClose if set to true for LayoutAnchorable instance
+		internal bool _canClose = true, _canCloseDefault = true;
+
 		public bool CanClose
 		{
 			get => _canClose;
@@ -433,6 +448,7 @@ namespace AvalonDock.Layout
 		#region CanFloat
 
 		private bool _canFloat = true;
+
 		public bool CanFloat
 		{
 			get => _canFloat;
@@ -449,6 +465,7 @@ namespace AvalonDock.Layout
 		#region IsEnabled
 
 		private bool _isEnabled = true;
+
 		public bool IsEnabled
 		{
 			get => _isEnabled;
@@ -463,6 +480,7 @@ namespace AvalonDock.Layout
 		#endregion IsEnabled
 
 		#region TabItem
+
 		public LayoutDocumentTabItem TabItem { get; internal set; }
 
 		#endregion TabItem
@@ -471,15 +489,14 @@ namespace AvalonDock.Layout
 
 		#region Public Methods
 
-		/// <summary>
-		/// Close the content
-		/// </summary>
-		/// <remarks>Please note that usually the anchorable is only hidden (not closed). By default when user click the X button it only hides the content.</remarks>
+		/// <summary>Close the content</summary>
+		/// <remarks>Note that the anchorable is only hidden (not closed). By default when user click the X button it only hides the content.</remarks>
 		public abstract void Close();
 
 		/// <inheritdoc />
 		public System.Xml.Schema.XmlSchema GetSchema() => null;
 
+		/// <inheritdoc />
 		public virtual void ReadXml(System.Xml.XmlReader reader)
 		{
 			if (reader.MoveToAttribute(nameof(Title)))
@@ -518,6 +535,7 @@ namespace AvalonDock.Layout
 			reader.Read();
 		}
 
+		/// <inheritdoc />
 		public virtual void WriteXml(System.Xml.XmlWriter writer)
 		{
 			if (!string.IsNullOrWhiteSpace(Title))
@@ -535,8 +553,8 @@ namespace AvalonDock.Layout
 			if (!string.IsNullOrWhiteSpace(ContentId))
 				writer.WriteAttributeString(nameof(ContentId), ContentId);
 
-			if (ToolTip is string toolTip &&!string.IsNullOrWhiteSpace(toolTip))
-					writer.WriteAttributeString(nameof(ToolTip), toolTip);
+			if (ToolTip is string toolTip && !string.IsNullOrWhiteSpace(toolTip))
+				writer.WriteAttributeString(nameof(ToolTip), toolTip);
 
 			if (FloatingLeft != 0.0) writer.WriteAttributeString(nameof(FloatingLeft), FloatingLeft.ToString(CultureInfo.InvariantCulture));
 			if (FloatingTop != 0.0) writer.WriteAttributeString(nameof(FloatingTop), FloatingTop.ToString(CultureInfo.InvariantCulture));
@@ -544,7 +562,10 @@ namespace AvalonDock.Layout
 			if (FloatingHeight != 0.0) writer.WriteAttributeString(nameof(FloatingHeight), FloatingHeight.ToString(CultureInfo.InvariantCulture));
 
 			if (IsMaximized) writer.WriteAttributeString(nameof(IsMaximized), IsMaximized.ToString());
-			if (!CanClose) writer.WriteAttributeString(nameof(CanClose), CanClose.ToString());
+			// BD: 14.08.2020 changed to check CanClose value against the default in _canCloseDefault
+			//     thus CanClose property will be serialized only when not equal to its default for given class
+			//     With previous code it was not possible to serialize CanClose if set to true for LayoutAnchorable instance
+			if (CanClose != _canCloseDefault) writer.WriteAttributeString(nameof(CanClose), CanClose.ToString());
 			if (!CanFloat) writer.WriteAttributeString(nameof(CanFloat), CanFloat.ToString());
 
 			if (LastActivationTimeStamp != null) writer.WriteAttributeString(nameof(LastActivationTimeStamp), LastActivationTimeStamp.Value.ToString(CultureInfo.InvariantCulture));
@@ -563,9 +584,7 @@ namespace AvalonDock.Layout
 			return string.Compare(Title, other.Title);
 		}
 
-		/// <summary>
-		/// Float the content in a popup window
-		/// </summary>
+		/// <summary>Float the content in a popup window</summary>
 		public void Float()
 		{
 			if (PreviousContainer != null && PreviousContainer.FindParent<LayoutFloatingWindow>() != null)
@@ -591,10 +610,13 @@ namespace AvalonDock.Layout
 				IsSelected = true;
 				IsActive = true;
 			}
-		}
 
-		/// <summary>Dock the content as document.</summary>
-		public void DockAsDocument()
+            // BD: 14.08.2020 raise IsFloating property changed
+            RaisePropertyChanged(nameof(IsFloating));
+        }
+
+        /// <summary>Dock the content as document.</summary>
+        public void DockAsDocument()
 		{
 			if (!(Root is LayoutRoot root)) throw new InvalidOperationException();
 			if (Parent is LayoutDocumentPane) return;
@@ -618,12 +640,13 @@ namespace AvalonDock.Layout
 			}
 			IsSelected = true;
 			IsActive = true;
-		}
 
-		/// <summary>
-		/// Re-dock the content to its previous container
-		/// </summary>
-		public void Dock()
+			// BD: 14.08.2020 raise IsFloating property changed
+			RaisePropertyChanged(nameof(IsFloating));
+        }
+
+        /// <summary>Re-dock the content to its previous container</summary>
+        public void Dock()
 		{
 			if (PreviousContainer != null)
 			{
@@ -654,21 +677,24 @@ namespace AvalonDock.Layout
 				InternalDock();
 
 			Root.CollectGarbage();
-		}
+
+			// BD: 14.08.2020 raise IsFloating property changed
+			RaisePropertyChanged(nameof(IsFloating));
+        }
 
 		#endregion Public Methods
 
 		#region Overrides
 
+		/// <inheritdoc />
 		protected override void OnParentChanging(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
 			if (oldValue != null) IsSelected = false;
-			//var root = Root;
-			//if (root != null && _isActive && newValue == null)
-			//    root.ActiveContent = null;
+
 			base.OnParentChanging(oldValue, newValue);
 		}
 
+		/// <inheritdoc />
 		protected override void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
 			if (IsSelected && Parent is ILayoutContentSelector)
@@ -676,10 +702,6 @@ namespace AvalonDock.Layout
 				var parentSelector = Parent as ILayoutContentSelector;
 				parentSelector.SelectedContentIndex = parentSelector.IndexOf(this);
 			}
-
-			//var root = Root;
-			//if (root != null && _isActive)
-			//    root.ActiveContent = this;
 
 			base.OnParentChanged(oldValue, newValue);
 		}
@@ -727,8 +749,7 @@ namespace AvalonDock.Layout
 			}
 
 			parentAsContainer.RemoveChild(this);
-			root?.CollectGarbage();
-			this.Content = null;
+			root?.CollectGarbage();			
 			OnClosed();
 		}
 

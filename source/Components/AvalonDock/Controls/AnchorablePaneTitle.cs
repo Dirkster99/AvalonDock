@@ -7,11 +7,12 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System.Linq;
-using System.Windows.Controls;
-using System.Windows;
-using System.Windows.Input;
 using AvalonDock.Layout;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace AvalonDock.Controls
 {
@@ -23,10 +24,13 @@ namespace AvalonDock.Controls
 	public class AnchorablePaneTitle : Control
 	{
 		#region fields
+
 		private bool _isMouseDown = false;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>
 		/// Static class constructor
 		/// </summary>
@@ -45,7 +49,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(nameof(Model), typeof(LayoutAnchorable), typeof(AnchorablePaneTitle),
 				new FrameworkPropertyMetadata(null, _OnModelChanged));
 
-		/// <summary>Gets or sets the <see cref="Model"/> property.  This dependency property indicates model attached to this view.</summary>
+		/// <summary>Gets/sets the <see cref="LayoutAnchorable"/> model attached of this view.</summary>
+		[Bindable(true), Description("Gets/sets the LayoutAnchorable model attached of this view."), Category("Anchorable")]
 		public LayoutAnchorable Model
 		{
 			get => (LayoutAnchorable)GetValue(ModelProperty);
@@ -73,7 +78,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
-		/// <summary>Gets the <see cref="LayoutItem"/> property. This dependency property indicates the LayoutItem attached to this tag item.</summary>
+		/// <summary>Gets the <see cref="LayoutItem"/> (<see cref="LayoutAnchorableItem"/> or <see cref="LayoutDocumentItem"/>) attached to this view.</summary>
+		[Bindable(true), Description("Gets the LayoutItem (LayoutAnchorableItem or LayoutDocumentItem) attached to this object."), Category("Layout")]
 		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
 
 		/// <summary>
@@ -122,7 +128,7 @@ namespace AvalonDock.Controls
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonDown(e);
-			
+
 			// Start a drag & drop action for a LayoutAnchorable
 			if (e.Handled || Model.CanMove == false) return;
 			var attachFloatingWindow = false;

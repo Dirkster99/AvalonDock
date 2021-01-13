@@ -7,12 +7,13 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using System;
-using System.Linq;
-using System.Windows.Controls;
-using System.Windows;
-using System.Collections.ObjectModel;
 using AvalonDock.Layout;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace AvalonDock.Controls
 {
@@ -27,11 +28,14 @@ namespace AvalonDock.Controls
 	public class LayoutAnchorSideControl : Control, ILayoutControl
 	{
 		#region fields
+
 		private readonly LayoutAnchorSide _model = null;
 		private readonly ObservableCollection<LayoutAnchorGroupControl> _childViews = new ObservableCollection<LayoutAnchorGroupControl>();
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Static class constructor</summary>
 		static LayoutAnchorSideControl()
 		{
@@ -48,6 +52,7 @@ namespace AvalonDock.Controls
 
 			Unloaded += LayoutAnchorSideControl_Unloaded;
 		}
+
 		#endregion Constructors
 
 		#region Properties
@@ -64,7 +69,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty IsLeftSideProperty = IsLeftSidePropertyKey.DependencyProperty;
 
-		/// <summary>Gets the <see cref="IsLeftSide"/> property. This dependency property indicates this control is anchored to left side.</summary>
+		/// <summary>Gets wether the control is anchored to left side.</summary>
+		[Bindable(true), Description("Gets wether the control is anchored to left side."), Category("Anchor")]
 		public bool IsLeftSide => (bool)GetValue(IsLeftSideProperty);
 
 		/// <summary>Provides a secure method for setting the <see cref="IsLeftSide"/> property. This dependency property indicates this control is anchored to left side.</summary>
@@ -81,7 +87,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty IsTopSideProperty = IsTopSidePropertyKey.DependencyProperty;
 
-		/// <summary>Gets the <see cref="IsTopSide"/> property. This dependency property indicates this control is anchored to top side.</summary>
+		/// <summary>Gets wether the control is anchored to top side.</summary>
+		[Bindable(true), Description("Gets wether the control is anchored to top side."), Category("Anchor")]
 		public bool IsTopSide => (bool)GetValue(IsTopSideProperty);
 
 		/// <summary>Provides a secure method for setting the <see cref="IsTopSide"/> property. This dependency property indicates this control is anchored to top side.</summary>
@@ -98,7 +105,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty IsRightSideProperty = IsRightSidePropertyKey.DependencyProperty;
 
-		/// <summary>Gets the <see cref="IsRightSide"/> property. This dependency property indicates this control is anchored to right side.</summary>
+		/// <summary>Gets wether the control is anchored to right side.</summary>
+		[Bindable(true), Description("Gets wether the control is anchored to right side."), Category("Anchor")]
 		public bool IsRightSide => (bool)GetValue(IsRightSideProperty);
 
 		/// <summary>Provides a secure method for setting the <see cref="IsRightSide"/> property. This dependency property indicates this control is anchored to right side.</summary>
@@ -115,7 +123,8 @@ namespace AvalonDock.Controls
 
 		public static readonly DependencyProperty IsBottomSideProperty = IsBottomSidePropertyKey.DependencyProperty;
 
-		/// <summary>Gets the <see cref="IsBottomSide"/> property. This dependency property indicates if this panel is anchored to bottom side.</summary>
+		/// <summary>Gets whether the control is anchored to bottom side.</summary>
+		[Bindable(true), Description("Gets whether the control is anchored to bottom side."), Category("Anchor")]
 		public bool IsBottomSide => (bool)GetValue(IsBottomSideProperty);
 
 		/// <summary>Provides a secure method for setting the <see cref="IsBottomSide"/> property. This dependency property indicates if this panel is anchored to bottom side.</summary>
@@ -127,6 +136,7 @@ namespace AvalonDock.Controls
 		#endregion Properties
 
 		#region Private Methods
+
 		/// <summary>
 		/// Executes when the element is removed from within an element tree of loaded elements.
 		/// </summary>

@@ -22,15 +22,19 @@ namespace AvalonDock.Layout
 	public class LayoutAnchorablePane : LayoutPositionableGroup<LayoutAnchorable>, ILayoutAnchorablePane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable
 	{
 		#region fields
+
 		private int _selectedIndex = -1;
 
 		[XmlIgnore]
 		private bool _autoFixSelectedContent = true;
+
 		private string _name = null;
-		string _id;
+		private string _id;
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Class constructor</summary>
 		public LayoutAnchorablePane()
 		{
@@ -205,6 +209,7 @@ namespace AvalonDock.Layout
 		#endregion Public Methods
 
 		#region Internal Methods
+
 		/// <summary>Invalidates the current <see cref="SelectedContentIndex"/> and sets the index for the next avialable child with IsEnabled == true.</summary>
 		internal void SetNextSelectedIndex()
 		{

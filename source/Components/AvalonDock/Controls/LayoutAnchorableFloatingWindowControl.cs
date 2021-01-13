@@ -7,17 +7,18 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using AvalonDock.Commands;
+using AvalonDock.Converters;
+using AvalonDock.Layout;
+using Microsoft.Windows.Shell;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
-using AvalonDock.Layout;
-using AvalonDock.Converters;
-using System.Windows.Controls.Primitives;
-using AvalonDock.Commands;
-using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
@@ -31,9 +32,11 @@ namespace AvalonDock.Controls
 	public class LayoutAnchorableFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
 	{
 		#region fields
+
 		private readonly LayoutAnchorableFloatingWindow _model;
 		private OverlayWindow _overlayWindow = null;
 		private List<IDropArea> _dropAreas = null;
+
 		#endregion fields
 
 		#region Constructors
@@ -89,10 +92,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty SingleContentLayoutItemProperty = DependencyProperty.Register(nameof(SingleContentLayoutItem), typeof(LayoutItem), typeof(LayoutAnchorableFloatingWindowControl),
 				new FrameworkPropertyMetadata(null, OnSingleContentLayoutItemChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="SingleContentLayoutItem"/> property. This dependency property 
-		/// indicates the layout item of the selected content when is shown a single anchorable pane.
-		/// </summary>
+		/// <summary>Gets/sets the layout item of the selected content when shown in a single anchorable pane.</summary>
+		[Bindable(true), Description("Gets/sets the layout item of the selected content when shown in a single anchorable pane."), Category("Anchorable")]
 		public LayoutItem SingleContentLayoutItem
 		{
 			get => (LayoutItem)GetValue(SingleContentLayoutItemProperty);
@@ -110,7 +111,7 @@ namespace AvalonDock.Controls
 		#endregion SingleContentLayoutItem
 
 		public ICommand HideWindowCommand { get; }
-		
+
 		public ICommand CloseWindowCommand { get; }
 
 		DockingManager IOverlayWindowHost.Manager => _model.Root.Manager;
@@ -179,6 +180,7 @@ namespace AvalonDock.Controls
 		#endregion Public Methods
 
 		#region Overrides
+
 		/// <inheritdoc />
 		protected override void OnInitialized(EventArgs e)
 		{
@@ -244,6 +246,7 @@ namespace AvalonDock.Controls
 						handled = true;
 					}
 					break;
+
 				case Win32Helper.WM_NCRBUTTONUP:
 					if (wParam.ToInt32() == Win32Helper.HT_CAPTION)
 					{
@@ -327,10 +330,11 @@ namespace AvalonDock.Controls
 			var visibilityBinding = GetBindingExpression(VisibilityProperty);
 			if (IsVisible && visibilityBinding == null)
 				SetBinding(VisibilityProperty, new Binding(nameof(IsVisible))
-					{ Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden});
+				{ Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden });
 		}
 
 		#region HideWindowCommand
+
 		private bool CanExecuteHideWindowCommand(object parameter)
 		{
 			var manager = Model?.Root?.Manager;
@@ -364,9 +368,11 @@ namespace AvalonDock.Controls
 			}
 			Hide(); // Bring toolwindows inside hidden FloatingWindow back requires restart of app
 		}
+
 		#endregion HideWindowCommand
 
 		#region CloseWindowCommand
+
 		private bool CanExecuteCloseWindowCommand(object parameter)
 		{
 			var manager = Model?.Root?.Manager;

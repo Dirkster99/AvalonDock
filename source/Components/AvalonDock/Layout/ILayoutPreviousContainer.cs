@@ -9,7 +9,7 @@
 
 namespace AvalonDock.Layout
 {
-	interface ILayoutPreviousContainer
+	internal interface ILayoutPreviousContainer
 	{
 		ILayoutContainer PreviousContainer { get; set; }
 

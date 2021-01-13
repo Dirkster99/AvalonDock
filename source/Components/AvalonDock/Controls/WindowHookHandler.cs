@@ -35,9 +35,11 @@ namespace AvalonDock.Controls
 	internal class WindowHookHandler
 	{
 		#region fields
+
 		private IntPtr _windowHook;
 		private Win32Helper.HookProc _hookProc;
 		private ReentrantFlag _insideActivateEvent = new ReentrantFlag();
+
 		#endregion fields
 
 		#region Constructors
@@ -51,6 +53,7 @@ namespace AvalonDock.Controls
 		#region Events
 
 		public event EventHandler<FocusChangeEventArgs> FocusChanged;
+
 		//public event EventHandler<WindowActivateEventArgs> Activate;
 
 		#endregion Events
@@ -90,7 +93,6 @@ namespace AvalonDock.Controls
 					}
 				}
 			}
-
 
 			return Win32Helper.CallNextHookEx(_windowHook, code, wParam, lParam);
 		}

@@ -9,9 +9,9 @@
 
 using System;
 using System.Linq;
-using System.Windows.Markup;
-using System.Windows.Controls;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Markup;
 
 namespace AvalonDock.Layout
 {
@@ -21,10 +21,13 @@ namespace AvalonDock.Layout
 	public class LayoutPanel : LayoutPositionableGroup<ILayoutPanelElement>, ILayoutPanelElement, ILayoutOrientableGroup
 	{
 		#region fields
+
 		private Orientation _orientation;
+
 		#endregion fields
-		
+
 		#region Constructors
+
 		/// <summary>Class constructor</summary>
 		public LayoutPanel()
 		{
@@ -40,6 +43,7 @@ namespace AvalonDock.Layout
 		#endregion Constructors
 
 		#region Properties
+
 		/// <summary>Gets/sets the orientation for this panel.</summary>
 		public Orientation Orientation
 		{
@@ -54,6 +58,7 @@ namespace AvalonDock.Layout
 		}
 
 		#region CanDock
+
 		/// <summary>
 		/// Using a DependencyProperty as the backing store for thhe <see cref="CanDock"/> property.
 		/// </summary>
@@ -65,7 +70,7 @@ namespace AvalonDock.Layout
 		/// Gets/sets dependency property that determines whether docking of dragged items
 		/// is enabled or not. This property can be used disable/enable docking of
 		/// dragged FloatingWindowControls.
-		/// 
+		///
 		/// This property should only be set to false if:
 		/// <see cref="LayoutAnchorable.CanMove"/> and <see cref="LayoutDocument.CanMove"/>
 		/// are false since users will otherwise be able to:
@@ -77,6 +82,7 @@ namespace AvalonDock.Layout
 			get { return (bool)GetValue(CanDockProperty); }
 			set { SetValue(CanDockProperty, value); }
 		}
+
 		#endregion CanDock
 
 		#endregion Properties
@@ -93,7 +99,7 @@ namespace AvalonDock.Layout
 
 			if (CanDock == false)
 				writer.WriteAttributeString(nameof(CanDock), CanDock.ToString());
-			
+
 			base.WriteXml(writer);
 		}
 

@@ -40,7 +40,7 @@ namespace AvalonDock.Layout
 			base.ReadXml(reader);
 		}
 
-		#endregion
+		#endregion Overrides
 
 		#region ILayoutPreviousContainer Interface
 
@@ -48,6 +48,7 @@ namespace AvalonDock.Layout
 
 		[field: NonSerialized]
 		private ILayoutContainer _previousContainer = null;
+
 		[XmlIgnore]
 		ILayoutContainer ILayoutPreviousContainer.PreviousContainer
 		{
@@ -62,18 +63,19 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion
+		#endregion PreviousContainer
 
 		string ILayoutPreviousContainer.PreviousContainerId { get; set; }
 
-		#endregion
+		#endregion ILayoutPreviousContainer Interface
 
 		#region ILayoutPaneSerializable Interface
 
-		string _id;
+		private string _id;
+
 		/// <inheritdoc />
 		string ILayoutPaneSerializable.Id { get => _id; set => _id = value; }
 
-		#endregion
+		#endregion ILayoutPaneSerializable Interface
 	}
 }

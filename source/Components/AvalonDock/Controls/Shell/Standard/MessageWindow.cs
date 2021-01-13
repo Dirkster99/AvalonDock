@@ -14,16 +14,17 @@
 namespace Standard
 {
 	using System;
+	using System.Collections.Generic;
+	using System.Diagnostics.CodeAnalysis;
 	using System.Runtime.InteropServices;
 	using System.Windows;
 	using System.Windows.Threading;
-	using System.Collections.Generic;
-	using System.Diagnostics.CodeAnalysis;
 
 	internal sealed class MessageWindow : DispatcherObject, IDisposable
 	{
 		// Alias this to a static so the wrapper doesn't get GC'd
 		private static readonly WndProc s_WndProc = new WndProc(_WndProc);
+
 		private static readonly Dictionary<IntPtr, MessageWindow> s_windowLookup = new Dictionary<IntPtr, MessageWindow>();
 
 		private WndProc _wndProcCallback;
@@ -104,13 +105,13 @@ namespace Standard
 			var className = _className;
 
 			if (isHwndBeingDestroyed)
-				Dispatcher.BeginInvoke(DispatcherPriority.Normal, (DispatcherOperationCallback) (arg => _DestroyWindow(IntPtr.Zero, className)));
+				Dispatcher.BeginInvoke(DispatcherPriority.Normal, (DispatcherOperationCallback)(arg => _DestroyWindow(IntPtr.Zero, className)));
 			else if (Handle != IntPtr.Zero)
 			{
 				if (CheckAccess())
 					_DestroyWindow(hwnd, className);
 				else
-					Dispatcher.BeginInvoke(DispatcherPriority.Normal, (DispatcherOperationCallback) (arg => _DestroyWindow(hwnd, className)));
+					Dispatcher.BeginInvoke(DispatcherPriority.Normal, (DispatcherOperationCallback)(arg => _DestroyWindow(hwnd, className)));
 			}
 			s_windowLookup.Remove(hwnd);
 			_className = null;

@@ -7,6 +7,7 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using System.ComponentModel;
 using System.Windows;
 
 namespace AvalonDock.Controls
@@ -16,10 +17,13 @@ namespace AvalonDock.Controls
 	{
 		/// <summary> This type of drop area identifies a <seealso cref="AvalonDock.DockingManager"/> which is the visual root of the AvalonDock control library.</summary>
 		DockingManager,
+
 		/// <summary>This type of drop area identifies a <see cref="LayoutDocumentPaneControl"/>.</summary>
 		DocumentPane,
+
 		/// <summary>This type of drop area identifies a <see cref="LayoutDocumentPaneGroupControl"/>.</summary>
 		DocumentPaneGroup,
+
 		/// <summary>This type of drop area identifies a <see cref="LayoutAnchorablePaneControl"/>.</summary>
 		AnchorablePane,
 	}
@@ -44,11 +48,8 @@ namespace AvalonDock.Controls
 	/// <seealso cref="FrameworkElement"/>
 	public class DropArea<T> : IDropArea where T : FrameworkElement
 	{
-		#region fields
-
-		#endregion  fields
-
 		#region Constructors
+
 		/// <summary>Class constructor from control that can be used as drop target and it's type of drop area. </summary>
 		/// <param name="areaElement"></param>
 		/// <param name="type">the type of drop area for this drop target.</param>
@@ -68,15 +69,13 @@ namespace AvalonDock.Controls
 
 		/// <inheritdoc />
 		public DropAreaType Type { get; }
-		
+
 		#endregion IDropArea
 
 		#region Properties
 
-		/// <summary>
-		/// Gets the <see cref="FrameworkElement"/> that implements a drop target
-		/// for a drag & drop (dock) operation.
-		/// </summary>
+		/// <summary>Gets the <see cref="FrameworkElement"/> that implements a drop target for a drag & drop (dock) operation.</summary>
+		[Bindable(false), Description("Gets the FrameworkElement that implements a drop target for a drag & drop (dock) operation."), Category("Other")]
 		public T AreaElement { get; }
 
 		#endregion Properties

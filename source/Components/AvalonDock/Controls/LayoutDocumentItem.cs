@@ -8,6 +8,7 @@
  ************************************************************************/
 
 using AvalonDock.Layout;
+using System.ComponentModel;
 using System.Windows;
 
 namespace AvalonDock.Controls
@@ -16,7 +17,7 @@ namespace AvalonDock.Controls
 	/// <summary>
 	/// This is a wrapper for around the custom document content view of <see cref="LayoutElement"/>.
 	/// Implements the <see cref="AvalonDock.Controls.LayoutItem" />
-	/// 
+	///
 	/// All DPs implemented here can be bound in a corresponding style to control parameters
 	/// in dependency properties via binding in MVVM.
 	/// </summary>
@@ -24,14 +25,18 @@ namespace AvalonDock.Controls
 	public class LayoutDocumentItem : LayoutItem
 	{
 		#region fields
+
 		private LayoutDocument _document;   // The content of this item
+
 		#endregion fields
 
 		#region Constructors
+
 		/// <summary>Class constructor</summary>
 		internal LayoutDocumentItem()
 		{
 		}
+
 		#endregion Constructors
 
 		#region Properties
@@ -42,10 +47,8 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register(nameof(Description), typeof(string), typeof(LayoutDocumentItem),
 					new FrameworkPropertyMetadata(null, OnDescriptionChanged));
 
-		/// <summary>
-		/// Gets or sets the <see cref="Description"/> property.  This dependency property 
-		/// indicates the description to display (in the <see cref="NavigatorWindow"/>) for the document item.
-		/// </summary>
+		/// <summary>Gets/sets the description to display (in the <see cref="NavigatorWindow"/>) for the document item.</summary>
+		[Bindable(true), Description("Gets/sets the description to display (in the NavigatorWindow) for the document item."), Category("Other")]
 		public string Description
 		{
 			get => (string)GetValue(DescriptionProperty);
