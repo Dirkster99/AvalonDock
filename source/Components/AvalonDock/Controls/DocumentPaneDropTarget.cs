@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -83,26 +83,41 @@ namespace AvalonDock.Controls
 					#region DropTargetType.DocumentPaneDockBottom
 
 					{
-						var paneGroupContainer = targetModel.Parent;
-						var paneGroupOrientaion = paneGroupContainer as ILayoutOrientableGroup;
-						var paneGroup = paneGroupContainer as LayoutDocumentPaneGroup;
+						var parentModel = targetModel.Parent as ILayoutGroup;
+						var parentModelOrientable = targetModel.Parent as ILayoutOrientableGroup;
+						int insertToIndex = parentModel.IndexOfChild(targetModel);
 
-						if (paneGroupOrientaion.Orientation != System.Windows.Controls.Orientation.Vertical)
+						if (parentModelOrientable.Orientation != System.Windows.Controls.Orientation.Vertical &&
+							parentModel.ChildrenCount == 1)
+							parentModelOrientable.Orientation = System.Windows.Controls.Orientation.Vertical;
+
+						if (parentModelOrientable.Orientation == System.Windows.Controls.Orientation.Vertical)
 						{
-							paneGroup.Orientation = System.Windows.Controls.Orientation.Vertical;
+							var layoutDocumentPaneGroup = floatingWindow.RootPanel as LayoutDocumentPaneGroup;
+							if (layoutDocumentPaneGroup != null &&
+								(layoutDocumentPaneGroup.Children.Count == 1 ||
+									layoutDocumentPaneGroup.Orientation == System.Windows.Controls.Orientation.Vertical))
+							{
+								var documentsToMove = layoutDocumentPaneGroup.Children.ToArray();
+								for (int i = 0; i < documentsToMove.Length; i++)
+									parentModel.InsertChildAt(insertToIndex + 1 + i, documentsToMove[i]);
+							}
+							else
+								parentModel.InsertChildAt(insertToIndex + 1, floatingWindow.RootPanel);
 						}
-
-						var insertToIndex = paneGroup.IndexOfChild(targetModel);
-						if (insertToIndex == (paneGroup.Children.Count - 1))
+						else
 						{
-							insertToIndex = paneGroup.Children.Count;
-						}
-						var documentsToMove = floatingWindow.Children.ToArray();
-						for (int i = 0; i < documentsToMove.Length; i++)
-						{
-							var floatingChild = documentsToMove[i];
-							paneGroup.InsertChildAt(insertToIndex + i, floatingChild);
+							var targetModelAsPositionableElement = targetModel as ILayoutPositionableElement;
+							var newOrientedPanel = new LayoutDocumentPaneGroup()
+							{
+								Orientation = System.Windows.Controls.Orientation.Vertical,
+								DockWidth = targetModelAsPositionableElement.DockWidth,
+								DockHeight = targetModelAsPositionableElement.DockHeight,
+							};
 
+							parentModel.InsertChildAt(insertToIndex, newOrientedPanel);
+							newOrientedPanel.Children.Add(targetModel);
+							newOrientedPanel.Children.Add(floatingWindow.RootPanel);
 						}
 					}
 					break;
@@ -114,26 +129,42 @@ namespace AvalonDock.Controls
 					#region DropTargetType.DocumentPaneDockTop
 
 					{
-						var paneGroupContainer = targetModel.Parent;
-						var paneGroupOrientaion = paneGroupContainer as ILayoutOrientableGroup;
-						var paneGroup = paneGroupContainer as LayoutDocumentPaneGroup;
+						var parentModel = targetModel.Parent as ILayoutGroup;
+						var parentModelOrientable = targetModel.Parent as ILayoutOrientableGroup;
+						int insertToIndex = parentModel.IndexOfChild(targetModel);
 
-						if(paneGroupOrientaion.Orientation != System.Windows.Controls.Orientation.Vertical)
+						if (parentModelOrientable.Orientation != System.Windows.Controls.Orientation.Vertical &&
+							parentModel.ChildrenCount == 1)
+							parentModelOrientable.Orientation = System.Windows.Controls.Orientation.Vertical;
+
+						if (parentModelOrientable.Orientation == System.Windows.Controls.Orientation.Vertical)
 						{
-							paneGroup.Orientation = System.Windows.Controls.Orientation.Vertical;
+							var layoutDocumentPaneGroup = floatingWindow.RootPanel as LayoutDocumentPaneGroup;
+							if (layoutDocumentPaneGroup != null &&
+								(layoutDocumentPaneGroup.Children.Count == 1 ||
+									layoutDocumentPaneGroup.Orientation == System.Windows.Controls.Orientation.Vertical))
+							{
+								var documentsToMove = layoutDocumentPaneGroup.Children.ToArray();
+								for (int i = 0; i < documentsToMove.Length; i++)
+									parentModel.InsertChildAt(insertToIndex + i, documentsToMove[i]);
+							}
+							else
+								parentModel.InsertChildAt(insertToIndex, floatingWindow.RootPanel);
 						}
-
-						var insertToIndex = paneGroup.IndexOfChild(targetModel);
-						if(insertToIndex < 0 )
+						else
 						{
-							insertToIndex = 0;
-						}
-						var documentsToMove = floatingWindow.Children.ToArray();
-						for (int i = 0; i < documentsToMove.Length; i++)
-						{
-							var floatingChild = documentsToMove[i];
-							paneGroup.InsertChildAt(insertToIndex + i, floatingChild);
+							var targetModelAsPositionableElement = targetModel as ILayoutPositionableElement;
+							var newOrientedPanel = new LayoutDocumentPaneGroup()
+							{
+								Orientation = System.Windows.Controls.Orientation.Vertical,
+								DockWidth = targetModelAsPositionableElement.DockWidth,
+								DockHeight = targetModelAsPositionableElement.DockHeight,
+							};
 
+							parentModel.InsertChildAt(insertToIndex, newOrientedPanel);
+							//the floating window must be added after the target modal as it could be raise a CollectGarbage call
+							newOrientedPanel.Children.Add(targetModel);
+							newOrientedPanel.Children.Insert(0, floatingWindow.RootPanel);
 						}
 					}
 					break;
@@ -145,26 +176,42 @@ namespace AvalonDock.Controls
 					#region DropTargetType.DocumentPaneDockLeft
 
 					{
-						var paneGroupContainer = targetModel.Parent;
-						var paneGroupOrientaion = paneGroupContainer as ILayoutOrientableGroup;
-						var paneGroup = paneGroupContainer as LayoutDocumentPaneGroup;
+						var parentModel = targetModel.Parent as ILayoutGroup;
+						var parentModelOrientable = targetModel.Parent as ILayoutOrientableGroup;
+						int insertToIndex = parentModel.IndexOfChild(targetModel);
 
-						if (paneGroupOrientaion.Orientation != System.Windows.Controls.Orientation.Horizontal)
+						if (parentModelOrientable.Orientation != System.Windows.Controls.Orientation.Horizontal &&
+							parentModel.ChildrenCount == 1)
+							parentModelOrientable.Orientation = System.Windows.Controls.Orientation.Horizontal;
+
+						if (parentModelOrientable.Orientation == System.Windows.Controls.Orientation.Horizontal)
 						{
-							paneGroup.Orientation = System.Windows.Controls.Orientation.Horizontal;
+							var layoutDocumentPaneGroup = floatingWindow.RootPanel as LayoutDocumentPaneGroup;
+							if (layoutDocumentPaneGroup != null &&
+								(layoutDocumentPaneGroup.Children.Count == 1 ||
+									layoutDocumentPaneGroup.Orientation == System.Windows.Controls.Orientation.Horizontal))
+							{
+								var documentsToMove = layoutDocumentPaneGroup.Children.ToArray();
+								for (int i = 0; i < documentsToMove.Length; i++)
+									parentModel.InsertChildAt(insertToIndex + i, documentsToMove[i]);
+							}
+							else
+								parentModel.InsertChildAt(insertToIndex, floatingWindow.RootPanel);
 						}
-
-						var insertToIndex = paneGroup.IndexOfChild(targetModel);
-						if (insertToIndex < 0)
+						else
 						{
-							insertToIndex = 0;
-						}
-						var documentsToMove = floatingWindow.Children.ToArray();
-						for (int i = 0; i < documentsToMove.Length; i++)
-						{
-							var floatingChild = documentsToMove[i];
-							paneGroup.InsertChildAt(insertToIndex + i, floatingChild);
+							var targetModelAsPositionableElement = targetModel as ILayoutPositionableElement;
+							var newOrientedPanel = new LayoutDocumentPaneGroup()
+							{
+								Orientation = System.Windows.Controls.Orientation.Horizontal,
+								DockWidth = targetModelAsPositionableElement.DockWidth,
+								DockHeight = targetModelAsPositionableElement.DockHeight,
+							};
 
+							parentModel.InsertChildAt(insertToIndex, newOrientedPanel);
+							//the floating window must be added after the target modal as it could be raise a CollectGarbage call
+							newOrientedPanel.Children.Add(targetModel);
+							newOrientedPanel.Children.Insert(0, floatingWindow.RootPanel);
 						}
 					}
 					break;
@@ -176,26 +223,41 @@ namespace AvalonDock.Controls
 					#region DropTargetType.DocumentPaneDockRight
 
 					{
-						var paneGroupContainer = targetModel.Parent;
-						var paneGroupOrientaion = paneGroupContainer as ILayoutOrientableGroup;
-						var paneGroup = paneGroupContainer as LayoutDocumentPaneGroup;
+						var parentModel = targetModel.Parent as ILayoutGroup;
+						var parentModelOrientable = targetModel.Parent as ILayoutOrientableGroup;
+						int insertToIndex = parentModel.IndexOfChild(targetModel);
 
-						if (paneGroupOrientaion.Orientation != System.Windows.Controls.Orientation.Horizontal)
+						if (parentModelOrientable.Orientation != System.Windows.Controls.Orientation.Horizontal &&
+							parentModel.ChildrenCount == 1)
+							parentModelOrientable.Orientation = System.Windows.Controls.Orientation.Horizontal;
+
+						if (parentModelOrientable.Orientation == System.Windows.Controls.Orientation.Horizontal)
 						{
-							paneGroup.Orientation = System.Windows.Controls.Orientation.Horizontal;
+							var layoutDocumentPaneGroup = floatingWindow.RootPanel as LayoutDocumentPaneGroup;
+							if (layoutDocumentPaneGroup != null &&
+								(layoutDocumentPaneGroup.Children.Count == 1 ||
+									layoutDocumentPaneGroup.Orientation == System.Windows.Controls.Orientation.Horizontal))
+							{
+								var documentToMove = layoutDocumentPaneGroup.Children.ToArray();
+								for (int i = 0; i < documentToMove.Length; i++)
+									parentModel.InsertChildAt(insertToIndex + 1 + i, documentToMove[i]);
+							}
+							else
+								parentModel.InsertChildAt(insertToIndex + 1, floatingWindow.RootPanel);
 						}
-
-						var insertToIndex = paneGroup.IndexOfChild(targetModel);
-						if (insertToIndex == (paneGroup.Children.Count - 1))
+						else
 						{
-							insertToIndex = paneGroup.Children.Count;
-						}
-						var documentsToMove = floatingWindow.Children.ToArray();
-						for (int i = 0; i < documentsToMove.Length; i++)
-						{
-							var floatingChild = documentsToMove[i];
-							paneGroup.InsertChildAt(insertToIndex + i, floatingChild);
+							var targetModelAsPositionableElement = targetModel as ILayoutPositionableElement;
+							var newOrientedPanel = new LayoutDocumentPaneGroup()
+							{
+								Orientation = System.Windows.Controls.Orientation.Horizontal,
+								DockWidth = targetModelAsPositionableElement.DockWidth,
+								DockHeight = targetModelAsPositionableElement.DockHeight,
+							};
 
+							parentModel.InsertChildAt(insertToIndex, newOrientedPanel);
+							newOrientedPanel.Children.Add(targetModel);
+							newOrientedPanel.Children.Add(floatingWindow.RootPanel);
 						}
 					}
 					break;
@@ -217,7 +279,7 @@ namespace AvalonDock.Controls
 						int i = _tabIndex == -1 ? 0 : _tabIndex;
 						foreach (var anchorableToImport in
 							layoutDocumentPaneGroup.Descendents().OfType<LayoutContent>()
-								.Where(item => allowedDropTypes.Contains(item.GetType())).ToArray())
+								.Where(item => allowedDropTypes.Any(dropType => dropType.IsInstanceOfType(item))).ToArray())
 						{
 							paneModel.Children.Insert(i, anchorableToImport);
 							i++;
