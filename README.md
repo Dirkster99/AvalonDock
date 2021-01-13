@@ -123,7 +123,8 @@ to also theme standard elements, such as, button and textblock etc.
 ## Fixes added in master branch but not released to NuGet. yet
 
 - [#221 Default window style interfere with resizer window](https://github.com/Dirkster99/AvalonDock/issues/221) (thanx to [Magnus Lindhe](https://github.com/mgnslndh))
-- [#224 Fixed a bug that freezed when changing DocumentPane Orientation](https://github.com/Dirkster99/AvalonDock/pull/224) (thanx to [sukamoni](https://github.com/sukamoni))
+- [#224 Reverted Fixed a bug that freezed when changing DocumentPane Orientation](https://github.com/Dirkster99/AvalonDock/pull/224) (thanx to [sukamoni](https://github.com/sukamoni))  
+  See pull request for issues with this PR
 
 ## Fixes added in Version 4.50.1
 
