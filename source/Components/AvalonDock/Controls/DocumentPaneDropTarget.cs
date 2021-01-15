@@ -64,6 +64,7 @@ namespace AvalonDock.Controls
 
 		#endregion Constructors
 
+
 		#region Overrides
 
 		/// <summary>
@@ -76,6 +77,25 @@ namespace AvalonDock.Controls
 			ILayoutDocumentPane targetModel = _targetPane.Model as ILayoutDocumentPane;
 			LayoutDocument documentActive = floatingWindow.Descendents().OfType<LayoutDocument>().FirstOrDefault();
 
+			// ensure paneGroup
+			var paneGroup = targetModel.Parent as LayoutDocumentPaneGroup;
+			if(paneGroup == null)
+			{
+				var targetModelAsPositionableElement = targetModel as ILayoutPositionableElement;
+				var layoutGroup = targetModel.Parent as ILayoutGroup;
+				paneGroup = new LayoutDocumentPaneGroup()
+				{
+					Orientation = System.Windows.Controls.Orientation.Vertical,
+					DockWidth = targetModelAsPositionableElement.DockWidth,
+					DockHeight = targetModelAsPositionableElement.DockHeight,
+				};
+
+				paneGroup.Children.Add(targetModel);
+				layoutGroup.InsertChildAt(0, paneGroup);
+			}
+			var paneGroupOrientaion = paneGroup as ILayoutOrientableGroup;
+
+
 			switch (Type)
 			{
 				case DropTargetType.DocumentPaneDockBottom:
@@ -83,9 +103,6 @@ namespace AvalonDock.Controls
 					#region DropTargetType.DocumentPaneDockBottom
 
 					{
-						var paneGroupContainer = targetModel.Parent;
-						var paneGroupOrientaion = paneGroupContainer as ILayoutOrientableGroup;
-						var paneGroup = paneGroupContainer as LayoutDocumentPaneGroup;
 
 						if (paneGroupOrientaion.Orientation != System.Windows.Controls.Orientation.Vertical)
 						{
@@ -114,9 +131,6 @@ namespace AvalonDock.Controls
 					#region DropTargetType.DocumentPaneDockTop
 
 					{
-						var paneGroupContainer = targetModel.Parent;
-						var paneGroupOrientaion = paneGroupContainer as ILayoutOrientableGroup;
-						var paneGroup = paneGroupContainer as LayoutDocumentPaneGroup;
 
 						if(paneGroupOrientaion.Orientation != System.Windows.Controls.Orientation.Vertical)
 						{
@@ -145,10 +159,6 @@ namespace AvalonDock.Controls
 					#region DropTargetType.DocumentPaneDockLeft
 
 					{
-						var paneGroupContainer = targetModel.Parent;
-						var paneGroupOrientaion = paneGroupContainer as ILayoutOrientableGroup;
-						var paneGroup = paneGroupContainer as LayoutDocumentPaneGroup;
-
 						if (paneGroupOrientaion.Orientation != System.Windows.Controls.Orientation.Horizontal)
 						{
 							paneGroup.Orientation = System.Windows.Controls.Orientation.Horizontal;
@@ -176,10 +186,6 @@ namespace AvalonDock.Controls
 					#region DropTargetType.DocumentPaneDockRight
 
 					{
-						var paneGroupContainer = targetModel.Parent;
-						var paneGroupOrientaion = paneGroupContainer as ILayoutOrientableGroup;
-						var paneGroup = paneGroupContainer as LayoutDocumentPaneGroup;
-
 						if (paneGroupOrientaion.Orientation != System.Windows.Controls.Orientation.Horizontal)
 						{
 							paneGroup.Orientation = System.Windows.Controls.Orientation.Horizontal;
