@@ -63,7 +63,7 @@ namespace AvalonDock.Controls
 		protected virtual void OnModelChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (Model != null)
-				SetLayoutItem(Model.Root.Manager.GetLayoutItemFromModel(Model));
+				SetLayoutItem(Model?.Root?.Manager?.GetLayoutItemFromModel(Model));
 			else
 				SetLayoutItem(null);
 		}

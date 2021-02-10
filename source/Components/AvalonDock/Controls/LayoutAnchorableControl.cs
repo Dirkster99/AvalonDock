@@ -67,7 +67,7 @@ namespace AvalonDock.Controls
 			if (Model != null)
 			{
 				Model.PropertyChanged += Model_PropertyChanged;
-				SetLayoutItem(Model.Root.Manager.GetLayoutItemFromModel(Model));
+				SetLayoutItem(Model?.Root?.Manager?.GetLayoutItemFromModel(Model));
 			}
 			else
 				SetLayoutItem(null);
