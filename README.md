@@ -120,7 +120,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## Fixes added in master branch but not released to NuGet. yet
+## Fixes added in Version 4.50.2
 
 - [#221 Default window style interfere with resizer window](https://github.com/Dirkster99/AvalonDock/issues/221) (thanx to [Magnus Lindhe](https://github.com/mgnslndh))
 - ~~[#224 Reverted Fixed a bug that freezed when changing DocumentPane Orientation](https://github.com/Dirkster99/AvalonDock/pull/224) (thanx to [sukamoni](https://github.com/sukamoni))  
