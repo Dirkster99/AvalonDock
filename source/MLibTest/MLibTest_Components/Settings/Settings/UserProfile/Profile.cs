@@ -1,4 +1,4 @@
-﻿namespace Settings.UserProfile
+namespace Settings.UserProfile
 {
 	using Settings.Interfaces;
 	using SettingsModel.Models;
@@ -19,7 +19,6 @@
 	public class Profile : IProfile
 	{
 		#region fields
-		protected static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		#endregion fields
 
 		#region constructor
