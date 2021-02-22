@@ -127,7 +127,7 @@ to also theme standard elements, such as, button and textblock etc.
   See pull request for issues with this PR
 
 - [#240 NullReferenceException in LayoutDocumentControl.OnModelChanged](https://github.com/Dirkster99/AvalonDock/issues/240) (thanx to [Khaos66](https://github.com/Khaos66))  
-
+- [#225 Keyboard up/down in textbox in floating anchorable focusing DropDownControlArea](https://github.com/Dirkster99/AvalonDock/issues/225) (thanx to [Muhahe](https://github.com/Muhahe)[LyonJack](https://github.com/LyonJack)[bdachev](https://github.com/bdachev))
 
 ## Fixes added in Version 4.50.1
 
