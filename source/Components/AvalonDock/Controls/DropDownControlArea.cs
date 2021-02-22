@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -25,6 +25,18 @@ namespace AvalonDock.Controls
 	/// <seealso cref="ContentControl"/>
 	public class DropDownControlArea : ContentControl
 	{
+		#region ctors
+		/// <summary>
+		/// Static class constructor
+		/// </summary>
+		static DropDownControlArea()
+		{
+			// Fixing issue with Keyboard up/down in textbox in floating anchorable focusing DropDownControlArea
+			// https://github.com/Dirkster99/AvalonDock/issues/225
+			FocusableProperty.OverrideMetadata(typeof(DropDownControlArea), new FrameworkPropertyMetadata(false));
+		}
+		#endregion ctors
+
 		#region Properties
 
 		#region DropDownContextMenu
