@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace AvalonDock.Controls
 {
@@ -34,9 +35,15 @@ namespace AvalonDock.Controls
 			// Fixing issue with Keyboard up/down in textbox in floating anchorable focusing DropDownControlArea
 			// https://github.com/Dirkster99/AvalonDock/issues/225
 			FocusableProperty.OverrideMetadata(typeof(DropDownControlArea), new FrameworkPropertyMetadata(false));
+			
+			// See PreviewMouseRightButtonUpCallback for details.
+			EventManager.RegisterClassHandler(
+			    typeof(DropDownControlArea),
+			    PreviewMouseRightButtonUpEvent,
+			    new MouseButtonEventHandler((s, e) => (s as DropDownControlArea)?.PreviewMouseRightButtonUpCallback(e)));
 		}
 		#endregion ctors
-
+		
 		#region Properties
 
 		#region DropDownContextMenu
@@ -75,17 +82,26 @@ namespace AvalonDock.Controls
 
 		#region Overrides
 
-		/// <inheritdoc />
-		protected override void OnPreviewMouseRightButtonUp(System.Windows.Input.MouseButtonEventArgs e)
+		// The core code uses OnPreviewMouseButtonUp for this logic. However, this change fixes
+		// a bug when the context menu style has no border. The right click to show the context
+		// menu gets handled by the first menu item. If that happens to be Close, the tab closes
+		// unexpectedly.
+		// We use a class handler for the event - which gets called earlier in the event handling
+		// chain - to show the right-click context menu and, importantly, mark the event as handled,
+		// so no further processing occurs.
+		private void PreviewMouseRightButtonUpCallback(MouseButtonEventArgs e)
 		{
-			base.OnPreviewMouseRightButtonUp(e);
-			if (e.Handled) return;
-			if (DropDownContextMenu == null) return;
-			DropDownContextMenu.PlacementTarget = null;
-			DropDownContextMenu.Placement = PlacementMode.MousePoint;
-			DropDownContextMenu.DataContext = DropDownContextMenuDataContext;
-			DropDownContextMenu.IsOpen = true;
-			// e.Handled = true;
+			if (!e.Handled && DropDownContextMenu != null)
+			{
+				DropDownContextMenu.PlacementTarget = null;
+				DropDownContextMenu.Placement = PlacementMode.MousePoint;
+				DropDownContextMenu.HorizontalOffset = 0d;
+				DropDownContextMenu.VerticalOffset = 0d;
+				DropDownContextMenu.DataContext = DropDownContextMenuDataContext;
+				DropDownContextMenu.IsOpen = true;
+
+				e.Handled = true;
+			}
 		}
 
 		//protected override System.Windows.Media.HitTestResult HitTestCore(System.Windows.Media.PointHitTestParameters hitTestParameters)
