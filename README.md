@@ -122,6 +122,8 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Fixes added in Master but not released to NuGet, yet
 
+- [#163 IsSelected vs IsActive behavior changed from 3.x to 4.1/4.2?](https://github.com/Dirkster99/AvalonDock/issues/163) (thanx to [triman](https://github.com/triman))
+
 - [#244 Right click on tab header closes tab unexpectedly](https://github.com/Dirkster99/AvalonDock/issues/244) (thanx to [Olly Atkins](https://github.com/oatkins))
 
 ## Fixes added in Version 4.50.2
