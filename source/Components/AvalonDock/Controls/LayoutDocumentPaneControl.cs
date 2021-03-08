@@ -69,6 +69,19 @@ namespace AvalonDock.Controls
 		#region Overrides
 
 		/// <summary>
+		/// Invoked when an unhandled SelectionChanged routed event is raised on this element. Implement this method
+		/// to add class handling for this event.
+		/// </summary>
+		/// <param name="e">The <see cref="SelectionChangedEventArgs"/> that contains the event data.
+		/// The event reports that the selection changed.</param>
+		protected override void OnSelectionChanged(SelectionChangedEventArgs e)
+		{
+			base.OnSelectionChanged(e);
+			if (_model.SelectedContent != null)
+				_model.SelectedContent.IsActive = true;
+		}
+
+		/// <summary>
 		/// Invoked when an unhandled <see cref="System.Windows.UIElement.MouseLeftButtonDown"/> routed
 		/// event is raised on this element. Implement this method to add class handling
 		/// for this event.
