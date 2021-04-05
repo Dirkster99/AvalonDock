@@ -1,4 +1,4 @@
-﻿namespace MLibTest.Demos.ViewModels.AD
+namespace MLibTest.Demos.ViewModels.AD
 {
 	using MLibTest.Demos.ViewModels.Interfaces;
 	using MLibTest.ViewModels.Base;
@@ -268,8 +268,9 @@
 		public Encoding GetEncoding(byte[] bom)
 		{
 			// Analyze the BOM
-			if (bom[0] == 0x2b && bom[1] == 0x2f && bom[2] == 0x76)
-				return Encoding.UTF7;
+			// Warning warning SYSLIB0001: 'Encoding.UTF7' is obsolete: 'The UTF-7 encoding is insecure and should not be used.
+			//if (bom[0] == 0x2b && bom[1] == 0x2f && bom[2] == 0x76)
+			//	return Encoding.UTF7;
 
 			if (bom[0] == 0xef && bom[1] == 0xbb && bom[2] == 0xbf)
 				return Encoding.UTF8;

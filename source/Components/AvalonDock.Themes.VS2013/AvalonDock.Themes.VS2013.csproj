@@ -9,6 +9,7 @@
     <Version>4.51.0</Version>
     <AssemblyVersion>4.51.0</AssemblyVersion>
     <FileVersion>4.51.0</FileVersion>
+		<PackageVersion>4.51.0-alpha</PackageVersion>
     <Company>Open Source</Company>
     <Product>Dirkster.AvalonDock</Product>
     <Copyright>2017-2021</Copyright>
