@@ -120,7 +120,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## Fixes added in Master but not released to NuGet, yet
+## Fixes added in Version 4.50.3
 
 - [#163 IsSelected vs IsActive behavior changed from 3.x to 4.1/4.2?](https://github.com/Dirkster99/AvalonDock/issues/163) (thanx to [triman](https://github.com/triman))
 
