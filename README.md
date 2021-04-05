@@ -120,6 +120,10 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
+## Features Added in PRE-VIEW Version 4.51.0
+
+- [#214 Migrate from netcoreapp3.0 to net5.0-windows](https://github.com/Dirkster99/AvalonDock/pull/214)  (thanx to [Magnus Lindhe](https://github.com/mgnslndh))
+
 ## Fixes added in Version 4.50.3
 
 - [#163 IsSelected vs IsActive behavior changed from 3.x to 4.1/4.2?](https://github.com/Dirkster99/AvalonDock/issues/163) (thanx to [triman](https://github.com/triman))
