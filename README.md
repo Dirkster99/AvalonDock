@@ -128,6 +128,8 @@ to also theme standard elements, such as, button and textblock etc.
 
 - [#208 Maximized floating windows sit under the task bar](https://github.com/Dirkster99/AvalonDock/issues/208) (thanx to [Flynn1179](https://github.com/Flynn1179))
 
+- [#255 Don't create FloatingWindows twice](https://github.com/Dirkster99/AvalonDock/pull/255) (thanx to [Khaos66](https://github.com/Khaos66))
+
 ## Fixes added in Version 4.50.2
 
 - [#221 Default window style interfere with resizer window](https://github.com/Dirkster99/AvalonDock/issues/221) (thanx to [Magnus Lindhe](https://github.com/mgnslndh))
