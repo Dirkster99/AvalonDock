@@ -1562,6 +1562,9 @@ namespace AvalonDock
 				};
 				newFW.SetParentToMainWindowOf(this);
 
+				// Fill list before calling Show (issue #254)
+				_fwList.Add(newFW);
+
 				// Floating Window can also contain only Pane Groups at its base (issue #27) so we check for
 				// RootPanel (which is a LayoutAnchorablePaneGroup) and make sure the window is positioned back
 				// in current (or nearest) monitor
@@ -1601,6 +1604,9 @@ namespace AvalonDock
 					//Owner = Window.GetWindow(this)
 				};
 				newFW.SetParentToMainWindowOf(this);
+
+				// Fill list before calling Show (issue #254)
+				_fwList.Add(newFW);
 
 				var paneForExtensions = modelFW.RootPanel;
 				if (paneForExtensions != null)
@@ -1957,10 +1963,10 @@ namespace AvalonDock
 			}
 			_fwHiddenList.Clear();
 
-			// load floating windows not already loaded! (issue #59)
+			// load floating windows not already loaded! (issue #59 & #254)
 			var items = new List<LayoutFloatingWindow>(Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)));
 			foreach (var fw in items)
-				_fwList.Add(CreateUIElementForModel(fw) as LayoutFloatingWindowControl);
+				CreateUIElementForModel(fw);
 
 			//create the overlaywindow if it's possible
 			if (IsVisible)
