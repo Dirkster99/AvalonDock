@@ -120,6 +120,10 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
+## Applied to master but not yet released to NuGet
+
+- [#262 Contextmenus on dpi-aware application have a wrong scaling](https://github.com/Dirkster99/AvalonDock/issues/262)   (thanx to [moby42](https://github.com/moby42))
+
 ## Features Added in PRE-VIEW Version 4.51.0
 
 - [#214 Migrate from netcoreapp3.0 to net5.0-windows](https://github.com/Dirkster99/AvalonDock/pull/214)  (thanx to [Magnus Lindhe](https://github.com/mgnslndh))

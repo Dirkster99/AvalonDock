@@ -93,7 +93,9 @@ namespace AvalonDock.Controls
 		{
 			if (!e.Handled && DropDownContextMenu != null)
 			{
-				DropDownContextMenu.PlacementTarget = null;
+				// Fix for multi-dpi aware aplications
+				DropDownContextMenu.PlacementTarget = e.Source as UIElement;
+				//DropDownContextMenu.PlacementTarget = null;
 				DropDownContextMenu.Placement = PlacementMode.MousePoint;
 				DropDownContextMenu.HorizontalOffset = 0d;
 				DropDownContextMenu.VerticalOffset = 0d;
