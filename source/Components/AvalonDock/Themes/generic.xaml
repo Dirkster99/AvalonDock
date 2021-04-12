@@ -662,8 +662,8 @@
 		<Setter Property="AnchorableHeaderTemplate" Value="{StaticResource AnchorableHeaderTemplate}" />
 		<Setter Property="DocumentTitleTemplate" Value="{StaticResource DocumentTitleTemplate}" />
 		<Setter Property="AnchorableTitleTemplate" Value="{StaticResource AnchorableTitleTemplate}" />
-		<Setter Property="AnchorableContextMenu" Value="{StaticResource AnchorableContextMenu}" />
-		<Setter Property="DocumentContextMenu" Value="{StaticResource DocumentContextMenu}" />
+		<Setter Property="AnchorableContextMenu" Value="{DynamicResource AnchorableContextMenu}" />
+		<Setter Property="DocumentContextMenu" Value="{DynamicResource DocumentContextMenu}" />
 		<Setter Property="DocumentPaneMenuItemHeaderTemplate" Value="{StaticResource DocumentHeaderTemplate}" />
 		<Setter Property="IconContentTemplate" Value="{StaticResource IconContentTemplate}" />
 		<Setter Property="Template">

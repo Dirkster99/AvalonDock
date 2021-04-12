@@ -1882,9 +1882,7 @@ namespace AvalonDock
 		/// <param name="e"></param>
 		private static void OnContextMenuPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
-			if (d.Dispatcher.CheckAccess() && 
-			    e.NewValue is ContextMenu contextMenu && 
-			    contextMenu.Dispatcher.CheckAccess())
+			if (e.NewValue is ContextMenu contextMenu)
 			{
 				contextMenu.Resources = ((DockingManager)d).Resources;
 			}
