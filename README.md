@@ -123,6 +123,7 @@ to also theme standard elements, such as, button and textblock etc.
 ## Applied to master but not yet released to NuGet
 
 - [#262 Contextmenus on dpi-aware application have a wrong scaling](https://github.com/Dirkster99/AvalonDock/issues/262)   (thanx to [moby42](https://github.com/moby42))
+- [#259 Fixing problems with tests running with XUnit StaFact](https://github.com/Dirkster99/AvalonDock/pull/259)   (thanx to [Erik Ovegård](https://github.com/eriove))
 
 ## Features Added in PRE-VIEW Version 4.51.0
 
