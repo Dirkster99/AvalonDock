@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -12,7 +12,7 @@ using System.Windows;
 namespace AvalonDock.Layout
 {
 	/// <summary>Defines a layout element that can be positioned in a Grid like environment.</summary>
-	internal interface ILayoutPositionableElement : ILayoutElement, ILayoutElementForFloatingWindow
+	public interface ILayoutPositionableElement : ILayoutElement, ILayoutElementForFloatingWindow
 	{
 		/// <summary>Gets/sets the <see cref="GridLength"/> of the dock width for this positionable layout element.</summary>
 		GridLength DockWidth { get; set; }
@@ -52,7 +52,7 @@ namespace AvalonDock.Layout
 	}
 
 	/// <summary>Defines a layout element that supports actual width and height properties.</summary>
-	internal interface ILayoutPositionableElementWithActualSize : ILayoutPositionableElement
+	public interface ILayoutPositionableElementWithActualSize : ILayoutPositionableElement
 	{
 		/// <summary>Gets/sets the actual width the positionable layout element.</summary>
 		double ActualWidth { get; set; }
@@ -62,7 +62,7 @@ namespace AvalonDock.Layout
 	}
 
 	/// <summary>Defines a layout element that supports position properties for a floating window.</summary>
-	internal interface ILayoutElementForFloatingWindow
+	public interface ILayoutElementForFloatingWindow
 	{
 		/// <summary>Invoke this method to raise the FloatingPropertiesUpdated event to inform subscribers of the change.</summary>
 		void RaiseFloatingPropertiesUpdated();
