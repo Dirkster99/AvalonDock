@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -13,6 +13,7 @@ using System.Linq;
 namespace AvalonDock.Layout.Serialization
 {
 	/// <summary>Implements a base class for the layout serialization/deserialization of the docking framework.</summary>
+	[Obsolete("This class was replaced with " + nameof(LayoutSerializerBase))]
 	public abstract class LayoutSerializer
 	{
 		#region fields

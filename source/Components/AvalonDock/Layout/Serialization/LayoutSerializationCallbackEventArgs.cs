@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,6 +7,7 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using System;
 using System.ComponentModel;
 
 namespace AvalonDock.Layout.Serialization
@@ -21,6 +22,7 @@ namespace AvalonDock.Layout.Serialization
 	///
 	/// Use the Cancel property to indicate the case in which an item should not be deserialized.
 	/// </summary>
+	[Obsolete("The class utilizing this event got replaced.")]
 	public class LayoutSerializationCallbackEventArgs : CancelEventArgs
 	{
 		#region constructors

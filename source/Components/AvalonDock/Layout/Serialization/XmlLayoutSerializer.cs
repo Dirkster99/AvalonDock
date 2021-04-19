@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,6 +7,7 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using System;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
@@ -14,6 +15,7 @@ using System.Xml.Serialization;
 namespace AvalonDock.Layout.Serialization
 {
 	/// <summary>Implements a layout serialization/deserialization method of the docking framework.</summary>
+	[Obsolete("This class was replaced with " + nameof(AsyncXmlLayoutSerializer))]
 	public class XmlLayoutSerializer : LayoutSerializer
 	{
 		#region Constructors
