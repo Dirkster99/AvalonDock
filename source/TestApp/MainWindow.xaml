@@ -121,6 +121,7 @@
                         <LayoutAnchorablePane>
                             <LayoutAnchorable
                                 Title="Tool Window 1"
+                                CanShowOnHover="True"
                                 ContentId="toolWindow1"
                                 Hiding="OnToolWindow1Hiding">
                                 <StackPanel MinHeight="450">

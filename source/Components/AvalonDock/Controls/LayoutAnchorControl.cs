@@ -138,7 +138,7 @@ namespace AvalonDock.Controls
 		{
 			base.OnMouseEnter(e);
 
-			if (!e.Handled)
+			if (!e.Handled && _model.CanShowOnHover)
 			{
 				_openUpTimer = new DispatcherTimer(DispatcherPriority.ApplicationIdle);
 				_openUpTimer.Interval = TimeSpan.FromMilliseconds(400);
