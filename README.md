@@ -125,6 +125,10 @@ to also theme standard elements, such as, button and textblock etc.
 - [#262 Contextmenus on dpi-aware application have a wrong scaling](https://github.com/Dirkster99/AvalonDock/issues/262)   (thanx to [moby42](https://github.com/moby42))
 - [#259 Fixing problems with tests running with XUnit StaFact](https://github.com/Dirkster99/AvalonDock/pull/259)   (thanx to [Erik Ovegård](https://github.com/eriove))
 
+- [#266 Adding a key for AnchorablePaneTitle](https://github.com/Dirkster99/AvalonDock/pull/266)   (thanx to [Zachary Canann](https://github.com/zcanann))
+
+
+
 ## Features Added in PRE-VIEW Version 4.51.0
 
 - [#214 Migrate from netcoreapp3.0 to net5.0-windows](https://github.com/Dirkster99/AvalonDock/pull/214)  (thanx to [Magnus Lindhe](https://github.com/mgnslndh))
