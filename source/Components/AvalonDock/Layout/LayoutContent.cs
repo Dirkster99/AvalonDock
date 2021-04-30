@@ -466,6 +466,13 @@ namespace AvalonDock.Layout
 
 		private bool _canShowOnHover = true;
 
+		/// <summary>
+		/// Set to false to disable the behavior of auto-showing
+		/// a <see cref="LayoutAnchorableControl"/> on mouse over.
+		/// When true, hovering the mouse over an anchorable tab 
+		/// will cause the anchorable to show itself.
+		/// </summary>
+		/// <remarks>Defaults to true</remarks>
 		public bool CanShowOnHover
 		{
 			get => _canShowOnHover;
