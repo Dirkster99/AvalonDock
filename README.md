@@ -127,7 +127,7 @@ to also theme standard elements, such as, button and textblock etc.
 
 - [#266 Adding a key for AnchorablePaneTitle](https://github.com/Dirkster99/AvalonDock/pull/266)   (thanx to [Zachary Canann](https://github.com/zcanann))
 
-
+- [#267 Optional show hidden LayoutAnchorable on hover](https://github.com/Dirkster99/AvalonDock/pull/267)   (thanx to [Cory Todd](https://github.com/corytodd))
 
 ## Features Added in PRE-VIEW Version 4.51.0
 
