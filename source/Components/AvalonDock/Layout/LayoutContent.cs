@@ -462,6 +462,30 @@ namespace AvalonDock.Layout
 
 		#endregion CanFloat
 
+		#region CanShowOnHover
+
+		private bool _canShowOnHover = true;
+
+		/// <summary>
+		/// Set to false to disable the behavior of auto-showing
+		/// a <see cref="LayoutAnchorableControl"/> on mouse over.
+		/// When true, hovering the mouse over an anchorable tab 
+		/// will cause the anchorable to show itself.
+		/// </summary>
+		/// <remarks>Defaults to true</remarks>
+		public bool CanShowOnHover
+		{
+			get => _canShowOnHover;
+			set
+			{
+				if (value == _canShowOnHover) return;
+				_canShowOnHover = value;
+				RaisePropertyChanged(nameof(CanShowOnHover));
+			}
+		}
+
+		#endregion CanShowOnHover
+
 		#region IsEnabled
 
 		private bool _isEnabled = true;
@@ -531,6 +555,8 @@ namespace AvalonDock.Layout
 				CanFloat = bool.Parse(reader.Value);
 			if (reader.MoveToAttribute(nameof(LastActivationTimeStamp)))
 				LastActivationTimeStamp = DateTime.Parse(reader.Value, CultureInfo.InvariantCulture);
+			if (reader.MoveToAttribute(nameof(CanShowOnHover)))
+				CanShowOnHover = bool.Parse(reader.Value);
 
 			reader.Read();
 		}
@@ -569,6 +595,8 @@ namespace AvalonDock.Layout
 			if (!CanFloat) writer.WriteAttributeString(nameof(CanFloat), CanFloat.ToString());
 
 			if (LastActivationTimeStamp != null) writer.WriteAttributeString(nameof(LastActivationTimeStamp), LastActivationTimeStamp.Value.ToString(CultureInfo.InvariantCulture));
+
+			if (!CanShowOnHover) writer.WriteAttributeString(nameof(CanShowOnHover), CanShowOnHover.ToString());
 
 			if (_previousContainer is ILayoutPaneSerializable paneSerializable)
 			{
