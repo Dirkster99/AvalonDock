@@ -152,11 +152,54 @@ namespace AvalonDock.Controls
 
 		internal bool KeepContentVisibleOnClose { get; set; }
 
+		#region OwnedByDockingManagerWindow
+
+		/// <summary><see cref="OwnedByDockingManagerWindow"/> dependency property.</summary>
+		public static readonly DependencyProperty OwnedByDockingManagerWindowProperty =
+			DependencyProperty.Register("OwnedByDockingManagerWindow", typeof(bool), typeof(LayoutFloatingWindowControl), new PropertyMetadata(true, OwnedByDockingManagerWindowPropertyChanged));
+
+		/// <summary>
+		/// Gets or sets a value indicating whether an undocked child window should be "owned" by the window
+		/// that hosts the docking manager or whether it should be an independent window.
+		/// </summary>
+		public bool OwnedByDockingManagerWindow
+		{
+			get { return (bool)GetValue(OwnedByDockingManagerWindowProperty); }
+			set { SetValue(OwnedByDockingManagerWindowProperty, value); }
+		}
+
+		private static void OwnedByDockingManagerWindowPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			if (d is LayoutFloatingWindowControl w && w.IsLoaded)
+			{
+				w.UpdateOwnership();
+			}
+		}
+
+		#endregion
+
+		#region AllowMinimize
+
+		/// <summary><see cref="AllowMinimize"/> dependency property.</summary>
+		public static readonly DependencyProperty AllowMinimizeProperty =
+			DependencyProperty.Register("AllowMinimize", typeof(bool), typeof(LayoutFloatingWindowControl), new PropertyMetadata(false));
+
+		/// <summary>
+		/// Gets/sets whether the floating window supports being minimized.
+		/// </summary>
+		public bool AllowMinimize
+		{
+			get { return (bool)GetValue(AllowMinimizeProperty); }
+			set { SetValue(AllowMinimizeProperty, value); }
+		}
+
+		#endregion AllowMinimize
+
 		#region IsMaximized
 
 		/// <summary><see cref="IsMaximized"/> dependency property.</summary>
 		public static readonly DependencyProperty IsMaximizedProperty = DependencyProperty.Register(nameof(IsMaximized), typeof(bool), typeof(LayoutFloatingWindowControl),
-				  new FrameworkPropertyMetadata(false));
+						  new FrameworkPropertyMetadata(false));
 
 		/// <summary>Gets/sets the <see cref="IsMaximized"/> property. This dependency property indicates if the window is maximized.</summary>
 		/// <remarks>Provides a secure method for setting the <see cref="IsMaximized"/> property.</remarks>
@@ -505,13 +548,26 @@ namespace AvalonDock.Controls
 		private void OnLoaded(object sender, RoutedEventArgs e)
 		{
 			Loaded -= OnLoaded;
-			this.SetParentToMainWindowOf(Model.Root.Manager);
+
+			this.UpdateOwnership();
+
 			_hwndSrc = PresentationSource.FromDependencyObject(this) as HwndSource;
 			_hwndSrcHook = FilterMessage;
 			_hwndSrc.AddHook(_hwndSrcHook);
 			// Restore maximize state
 			var maximized = Model.Descendents().OfType<ILayoutElementForFloatingWindow>().Any(l => l.IsMaximized);
 			UpdateMaximizedState(maximized);
+		}
+
+		internal void UpdateOwnership()
+		{
+			// Determine whether the child window should be owned by the parent or act independently
+			// according to OwnedByDockingManagerWindow property.
+			var manager = Model?.Root?.Manager;
+			if (OwnedByDockingManagerWindow && manager != null)
+				this.SetParentToMainWindowOf(manager);
+			else
+				this.SetParentWindowToNull();
 		}
 
 		private void OnUnloaded(object sender, RoutedEventArgs e)
@@ -578,7 +634,18 @@ namespace AvalonDock.Controls
 				posElement.IsMaximized = isMaximized;
 			IsMaximized = isMaximized;
 			_isInternalChange = true;
-			WindowState = isMaximized ? WindowState.Maximized : WindowState.Normal;
+
+			if (isMaximized)
+			{
+				WindowState = WindowState.Maximized;
+			}
+			else if (!this.AllowMinimize || this.WindowState != WindowState.Minimized)
+			{
+				// If minimize is not supported, this prevents the window from being minimized.
+				// by resetting it to the normal state.
+				WindowState = WindowState.Normal;
+			}
+
 			_isInternalChange = false;
 		}
 
