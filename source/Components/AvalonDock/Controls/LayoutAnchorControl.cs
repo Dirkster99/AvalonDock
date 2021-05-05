@@ -90,6 +90,22 @@ namespace AvalonDock.Controls
 
 		#endregion Side
 
+        	#region IsAutoHiding
+
+        	static readonly DependencyPropertyKey IsAutoHidingPropertyKey = DependencyProperty.RegisterReadOnly("IsAutoHiding", typeof(bool), typeof(LayoutAnchorControl),
+            		new PropertyMetadata(true));
+
+        	public static readonly DependencyProperty IsAutoHidingProperty = IsAutoHidingPropertyKey.DependencyProperty;
+
+        	public bool IsAutoHiding => (bool)GetValue(IsAutoHidingProperty);
+
+        	internal void SetIsAutoHiding(bool value)
+        	{
+        	    SetValue(IsAutoHidingPropertyKey, value);
+        	}
+
+        	#endregion IsAutoHiding
+
 		#endregion Properties
 
 		#region Overrides
