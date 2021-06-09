@@ -1448,7 +1448,7 @@
 							<MultiDataTrigger.Conditions>
 								<Condition Binding="{Binding IsLastFocusedDocument}" Value="true" />
 							</MultiDataTrigger.Conditions>
-							<Setter TargetName="PART_ImgPinClose" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrushKey}}" />
+							<Setter TargetName="PART_ImgPinClose" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}" />
 						</MultiDataTrigger>
 
 						<!--  Document Well : Tab : Button / Selected, inactive, hovered  -->
@@ -1459,7 +1459,7 @@
 							</MultiDataTrigger.Conditions>
 							<Setter TargetName="DocumentCloseButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveHoveredBackground}}" />
 							<Setter TargetName="DocumentCloseButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveHoveredBorder}}" />
-							<Setter TargetName="PART_ImgPinClose" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrushKey}}" />
+							<Setter TargetName="PART_ImgPinClose" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveHoveredGlyph}}" />
 						</MultiDataTrigger>
 
 						<!--  Document Well : Tab : Button / Selected, inactive, pressed  -->
@@ -1475,7 +1475,7 @@
 
 						<!--  Document Well : Tab : Button / Selected, active  -->
 						<DataTrigger Binding="{Binding IsActive}" Value="true">
-							<Setter TargetName="PART_ImgPinClose" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DockingButtonForegroundArrowBrushKey}}" />
+							<Setter TargetName="PART_ImgPinClose" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveGlyph}}" />
 						</DataTrigger>
 
 						<!--  Document Well : Tab : Button / Selected, active, hovered  -->
