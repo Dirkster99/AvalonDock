@@ -123,6 +123,7 @@ to also theme standard elements, such as, button and textblock etc.
 ## Applied to master but not yet released to NuGet
 
 - [#278 Rename pt-BR to pt (make Brazilian Portuguese default to Portuguese)](https://github.com/Dirkster99/AvalonDock/pull/278)   (thanx to [mpondo](https://github.com/mpondo))
+- [#272 Fix Mismatched ResourceKey on VS2013 Theme](https://github.com/Dirkster99/AvalonDock/pull/272)   (thanx to [Reisen Usagi](https://github.com/usagirei))
 
 ## Features and Fixes Added in Version 4.51.1
 
