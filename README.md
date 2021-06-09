@@ -120,6 +120,10 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
+## Applied to master but not yet released to NuGet
+
+- [#278 Rename pt-BR to pt (make Brazilian Portuguese default to Portuguese)](https://github.com/Dirkster99/AvalonDock/pull/278)   (thanx to [mpondo](https://github.com/mpondo))
+
 ## Features and Fixes Added in Version 4.51.1
 
 - [#262 Contextmenus on dpi-aware application have a wrong scaling](https://github.com/Dirkster99/AvalonDock/issues/262)   (thanx to [moby42](https://github.com/moby42))
