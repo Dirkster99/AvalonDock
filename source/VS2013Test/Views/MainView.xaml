@@ -1,0 +1,206 @@
+<Window x:Class="AvalonDock.VS2013Test.Views.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AvalonDock.VS2013Test"
+		xmlns:viewModels="clr-namespace:AvalonDock.VS2013Test.ViewModels"
+		xmlns:themes="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.VS2013"
+		xmlns:icons="clr-namespace:VS2013Test.Icons"
+        mc:Ignorable="d"
+        Title="VS2013Test" MinWidth="140" MinHeight="34" MaxWidth="{x:Static SystemParameters.MaximizedPrimaryScreenWidth}" MaxHeight="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" Height="720" Width="1280" SnapsToDevicePixels="True" Foreground="White" Background="#2d2d30" WindowStyle="None" ResizeMode="CanResize">
+
+	<Window.DataContext>
+		<viewModels:Workspace/>
+	</Window.DataContext>
+
+	<WindowChrome.WindowChrome>
+		<WindowChrome CaptionHeight="25" ResizeBorderThickness="8" CornerRadius="0" GlassFrameThickness="0" NonClientFrameEdges="None" />
+	</WindowChrome.WindowChrome>
+
+	<Window.Style>
+		<Style TargetType="{x:Type Window}">
+			<Setter Property="BorderThickness" Value="1" />
+			<Setter Property="BorderBrush" Value="#1982C4" />
+			<Style.Triggers>
+				<Trigger Property="IsActive" Value="False">
+					<Setter Property="BorderBrush" Value="#3F3F46"/>
+				</Trigger>
+				<Trigger Property="WindowState" Value="Maximized">
+					<Setter Property="BorderThickness" Value="0" />
+				</Trigger>
+			</Style.Triggers>
+		</Style>
+	</Window.Style>
+
+	<Grid>
+		<Grid.Style>
+			<Style TargetType="{x:Type Grid}">
+				<Style.Triggers>
+					<DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
+						<Setter Property="Margin" Value="7,9,7,9" />
+					</DataTrigger>
+				</Style.Triggers>
+			</Style>
+		</Grid.Style>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+
+		<WrapPanel Margin="8,4" HorizontalAlignment="Left">
+			<icons:VisualStudioIcon Margin="4,0,5,0" Height="20">
+				<UserControl.Style>
+					<Style TargetType="{x:Type UserControl}">
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="False">
+								<Setter Property="Foreground" Value="#818181" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</UserControl.Style>
+			</icons:VisualStudioIcon>
+			
+			<Menu VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
+				<MenuItem Header="File">
+					<MenuItem Command="{Binding NewCommand}" Header="New" />
+					<MenuItem Command="{Binding OpenCommand}" Header="Open" />
+					<Separator />
+					<MenuItem Command="{Binding ActiveDocument.SaveCommand}" Header="Save" />
+					<MenuItem Command="{Binding ActiveDocument.SaveAsCommand}" Header="Save As..." />
+					<Separator />
+					<MenuItem Command="{Binding ActiveDocument.CloseCommand}" Header="Close" />
+				</MenuItem>
+
+				<MenuItem Header="Edit"/>
+
+				<MenuItem Header="View">
+					<MenuItem Header="SolutionExplorer" IsCheckable="True" IsChecked="{Binding Explorer.IsVisible, Mode=TwoWay}" />
+					<MenuItem Header="Properties" IsCheckable="True" IsChecked="{Binding Props.IsVisible, Mode=TwoWay}" />
+					<MenuItem Header="Error List" IsCheckable="True" IsChecked="{Binding Errors.IsVisible, Mode=TwoWay}" />
+					<MenuItem Header="Output" IsCheckable="True" IsChecked="{Binding Output.IsVisible, Mode=TwoWay}" />
+				</MenuItem>
+				
+				<!--<MenuItem Header="Layout">
+					<MenuItem Command="{Binding LoadLayoutCommand, ElementName=mainWindow}" Header="Load" />
+					<MenuItem Command="{Binding SaveLayoutCommand, ElementName=mainWindow}" Header="Save" />
+					<MenuItem Click="OnDumpToConsole" Header="Dump to Console" />
+				</MenuItem>-->
+			</Menu>
+			
+			<ComboBox
+				 WindowChrome.IsHitTestVisibleInChrome="True"
+				DisplayMemberPath="Item1"
+				ItemsSource="{Binding Themes}"
+				SelectedItem="{Binding SelectedTheme}" />
+		</WrapPanel>
+
+		<DockingManager
+            Grid.Row="1"
+		    ActiveContent="{Binding ActiveDocument, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
+		    AnchorablesSource="{Binding Tools}"
+		    DocumentsSource="{Binding Files}"
+			Theme="{Binding SelectedTheme.Item2}">
+
+			<DockingManager.LayoutItemTemplateSelector>
+				<local:PanesTemplateSelector>
+					<local:PanesTemplateSelector.FileViewTemplate>
+						<DataTemplate>
+							<TextBox Background="Transparent" BorderThickness="0" Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}" />
+						</DataTemplate>
+					</local:PanesTemplateSelector.FileViewTemplate>
+					<local:PanesTemplateSelector.FileStatsViewTemplate>
+						<DataTemplate>
+							<Border/>
+						</DataTemplate>
+					</local:PanesTemplateSelector.FileStatsViewTemplate>
+					<local:PanesTemplateSelector.PropertiesViewTemplate>
+						<DataTemplate>
+							<Border/>
+						</DataTemplate>
+					</local:PanesTemplateSelector.PropertiesViewTemplate>
+					<local:PanesTemplateSelector.ExplorerViewTemplate>
+						<DataTemplate>
+							<Border/>
+						</DataTemplate>
+					</local:PanesTemplateSelector.ExplorerViewTemplate>
+					<local:PanesTemplateSelector.ErrorViewTemplate>
+						<DataTemplate>
+							<Border/>
+						</DataTemplate>
+					</local:PanesTemplateSelector.ErrorViewTemplate>
+					<local:PanesTemplateSelector.OutputViewTemplate>
+						<DataTemplate>
+							<Border/>
+						</DataTemplate>
+					</local:PanesTemplateSelector.OutputViewTemplate>
+				</local:PanesTemplateSelector>
+			</DockingManager.LayoutItemTemplateSelector>
+
+			<DockingManager.LayoutItemContainerStyleSelector>
+				<local:PanesStyleSelector>
+					<local:PanesStyleSelector.ToolStyle>
+						<Style TargetType="{x:Type LayoutAnchorableItem}">
+							<Setter Property="Title" Value="{Binding Model.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+							<Setter Property="Visibility" Value="{Binding Model.IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}" />
+							<Setter Property="ContentId" Value="{Binding Model.ContentId, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+							<Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}" />
+							<Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}" />
+							<Setter Property="CanHide" Value="True" />
+						</Style>
+					</local:PanesStyleSelector.ToolStyle>
+					<local:PanesStyleSelector.FileStyle>
+						<Style TargetType="{x:Type LayoutItem}">
+							<Setter Property="Title" Value="{Binding Model.Title}" />
+							<Setter Property="ToolTip" Value="{Binding Model.FilePath}" />
+							<Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}" />
+							<Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
+							<Setter Property="IconSource" Value="{Binding Model.IconSource}" />
+							<Setter Property="ContentId" Value="{Binding Model.ContentId}" />
+							<Setter Property="CanClose" Value="True"/>
+						</Style>
+					</local:PanesStyleSelector.FileStyle>
+				</local:PanesStyleSelector>
+			</DockingManager.LayoutItemContainerStyleSelector>
+			<DockingManager.LayoutUpdateStrategy>
+				<local:LayoutInitializer />
+			</DockingManager.LayoutUpdateStrategy>
+
+			<LayoutRoot>
+				<LayoutPanel Orientation="Vertical">
+					<LayoutPanel>
+						<LayoutAnchorablePaneGroup DockWidth="256">
+							<LayoutAnchorablePane Name="ExplorerPane"/>
+						</LayoutAnchorablePaneGroup>
+
+						<LayoutDocumentPane/>
+
+						<LayoutAnchorablePaneGroup DockWidth="256">
+							<LayoutAnchorablePane Name="PropertiesPane"/>
+						</LayoutAnchorablePaneGroup>
+					</LayoutPanel>
+
+					<LayoutAnchorablePaneGroup DockHeight="128">
+						<LayoutAnchorablePane Name="ErrorPane"/>
+						<LayoutAnchorablePane Name="OutputPane"/>
+					</LayoutAnchorablePaneGroup>
+				</LayoutPanel>
+			</LayoutRoot>
+		</DockingManager>
+
+		<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" WindowChrome.IsHitTestVisibleInChrome="True">
+			<Button Style="{StaticResource MinimizeButton}" Click="MinimizeClick" />
+			<Button Style="{StaticResource MaximizeButton}" Click="MaximizeClick" />
+			<Button Style="{StaticResource RestoreDownButton}" Click="RestoreDownClick" />
+			<Button Style="{StaticResource CloseButton}" Click="CloseClick" />
+		</StackPanel>
+
+		<Border Grid.Row="2" Height="23" Background="#1982C4">
+			<Grid>
+				<TextBlock Text="Ready" VerticalAlignment="Center" Margin="6,0,0,0" />
+			</Grid>
+		</Border>
+	</Grid>
+</Window>

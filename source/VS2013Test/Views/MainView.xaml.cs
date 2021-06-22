@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace VS2013Test
+namespace AvalonDock.VS2013Test.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

@@ -1,10 +1,21 @@
-<Application x:Class="VS2013Test.App"
+<Application x:Class="AvalonDock.VS2013Test.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:VS2013Test"
-             StartupUri="MainView.xaml">
+			 xmlns:converters="clr-namespace:AvalonDock.VS2013Test.Converters"    
+             StartupUri="Views/MainView.xaml">
 	
     <Application.Resources>
-         
-    </Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary>
+					<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+					<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+					<converters:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
+				</ResourceDictionary>
+
+				<ResourceDictionary Source="pack://application:,,,/VS2013Test;component/Themes/Generic.xaml" />
+				<ResourceDictionary Source="/AvalonDock.Themes.VS2013;component/DarkBrushs.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Application.Resources>
 </Application>
