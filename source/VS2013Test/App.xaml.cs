@@ -6,6 +6,6 @@ namespace AvalonDock.VS2013Test
 	/// Interaction logic for App.xaml
 	/// </summary>
 	public partial class App : Application
-    {
-    }
+	{
+	}
 }

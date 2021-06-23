@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AvalonDock.VS2013Test"
 		xmlns:viewModels="clr-namespace:AvalonDock.VS2013Test.ViewModels"
-		xmlns:themes="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.VS2013"
+		xmlns:reskeys="clr-namespace:AvalonDock.Themes.VS2013.Themes;assembly=AvalonDock.Themes.VS2013"
 		xmlns:icons="clr-namespace:VS2013Test.Icons"
         mc:Ignorable="d"
-        Title="VS2013Test" MinWidth="140" MinHeight="34" MaxWidth="{x:Static SystemParameters.MaximizedPrimaryScreenWidth}" MaxHeight="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" Height="720" Width="1280" SnapsToDevicePixels="True" Foreground="White" Background="#2d2d30" WindowStyle="None" ResizeMode="CanResize">
+        Title="VS2013Test" MinWidth="140" MinHeight="34" MaxWidth="{x:Static SystemParameters.MaximizedPrimaryScreenWidth}" MaxHeight="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" Height="720" Width="1280" SnapsToDevicePixels="True" Foreground="White" Background="{DynamicResource HeaderBackground}" WindowStyle="None" ResizeMode="CanResize">
 
 	<Window.DataContext>
 		<viewModels:Workspace/>
@@ -50,10 +50,12 @@
 			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
 
-		<WrapPanel Margin="8,4" HorizontalAlignment="Left">
-			<icons:VisualStudioIcon Margin="4,0,5,0" Height="20">
+		<StackPanel Margin="8,4" HorizontalAlignment="Left" Orientation="Horizontal">
+			<icons:VisualStudioIcon Margin="4,0" Height="20">
 				<UserControl.Style>
 					<Style TargetType="{x:Type UserControl}">
+						<Setter Property="Foreground" Value="{DynamicResource IconBackground}"/>
+						
 						<Style.Triggers>
 							<DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="False">
 								<Setter Property="Foreground" Value="#818181" />
@@ -90,12 +92,12 @@
 				</MenuItem>-->
 			</Menu>
 			
-			<ComboBox
+			<ComboBox Margin="4,0"
 				 WindowChrome.IsHitTestVisibleInChrome="True"
 				DisplayMemberPath="Item1"
 				ItemsSource="{Binding Themes}"
-				SelectedItem="{Binding SelectedTheme}" />
-		</WrapPanel>
+				SelectedItem="{Binding SelectedTheme}" SelectedIndex="0" />
+		</StackPanel>
 
 		<DockingManager
             Grid.Row="1"
@@ -197,9 +199,9 @@
 			<Button Style="{StaticResource CloseButton}" Click="CloseClick" />
 		</StackPanel>
 
-		<Border Grid.Row="2" Height="23" Background="#1982C4">
+		<Border Grid.Row="2" Height="23" Background="{DynamicResource StatusBarBackground}">
 			<Grid>
-				<TextBlock Text="Ready" VerticalAlignment="Center" Margin="6,0,0,0" />
+				<TextBlock Text="Ready" VerticalAlignment="Center" Margin="6,0" />
 			</Grid>
 		</Border>
 	</Grid>

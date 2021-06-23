@@ -7,14 +7,15 @@
     <Application.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="pack://application:,,,/AvalonDock.Themes.VS2013;component/DarkBrushs.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/VS2013Test;component/Themes/DarkBrushsExtended.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/VS2013Test;component/Themes/Generic.xaml" />
+
 				<ResourceDictionary>
 					<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 					<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 					<converters:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
 				</ResourceDictionary>
-
-				<ResourceDictionary Source="pack://application:,,,/VS2013Test;component/Themes/Generic.xaml" />
-				<ResourceDictionary Source="/AvalonDock.Themes.VS2013;component/DarkBrushs.xaml" />
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Application.Resources>
