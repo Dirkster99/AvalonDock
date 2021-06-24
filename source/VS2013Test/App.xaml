@@ -7,7 +7,6 @@
     <Application.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<ResourceDictionary Source="pack://application:,,,/AvalonDock.Themes.VS2013;component/DarkBrushs.xaml" />
 				<ResourceDictionary Source="pack://application:,,,/VS2013Test;component/Themes/DarkBrushsExtended.xaml" />
 				<ResourceDictionary Source="pack://application:,,,/VS2013Test;component/Themes/Generic.xaml" />
 

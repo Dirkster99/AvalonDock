@@ -7,7 +7,7 @@
 		<Setter Property="Focusable" Value="False"/>
 		<Setter Property="ToolTip" Value="Close"/>
 		<Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
-		<Setter Property="Foreground" Value="White"/>
+		<Setter Property="Foreground" Value="{DynamicResource SystemButtonsForeground}"/>
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
@@ -17,13 +17,14 @@
 
 					<ControlTemplate.Triggers>
 						<Trigger Property="IsMouseOver" Value="True">
-							<Setter Property="Background" Value="#393939"/>
+							<Setter Property="Background" Value="{DynamicResource SystemButtonsMouseOverBackground}"/>
 						</Trigger>
 						<Trigger Property="IsPressed" Value="true">
-							<Setter Property="Background" Value="#1982C4"/>
+							<Setter Property="Foreground" Value="{DynamicResource SystemButtonsMousePressedForeground}"/>
+							<Setter Property="Background" Value="{DynamicResource SystemButtonsMousePressedBackground}"/>
 						</Trigger>
 						<DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="False">
-							<Setter Property="Foreground" Value="#818181" />
+							<Setter Property="Foreground" Value="{DynamicResource SystemButtonsInactiveForeground}" />
 						</DataTrigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
@@ -37,7 +38,7 @@
 		<Setter Property="IsTabStop" Value="False"/>
 		<Setter Property="Focusable" Value="False"/>
 		<Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
-		<Setter Property="Foreground" Value="White"/>
+		<Setter Property="Foreground" Value="{DynamicResource SystemButtonsForeground}"/>
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
@@ -47,16 +48,17 @@
 
 					<ControlTemplate.Triggers>
 						<Trigger Property="IsMouseOver" Value="True">
-							<Setter Property="Background" Value="#393939"/>
+							<Setter Property="Background" Value="{DynamicResource SystemButtonsMouseOverBackground}"/>
 						</Trigger>
 						<Trigger Property="IsPressed" Value="true">
-							<Setter Property="Background" Value="#1982C4"/>
+							<Setter Property="Foreground" Value="{DynamicResource SystemButtonsMousePressedForeground}"/>
+							<Setter Property="Background" Value="{DynamicResource SystemButtonsMousePressedBackground}"/>
 						</Trigger>
 						<DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="Maximized">
 							<Setter Property="Visibility" Value="Collapsed"/>
 						</DataTrigger>
 						<DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="False">
-							<Setter Property="Foreground" Value="#818181" />
+							<Setter Property="Foreground" Value="{DynamicResource SystemButtonsInactiveForeground}" />
 						</DataTrigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
@@ -71,7 +73,7 @@
 		<Setter Property="Focusable" Value="False"/>
 		<Setter Property="ToolTip" Value="Restore Down"/>
 		<Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
-		<Setter Property="Foreground" Value="White"/>
+		<Setter Property="Foreground" Value="{DynamicResource SystemButtonsForeground}"/>
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
@@ -81,16 +83,17 @@
 
 					<ControlTemplate.Triggers>
 						<Trigger Property="IsMouseOver" Value="True">
-							<Setter Property="Background" Value="#393939"/>
+							<Setter Property="Background" Value="{DynamicResource SystemButtonsMouseOverBackground}"/>
 						</Trigger>
 						<Trigger Property="IsPressed" Value="true">
-							<Setter Property="Background" Value="#1982C4"/>
+							<Setter Property="Foreground" Value="{DynamicResource SystemButtonsMousePressedForeground}"/>
+							<Setter Property="Background" Value="{DynamicResource SystemButtonsMousePressedBackground}"/>
 						</Trigger>
 						<DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="Maximized">
 							<Setter Property="Visibility" Value="Visible"/>
 						</DataTrigger>
 						<DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="False">
-							<Setter Property="Foreground" Value="#818181" />
+							<Setter Property="Foreground" Value="{DynamicResource SystemButtonsInactiveForeground}" />
 						</DataTrigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
@@ -105,7 +108,7 @@
 		<Setter Property="Focusable" Value="False"/>
 		<Setter Property="ToolTip" Value="Minimize"/>
 		<Setter Property="Background" Value="{Binding Background, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
-		<Setter Property="Foreground" Value="White"/>
+		<Setter Property="Foreground" Value="{DynamicResource SystemButtonsForeground}"/>
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
@@ -115,19 +118,14 @@
 
 					<ControlTemplate.Triggers>
 						<Trigger Property="IsMouseOver" Value="True">
-							<Setter Property="Background" Value="#393939"/>
+							<Setter Property="Background" Value="{DynamicResource SystemButtonsMouseOverBackground}"/>
 						</Trigger>
-						<MultiTrigger>
-							<MultiTrigger.Conditions>
-								<Condition Property="IsMouseOver" Value="True" />
-								<Condition Property="IsPressed" Value="True" />
-							</MultiTrigger.Conditions>
-							<MultiTrigger.Setters>
-								<Setter Property="Background" Value="#1982C4"/>
-							</MultiTrigger.Setters>
-						</MultiTrigger>
+						<Trigger Property="IsPressed" Value="true">
+							<Setter Property="Foreground" Value="{DynamicResource SystemButtonsMousePressedForeground}"/>
+							<Setter Property="Background" Value="{DynamicResource SystemButtonsMousePressedBackground}"/>
+						</Trigger>
 						<DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="False">
-							<Setter Property="Foreground" Value="#818181" />
+							<Setter Property="Foreground" Value="{DynamicResource SystemButtonsInactiveForeground}" />
 						</DataTrigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>

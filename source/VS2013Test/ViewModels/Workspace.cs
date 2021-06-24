@@ -192,13 +192,13 @@ namespace AvalonDock.VS2013Test.ViewModels
 			switch (selectedTheme.Item1)
 			{
 				case "Vs2013DarkTheme":
-					Application.Current.Resources.MergedDictionaries[1].Source = new Uri("pack://application:,,,/VS2013Test;component/Themes/DarkBrushsExtended.xaml");
+					Application.Current.Resources.MergedDictionaries[0].Source = new Uri("pack://application:,,,/VS2013Test;component/Themes/DarkBrushsExtended.xaml");
 					break;
 				case "Vs2013LightTheme":
-					Application.Current.Resources.MergedDictionaries[1].Source = new Uri("pack://application:,,,/VS2013Test;component/Themes/LightBrushsExtended.xaml");
+					Application.Current.Resources.MergedDictionaries[0].Source = new Uri("pack://application:,,,/VS2013Test;component/Themes/LightBrushsExtended.xaml");
 					break;
 				case "Vs2013BlueTheme":
-					Application.Current.Resources.MergedDictionaries[1].Source = new Uri("pack://application:,,,/VS2013Test;component/Themes/BlueBrushsExtended.xaml");
+					Application.Current.Resources.MergedDictionaries[0].Source = new Uri("pack://application:,,,/VS2013Test;component/Themes/BlueBrushsExtended.xaml");
 					break;
 				default:
 					break;
