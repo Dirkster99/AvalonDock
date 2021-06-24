@@ -7,7 +7,7 @@
 		xmlns:viewModels="clr-namespace:AvalonDock.VS2013Test.ViewModels"
 		xmlns:icons="clr-namespace:VS2013Test.Icons"
         mc:Ignorable="d"
-        Title="VS2013Test" MinWidth="140" MinHeight="34" MaxWidth="{x:Static SystemParameters.MaximizedPrimaryScreenWidth}" MaxHeight="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" Height="720" Width="1280" SnapsToDevicePixels="True" UseLayoutRounding="True" Foreground="{DynamicResource WindowForeground}" Background="{DynamicResource HeaderBackground}" WindowStyle="None" ResizeMode="CanResize">
+        Title="VS2013Test" MinWidth="140" MinHeight="34" MaxWidth="{x:Static SystemParameters.MaximizedPrimaryScreenWidth}" MaxHeight="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" Height="720" Width="1280" SnapsToDevicePixels="True" Foreground="{DynamicResource WindowForeground}" Background="{DynamicResource HeaderBackground}" WindowStyle="None" ResizeMode="CanResize">
 
 	<Window.DataContext>
 		<viewModels:Workspace/>
@@ -25,9 +25,6 @@
 				<Trigger Property="IsActive" Value="False">
 					<Setter Property="BorderBrush" Value="{DynamicResource WindowInactiveBorderBrush}"/>
 				</Trigger>
-				<Trigger Property="WindowState" Value="Maximized">
-					<Setter Property="BorderThickness" Value="0" />
-				</Trigger>
 			</Style.Triggers>
 		</Style>
 	</Window.Style>
@@ -37,7 +34,7 @@
 			<Style TargetType="{x:Type Grid}">
 				<Style.Triggers>
 					<DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}" Value="Maximized">
-						<Setter Property="Margin" Value="7,7,7,9" />
+						<Setter Property="Margin" Value="6,6,6,8" />
 					</DataTrigger>
 				</Style.Triggers>
 			</Style>
@@ -200,7 +197,18 @@
 
 		<Border Grid.Row="2" Height="23" Background="{DynamicResource StatusBarBackground}">
 			<Grid>
-				<TextBlock Text="Ready" Foreground="{DynamicResource StatusBarForeground}" VerticalAlignment="Center" Margin="6,0" />
+				<StackPanel Orientation="Horizontal">
+					<Path Stroke="White" StrokeThickness="1" VerticalAlignment="Bottom" Margin="7.5,0,8,5">
+						<Path.Data>
+							<RectangleGeometry Rect="0,0,12,10"/>
+						</Path.Data>
+						<Path.RenderTransform>
+							<SkewTransform AngleX="-15">
+							</SkewTransform>
+						</Path.RenderTransform>
+					</Path>
+					<TextBlock Text="Ready" Foreground="{DynamicResource StatusBarForeground}" VerticalAlignment="Center" Margin="0,0,6,1" />
+				</StackPanel>
 			</Grid>
 		</Border>
 	</Grid>
