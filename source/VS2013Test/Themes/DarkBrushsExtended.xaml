@@ -14,4 +14,8 @@
 	<SolidColorBrush x:Key="WindowForeground" Color="White" />
 	<SolidColorBrush x:Key="WindowBorderBrush" Color="#007ACC" />
 	<SolidColorBrush x:Key="WindowInactiveBorderBrush" Color="#434346" />
+	<SolidColorBrush x:Key="ToolBarGripper" Color="#656565" />
+	<SolidColorBrush x:Key="ProjectNameForeground" Color="White" />
+	<SolidColorBrush x:Key="ProjectNameInactiveForeground" Color="#818181" />
+	<SolidColorBrush x:Key="ProjectNameBackground" Color="#252526" />
 </ResourceDictionary>

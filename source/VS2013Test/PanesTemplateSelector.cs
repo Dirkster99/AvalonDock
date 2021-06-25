@@ -47,6 +47,18 @@ namespace AvalonDock.VS2013Test
 			set;
 		}
 
+		public DataTemplate GitChangesViewTemplate
+		{
+			get;
+			set;
+		}
+
+		public DataTemplate ToolboxViewTemplate
+		{
+			get;
+			set;
+		}
+
 		public override DataTemplate SelectTemplate(object item, DependencyObject container)
 		{
 			var itemAsLayoutContent = item as LayoutContent;
@@ -68,6 +80,12 @@ namespace AvalonDock.VS2013Test
 
 			if (item is OutputViewModel)
 				return OutputViewTemplate;
+
+			if (item is GitChangesViewModel)
+				return GitChangesViewTemplate;
+
+			if (item is ToolboxViewModel)
+				return ToolboxViewTemplate;
 
 			return base.SelectTemplate(item, container);
 		}

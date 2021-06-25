@@ -25,6 +25,8 @@ namespace AvalonDock.VS2013Test.ViewModels
 		private PropertiesViewModel _props;
 		private ExplorerViewModel _explorer;
 		private OutputViewModel _output;
+		private GitChangesViewModel _git;
+		private ToolboxViewModel _toolbox;
 		private RelayCommand _openCommand;
 		private RelayCommand _newCommand;
 		private Tuple<string, Theme> selectedTheme;
@@ -64,7 +66,7 @@ namespace AvalonDock.VS2013Test.ViewModels
 			get
 			{
 				if (_tools == null)
-					_tools = new ToolViewModel[] { Explorer, Props, Errors, Output };
+					_tools = new ToolViewModel[] { Explorer, Props, Errors, Output, Git, Toolbox };
 				return _tools;
 			}
 		}
@@ -121,6 +123,28 @@ namespace AvalonDock.VS2013Test.ViewModels
 					_output = new OutputViewModel();
 
 				return _output;
+			}
+		}
+
+		public GitChangesViewModel Git
+		{
+			get
+			{
+				if (_git == null)
+					_git = new GitChangesViewModel();
+
+				return _git;
+			}
+		}
+
+		public ToolboxViewModel Toolbox
+		{
+			get
+			{
+				if (_toolbox == null)
+					_toolbox = new ToolboxViewModel();
+
+				return _toolbox;
 			}
 		}
 

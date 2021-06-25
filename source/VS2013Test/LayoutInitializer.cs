@@ -52,19 +52,6 @@ namespace AvalonDock.VS2013Test
 				}
 			}
 
-			if (anchorableToShow.Content is ErrorViewModel)
-			{
-				anchorableToShow.AutoHideHeight = 128;
-
-				var scriptEditorPane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(d => d.Name == "ErrorPane");
-
-				if (scriptEditorPane != null)
-				{
-					scriptEditorPane.Children.Add(anchorableToShow);
-					return true;
-				}
-			}
-
 			if (anchorableToShow.Content is OutputViewModel)
 			{
 				anchorableToShow.AutoHideHeight = 128;
@@ -76,6 +63,40 @@ namespace AvalonDock.VS2013Test
 					outputPane.Children.Add(anchorableToShow);
 					return true;
 				}
+			}
+
+			if (anchorableToShow.Content is ToolboxViewModel)
+			{
+				var leftGroup = new LayoutAnchorGroup();
+				leftGroup.Children.Add(anchorableToShow);
+
+				anchorableToShow.AutoHideWidth = 256;
+
+				layout.LeftSide.Children.Add(leftGroup);
+				return true;
+			}
+
+			if (anchorableToShow.Content is GitChangesViewModel)
+			{
+				var rightGroup = new LayoutAnchorGroup();
+				rightGroup.Children.Add(anchorableToShow);
+
+				anchorableToShow.AutoHideWidth = 256;
+
+				layout.RightSide.Children.Add(rightGroup);
+				return true;
+			}
+
+			if (anchorableToShow.Content is ErrorViewModel)
+			{
+				var bottomGroup = new LayoutAnchorGroup();
+				bottomGroup.Children.Add(anchorableToShow);
+
+				anchorableToShow.AutoHideWidth = 256;
+				anchorableToShow.AutoHideHeight = 128;
+
+				layout.BottomSide.Children.Add(bottomGroup);
+				return true;
 			}
 
 			return false;
