@@ -7,8 +7,10 @@
     <Application.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="pack://application:,,,/MLib;component/Themes/DarkTheme.xaml" />
 				<ResourceDictionary Source="pack://application:,,,/VS2013Test;component/Themes/DarkBrushsExtended.xaml" />
 				<ResourceDictionary Source="pack://application:,,,/VS2013Test;component/Themes/Generic.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/VS2013Test;component/Themes/Controls/VsResizeGrip.xaml" />
 
 				<ResourceDictionary>
 					<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />

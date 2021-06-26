@@ -7,14 +7,14 @@
 		xmlns:viewModels="clr-namespace:AvalonDock.VS2013Test.ViewModels"
 		xmlns:icons="clr-namespace:VS2013Test.Icons"
         mc:Ignorable="d"
-        Title="VS2013Test" MinWidth="140" MinHeight="34" MaxWidth="{x:Static SystemParameters.MaximizedPrimaryScreenWidth}" MaxHeight="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" Height="900" Width="1600" SnapsToDevicePixels="True" Foreground="{DynamicResource WindowForeground}" Background="{DynamicResource HeaderBackground}" WindowStyle="None" ResizeMode="CanResize">
+        Title="VS2013Test" MinWidth="140" MinHeight="34" MaxWidth="{x:Static SystemParameters.MaximizedPrimaryScreenWidth}" MaxHeight="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" Height="900" Width="1600" SnapsToDevicePixels="True" Foreground="{DynamicResource WindowForeground}" Background="{DynamicResource HeaderBackground}" WindowStyle="None" ResizeMode="CanResizeWithGrip" StateChanged="WindowStateChanged">
 
 	<Window.DataContext>
 		<viewModels:Workspace/>
 	</Window.DataContext>
 
 	<WindowChrome.WindowChrome>
-		<WindowChrome CaptionHeight="{Binding ElementName=header, Path=ActualHeight}" ResizeBorderThickness="8" CornerRadius="0" GlassFrameThickness="0" NonClientFrameEdges="None" />
+		<WindowChrome x:Name="chrome" ResizeBorderThickness="8" CornerRadius="0" GlassFrameThickness="0" NonClientFrameEdges="None" />
 	</WindowChrome.WindowChrome>
 
 	<Window.Style>
@@ -46,7 +46,7 @@
 			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
 
-		<Grid x:Name="header">
+		<Grid x:Name="header" SizeChanged="HeaderSizeChanged">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto"/>
 				<RowDefinition Height="4"/>
@@ -68,7 +68,7 @@
 					</UserControl.Style>
 				</icons:VisualStudioIcon>
 
-				<Menu VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
+				<Menu Style="{DynamicResource MetroMenu}" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
 					<MenuItem Header="File">
 						<MenuItem Command="{Binding NewCommand}" Header="New" />
 						<MenuItem Command="{Binding OpenCommand}" Header="Open" />
@@ -86,13 +86,9 @@
 						<MenuItem Header="Properties" IsCheckable="True" IsChecked="{Binding Props.IsVisible, Mode=TwoWay}" />
 						<MenuItem Header="Error List" IsCheckable="True" IsChecked="{Binding Errors.IsVisible, Mode=TwoWay}" />
 						<MenuItem Header="Output" IsCheckable="True" IsChecked="{Binding Output.IsVisible, Mode=TwoWay}" />
+						<MenuItem Header="Git Changes" IsCheckable="True" IsChecked="{Binding Git.IsVisible, Mode=TwoWay}" />
+						<MenuItem Header="Toolbox" IsCheckable="True" IsChecked="{Binding Toolbox.IsVisible, Mode=TwoWay}" />
 					</MenuItem>
-
-					<!--<MenuItem Header="Layout">
-					<MenuItem Command="{Binding LoadLayoutCommand, ElementName=mainWindow}" Header="Load" />
-					<MenuItem Command="{Binding SaveLayoutCommand, ElementName=mainWindow}" Header="Save" />
-					<MenuItem Click="OnDumpToConsole" Header="Dump to Console" />
-				</MenuItem>-->
 				</Menu>
 
 				<ComboBox Margin="4,0"
@@ -177,14 +173,9 @@
 				<local:PanesTemplateSelector>
 					<local:PanesTemplateSelector.FileViewTemplate>
 						<DataTemplate>
-							<TextBox Background="Transparent" BorderThickness="0" Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}" />
+							<TextBox Background="Transparent" Foreground="{DynamicResource WindowForeground}" CaretBrush="{DynamicResource WindowForeground}" FontFamily="Consolas" BorderThickness="0" Padding="2,4" Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" AcceptsTab="True" />
 						</DataTemplate>
 					</local:PanesTemplateSelector.FileViewTemplate>
-					<local:PanesTemplateSelector.FileStatsViewTemplate>
-						<DataTemplate>
-							<Border/>
-						</DataTemplate>
-					</local:PanesTemplateSelector.FileStatsViewTemplate>
 					<local:PanesTemplateSelector.PropertiesViewTemplate>
 						<DataTemplate>
 							<Border/>
@@ -252,7 +243,8 @@
 					<LayoutPanel Orientation="Vertical">
 						<LayoutDocumentPane/>
 
-						<LayoutAnchorablePaneGroup DockHeight="128">
+						<LayoutAnchorablePaneGroup DockHeight="128" Orientation="Horizontal">
+							<LayoutAnchorablePane Name="ErrorsPane"/>
 							<LayoutAnchorablePane Name="OutputPane"/>
 						</LayoutAnchorablePaneGroup>
 					</LayoutPanel>

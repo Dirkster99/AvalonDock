@@ -17,12 +17,6 @@ namespace AvalonDock.VS2013Test
 			set;
 		}
 
-		public DataTemplate FileStatsViewTemplate
-		{
-			get;
-			set;
-		}
-
 		public DataTemplate PropertiesViewTemplate
 		{
 			get;
@@ -65,9 +59,6 @@ namespace AvalonDock.VS2013Test
 
 			if (item is FileViewModel)
 				return FileViewTemplate;
-
-			if (item is FileStatsViewModel)
-				return FileStatsViewTemplate;
 
 			if (item is PropertiesViewModel)
 				return PropertiesViewTemplate;

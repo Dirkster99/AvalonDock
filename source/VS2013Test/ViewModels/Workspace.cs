@@ -20,7 +20,6 @@ namespace AvalonDock.VS2013Test.ViewModels
 		private ObservableCollection<FileViewModel> _files = new ObservableCollection<FileViewModel>();
 		private ReadOnlyObservableCollection<FileViewModel> _readonyFiles;
 		private FileViewModel _activeDocument;
-		private FileStatsViewModel _fileStats;
 		private ErrorViewModel _errors;
 		private PropertiesViewModel _props;
 		private ExplorerViewModel _explorer;
@@ -68,17 +67,6 @@ namespace AvalonDock.VS2013Test.ViewModels
 				if (_tools == null)
 					_tools = new ToolViewModel[] { Explorer, Props, Errors, Output, Git, Toolbox };
 				return _tools;
-			}
-		}
-
-		public FileStatsViewModel FileStats
-		{
-			get
-			{
-				if (_fileStats == null)
-					_fileStats = new FileStatsViewModel();
-
-				return _fileStats;
 			}
 		}
 
@@ -216,13 +204,17 @@ namespace AvalonDock.VS2013Test.ViewModels
 			switch (selectedTheme.Item1)
 			{
 				case "Vs2013DarkTheme":
-					Application.Current.Resources.MergedDictionaries[0].Source = new Uri("pack://application:,,,/VS2013Test;component/Themes/DarkBrushsExtended.xaml");
+					Application.Current.Resources.MergedDictionaries[0].Source = new Uri("pack://application:,,,/MLib;component/Themes/DarkTheme.xaml");
+					Application.Current.Resources.MergedDictionaries[1].Source = new Uri("pack://application:,,,/VS2013Test;component/Themes/DarkBrushsExtended.xaml");
 					break;
 				case "Vs2013LightTheme":
-					Application.Current.Resources.MergedDictionaries[0].Source = new Uri("pack://application:,,,/VS2013Test;component/Themes/LightBrushsExtended.xaml");
+					Application.Current.Resources.MergedDictionaries[0].Source = new Uri("pack://application:,,,/MLib;component/Themes/LightTheme.xaml");
+					Application.Current.Resources.MergedDictionaries[1].Source = new Uri("pack://application:,,,/VS2013Test;component/Themes/LightBrushsExtended.xaml");
 					break;
 				case "Vs2013BlueTheme":
-					Application.Current.Resources.MergedDictionaries[0].Source = new Uri("pack://application:,,,/VS2013Test;component/Themes/BlueBrushsExtended.xaml");
+					//TODO: Create new color resources for blue theme
+					Application.Current.Resources.MergedDictionaries[0].Source = new Uri("pack://application:,,,/MLib;component/Themes/LightTheme.xaml");
+					Application.Current.Resources.MergedDictionaries[1].Source = new Uri("pack://application:,,,/VS2013Test;component/Themes/BlueBrushsExtended.xaml");
 					break;
 				default:
 					break;

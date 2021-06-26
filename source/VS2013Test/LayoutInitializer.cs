@@ -12,19 +12,19 @@ namespace AvalonDock.VS2013Test
 			//just for test provide a new anchorablepane 
 			//if the pane is floating let the manager go ahead
 			LayoutAnchorablePane destPane = destinationContainer as LayoutAnchorablePane;
+			anchorableToShow.AutoHideWidth = 256;
+			anchorableToShow.AutoHideHeight = 128;
 
 			if (destinationContainer != null && destinationContainer.FindParent<LayoutFloatingWindow>() != null)
 				return false;
 
 			if (anchorableToShow.Content is ExplorerViewModel)
 			{
-				anchorableToShow.AutoHideWidth = 256;
+				var explorerPane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(d => d.Name == "ExplorerPane");
 
-				var treeViewPane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(d => d.Name == "ExplorerPane");
-
-				if (treeViewPane != null)
+				if (explorerPane != null)
 				{
-					treeViewPane.Children.Add(anchorableToShow);
+					explorerPane.Children.Add(anchorableToShow);
 					return true;
 				}
 			}
@@ -32,6 +32,7 @@ namespace AvalonDock.VS2013Test
 			if (anchorableToShow.Content is PropertiesViewModel)
 			{
 				var propertiesPane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(d => d.Name == "PropertiesPane");
+
 				if (propertiesPane != null)
 				{
 					propertiesPane.Children.Add(anchorableToShow);
@@ -39,23 +40,8 @@ namespace AvalonDock.VS2013Test
 				}
 			}
 
-			if (anchorableToShow.Content is FileStatsViewModel)
-			{
-				anchorableToShow.AutoHideWidth = 256;
-
-				var controllerPane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(d => d.Name == "FileStatsPane");
-
-				if (controllerPane != null)
-				{
-					controllerPane.Children.Add(anchorableToShow);
-					return true;
-				}
-			}
-
 			if (anchorableToShow.Content is OutputViewModel)
 			{
-				anchorableToShow.AutoHideHeight = 128;
-
 				var outputPane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(d => d.Name == "OutputPane");
 
 				if (outputPane != null)
@@ -69,9 +55,6 @@ namespace AvalonDock.VS2013Test
 			{
 				var leftGroup = new LayoutAnchorGroup();
 				leftGroup.Children.Add(anchorableToShow);
-
-				anchorableToShow.AutoHideWidth = 256;
-
 				layout.LeftSide.Children.Add(leftGroup);
 				return true;
 			}
@@ -80,21 +63,23 @@ namespace AvalonDock.VS2013Test
 			{
 				var rightGroup = new LayoutAnchorGroup();
 				rightGroup.Children.Add(anchorableToShow);
-
-				anchorableToShow.AutoHideWidth = 256;
-
 				layout.RightSide.Children.Add(rightGroup);
 				return true;
 			}
 
 			if (anchorableToShow.Content is ErrorViewModel)
 			{
+				//var errorsPane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(d => d.Name == "ErrorsPane");
+
+				//if (errorsPane != null)
+				//{
+				//	errorsPane.Children.Add(anchorableToShow);
+				//	anchorableToShow.Hide(false);
+				//	return true;
+				//}
+
 				var bottomGroup = new LayoutAnchorGroup();
 				bottomGroup.Children.Add(anchorableToShow);
-
-				anchorableToShow.AutoHideWidth = 256;
-				anchorableToShow.AutoHideHeight = 128;
-
 				layout.BottomSide.Children.Add(bottomGroup);
 				return true;
 			}
