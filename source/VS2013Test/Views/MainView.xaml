@@ -7,11 +7,8 @@
 		xmlns:viewModels="clr-namespace:AvalonDock.VS2013Test.ViewModels"
 		xmlns:icons="clr-namespace:VS2013Test.Icons"
         mc:Ignorable="d"
-        Title="VS2013Test" MinWidth="140" MinHeight="34" MaxWidth="{x:Static SystemParameters.MaximizedPrimaryScreenWidth}" MaxHeight="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" Height="900" Width="1600" SnapsToDevicePixels="True" Foreground="{DynamicResource WindowForeground}" Background="{DynamicResource HeaderBackground}" WindowStyle="None" ResizeMode="CanResizeWithGrip" StateChanged="WindowStateChanged">
-
-	<Window.DataContext>
-		<viewModels:Workspace/>
-	</Window.DataContext>
+		d:DataContext="{d:DesignInstance viewModels:Workspace, IsDesignTimeCreatable=True}"
+        Title="VS2013Test" MinWidth="140" MinHeight="116" MaxWidth="{x:Static SystemParameters.MaximizedPrimaryScreenWidth}" MaxHeight="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" Height="900" Width="1600" SnapsToDevicePixels="True" Foreground="{DynamicResource WindowForeground}" Background="{DynamicResource HeaderBackground}" WindowStyle="None" ResizeMode="CanResizeWithGrip" StateChanged="WindowStateChanged">
 
 	<WindowChrome.WindowChrome>
 		<WindowChrome x:Name="chrome" ResizeBorderThickness="8" CornerRadius="0" GlassFrameThickness="0" NonClientFrameEdges="None" />
@@ -43,7 +40,7 @@
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
 			<RowDefinition/>
-			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="23"/>
 		</Grid.RowDefinitions>
 
 		<Grid x:Name="header" SizeChanged="HeaderSizeChanged">
@@ -79,8 +76,6 @@
 						<MenuItem Command="{Binding ActiveDocument.CloseCommand}" Header="Close" />
 					</MenuItem>
 
-					<MenuItem Header="Edit"/>
-
 					<MenuItem Header="View">
 						<MenuItem Header="SolutionExplorer" IsCheckable="True" IsChecked="{Binding Explorer.IsVisible, Mode=TwoWay}" />
 						<MenuItem Header="Properties" IsCheckable="True" IsChecked="{Binding Props.IsVisible, Mode=TwoWay}" />
@@ -91,18 +86,18 @@
 					</MenuItem>
 				</Menu>
 
-				<ComboBox Margin="4,0"
-				 WindowChrome.IsHitTestVisibleInChrome="True"
-				DisplayMemberPath="Item1"
-				ItemsSource="{Binding Themes}"
-				SelectedItem="{Binding SelectedTheme}" SelectedIndex="0" />
+				<ComboBox 
+					Margin="4,0"
+					WindowChrome.IsHitTestVisibleInChrome="True"
+					DisplayMemberPath="Item1"
+					ItemsSource="{Binding Themes}"
+					SelectedItem="{Binding SelectedTheme}" />
 
 				<Border Background="{DynamicResource ProjectNameBackground}" Padding="8,0" Margin="14,0">
 					<TextBlock Text="VS2013 Demo" VerticalAlignment="Center" Padding="0,1,0,0">
 						<TextBlock.Style>
 							<Style TargetType="TextBlock">
 								<Setter Property="Foreground" Value="{DynamicResource ProjectNameForeground}"/>
-
 								<Style.Triggers>
 									<DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="False">
 										<Setter Property="Foreground" Value="{DynamicResource ProjectNameInactiveForeground}" />
@@ -164,6 +159,7 @@
 
 		<DockingManager
             Grid.Row="1"
+			AutoHideDelay="0"
 		    ActiveContent="{Binding ActiveDocument, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
 		    AnchorablesSource="{Binding Tools}"
 		    DocumentsSource="{Binding Files}"
@@ -173,7 +169,21 @@
 				<local:PanesTemplateSelector>
 					<local:PanesTemplateSelector.FileViewTemplate>
 						<DataTemplate>
-							<TextBox Background="Transparent" Foreground="{DynamicResource WindowForeground}" CaretBrush="{DynamicResource WindowForeground}" FontFamily="Consolas" BorderThickness="0" Padding="2,4" Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" AcceptsTab="True" />
+							<Grid>
+								<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+									<TextBox 
+										Background="Transparent" 
+										Foreground="{DynamicResource WindowForeground}" 
+										CaretBrush="{DynamicResource WindowForeground}" 
+										FontFamily="Consolas" 
+										BorderThickness="0" 
+										Padding="2,4" 
+										Text="{Binding TextContent, UpdateSourceTrigger=PropertyChanged}" 
+										AcceptsReturn="True" 
+										AcceptsTab="True" />
+								</ScrollViewer>
+								<Rectangle Fill="{DynamicResource ScrollViewerRectBackground}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="17" Height="17"/>
+							</Grid>
 						</DataTemplate>
 					</local:PanesTemplateSelector.FileViewTemplate>
 					<local:PanesTemplateSelector.PropertiesViewTemplate>
@@ -213,23 +223,20 @@
 				<local:PanesStyleSelector>
 					<local:PanesStyleSelector.ToolStyle>
 						<Style TargetType="{x:Type LayoutAnchorableItem}">
-							<Setter Property="Title" Value="{Binding Model.Title, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+							<Setter Property="Title" Value="{Binding Model.Title}" />
+							<Setter Property="CanHide" Value="True" />
 							<Setter Property="Visibility" Value="{Binding Model.IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}" />
-							<Setter Property="ContentId" Value="{Binding Model.ContentId, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+							<Setter Property="ContentId" Value="{Binding Model.ContentId}" />
 							<Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}" />
 							<Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}" />
-							<Setter Property="CanHide" Value="True" />
 						</Style>
 					</local:PanesStyleSelector.ToolStyle>
 					<local:PanesStyleSelector.FileStyle>
 						<Style TargetType="{x:Type LayoutItem}">
 							<Setter Property="Title" Value="{Binding Model.Title}" />
 							<Setter Property="ToolTip" Value="{Binding Model.FilePath}" />
-							<Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}" />
 							<Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
-							<Setter Property="IconSource" Value="{Binding Model.IconSource}" />
 							<Setter Property="ContentId" Value="{Binding Model.ContentId}" />
-							<Setter Property="CanClose" Value="True"/>
 						</Style>
 					</local:PanesStyleSelector.FileStyle>
 				</local:PanesStyleSelector>
@@ -257,7 +264,7 @@
 			</LayoutRoot>
 		</DockingManager>
 
-		<Border Grid.Row="2" Height="23" Background="{DynamicResource StatusBarBackground}">
+		<Border Grid.Row="2" Background="{DynamicResource StatusBarBackground}">
 			<Grid>
 				<StackPanel Orientation="Horizontal">
 					<Path Stroke="White" StrokeThickness="1" VerticalAlignment="Bottom" Margin="7.5,0,8,5">

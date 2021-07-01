@@ -19,6 +19,7 @@
 	<SolidColorBrush x:Key="ProjectNameForeground" Color="Black" />
 	<SolidColorBrush x:Key="ProjectNameInactiveForeground" Color="#929496" />
 	<SolidColorBrush x:Key="ProjectNameBackground" Color="#E0E3E6" />
+	<SolidColorBrush x:Key="ScrollViewerRectBackground" Color="#F5F5F5" />
 	<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type MLib_reskeys:ResourceKeys}, ResourceId=NormalBackgroundBrushKey}" Color="Transparent" />
 	<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type MLib_reskeys:ResourceKeys}, ResourceId=TopLevelHeaderMenuBackgroundKey}" Color="Transparent" />
 </ResourceDictionary>

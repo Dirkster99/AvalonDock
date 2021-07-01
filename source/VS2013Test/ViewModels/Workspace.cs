@@ -15,7 +15,6 @@ namespace AvalonDock.VS2013Test.ViewModels
 		#region fields
 
 		private static Workspace _this = new Workspace();
-
 		private ToolViewModel[] _tools;
 		private ObservableCollection<FileViewModel> _files = new ObservableCollection<FileViewModel>();
 		private ReadOnlyObservableCollection<FileViewModel> _readonyFiles;
@@ -28,7 +27,7 @@ namespace AvalonDock.VS2013Test.ViewModels
 		private ToolboxViewModel _toolbox;
 		private RelayCommand _openCommand;
 		private RelayCommand _newCommand;
-		private Tuple<string, Theme> selectedTheme;
+		private Tuple<string, Theme> _selectedTheme;
 
 		#endregion fields
 
@@ -39,6 +38,7 @@ namespace AvalonDock.VS2013Test.ViewModels
 		/// </summary>
 		public Workspace()
 		{
+			SelectedTheme = Themes.First();
 		}
 
 		#endregion constructors
@@ -186,10 +186,10 @@ namespace AvalonDock.VS2013Test.ViewModels
 
 		public Tuple<string, Theme> SelectedTheme
 		{
-			get { return selectedTheme; }
+			get { return _selectedTheme; }
 			set
 			{
-				selectedTheme = value;
+				_selectedTheme = value;
 				SwitchExtendedTheme();
 				RaisePropertyChanged(nameof(SelectedTheme));
 			}
@@ -201,7 +201,7 @@ namespace AvalonDock.VS2013Test.ViewModels
 
 		private void SwitchExtendedTheme()
 		{
-			switch (selectedTheme.Item1)
+			switch (_selectedTheme.Item1)
 			{
 				case "Vs2013DarkTheme":
 					Application.Current.Resources.MergedDictionaries[0].Source = new Uri("pack://application:,,,/MLib;component/Themes/DarkTheme.xaml");
@@ -239,11 +239,16 @@ namespace AvalonDock.VS2013Test.ViewModels
 
 		internal void Save(FileViewModel fileToSave, bool saveAsFlag = false)
 		{
+			string newTitle = string.Empty;
+
 			if (fileToSave.FilePath == null || saveAsFlag)
 			{
 				var dlg = new SaveFileDialog();
 				if (dlg.ShowDialog().GetValueOrDefault())
-					fileToSave.FilePath = dlg.SafeFileName;
+				{
+					fileToSave.FilePath = dlg.FileName;
+					newTitle = dlg.SafeFileName;
+				}
 			}
 			if (fileToSave.FilePath == null)
 			{
@@ -251,6 +256,9 @@ namespace AvalonDock.VS2013Test.ViewModels
 			}
 			File.WriteAllText(fileToSave.FilePath, fileToSave.TextContent);
 			ActiveDocument.IsDirty = false;
+
+			if (string.IsNullOrEmpty(newTitle)) return;
+			ActiveDocument.Title = newTitle;
 		}
 
 		internal FileViewModel Open(string filepath)

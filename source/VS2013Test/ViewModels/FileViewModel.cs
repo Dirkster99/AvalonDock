@@ -7,7 +7,7 @@ namespace AvalonDock.VS2013Test.ViewModels
 	class FileViewModel : PaneViewModel
 	{
 		#region fields
-		private static ImageSourceConverter ISC = new ImageSourceConverter();
+		//private static ImageSourceConverter ISC = new ImageSourceConverter();
 		private string _filePath = null;
 		private string _textContent = string.Empty;
 		private bool _isDirty = false;
@@ -27,7 +27,7 @@ namespace AvalonDock.VS2013Test.ViewModels
 			Title = FileName;
 
 			//Set the icon only for open documents (just a test)
-			IconSource = ISC.ConvertFromInvariantString(@"pack://application:,,/Images/document.png") as ImageSource;
+			//IconSource = ISC.ConvertFromInvariantString(@"pack://application:,,/Images/document.png") as ImageSource;
 		}
 
 		/// <summary>

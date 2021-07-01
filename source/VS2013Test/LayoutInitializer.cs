@@ -12,11 +12,12 @@ namespace AvalonDock.VS2013Test
 			//just for test provide a new anchorablepane 
 			//if the pane is floating let the manager go ahead
 			LayoutAnchorablePane destPane = destinationContainer as LayoutAnchorablePane;
-			anchorableToShow.AutoHideWidth = 256;
-			anchorableToShow.AutoHideHeight = 128;
-
 			if (destinationContainer != null && destinationContainer.FindParent<LayoutFloatingWindow>() != null)
 				return false;
+
+			anchorableToShow.AutoHideWidth = 256;
+			anchorableToShow.AutoHideHeight = 128;
+			anchorableToShow.CanShowOnHover = false;
 
 			if (anchorableToShow.Content is ExplorerViewModel)
 			{
@@ -69,15 +70,6 @@ namespace AvalonDock.VS2013Test
 
 			if (anchorableToShow.Content is ErrorViewModel)
 			{
-				//var errorsPane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(d => d.Name == "ErrorsPane");
-
-				//if (errorsPane != null)
-				//{
-				//	errorsPane.Children.Add(anchorableToShow);
-				//	anchorableToShow.Hide(false);
-				//	return true;
-				//}
-
 				var bottomGroup = new LayoutAnchorGroup();
 				bottomGroup.Children.Add(anchorableToShow);
 				layout.BottomSide.Children.Add(bottomGroup);

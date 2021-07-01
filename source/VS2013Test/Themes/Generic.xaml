@@ -12,7 +12,7 @@
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
 					<Border Background="{TemplateBinding Background}">
-						<Path Width="46" Height="32" StrokeThickness="1" Stroke="{TemplateBinding Foreground}" Data="M 18,11 27,20 M 18,20 27,11"/>
+						<Path Width="46" Height="32" StrokeThickness="1" Stroke="{TemplateBinding Foreground}" Data="M 18,11 27,20 M 18,20 27,11" Margin="0,2,0,0"/>
 					</Border>
 
 					<ControlTemplate.Triggers>
@@ -43,7 +43,7 @@
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
 					<Border Background="{TemplateBinding Background}">
-						<Path x:Name="MaximizePath" Width="46" Height="32" Data="M 18.5,10.5 H 27.5 V 19.5 H 18.5 Z" Stroke="{TemplateBinding Foreground}" StrokeThickness="1" />
+						<Path x:Name="MaximizePath" Width="46" Height="32" Data="M 18.5,10.5 H 27.5 V 19.5 H 18.5 Z" Stroke="{TemplateBinding Foreground}" StrokeThickness="1" Margin="0,2,0,0"/>
 					</Border>
 
 					<ControlTemplate.Triggers>
@@ -78,7 +78,7 @@
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
 					<Border Background="{TemplateBinding Background}">
-						<Path x:Name="RestoreDownPath" Width="46" Height="32" Data="M 18.5,12.5 H 25.5 V 19.5 H 18.5 Z M 20.5,12.5 V 10.5 H 27.5 V 17.5 H 25.5" Stroke="{TemplateBinding Foreground}" StrokeThickness="1" />
+						<Path x:Name="RestoreDownPath" Width="46" Height="32" Data="M 18.5,12.5 H 25.5 V 19.5 H 18.5 Z M 20.5,12.5 V 10.5 H 27.5 V 17.5 H 25.5" Stroke="{TemplateBinding Foreground}" StrokeThickness="1" Margin="0,2,0,0"/>
 					</Border>
 
 					<ControlTemplate.Triggers>
@@ -113,7 +113,7 @@
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type Button}">
 					<Border Background="{TemplateBinding Background}">
-						<Path Width="46" Height="32" StrokeThickness="1" Stroke="{TemplateBinding Foreground}" Data="M 18,15 H 28"/>
+						<Path Width="46" Height="32" StrokeThickness="1" Stroke="{TemplateBinding Foreground}" Data="M 18,15 H 28" Margin="0,2,0,0"/>
 					</Border>
 
 					<ControlTemplate.Triggers>
