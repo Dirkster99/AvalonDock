@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -701,6 +702,7 @@ namespace AvalonDock.Controls
 				});
 
 				_rootPresenter = new Border { Child = new AdornerDecorator { Child = Content }, Focusable = true };
+				AutomationProperties.SetName(_rootPresenter, "FloatingWindowHost");
 				_rootPresenter.SetBinding(Border.BackgroundProperty, new Binding(nameof(Background)) { Source = _owner });
 				_wpfContentHost.RootVisual = _rootPresenter;
 				_manager = _owner.Model.Root.Manager;
