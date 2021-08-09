@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -153,6 +153,7 @@ namespace AvalonDock
 		internal const int WM_INITMENUPOPUP = 0x0117;
 		internal const int WM_KEYDOWN = 0x0100;
 		internal const int WM_KEYUP = 0x0101;
+		internal const int WM_CLOSE = 0x10;
 
 		internal const int WA_INACTIVE = 0x0000;
 
