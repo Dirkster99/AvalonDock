@@ -1,4 +1,4 @@
-﻿<ResourceDictionary
+<ResourceDictionary
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:options="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
@@ -150,12 +150,12 @@
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActivePressedBackground}"
 		options:Freeze="true"
-		Color="#0E6198" />
+		Color="#007ACC" />
 	<!--  AccentColor  -->
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActivePressedBorder}"
 		options:Freeze="true"
-		Color="#0E6198" />
+		Color="#007ACC" />
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActivePressedGlyph}"
 		options:Freeze="true"
@@ -163,7 +163,7 @@
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}"
 		options:Freeze="true"
-		Color="#6D6D70" />
+		Color="#F1F1F1" />
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveHoveredBackground}"
 		options:Freeze="true"

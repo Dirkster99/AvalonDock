@@ -1,0 +1,48 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:s="clr-namespace:System;assembly=mscorlib">
+
+	<Style TargetType="ResizeGrip">
+		<Setter Property="UIElement.Focusable">
+			<Setter.Value>
+				<s:Boolean>False</s:Boolean>
+			</Setter.Value>
+		</Setter>
+		
+		<Setter Property="Control.Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="ResizeGrip">
+					<Grid Background="#00FFFFFF" x:Uid="Grid_1" SnapsToDevicePixels="True">
+						<Canvas Width="8" Height="8" Margin="5,5,5,5" Opacity="0.5" x:Uid="Canvas_1">
+							<Canvas Width="7" Height="7" Margin="1,1,0,0" x:Uid="Canvas_2">
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_1" Canvas.Left="6" Canvas.Top="6" Fill="White"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_2" Canvas.Left="4" Canvas.Top="6" Fill="White"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_3" Canvas.Left="2" Canvas.Top="6" Fill="White"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_4" Canvas.Left="0" Canvas.Top="6" Fill="White"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_5" Canvas.Left="6" Canvas.Top="4" Fill="White"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_6" Canvas.Left="6" Canvas.Top="2" Fill="White"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_7" Canvas.Left="6" Canvas.Top="0" Fill="White"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_8" Canvas.Left="4" Canvas.Top="2" Fill="White"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_9" Canvas.Left="2" Canvas.Top="4" Fill="White"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_10" Canvas.Left="4" Canvas.Top="4" Fill="White"/>
+							</Canvas>
+							
+							<Canvas Width="7" Height="7" Margin="0,0,0,0" x:Uid="Canvas_3">
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_11" Canvas.Left="6" Canvas.Top="6" Fill="#7F000000"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_12" Canvas.Left="4" Canvas.Top="6" Fill="#7F000000"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_13" Canvas.Left="2" Canvas.Top="6" Fill="#7F000000"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_14" Canvas.Left="0" Canvas.Top="6" Fill="#7F000000"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_15" Canvas.Left="6" Canvas.Top="4" Fill="#7F000000"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_16" Canvas.Left="6" Canvas.Top="2" Fill="#7F000000"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_17" Canvas.Left="6" Canvas.Top="0" Fill="#7F000000"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_18" Canvas.Left="4" Canvas.Top="2" Fill="#7F000000"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_19" Canvas.Left="2" Canvas.Top="4" Fill="#7F000000"/>
+								<Rectangle Width="1" Height="1" x:Uid="Rectangle_20" Canvas.Left="4" Canvas.Top="4" Fill="#7F000000"/>
+							</Canvas>
+						</Canvas>
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+</ResourceDictionary>
