@@ -286,6 +286,8 @@ namespace AvalonDock.Controls
 			#endregion Setup GridRows/Cols
 		}
 
+		/// <summary>Apply Horizontal/Vertical cursor style
+		/// (and splitter style if optional splitter style is set) to Grid Resizer Control.</summary>
 		private void CreateSplitters()
 		{
 			for (var iChild = 1; iChild < Children.Count; iChild++)
