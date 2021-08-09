@@ -126,6 +126,7 @@ to also theme standard elements, such as, button and textblock etc.
 - [#272 Fix Mismatched ResourceKey on VS2013 Theme](https://github.com/Dirkster99/AvalonDock/pull/272)   (thanx to [Reisen Usagi](https://github.com/usagirei))
 - [#274 Support custom styles for LayoutGridResizerControl](https://github.com/Dirkster99/AvalonDock/pull/274)   (thanx to [thanx to mpondo](https://github.com/mpondo))
 - [#276 Support minimizing floating windows independently of main window](https://github.com/Dirkster99/AvalonDock/pull/276)   (thanx to [thanx to mpondo](https://github.com/mpondo))
+- [#284 Vs2013 theme improvement](https://github.com/Dirkster99/AvalonDock/pull/284)   (thanx to [thanx to oktrue](https://github.com/oktrue))
 
 ## Features and Fixes Added in Version 4.51.1
 
