@@ -128,6 +128,7 @@ to also theme standard elements, such as, button and textblock etc.
 - [#276 Support minimizing floating windows independently of main window](https://github.com/Dirkster99/AvalonDock/pull/276)   (thanx to [thanx to mpondo](https://github.com/mpondo))
 - [#284 Vs2013 theme improvement](https://github.com/Dirkster99/AvalonDock/pull/284)   (thanx to [thanx to oktrue](https://github.com/oktrue))
 - [#288 Fix close from taskbar for floating window](https://github.com/Dirkster99/AvalonDock/pull/288)   (thanx to [thanx to mpondo](https://github.com/mpondo))
+- [#291 Fix Issue #281 floating window host: UI automation name](https://github.com/Dirkster99/AvalonDock/pull/291)   (thanx to [thanx to rmadsen-ks](https://github.com/rmadsen-ks))
 
 ## Features and Fixes Added in Version 4.51.1
 
