@@ -1,0 +1,23 @@
+<Application x:Class="AvalonDock.VS2013Test.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:converters="clr-namespace:AvalonDock.VS2013Test.Converters"    
+             StartupUri="Views/MainView.xaml">
+	
+    <Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="pack://application:,,,/MLib;component/Themes/DarkTheme.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/VS2013Test;component/Themes/DarkBrushsExtended.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/VS2013Test;component/Themes/Generic.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/VS2013Test;component/Themes/Controls/VsResizeGrip.xaml" />
+
+				<ResourceDictionary>
+					<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+					<BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+					<converters:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
+				</ResourceDictionary>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Application.Resources>
+</Application>

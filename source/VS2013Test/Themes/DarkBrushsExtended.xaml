@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"			
+					xmlns:MLib_reskeys="clr-namespace:MLib.Themes;assembly=MLib">
+
+	<SolidColorBrush x:Key="IconBrush" Color="White" />
+	<SolidColorBrush x:Key="IconInactiveBrush" Color="#66FFFFFF" />
+	<SolidColorBrush x:Key="HeaderBackground" Color="#2D2D30" />
+	<SolidColorBrush x:Key="StatusBarBackground" Color="#007ACC" />
+	<SolidColorBrush x:Key="StatusBarForeground" Color="White" />
+	<SolidColorBrush x:Key="SystemButtonsForeground" Color="White" />
+	<SolidColorBrush x:Key="SystemButtonsInactiveForeground" Color="#818183" />
+	<SolidColorBrush x:Key="SystemButtonsMouseOverBackground" Color="#393939" />
+	<SolidColorBrush x:Key="SystemButtonsMousePressedForeground" Color="White" />
+	<SolidColorBrush x:Key="SystemButtonsMousePressedBackground" Color="#007ACC" />
+	<SolidColorBrush x:Key="WindowForeground" Color="White" />
+	<SolidColorBrush x:Key="WindowBorderBrush" Color="#007ACC" />
+	<SolidColorBrush x:Key="WindowInactiveBorderBrush" Color="#434346" />
+	<SolidColorBrush x:Key="ToolBarGripper" Color="#656565" />
+	<SolidColorBrush x:Key="ProjectNameForeground" Color="White" />
+	<SolidColorBrush x:Key="ProjectNameInactiveForeground" Color="#818181" />
+	<SolidColorBrush x:Key="ProjectNameBackground" Color="#252526" />
+	<SolidColorBrush x:Key="ScrollViewerRectBackground" Color="#333333" />
+	<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type MLib_reskeys:ResourceKeys}, ResourceId=NormalBackgroundBrushKey}" Color="Transparent" />
+	<SolidColorBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type MLib_reskeys:ResourceKeys}, ResourceId=TopLevelHeaderMenuBackgroundKey}" Color="Transparent" />
+</ResourceDictionary>

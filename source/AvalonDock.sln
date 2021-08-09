@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvalonDock.Themes.Aero", "C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutomationTest", "AutomationTest", "{20876020-CC7D-46BD-9B80-E4F01FC0FD31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvalonDockTest", "AutomationTest\AvalonDockTest\AvalonDockTest.csproj", "{FE4E16A2-876A-4356-9974-8A89C50B2A5A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvalonDockTest", "AutomationTest\AvalonDockTest\AvalonDockTest.csproj", "{FE4E16A2-876A-4356-9974-8A89C50B2A5A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceLocator", "MLibTest\MLibTest_Components\ServiceLocator\ServiceLocator.csproj", "{38F7F15D-2F13-49E4-B4E6-B9552072AFCD}"
 EndProject
@@ -40,7 +40,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsTestApp", "WinForms
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvalonDocPanelMemoryLeaks", "AvalonDocPanelMemoryLeaks\AvalonDocPanelMemoryLeaks.csproj", "{5543BFED-827A-4404-8066-3FFDB201DDF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaliburnDockTestApp", "CaliburnDockTestApp\CaliburnDockTestApp.csproj", "{F8AEE594-DB5E-4DB8-9F45-4969CA5F8EF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaliburnDockTestApp", "CaliburnDockTestApp\CaliburnDockTestApp.csproj", "{F8AEE594-DB5E-4DB8-9F45-4969CA5F8EF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VS2013Test", "VS2013Test\VS2013Test.csproj", "{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -244,6 +246,18 @@ Global
 		{F8AEE594-DB5E-4DB8-9F45-4969CA5F8EF1}.Release|x64.Build.0 = Release|Any CPU
 		{F8AEE594-DB5E-4DB8-9F45-4969CA5F8EF1}.Release|x86.ActiveCfg = Release|Any CPU
 		{F8AEE594-DB5E-4DB8-9F45-4969CA5F8EF1}.Release|x86.Build.0 = Release|Any CPU
+		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Debug|x64.Build.0 = Debug|Any CPU
+		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Debug|x86.Build.0 = Debug|Any CPU
+		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Release|x64.ActiveCfg = Release|Any CPU
+		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Release|x64.Build.0 = Release|Any CPU
+		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Release|x86.ActiveCfg = Release|Any CPU
+		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -267,6 +281,7 @@ Global
 		{2433B8AF-0788-4C86-8FDD-E3BCB62E2157} = {1D267DDB-F2DE-4B70-87C1-E93A0C2D73F4}
 		{5543BFED-827A-4404-8066-3FFDB201DDF0} = {1D267DDB-F2DE-4B70-87C1-E93A0C2D73F4}
 		{F8AEE594-DB5E-4DB8-9F45-4969CA5F8EF1} = {1D267DDB-F2DE-4B70-87C1-E93A0C2D73F4}
+		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E} = {1D267DDB-F2DE-4B70-87C1-E93A0C2D73F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {459B8289-CF04-4E70-AEC9-23DC3A6E66F6}
