@@ -1613,7 +1613,8 @@ namespace AvalonDock
 				{
 					//Owner = Window.GetWindow(this)
 				};
-				newFW.SetParentToMainWindowOf(this);
+				
+				newFW.UpdateOwnership();
 
 				// Fill list before calling Show (issue #254)
 				_fwList.Add(newFW);
@@ -1656,7 +1657,8 @@ namespace AvalonDock
 				{
 					//Owner = Window.GetWindow(this)
 				};
-				newFW.SetParentToMainWindowOf(this);
+				
+				newFW.UpdateOwnership();
 
 				// Fill list before calling Show (issue #254)
 				_fwList.Add(newFW);
