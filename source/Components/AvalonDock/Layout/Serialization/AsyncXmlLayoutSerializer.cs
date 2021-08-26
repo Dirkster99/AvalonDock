@@ -9,14 +9,14 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
 namespace AvalonDock.Layout.Serialization
 {
 	/// <summary>Implements a layout serialization/deserialization method of the docking framework.</summary>
-	[Obsolete("This class was replaced with " + nameof(AsyncXmlLayoutSerializer))]
-	public class XmlLayoutSerializer : LayoutSerializer
+	public class AsyncXmlLayoutSerializer : LayoutSerializerBase
 	{
 		#region Constructors
 
@@ -24,7 +24,7 @@ namespace AvalonDock.Layout.Serialization
 		/// Class constructor from <see cref="DockingManager"/> instance.
 		/// </summary>
 		/// <param name="manager"></param>
-		public XmlLayoutSerializer(DockingManager manager)
+		public AsyncXmlLayoutSerializer(DockingManager manager)
 			: base(manager)
 		{
 		}
@@ -62,69 +62,49 @@ namespace AvalonDock.Layout.Serialization
 		public void Serialize(string filepath)
 		{
 			using (var stream = new StreamWriter(filepath))
+			{
 				Serialize(stream);
+			}
 		}
 
 		/// <summary>Deserialize the layout a file from a <see cref="Stream"/>.</summary>
 		/// <param name="stream"></param>
-		public void Deserialize(System.IO.Stream stream)
+		public async Task Deserialize(System.IO.Stream stream)
 		{
-			try
-			{
-				StartDeserialization();
-				var serializer = new XmlSerializer(typeof(LayoutRoot));
-				var layout = serializer.Deserialize(stream) as LayoutRoot;
-				FixupLayout(layout);
-				Manager.Layout = layout;
-			}
-			finally
-			{
-				EndDeserialization();
-			}
+			var serializer = new XmlSerializer(typeof(LayoutRoot));
+			var layout = (LayoutRoot)serializer.Deserialize(stream);
+			await FixupLayout(layout);
+			Manager.Layout = layout;
 		}
 
 		/// <summary>Deserialize the layout a file from a <see cref="TextReader"/>.</summary>
 		/// <param name="reader"></param>
-		public void Deserialize(TextReader reader)
+		public async Task Deserialize(TextReader reader)
 		{
-			try
-			{
-				StartDeserialization();
-				var serializer = new XmlSerializer(typeof(LayoutRoot));
-				var layout = serializer.Deserialize(reader) as LayoutRoot;
-				FixupLayout(layout);
-				Manager.Layout = layout;
-			}
-			finally
-			{
-				EndDeserialization();
-			}
+			var serializer = new XmlSerializer(typeof(LayoutRoot));
+			var layout = (LayoutRoot)serializer.Deserialize(reader);
+			await FixupLayout(layout);
+			Manager.Layout = layout;
 		}
 
 		/// <summary>Deserialize the layout a file from a <see cref="XmlReader"/>.</summary>
 		/// <param name="reader"></param>
-		public void Deserialize(XmlReader reader)
+		public async Task Deserialize(XmlReader reader)
 		{
-			try
-			{
-				StartDeserialization();
-				var serializer = new XmlSerializer(typeof(LayoutRoot));
-				var layout = serializer.Deserialize(reader) as LayoutRoot;
-				FixupLayout(layout);
-				Manager.Layout = layout;
-			}
-			finally
-			{
-				EndDeserialization();
-			}
+			var serializer = new XmlSerializer(typeof(LayoutRoot));
+			var layout = (LayoutRoot)serializer.Deserialize(reader);
+			await FixupLayout(layout);
+			Manager.Layout = layout;
 		}
 
 		/// <summary>Deserialize the layout from a file using a <see cref="StreamReader"/>.</summary>
 		/// <param name="filepath"></param>
-		public void Deserialize(string filepath)
+		public async Task Deserialize(string filepath)
 		{
 			using (var stream = new StreamReader(filepath))
-				Deserialize(stream);
+			{
+				await Deserialize(stream);
+			}
 		}
 
 		#endregion Public Methods

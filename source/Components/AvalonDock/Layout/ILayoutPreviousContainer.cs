@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -9,7 +9,7 @@
 
 namespace AvalonDock.Layout
 {
-	internal interface ILayoutPreviousContainer
+	public interface ILayoutPreviousContainer
 	{
 		ILayoutContainer PreviousContainer { get; set; }
 
