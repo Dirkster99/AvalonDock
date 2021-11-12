@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -61,7 +61,7 @@ namespace AvalonDock.Layout
 			foreach (var child in Children)
 			{
 				var type = child.GetType();
-				var serializer = new XmlSerializer(type);
+				var serializer = XmlSerializer.FromTypes(new[] { type })[0];
 				serializer.Serialize(writer, child);
 			}
 		}

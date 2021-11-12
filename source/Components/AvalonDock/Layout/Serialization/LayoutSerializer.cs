@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -75,6 +75,9 @@ namespace AvalonDock.Layout.Serialization
 				LayoutAnchorable previousAchorable = null;            //try find the content in replaced layout
 				if (lcToFix.ContentId != null)
 					previousAchorable = _previousAnchorables.FirstOrDefault(a => a.ContentId == lcToFix.ContentId);
+
+				if (previousAchorable != null && previousAchorable.Title != null)
+					lcToFix.Title = previousAchorable.Title;
 
 				if (LayoutSerializationCallback != null)
 				{
