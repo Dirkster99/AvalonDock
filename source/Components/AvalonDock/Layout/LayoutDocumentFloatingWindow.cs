@@ -153,12 +153,12 @@ namespace AvalonDock.Layout
 
 				XmlSerializer serializer;
 				if (reader.LocalName.Equals(nameof(LayoutDocument)))
-					serializer = new XmlSerializer(typeof(LayoutDocument));
+					serializer = XmlSerializer.FromTypes(new[] { typeof(LayoutDocument) })[0];
 				else
 				{
 					var type = LayoutRoot.FindType(reader.LocalName);
 					if (type == null) throw new ArgumentException("AvalonDock.LayoutDocumentFloatingWindow doesn't know how to deserialize " + reader.LocalName);
-					serializer = new XmlSerializer(type);
+					serializer = XmlSerializer.FromTypes(new[] { type })[0];
 				}
 				RootPanel = (LayoutDocumentPaneGroup)serializer.Deserialize(reader);
 			}
