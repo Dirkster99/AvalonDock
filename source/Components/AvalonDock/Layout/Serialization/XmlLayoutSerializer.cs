@@ -29,53 +29,30 @@ namespace AvalonDock.Layout.Serialization
 
 		#endregion Constructors
 
-		#region Private Methods
-
-		/// <summary> Function for LayoutRoot deserialization. </summary>
-		/// <returns>Desererialized LayoutRoot</returns>
-		private delegate LayoutRoot DeserelizeFunction();
-
-		/// <summary> Deserializes layout with the given function <see cref="DeserelizeFunction"/>.</summary>
-		/// <param name="function"></param>
-		private void DeserelizeCommon(DeserelizeFunction function)
-		{
-			try
-			{
-				StartDeserialization();
-				var layout = function();
-				FixupLayout(layout);
-				Manager.Layout = layout;
-			}
-			finally
-			{
-				EndDeserialization();
-			}
-		}
-		#endregion Private Methods
-
 		#region Public Methods
-
-		readonly XmlSerializer _serializer = XmlSerializer.FromTypes(new[] { typeof(LayoutRoot) })[0];
 
 		/// <summary>Serialize the layout into a <see cref="XmlWriter"/>.</summary>
 		/// <param name="writer"></param>
 		public void Serialize(XmlWriter writer)
 		{
-			_serializer.Serialize(writer, Manager.Layout);
+			var serializer = new XmlSerializer(typeof(LayoutRoot));
+			serializer.Serialize(writer, Manager.Layout);
 		}
 
 		/// <summary>Serialize the layout into a <see cref="TextWriter"/>.</summary>
 		/// <param name="writer"></param>
 		public void Serialize(TextWriter writer)
 		{
-			_serializer.Serialize(writer, Manager.Layout);
+			var serializer = new XmlSerializer(typeof(LayoutRoot));
+			serializer.Serialize(writer, Manager.Layout);
 		}
 
 		/// <summary>Serialize the layout into a <see cref="Stream"/>.</summary>
 		/// <param name="stream"></param>
 		public void Serialize(Stream stream)
 		{
-			_serializer.Serialize(stream, Manager.Layout);
+			var serializer = new XmlSerializer(typeof(LayoutRoot));
+			serializer.Serialize(stream, Manager.Layout);
 		}
 
 		/// <summary>Serialize the layout into a file using a <see cref="StreamWriter"/>.</summary>
@@ -90,32 +67,62 @@ namespace AvalonDock.Layout.Serialization
 		/// <param name="stream"></param>
 		public void Deserialize(System.IO.Stream stream)
 		{
-			LayoutRoot function() => _serializer.Deserialize(stream) as LayoutRoot;
-			DeserelizeCommon(function);
+			try
+			{
+				StartDeserialization();
+				var serializer = new XmlSerializer(typeof(LayoutRoot));
+				var layout = serializer.Deserialize(stream) as LayoutRoot;
+				FixupLayout(layout);
+				Manager.Layout = layout;
+			}
+			finally
+			{
+				EndDeserialization();
+			}
 		}
 
 		/// <summary>Deserialize the layout a file from a <see cref="TextReader"/>.</summary>
 		/// <param name="reader"></param>
 		public void Deserialize(TextReader reader)
 		{
-			LayoutRoot function() => _serializer.Deserialize(reader) as LayoutRoot;
-			DeserelizeCommon(function);
+			try
+			{
+				StartDeserialization();
+				var serializer = new XmlSerializer(typeof(LayoutRoot));
+				var layout = serializer.Deserialize(reader) as LayoutRoot;
+				FixupLayout(layout);
+				Manager.Layout = layout;
+			}
+			finally
+			{
+				EndDeserialization();
+			}
 		}
 
 		/// <summary>Deserialize the layout a file from a <see cref="XmlReader"/>.</summary>
 		/// <param name="reader"></param>
 		public void Deserialize(XmlReader reader)
 		{
-			LayoutRoot function() => _serializer.Deserialize(reader) as LayoutRoot;
-			DeserelizeCommon(function);
+			try
+			{
+				StartDeserialization();
+				var serializer = new XmlSerializer(typeof(LayoutRoot));
+				var layout = serializer.Deserialize(reader) as LayoutRoot;
+				FixupLayout(layout);
+				Manager.Layout = layout;
+			}
+			finally
+			{
+				EndDeserialization();
+			}
 		}
 
 		/// <summary>Deserialize the layout from a file using a <see cref="StreamReader"/>.</summary>
 		/// <param name="filepath"></param>
 		public void Deserialize(string filepath)
 		{
-			using (var stream = new StreamReader(filepath, true))
-				Deserialize(stream); ;
+			using (var stream = new StreamReader(filepath))
+				Deserialize(stream);
 		}
 
 		#endregion Public Methods

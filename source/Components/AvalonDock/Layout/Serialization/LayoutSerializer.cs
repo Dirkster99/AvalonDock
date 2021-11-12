@@ -76,9 +76,6 @@ namespace AvalonDock.Layout.Serialization
 				if (lcToFix.ContentId != null)
 					previousAchorable = _previousAnchorables.FirstOrDefault(a => a.ContentId == lcToFix.ContentId);
 
-				if(previousAchorable != null && previousAchorable.Title != null)
-					lcToFix.Title = previousAchorable.Title; 
-
 				if (LayoutSerializationCallback != null)
 				{
 					// Ask client application via callback if item should be deserialized

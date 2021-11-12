@@ -149,16 +149,32 @@ namespace AvalonDock.Layout
 					reader.Read();
 					continue;
 				}
-				string fullName = String.Format("{0}.{1}", GetType().Namespace, reader.LocalName);
-				Type typeForSerializer = Type.GetType(fullName);
 
-				if (typeForSerializer == null)
-					typeForSerializer = FindType(reader.LocalName);
+				XmlSerializer serializer = null;
+				if (reader.LocalName == nameof(LayoutAnchorablePaneGroup))
+					serializer = new XmlSerializer(typeof(LayoutAnchorablePaneGroup));
+				else if (reader.LocalName == nameof(LayoutAnchorablePane))
+					serializer = new XmlSerializer(typeof(LayoutAnchorablePane));
+				else if (reader.LocalName == nameof(LayoutAnchorable))
+					serializer = new XmlSerializer(typeof(LayoutAnchorable));
+				else if (reader.LocalName == nameof(LayoutDocumentPaneGroup))
+					serializer = new XmlSerializer(typeof(LayoutDocumentPaneGroup));
+				else if (reader.LocalName == nameof(LayoutDocumentPane))
+					serializer = new XmlSerializer(typeof(LayoutDocumentPane));
+				else if (reader.LocalName == nameof(LayoutDocument))
+					serializer = new XmlSerializer(typeof(LayoutDocument));
+				else if (reader.LocalName == nameof(LayoutAnchorGroup))
+					serializer = new XmlSerializer(typeof(LayoutAnchorGroup));
+				else if (reader.LocalName == nameof(LayoutPanel))
+					serializer = new XmlSerializer(typeof(LayoutPanel));
+				else
+				{
+					var type = FindType(reader.LocalName);
+					if (type == null)
+						throw new ArgumentException("AvalonDock.LayoutGroup doesn't know how to deserialize " + reader.LocalName);
+					serializer = new XmlSerializer(type);
+				}
 
-				if (typeForSerializer == null)
-					throw new ArgumentException("AvalonDock.LayoutGroup doesn't know how to deserialize " + reader.LocalName);
-
-				XmlSerializer serializer = XmlSerializer.FromTypes(new[] { typeForSerializer })[0];
 				Children.Add((T)serializer.Deserialize(reader));
 			}
 
@@ -172,7 +188,7 @@ namespace AvalonDock.Layout
 			foreach (var child in Children)
 			{
 				var type = child.GetType();
-				var serializer = XmlSerializer.FromTypes(new[] { type })[0];
+				var serializer = new XmlSerializer(type);
 				serializer.Serialize(writer, child);
 			}
 		}
