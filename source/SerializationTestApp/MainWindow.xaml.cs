@@ -33,9 +33,9 @@ namespace SerializationTestApp
 		{
 			if (e.Model.ContentId == "W1")
 			{
-				if (_viewModel.Windows.OfType<ExplorerViewModel>().Any())
+				if (_viewModel.Windows.OfType<ExplorerViewModel>().FirstOrDefault() is ExplorerViewModel expl)
 				{
-					e.Cancel = true;
+					e.Content = expl;
 				}
 				else
 				{
@@ -46,9 +46,9 @@ namespace SerializationTestApp
 			}
 			else if (e.Model.ContentId == "W2")
 			{
-				if (_viewModel.Windows.OfType<PropertiesViewModel>().Any())
+				if (_viewModel.Windows.OfType<PropertiesViewModel>().FirstOrDefault() is PropertiesViewModel props)
 				{
-					e.Cancel = true;
+					e.Content = props;
 				}
 				else
 				{
@@ -59,9 +59,9 @@ namespace SerializationTestApp
 			}
 			else if (e.Model.ContentId == "D1")
 			{
-				if (_viewModel.Documents.OfType<TextDocumentViewModel>().Any(d => d.Title == e.Model.Title))
+				if (_viewModel.Documents.OfType<TextDocumentViewModel>().FirstOrDefault(d => d.Title == e.Model.Title) is TextDocumentViewModel text)
 				{
-					e.Cancel = true;
+					e.Content = text;
 				}
 				else
 				{
