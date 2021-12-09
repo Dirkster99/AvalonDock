@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -19,7 +19,7 @@ namespace AvalonDock.Layout
 	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
-	public class LayoutAnchorablePane : LayoutPositionableGroup<LayoutAnchorable>, ILayoutAnchorablePane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable
+	public class LayoutAnchorablePane : LayoutPositionableGroup<LayoutAnchorable>, ILayoutAnchorablePane, ILayoutPositionableElement, ILayoutContentSelector
 	{
 		#region fields
 
@@ -29,7 +29,6 @@ namespace AvalonDock.Layout
 		private bool _autoFixSelectedContent = true;
 
 		private string _name = null;
-		private string _id;
 
 		#endregion fields
 
@@ -94,13 +93,6 @@ namespace AvalonDock.Layout
 		/// <summary>Gets the selected content in the pane or null.</summary>
 		public LayoutContent SelectedContent => _selectedIndex == -1 ? null : Children[_selectedIndex];
 
-		/// <summary>Gets/sets the unique id that is used for the serialization of this panel.</summary>
-		string ILayoutPaneSerializable.Id
-		{
-			get => _id;
-			set => _id = value;
-		}
-
 		#endregion Properties
 
 		#region Overrides
@@ -148,7 +140,6 @@ namespace AvalonDock.Layout
 		/// <inheritdoc />
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{
-			if (_id != null) writer.WriteAttributeString(nameof(ILayoutPaneSerializable.Id), _id);
 			if (_name != null) writer.WriteAttributeString(nameof(Name), _name);
 			base.WriteXml(writer);
 		}
@@ -156,7 +147,6 @@ namespace AvalonDock.Layout
 		/// <inheritdoc />
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
-			if (reader.MoveToAttribute(nameof(ILayoutPaneSerializable.Id))) _id = reader.Value;
 			if (reader.MoveToAttribute(nameof(Name))) _name = reader.Value;
 			_autoFixSelectedContent = false;
 			base.ReadXml(reader);

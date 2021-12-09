@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -63,10 +63,8 @@ namespace AvalonDock.Layout.Serialization
 			//fix container panes
 			foreach (var lcToAttach in layout.Descendents().OfType<ILayoutPreviousContainer>().Where(lc => lc.PreviousContainerId != null))
 			{
-				var paneContainerToAttach = layout.Descendents().OfType<ILayoutPaneSerializable>().FirstOrDefault(lps => lps.Id == lcToAttach.PreviousContainerId);
-				if (paneContainerToAttach == null)
-					throw new ArgumentException($"Unable to find a pane with id ='{lcToAttach.PreviousContainerId}'");
-				lcToAttach.PreviousContainer = paneContainerToAttach as ILayoutContainer;
+				var paneContainerToAttach = layout.Descendents().OfType<ILayoutContainer>().FirstOrDefault(le => le.Id == lcToAttach.PreviousContainerId);
+				lcToAttach.PreviousContainer = paneContainerToAttach ?? throw new ArgumentException($"Unable to find a pane with id ='{lcToAttach.PreviousContainerId}'");
 			}
 
 			//now fix the content of the layout anchorable contents

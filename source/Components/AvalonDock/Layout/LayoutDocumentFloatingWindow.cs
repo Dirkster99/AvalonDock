@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -132,6 +132,8 @@ namespace AvalonDock.Layout
 		/// <inheritdoc />
 		public override void ReadXml(XmlReader reader)
 		{
+			base.ReadXml(reader);
+
 			reader.MoveToContent();
 			if (reader.IsEmptyElement)
 			{

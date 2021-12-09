@@ -239,8 +239,6 @@ namespace AvalonDock.Layout
 				if (value == _previousContainer) return;
 				_previousContainer = value;
 				RaisePropertyChanged(nameof(PreviousContainer));
-				if (_previousContainer is ILayoutPaneSerializable paneSerializable && paneSerializable.Id == null)
-					paneSerializable.Id = Guid.NewGuid().ToString();
 			}
 		}
 
@@ -523,6 +521,8 @@ namespace AvalonDock.Layout
 		/// <inheritdoc />
 		public virtual void ReadXml(System.Xml.XmlReader reader)
 		{
+			if (reader.MoveToAttribute(nameof(Id))) Id = reader.Value;
+
 			if (reader.MoveToAttribute(nameof(Title)))
 				Title = reader.Value;
 			//if (reader.MoveToAttribute("IconSource"))
@@ -564,6 +564,8 @@ namespace AvalonDock.Layout
 		/// <inheritdoc />
 		public virtual void WriteXml(System.Xml.XmlWriter writer)
 		{
+			writer.WriteAttributeString(nameof(Id), Id);
+
 			if (!string.IsNullOrWhiteSpace(Title))
 				writer.WriteAttributeString(nameof(Title), Title);
 
@@ -598,9 +600,9 @@ namespace AvalonDock.Layout
 
 			if (!CanShowOnHover) writer.WriteAttributeString(nameof(CanShowOnHover), CanShowOnHover.ToString());
 
-			if (_previousContainer is ILayoutPaneSerializable paneSerializable)
+			if (_previousContainer != null)
 			{
-				writer.WriteAttributeString("PreviousContainerId", paneSerializable.Id);
+				writer.WriteAttributeString("PreviousContainerId", _previousContainer.Id);
 				writer.WriteAttributeString("PreviousContainerIndex", _previousContainerIndex.ToString());
 			}
 		}
@@ -758,21 +760,14 @@ namespace AvalonDock.Layout
 				PreviousContainer = parentAsContainer;
 				PreviousContainerIndex = parentAsGroup.IndexOfChild(this);
 
-				if (parentAsGroup is ILayoutPaneSerializable layoutPaneSerializable)
+				PreviousContainerId = parentAsGroup.Id;
+				// This parentAsGroup will be removed in the GarbageCollection below
+				if (parentAsGroup.Children.Count() == 1 && parentAsGroup.Parent != null && Root.Manager != null)
 				{
-					PreviousContainerId = layoutPaneSerializable.Id;
-					// This parentAsGroup will be removed in the GarbageCollection below
-					if (parentAsGroup.Children.Count() == 1 && parentAsGroup.Parent != null && Root.Manager != null)
-					{
-						Parent = Root.Manager.Layout;
-						PreviousContainer = parentAsGroup.Parent;
-						PreviousContainerIndex = -1;
-
-						if (parentAsGroup.Parent is ILayoutPaneSerializable paneSerializable)
-							PreviousContainerId = paneSerializable.Id;
-						else
-							PreviousContainerId = null;
-					}
+					Parent = Root.Manager.Layout;
+					PreviousContainer = parentAsGroup.Parent;
+					PreviousContainerIndex = -1;
+					PreviousContainerId = parentAsGroup.Parent.Id;
 				}
 			}
 

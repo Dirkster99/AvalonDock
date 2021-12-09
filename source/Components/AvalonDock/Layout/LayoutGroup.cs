@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -131,6 +131,8 @@ namespace AvalonDock.Layout
 		/// <summary>provides a standard overridable implementation for deriving classes.</summary>
 		public virtual void ReadXml(System.Xml.XmlReader reader)
 		{
+			if (reader.MoveToAttribute(nameof(Id))) Id = reader.Value;
+
 			reader.MoveToContent();
 			if (reader.IsEmptyElement)
 			{
@@ -185,6 +187,8 @@ namespace AvalonDock.Layout
 		/// <summary>provides a standard overridable implementation for deriving classes.</summary>
 		public virtual void WriteXml(System.Xml.XmlWriter writer)
 		{
+			writer.WriteAttributeString(nameof(Id), Id);
+
 			foreach (var child in Children)
 			{
 				var type = child.GetType();

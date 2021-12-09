@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -21,13 +21,12 @@ namespace AvalonDock.Layout
 	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
-	public class LayoutDocumentPane : LayoutPositionableGroup<LayoutContent>, ILayoutDocumentPane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable
+	public class LayoutDocumentPane : LayoutPositionableGroup<LayoutContent>, ILayoutDocumentPane, ILayoutPositionableElement, ILayoutContentSelector
 	{
 		#region fields
 
 		private bool _showHeader = true;
 		private int _selectedIndex = -1;
-		private string _id;
 
 		[XmlIgnore]
 		private readonly bool _autoFixSelectedContent = true;
@@ -87,13 +86,6 @@ namespace AvalonDock.Layout
 
 		/// <inheritdoc cref="ILayoutContentSelector"/>
 		public LayoutContent SelectedContent => _selectedIndex == -1 ? null : Children[_selectedIndex];
-
-		/// <inheritdoc />
-		string ILayoutPaneSerializable.Id
-		{
-			get => _id;
-			set => _id = value;
-		}
 
 		/// <summary>Gets whether the pane is hosted in a floating window.</summary>
 		public bool IsHostedInFloatingWindow => this.FindParent<LayoutFloatingWindow>() != null;
@@ -174,7 +166,6 @@ namespace AvalonDock.Layout
 		/// <inheritdoc/>
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{
-			if (_id != null) writer.WriteAttributeString(nameof(ILayoutPaneSerializable.Id), _id);
 			if (!_showHeader) writer.WriteAttributeString(nameof(ShowHeader), _showHeader.ToString());
 			base.WriteXml(writer);
 		}
@@ -182,7 +173,6 @@ namespace AvalonDock.Layout
 		/// <inheritdoc/>
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
-			if (reader.MoveToAttribute(nameof(ILayoutPaneSerializable.Id))) _id = reader.Value;
 			if (reader.MoveToAttribute(nameof(ShowHeader))) _showHeader = bool.Parse(reader.Value);
 			base.ReadXml(reader);
 		}

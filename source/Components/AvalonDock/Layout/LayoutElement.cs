@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -42,6 +42,7 @@ namespace AvalonDock.Layout
 		/// </summary>
 		internal LayoutElement()
 		{
+			Id = Guid.NewGuid().ToString();
 		}
 
 		#endregion Constructors
@@ -61,6 +62,9 @@ namespace AvalonDock.Layout
 		#endregion Events
 
 		#region Properties
+
+		/// <summary>Gets/sets the unique id that is used for the serialization of this panel.</summary>
+		public string Id { get; protected set; }
 
 		/// <summary>Gets or sets the parent container of the element</summary>
 		[XmlIgnore]

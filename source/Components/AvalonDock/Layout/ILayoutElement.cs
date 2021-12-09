@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -17,6 +17,9 @@ namespace AvalonDock.Layout
 	/// </summary>
 	public interface ILayoutElement : INotifyPropertyChanged, INotifyPropertyChanging
 	{
+		/// <summary>Gets/sets the unique id that is used for the serialization of this panel.</summary>
+		string Id { get; }
+
 		/// <summary>Gets the parent <see cref="LayoutContainer"/> for this layout element.</summary>
 		ILayoutContainer Parent { get; }
 

@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:SerializationTestApp"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-	<Grid Background="Blue">
-		<TextBlock Text="TextDocument" Foreground="White" FontSize="48" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-	</Grid>
+    <Grid Background="Blue">
+        <TextBlock Text="TextDocument" Foreground="White" FontSize="48" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+    </Grid>
 </UserControl>

@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -53,11 +53,16 @@ namespace AvalonDock.Layout
 		}
 
 		/// <inheritdoc cref="IXmlSerializable"/>
-		public abstract void ReadXml(XmlReader reader);
+		public virtual void ReadXml(XmlReader reader)
+		{
+			if (reader.MoveToAttribute(nameof(Id))) Id = reader.Value;
+		}
 
 		/// <inheritdoc cref="IXmlSerializable"/>
 		public virtual void WriteXml(XmlWriter writer)
 		{
+			writer.WriteAttributeString(nameof(Id), Id);
+
 			foreach (var child in Children)
 			{
 				var type = child.GetType();

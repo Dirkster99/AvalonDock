@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -542,7 +542,7 @@ namespace AvalonDock.Layout
 			Debug.Assert(!this.Descendents().OfType<LayoutAnchorablePane>().Any(a => a.ChildrenCount == 0 && a.IsVisible));
 			//DumpTree(true);
 #if TRACE
-            RootPanel.ConsoleDump(4);
+			RootPanel.ConsoleDump(4);
 #endif
 #endif
 		}
