@@ -1,0 +1,77 @@
+<Window x:Class="SerializationTestApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SerializationTestApp"
+		d:DataContext="{d:DesignInstance local:MainWindowViewModel}"
+		mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
+		<Menu IsMainMenu="True">
+			<MenuItem Header="View">
+				<MenuItem Header="Explorer" Command="{Binding ViewExplorerCommand}"/>
+				<MenuItem Header="Properties" Command="{Binding ViewPropertiesCommand}"/>
+			</MenuItem>
+			<MenuItem Header="Layout">
+				<MenuItem Header="Serialize Layout" Click="SerializeLayout"/>
+				<MenuItem Header="Deserialize Layout" Click="DeserializeLayout"/>
+			</MenuItem>
+			<MenuItem Header="Tools">
+				<MenuItem Header="Create Text Document" Command="{Binding CreateTextDocumentCommand}"/>
+			</MenuItem>
+		</Menu>
+		
+		<DockingManager x:Name="DockingManager"
+					    Grid.Row="1"
+						AnchorablesSource="{Binding Windows}"
+						DocumentsSource="{Binding Documents}">
+			<DockingManager.Theme>
+				<Vs2013LightTheme/>
+			</DockingManager.Theme>
+			
+			<DockingManager.LayoutItemTemplateSelector>
+				<local:LayoutItemTemplateSelector>
+					<local:LayoutItemTemplateSelector.ExplorerTemplate>
+						<DataTemplate>
+							<local:Explorer/>
+						</DataTemplate>
+					</local:LayoutItemTemplateSelector.ExplorerTemplate>
+					<local:LayoutItemTemplateSelector.PropertiesTemplate>
+						<DataTemplate>
+							<local:Properties/>
+						</DataTemplate>
+					</local:LayoutItemTemplateSelector.PropertiesTemplate>
+					<local:LayoutItemTemplateSelector.TextDocumentTemplate>
+						<DataTemplate>
+							<local:TextDocument/>
+						</DataTemplate>
+					</local:LayoutItemTemplateSelector.TextDocumentTemplate>
+				</local:LayoutItemTemplateSelector>
+			</DockingManager.LayoutItemTemplateSelector>
+
+			<DockingManager.LayoutItemContainerStyleSelector>
+				<local:LayoutItemContainerStyleSelector>
+					<local:LayoutItemContainerStyleSelector.WindowStyle>
+						<Style TargetType="{x:Type LayoutAnchorableItem}">
+							<Setter Property="Title" Value="{Binding Model.Title}" />
+							<Setter Property="ContentId" Value="{Binding Model.ContentId}" />
+						</Style>
+					</local:LayoutItemContainerStyleSelector.WindowStyle>
+					<local:LayoutItemContainerStyleSelector.DocumentStyle>
+						<Style TargetType="{x:Type LayoutItem}">
+							<Setter Property="Title" Value="{Binding Model.Title}" />
+							<Setter Property="ContentId" Value="{Binding Model.ContentId}" />
+							<Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
+						</Style>
+					</local:LayoutItemContainerStyleSelector.DocumentStyle>
+				</local:LayoutItemContainerStyleSelector>
+			</DockingManager.LayoutItemContainerStyleSelector>
+			
+		</DockingManager>
+    </Grid>
+</Window>

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.352
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.31911.260
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "TestApp\TestApp.csproj", "{339BC0D5-2A54-40ED-9850-7ED65182E6E1}"
 EndProject
@@ -42,7 +42,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvalonDocPanelMemoryLeaks",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaliburnDockTestApp", "CaliburnDockTestApp\CaliburnDockTestApp.csproj", "{F8AEE594-DB5E-4DB8-9F45-4969CA5F8EF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VS2013Test", "VS2013Test\VS2013Test.csproj", "{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VS2013Test", "VS2013Test\VS2013Test.csproj", "{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerializationTestApp", "SerializationTestApp\SerializationTestApp.csproj", "{8B9223C8-6E89-407B-88E3-24EC0EB0D97D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -258,6 +260,18 @@ Global
 		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Release|x64.Build.0 = Release|Any CPU
 		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Release|x86.ActiveCfg = Release|Any CPU
 		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E}.Release|x86.Build.0 = Release|Any CPU
+		{8B9223C8-6E89-407B-88E3-24EC0EB0D97D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B9223C8-6E89-407B-88E3-24EC0EB0D97D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B9223C8-6E89-407B-88E3-24EC0EB0D97D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8B9223C8-6E89-407B-88E3-24EC0EB0D97D}.Debug|x64.Build.0 = Debug|Any CPU
+		{8B9223C8-6E89-407B-88E3-24EC0EB0D97D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8B9223C8-6E89-407B-88E3-24EC0EB0D97D}.Debug|x86.Build.0 = Debug|Any CPU
+		{8B9223C8-6E89-407B-88E3-24EC0EB0D97D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B9223C8-6E89-407B-88E3-24EC0EB0D97D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B9223C8-6E89-407B-88E3-24EC0EB0D97D}.Release|x64.ActiveCfg = Release|Any CPU
+		{8B9223C8-6E89-407B-88E3-24EC0EB0D97D}.Release|x64.Build.0 = Release|Any CPU
+		{8B9223C8-6E89-407B-88E3-24EC0EB0D97D}.Release|x86.ActiveCfg = Release|Any CPU
+		{8B9223C8-6E89-407B-88E3-24EC0EB0D97D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -282,6 +296,7 @@ Global
 		{5543BFED-827A-4404-8066-3FFDB201DDF0} = {1D267DDB-F2DE-4B70-87C1-E93A0C2D73F4}
 		{F8AEE594-DB5E-4DB8-9F45-4969CA5F8EF1} = {1D267DDB-F2DE-4B70-87C1-E93A0C2D73F4}
 		{12C5DFE9-27AE-4BAB-9050-617F8A7FC52E} = {1D267DDB-F2DE-4B70-87C1-E93A0C2D73F4}
+		{8B9223C8-6E89-407B-88E3-24EC0EB0D97D} = {1D267DDB-F2DE-4B70-87C1-E93A0C2D73F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {459B8289-CF04-4E70-AEC9-23DC3A6E66F6}
