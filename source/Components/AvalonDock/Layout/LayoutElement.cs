@@ -64,7 +64,7 @@ namespace AvalonDock.Layout
 		#region Properties
 
 		/// <summary>Gets/sets the unique id that is used for the serialization of this panel.</summary>
-		public string Id { get; protected set; }
+		public string Id { get; set; }
 
 		/// <summary>Gets or sets the parent container of the element</summary>
 		[XmlIgnore]
