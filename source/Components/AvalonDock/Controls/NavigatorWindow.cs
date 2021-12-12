@@ -58,15 +58,19 @@ namespace AvalonDock.Controls
 			SetAnchorables(_manager.Layout.Descendents().OfType<LayoutAnchorable>().Where(a => a.IsVisible).Select(d => (LayoutAnchorableItem)_manager.GetLayoutItemFromModel(d)).ToArray());
 			SetDocuments(_manager.Layout.Descendents().OfType<LayoutDocument>().OrderByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault()).Select(d => (LayoutDocumentItem)_manager.GetLayoutItemFromModel(d)).ToArray());
 			_internalSetSelectedDocument = false;
-			if (Documents.Length > 1)
+			if (Documents.Length > 0)
 			{
-				InternalSetSelectedDocument(Documents[1]);
+				InternalSetSelectedDocument(Documents[0]);
 				_isSelectingDocument = true;
 			}
-			else if (Anchorables.Count() > 1)
+			else
 			{
-				InternalSetSelectedAnchorable(Anchorables.ToArray()[1]);
-				_isSelectingDocument = false;
+				var anchorable = Anchorables.FirstOrDefault();
+				if (anchorable != null)
+				{
+					InternalSetSelectedAnchorable(anchorable);
+					_isSelectingDocument = false;
+				}
 			}
 			DataContext = this;
 			Loaded += OnLoaded;
