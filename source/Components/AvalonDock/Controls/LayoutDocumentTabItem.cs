@@ -182,7 +182,11 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnMouseDown(MouseButtonEventArgs e)
 		{
-			if (e.ChangedButton == MouseButton.Middle && LayoutItem.CloseCommand.CanExecute(null)) LayoutItem.CloseCommand.Execute(null);
+			if (LayoutItem != null && e.ChangedButton == MouseButton.Middle && LayoutItem.CloseCommand.CanExecute(null))
+			{
+				LayoutItem.CloseCommand.Execute(null);
+			}
+			
 			base.OnMouseDown(e);
 		}
 
