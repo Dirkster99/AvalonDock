@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -29,30 +29,53 @@ namespace AvalonDock.Layout.Serialization
 
 		#endregion Constructors
 
+		#region Private Methods
+		/// <returns>Desererialized LayoutRoot</returns>
+		/// <summary> Function for LayoutRoot deserialization. </summary>
+
+		private delegate LayoutRoot DeserializeFunction();
+
+		/// <summary> Deserializes layout with the given function <see cref="DeserializeFunction"/>.</summary>
+		/// <param name="function"></param>
+		private void DeserializeCommon(DeserializeFunction function)
+		{
+			try
+			{
+				StartDeserialization();
+				var layout = function();
+				FixupLayout(layout);
+				Manager.Layout = layout;
+			}
+			finally
+			{
+				EndDeserialization();
+			}
+		}
+		#endregion
+
 		#region Public Methods
+
+		readonly XmlSerializer _serializer = XmlSerializer.FromTypes(new[] { typeof(LayoutRoot) })[0];
 
 		/// <summary>Serialize the layout into a <see cref="XmlWriter"/>.</summary>
 		/// <param name="writer"></param>
 		public void Serialize(XmlWriter writer)
 		{
-			var serializer = new XmlSerializer(typeof(LayoutRoot));
-			serializer.Serialize(writer, Manager.Layout);
+			_serializer.Serialize(writer, Manager.Layout);
 		}
 
 		/// <summary>Serialize the layout into a <see cref="TextWriter"/>.</summary>
 		/// <param name="writer"></param>
 		public void Serialize(TextWriter writer)
 		{
-			var serializer = new XmlSerializer(typeof(LayoutRoot));
-			serializer.Serialize(writer, Manager.Layout);
+			_serializer.Serialize(writer, Manager.Layout);
 		}
 
 		/// <summary>Serialize the layout into a <see cref="Stream"/>.</summary>
 		/// <param name="stream"></param>
 		public void Serialize(Stream stream)
 		{
-			var serializer = new XmlSerializer(typeof(LayoutRoot));
-			serializer.Serialize(stream, Manager.Layout);
+			_serializer.Serialize(stream, Manager.Layout);
 		}
 
 		/// <summary>Serialize the layout into a file using a <see cref="StreamWriter"/>.</summary>
@@ -67,54 +90,26 @@ namespace AvalonDock.Layout.Serialization
 		/// <param name="stream"></param>
 		public void Deserialize(System.IO.Stream stream)
 		{
-			try
-			{
-				StartDeserialization();
-				var serializer = new XmlSerializer(typeof(LayoutRoot));
-				var layout = serializer.Deserialize(stream) as LayoutRoot;
-				FixupLayout(layout);
-				Manager.Layout = layout;
-			}
-			finally
-			{
-				EndDeserialization();
-			}
+			LayoutRoot function() => _serializer.Deserialize(stream) as LayoutRoot;
+			DeserializeCommon(function);
 		}
 
 		/// <summary>Deserialize the layout a file from a <see cref="TextReader"/>.</summary>
 		/// <param name="reader"></param>
 		public void Deserialize(TextReader reader)
 		{
-			try
-			{
-				StartDeserialization();
-				var serializer = new XmlSerializer(typeof(LayoutRoot));
-				var layout = serializer.Deserialize(reader) as LayoutRoot;
-				FixupLayout(layout);
-				Manager.Layout = layout;
-			}
-			finally
-			{
-				EndDeserialization();
-			}
+
+			LayoutRoot function() => _serializer.Deserialize(reader) as LayoutRoot;
+			DeserializeCommon(function);
 		}
 
 		/// <summary>Deserialize the layout a file from a <see cref="XmlReader"/>.</summary>
 		/// <param name="reader"></param>
 		public void Deserialize(XmlReader reader)
 		{
-			try
-			{
-				StartDeserialization();
-				var serializer = new XmlSerializer(typeof(LayoutRoot));
-				var layout = serializer.Deserialize(reader) as LayoutRoot;
-				FixupLayout(layout);
-				Manager.Layout = layout;
-			}
-			finally
-			{
-				EndDeserialization();
-			}
+
+			LayoutRoot function() => _serializer.Deserialize(reader) as LayoutRoot;
+			DeserializeCommon(function);
 		}
 
 		/// <summary>Deserialize the layout from a file using a <see cref="StreamReader"/>.</summary>
