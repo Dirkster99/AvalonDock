@@ -123,6 +123,7 @@ to also theme standard elements, such as, button and textblock etc.
 ## Features and Fixes in master but not released, yet
 
 - [#314 Fix NavigatorWindow not working if there is only one document](https://github.com/Dirkster99/AvalonDock/pull/314)   (thanx to [Siegfried Pammer](https://github.com/siegfriedpammer))
+- [#308 Code Clean-Up Serialization](https://github.com/Dirkster99/AvalonDock/pull/308)   (thanx to [RadvileSaveraiteFemtika](https://github.com/RadvileSaveraiteFemtika))
 
 ## Features and Fixes Added in Version 4.60.0
 
