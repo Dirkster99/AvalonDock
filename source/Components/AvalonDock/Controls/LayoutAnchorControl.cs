@@ -138,7 +138,8 @@ namespace AvalonDock.Controls
 		{
 			base.OnMouseEnter(e);
 
-			if (!e.Handled)
+			// If the model wants to auto-show itself on hover then initiate the show action
+			if (!e.Handled && _model.CanShowOnHover)
 			{
 				_openUpTimer = new DispatcherTimer(DispatcherPriority.ApplicationIdle);
 				_openUpTimer.Interval = TimeSpan.FromMilliseconds(400);

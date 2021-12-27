@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -16,6 +16,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Interop;
 
 namespace AvalonDock.Controls
 {
@@ -140,6 +141,17 @@ namespace AvalonDock.Controls
 							WindowChrome.GetWindowChrome(this).ShowSystemMenu = !handled;
 						else
 							WindowChrome.GetWindowChrome(this).ShowSystemMenu = false;
+					}
+					break;
+
+				case Win32Helper.WM_CLOSE:
+					if (CloseInitiatedByUser)
+					{
+						// We want to force the window to go through our standard logic for closing.
+						// So, if the window close is initiated outside of our code (such as from the taskbar),
+						// we cancel that close and trigger our close logic instead.
+						this.CloseWindowCommand.Execute(null);
+						handled = true;
 					}
 					break;
 			}

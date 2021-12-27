@@ -1104,6 +1104,59 @@ namespace AvalonDock
 
 		#endregion GridSplitterHeight
 
+		#region GridSplitterVerticalStyle
+
+		/// <summary>
+		/// GridSplitterVerticalStyle Dependency Property
+		/// </summary>
+		public static readonly DependencyProperty GridSplitterVerticalStyleProperty = DependencyProperty.Register("GridSplitterVerticalStyle", typeof(Style), typeof(DockingManager),
+				new FrameworkPropertyMetadata((Style)null));
+
+		/// <summary>
+		/// Gets or sets the GridSplitterVerticalStyle property.  This dependency property 
+		/// indicates the style to apply to the LayoutGridResizerControl when displayed vertically.
+		/// </summary>
+		public Style GridSplitterVerticalStyle
+		{
+			get
+			{
+				return (Style)GetValue(GridSplitterVerticalStyleProperty);
+			}
+			set
+			{
+				SetValue(GridSplitterVerticalStyleProperty, value);
+			}
+		}
+
+		#endregion
+
+		#region GridSplitterHorizontalStyle
+
+		/// <summary>
+		/// GridSplitterHorizontalStyle Dependency Property
+		/// </summary>
+		public static readonly DependencyProperty GridSplitterHorizontalStyleProperty = DependencyProperty.Register("GridSplitterHorizontalStyle", typeof(Style), typeof(DockingManager),
+				new FrameworkPropertyMetadata((Style)null));
+
+		/// <summary>
+		/// Gets or sets the GridSplitterHorizontalStyle property.  This dependency property 
+		/// indicates the style to apply to the LayoutGridResizerControl when displayed horizontally.
+		/// </summary>
+		public Style GridSplitterHorizontalStyle
+		{
+			get
+			{
+				return (Style)GetValue(GridSplitterHorizontalStyleProperty);
+			}
+			set
+			{
+				SetValue(GridSplitterHorizontalStyleProperty, value);
+			}
+		}
+
+		#endregion
+
+
 		#region DocumentPaneMenuItemHeaderTemplate
 
 		/// <summary><see cref="DocumentPaneMenuItemHeaderTemplate"/> dependency property.</summary>
@@ -1560,7 +1613,8 @@ namespace AvalonDock
 				{
 					//Owner = Window.GetWindow(this)
 				};
-				newFW.SetParentToMainWindowOf(this);
+				
+				newFW.UpdateOwnership();
 
 				// Fill list before calling Show (issue #254)
 				_fwList.Add(newFW);
@@ -1603,7 +1657,8 @@ namespace AvalonDock
 				{
 					//Owner = Window.GetWindow(this)
 				};
-				newFW.SetParentToMainWindowOf(this);
+				
+				newFW.UpdateOwnership();
 
 				// Fill list before calling Show (issue #254)
 				_fwList.Add(newFW);

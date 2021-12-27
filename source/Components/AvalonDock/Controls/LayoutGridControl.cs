@@ -286,11 +286,27 @@ namespace AvalonDock.Controls
 			#endregion Setup GridRows/Cols
 		}
 
+		/// <summary>Apply Horizontal/Vertical cursor style
+		/// (and splitter style if optional splitter style is set) to Grid Resizer Control.</summary>
 		private void CreateSplitters()
 		{
 			for (var iChild = 1; iChild < Children.Count; iChild++)
 			{
-				Children.Insert(iChild, new LayoutGridResizerControl { Cursor = this.Orientation == Orientation.Horizontal ? Cursors.SizeWE : Cursors.SizeNS });
+				var splitter = new LayoutGridResizerControl();
+
+				if (Orientation == Orientation.Horizontal)
+				{
+					splitter.Cursor = Cursors.SizeWE;
+					splitter.Style = _model.Root?.Manager?.GridSplitterVerticalStyle;
+				}
+				else
+				{
+					splitter.Cursor = Cursors.SizeNS;
+					splitter.Style = _model.Root?.Manager?.GridSplitterHorizontalStyle;
+				}
+
+
+				Children.Insert(iChild, splitter);
 				// TODO: MK Is this a bug????
 				iChild++;
 			}

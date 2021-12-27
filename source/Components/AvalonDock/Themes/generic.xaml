@@ -294,7 +294,7 @@
 		</Setter>
 	</Style>
 
-	<Style TargetType="avalonDockControls:AnchorablePaneTitle">
+	<Style x:Key="AnchorablePaneTitleStyle" TargetType="{x:Type avalonDockControls:AnchorablePaneTitle}">
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate>

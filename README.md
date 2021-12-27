@@ -120,10 +120,30 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
-## Applied to master but not yet released to NuGet
+## Features and Fixes Added in Version 4.60.1
+
+- [#314 Fix NavigatorWindow not working if there is only one document](https://github.com/Dirkster99/AvalonDock/pull/314)   (thanx to [Siegfried Pammer](https://github.com/siegfriedpammer))
+- [#308 Code Clean-Up Serialization](https://github.com/Dirkster99/AvalonDock/pull/308)   (thanx to [RadvileSaveraiteFemtika](https://github.com/RadvileSaveraiteFemtika))
+- [#317 Aded LayoutItem null check when processing mouseMiddleClickButton](https://github.com/Dirkster99/AvalonDock/pull/317)    (thanx to [JuanCar Orozco](https://github.com/Skaptor))
+
+## Features and Fixes Added in Version 4.60.0
+
+- [#278 Rename pt-BR to pt (make Brazilian Portuguese default to Portuguese)](https://github.com/Dirkster99/AvalonDock/pull/278)   (thanx to [mpondo](https://github.com/mpondo))
+- [#272 Fix Mismatched ResourceKey on VS2013 Theme](https://github.com/Dirkster99/AvalonDock/pull/272)   (thanx to [Reisen Usagi](https://github.com/usagirei))
+- [#274 Support custom styles for LayoutGridResizerControl](https://github.com/Dirkster99/AvalonDock/pull/274)   (thanx to [mpondo](https://github.com/mpondo))
+- [#276 Support minimizing floating windows independently of main window](https://github.com/Dirkster99/AvalonDock/pull/276)   (thanx to [mpondo](https://github.com/mpondo))
+- [#284 Vs2013 theme improvement](https://github.com/Dirkster99/AvalonDock/pull/284)   (thanx to [oktrue](https://github.com/oktrue))
+- [#288 Fix close from taskbar for floating window](https://github.com/Dirkster99/AvalonDock/pull/288)   (thanx to [mpondo](https://github.com/mpondo))
+- [#291 Fix Issue #281 floating window host: UI automation name](https://github.com/Dirkster99/AvalonDock/pull/291)   (thanx to [rmadsen-ks](https://github.com/rmadsen-ks))
+
+## Features and Fixes Added in Version 4.51.1
 
 - [#262 Contextmenus on dpi-aware application have a wrong scaling](https://github.com/Dirkster99/AvalonDock/issues/262)   (thanx to [moby42](https://github.com/moby42))
 - [#259 Fixing problems with tests running with XUnit StaFact](https://github.com/Dirkster99/AvalonDock/pull/259)   (thanx to [Erik Ovegård](https://github.com/eriove))
+
+- [#266 Adding a key for AnchorablePaneTitle](https://github.com/Dirkster99/AvalonDock/pull/266)   (thanx to [Zachary Canann](https://github.com/zcanann))
+
+- [#267 Optional show hidden LayoutAnchorable on hover](https://github.com/Dirkster99/AvalonDock/pull/267)   (thanx to [Cory Todd](https://github.com/corytodd))
 
 ## Features Added in PRE-VIEW Version 4.51.0
 
