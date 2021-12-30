@@ -1403,6 +1403,8 @@ namespace AvalonDock
 
 		private bool IsNavigatorWindowActive => _navigatorWindow != null;
 
+		private bool CanShowNavigatorWindow => _layoutItems.Any();
+
 		#endregion Private Properties
 
 		#region IOverlayWindowHost Interface
@@ -1921,7 +1923,7 @@ namespace AvalonDock
 			{
 				if (e.IsDown && e.Key == Key.Tab)
 				{
-					if (!IsNavigatorWindowActive)
+					if (CanShowNavigatorWindow && !IsNavigatorWindowActive)
 					{
 						ShowNavigatorWindow();
 						e.Handled = true;
