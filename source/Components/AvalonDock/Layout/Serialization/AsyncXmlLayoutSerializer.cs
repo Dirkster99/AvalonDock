@@ -9,6 +9,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
@@ -30,6 +31,23 @@ namespace AvalonDock.Layout.Serialization
 		}
 
 		#endregion Constructors
+
+
+		#region Private Methods
+
+		/// <summary>Performs all required actions for deserialization.</summary>
+		/// <param name="function">
+		/// A function, receiving the <see cref="LayoutRoot"/> <see cref="XmlSerializer"/>,
+		/// that is supposed to call a deserialize method.
+		/// </param>
+		private Task DeserializeCommon(Func<XmlSerializer, LayoutRoot> function)
+			=> DeserializeCommon(() =>
+			{
+				var serializer = XmlSerializer.FromTypes(new[] {typeof(LayoutRoot)}).First();
+				return function(serializer);
+			});
+
+		#endregion
 
 		#region Public Methods
 
@@ -69,33 +87,18 @@ namespace AvalonDock.Layout.Serialization
 
 		/// <summary>Deserialize the layout a file from a <see cref="Stream"/>.</summary>
 		/// <param name="stream"></param>
-		public async Task Deserialize(System.IO.Stream stream)
-		{
-			var serializer = new XmlSerializer(typeof(LayoutRoot));
-			var layout = (LayoutRoot)serializer.Deserialize(stream);
-			await FixupLayout(layout);
-			Manager.Layout = layout;
-		}
+		public Task Deserialize(Stream stream)
+			=> DeserializeCommon((xmlSerializer) => (LayoutRoot) xmlSerializer.Deserialize(stream));
 
 		/// <summary>Deserialize the layout a file from a <see cref="TextReader"/>.</summary>
 		/// <param name="reader"></param>
-		public async Task Deserialize(TextReader reader)
-		{
-			var serializer = new XmlSerializer(typeof(LayoutRoot));
-			var layout = (LayoutRoot)serializer.Deserialize(reader);
-			await FixupLayout(layout);
-			Manager.Layout = layout;
-		}
+		public Task Deserialize(TextReader reader)
+			=> DeserializeCommon((xmlSerializer) => (LayoutRoot) xmlSerializer.Deserialize(reader));
 
 		/// <summary>Deserialize the layout a file from a <see cref="XmlReader"/>.</summary>
 		/// <param name="reader"></param>
-		public async Task Deserialize(XmlReader reader)
-		{
-			var serializer = new XmlSerializer(typeof(LayoutRoot));
-			var layout = (LayoutRoot)serializer.Deserialize(reader);
-			await FixupLayout(layout);
-			Manager.Layout = layout;
-		}
+		public Task Deserialize(XmlReader reader)
+			=> DeserializeCommon((xmlSerializer) => (LayoutRoot) xmlSerializer.Deserialize(reader));
 
 		/// <summary>Deserialize the layout from a file using a <see cref="StreamReader"/>.</summary>
 		/// <param name="filepath"></param>
