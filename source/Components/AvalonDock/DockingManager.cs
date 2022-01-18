@@ -2091,6 +2091,7 @@ namespace AvalonDock
 		{
 			if (_overlayWindow == null)
 				_overlayWindow = new OverlayWindow(this);
+			_overlayWindow.Owner = Window.GetWindow(this);
 			var rectWindow = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			_overlayWindow.Left = rectWindow.Left;
 			_overlayWindow.Top = rectWindow.Top;

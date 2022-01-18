@@ -613,6 +613,7 @@ namespace AvalonDock.Controls
 			Left = mousePosition.X - DragDelta.X;                 // BugFix Issue #6
 			Top = mousePosition.Y - DragDelta.Y;
 			_attachDrag = false;
+			Show();
 			var lParam = new IntPtr(((int)mousePosition.X & 0xFFFF) | ((int)mousePosition.Y << 16));
 			Win32Helper.SendMessage(windowHandle, Win32Helper.WM_NCLBUTTONDOWN, new IntPtr(Win32Helper.HT_CAPTION), lParam);
 		}
