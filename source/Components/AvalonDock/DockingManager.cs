@@ -1408,7 +1408,12 @@ namespace AvalonDock
 		#region IOverlayWindowHost Interface
 
 		/// <inheritdoc/>
-		bool IOverlayWindowHost.HitTest(Point dragPoint)
+		bool IOverlayWindowHost.HitTestScreen(Point dragPoint)
+		{
+			return HitTest(this.TransformToDeviceDPI(dragPoint));
+		}
+
+		bool HitTest(Point dragPoint)
 		{
 			try
 			{
@@ -1430,6 +1435,7 @@ namespace AvalonDock
 		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
 		{
 			CreateOverlayWindow();
+			// keep this, it sets the parent for splitter to get the dpi right
 			_overlayWindow.Owner = draggingWindow;
 			_overlayWindow.EnableDropTargets();
 			_overlayWindow.Show();
@@ -2090,8 +2096,11 @@ namespace AvalonDock
 		private void CreateOverlayWindow()
 		{
 			if (_overlayWindow == null)
+			{
 				_overlayWindow = new OverlayWindow(this);
-			_overlayWindow.Owner = Window.GetWindow(this);
+				_overlayWindow.Owner = Window.GetWindow(this);
+			}
+
 			var rectWindow = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			_overlayWindow.Left = rectWindow.Left;
 			_overlayWindow.Top = rectWindow.Top;

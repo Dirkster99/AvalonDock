@@ -210,7 +210,12 @@ namespace AvalonDock.Controls
 			base.OnClosing(e);
 		}
 
-		bool IOverlayWindowHost.HitTest(Point dragPoint)
+		bool IOverlayWindowHost.HitTestScreen(Point dragPoint)
+		{
+			return HitTest(this.TransformToDeviceDPI(dragPoint));
+		}
+
+		bool HitTest(Point dragPoint)
 		{
 			var detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			return detectionRect.Contains(dragPoint);

@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -140,7 +140,12 @@ namespace AvalonDock.Controls
 
 		#region IOverlayWindowHost
 
-		bool IOverlayWindowHost.HitTest(Point dragPoint)
+		bool IOverlayWindowHost.HitTestScreen(Point dragPoint)
+		{
+			return HitTest(this.TransformToDeviceDPI(dragPoint));
+		}
+
+		bool HitTest(Point dragPoint)
 		{
 			var detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			return detectionRect.Contains(dragPoint);

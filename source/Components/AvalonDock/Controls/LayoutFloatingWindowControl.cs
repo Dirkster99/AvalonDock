@@ -364,7 +364,7 @@ namespace AvalonDock.Controls
 
 					if (_dragService != null)
 					{
-						var mousePosition = this.TransformToDeviceDPI(Win32Helper.GetMousePosition());
+						var mousePosition = (Win32Helper.GetMousePosition());
 						_dragService.Drop(mousePosition, out var dropFlag);
 						_dragService = null;
 						SetIsDragging(false);
@@ -658,7 +658,7 @@ namespace AvalonDock.Controls
 				_dragService = new DragService(this);
 				SetIsDragging(true);
 			}
-			var mousePosition = this.TransformToDeviceDPI(Win32Helper.GetMousePosition());
+			var mousePosition = (Win32Helper.GetMousePosition());
 			_dragService.UpdateMouseLocation(mousePosition);
 		}
 
