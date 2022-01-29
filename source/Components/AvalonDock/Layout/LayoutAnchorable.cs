@@ -553,8 +553,16 @@ namespace AvalonDock.Layout
 						cnt.PreviousContainer = previousContainer;
 				}
 
+				var selectedIndex = -1;
+				var selectedItem = parentGroup.Children.FirstOrDefault(x => x.IsActive);
+				if (selectedItem != null)
+					selectedIndex = parentGroup.Children.IndexOf(selectedItem);
+
 				foreach (var anchorableToToggle in parentGroup.Children.ToArray())
 					previousContainer.Children.Add(anchorableToToggle);
+
+				if (selectedIndex != -1)
+					previousContainer.SelectedContentIndex = selectedIndex;
 
 				parentSide.Children.Remove(parentGroup);
 
