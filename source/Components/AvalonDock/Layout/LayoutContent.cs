@@ -647,7 +647,7 @@ namespace AvalonDock.Layout
         public void DockAsDocument()
 		{
 			if (!(Root is LayoutRoot root)) throw new InvalidOperationException();
-			if (Parent is LayoutDocumentPane) return;
+			if (!(Parent is LayoutDocumentPane || Parent is LayoutAnchorablePane)) return;
 
 			if (PreviousContainer is LayoutDocumentPane)
 			{
