@@ -126,7 +126,8 @@ namespace AvalonDock.Controls
 				var fwAsDocument = floatingWindow as LayoutDocumentFloatingWindow;
 				this.Drop(fwAsDocument);
 			}
-
+			if (currentActiveContent == null)
+				return;
 			Dispatcher.BeginInvoke(new Action(() =>
 				{
 					currentActiveContent.IsSelected = false;
