@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -105,6 +105,11 @@ namespace AvalonDock.Controls
 		#endregion Overrides
 
 		#region Public Methods
+
+		public bool HitTestScreen(Point dragPoint)
+		{
+			return HitTest(_targetElement.TransformToDeviceDPI(dragPoint));
+		}
 
 		public void Drop(LayoutFloatingWindow floatingWindow)
 		{

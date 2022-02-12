@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -36,7 +36,7 @@ namespace AvalonDock.Controls
 		/// </summary>
 		/// <param name="dragPoint">The point to test.</param>
 		/// <returns><c>true</c> if inside window, otherwise <c>false</c>.</returns>
-		bool HitTest(Point dragPoint);
+		bool HitTestScreen(Point dragPoint);
 
 		/// <summary>
 		/// Is invoked by the <see cref="DragService"/> of a <see cref="LayoutFloatingWindowControl"/>

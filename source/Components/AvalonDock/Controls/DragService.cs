@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -85,13 +85,14 @@ namespace AvalonDock.Controls
 		internal void UpdateMouseLocation(Point dragPosition)
 		{
 			////var floatingWindowModel = _floatingWindow.Model as LayoutFloatingWindow;
+			// TODO - pass in without DPI adjustment, screen co-ords, adjust inside the target window
 
-			var newHost = _overlayWindowHosts.FirstOrDefault(oh => oh.HitTest(dragPosition));
+			var newHost = _overlayWindowHosts.FirstOrDefault(oh => oh.HitTestScreen(dragPosition));
 
 			if (_currentHost != null || _currentHost != newHost)
 			{
 				//is mouse still inside current overlay window host?
-				if ((_currentHost != null && !_currentHost.HitTest(dragPosition)) ||
+				if ((_currentHost != null && !_currentHost.HitTestScreen(dragPosition)) ||
 					_currentHost != newHost)
 				{
 					//esit drop target
@@ -125,7 +126,7 @@ namespace AvalonDock.Controls
 				return;
 
 			if (_currentDropTarget != null &&
-				!_currentDropTarget.HitTest(dragPosition))
+				!_currentDropTarget.HitTestScreen(dragPosition))
 			{
 				_currentWindow.DragLeave(_currentDropTarget);
 				_currentDropTarget = null;
@@ -134,8 +135,9 @@ namespace AvalonDock.Controls
 			List<IDropArea> areasToRemove = new List<IDropArea>();
 			_currentWindowAreas.ForEach(a =>
 			{
+				
 				//is mouse still inside this area?
-				if (!a.DetectionRect.Contains(dragPosition))
+				if (!a.DetectionRect.Contains(a.TransformToDeviceDPI(dragPosition)))
 				{
 					_currentWindow.DragLeave(a);
 					areasToRemove.Add(a);
@@ -146,7 +148,7 @@ namespace AvalonDock.Controls
 				_currentWindowAreas.Remove(a));
 
 			var areasToAdd =
-				_currentHost.GetDropAreas(_floatingWindow).Where(cw => !_currentWindowAreas.Contains(cw) && cw.DetectionRect.Contains(dragPosition)).ToList();
+				_currentHost.GetDropAreas(_floatingWindow).Where(cw => !_currentWindowAreas.Contains(cw) && cw.DetectionRect.Contains(cw.TransformToDeviceDPI(dragPosition))).ToList();
 
 			_currentWindowAreas.AddRange(areasToAdd);
 
@@ -160,7 +162,7 @@ namespace AvalonDock.Controls
 					if (_currentDropTarget != null)
 						return;
 
-					_currentDropTarget = _currentWindow.GetTargets().FirstOrDefault(dt => dt.HitTest(dragPosition));
+					_currentDropTarget = _currentWindow.GetTargets().FirstOrDefault(dt => dt.HitTestScreen(dragPosition));
 
 					if (_currentDropTarget != null)
 					{
@@ -185,6 +187,7 @@ namespace AvalonDock.Controls
 		/// is docked into a new visual tree position).</param>
 		internal void Drop(Point dropLocation, out bool dropHandled)
 		{
+			// TODO - pass in without DPI adjustment, screen co-ords, adjust inside the target window
 			dropHandled = false;
 
 			UpdateMouseLocation(dropLocation);

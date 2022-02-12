@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -36,6 +36,8 @@ namespace AvalonDock.Controls
 
 		/// <summary> Gets the type of drop area for this drop target.</summary>
 		DropAreaType Type { get; }
+
+		Point TransformToDeviceDPI(Point dragPosition);
 	}
 
 	/// <inheritdoc />
@@ -69,6 +71,11 @@ namespace AvalonDock.Controls
 
 		/// <inheritdoc />
 		public DropAreaType Type { get; }
+
+		public Point TransformToDeviceDPI(Point dragPosition)
+		{
+			return AreaElement.TransformToDeviceDPI(dragPosition);
+		}
 
 		#endregion IDropArea
 

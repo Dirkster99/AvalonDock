@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -48,7 +48,7 @@ namespace AvalonDock.Controls
 		/// <summary>Determines whether the <paramref name="dragPoint"/> is part of this drop target or not.</summary>
 		/// <param name="dragPoint">The point to test.</param>
 		/// <returns><c>true</c> if it is inside the target.</returns>
-		bool HitTest(Point dragPoint);
+		bool HitTestScreen(Point dragPoint);
 
 		/// <summary>
 		/// Method is invoked to complete a drag & drop operation with a (new) docking position
