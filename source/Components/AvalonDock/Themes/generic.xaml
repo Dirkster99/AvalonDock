@@ -1203,6 +1203,7 @@
 											Text="{x:Static avalonDockProperties:Resources.Active_ToolWindows}" />
 										<ListBox
 											x:Name="PART_AnchorableListBox"
+											AutomationProperties.Name="{x:Static avalonDockProperties:Resources.Active_ToolWindows}"
 											Grid.Row="1"
 											MaxHeight="400"
 											Background="Transparent"
@@ -1250,6 +1251,7 @@
 											Text="{x:Static avalonDockProperties:Resources.Active_Files}" />
 										<ListBox
 											x:Name="PART_DocumentListBox"
+											AutomationProperties.Name="{x:Static avalonDockProperties:Resources.Active_Files}"
 											Grid.Row="1"
 											MaxHeight="400"
 											Background="Transparent"
