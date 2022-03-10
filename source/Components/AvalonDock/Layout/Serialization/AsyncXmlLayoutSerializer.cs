@@ -16,7 +16,38 @@ using System.Xml.Serialization;
 
 namespace AvalonDock.Layout.Serialization
 {
-	/// <summary>Implements a layout serialization/deserialization method of the docking framework.</summary>
+	/// <summary>
+	/// Implements a layout serialization/deserialization method of the docking framework.
+	/// </summary>
+	/// <example>
+	/// <code>
+    /// private void Serialize()
+    /// {
+    ///     // The serialization is not done async as the XmlSerializer used is not having async overloads
+    ///     var serializer = new AvalonDock.Layout.Serialization.AsyncXmlLayoutSerializer(dockManager);
+    ///     serializer.Serialize(@".\AvalonDock.config");
+    /// }
+	/// </code>
+	/// </example>
+	/// <example>
+	/// <code>
+	/// private async Task DeserializeAsync(AvalonDock.DockingManager dockManager)
+	/// {
+	///     using (var serializer = new AvalonDock.Layout.Serialization.AsyncXmlLayoutSerializer(dockManager))
+	///	    {
+	///	        serializer.LayoutRestore += async (s, args) =>
+	///         {
+	///             // Emulate an async operation for this
+	///             await Task.Delay(1000);
+	///             // Required for each interaction with actual AvalonDock, as these are STA components
+	///             await Dispatcher.InvokeAsync(() => args.Content = args.Content);
+	///         };
+	///         if (File.Exists(@".\AvalonDock.config"))
+	///             await serializer.DeserializeAsync(@".\AvalonDock.config");
+	///     }
+	/// }
+	/// </code>
+	/// </example>
 	public class AsyncXmlLayoutSerializer : LayoutSerializerBase
 	{
 		#region Constructors

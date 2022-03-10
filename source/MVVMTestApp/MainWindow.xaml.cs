@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -23,20 +24,49 @@ namespace AvalonDock.MVVMTestApp
 
 		private void MainWindow_Loaded(object sender, RoutedEventArgs e)
 		{
+			Deserialize();
+			// await DeserializeAsync();
+		}
+
+		private void Deserialize()
+		{
 			var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
-			serializer.LayoutSerializationCallback += (s, args) =>
-			{
-				args.Content = args.Content;
-			};
+			serializer.LayoutSerializationCallback += (s, args) => { args.Content = args.Content; };
 
 			if (File.Exists(@".\AvalonDock.config"))
 				serializer.Deserialize(@".\AvalonDock.config");
 		}
+		private async Task DeserializeAsync()
+		{
+			using (var serializer = new AvalonDock.Layout.Serialization.AsyncXmlLayoutSerializer(dockManager))
+			{
+				serializer.LayoutRestore += async (s, args) =>
+				{
+					// Emulate an async operation for this
+					await Task.Delay(1000);
+					// Required for each interaction with actual AvalonDock, as these are STA components
+					await Dispatcher.InvokeAsync(() => args.Content = args.Content);
+				};
+
+				if (File.Exists(@".\AvalonDock.config"))
+					await serializer.DeserializeAsync(@".\AvalonDock.config");
+			}
+		}
 
 		private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
 		{
+			Serialize();
+		}
+
+		private void Serialize()
+		{
 			var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
 			serializer.Serialize(@".\AvalonDock.config");
+			
+			// AsyncXmlLayoutSerializer may also be used here, as the serialization is not done async
+			// due to the XmlSerializer used not having async overloads
+			// var serializer = new AvalonDock.Layout.Serialization.AsyncXmlLayoutSerializer(dockManager);
+			// serializer.Serialize(@".\AvalonDock.config");
 		}
 
 		#region LoadLayoutCommand
