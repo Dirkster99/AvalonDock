@@ -21,12 +21,12 @@ namespace AvalonDock.Layout.Serialization
 	/// </summary>
 	/// <example>
 	/// <code>
-    /// private void Serialize()
-    /// {
-    ///     // The serialization is not done async as the XmlSerializer used is not having async overloads
-    ///     var serializer = new AvalonDock.Layout.Serialization.AsyncXmlLayoutSerializer(dockManager);
-    ///     serializer.Serialize(@".\AvalonDock.config");
-    /// }
+	/// private void Serialize()
+	/// {
+	///     // The serialization is not done async as the XmlSerializer used is not having async overloads
+	///     var serializer = new AvalonDock.Layout.Serialization.AsyncXmlLayoutSerializer(dockManager);
+	///     serializer.Serialize(@".\AvalonDock.config");
+	/// }
 	/// </code>
 	/// </example>
 	/// <example>
