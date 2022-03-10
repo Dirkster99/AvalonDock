@@ -9,11 +9,15 @@
 
 using AvalonDock.Layout;
 using AvalonDock.Themes;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace AvalonDock.Controls
 {
@@ -55,10 +59,28 @@ namespace AvalonDock.Controls
 		{
 			_manager = manager;
 			_internalSetSelectedDocument = true;
-			SetAnchorables(_manager.Layout.Descendents().OfType<LayoutAnchorable>().Where(a => a.IsVisible).Select(d => (LayoutAnchorableItem)_manager.GetLayoutItemFromModel(d)).ToArray());
-			SetDocuments(_manager.Layout.Descendents().OfType<LayoutDocument>().OrderByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault()).Select(d => (LayoutDocumentItem)_manager.GetLayoutItemFromModel(d)).ToArray());
+			SetAnchorables(_manager.Layout.Descendents()
+				.OfType<LayoutAnchorable>()
+				.Where(a => a.IsVisible)
+				.OrderByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault())
+				.Select(d => (LayoutAnchorableItem)_manager.GetLayoutItemFromModel(d))
+				.ToArray());
+			SetDocuments(_manager.Layout.Descendents()
+				.OfType<LayoutDocument>()
+				.OrderByDescending(d => d.LastActivationTimeStamp.GetValueOrDefault())
+				.Select(d => (LayoutDocumentItem)_manager.GetLayoutItemFromModel(d))
+				.ToArray());
 			_internalSetSelectedDocument = false;
-			if (Documents.Length > 0)
+
+			// if there are multiple documents, select the next document.
+			// if there is only one document, select that document.
+			// if there are no documents, select the first anchorable.
+			if (Documents.Length > 1)
+			{
+				InternalSetSelectedDocument(Documents[1]);
+				_isSelectingDocument = true;
+			}
+			else if (Documents.Length == 1)
 			{
 				InternalSetSelectedDocument(Documents[0]);
 				_isSelectingDocument = true;
@@ -72,6 +94,7 @@ namespace AvalonDock.Controls
 					_isSelectingDocument = false;
 				}
 			}
+
 			DataContext = this;
 			Loaded += OnLoaded;
 			Unloaded += OnUnloaded;
@@ -130,8 +153,17 @@ namespace AvalonDock.Controls
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="SelectedDocument"/> property.</summary>
 		protected virtual void OnSelectedDocumentChanged(DependencyPropertyChangedEventArgs e)
 		{
-			if (_internalSetSelectedDocument || SelectedDocument == null || !SelectedDocument.ActivateCommand.CanExecute(null)) return;
-			Hide();
+			if (_internalSetSelectedDocument || SelectedDocument == null)
+			{
+				return;
+			}
+
+			if (!SelectedDocument.ActivateCommand.CanExecute(null))
+			{
+				return;
+			}
+
+			Close();
 			SelectedDocument.ActivateCommand.Execute(null);
 		}
 
@@ -179,46 +211,140 @@ namespace AvalonDock.Controls
 			base.OnApplyTemplate();
 			_anchorableListBox = GetTemplateChild(PART_AnchorableListBox) as ListBox;
 			_documentListBox = GetTemplateChild(PART_DocumentListBox) as ListBox;
+
+			if (_anchorableListBox != null)
+			{
+				_anchorableListBox.ItemContainerGenerator.StatusChanged += ItemContainerGenerator_StatusChanged;
+			}
+
+			if (_documentListBox != null)
+			{
+				_documentListBox.ItemContainerGenerator.StatusChanged += ItemContainerGenerator_StatusChanged;
+			}
+		}
+
+		private void ItemContainerGenerator_StatusChanged(object sender, EventArgs e)
+		{
+			bool isListOfDocuments = sender == _documentListBox.ItemContainerGenerator;
+			var itemsCollection = isListOfDocuments ? (IEnumerable)Documents : Anchorables.ToArray();
+			ItemContainerGenerator generator = (ItemContainerGenerator)sender;
+			switch (generator.Status)
+			{
+				case GeneratorStatus.ContainersGenerated:
+					foreach (object item in itemsCollection)
+					{
+						ListBoxItem container = (ListBoxItem)generator.ContainerFromItem(item);
+						if (container != null)
+						{
+							if (isListOfDocuments)
+							{
+								container.IsKeyboardFocusedChanged += DocumentsItemContainer_IsKeyboardFocusedChanged;
+							}
+							else
+							{
+								container.IsKeyboardFocusedChanged += AnchorablesItemContainer_IsKeyboardFocusedChanged;
+							}
+						}
+					}
+					break;
+			}
+		}
+
+		private void AnchorablesItemContainer_IsKeyboardFocusedChanged(object sender, DependencyPropertyChangedEventArgs e)
+		{
+			ListBoxItem item = (ListBoxItem)sender;
+			if (item.IsKeyboardFocused)
+			{
+				_internalSetSelectedAnchorable = true;
+				item.IsSelected = true;
+				_internalSetSelectedAnchorable = false;
+			}
+		}
+
+		private void DocumentsItemContainer_IsKeyboardFocusedChanged(object sender, DependencyPropertyChangedEventArgs e)
+		{
+			ListBoxItem item = (ListBoxItem)sender;
+			if (item.IsKeyboardFocused)
+			{
+				_internalSetSelectedDocument = true;
+				item.IsSelected = true;
+				_internalSetSelectedDocument = false;
+			}
 		}
 
 		/// <inheritdoc />
-		protected override void OnPreviewKeyDown(System.Windows.Input.KeyEventArgs e)
+		protected override void OnKeyDown(KeyEventArgs e)
 		{
-			var shouldHandle = false;
-			// Press Tab to switch Selected LayoutContent.
-			if (e.Key == System.Windows.Input.Key.Tab)
+			switch (e.Key)
+			{
+				// Press Tab to switch Selected LayoutContent.
+				case Key.Tab:
+					SetNextLayoutContent(true);
+					e.Handled = true;
+					break;
+				case Key.Left:
+				case Key.Right:
+					if (_isSelectingDocument)
+					{
+						var anchorable = Anchorables.ElementAtOrDefault(Documents.IndexOf(SelectedDocument))
+							?? Anchorables.LastOrDefault();
+						if (anchorable != null)
+						{
+							_isSelectingDocument = false;
+							InternalSetSelectedDocument(null);
+							InternalSetSelectedAnchorable(anchorable);
+						}
+					}
+					else
+					{
+						int index = _anchorableListBox?.SelectedIndex
+							?? Anchorables.ToArray().IndexOf(SelectedAnchorable);
+						var document = Documents.ElementAtOrDefault(index)
+							?? Documents.LastOrDefault();
+						if (document != null)
+						{
+							_isSelectingDocument = true;
+							InternalSetSelectedAnchorable(null);
+							InternalSetSelectedDocument(document);
+						}
+					}
+					e.Handled = true;
+					break;
+				case Key.Up:
+					SetNextLayoutContent(false);
+					e.Handled = true;
+					break;
+				case Key.Down:
+					SetNextLayoutContent(true);
+					e.Handled = true;
+					break;
+			}
+			if (!e.Handled)
+			{
+				base.OnKeyDown(e);
+			}
+
+			void SetNextLayoutContent(bool next)
 			{
 				// Selecting LayoutDocuments
 				if (_isSelectingDocument)
 				{
 					if (SelectedDocument != null)
 					{
-						// Jump to next LayoutDocument
-						// if we are on the last LayoutDocument and we have Anchorables we jump over to the Anchorables list
-						// if there are no Anchorables we call SelectNextDocument which has logic in it to loop back to the top of the list
-						var docIndex = Documents.IndexOf(SelectedDocument);
-						if (docIndex < Documents.Length - 1 || !Anchorables.Any())
+						// Jump to previous/next LayoutDocument
+						if (next)
 						{
 							SelectNextDocument();
-							shouldHandle = true;
 						}
-						// Jump to first LayoutAnchorable
-						else if (Anchorables.Any())
+						else
 						{
-							_isSelectingDocument = false;
-							InternalSetSelectedDocument(null);
-							InternalSetSelectedAnchorable(Anchorables.First());
-							shouldHandle = true;
+							SelectPreviousDocument();
 						}
 					}
 					// There is no SelectedDocument, select the first one.
-					else
+					else if (Documents.Length > 0)
 					{
-						if (Documents.Length > 0)
-						{
-							InternalSetSelectedDocument(Documents[0]);
-							shouldHandle = true;
-						}
+						InternalSetSelectedDocument(Documents[0]);
 					}
 				}
 				// Selecting LayoutAnchorables
@@ -226,51 +352,42 @@ namespace AvalonDock.Controls
 				{
 					if (SelectedAnchorable != null)
 					{
-						// Jump to next LayoutAnchorable
-						// if we are on the last LayoutAnchorable and we have one or more LayoutDocuments we jump over to the Documents list
-						// if there are no Documents we call SelectNextAnchorable which has logic in it to loop back to the top of the list
-						var anchorableIndex = Anchorables.ToArray().IndexOf(SelectedAnchorable);
-						if (anchorableIndex < Anchorables.Count() - 1 || Documents.Count() == 0)
+						// Jump to previous/next LayoutAnchorable
+						if (next)
 						{
 							SelectNextAnchorable();
-							shouldHandle = true;
 						}
-						// Jump to first LayoutDocument
-						else if (Documents.Length > 0)
+						else
 						{
-							_isSelectingDocument = true;
-							InternalSetSelectedAnchorable(null);
-							InternalSetSelectedDocument(Documents[0]);
-							shouldHandle = true;
+							SelectPreviousAnchorable();
 						}
 					}
 					// There is no SelectedAnchorable, select the first one.
 					else
 					{
-						if (Anchorables.Any())
+						var anchorable = Anchorables.FirstOrDefault();
+						if (anchorable != null)
 						{
-							InternalSetSelectedAnchorable(Anchorables.ToArray()[0]);
-							shouldHandle = true;
+							InternalSetSelectedAnchorable(anchorable);
 						}
 					}
 				}
 			}
-
-			if (shouldHandle) e.Handled = true;
-			base.OnPreviewKeyDown(e);
 		}
 
 		/// <inheritdoc />
-		protected override void OnPreviewKeyUp(System.Windows.Input.KeyEventArgs e)
+		protected override void OnKeyUp(KeyEventArgs e)
 		{
-			if (e.Key != System.Windows.Input.Key.Tab)
+			if (!(e.Key == Key.Tab || e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down))
 			{
 				Close();
-				if (SelectedDocument != null && SelectedDocument.ActivateCommand.CanExecute(null)) SelectedDocument.ActivateCommand.Execute(null);
-				if (SelectedDocument == null && SelectedAnchorable != null && SelectedAnchorable.ActivateCommand.CanExecute(null)) SelectedAnchorable.ActivateCommand.Execute(null);
+				if (SelectedDocument != null && SelectedDocument.ActivateCommand.CanExecute(null))
+					SelectedDocument.ActivateCommand.Execute(null);
+				if (SelectedDocument == null && SelectedAnchorable != null && SelectedAnchorable.ActivateCommand.CanExecute(null))
+					SelectedAnchorable.ActivateCommand.Execute(null);
 				e.Handled = true;
 			}
-			base.OnPreviewKeyUp(e);
+			base.OnKeyUp(e);
 		}
 
 		#endregion Overrides
@@ -338,7 +455,26 @@ namespace AvalonDock.Controls
 			var anchorablesArray = Anchorables.ToArray();
 			var anchorableIndex = anchorablesArray.IndexOf(SelectedAnchorable);
 			anchorableIndex++;
-			if (anchorableIndex == Anchorables.Count()) anchorableIndex = 0;
+			if (anchorableIndex == anchorablesArray.Length) anchorableIndex = 0;
+			InternalSetSelectedAnchorable(anchorablesArray[anchorableIndex]);
+		}
+
+		internal void SelectPreviousDocument()
+		{
+			if (SelectedDocument == null) return;
+			var docIndex = Documents.IndexOf(SelectedDocument);
+			docIndex--;
+			if (docIndex < 0) docIndex = Documents.Length - 1;
+			InternalSetSelectedDocument(Documents[docIndex]);
+		}
+
+		internal void SelectPreviousAnchorable()
+		{
+			if (SelectedAnchorable == null) return;
+			var anchorablesArray = Anchorables.ToArray();
+			var anchorableIndex = anchorablesArray.IndexOf(SelectedAnchorable);
+			anchorableIndex--;
+			if (anchorableIndex < 0) anchorableIndex = anchorablesArray.Length - 1;
 			InternalSetSelectedAnchorable(anchorablesArray[anchorableIndex]);
 		}
 
@@ -351,7 +487,10 @@ namespace AvalonDock.Controls
 			_internalSetSelectedAnchorable = true;
 			SelectedAnchorable = anchorableToSelect;
 			_internalSetSelectedAnchorable = false;
-			_anchorableListBox?.Focus();
+			if (_anchorableListBox != null)
+			{
+				FocusSelectedItem(_anchorableListBox);
+			}
 		}
 
 		private void InternalSetSelectedDocument(LayoutDocumentItem documentToSelect)
@@ -359,18 +498,39 @@ namespace AvalonDock.Controls
 			_internalSetSelectedDocument = true;
 			SelectedDocument = documentToSelect;
 			_internalSetSelectedDocument = false;
-			if (_documentListBox != null && documentToSelect != null) _documentListBox.Focus();
+			if (_documentListBox != null)
+			{
+				FocusSelectedItem(_documentListBox);
+			}
 		}
 
 		private void OnLoaded(object sender, RoutedEventArgs e)
 		{
 			Loaded -= OnLoaded;
-			if (_documentListBox != null && SelectedDocument != null) _documentListBox.Focus();
-			else if (_anchorableListBox != null && SelectedAnchorable != null) _anchorableListBox.Focus();
+			if (_documentListBox != null && SelectedDocument != null)
+			{
+				FocusSelectedItem(_documentListBox);
+			}
+			else if (_anchorableListBox != null && SelectedAnchorable != null)
+			{
+				FocusSelectedItem(_anchorableListBox);
+			}
 			WindowStartupLocation = WindowStartupLocation.CenterOwner;
 		}
 
 		private void OnUnloaded(object sender, RoutedEventArgs e) => Unloaded -= OnUnloaded;
+
+		private void FocusSelectedItem(ListBox list)
+		{
+			if (list.SelectedIndex >= 0)
+			{
+				var listBoxItem = (ListBoxItem)list.ItemContainerGenerator.ContainerFromIndex(list.SelectedIndex);
+				if (listBoxItem != null)
+				{
+					this.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, (Func<bool>)listBoxItem.Focus);
+				}
+			}
+		}
 
 		#endregion Private Methods
 	}

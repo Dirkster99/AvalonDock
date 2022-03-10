@@ -637,7 +637,7 @@ namespace AvalonDock.Controls
 				Left = ptTopLeftScreen.X,
 				Top = ptTopLeftScreen.Y,
 				ShowActivated = false,
-				//Owner = Window.GetWindow(this),
+				Owner = Window.GetWindow(this),
 				Content = panelHostResizer
 			};
 			_resizerWindowHost.Loaded += (s, e) => _resizerWindowHost.SetParentToMainWindowOf(this);

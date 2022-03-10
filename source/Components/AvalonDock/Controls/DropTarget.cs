@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -106,6 +106,11 @@ namespace AvalonDock.Controls
 
 		#region Public Methods
 
+		public bool HitTestScreen(Point dragPoint)
+		{
+			return HitTest(_targetElement.TransformToDeviceDPI(dragPoint));
+		}
+
 		public void Drop(LayoutFloatingWindow floatingWindow)
 		{
 			var root = floatingWindow.Root;
@@ -121,7 +126,8 @@ namespace AvalonDock.Controls
 				var fwAsDocument = floatingWindow as LayoutDocumentFloatingWindow;
 				this.Drop(fwAsDocument);
 			}
-
+			if (currentActiveContent == null)
+				return;
 			Dispatcher.BeginInvoke(new Action(() =>
 				{
 					currentActiveContent.IsSelected = false;

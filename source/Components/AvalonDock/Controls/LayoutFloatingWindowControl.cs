@@ -364,7 +364,7 @@ namespace AvalonDock.Controls
 
 					if (_dragService != null)
 					{
-						var mousePosition = this.TransformToDeviceDPI(Win32Helper.GetMousePosition());
+						var mousePosition = (Win32Helper.GetMousePosition());
 						_dragService.Drop(mousePosition, out var dropFlag);
 						_dragService = null;
 						SetIsDragging(false);
@@ -606,13 +606,24 @@ namespace AvalonDock.Controls
 			var windowHandle = new WindowInteropHelper(this).Handle;
 			var mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
 
+			var area = this.GetScreenArea();
+
 			// BugFix Issue #6
 			// This code is initializes the drag when content (document or toolwindow) is dragged
 			// A second chance back up plan if DragDelta is not set
 			if (DragDelta == default) DragDelta = new Point(3, 3);
 			Left = mousePosition.X - DragDelta.X;                 // BugFix Issue #6
 			Top = mousePosition.Y - DragDelta.Y;
+
+			if (this.GetScreenArea().Size != area.Size) // setting the top/left co-ordinates has changed the size - this means moving to a screen with a different DPI. Recalculate mouse position based on new DPI to avoid wrong drag location
+			{
+				mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
+				Left = mousePosition.X - DragDelta.X;
+				Top = mousePosition.Y - DragDelta.Y;
+			}
+
 			_attachDrag = false;
+			Show();
 			var lParam = new IntPtr(((int)mousePosition.X & 0xFFFF) | ((int)mousePosition.Y << 16));
 			Win32Helper.SendMessage(windowHandle, Win32Helper.WM_NCLBUTTONDOWN, new IntPtr(Win32Helper.HT_CAPTION), lParam);
 		}
@@ -657,7 +668,7 @@ namespace AvalonDock.Controls
 				_dragService = new DragService(this);
 				SetIsDragging(true);
 			}
-			var mousePosition = this.TransformToDeviceDPI(Win32Helper.GetMousePosition());
+			var mousePosition = (Win32Helper.GetMousePosition());
 			_dragService.UpdateMouseLocation(mousePosition);
 		}
 

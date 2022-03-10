@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -98,6 +98,11 @@ namespace AvalonDock.Controls
 		{
 			_document = null;
 			base.Detach();
+		}
+
+		protected override bool CanExecuteDockAsDocumentCommand()
+		{
+			return (LayoutElement != null && LayoutElement.FindParent<LayoutDocumentPane>() != null && LayoutElement.IsFloating);
 		}
 
 		#endregion Overrides

@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -140,7 +140,12 @@ namespace AvalonDock.Controls
 
 		#region IOverlayWindowHost
 
-		bool IOverlayWindowHost.HitTest(Point dragPoint)
+		bool IOverlayWindowHost.HitTestScreen(Point dragPoint)
+		{
+			return HitTest(this.TransformToDeviceDPI(dragPoint));
+		}
+
+		bool HitTest(Point dragPoint)
 		{
 			var detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			return detectionRect.Contains(dragPoint);
@@ -151,12 +156,13 @@ namespace AvalonDock.Controls
 			_dropAreas = null;
 			_overlayWindow.Owner = null;
 			_overlayWindow.HideDropTargets();
+			_overlayWindow.Close();
+			_overlayWindow = null;
 		}
 
 		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
 		{
 			CreateOverlayWindow();
-			_overlayWindow.Owner = draggingWindow;
 			_overlayWindow.EnableDropTargets();
 			_overlayWindow.Show();
 			return _overlayWindow;
@@ -292,6 +298,7 @@ namespace AvalonDock.Controls
 		private void CreateOverlayWindow()
 		{
 			if (_overlayWindow == null) _overlayWindow = new OverlayWindow(this);
+			_overlayWindow.Owner = Window.GetWindow(this);
 			var rectWindow = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			_overlayWindow.Left = rectWindow.Left;
 			_overlayWindow.Top = rectWindow.Top;

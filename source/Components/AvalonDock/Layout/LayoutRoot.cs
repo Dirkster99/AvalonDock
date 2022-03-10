@@ -98,9 +98,19 @@ namespace AvalonDock.Layout
 			{
 				if (_rootPanel == value) return;
 				RaisePropertyChanging(nameof(RootPanel));
+				var activeContent = ActiveContent;
+				var activeRoot = activeContent?.Root;
 				if (_rootPanel != null && _rootPanel.Parent == this) _rootPanel.Parent = null;
 				_rootPanel = value ?? new LayoutPanel(new LayoutDocumentPane());
 				_rootPanel.Parent = this;
+				if (ActiveContent == null && activeRoot == this && activeContent != null)
+				{
+					ActiveContent = activeContent;
+					if (ActiveContent != activeContent)
+					{
+						ActiveContent = activeContent;
+					}
+				}
 				RaisePropertyChanged(nameof(RootPanel));
 			}
 		}

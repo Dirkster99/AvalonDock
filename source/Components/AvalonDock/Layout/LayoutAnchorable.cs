@@ -442,12 +442,20 @@ namespace AvalonDock.Layout
 						case AnchorSide.Right:
 							if (parentGroup.Root.RootPanel.Orientation == Orientation.Horizontal)
 							{
-								previousContainer = new LayoutAnchorablePane { DockMinWidth = AutoHideMinWidth };
+								previousContainer = new LayoutAnchorablePane
+								{
+									DockMinWidth = AutoHideMinWidth,
+									DockMinHeight = AutoHideMinHeight
+								};
 								parentGroup.Root.RootPanel.Children.Add(previousContainer);
 							}
 							else
 							{
-								previousContainer = new LayoutAnchorablePane();
+								previousContainer = new LayoutAnchorablePane
+								{
+									DockMinHeight = AutoHideMinHeight,
+									DockMinWidth = AutoHideMinWidth
+								};
 								var panel = new LayoutPanel { Orientation = Orientation.Horizontal };
 								var root = parentGroup.Root as LayoutRoot;
 								var oldRootPanel = parentGroup.Root.RootPanel;
@@ -460,12 +468,20 @@ namespace AvalonDock.Layout
 						case AnchorSide.Left:
 							if (parentGroup.Root.RootPanel.Orientation == Orientation.Horizontal)
 							{
-								previousContainer = new LayoutAnchorablePane { DockMinWidth = AutoHideMinWidth };
+								previousContainer = new LayoutAnchorablePane
+								{
+									DockMinWidth = AutoHideMinWidth,
+									DockMinHeight = AutoHideMinHeight
+								};
 								parentGroup.Root.RootPanel.Children.Insert(0, previousContainer);
 							}
 							else
 							{
-								previousContainer = new LayoutAnchorablePane();
+								previousContainer = new LayoutAnchorablePane
+								{
+									DockMinHeight = AutoHideMinHeight,
+									DockMinWidth = AutoHideMinWidth
+								};
 								var panel = new LayoutPanel { Orientation = Orientation.Horizontal };
 								var root = parentGroup.Root as LayoutRoot;
 								var oldRootPanel = parentGroup.Root.RootPanel;
@@ -478,12 +494,20 @@ namespace AvalonDock.Layout
 						case AnchorSide.Top:
 							if (parentGroup.Root.RootPanel.Orientation == Orientation.Vertical)
 							{
-								previousContainer = new LayoutAnchorablePane { DockMinHeight = AutoHideMinHeight };
+								previousContainer = new LayoutAnchorablePane
+								{
+									DockMinHeight = AutoHideMinHeight,
+									DockMinWidth = AutoHideMinWidth
+								};
 								parentGroup.Root.RootPanel.Children.Insert(0, previousContainer);
 							}
 							else
 							{
-								previousContainer = new LayoutAnchorablePane();
+								previousContainer = new LayoutAnchorablePane
+								{
+									DockMinWidth = AutoHideMinWidth,
+									DockMinHeight = AutoHideMinHeight
+								};
 								var panel = new LayoutPanel { Orientation = Orientation.Vertical };
 								var root = parentGroup.Root as LayoutRoot;
 								var oldRootPanel = parentGroup.Root.RootPanel;
@@ -498,13 +522,18 @@ namespace AvalonDock.Layout
 							{
 								previousContainer = new LayoutAnchorablePane
 								{
-									DockMinHeight = AutoHideMinHeight
+									DockMinHeight = AutoHideMinHeight,
+									DockMinWidth = AutoHideMinWidth
 								};
 								parentGroup.Root.RootPanel.Children.Add(previousContainer);
 							}
 							else
 							{
-								previousContainer = new LayoutAnchorablePane();
+								previousContainer = new LayoutAnchorablePane
+                                {
+                                    DockMinWidth = AutoHideMinWidth,
+									DockMinHeight = AutoHideMinHeight
+                                };
 								var panel = new LayoutPanel { Orientation = Orientation.Vertical };
 								var root = parentGroup.Root as LayoutRoot;
 								var oldRootPanel = parentGroup.Root.RootPanel;
@@ -524,8 +553,16 @@ namespace AvalonDock.Layout
 						cnt.PreviousContainer = previousContainer;
 				}
 
+				var selectedIndex = -1;
+				var selectedItem = parentGroup.Children.FirstOrDefault(x => x.IsActive);
+				if (selectedItem != null)
+					selectedIndex = parentGroup.Children.IndexOf(selectedItem);
+
 				foreach (var anchorableToToggle in parentGroup.Children.ToArray())
 					previousContainer.Children.Add(anchorableToToggle);
+
+				if (selectedIndex != -1)
+					previousContainer.SelectedContentIndex = selectedIndex;
 
 				parentSide.Children.Remove(parentGroup);
 
