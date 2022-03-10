@@ -15,7 +15,6 @@ using System.Xml.Serialization;
 namespace AvalonDock.Layout.Serialization
 {
 	/// <summary>Implements a layout serialization/deserialization method of the docking framework.</summary>
-	[Obsolete("This class was replaced with " + nameof(AsyncXmlLayoutSerializer))]
 	public class XmlLayoutSerializer : LayoutSerializer
 	{
 		#region Constructors
