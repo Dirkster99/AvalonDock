@@ -40,8 +40,8 @@ namespace AvalonDock.Layout.Serialization
 		/// A function, receiving the <see cref="LayoutRoot"/> <see cref="XmlSerializer"/>,
 		/// that is supposed to call a deserialize method.
 		/// </param>
-		private Task DeserializeCommon(Func<XmlSerializer, LayoutRoot> function)
-			=> DeserializeCommon(() =>
+		private Task DeserializeCommonAsync(Func<XmlSerializer, LayoutRoot> function)
+			=> base.DeserializeCommonAsync(() =>
 			{
 				var serializer = XmlSerializer.FromTypes(new[] {typeof(LayoutRoot)}).First();
 				return function(serializer);
@@ -87,26 +87,26 @@ namespace AvalonDock.Layout.Serialization
 
 		/// <summary>Deserialize the layout a file from a <see cref="Stream"/>.</summary>
 		/// <param name="stream"></param>
-		public Task Deserialize(Stream stream)
-			=> DeserializeCommon((xmlSerializer) => (LayoutRoot) xmlSerializer.Deserialize(stream));
+		public Task DeserializeAsync(Stream stream)
+			=> DeserializeCommonAsync((xmlSerializer) => (LayoutRoot) xmlSerializer.Deserialize(stream));
 
 		/// <summary>Deserialize the layout a file from a <see cref="TextReader"/>.</summary>
 		/// <param name="reader"></param>
-		public Task Deserialize(TextReader reader)
-			=> DeserializeCommon((xmlSerializer) => (LayoutRoot) xmlSerializer.Deserialize(reader));
+		public Task DeserializeAsync(TextReader reader)
+			=> DeserializeCommonAsync((xmlSerializer) => (LayoutRoot) xmlSerializer.Deserialize(reader));
 
 		/// <summary>Deserialize the layout a file from a <see cref="XmlReader"/>.</summary>
 		/// <param name="reader"></param>
-		public Task Deserialize(XmlReader reader)
-			=> DeserializeCommon((xmlSerializer) => (LayoutRoot) xmlSerializer.Deserialize(reader));
+		public Task DeserializeAsync(XmlReader reader)
+			=> DeserializeCommonAsync((xmlSerializer) => (LayoutRoot) xmlSerializer.Deserialize(reader));
 
 		/// <summary>Deserialize the layout from a file using a <see cref="StreamReader"/>.</summary>
 		/// <param name="filepath"></param>
-		public async Task Deserialize(string filepath)
+		public async Task DeserializeAsync(string filepath)
 		{
 			using (var stream = new StreamReader(filepath))
 			{
-				await Deserialize(stream);
+				await DeserializeAsync(stream);
 			}
 		}
 

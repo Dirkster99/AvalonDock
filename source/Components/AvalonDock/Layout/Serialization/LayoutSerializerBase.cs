@@ -128,7 +128,7 @@ namespace AvalonDock.Layout.Serialization
 				.Where(lc => lc.Content == null);
 		}
 
-		private async Task HandleLayoutRestoreFallback(
+		private async Task HandleLayoutRestoreFallbackAsync(
 			LayoutContent previousContent,
 			LayoutContent lcToFix,
 			Action onPreviousContentNull)
@@ -144,23 +144,23 @@ namespace AvalonDock.Layout.Serialization
 			}
 		}
 
-		private Task HandleLayoutRestoreFallbackOfAnchorable(
+		private Task HandleLayoutRestoreFallbackOfAnchorableAsync(
 			LayoutAnchorable previousAnchorable,
 			LayoutAnchorable lcToFix)
-			=> HandleLayoutRestoreFallback(
+			=> HandleLayoutRestoreFallbackAsync(
 				previousAnchorable,
 				lcToFix,
 				() => lcToFix.Hide(false));
 		private Task HandleLayoutRestoreFallbackOfDocument(
 			LayoutDocument previousAnchorable,
 			LayoutDocument lcToFix)
-			=> HandleLayoutRestoreFallback(
+			=> HandleLayoutRestoreFallbackAsync(
 				previousAnchorable,
 				lcToFix,
 				// ReSharper disable once ConvertClosureToMethodGroup
 				() => lcToFix.Close());
 
-		private async Task<bool> TryHandleLayoutRestoreByUserCallback(
+		private async Task<bool> TryHandleLayoutRestoreByUserCallbackAsync(
 			LayoutContent previousContent,
 			LayoutContent lcToFix,
 			Action onNoContentAvailable)
@@ -190,17 +190,17 @@ namespace AvalonDock.Layout.Serialization
 			return true;
 		}
 
-		private Task<bool> TryHandleLayoutRestoreOfAnchorableByUserCallback(
+		private Task<bool> TryHandleLayoutRestoreOfAnchorableByUserCallbackAsync(
 			LayoutAnchorable previousAnchorable,
 			LayoutAnchorable lcToFix)
-			=> TryHandleLayoutRestoreByUserCallback(
+			=> TryHandleLayoutRestoreByUserCallbackAsync(
 				previousAnchorable,
 				lcToFix,
 				() => lcToFix.Hide(false));
-		private Task<bool> TryHandleLayoutRestoreOfDocumentByUserCallback(
+		private Task<bool> TryHandleLayoutRestoreOfDocumentByUserCallbackAsync(
 			LayoutDocument previousDocument,
 			LayoutDocument lcToFix)
-			=> TryHandleLayoutRestoreByUserCallback(
+			=> TryHandleLayoutRestoreByUserCallbackAsync(
 				previousDocument,
 				lcToFix,
 				// ReSharper disable once ConvertClosureToMethodGroup
@@ -242,10 +242,10 @@ namespace AvalonDock.Layout.Serialization
 		/// A function, returning the deserialized <see cref="LayoutRoot"/>,
 		/// that is supposed to call a deserialize method.
 		/// </param>
-		protected async Task DeserializeCommon(Func<LayoutRoot> function)
+		protected async Task DeserializeCommonAsync(Func<LayoutRoot> function)
 		{
 			var layout = function();
-			await FixupLayout(layout);
+			await FixupLayoutAsync(layout);
 			Manager.Layout = layout;
 		}
 
@@ -264,7 +264,7 @@ namespace AvalonDock.Layout.Serialization
 		/// is equivalent to <see cref="ILayoutPreviousContainer.PreviousContainerId"/>.
 		/// </remarks>
 		/// <param name="layoutRoot"></param>
-		protected virtual async Task FixupPreviousContainerReference(LayoutRoot layoutRoot)
+		protected virtual async Task FixupPreviousContainerReferenceAsync(LayoutRoot layoutRoot)
 		{
 			foreach (var lcToAttach in GetDescendentsWithPreviousContainerId(layoutRoot))
 			{
@@ -280,36 +280,36 @@ namespace AvalonDock.Layout.Serialization
 			}
 		}
 
-		protected virtual async Task ReapplyAnchorablesContent(LayoutRoot layout)
+		protected virtual async Task ReapplyAnchorablesContentAsync(LayoutRoot layout)
 		{
 			foreach (var lcToFix in GetDescendentsWithoutContent<LayoutAnchorable>(layout)
 				         .ToArray())
 			{
 				var previousAnchorable = GetPreviousAnchorableByContentIdOrDefault(lcToFix.ContentId);
 
-				if (await TryHandleLayoutRestoreOfAnchorableByUserCallback(previousAnchorable, lcToFix))
+				if (await TryHandleLayoutRestoreOfAnchorableByUserCallbackAsync(previousAnchorable, lcToFix))
 					continue;
-				await HandleLayoutRestoreFallbackOfAnchorable(previousAnchorable, lcToFix);
+				await HandleLayoutRestoreFallbackOfAnchorableAsync(previousAnchorable, lcToFix);
 			}
 		}
 
-		protected virtual async Task ReapplyDocumentsContent(LayoutRoot layout)
+		protected virtual async Task ReapplyDocumentsContentAsync(LayoutRoot layout)
 		{
 			foreach (var lcToFix in GetDescendentsWithoutContent<LayoutDocument>(layout)
 				         .ToArray())
 			{
 				var previousDocument = GetPreviousDocumentByContentIdOrDefault(lcToFix.ContentId);
-				if (await TryHandleLayoutRestoreOfDocumentByUserCallback(lcToFix, previousDocument))
+				if (await TryHandleLayoutRestoreOfDocumentByUserCallbackAsync(lcToFix, previousDocument))
 					continue;
 				await HandleLayoutRestoreFallbackOfDocument(previousDocument, lcToFix);
 			}
 		}
 
-		protected virtual async Task FixupLayout(LayoutRoot layout)
+		protected virtual async Task FixupLayoutAsync(LayoutRoot layout)
 		{
-			await FixupPreviousContainerReference(layout);
-			await ReapplyAnchorablesContent(layout);
-			await ReapplyDocumentsContent(layout);
+			await FixupPreviousContainerReferenceAsync(layout);
+			await ReapplyAnchorablesContentAsync(layout);
+			await ReapplyDocumentsContentAsync(layout);
 
 			await Dispatcher.InvokeAsync(layout.CollectGarbage);
 		}
