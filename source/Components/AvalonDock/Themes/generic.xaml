@@ -376,6 +376,8 @@
 		</Setter>
 	</Style>
 
+	<Style TargetType="{x:Type avalonDockControls:AnchorablePaneTitle}" BasedOn="{StaticResource AnchorablePaneTitleStyle}"/>
+	
 	<ControlTemplate x:Key="AnchorSideTemplate" TargetType="{x:Type avalonDockControls:LayoutAnchorSideControl}">
 		<ItemsControl Background="{TemplateBinding Background}" ItemsSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Children}">
 			<ItemsControl.ItemsPanel>
