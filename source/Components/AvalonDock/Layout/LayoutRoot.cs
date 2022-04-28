@@ -653,9 +653,19 @@ namespace AvalonDock.Layout
 
 		internal static Type FindType(string name)
 		{
-			foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-				foreach (var type in assembly.GetTypes())
-					if (type.Name.Equals(name)) return type;
+			var avalonAssembly = Assembly.GetAssembly(typeof(LayoutRoot));
+
+			foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().OrderBy(a => a != avalonAssembly))
+				try
+				{
+					foreach (var type in assembly.GetTypes())
+						if (type.Name.Equals(name))
+							return type;
+				}
+				catch (ReflectionTypeLoadException)
+				{
+				}
+
 			return null;
 		}
 
