@@ -418,13 +418,6 @@ namespace Microsoft.Windows.Shell
 			// Since we always want the client size to equal the window size, we can unconditionally handle it
 			// without having to modify the parameters.
 			handled = true;
-			if (wParam != IntPtr.Zero)
-			{
-				var client = (RECT)Marshal.PtrToStructure(lParam, typeof(RECT));
-				client.Bottom++;
-				Marshal.StructureToPtr(client, lParam, false);
-				return IntPtr.Zero;
-			}
 			return new IntPtr((int)WVR.REDRAW);
 		}
 
