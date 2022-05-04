@@ -162,7 +162,7 @@ namespace AvalonDock.Controls
 
 		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
 		{
-			CreateOverlayWindow();
+			CreateOverlayWindow(draggingWindow);
 			_overlayWindow.EnableDropTargets();
 			_overlayWindow.Show();
 			return _overlayWindow;
@@ -295,10 +295,20 @@ namespace AvalonDock.Controls
 			if (!IsVisible && _model.IsVisible) Show();
 		}
 
-		private void CreateOverlayWindow()
+		private void CreateOverlayWindow(LayoutFloatingWindowControl draggingWindow)
 		{
 			if (_overlayWindow == null) _overlayWindow = new OverlayWindow(this);
-			_overlayWindow.Owner = Window.GetWindow(this);
+
+			// Usually, the overlay window is made a child of the main window. However, if the floating
+			// window being dragged isn't also a child of the main window (because OwnedByDockingManagerWindow
+			// is set to false to allow the parent window to be minimized independently of floating windows),
+			// this causes the floating window to be moved behind the main window. Just not setting the parent
+			// seems to work acceptably here in that case.
+			if (draggingWindow?.OwnedByDockingManagerWindow ?? true)
+				_overlayWindow.Owner = Window.GetWindow(this);
+			else
+				_overlayWindow.Owner = null;
+
 			var rectWindow = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			_overlayWindow.Left = rectWindow.Left;
 			_overlayWindow.Top = rectWindow.Top;
