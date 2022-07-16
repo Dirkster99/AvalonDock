@@ -109,6 +109,7 @@ namespace AvalonDock.Controls
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonDown(e);
+			CaptureMouse();
 			_allowDrag = false;
 			Model.IsActive = true;
 			if (Model is LayoutDocument layoutDocument && !layoutDocument.CanMove) return;
