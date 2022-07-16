@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -167,7 +168,7 @@ namespace AvalonDock.Controls
 				Height = 0,
 			})
 			{ RootVisual = _internalHostPresenter };
-
+			AutomationProperties.SetName(_internalHostPresenter, "InternalWindowHost");
 			AddLogicalChild(_internalHostPresenter);
 			Win32Helper.BringWindowToTop(_internalHwndSource.Handle);
 			return new HandleRef(this, _internalHwndSource.Handle);
