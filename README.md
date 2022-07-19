@@ -120,6 +120,15 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
+## Fixes Added in Version 4.70.2
+
+- [#338 Fixes #309 Anchorable Header not visible in generic theme](https://github.com/Dirkster99/AvalonDock/pull/338)   (thanx to [Darren Gosbell](https://github.com/dgosbell))
+- [#346 fix crash if some assembly not allow GetTypes()](https://github.com/Dirkster99/AvalonDock/pull/346)   (thanx to [Trivalik](https://github.com/trivalik))
+- [#347 #345 fix refresh when moving floating windows](https://github.com/Dirkster99/AvalonDock/pull/347)   (thanx to [Norberto Magni](https://github.com/nmagni))
+- [#357 LayoutAutoHideWindowControl: UI automation name](https://github.com/Dirkster99/AvalonDock/pull/357)   (thanx to [Ben](https://github.com/bbuerger))
+- [#363 Fixes #362 DockingManager with a Viewbox ancestor does not properly render auto-hidden LayoutAnchorables](https://github.com/Dirkster99/AvalonDock/pull/363)   (thanx to [Tim Cooke](https://github.com/timothylcooke))
+- [#367 Fix for #306 StartDraggingFloatingWindow](https://github.com/Dirkster99/AvalonDock/pull/367)   (thanx to [Muhahe](https://github.com/Muhahe))
+
 ## Fixes Added in Version 4.70.1
 
 - [#336 Keep ActiveContent when switching RootPanel](https://github.com/Dirkster99/AvalonDock/pull/336)   (thanx to [Khaos66](https://github.com/Khaos66))
