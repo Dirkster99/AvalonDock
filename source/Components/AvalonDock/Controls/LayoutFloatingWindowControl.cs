@@ -536,6 +536,26 @@ namespace AvalonDock.Controls
 			base.OnInitialized(e);
 		}
 
+		protected override void OnClosing(CancelEventArgs e)
+        	{
+            		base.OnClosing(e);
+            		AssureOwnerIsNotMinimized();
+        	}
+
+        	/// <summary>
+		/// Prevents a known bug in WPF, which wronlgy minimizes the parent window, when closing this control
+        	/// </summary>
+        	private void AssureOwnerIsNotMinimized()
+        	{
+            		try
+            		{
+                		Owner?.Activate();
+            		}
+            		catch (Exception)
+            		{
+            		}
+        	}
+
 		#endregion Overrides
 
 		#region Private Methods
