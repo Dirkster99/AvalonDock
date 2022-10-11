@@ -119,6 +119,17 @@ namespace AvalonDock
 		/// <seealso cref="ActiveContent"/>
 		public event EventHandler ActiveContentChanged;
 
+		/// <summary>
+		/// Event is raised when LayoutFloatingWindowControl created
+		/// </summary>
+		public event EventHandler<LayoutFloatingWindowControlCreatedEventArgs> LayoutFloatingWindowControlCreated;
+
+		/// <summary>
+		/// Event is raised when LayoutFloatingWindowControl closed
+		/// </summary>
+		public event EventHandler<LayoutFloatingWindowControlClosedEventArgs> LayoutFloatingWindowControlClosed;
+
+
 		#endregion Events
 
 		#region Public Properties
@@ -1736,7 +1747,11 @@ namespace AvalonDock
 
 			var show = fwc == null; // Do not show already visible floating window
 			if (fwc == null)
+			{
 				fwc = CreateFloatingWindow(contentModel, false);
+
+				LayoutFloatingWindowControlCreated?.Invoke(this, new LayoutFloatingWindowControlCreatedEventArgs(fwc));
+			}
 
 			if (fwc != null)
 			{
@@ -1758,6 +1773,9 @@ namespace AvalonDock
 		{
 			var fwc = CreateFloatingWindowForLayoutAnchorableWithoutParent(paneModel, false);
 			if (fwc == null) return;
+
+			LayoutFloatingWindowControlCreated?.Invoke(this, new LayoutFloatingWindowControlCreatedEventArgs(fwc));
+
 			fwc.AttachDrag();
 			fwc.Show();
 		}
@@ -1815,7 +1833,12 @@ namespace AvalonDock
 			overlayWindowHosts.AddRange(bottomFloatingWindows);
 		}
 
-		internal void RemoveFloatingWindow(LayoutFloatingWindowControl floatingWindow) => _fwList.Remove(floatingWindow);
+		internal void RemoveFloatingWindow(LayoutFloatingWindowControl floatingWindow)
+		{
+			_fwList.Remove(floatingWindow);
+
+			LayoutFloatingWindowControlClosed?.Invoke(this, new LayoutFloatingWindowControlClosedEventArgs(floatingWindow));
+		}
 
 		internal void ExecuteCloseCommand(LayoutDocument document)
 		{
