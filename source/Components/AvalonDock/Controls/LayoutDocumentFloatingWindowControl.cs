@@ -137,10 +137,15 @@ namespace AvalonDock.Controls
 					{
 						if (OpenContextMenu())
 							handled = true;
-						if (_model.Root.Manager.ShowSystemMenu)
-							WindowChrome.GetWindowChrome(this).ShowSystemMenu = !handled;
-						else
-							WindowChrome.GetWindowChrome(this).ShowSystemMenu = false;
+
+						var windowChrome = WindowChrome.GetWindowChrome(this);
+						if (windowChrome != null)
+						{
+							if (_model.Root.Manager.ShowSystemMenu)
+								windowChrome.ShowSystemMenu = !handled;
+							else
+								windowChrome.ShowSystemMenu = false;
+						}
 					}
 					break;
 
