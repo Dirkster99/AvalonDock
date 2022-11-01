@@ -1621,7 +1621,7 @@ namespace AvalonDock
 				{
 					//Owner = Window.GetWindow(this)
 				};
-				
+
 				newFW.UpdateOwnership();
 
 				// Fill list before calling Show (issue #254)
@@ -1665,7 +1665,7 @@ namespace AvalonDock
 				{
 					//Owner = Window.GetWindow(this)
 				};
-				
+
 				newFW.UpdateOwnership();
 
 				// Fill list before calling Show (issue #254)
@@ -2104,9 +2104,7 @@ namespace AvalonDock
 
 			// Usually, the overlay window is made a child of the main window. However, if the floating
 			// window being dragged isn't also a child of the main window (because OwnedByDockingManagerWindow
-			// is set to false to allow the parent window to be minimized independently of floating windows),
-			// this causes the floating window to be moved behind the main window. Just not setting the parent
-			// seems to work acceptably here in that case.
+			// is set to false to allow the parent window to be minimized independently of floating windows)
 			if (draggingWindow?.OwnedByDockingManagerWindow ?? true)
 				_overlayWindow.Owner = Window.GetWindow(this);
 			else
