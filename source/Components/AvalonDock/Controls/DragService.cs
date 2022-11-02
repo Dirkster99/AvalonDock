@@ -8,9 +8,11 @@
  ************************************************************************/
 
 using AvalonDock.Layout;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Interop;
 
 namespace AvalonDock.Controls
 {
@@ -111,6 +113,14 @@ namespace AvalonDock.Controls
 						_currentWindow.DragLeave(_floatingWindow);
 					if (_currentHost != null)
 						_currentHost.HideOverlayWindow();
+
+					if (_currentHost is LayoutFloatingWindowControl floatingWindowControl && !floatingWindowControl.OwnedByDockingManagerWindow)
+					{
+						floatingWindowControl._canShowDragOnMainWindow = true;
+						// Update
+						GetOverlayWindowHosts();
+					}
+
 					_currentHost = null;
 				}
 
@@ -119,6 +129,35 @@ namespace AvalonDock.Controls
 					_currentHost = newHost;
 					_currentWindow = _currentHost.ShowOverlayWindow(_floatingWindow);
 					_currentWindow.DragEnter(_floatingWindow);
+
+					// Set the target window to topmost
+					if (_currentHost is LayoutFloatingWindowControl floatingWindowControl)
+					{
+						if (!floatingWindowControl.OwnedByDockingManagerWindow && !_floatingWindow.OwnedByDockingManagerWindow)
+						{
+							var manager = floatingWindowControl.Model?.Root?.Manager;
+							if (manager != null)
+							{
+								floatingWindowControl._canShowDragOnMainWindow = true;
+							}
+						}
+
+						BringWindowToTop2(floatingWindowControl);
+					}
+					else if (_currentHost is DockingManager dockingManager)
+					{
+						BringWindowToTop2(Window.GetWindow(dockingManager));
+						dockingManager.GetFloatingWindowsByZOrder().ForEach((item) => item._canShowDragOnMainWindow = false);
+					}
+
+					// Update
+					GetOverlayWindowHosts();
+
+					BringWindowToTop2(_floatingWindow);
+					if (_currentWindow is Window overlayWindow)
+					{
+						BringWindowToTop2(overlayWindow);
+					}
 				}
 			}
 
@@ -135,7 +174,6 @@ namespace AvalonDock.Controls
 			List<IDropArea> areasToRemove = new List<IDropArea>();
 			_currentWindowAreas.ForEach(a =>
 			{
-				
 				//is mouse still inside this area?
 				if (!a.DetectionRect.Contains(a.TransformToDeviceDPI(dragPosition)))
 				{
@@ -197,6 +235,12 @@ namespace AvalonDock.Controls
 
 			if (_currentHost != null)
 				_currentHost.HideOverlayWindow();
+			else if (_currentHost is LayoutFloatingWindowControl floatingWindow && !floatingWindow.OwnedByDockingManagerWindow)
+			{
+				floatingWindow._canShowDragOnMainWindow = false;
+				GetOverlayWindowHosts();
+			}
+
 
 			if (_currentDropTarget != null)
 			{
@@ -209,6 +253,9 @@ namespace AvalonDock.Controls
 
 			if (_currentDropTarget != null)
 				_currentWindow.DragLeave(_currentDropTarget);
+			else
+				Win32Helper.BringWindowToTop(new WindowInteropHelper(_floatingWindow).Handle);
+
 
 			if (_currentWindow != null)
 				_currentWindow.DragLeave(_floatingWindow);
@@ -246,6 +293,12 @@ namespace AvalonDock.Controls
 
 		#region Private Methods
 
+		private void BringWindowToTop2(Window window)
+		{
+			Win32Helper.SetWindowPos(new WindowInteropHelper(window).Handle,
+				IntPtr.Zero, 0, 0, 0, 0, Win32Helper.SetWindowPosFlags.IgnoreResize | Win32Helper.SetWindowPosFlags.IgnoreMove | Win32Helper.SetWindowPosFlags.DoNotActivate);
+		}
+
 		/// <summary>
 		/// Adds <see cref="IOverlayWindowHost"/>s into a private collection of possible
 		/// drop target hosts that can show a drop target button to drop a dragged
@@ -256,14 +309,32 @@ namespace AvalonDock.Controls
 		{
 			if (_manager.Layout.RootPanel.CanDock)
 			{
+				_overlayWindowHosts.Clear();
+
 				// Add LayoutFloatingWindowControls as drop target hosts
 				// 1) Don't drop a floating window on to itself
 				// 2) Use this Drop target if its visible
-				_overlayWindowHosts.AddRange(_manager.GetFloatingWindowsByZOrder().OfType<LayoutAnchorableFloatingWindowControl>().Where(fw => fw != _floatingWindow && fw.IsVisible));
-				_overlayWindowHosts.AddRange(_manager.GetFloatingWindowsByZOrder().OfType<LayoutDocumentFloatingWindowControl>().Where(fw => fw != _floatingWindow && fw.IsVisible));
+
+				var topFloatingWindows = new List<IOverlayWindowHost>();
+				var bottomFloatingWindows = new List<IOverlayWindowHost>();
+
+				foreach (var fw in _manager.GetFloatingWindowsByZOrder())
+				{
+					if (fw != _floatingWindow && fw.IsVisible)
+					{
+						if (fw.OwnedByDockingManagerWindow || fw._canShowDragOnMainWindow)
+							topFloatingWindows.Add(fw as IOverlayWindowHost);
+						else
+							bottomFloatingWindows.Add(fw as IOverlayWindowHost);
+					}
+				}
+
+				_overlayWindowHosts.AddRange(topFloatingWindows);
 
 				// Add dockingManager itself as a drop target host
 				_overlayWindowHosts.Add(_manager);
+
+				_overlayWindowHosts.AddRange(bottomFloatingWindows);
 			}
 		}
 
