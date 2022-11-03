@@ -72,8 +72,6 @@ namespace AvalonDock.Controls
 		{
 			_floatingWindow = floatingWindow;
 			_manager = floatingWindow.Model.Root.Manager;
-
-			GetOverlayWindowHosts();
 		}
 
 		#endregion Constructors
