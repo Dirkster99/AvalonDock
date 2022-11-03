@@ -52,12 +52,7 @@ namespace AvalonDock.Controls
 		/// </summary>
 		/// <see cref="TotalMargin"/>
 		private bool _isTotalMarginSet = false;
-
-		/// <summary>
-		/// This field is controlled by the DragService and is used to set whether to display in front of the main window.
-		/// </summary>
-		internal bool _canShowDragOnMainWindow;
-
+		
 		#endregion fields
 
 		#region Constructors
