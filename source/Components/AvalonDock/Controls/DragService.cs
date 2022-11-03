@@ -57,6 +57,7 @@ namespace AvalonDock.Controls
 		private IOverlayWindow _currentWindow;
 		private List<IDropArea> _currentWindowAreas = new List<IDropArea>();
 		private IDropTarget _currentDropTarget;
+		private bool _isDrag;
 
 		#endregion fields
 
@@ -89,7 +90,12 @@ namespace AvalonDock.Controls
 			////var floatingWindowModel = _floatingWindow.Model as LayoutFloatingWindow;
 			// TODO - pass in without DPI adjustment, screen co-ords, adjust inside the target window
 
-			GetOverlayWindowHosts();
+			if (!_isDrag)
+			{
+				GetOverlayWindowHosts();
+				_isDrag = true;
+			}
+
 			var newHost = _overlayWindowHosts.FirstOrDefault(oh => oh.HitTestScreen(dragPosition));
 
 			if (_currentHost != null || _currentHost != newHost)
@@ -113,7 +119,10 @@ namespace AvalonDock.Controls
 					if (_currentWindow != null)
 						_currentWindow.DragLeave(_floatingWindow);
 					if (_currentHost != null)
+					{
 						_currentHost.HideOverlayWindow();
+						GetOverlayWindowHosts();
+					}
 
 					_currentHost = null;
 				}
@@ -134,6 +143,8 @@ namespace AvalonDock.Controls
 					{
 						BringWindowToTop2(Window.GetWindow(dockingManager));
 					}
+
+					GetOverlayWindowHosts();
 
 					BringWindowToTop2(_floatingWindow);
 					if (_currentWindow is Window overlayWindow)
@@ -235,6 +246,7 @@ namespace AvalonDock.Controls
 
 			_currentWindow = null;
 			_currentHost = null;
+			_isDrag = false;
 		}
 
 		/// <summary>
