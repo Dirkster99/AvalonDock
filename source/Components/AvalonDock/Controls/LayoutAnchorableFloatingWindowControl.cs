@@ -256,8 +256,12 @@ namespace AvalonDock.Controls
 				case Win32Helper.WM_NCRBUTTONUP:
 					if (wParam.ToInt32() == Win32Helper.HT_CAPTION)
 					{
-						if (OpenContextMenu()) handled = true;
-						WindowChrome.GetWindowChrome(this).ShowSystemMenu = _model.Root.Manager.ShowSystemMenu && !handled;
+						var windowChrome = WindowChrome.GetWindowChrome(this);
+						if (windowChrome != null)
+						{
+							if (OpenContextMenu()) handled = true;
+							windowChrome.ShowSystemMenu = _model.Root.Manager.ShowSystemMenu && !handled;
+						}
 					}
 					break;
 			}
