@@ -323,9 +323,6 @@ namespace AvalonDock
 		[DllImport("user32.dll")]
 		internal static extern IntPtr GetTopWindow(IntPtr hWnd);
 
-		internal const uint GW_HWNDNEXT = 2;
-		internal const uint GW_HWNDPREV = 3;
-
 		[DllImport("user32.dll", SetLastError = true)]
 		internal static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
 
@@ -338,6 +335,28 @@ namespace AvalonDock
 			GW_OWNER = 4,
 			GW_CHILD = 5,
 			GW_ENABLEDPOPUP = 6
+		}
+
+		public static bool GetWindowZOrder(IntPtr hwnd, out int zOrder)
+		{
+			var lowestHwnd = GetWindow(hwnd, (uint)GetWindow_Cmd.GW_HWNDLAST);
+
+			var z = 0;
+			var hwndTmp = lowestHwnd;
+			while (hwndTmp != IntPtr.Zero)
+			{
+				if (hwnd == hwndTmp)
+				{
+					zOrder = z;
+					return true;
+				}
+
+				hwndTmp = GetWindow(hwndTmp, (uint)GetWindow_Cmd.GW_HWNDPREV);
+				z++;
+			}
+
+			zOrder = int.MinValue;
+			return false;
 		}
 
 		internal static int MakeLParam(int LoWord, int HiWord)

@@ -1621,7 +1621,7 @@ namespace AvalonDock
 				{
 					//Owner = Window.GetWindow(this)
 				};
-				
+
 				newFW.UpdateOwnership();
 
 				// Fill list before calling Show (issue #254)
@@ -1665,7 +1665,7 @@ namespace AvalonDock
 				{
 					//Owner = Window.GetWindow(this)
 				};
-				
+
 				newFW.UpdateOwnership();
 
 				// Fill list before calling Show (issue #254)
@@ -1775,6 +1775,44 @@ namespace AvalonDock
 
 				currentHandle = Win32Helper.GetWindow(currentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDNEXT);
 			}
+		}
+
+		internal void GetOverlayWindowHostsByZOrder(ref List<IOverlayWindowHost> overlayWindowHosts, LayoutFloatingWindowControl dragFloatingWindow)
+		{
+			overlayWindowHosts.Clear();
+
+			var topFloatingWindows = new List<IOverlayWindowHost>();
+			var bottomFloatingWindows = new List<IOverlayWindowHost>();
+
+			var parentWindow = Window.GetWindow(this);
+			var windowParentHandle = parentWindow != null ? new WindowInteropHelper(parentWindow).Handle : Process.GetCurrentProcess().MainWindowHandle;
+			var b = Win32Helper.GetWindowZOrder(windowParentHandle, out var mainWindow_z);
+			var currentHandle = Win32Helper.GetWindow(windowParentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDFIRST);
+			while (currentHandle != IntPtr.Zero)
+			{
+				for (int i = 0; i < _fwList.Count; i++)
+				{
+					var fw = _fwList[i];
+					if (fw is IOverlayWindowHost host && fw != dragFloatingWindow && fw.IsVisible)
+					{
+						var fw_hwnd = new WindowInteropHelper(fw).Handle;
+						if (currentHandle == fw_hwnd && fw.Model.Root != null && fw.Model.Root.Manager == this)
+						{
+							if (fw.OwnedByDockingManagerWindow || (Win32Helper.GetWindowZOrder(fw_hwnd, out var fw_z) && fw_z > mainWindow_z))
+								topFloatingWindows.Add(host);
+							else
+								bottomFloatingWindows.Add(host);
+							break;
+						}
+					}
+				}
+
+				currentHandle = Win32Helper.GetWindow(currentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDNEXT);
+			}
+
+			overlayWindowHosts.AddRange(topFloatingWindows);
+			overlayWindowHosts.Add(this);
+			overlayWindowHosts.AddRange(bottomFloatingWindows);
 		}
 
 		internal void RemoveFloatingWindow(LayoutFloatingWindowControl floatingWindow) => _fwList.Remove(floatingWindow);
@@ -2104,9 +2142,7 @@ namespace AvalonDock
 
 			// Usually, the overlay window is made a child of the main window. However, if the floating
 			// window being dragged isn't also a child of the main window (because OwnedByDockingManagerWindow
-			// is set to false to allow the parent window to be minimized independently of floating windows),
-			// this causes the floating window to be moved behind the main window. Just not setting the parent
-			// seems to work acceptably here in that case.
+			// is set to false to allow the parent window to be minimized independently of floating windows)
 			if (draggingWindow?.OwnedByDockingManagerWindow ?? true)
 				_overlayWindow.Owner = Window.GetWindow(this);
 			else

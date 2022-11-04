@@ -52,7 +52,7 @@ namespace AvalonDock.Controls
 		/// </summary>
 		/// <see cref="TotalMargin"/>
 		private bool _isTotalMarginSet = false;
-
+		
 		#endregion fields
 
 		#region Constructors
