@@ -120,6 +120,14 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
+## Fixes Added in Version 4.70.3
+
+- [#394 Fix the get owner DockingManagerWindow and Update drag and drop](https://github.com/Dirkster99/AvalonDock/pull/394) (thanx to [EQOH Noisrev](https://github.com/Noisrev))
+
+- [#393 Add Null check for GetWindowChrome](https://github.com/Dirkster99/AvalonDock/pull/393) (thanx to [EQOH Noisrev](https://github.com/Noisrev))
+
+- [#376 Prevents a known bug in WPF](https://github.com/Dirkster99/AvalonDock/pull/376) (thanx to [Ben Buerger](https://github.com/bbuerger))
+
 ## Fixes Added in Version 4.70.2
 
 - [#338 Fixes #309 Anchorable Header not visible in generic theme](https://github.com/Dirkster99/AvalonDock/pull/338)   (thanx to [Darren Gosbell](https://github.com/dgosbell))

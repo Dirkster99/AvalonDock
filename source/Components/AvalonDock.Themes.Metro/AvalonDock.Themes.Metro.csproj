@@ -6,10 +6,10 @@
     <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>4.70.2</Version>
-    <AssemblyVersion>4.70.2</AssemblyVersion>
-    <FileVersion>4.70.2</FileVersion>
-    <PackageVersion>4.70.2</PackageVersion>
+    <Version>4.70.3</Version>
+    <AssemblyVersion>4.70.3</AssemblyVersion>
+    <FileVersion>4.70.3</FileVersion>
+    <PackageVersion>4.70.3</PackageVersion>
     <Company>Open Source</Company>
     <Product>Dirkster.AvalonDock</Product>
     <Copyright>2017-2022</Copyright>
