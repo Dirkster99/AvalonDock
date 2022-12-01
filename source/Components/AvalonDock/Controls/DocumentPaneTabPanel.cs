@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -36,8 +36,6 @@ namespace AvalonDock.Controls
 
 		protected override Size MeasureOverride(Size availableSize)
 		{
-			var visibleChildren = Children.Cast<UIElement>().Where(ch => ch.Visibility != System.Windows.Visibility.Collapsed);
-
 			Size desideredSize = new Size();
 			foreach (FrameworkElement child in Children)
 			{
