@@ -61,7 +61,7 @@ namespace AvalonDock.Layout
 			foreach (var child in Children)
 			{
 				var type = child.GetType();
-				var serializer = XmlSerializer.FromTypes(new[] { type })[0];
+				var serializer = XmlSerializersCache.GetSerializer(type);
 				serializer.Serialize(writer, child);
 			}
 		}

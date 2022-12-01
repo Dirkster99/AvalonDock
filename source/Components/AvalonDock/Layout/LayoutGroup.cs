@@ -159,7 +159,7 @@ namespace AvalonDock.Layout
 				if (typeForSerializer == null)
 					throw new ArgumentException("AvalonDock.LayoutGroup doesn't know how to deserialize " + reader.LocalName);
 
-				XmlSerializer serializer = XmlSerializer.FromTypes(new[] { typeForSerializer })[0];
+				XmlSerializer serializer = XmlSerializersCache.GetSerializer(typeForSerializer);
 				Children.Add((T)serializer.Deserialize(reader));
 			}
 
@@ -173,7 +173,7 @@ namespace AvalonDock.Layout
 			foreach (var child in Children)
 			{
 				var type = child.GetType();
-				var serializer = XmlSerializer.FromTypes(new[] { type })[0];
+				var serializer = XmlSerializersCache.GetSerializer(type);
 				serializer.Serialize(writer, child);
 			}
 		}
