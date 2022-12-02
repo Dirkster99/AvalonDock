@@ -2230,6 +2230,7 @@ namespace AvalonDock
 					var documentsToRemove = Layout.Descendents().OfType<LayoutDocument>().Where(d => e.OldItems.Contains(d.Content)).ToArray();
 					foreach (var documentToRemove in documentsToRemove)
 					{
+						documentToRemove.Content = null;
 						documentToRemove.Parent.RemoveChild(documentToRemove);
 						RemoveViewFromLogicalChild(documentToRemove);
 					}

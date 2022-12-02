@@ -109,6 +109,20 @@ namespace AvalonDock.Layout
 
 		#endregion Public Methods
 
+		#region Internal Methods
+
+		/// <summary>
+		/// When deserializing layout enclosing element parent is set later than this parent
+		/// We need to update it, otherwise when deleting this element <see cref="LayoutRoot.ElementRemoved" /> will no be called
+		/// </summary>
+		internal void FixCachedRootOnDeserialize()
+		{
+			if (_root == null)
+				_root = Root;
+		}
+
+		#endregion Internal Methods
+
 		#region protected methods
 
 		/// <summary>Provides derived classes an opportunity to handle execute code before to the <see cref="Parent"/> property changes.</summary>
