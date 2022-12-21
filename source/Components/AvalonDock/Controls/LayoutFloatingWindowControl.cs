@@ -348,14 +348,6 @@ namespace AvalonDock.Controls
 			switch (msg)
 			{
 				case Win32Helper.WM_ACTIVATE:
-					if (((int)wParam & 0xFFFF) == Win32Helper.WA_INACTIVE)
-					{
-						if (lParam == this.GetParentWindowHandle())
-						{
-							Win32Helper.SetActiveWindow(_hwndSrc.Handle);
-							handled = true;
-						}
-					}
 					UpdateWindowsSizeBasedOnMinSize();
 
 					break;
