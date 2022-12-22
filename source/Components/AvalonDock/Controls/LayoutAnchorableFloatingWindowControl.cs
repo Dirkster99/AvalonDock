@@ -251,9 +251,10 @@ namespace AvalonDock.Controls
 					{
 						var isActive = !(((int)wParam & 0xFFFF) == Win32Helper.WA_INACTIVE);
 						anchorablePane.SelectedContent.IsActive = isActive;
+
+						handled = true;
 					}
 
-					handled = true;
 					break;
 
 				case Win32Helper.WM_NCRBUTTONUP:

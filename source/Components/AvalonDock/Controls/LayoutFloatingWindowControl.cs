@@ -349,7 +349,6 @@ namespace AvalonDock.Controls
 			{
 				case Win32Helper.WM_ACTIVATE:
 					UpdateWindowsSizeBasedOnMinSize();
-
 					break;
 
 				case Win32Helper.WM_EXITSIZEMOVE:
