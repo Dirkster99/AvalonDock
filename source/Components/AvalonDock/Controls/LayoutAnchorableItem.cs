@@ -276,7 +276,7 @@ namespace AvalonDock.Controls
 				{
 					switch (Visibility)
 					{
-						case Visibility.Hidden: case Visibility.Collapsed: _anchorable.Hide(false); break;
+						case Visibility.Hidden: case Visibility.Collapsed: _anchorable.HideAnchorable(false); break;
 						case Visibility.Visible: _anchorable.Show(); break;
 					}
 				}

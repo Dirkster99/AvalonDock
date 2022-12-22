@@ -63,24 +63,15 @@ namespace AvalonDockTest
 			dockingManager.AnchorableHiding += (s, e) => isHidingRaised.Add(e.Anchorable);
 			dockingManager.AnchorableHidden += (s, e) => isHiddenRaised.Add(e.Anchorable);
 
-			// Get the visual items
-
-			LayoutAnchorableItem item2 = dockingManager.GetLayoutItemFromModel(windows.Screen2) as LayoutAnchorableItem;
-			LayoutAnchorableItem item3 = dockingManager.GetLayoutItemFromModel(windows.Screen3) as LayoutAnchorableItem;
-
-			Assert.IsNotNull(item2);
-			Assert.IsNotNull(item3);
-
 			// Ensure the items can be hidden and closed
-
-			item2.CanClose = true;
-			item3.CanClose = true;
-			item2.CanHide = true;
-			item3.CanHide = true;
+			windows.Screen2.CanHide = true;
+			windows.Screen3.CanHide = true;
+			windows.Screen2.CanClose = true;
+			windows.Screen3.CanClose = true;
 
 			// Hide item3
 
-			item3.HideCommand.Execute(null);
+			windows.Screen3.Hide();
 
 			// Ensure only item3 is hidden, and check the correct events were fired
 
@@ -99,7 +90,7 @@ namespace AvalonDockTest
 
 			// Close item2
 
-			item2.CloseCommand.Execute(null);
+			windows.Screen2.Close();
 
 			// Check the correct events were fired
 
@@ -148,24 +139,15 @@ namespace AvalonDockTest
 			};
 			dockingManager.AnchorableHidden += (s, e) => isHiddenRaised.Add(e.Anchorable);
 
-			// Get the visual items
-
-			LayoutAnchorableItem item2 = dockingManager.GetLayoutItemFromModel(windows.Screen2) as LayoutAnchorableItem;
-			LayoutAnchorableItem item3 = dockingManager.GetLayoutItemFromModel(windows.Screen3) as LayoutAnchorableItem;
-
-			Assert.IsNotNull(item2);
-			Assert.IsNotNull(item3);
-
 			// Ensure the items can be hidden and closed
+			windows.Screen2.CanHide = true;
+			windows.Screen3.CanHide = true;
+			windows.Screen2.CanClose = true;
+			windows.Screen3.CanClose = true;
 
-			item2.CanClose = true;
-			item3.CanClose = true;
-			item2.CanHide = true;
-			item3.CanHide = true;
+			// Hide Screen3
 
-			// Hide item3
-
-			item3.HideCommand.Execute(null);
+			windows.Screen3.Hide();
 
 			// Ensure nothing was hidden but cancelled instead, and check the correct events were fired
 
@@ -180,9 +162,9 @@ namespace AvalonDockTest
 
 			isHidingRaised.Clear();
 
-			// Close item2
+			// Close Screen2
 
-			item2.CloseCommand.Execute(null);
+			windows.Screen2.Close();
 
 			// Ensure nothing was closed, and check the correct events were fired
 
@@ -226,24 +208,13 @@ namespace AvalonDockTest
 			};
 			dockingManager.AnchorableHidden += (s, e) => isHiddenRaised.Add(e.Anchorable);
 
-			// Get the visual items
+			// Ensure the Screen3 can be hidden and closed
+			windows.Screen3.CanHide = true;
+			windows.Screen3.CanClose = true;
 
-			LayoutAnchorableItem item2 = dockingManager.GetLayoutItemFromModel(windows.Screen2) as LayoutAnchorableItem;
-			LayoutAnchorableItem item3 = dockingManager.GetLayoutItemFromModel(windows.Screen3) as LayoutAnchorableItem;
+			// Hide Screen3
 
-			Assert.IsNotNull(item2);
-			Assert.IsNotNull(item3);
-
-			// Ensure the items can be hidden and closed
-
-			item2.CanClose = true;
-			item3.CanClose = true;
-			item2.CanHide = true;
-			item3.CanHide = true;
-
-			// Hide item3
-
-			item3.HideCommand.Execute(null);
+			windows.Screen3.Hide();
 
 			// Ensure nothing was hidden but cancelled instead, and check the correct events were fired
 

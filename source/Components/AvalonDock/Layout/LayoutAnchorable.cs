@@ -280,7 +280,16 @@ namespace AvalonDock.Layout
 		}
 
 		/// <inheritdoc />
-		public override void Close() => CloseAnchorable();
+		public override void Close()
+		{
+			if (Root?.Manager != null)
+			{
+				var dockingManager = Root.Manager;
+				dockingManager.ExecuteCloseCommand(this);
+			}
+			else
+				CloseAnchorable();
+		}
 
 #if TRACE
 		/// <inheritdoc />
@@ -298,24 +307,31 @@ namespace AvalonDock.Layout
 		#endregion Overrides
 
 		#region Public Methods
+		public void Hide()
+		{
+			if (Root?.Manager is DockingManager dockingManager)
+				dockingManager.ExecuteHideCommand(this);
+			else
+				HideAnchorable(true);
+		}
 
 		/// <summary>Hide this contents.</summary>
 		/// <remarks>Add this content to <see cref="ILayoutRoot.Hidden"/> collection of parent root.</remarks>
 		/// <param name="cancelable"></param>
-		public void Hide(bool cancelable = true)
+		internal bool HideAnchorable(bool cancelable)
 		{
 			if (!IsVisible)
 			{
 				IsSelected = true;
 				IsActive = true;
-				return;
+				return false;
 			}
 
 			if (cancelable)
 			{
 				var args = new CancelEventArgs();
 				OnHiding(args);
-				if (args.Cancel) return;
+				if (args.Cancel) return false;
 			}
 
 			RaisePropertyChanging(nameof(IsHidden));
@@ -330,6 +346,8 @@ namespace AvalonDock.Layout
 			RaisePropertyChanged(nameof(IsVisible));
 			RaisePropertyChanged(nameof(IsHidden));
 			NotifyIsVisibleChanged();
+
+			return true;
 		}
 
 		/// <summary>Show the content.</summary>

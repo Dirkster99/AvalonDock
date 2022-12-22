@@ -1962,9 +1962,8 @@ namespace AvalonDock
 			}
 			if (hidingArgs?.Cancel == true) return;
 
-			model.Hide();
-
-			AnchorableHidden?.Invoke(this, new AnchorableHiddenEventArgs(model));
+			if(model.HideAnchorable(true))
+				AnchorableHidden?.Invoke(this, new AnchorableHiddenEventArgs(model));
 		}
 
 		internal void ExecuteAutoHideCommand(LayoutAnchorable _anchorable) => _anchorable.ToggleAutoHide();
