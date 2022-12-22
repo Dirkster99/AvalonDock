@@ -608,11 +608,12 @@ namespace AvalonDock.Layout
 
 		#region Internal Methods
 
-		internal void CloseAnchorable()
+		internal bool CloseAnchorable()
 		{
-			if (!TestCanClose()) return;
+			if (!TestCanClose()) return false;
 			if (IsAutoHidden) ToggleAutoHide();
 			CloseInternal();
+			return true;
 		}
 
 		// BD: 17.08.2020 Remove that bodge and handle CanClose=false && CanHide=true in XAML
