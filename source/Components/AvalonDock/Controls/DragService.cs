@@ -279,6 +279,8 @@ namespace AvalonDock.Controls
 
 		private void BringWindowToTop2(Window window)
 		{
+			if (window == null) return;
+
 			Win32Helper.SetWindowPos(new WindowInteropHelper(window).Handle,
 				IntPtr.Zero, 0, 0, 0, 0, Win32Helper.SetWindowPosFlags.IgnoreResize | Win32Helper.SetWindowPosFlags.IgnoreMove | Win32Helper.SetWindowPosFlags.DoNotActivate);
 		}
