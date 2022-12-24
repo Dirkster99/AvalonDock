@@ -196,6 +196,7 @@ namespace AvalonDock.Controls
 					if (_currentDropTarget != null)
 					{
 						_currentWindow.DragEnter(_currentDropTarget);
+						BringWindowToTop2((Window)_currentWindow);
 						return;
 					}
 				});
