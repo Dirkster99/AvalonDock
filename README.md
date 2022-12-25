@@ -122,21 +122,21 @@ to also theme standard elements, such as, button and textblock etc.
 
 ## Fixes Added in Version 4.71.0
 
-- [#399 add open/close LayoutFlayoutingWindowsControl events](https://github.com/Dirkster99/AvalonDock/pull/399) (thanx to [https://github.com/GonzRu](Denis Smirnov))
+- [#399 add open/close LayoutFlayoutingWindowsControl events](https://github.com/Dirkster99/AvalonDock/pull/399) (thanx to [Denis Smirnov](https://github.com/GonzRu))
 
-- [#400 set ResizeOverlay's owner always null](https://github.com/Dirkster99/AvalonDock/pull/400) (thanx to [https://github.com/GonzRu](Denis Smirnov))
+- [#400 set ResizeOverlay's owner always null](https://github.com/Dirkster99/AvalonDock/pull/400) (thanx to [Denis Smirnov](https://github.com/GonzRu))
 
-- [#401 remove unused variable from DocumentPaneTabPanel](https://github.com/Dirkster99/AvalonDock/pull/401) (thanx to [https://github.com/GonzRu](Denis Smirnov))
+- [#401 remove unused variable from DocumentPaneTabPanel](https://github.com/Dirkster99/AvalonDock/pull/401) (thanx to [Denis Smirnov](https://github.com/GonzRu))
 
-- [#403 Add XmlSerializer cache to fix memory leaks.](https://github.com/Dirkster99/AvalonDock/pull/403) (thanx to [https://github.com/pkindruk](Pavel Kindruk))
+- [#403 Add XmlSerializer cache to fix memory leaks.](https://github.com/Dirkster99/AvalonDock/pull/403) (thanx to [Pavel Kindruk](https://github.com/pkindruk))
 
-- [#404 Fix deserialized layout document close.](https://github.com/Dirkster99/AvalonDock/pull/404) (thanx to [https://github.com/pkindruk](Pavel Kindruk))
+- [#404 Fix deserialized layout document close.](https://github.com/Dirkster99/AvalonDock/pull/404) (thanx to [Pavel Kindruk](https://github.com/pkindruk))
 
-- [#409 Restore previously activated document after closing active document](https://github.com/Dirkster99/AvalonDock/pull/409) (thanx to [https://github.com/L45eMy](L45eMy))
+- [#409 Restore previously activated document after closing active document](https://github.com/Dirkster99/AvalonDock/pull/409) (thanx to [L45eMy](https://github.com/L45eMy))
 
 - [#410 Improved activation of floating Windows](https://github.com/Dirkster99/AvalonDock/pull/410) (thanx to [EQOH Noisrev](https://github.com/Noisrev))
 
-- [#411 Add anchorable hide and close notifications to DockingManager](https://github.com/Dirkster99/AvalonDock/pull/411) (thanx to [https://github.com/stewienj](John Stewien))
+- [#411 Add anchorable hide and close notifications to DockingManager](https://github.com/Dirkster99/AvalonDock/pull/411) (thanx to [John Stewien](https://github.com/stewienj))
 
 - [#412 Fix a issue where the dragged window still appeared above the overlay window](https://github.com/Dirkster99/AvalonDock/pull/412) (thanx to [EQOH Noisrev](https://github.com/Noisrev))
 
