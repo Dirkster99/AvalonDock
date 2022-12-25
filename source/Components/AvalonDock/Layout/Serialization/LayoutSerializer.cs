@@ -60,6 +60,8 @@ namespace AvalonDock.Layout.Serialization
 
 		protected virtual void FixupLayout(LayoutRoot layout)
 		{
+			foreach (var element in layout.Descendents().OfType<LayoutElement>()) element.FixCachedRootOnDeserialize();
+
 			//fix container panes
 			foreach (var lcToAttach in layout.Descendents().OfType<ILayoutPreviousContainer>().Where(lc => lc.PreviousContainerId != null))
 			{
