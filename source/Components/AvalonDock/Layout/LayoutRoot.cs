@@ -966,7 +966,7 @@ namespace AvalonDock.Layout
 						throw new ArgumentException("AvalonDock.LayoutRoot doesn't know how to deserialize " + reader.LocalName);
 					break;
 			}
-			XmlSerializer serializer = XmlSerializer.FromTypes(new[] { typeToSerialize })[0];
+			XmlSerializer serializer = XmlSerializersCache.GetSerializer(typeToSerialize);
 			return serializer.Deserialize(reader);
 		}
 
