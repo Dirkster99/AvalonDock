@@ -113,22 +113,117 @@ namespace AvalonDock.Controls
 			if (e.PropertyName == nameof(LayoutDocumentFloatingWindow.RootPanel) && _model.RootPanel == null) InternalClose();
 		}
 
+		private void ActiveOfSinglePane(bool isActive)
+		{
+			var layoutDocumentPane = _model.Descendents().OfType<LayoutDocumentPane>()
+				.FirstOrDefault(p => p.ChildrenCount > 0 && p.SelectedContent != null);
+
+			layoutDocumentPane.SelectedContent.IsActive = isActive;
+		}
+
+		private static LayoutDocumentPaneControl FindDocumentPaneControlByPoint(IEnumerable<LayoutDocumentPaneControl> areaHosts, Point point)
+		{
+			foreach (var areaHost in areaHosts)
+			{
+				var area = areaHost.GetScreenArea();
+				var pos = areaHost.TransformFromDeviceDPI(point);
+				var b = area.Contains(pos);
+
+				if (b)
+				{
+					return areaHost;
+				}
+			}
+
+			return null;
+		}
+
+		private void ActiveOfMultiPane(bool isActive)
+		{
+			var mousePosition = Win32Helper.GetMousePosition();
+			var rootVisual = ((FloatingWindowContentHost)Content).RootVisual;
+			var areaHosts = rootVisual.FindVisualChildren<LayoutDocumentPaneControl>();
+
+			if (isActive)
+			{
+				var documentPane = FindDocumentPaneControlByPoint(areaHosts, mousePosition);
+				if (documentPane != null)
+				{
+					var model = (LayoutDocumentPane)documentPane.Model;
+					if (model.SelectedContent != null)
+					{
+						model.SelectedContent.IsActive = true;
+						return;
+					}
+					// AnchorablePane
+					else
+					{
+						var index = 0;
+						for (var i = 0; i < model.Children.Count; i++)
+						{
+							var item = model.Children[i];
+							if (item.IsLastFocusedDocument)
+							{
+								index = i;
+							}
+						}
+
+						model.SelectedContentIndex = index;
+						return;
+					}
+				}
+				else
+				{
+					// Active the Last Focus
+					foreach (var areaHost in areaHosts)
+					{
+						var model = (LayoutDocumentPane)areaHost.Model;
+						for (var i = 0; i < model.Children.Count; i++)
+						{
+							var item = model.Children[i];
+							if (item.IsLastFocusedDocument)
+							{
+								item.IsActive = true;
+								return;
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				foreach (var areaHost in areaHosts)
+				{
+					var model = (LayoutDocumentPane)areaHost.Model;
+					for (var i = 0; i < model.Children.Count; i++)
+					{
+						var item = model.Children[i];
+						if (item.IsActive)
+						{
+							item.IsActive = false;
+						}
+					}
+				}
+			}
+		}
+
 		/// <inheritdoc />
 		protected override IntPtr FilterMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
 		{
 			switch (msg)
 			{
-				case Win32Helper.WM_NCLBUTTONDOWN: //Left button down on title -> start dragging over docking manager
-					if (wParam.ToInt32() == Win32Helper.HT_CAPTION)
+				case Win32Helper.WM_ACTIVATE:
+					var isInactive = ((int)wParam & 0xFFFF) == Win32Helper.WA_INACTIVE;
+					if (_model.IsSinglePane)
 					{
-						LayoutDocumentPane layoutDocumentPane = _model.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault(p => p.ChildrenCount > 0 && p.SelectedContent != null);
-						if (layoutDocumentPane != null)
-						{
-							layoutDocumentPane.SelectedContent.IsActive = true;
-						}
-
-						handled = true;
+						ActiveOfSinglePane(!isInactive);
 					}
+					else
+					{
+						ActiveOfMultiPane(!isInactive);
+					}
+
+					handled = true;
 					break;
 
 				case Win32Helper.WM_NCRBUTTONUP:
