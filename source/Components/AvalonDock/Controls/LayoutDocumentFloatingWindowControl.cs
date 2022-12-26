@@ -118,15 +118,33 @@ namespace AvalonDock.Controls
 			var layoutDocumentPane = _model.Descendents().OfType<LayoutDocumentPane>()
 				.FirstOrDefault(p => p.ChildrenCount > 0 && p.SelectedContent != null);
 
-			layoutDocumentPane.SelectedContent.IsActive = isActive;
+			if (layoutDocumentPane != null)
+			{
+				layoutDocumentPane.SelectedContent.IsActive = isActive;
+			}
+			// When the floating tool window is mixed with the floating document window
+			// and the document pane in the floating document window is dragged out.
+
+			// Only the Tool panes is left in the floating document window.
+			// The Children Count is greater than 0 and the Selected Content is null.
+
+			// Then we only need to activate the last active content.
+			else
+			{
+				ActiveLastActivationOfItems(isActive);
+			}
 		}
 
-		private static LayoutDocumentPaneControl FindDocumentPaneControlByPoint(IEnumerable<LayoutDocumentPaneControl> areaHosts, Point point)
+		private LayoutDocumentPaneControl FindDocumentPaneControlByMousePoint()
 		{
+			var mousePosition = Win32Helper.GetMousePosition();
+			var rootVisual = ((FloatingWindowContentHost)Content).RootVisual;
+			var areaHosts = rootVisual.FindVisualChildren<LayoutDocumentPaneControl>();
+
 			foreach (var areaHost in areaHosts)
 			{
 				var area = areaHost.GetScreenArea();
-				var pos = areaHost.TransformFromDeviceDPI(point);
+				var pos = areaHost.TransformFromDeviceDPI(mousePosition);
 				var b = area.Contains(pos);
 
 				if (b)
@@ -138,15 +156,58 @@ namespace AvalonDock.Controls
 			return null;
 		}
 
+		private void ActiveLastActivationOfPane(LayoutDocumentPane model)
+		{
+			if (model.Children.Count > 0)
+			{
+				var index = 0;
+				if (model.Children.Count > 1)
+				{
+					var tmTimeStamp = model.Children[0].LastActivationTimeStamp;
+					for (var i = 1; i < model.Children.Count; i++)
+					{
+						var item = model.Children[i];
+						if (item.LastActivationTimeStamp > tmTimeStamp)
+						{
+							tmTimeStamp = item.LastActivationTimeStamp;
+							index = i;
+						}
+					}
+				}
+
+				model.SelectedContentIndex = index;
+			}
+		}
+
+		private void ActiveLastActivationOfItems(bool isActive)
+		{
+			var items = _model.Descendents().OfType<LayoutContent>().ToList();
+			if (items.Count > 0)
+			{
+				var index = 0;
+				if (items.Count > 1)
+				{
+					var tmpTimeStamp2 = items[0].LastActivationTimeStamp;
+					for (var i = 1; i < items.Count; i++)
+					{
+						var item = items[i];
+						if (item.LastActivationTimeStamp > tmpTimeStamp2)
+						{
+							tmpTimeStamp2 = item.LastActivationTimeStamp;
+							index = i;
+						}
+					}
+				}
+
+				items[index].IsActive = isActive;
+			}
+		}
+
 		private void ActiveOfMultiPane(bool isActive)
 		{
-			var mousePosition = Win32Helper.GetMousePosition();
-			var rootVisual = ((FloatingWindowContentHost)Content).RootVisual;
-			var areaHosts = rootVisual.FindVisualChildren<LayoutDocumentPaneControl>();
-
 			if (isActive)
 			{
-				var documentPane = FindDocumentPaneControlByPoint(areaHosts, mousePosition);
+				var documentPane = FindDocumentPaneControlByMousePoint();
 				if (documentPane != null)
 				{
 					var model = (LayoutDocumentPane)documentPane.Model;
@@ -155,56 +216,14 @@ namespace AvalonDock.Controls
 						model.SelectedContent.IsActive = true;
 						return;
 					}
-					// AnchorablePane
 					else
 					{
-						var index = 0;
-						for (var i = 0; i < model.Children.Count; i++)
-						{
-							var item = model.Children[i];
-							if (item.IsLastFocusedDocument)
-							{
-								index = i;
-							}
-						}
-
-						model.SelectedContentIndex = index;
+						ActiveLastActivationOfPane(model);
 						return;
 					}
 				}
-				else
-				{
-					// Active the Last Focus
-					foreach (var areaHost in areaHosts)
-					{
-						var model = (LayoutDocumentPane)areaHost.Model;
-						for (var i = 0; i < model.Children.Count; i++)
-						{
-							var item = model.Children[i];
-							if (item.IsLastFocusedDocument)
-							{
-								item.IsActive = true;
-								return;
-							}
-						}
-					}
-				}
 			}
-			else
-			{
-				foreach (var areaHost in areaHosts)
-				{
-					var model = (LayoutDocumentPane)areaHost.Model;
-					for (var i = 0; i < model.Children.Count; i++)
-					{
-						var item = model.Children[i];
-						if (item.IsActive)
-						{
-							item.IsActive = false;
-						}
-					}
-				}
-			}
+			ActiveLastActivationOfItems(isActive);
 		}
 
 		/// <inheritdoc />
