@@ -122,7 +122,13 @@ namespace AvalonDock.Controls
 			{
 				layoutDocumentPane.SelectedContent.IsActive = isActive;
 			}
-			// 
+			// When the floating tool window is mixed with the floating document window
+			// and the document pane in the floating document window is dragged out.
+
+			// Only the Tool panes is left in the floating document window.
+			// The Children Count is greater than 0 and the Selected Content is null.
+
+			// Then we only need to activate the last active content.
 			else
 			{
 				ActiveLastActivationOfItems(isActive);
