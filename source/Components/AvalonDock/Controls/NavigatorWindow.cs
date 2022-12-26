@@ -98,6 +98,7 @@ namespace AvalonDock.Controls
 			DataContext = this;
 			Loaded += OnLoaded;
 			Unloaded += OnUnloaded;
+			Deactivated += OnDeactivated;
 			UpdateThemeResources();
 		}
 
@@ -380,11 +381,7 @@ namespace AvalonDock.Controls
 		{
 			if (!(e.Key == Key.Tab || e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down))
 			{
-				Close();
-				if (SelectedDocument != null && SelectedDocument.ActivateCommand.CanExecute(null))
-					SelectedDocument.ActivateCommand.Execute(null);
-				if (SelectedDocument == null && SelectedAnchorable != null && SelectedAnchorable.ActivateCommand.CanExecute(null))
-					SelectedAnchorable.ActivateCommand.Execute(null);
+				CloseAndActiveSelected();
 				e.Handled = true;
 			}
 			base.OnKeyUp(e);
@@ -519,6 +516,21 @@ namespace AvalonDock.Controls
 		}
 
 		private void OnUnloaded(object sender, RoutedEventArgs e) => Unloaded -= OnUnloaded;
+
+		private void OnDeactivated(object sender, EventArgs e)
+		{
+			CloseAndActiveSelected();
+		}
+
+		private void CloseAndActiveSelected()
+		{
+			Deactivated -= OnDeactivated;
+			Close();
+			if (SelectedDocument != null && SelectedDocument.ActivateCommand.CanExecute(null))
+				SelectedDocument.ActivateCommand.Execute(null);
+			if (SelectedDocument == null && SelectedAnchorable != null && SelectedAnchorable.ActivateCommand.CanExecute(null))
+				SelectedAnchorable.ActivateCommand.Execute(null);
+		}
 
 		private void FocusSelectedItem(ListBox list)
 		{
