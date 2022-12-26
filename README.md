@@ -120,6 +120,14 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
+## Fixes Added in Version 4.71.1
+
+- [#413 Fix the binding error in AnchorGroupTemplate](https://github.com/Dirkster99/AvalonDock/pull/413) (thanx to [EQOH Noisrev](https://github.com/Noisrev))
+
+- [#414 When apply new template, add back collection change event handler](https://github.com/Dirkster99/AvalonDock/pull/414) (thanx to [EQOH Noisrev](https://github.com/Noisrev))
+
+- [#415 Improved and fix floating window activation and activation pane](https://github.com/Dirkster99/AvalonDock/pull/415) (thanx to [EQOH Noisrev](https://github.com/Noisrev))
+
 ## Fixes Added in Version 4.71.0
 
 - [#399 add open/close LayoutFlayoutingWindowsControl events](https://github.com/Dirkster99/AvalonDock/pull/399) (thanx to [Denis Smirnov](https://github.com/GonzRu))
