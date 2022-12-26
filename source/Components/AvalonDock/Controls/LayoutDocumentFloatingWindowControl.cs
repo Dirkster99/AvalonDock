@@ -129,13 +129,17 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		private static LayoutDocumentPaneControl FindDocumentPaneControlByPoint(IEnumerable<LayoutDocumentPaneControl> areaHosts, Point point)
+		private LayoutDocumentPaneControl FindDocumentPaneControlByMousePoint()
 		{
+			var mousePosition = Win32Helper.GetMousePosition();
+			var rootVisual = ((FloatingWindowContentHost)Content).RootVisual;
+			var areaHosts = rootVisual.FindVisualChildren<LayoutDocumentPaneControl>();
+
 			foreach (var areaHost in areaHosts)
 			{
 				var area = areaHost.GetScreenArea();
-				var pos = areaHost.TransformFromDeviceDPI(point);
-				var b = area.Contains(point);
+				var pos = areaHost.TransformFromDeviceDPI(mousePosition);
+				var b = area.Contains(pos);
 
 				if (b)
 				{
@@ -195,13 +199,9 @@ namespace AvalonDock.Controls
 
 		private void ActiveOfMultiPane(bool isActive)
 		{
-			var mousePosition = Win32Helper.GetMousePosition();
-			var rootVisual = ((FloatingWindowContentHost)Content).RootVisual;
-			var areaHosts = rootVisual.FindVisualChildren<LayoutDocumentPaneControl>();
-
 			if (isActive)
 			{
-				var documentPane = FindDocumentPaneControlByPoint(areaHosts, mousePosition);
+				var documentPane = FindDocumentPaneControlByMousePoint();
 				if (documentPane != null)
 				{
 					var model = (LayoutDocumentPane)documentPane.Model;
