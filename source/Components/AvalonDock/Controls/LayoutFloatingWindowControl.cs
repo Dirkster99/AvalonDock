@@ -7,8 +7,6 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
-using AvalonDock.Themes;
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -21,6 +19,9 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+
+using AvalonDock.Layout;
+using AvalonDock.Themes;
 
 namespace AvalonDock.Controls
 {
@@ -52,7 +53,7 @@ namespace AvalonDock.Controls
 		/// </summary>
 		/// <see cref="TotalMargin"/>
 		private bool _isTotalMarginSet = false;
-		
+
 		#endregion fields
 
 		#region Constructors
@@ -491,6 +492,75 @@ namespace AvalonDock.Controls
 			Close();
 		}
 
+		internal T FindPaneControlByMousePoint<T>() where T : FrameworkElement, ILayoutControl
+		{
+			var mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
+			var rootVisual = ((FloatingWindowContentHost)Content).RootVisual;
+			var areaHosts = rootVisual.FindVisualChildren<T>();
+
+			foreach (var areaHost in areaHosts)
+			{
+				var rect = areaHost.GetScreenArea();
+				var b = rect.Contains(mousePosition);
+
+				if (b)
+				{
+					return areaHost;
+				}
+			}
+
+			return null;
+		}
+
+		internal void ActiveTheLastActivedItemOfItems(bool isActive)
+		{
+			var items = _model.Descendents().OfType<LayoutContent>().ToList();
+			if (items.Count > 0)
+			{
+				var index = 0;
+				if (items.Count > 1)
+				{
+					var tmpTimeStamp2 = items[0].LastActivationTimeStamp;
+					for (var i = 1; i < items.Count; i++)
+					{
+						var item = items[i];
+						if (item.LastActivationTimeStamp > tmpTimeStamp2)
+						{
+							tmpTimeStamp2 = item.LastActivationTimeStamp;
+							index = i;
+						}
+					}
+				}
+
+				items[index].IsActive = isActive;
+			}
+		}
+
+		internal static void ActiveTheLastActivedItemOfPane<TPane, TChild>(TPane pane)
+			where TPane : LayoutPositionableGroup<TChild>, ILayoutContentSelector
+			where TChild : LayoutContent
+		{
+			if (pane.Children.Count > 0)
+			{
+				var index = 0;
+				if (pane.Children.Count > 1)
+				{
+					var tmTimeStamp = pane.Children[0].LastActivationTimeStamp;
+					for (var i = 1; i < pane.Children.Count; i++)
+					{
+						var item = pane.Children[i];
+						if (item.LastActivationTimeStamp > tmTimeStamp)
+						{
+							tmTimeStamp = item.LastActivationTimeStamp;
+							index = i;
+						}
+					}
+				}
+
+				pane.SelectedContentIndex = index;
+			}
+		}
+
 		#endregion Internal Methods
 
 		#region Overrides
@@ -528,24 +598,24 @@ namespace AvalonDock.Controls
 		}
 
 		protected override void OnClosing(CancelEventArgs e)
-        	{
-            		base.OnClosing(e);
-            		AssureOwnerIsNotMinimized();
-        	}
+		{
+			base.OnClosing(e);
+			AssureOwnerIsNotMinimized();
+		}
 
-        	/// <summary>
+		/// <summary>
 		/// Prevents a known bug in WPF, which wronlgy minimizes the parent window, when closing this control
-        	/// </summary>
-        	private void AssureOwnerIsNotMinimized()
-        	{
-            		try
-            		{
-                		Owner?.Activate();
-            		}
-            		catch (Exception)
-            		{
-            		}
-        	}
+		/// </summary>
+		private void AssureOwnerIsNotMinimized()
+		{
+			try
+			{
+				Owner?.Activate();
+			}
+			catch (Exception)
+			{
+			}
+		}
 
 		#endregion Overrides
 

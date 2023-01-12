@@ -435,14 +435,14 @@ namespace AvalonDock.Controls
 
 		#region ActiveItem
 
-		private void ActiveItemOfSinglePane(bool isActive)
+		internal void ActiveItemOfSinglePane(bool isActive)
 		{
-			var layoutAnchorablePane = _model.Descendents().OfType<LayoutAnchorablePane>()
+			var pane = _model.Descendents().OfType<LayoutAnchorablePane>()
 				.FirstOrDefault(p => p.ChildrenCount > 0 && p.SelectedContent != null);
 
-			if (layoutAnchorablePane != null)
+			if (pane != null)
 			{
-				layoutAnchorablePane.SelectedContent.IsActive = isActive;
+				pane.SelectedContent.IsActive = isActive;
 			}
 			// When the floating tool window is mixed with the floating document window
 			// and the document pane in the floating document window is dragged out.
@@ -457,82 +457,14 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		private LayoutAnchorablePaneControl FindPaneControlByMousePoint()
-		{
-			var mousePosition = Win32Helper.GetMousePosition();
-			var rootVisual = ((FloatingWindowContentHost)Content).RootVisual;
-			var areaHosts = rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>();
-
-			foreach (var areaHost in areaHosts)
-			{
-				var rect = areaHost.GetScreenArea();
-				var pos = areaHost.TransformFromDeviceDPI(mousePosition);
-				var b = rect.Contains(pos);
-
-				if (b)
-				{
-					return areaHost;
-				}
-			}
-
-			return null;
-		}
-
-		private static void ActiveTheLastActivedItemOfPane(LayoutAnchorablePane pane)
-		{
-			if (pane.Children.Count > 0)
-			{
-				var index = 0;
-				if (pane.Children.Count > 1)
-				{
-					var tmTimeStamp = pane.Children[0].LastActivationTimeStamp;
-					for (var i = 1; i < pane.Children.Count; i++)
-					{
-						var item = pane.Children[i];
-						if (item.LastActivationTimeStamp > tmTimeStamp)
-						{
-							tmTimeStamp = item.LastActivationTimeStamp;
-							index = i;
-						}
-					}
-				}
-
-				pane.SelectedContentIndex = index;
-			}
-		}
-
-		private void ActiveTheLastActivedItemOfItems(bool isActive)
-		{
-			var items = _model.Descendents().OfType<LayoutContent>().ToList();
-			if (items.Count > 0)
-			{
-				var index = 0;
-				if (items.Count > 1)
-				{
-					var tmpTimeStamp2 = items[0].LastActivationTimeStamp;
-					for (var i = 1; i < items.Count; i++)
-					{
-						var item = items[i];
-						if (item.LastActivationTimeStamp > tmpTimeStamp2)
-						{
-							tmpTimeStamp2 = item.LastActivationTimeStamp;
-							index = i;
-						}
-					}
-				}
-
-				items[index].IsActive = isActive;
-			}
-		}
-
-		private void ActiveItemOfMultiPane(bool isActive)
+		internal void ActiveItemOfMultiPane(bool isActive)
 		{
 			if (isActive)
 			{
-				var anchorablePane = FindPaneControlByMousePoint();
-				if (anchorablePane != null)
+				var paneControl = FindPaneControlByMousePoint<LayoutAnchorablePaneControl>();
+				if (paneControl != null)
 				{
-					var model = (LayoutAnchorablePane)anchorablePane.Model;
+					var model = (LayoutAnchorablePane)paneControl.Model;
 					if (model.SelectedContent != null)
 					{
 						model.SelectedContent.IsActive = true;
@@ -540,7 +472,7 @@ namespace AvalonDock.Controls
 					}
 					else
 					{
-						ActiveTheLastActivedItemOfPane(model);
+						ActiveTheLastActivedItemOfPane<LayoutAnchorablePane, LayoutAnchorable>(model);
 						return;
 					}
 				}
