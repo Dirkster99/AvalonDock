@@ -437,12 +437,12 @@ namespace AvalonDock.Controls
 
 		private void ActiveItemOfSinglePane(bool isActive)
 		{
-			var layoutDocumentPane = _model.Descendents().OfType<LayoutDocumentPane>()
+			var layoutAnchorablePane = _model.Descendents().OfType<LayoutAnchorablePane>()
 				.FirstOrDefault(p => p.ChildrenCount > 0 && p.SelectedContent != null);
 
-			if (layoutDocumentPane != null)
+			if (layoutAnchorablePane != null)
 			{
-				layoutDocumentPane.SelectedContent.IsActive = isActive;
+				layoutAnchorablePane.SelectedContent.IsActive = isActive;
 			}
 			// When the floating tool window is mixed with the floating document window
 			// and the document pane in the floating document window is dragged out.
@@ -529,10 +529,10 @@ namespace AvalonDock.Controls
 		{
 			if (isActive)
 			{
-				var documentPane = FindPaneControlByMousePoint();
-				if (documentPane != null)
+				var anchorablePane = FindPaneControlByMousePoint();
+				if (anchorablePane != null)
 				{
-					var model = (LayoutAnchorablePane)documentPane.Model;
+					var model = (LayoutAnchorablePane)anchorablePane.Model;
 					if (model.SelectedContent != null)
 					{
 						model.SelectedContent.IsActive = true;
