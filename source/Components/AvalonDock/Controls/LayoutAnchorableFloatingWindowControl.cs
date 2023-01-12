@@ -7,10 +7,6 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Commands;
-using AvalonDock.Converters;
-using AvalonDock.Layout;
-using Microsoft.Windows.Shell;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,6 +15,12 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+
+using AvalonDock.Commands;
+using AvalonDock.Converters;
+using AvalonDock.Layout;
+
+using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
@@ -244,17 +246,17 @@ namespace AvalonDock.Controls
 			switch (msg)
 			{
 				case Win32Helper.WM_ACTIVATE:
-					var anchorablePane = _model.Descendents().OfType<LayoutAnchorablePane>()
-						.FirstOrDefault(p => p.ChildrenCount > 0 && p.SelectedContent != null);
-
-					if (anchorablePane != null)
+					var isInactive = ((int)wParam & 0xFFFF) == Win32Helper.WA_INACTIVE;
+					if (_model.IsSinglePane)
 					{
-						var isActive = !(((int)wParam & 0xFFFF) == Win32Helper.WA_INACTIVE);
-						anchorablePane.SelectedContent.IsActive = isActive;
-
-						handled = true;
+						ActiveItemOfSinglePane(!isInactive);
+					}
+					else
+					{
+						ActiveItemOfMultiPane(!isInactive);
 					}
 
+					handled = true;
 					break;
 
 				case Win32Helper.WM_NCRBUTTONUP:
@@ -430,6 +432,123 @@ namespace AvalonDock.Controls
 		}
 
 		#endregion CloseWindowCommand
+
+		#region ActiveItem
+
+		private void ActiveItemOfSinglePane(bool isActive)
+		{
+			var layoutDocumentPane = _model.Descendents().OfType<LayoutDocumentPane>()
+				.FirstOrDefault(p => p.ChildrenCount > 0 && p.SelectedContent != null);
+
+			if (layoutDocumentPane != null)
+			{
+				layoutDocumentPane.SelectedContent.IsActive = isActive;
+			}
+			// When the floating tool window is mixed with the floating document window
+			// and the document pane in the floating document window is dragged out.
+
+			// Only the Tool panes is left in the floating document window.
+			// The Children Count is greater than 0 and the Selected Content is null.
+
+			// Then we only need to activate the last active content.
+			else
+			{
+				ActiveTheLastActivedItemOfItems(isActive);
+			}
+		}
+
+		private LayoutAnchorablePaneControl FindPaneControlByMousePoint()
+		{
+			var mousePosition = Win32Helper.GetMousePosition();
+			var rootVisual = ((FloatingWindowContentHost)Content).RootVisual;
+			var areaHosts = rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>();
+
+			foreach (var areaHost in areaHosts)
+			{
+				var rect = areaHost.GetScreenArea();
+				var pos = areaHost.TransformFromDeviceDPI(mousePosition);
+				var b = rect.Contains(pos);
+
+				if (b)
+				{
+					return areaHost;
+				}
+			}
+
+			return null;
+		}
+
+		private static void ActiveTheLastActivedItemOfPane(LayoutAnchorablePane pane)
+		{
+			if (pane.Children.Count > 0)
+			{
+				var index = 0;
+				if (pane.Children.Count > 1)
+				{
+					var tmTimeStamp = pane.Children[0].LastActivationTimeStamp;
+					for (var i = 1; i < pane.Children.Count; i++)
+					{
+						var item = pane.Children[i];
+						if (item.LastActivationTimeStamp > tmTimeStamp)
+						{
+							tmTimeStamp = item.LastActivationTimeStamp;
+							index = i;
+						}
+					}
+				}
+
+				pane.SelectedContentIndex = index;
+			}
+		}
+
+		private void ActiveTheLastActivedItemOfItems(bool isActive)
+		{
+			var items = _model.Descendents().OfType<LayoutContent>().ToList();
+			if (items.Count > 0)
+			{
+				var index = 0;
+				if (items.Count > 1)
+				{
+					var tmpTimeStamp2 = items[0].LastActivationTimeStamp;
+					for (var i = 1; i < items.Count; i++)
+					{
+						var item = items[i];
+						if (item.LastActivationTimeStamp > tmpTimeStamp2)
+						{
+							tmpTimeStamp2 = item.LastActivationTimeStamp;
+							index = i;
+						}
+					}
+				}
+
+				items[index].IsActive = isActive;
+			}
+		}
+
+		private void ActiveItemOfMultiPane(bool isActive)
+		{
+			if (isActive)
+			{
+				var documentPane = FindPaneControlByMousePoint();
+				if (documentPane != null)
+				{
+					var model = (LayoutAnchorablePane)documentPane.Model;
+					if (model.SelectedContent != null)
+					{
+						model.SelectedContent.IsActive = true;
+						return;
+					}
+					else
+					{
+						ActiveTheLastActivedItemOfPane(model);
+						return;
+					}
+				}
+			}
+			ActiveTheLastActivedItemOfItems(isActive);
+		}
+
+		#endregion ActiveItem
 
 		#endregion Private Methods
 	}
