@@ -249,11 +249,11 @@ namespace AvalonDock.Controls
 					var isInactive = ((int)wParam & 0xFFFF) == Win32Helper.WA_INACTIVE;
 					if (_model.IsSinglePane)
 					{
-						ActiveItemOfSinglePane(!isInactive);
+						LayoutFloatingWindowControlHelper.ActiveTheContentOfSinglePane(this, !isInactive);
 					}
 					else
 					{
-						ActiveItemOfMultiPane(!isInactive);
+						LayoutFloatingWindowControlHelper.ActiveTheContentOfMultiPane(this, !isInactive);
 					}
 
 					handled = true;
@@ -432,55 +432,6 @@ namespace AvalonDock.Controls
 		}
 
 		#endregion CloseWindowCommand
-
-		#region ActiveItem
-
-		internal void ActiveItemOfSinglePane(bool isActive)
-		{
-			var pane = _model.Descendents().OfType<LayoutAnchorablePane>()
-				.FirstOrDefault(p => p.ChildrenCount > 0 && p.SelectedContent != null);
-
-			if (pane != null)
-			{
-				pane.SelectedContent.IsActive = isActive;
-			}
-			// When the floating tool window is mixed with the floating document window
-			// and the document pane in the floating document window is dragged out.
-
-			// Only the Tool panes is left in the floating document window.
-			// The Children Count is greater than 0 and the Selected Content is null.
-
-			// Then we only need to activate the last active content.
-			else
-			{
-				ActiveTheLastActivedItemOfItems(isActive);
-			}
-		}
-
-		internal void ActiveItemOfMultiPane(bool isActive)
-		{
-			if (isActive)
-			{
-				var paneControl = FindPaneControlByMousePoint<LayoutAnchorablePaneControl>();
-				if (paneControl != null)
-				{
-					var model = (LayoutAnchorablePane)paneControl.Model;
-					if (model.SelectedContent != null)
-					{
-						model.SelectedContent.IsActive = true;
-						return;
-					}
-					else
-					{
-						ActiveTheLastActivedItemOfPane<LayoutAnchorablePane, LayoutAnchorable>(model);
-						return;
-					}
-				}
-			}
-			ActiveTheLastActivedItemOfItems(isActive);
-		}
-
-		#endregion ActiveItem
 
 		#endregion Private Methods
 	}
