@@ -120,6 +120,14 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
+## Fixes Added in Version 4.71.2
+
+- [#416 Fix Issue #226: Restore floating windows to maximized state](https://github.com/Dirkster99/AvalonDock/pull/416) (thanx to [Michael Möller](https://github.com/moellerm))
+
+- [#417 Close and active selected item when NavigatorWindow is inactive](https://github.com/Dirkster99/AvalonDock/pull/417) (thanx to [EQOH Noisrev](https://github.com/Noisrev))
+
+- [#418 Add active content handler to LayoutAnchorableFloatingWindow and improve the active content handlers](https://github.com/Dirkster99/AvalonDock/pull/418) (thanx to [EQOH Noisrev](https://github.com/Noisrev))
+
 ## Fixes Added in Version 4.71.1
 
 - [#413 Fix the binding error in AnchorGroupTemplate](https://github.com/Dirkster99/AvalonDock/pull/413) (thanx to [EQOH Noisrev](https://github.com/Noisrev))
