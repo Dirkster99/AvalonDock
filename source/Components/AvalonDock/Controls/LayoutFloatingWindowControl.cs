@@ -218,7 +218,21 @@ namespace AvalonDock.Controls
 		protected override void OnStateChanged(EventArgs e)
 		{
 			if (!_isInternalChange)
-				UpdateMaximizedState(WindowState == WindowState.Maximized);
+			{
+				if (WindowState == WindowState.Maximized)
+				{
+					// Forward external changes to WindowState from any state to a new Maximized state
+					// to the LayoutFloatingWindowControl internal representation.
+					UpdateMaximizedState(true);
+				}
+				else if (IsMaximized && OwnedByDockingManagerWindow)
+				{
+					// Override any external changes to WindowState when owned and in Maximized state.
+					// This override fixes the issue of an owned LayoutFloatingWindowControl loosing
+					// its Maximized state when the owner window is restored from a Minimized state.
+					WindowState = WindowState.Maximized;
+				}
+			}
 
 			base.OnStateChanged(e);
 		}
