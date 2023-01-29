@@ -7,15 +7,17 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Commands;
-using AvalonDock.Layout;
-using Microsoft.Windows.Shell;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+
+using AvalonDock.Commands;
+using AvalonDock.Layout;
+
+using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
@@ -113,119 +115,6 @@ namespace AvalonDock.Controls
 			if (e.PropertyName == nameof(LayoutDocumentFloatingWindow.RootPanel) && _model.RootPanel == null) InternalClose();
 		}
 
-		private void ActiveOfSinglePane(bool isActive)
-		{
-			var layoutDocumentPane = _model.Descendents().OfType<LayoutDocumentPane>()
-				.FirstOrDefault(p => p.ChildrenCount > 0 && p.SelectedContent != null);
-
-			if (layoutDocumentPane != null)
-			{
-				layoutDocumentPane.SelectedContent.IsActive = isActive;
-			}
-			// When the floating tool window is mixed with the floating document window
-			// and the document pane in the floating document window is dragged out.
-
-			// Only the Tool panes is left in the floating document window.
-			// The Children Count is greater than 0 and the Selected Content is null.
-
-			// Then we only need to activate the last active content.
-			else
-			{
-				ActiveLastActivationOfItems(isActive);
-			}
-		}
-
-		private LayoutDocumentPaneControl FindDocumentPaneControlByMousePoint()
-		{
-			var mousePosition = Win32Helper.GetMousePosition();
-			var rootVisual = ((FloatingWindowContentHost)Content).RootVisual;
-			var areaHosts = rootVisual.FindVisualChildren<LayoutDocumentPaneControl>();
-
-			foreach (var areaHost in areaHosts)
-			{
-				var area = areaHost.GetScreenArea();
-				var pos = areaHost.TransformFromDeviceDPI(mousePosition);
-				var b = area.Contains(pos);
-
-				if (b)
-				{
-					return areaHost;
-				}
-			}
-
-			return null;
-		}
-
-		private void ActiveLastActivationOfPane(LayoutDocumentPane model)
-		{
-			if (model.Children.Count > 0)
-			{
-				var index = 0;
-				if (model.Children.Count > 1)
-				{
-					var tmTimeStamp = model.Children[0].LastActivationTimeStamp;
-					for (var i = 1; i < model.Children.Count; i++)
-					{
-						var item = model.Children[i];
-						if (item.LastActivationTimeStamp > tmTimeStamp)
-						{
-							tmTimeStamp = item.LastActivationTimeStamp;
-							index = i;
-						}
-					}
-				}
-
-				model.SelectedContentIndex = index;
-			}
-		}
-
-		private void ActiveLastActivationOfItems(bool isActive)
-		{
-			var items = _model.Descendents().OfType<LayoutContent>().ToList();
-			if (items.Count > 0)
-			{
-				var index = 0;
-				if (items.Count > 1)
-				{
-					var tmpTimeStamp2 = items[0].LastActivationTimeStamp;
-					for (var i = 1; i < items.Count; i++)
-					{
-						var item = items[i];
-						if (item.LastActivationTimeStamp > tmpTimeStamp2)
-						{
-							tmpTimeStamp2 = item.LastActivationTimeStamp;
-							index = i;
-						}
-					}
-				}
-
-				items[index].IsActive = isActive;
-			}
-		}
-
-		private void ActiveOfMultiPane(bool isActive)
-		{
-			if (isActive)
-			{
-				var documentPane = FindDocumentPaneControlByMousePoint();
-				if (documentPane != null)
-				{
-					var model = (LayoutDocumentPane)documentPane.Model;
-					if (model.SelectedContent != null)
-					{
-						model.SelectedContent.IsActive = true;
-						return;
-					}
-					else
-					{
-						ActiveLastActivationOfPane(model);
-						return;
-					}
-				}
-			}
-			ActiveLastActivationOfItems(isActive);
-		}
-
 		/// <inheritdoc />
 		protected override IntPtr FilterMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
 		{
@@ -235,11 +124,11 @@ namespace AvalonDock.Controls
 					var isInactive = ((int)wParam & 0xFFFF) == Win32Helper.WA_INACTIVE;
 					if (_model.IsSinglePane)
 					{
-						ActiveOfSinglePane(!isInactive);
+						LayoutFloatingWindowControlHelper.ActiveTheContentOfSinglePane(this, !isInactive);
 					}
 					else
 					{
-						ActiveOfMultiPane(!isInactive);
+						LayoutFloatingWindowControlHelper.ActiveTheContentOfMultiPane(this, !isInactive);
 					}
 
 					handled = true;

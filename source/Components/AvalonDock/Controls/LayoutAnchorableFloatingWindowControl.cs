@@ -7,10 +7,6 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Commands;
-using AvalonDock.Converters;
-using AvalonDock.Layout;
-using Microsoft.Windows.Shell;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,6 +15,12 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+
+using AvalonDock.Commands;
+using AvalonDock.Converters;
+using AvalonDock.Layout;
+
+using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
@@ -244,17 +246,17 @@ namespace AvalonDock.Controls
 			switch (msg)
 			{
 				case Win32Helper.WM_ACTIVATE:
-					var anchorablePane = _model.Descendents().OfType<LayoutAnchorablePane>()
-						.FirstOrDefault(p => p.ChildrenCount > 0 && p.SelectedContent != null);
-
-					if (anchorablePane != null)
+					var isInactive = ((int)wParam & 0xFFFF) == Win32Helper.WA_INACTIVE;
+					if (_model.IsSinglePane)
 					{
-						var isActive = !(((int)wParam & 0xFFFF) == Win32Helper.WA_INACTIVE);
-						anchorablePane.SelectedContent.IsActive = isActive;
-
-						handled = true;
+						LayoutFloatingWindowControlHelper.ActiveTheContentOfSinglePane(this, !isInactive);
+					}
+					else
+					{
+						LayoutFloatingWindowControlHelper.ActiveTheContentOfMultiPane(this, !isInactive);
 					}
 
+					handled = true;
 					break;
 
 				case Win32Helper.WM_NCRBUTTONUP:
