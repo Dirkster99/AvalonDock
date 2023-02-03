@@ -758,9 +758,7 @@
 						BorderBrush="{TemplateBinding BorderBrush}"
 						BorderThickness="{TemplateBinding BorderThickness}">
 						<ContentPresenter
-							Content="{Binding LayoutItem.View, RelativeSource={RelativeSource TemplatedParent}}"
-							ContentTemplate="{Binding LayoutItem.View.ContentTemplate, RelativeSource={RelativeSource TemplatedParent}}"
-							ContentTemplateSelector="{Binding LayoutItem.View.ContentTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}" />
+							Content="{Binding LayoutItem.View, RelativeSource={RelativeSource TemplatedParent}}" />
 					</Border>
 				</ControlTemplate>
 			</Setter.Value>
