@@ -323,9 +323,6 @@ namespace AvalonDock
 		[DllImport("user32.dll")]
 		internal static extern IntPtr GetTopWindow(IntPtr hWnd);
 
-		internal const uint GW_HWNDNEXT = 2;
-		internal const uint GW_HWNDPREV = 3;
-
 		[DllImport("user32.dll", SetLastError = true)]
 		internal static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
 
@@ -338,6 +335,28 @@ namespace AvalonDock
 			GW_OWNER = 4,
 			GW_CHILD = 5,
 			GW_ENABLEDPOPUP = 6
+		}
+
+		public static bool GetWindowZOrder(IntPtr hwnd, out int zOrder)
+		{
+			var lowestHwnd = GetWindow(hwnd, (uint)GetWindow_Cmd.GW_HWNDLAST);
+
+			var z = 0;
+			var hwndTmp = lowestHwnd;
+			while (hwndTmp != IntPtr.Zero)
+			{
+				if (hwnd == hwndTmp)
+				{
+					zOrder = z;
+					return true;
+				}
+
+				hwndTmp = GetWindow(hwndTmp, (uint)GetWindow_Cmd.GW_HWNDPREV);
+				z++;
+			}
+
+			zOrder = int.MinValue;
+			return false;
 		}
 
 		internal static int MakeLParam(int LoWord, int HiWord)
@@ -397,31 +416,39 @@ namespace AvalonDock
 		[DllImport("user32.dll", ExactSpelling = true, CharSet = CharSet.Auto)]
 		internal static extern IntPtr GetParent(IntPtr hWnd);
 
-		/// <summary>
-		/// Changes an attribute of the specified window. The function also sets the 32-bit (long) value at the specified offset into the extra window memory.
-		/// </summary>
-		/// <param name="hWnd">A handle to the window and, indirectly, the class to which the window belongs..</param>
-		/// <param name="nIndex">The zero-based offset to the value to be set. Valid values are in the range zero through the number of bytes of extra window memory, minus the size of an integer. To set any other value, specify one of the following values: GWL_EXSTYLE, GWL_HINSTANCE, GWL_ID, GWL_STYLE, GWL_USERDATA, GWL_WNDPROC </param>
-		/// <param name="dwNewLong">The replacement value.</param>
-		/// <returns>If the function succeeds, the return value is the previous value of the specified 32-bit integer.
-		/// If the function fails, the return value is zero. To get extended error information, call GetLastError. </returns>
-		[DllImport("user32.dll")]
-		private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+		[DllImport("user32.dll", EntryPoint = "GetWindowLong")]
+		private static extern int GetWindowLong32(IntPtr hWnd, int nIndex);
 
-		[DllImport("user32.dll", SetLastError = true)]
-		private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+		[DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
+		private static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, int nIndex);
+
+		internal static IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex) 
+		{
+			return IntPtr.Size == 8 ? GetWindowLongPtr64(hWnd, nIndex) : new IntPtr(GetWindowLong32(hWnd, nIndex));
+		}
+
+		[DllImport("user32.dll", EntryPoint = "SetWindowLong")]
+		private static extern int SetWindowLong32(IntPtr hWnd, int nIndex, int dwNewLong);
+
+		[DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
+		private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+		internal static IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong) 
+		{
+			return IntPtr.Size == 8 ? SetWindowLongPtr64(hWnd, nIndex, dwNewLong) : new IntPtr(SetWindowLong32(hWnd, nIndex, dwNewLong.ToInt32()));
+		}
 
 		public static void SetOwner(IntPtr childHandle, IntPtr ownerHandle)
 		{
-			SetWindowLong(
+			SetWindowLongPtr(
 				childHandle,
 				-8, // GWL_HWNDPARENT
-				ownerHandle.ToInt32());
+				ownerHandle);
 		}
 
 		public static IntPtr GetOwner(IntPtr childHandle)
 		{
-			return new IntPtr(GetWindowLong(childHandle, -8));
+			return GetWindowLongPtr(childHandle, -8);
 		}
 
 		//Monitor Patch #13440

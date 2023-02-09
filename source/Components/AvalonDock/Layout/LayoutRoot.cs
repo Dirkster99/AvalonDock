@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Markup;
@@ -98,9 +99,19 @@ namespace AvalonDock.Layout
 			{
 				if (_rootPanel == value) return;
 				RaisePropertyChanging(nameof(RootPanel));
+				var activeContent = ActiveContent;
+				var activeRoot = activeContent?.Root;
 				if (_rootPanel != null && _rootPanel.Parent == this) _rootPanel.Parent = null;
 				_rootPanel = value ?? new LayoutPanel(new LayoutDocumentPane());
 				_rootPanel.Parent = this;
+				if (ActiveContent == null && activeRoot == this && activeContent != null)
+				{
+					ActiveContent = activeContent;
+					if (ActiveContent != activeContent)
+					{
+						ActiveContent = activeContent;
+					}
+				}
 				RaisePropertyChanged(nameof(RootPanel));
 			}
 		}
@@ -643,9 +654,19 @@ namespace AvalonDock.Layout
 
 		internal static Type FindType(string name)
 		{
-			foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-				foreach (var type in assembly.GetTypes())
-					if (type.Name.Equals(name)) return type;
+			var avalonAssembly = Assembly.GetAssembly(typeof(LayoutRoot));
+
+			foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().OrderBy(a => a != avalonAssembly))
+				try
+				{
+					foreach (var type in assembly.GetTypes())
+						if (type.Name.Equals(name))
+							return type;
+				}
+				catch (ReflectionTypeLoadException)
+				{
+				}
+
 			return null;
 		}
 
@@ -945,7 +966,7 @@ namespace AvalonDock.Layout
 						throw new ArgumentException("AvalonDock.LayoutRoot doesn't know how to deserialize " + reader.LocalName);
 					break;
 			}
-			XmlSerializer serializer = XmlSerializer.FromTypes(new[] { typeToSerialize })[0];
+			XmlSerializer serializer = XmlSerializersCache.GetSerializer(typeToSerialize);
 			return serializer.Deserialize(reader);
 		}
 

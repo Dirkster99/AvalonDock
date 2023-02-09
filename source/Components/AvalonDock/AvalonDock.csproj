@@ -6,13 +6,13 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>4.70.0</Version>
-    <AssemblyVersion>4.70.0</AssemblyVersion>
-    <FileVersion>4.70.0</FileVersion>
-    <PackageVersion>4.70.0</PackageVersion>
+    <Version>4.71.2</Version>
+    <AssemblyVersion>4.71.2</AssemblyVersion>
+    <FileVersion>4.71.2</FileVersion>
+    <PackageVersion>4.71.2</PackageVersion>
     <Company>Open Source</Company>
     <Product>Dirkster.AvalonDock</Product>
-    <Copyright>2017-2022</Copyright>
+    <Copyright>2017-2023</Copyright>
     <Description>This assembly implements a docking layout system for WPF.</Description>
     <PackageProjectUrl>https://github.com/Dirkster99/AvalonDock</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Dirkster99/AvalonDock</RepositoryUrl>

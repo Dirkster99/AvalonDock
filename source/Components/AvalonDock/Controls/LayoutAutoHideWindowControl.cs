@@ -9,10 +9,12 @@
 
 using AvalonDock.Layout;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -44,6 +46,8 @@ namespace AvalonDock.Controls
 		private Border _resizerGhost = null;
 		private Window _resizerWindowHost = null;
 		private Vector _initialStartPoint;
+		private List<FrameworkElement> _sizeChangedListeningControls;
+		private SizeChangedEventHandler _sizeChangedHandler;
 
 		#endregion fields
 
@@ -59,6 +63,7 @@ namespace AvalonDock.Controls
 
 		internal LayoutAutoHideWindowControl()
 		{
+			_sizeChangedHandler = ViewboxZoomChanged;
 		}
 
 		#endregion Constructors
@@ -116,6 +121,8 @@ namespace AvalonDock.Controls
 			_manager = _model.Root.Manager;
 			CreateInternalGrid();
 			_model.PropertyChanged += _model_PropertyChanged;
+			SetLayoutTransform();
+			StartListeningToViewboxZoomChange();
 			Visibility = Visibility.Visible;
 			InvalidateMeasure();
 			UpdateWindowPos();
@@ -124,6 +131,8 @@ namespace AvalonDock.Controls
 
 		internal void Hide()
 		{
+			StopListeningToViewboxZoomChange();
+
 			if (_model == null) return;
 			_model.PropertyChanged -= _model_PropertyChanged;
 			RemoveInternalGrid();
@@ -167,7 +176,7 @@ namespace AvalonDock.Controls
 				Height = 0,
 			})
 			{ RootVisual = _internalHostPresenter };
-
+			AutomationProperties.SetName(_internalHostPresenter, "InternalWindowHost");
 			AddLogicalChild(_internalHostPresenter);
 			Win32Helper.BringWindowToTop(_internalHwndSource.Handle);
 			return new HandleRef(this, _internalHwndSource.Handle);
@@ -212,6 +221,61 @@ namespace AvalonDock.Controls
 		{
 			if (e.PropertyName != nameof(LayoutAnchorable.IsAutoHidden)) return;
 			if (!_model.IsAutoHidden) _manager.HideAutoHideWindow(_anchor);
+		}
+
+		private Transform ChildLayoutTransform
+		{
+			get
+			{
+				var viewboxes = _manager.GetParents().OfType<Viewbox>().ToList();
+
+				if (viewboxes.Any())
+				{
+					if (_manager.TransformToAncestor(viewboxes[viewboxes.Count - 1]) is Transform transform)
+					{
+						if (!transform.Value.IsIdentity)
+						{
+							var origin = transform.Transform(new Point());
+
+							var newTransformGroup = new TransformGroup();
+							newTransformGroup.Children.Add(transform);
+							newTransformGroup.Children.Add(new TranslateTransform(-origin.X, -origin.Y));
+							return newTransformGroup;
+						}
+					}
+				}
+
+				return Transform.Identity;
+			}
+		}
+
+		private void SetLayoutTransform()
+		{
+			// We refresh this each time either:
+			// 1) The window is created.
+			// 2) An ancestor Viewbox changes its zoom (the Viewbox or its child changes size)
+			// We would also want to refresh when the visual tree changes such that an ancestor Viewbox is added, removed, or changed. However, this is completely unnecessary
+			// because the LayoutAutoHideWindowControl closes if a visual ancestor is changed: DockingManager.Unloaded handler calls _autoHideWindowManager?.HideAutoWindow()
+			if (ChildLayoutTransform is Transform transform && _internalHostPresenter.LayoutTransform.Value != transform.Value)
+			{
+				LayoutTransform = (Transform)transform.Inverse;
+				_internalHostPresenter.LayoutTransform = transform;
+			}
+		}
+		private void StartListeningToViewboxZoomChange()
+		{
+			StopListeningToViewboxZoomChange();
+			_sizeChangedListeningControls = _manager.GetParents().OfType<Viewbox>().SelectMany(x => new[] { x, x.Child }).OfType<FrameworkElement>().Distinct().ToList();
+			_sizeChangedListeningControls.ForEach(x => x.SizeChanged += _sizeChangedHandler);
+		}
+		private void StopListeningToViewboxZoomChange()
+		{
+			_sizeChangedListeningControls?.ForEach(x => x.SizeChanged -= _sizeChangedHandler);
+			_sizeChangedListeningControls?.Clear();
+		}
+		private void ViewboxZoomChanged(object sender, SizeChangedEventArgs e)
+		{
+			SetLayoutTransform();
 		}
 
 		private void CreateInternalGrid()
@@ -351,11 +415,13 @@ namespace AvalonDock.Controls
 			var trToWnd = TransformToAncestor(rootVisual);
 			//var transformedDelta = trToWnd.Transform(new Point(e.HorizontalChange, e.VerticalChange)) - trToWnd.Transform(new Point());
 
+			var deltaPoint = ChildLayoutTransform.Inverse.Transform(new Point(Canvas.GetLeft(_resizerGhost) - _initialStartPoint.X, Canvas.GetTop(_resizerGhost) - _initialStartPoint.Y));
+
 			double delta;
 			if (_side == AnchorSide.Right || _side == AnchorSide.Left)
-				delta = Canvas.GetLeft(_resizerGhost) - _initialStartPoint.X;
+				delta = deltaPoint.X;
 			else
-				delta = Canvas.GetTop(_resizerGhost) - _initialStartPoint.Y;
+				delta = deltaPoint.Y;
 
 			switch (_side)
 			{
@@ -400,6 +466,10 @@ namespace AvalonDock.Controls
 
 			var trToWnd = TransformToAncestor(rootVisual);
 			var transformedDelta = trToWnd.Transform(new Point(e.HorizontalChange, e.VerticalChange)) - trToWnd.Transform(new Point());
+			if (ChildLayoutTransform is Transform transform && !transform.Value.IsIdentity)
+			{
+				transformedDelta = transform.Transform(new Point() + transformedDelta) - new Point();
+			}
 
 			if (_side == AnchorSide.Right || _side == AnchorSide.Left)
 			{

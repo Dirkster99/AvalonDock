@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -46,11 +46,6 @@ namespace AvalonDock.Controls
 		internal LayoutAnchorSideControl(LayoutAnchorSide model)
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));
-			CreateChildrenViews();
-			_model.Children.CollectionChanged += OnModelChildrenCollectionChanged;
-			UpdateSide();
-
-			Unloaded += LayoutAnchorSideControl_Unloaded;
 		}
 
 		#endregion Constructors
@@ -137,11 +132,27 @@ namespace AvalonDock.Controls
 
 		#region Private Methods
 
-		/// <summary>
-		/// Executes when the element is removed from within an element tree of loaded elements.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
+		public override void OnApplyTemplate()
+		{
+			base.OnApplyTemplate();
+
+			Loaded += LayoutAnchorSideControl_Loaded;
+		}
+
+		protected override void OnInitialized(EventArgs e)
+		{
+			base.OnInitialized(e);
+			CreateChildrenViews();
+			UpdateSide();
+		}
+
+		private void LayoutAnchorSideControl_Loaded(object sender, RoutedEventArgs e)
+		{
+			Loaded -= LayoutAnchorSideControl_Loaded;
+			Unloaded += LayoutAnchorSideControl_Unloaded;
+			_model.Children.CollectionChanged += OnModelChildrenCollectionChanged;
+		}
+
 		private void LayoutAnchorSideControl_Unloaded(object sender, RoutedEventArgs e)
 		{
 			_model.Children.CollectionChanged -= OnModelChildrenCollectionChanged;

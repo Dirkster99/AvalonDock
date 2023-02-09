@@ -115,9 +115,34 @@ namespace AvalonDock
 		/// <summary>Event fired after a document is closed.</summary>
 		public event EventHandler<DocumentClosedEventArgs> DocumentClosed;
 
+		/// <summary>Event fired when an anchorable is about to be closed.</summary>
+		/// <remarks>Subscribers have the opportuniy to cancel the operation.</remarks>
+		public event EventHandler<AnchorableClosingEventArgs> AnchorableClosing;
+
+		/// <summary>Event fired after an anchorable is closed</summary>
+		public event EventHandler<AnchorableClosedEventArgs> AnchorableClosed;
+
+		/// <summary>Event fired when an anchorable is about to be hidden.</summary>
+		/// <remarks>Subscribers have the opportuniy to cancel the operation.</remarks>
+		public event EventHandler<AnchorableHidingEventArgs> AnchorableHiding;
+
+		/// <summary>Event fired after an anchorable is hidden</summary>
+		public event EventHandler<AnchorableHiddenEventArgs> AnchorableHidden;
+
 		/// <summary>Event is raised when <see cref="ActiveContent"/> changes.</summary>
 		/// <seealso cref="ActiveContent"/>
 		public event EventHandler ActiveContentChanged;
+
+		/// <summary>
+		/// Event is raised when LayoutFloatingWindowControl created
+		/// </summary>
+		public event EventHandler<LayoutFloatingWindowControlCreatedEventArgs> LayoutFloatingWindowControlCreated;
+
+		/// <summary>
+		/// Event is raised when LayoutFloatingWindowControl closed
+		/// </summary>
+		public event EventHandler<LayoutFloatingWindowControlClosedEventArgs> LayoutFloatingWindowControlClosed;
+
 
 		#endregion Events
 
@@ -1436,7 +1461,7 @@ namespace AvalonDock
 		/// <inheritdoc/>
 		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
 		{
-			CreateOverlayWindow();
+			CreateOverlayWindow(draggingWindow);
 			_overlayWindow.EnableDropTargets();
 			_overlayWindow.Show();
 			return _overlayWindow;
@@ -1621,7 +1646,7 @@ namespace AvalonDock
 				{
 					//Owner = Window.GetWindow(this)
 				};
-				
+
 				newFW.UpdateOwnership();
 
 				// Fill list before calling Show (issue #254)
@@ -1665,7 +1690,7 @@ namespace AvalonDock
 				{
 					//Owner = Window.GetWindow(this)
 				};
-				
+
 				newFW.UpdateOwnership();
 
 				// Fill list before calling Show (issue #254)
@@ -1736,7 +1761,11 @@ namespace AvalonDock
 
 			var show = fwc == null; // Do not show already visible floating window
 			if (fwc == null)
+			{
 				fwc = CreateFloatingWindow(contentModel, false);
+
+				LayoutFloatingWindowControlCreated?.Invoke(this, new LayoutFloatingWindowControlCreatedEventArgs(fwc));
+			}
 
 			if (fwc != null)
 			{
@@ -1758,6 +1787,9 @@ namespace AvalonDock
 		{
 			var fwc = CreateFloatingWindowForLayoutAnchorableWithoutParent(paneModel, false);
 			if (fwc == null) return;
+
+			LayoutFloatingWindowControlCreated?.Invoke(this, new LayoutFloatingWindowControlCreatedEventArgs(fwc));
+
 			fwc.AttachDrag();
 			fwc.Show();
 		}
@@ -1777,7 +1809,50 @@ namespace AvalonDock
 			}
 		}
 
-		internal void RemoveFloatingWindow(LayoutFloatingWindowControl floatingWindow) => _fwList.Remove(floatingWindow);
+		internal void GetOverlayWindowHostsByZOrder(ref List<IOverlayWindowHost> overlayWindowHosts, LayoutFloatingWindowControl dragFloatingWindow)
+		{
+			overlayWindowHosts.Clear();
+
+			var topFloatingWindows = new List<IOverlayWindowHost>();
+			var bottomFloatingWindows = new List<IOverlayWindowHost>();
+
+			var parentWindow = Window.GetWindow(this);
+			var windowParentHandle = parentWindow != null ? new WindowInteropHelper(parentWindow).Handle : Process.GetCurrentProcess().MainWindowHandle;
+			var b = Win32Helper.GetWindowZOrder(windowParentHandle, out var mainWindow_z);
+			var currentHandle = Win32Helper.GetWindow(windowParentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDFIRST);
+			while (currentHandle != IntPtr.Zero)
+			{
+				for (int i = 0; i < _fwList.Count; i++)
+				{
+					var fw = _fwList[i];
+					if (fw is IOverlayWindowHost host && fw != dragFloatingWindow && fw.IsVisible)
+					{
+						var fw_hwnd = new WindowInteropHelper(fw).Handle;
+						if (currentHandle == fw_hwnd && fw.Model.Root != null && fw.Model.Root.Manager == this)
+						{
+							if (fw.OwnedByDockingManagerWindow || (Win32Helper.GetWindowZOrder(fw_hwnd, out var fw_z) && fw_z > mainWindow_z))
+								topFloatingWindows.Add(host);
+							else
+								bottomFloatingWindows.Add(host);
+							break;
+						}
+					}
+				}
+
+				currentHandle = Win32Helper.GetWindow(currentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDNEXT);
+			}
+
+			overlayWindowHosts.AddRange(topFloatingWindows);
+			overlayWindowHosts.Add(this);
+			overlayWindowHosts.AddRange(bottomFloatingWindows);
+		}
+
+		internal void RemoveFloatingWindow(LayoutFloatingWindowControl floatingWindow)
+		{
+			_fwList.Remove(floatingWindow);
+
+			LayoutFloatingWindowControlClosed?.Invoke(this, new LayoutFloatingWindowControlClosedEventArgs(floatingWindow));
+		}
 
 		internal void ExecuteCloseCommand(LayoutDocument document)
 		{
@@ -1884,11 +1959,35 @@ namespace AvalonDock
 		internal void ExecuteCloseCommand(LayoutAnchorable anchorable)
 		{
 			if (!(anchorable is LayoutAnchorable model)) return;
-			model.CloseAnchorable();
-			RemoveViewFromLogicalChild(anchorable);
+
+			AnchorableClosingEventArgs closingArgs = null;
+			AnchorableClosing?.Invoke(this, closingArgs = new AnchorableClosingEventArgs(model));
+			if (closingArgs?.Cancel == true)
+				return;
+
+			if (model.CloseAnchorable())
+			{
+				RemoveViewFromLogicalChild(model);
+				AnchorableClosed?.Invoke(this, new AnchorableClosedEventArgs(model));
+			}
 		}
 
-		internal void ExecuteHideCommand(LayoutAnchorable anchorable) => anchorable?.Hide();
+		internal void ExecuteHideCommand(LayoutAnchorable anchorable)
+		{
+			if (!(anchorable is LayoutAnchorable model)) return;
+
+			AnchorableHidingEventArgs hidingArgs = null;
+			AnchorableHiding?.Invoke(this, hidingArgs = new AnchorableHidingEventArgs(model));
+			if (hidingArgs?.CloseInsteadOfHide == true)
+			{
+				ExecuteCloseCommand(model);
+				return;
+			}
+			if (hidingArgs?.Cancel == true) return;
+
+			if(model.HideAnchorable(true))
+				AnchorableHidden?.Invoke(this, new AnchorableHiddenEventArgs(model));
+		}
 
 		internal void ExecuteAutoHideCommand(LayoutAnchorable _anchorable) => _anchorable.ToggleAutoHide();
 
@@ -2095,13 +2194,20 @@ namespace AvalonDock
 			SetAutoHideWindow(new LayoutAutoHideWindowControl());
 		}
 
-		private void CreateOverlayWindow()
+		private void CreateOverlayWindow(LayoutFloatingWindowControl draggingWindow = null)
 		{
 			if (_overlayWindow == null)
 			{
 				_overlayWindow = new OverlayWindow(this);
 			}
-			_overlayWindow.Owner = Window.GetWindow(this);
+
+			// Usually, the overlay window is made a child of the main window. However, if the floating
+			// window being dragged isn't also a child of the main window (because OwnedByDockingManagerWindow
+			// is set to false to allow the parent window to be minimized independently of floating windows)
+			if (draggingWindow?.OwnedByDockingManagerWindow ?? true)
+				_overlayWindow.Owner = Window.GetWindow(this);
+			else
+				_overlayWindow.Owner = null;
 
 			var rectWindow = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			_overlayWindow.Left = rectWindow.Left;
@@ -2185,6 +2291,7 @@ namespace AvalonDock
 					var documentsToRemove = Layout.Descendents().OfType<LayoutDocument>().Where(d => e.OldItems.Contains(d.Content)).ToArray();
 					foreach (var documentToRemove in documentsToRemove)
 					{
+						documentToRemove.Content = null;
 						documentToRemove.Parent.RemoveChild(documentToRemove);
 						RemoveViewFromLogicalChild(documentToRemove);
 					}

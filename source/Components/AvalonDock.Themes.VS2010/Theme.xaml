@@ -545,14 +545,26 @@
 
 	<ControlTemplate x:Key="AvalonDock_ThemeVS2010_AnchorGroupTemplate" TargetType="{x:Type avalonDockControls:LayoutAnchorGroupControl}">
 		<ItemsControl ItemsSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Children}">
-			<ItemsControl.LayoutTransform>
-				<RotateTransform Angle="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Model.Parent.Side, Converter={avalonDockConverters:AnchorSideToAngleConverter}}" />
-			</ItemsControl.LayoutTransform>
 			<ItemsControl.ItemsPanel>
 				<ItemsPanelTemplate>
 					<StackPanel Orientation="Horizontal" />
 				</ItemsPanelTemplate>
 			</ItemsControl.ItemsPanel>
+			<ItemsControl.Style>
+				<Style TargetType="{x:Type ItemsControl}">
+					<Style.Resources>
+						<RotateTransform x:Key="LeftRightAnchorSideRotateTransform" Angle="90" />
+					</Style.Resources>
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding Path=Model.Parent.Side, RelativeSource={RelativeSource TemplatedParent}}" Value="Left">
+							<Setter Property="LayoutTransform" Value="{StaticResource LeftRightAnchorSideRotateTransform}" />
+						</DataTrigger>
+						<DataTrigger Binding="{Binding Path=Model.Parent.Side, RelativeSource={RelativeSource TemplatedParent}}" Value="Right">
+							<Setter Property="LayoutTransform" Value="{StaticResource LeftRightAnchorSideRotateTransform}" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</ItemsControl.Style>
 		</ItemsControl>
 	</ControlTemplate>
 

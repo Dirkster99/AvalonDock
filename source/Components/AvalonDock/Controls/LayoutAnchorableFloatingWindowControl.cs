@@ -7,10 +7,6 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Commands;
-using AvalonDock.Converters;
-using AvalonDock.Layout;
-using Microsoft.Windows.Shell;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,6 +15,12 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+
+using AvalonDock.Commands;
+using AvalonDock.Converters;
+using AvalonDock.Layout;
+
+using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
@@ -162,7 +164,7 @@ namespace AvalonDock.Controls
 
 		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
 		{
-			CreateOverlayWindow();
+			CreateOverlayWindow(draggingWindow);
 			_overlayWindow.EnableDropTargets();
 			_overlayWindow.Show();
 			return _overlayWindow;
@@ -243,21 +245,29 @@ namespace AvalonDock.Controls
 		{
 			switch (msg)
 			{
-				case Win32Helper.WM_NCLBUTTONDOWN: //Left button down on title -> start dragging over docking manager
-					if (wParam.ToInt32() == Win32Helper.HT_CAPTION)
+				case Win32Helper.WM_ACTIVATE:
+					var isInactive = ((int)wParam & 0xFFFF) == Win32Helper.WA_INACTIVE;
+					if (_model.IsSinglePane)
 					{
-						var anchorablePane = _model.Descendents().OfType<LayoutAnchorablePane>()
-							.FirstOrDefault(p => p.ChildrenCount > 0 && p.SelectedContent != null);
-						if (anchorablePane != null) anchorablePane.SelectedContent.IsActive = true;
-						handled = true;
+						LayoutFloatingWindowControlHelper.ActiveTheContentOfSinglePane(this, !isInactive);
 					}
+					else
+					{
+						LayoutFloatingWindowControlHelper.ActiveTheContentOfMultiPane(this, !isInactive);
+					}
+
+					handled = true;
 					break;
 
 				case Win32Helper.WM_NCRBUTTONUP:
 					if (wParam.ToInt32() == Win32Helper.HT_CAPTION)
 					{
-						if (OpenContextMenu()) handled = true;
-						WindowChrome.GetWindowChrome(this).ShowSystemMenu = _model.Root.Manager.ShowSystemMenu && !handled;
+						var windowChrome = WindowChrome.GetWindowChrome(this);
+						if (windowChrome != null)
+						{
+							if (OpenContextMenu()) handled = true;
+							windowChrome.ShowSystemMenu = _model.Root.Manager.ShowSystemMenu && !handled;
+						}
 					}
 					break;
 			}
@@ -295,10 +305,18 @@ namespace AvalonDock.Controls
 			if (!IsVisible && _model.IsVisible) Show();
 		}
 
-		private void CreateOverlayWindow()
+		private void CreateOverlayWindow(LayoutFloatingWindowControl draggingWindow)
 		{
 			if (_overlayWindow == null) _overlayWindow = new OverlayWindow(this);
-			_overlayWindow.Owner = Window.GetWindow(this);
+
+			// Usually, the overlay window is made a child of the main window. However, if the floating
+			// window being dragged isn't also a child of the main window (because OwnedByDockingManagerWindow
+			// is set to false to allow the parent window to be minimized independently of floating windows)
+			if (draggingWindow?.OwnedByDockingManagerWindow ?? true)
+				_overlayWindow.Owner = Window.GetWindow(_model.Root.Manager);
+			else
+				_overlayWindow.Owner = null;
+
 			var rectWindow = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			_overlayWindow.Left = rectWindow.Left;
 			_overlayWindow.Top = rectWindow.Top;

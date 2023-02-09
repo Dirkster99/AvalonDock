@@ -55,7 +55,7 @@ namespace AvalonDock.Layout.Serialization
 
 		#region Public Methods
 
-		readonly XmlSerializer _serializer = XmlSerializer.FromTypes(new[] { typeof(LayoutRoot) })[0];
+		readonly XmlSerializer _serializer = XmlSerializersCache.GetSerializer<LayoutRoot>();
 
 		/// <summary>Serialize the layout into a <see cref="XmlWriter"/>.</summary>
 		/// <param name="writer"></param>

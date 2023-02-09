@@ -155,7 +155,7 @@ namespace AvalonDock.Layout
 		{
 			if (!_autoFixSelectedContent) return;
 			if (SelectedContentIndex >= ChildrenCount) SelectedContentIndex = Children.Count - 1;
-			if (SelectedContentIndex == -1 && ChildrenCount > 0) SetNextSelectedIndex();
+			if (SelectedContentIndex == -1 && ChildrenCount > 0) SetLastActivatedIndex();
 		}
 
 		/// <summary>
@@ -221,6 +221,13 @@ namespace AvalonDock.Layout
 				SelectedContentIndex = i;
 				return;
 			}
+		}
+
+		/// <summary>Sets the current <see cref="SelectedContentIndex"/> to the last activated child with IsEnabled == true</summary>
+		private void SetLastActivatedIndex()
+		{
+			var lastActivatedDocument = Children.Where(c => c.IsEnabled).OrderByDescending(c => c.LastActivationTimeStamp.GetValueOrDefault()).FirstOrDefault();
+			SelectedContentIndex = Children.IndexOf(lastActivatedDocument);
 		}
 
 		/// <summary>Updates the <see cref="IsDirectlyHostedInFloatingWindow"/> property of this object.</summary>
