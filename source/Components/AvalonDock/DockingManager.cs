@@ -1138,7 +1138,7 @@ namespace AvalonDock
 				new FrameworkPropertyMetadata((Style)null));
 
 		/// <summary>
-		/// Gets or sets the GridSplitterVerticalStyle property.  This dependency property 
+		/// Gets or sets the GridSplitterVerticalStyle property.  This dependency property
 		/// indicates the style to apply to the LayoutGridResizerControl when displayed vertically.
 		/// </summary>
 		public Style GridSplitterVerticalStyle
@@ -1164,7 +1164,7 @@ namespace AvalonDock
 				new FrameworkPropertyMetadata((Style)null));
 
 		/// <summary>
-		/// Gets or sets the GridSplitterHorizontalStyle property.  This dependency property 
+		/// Gets or sets the GridSplitterHorizontalStyle property.  This dependency property
 		/// indicates the style to apply to the LayoutGridResizerControl when displayed horizontally.
 		/// </summary>
 		public Style GridSplitterHorizontalStyle
@@ -2125,9 +2125,8 @@ namespace AvalonDock
 			}
 			_fwHiddenList.Clear();
 
-			// load floating windows not already loaded! (issue #59 & #254)
-			var items = new List<LayoutFloatingWindow>(Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)));
-			foreach (var fw in items)
+			// load floating windows not already loaded! (issue #59 & #254 & #426)
+			foreach (var fw in Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)))
 				CreateUIElementForModel(fw);
 
 			//create the overlaywindow if it's possible
