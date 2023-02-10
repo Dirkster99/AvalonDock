@@ -2125,9 +2125,8 @@ namespace AvalonDock
 			}
 			_fwHiddenList.Clear();
 
-			// load floating windows not already loaded! (issue #59 & #254)
-			var items = new List<LayoutFloatingWindow>(Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)));
-			foreach (var fw in items)
+			// load floating windows not already loaded! (issue #59 & #254 & #426)
+			foreach (var fw in Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)))
 				CreateUIElementForModel(fw);
 
 			//create the overlaywindow if it's possible
