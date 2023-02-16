@@ -1383,6 +1383,22 @@ namespace AvalonDock
 
 		#endregion AutoWindowSizeWhenOpened
 
+		#region ShowNavigator
+
+		/// <summary><see cref="ShowNavigator"/> dependency property.</summary>
+		public static readonly DependencyProperty ShowNavigatorProperty = DependencyProperty.Register(nameof(ShowNavigator), typeof(bool), typeof(DockingManager),
+				new FrameworkPropertyMetadata(true));
+
+		/// <summary>Gets/sets whether the navigator window should be shown when the user presses Control + Tab.</summary>
+		[Bindable(true), Description("Gets/sets whether floating windows should show the system menu when a custom context menu is not defined."), Category("FloatingWindow")]
+		public bool ShowNavigator
+		{
+			get => (bool)GetValue(ShowNavigatorProperty);
+			set => SetValue(ShowNavigatorProperty, value);
+		}
+
+		#endregion ShowNavigator
+
 		#endregion Public Properties
 
 		#region LogicalChildren
@@ -1428,7 +1444,7 @@ namespace AvalonDock
 
 		private bool IsNavigatorWindowActive => _navigatorWindow != null;
 
-		private bool CanShowNavigatorWindow => _layoutItems.Any();
+		private bool CanShowNavigatorWindow => ShowNavigator && _layoutItems.Any();
 
 		#endregion Private Properties
 
