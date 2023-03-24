@@ -120,6 +120,18 @@ to also theme standard elements, such as, button and textblock etc.
 
 # Mile Stone History
 
+## Fixes and Features Added in Version 4.72.0
+
+- [#423 issue #422 DockingManager.LayoutItemTemplateSelector is applied twice because...](https://github.com/Dirkster99/AvalonDock/pull/423) (thanx to [Mona04](https://github.com/Mona04))
+
+- [#425 Fix: Potential NRE on app close](https://github.com/Dirkster99/AvalonDock/pull/425) (thanx to [Khaos66](https://github.com/Khaos66))
+
+- [#427 Fix floating windows still created twice](https://github.com/Dirkster99/AvalonDock/pull/427) (thanx to [Khaos66](https://github.com/Khaos66))
+
+- [Add DockingManager.ShowNavigator](https://github.com/Dirkster99/AvalonDock/pull/428) (thanx to [Calum Robinson](https://github.com/calumr))
+
+- [#431 Fix unwanted group orientation change when using mixed orientation](https://github.com/Dirkster99/AvalonDock/pull/431) (thanx to [KuroiRoy](https://github.com/KuroiRoy))
+
 ## Fixes Added in Version 4.71.2
 
 - [#416 Fix Issue #226: Restore floating windows to maximized state](https://github.com/Dirkster99/AvalonDock/pull/416) (thanx to [Michael Möller](https://github.com/moellerm))
