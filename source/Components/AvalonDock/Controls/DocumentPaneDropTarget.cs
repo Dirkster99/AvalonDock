@@ -74,18 +74,21 @@ namespace AvalonDock.Controls
 		/// <param name="floatingWindow"></param>
 		protected override void Drop(LayoutDocumentFloatingWindow floatingWindow)
 		{
-			ILayoutDocumentPane targetModel = _targetPane.Model as ILayoutDocumentPane;
-			LayoutDocument documentActive = floatingWindow.Descendents().OfType<LayoutDocument>().FirstOrDefault();
+			var targetModel = (ILayoutDocumentPane)_targetPane.Model;
+			var documentActive = floatingWindow.Descendents().OfType<LayoutDocument>().FirstOrDefault();
 
-			// ensure paneGroup
 			var paneGroup = targetModel.Parent as LayoutDocumentPaneGroup;
+			var requiredOrientation = Type == DropTargetType.DocumentPaneDockBottom || Type == DropTargetType.DocumentPaneDockTop ?
+				System.Windows.Controls.Orientation.Vertical : System.Windows.Controls.Orientation.Horizontal;
+			var allowMixedOrientation = targetModel.Root.Manager.AllowMixedOrientation;
+
 			if(paneGroup == null)
 			{
-				var targetModelAsPositionableElement = targetModel as ILayoutPositionableElement;
-				var layoutGroup = targetModel.Parent as ILayoutGroup;
-				paneGroup = new LayoutDocumentPaneGroup()
+				var targetModelAsPositionableElement = (ILayoutPositionableElement)targetModel;
+				var layoutGroup = (ILayoutGroup)targetModel.Parent;
+				paneGroup = new LayoutDocumentPaneGroup
 				{
-					Orientation = System.Windows.Controls.Orientation.Vertical,
+					Orientation = requiredOrientation,
 					DockWidth = targetModelAsPositionableElement.DockWidth,
 					DockHeight = targetModelAsPositionableElement.DockHeight,
 				};
@@ -93,8 +96,20 @@ namespace AvalonDock.Controls
 				paneGroup.Children.Add(targetModel);
 				layoutGroup.InsertChildAt(0, paneGroup);
 			}
-			var paneGroupOrientaion = paneGroup as ILayoutOrientableGroup;
-
+			else if (allowMixedOrientation && paneGroup.Orientation != requiredOrientation && Type != DropTargetType.DocumentPaneDockInside)
+			{
+				var targetModelAsPositionableElement = (ILayoutPositionableElement)targetModel;
+				var newGroup = new LayoutDocumentPaneGroup
+				{
+					Orientation = requiredOrientation,
+					DockWidth = targetModelAsPositionableElement.DockWidth,
+					DockHeight = targetModelAsPositionableElement.DockHeight,
+				};
+				
+				paneGroup.ReplaceChild(targetModel, newGroup);
+				newGroup.Children.Add(targetModel);
+				paneGroup = newGroup;
+			}
 
 			switch (Type)
 			{
@@ -104,7 +119,7 @@ namespace AvalonDock.Controls
 
 					{
 
-						if (paneGroupOrientaion.Orientation != System.Windows.Controls.Orientation.Vertical)
+						if (!allowMixedOrientation && paneGroup.Orientation != System.Windows.Controls.Orientation.Vertical)
 						{
 							paneGroup.Orientation = System.Windows.Controls.Orientation.Vertical;
 						}
@@ -132,7 +147,7 @@ namespace AvalonDock.Controls
 
 					{
 
-						if(paneGroupOrientaion.Orientation != System.Windows.Controls.Orientation.Vertical)
+						if(!allowMixedOrientation && paneGroup.Orientation != System.Windows.Controls.Orientation.Vertical)
 						{
 							paneGroup.Orientation = System.Windows.Controls.Orientation.Vertical;
 						}
@@ -159,7 +174,7 @@ namespace AvalonDock.Controls
 					#region DropTargetType.DocumentPaneDockLeft
 
 					{
-						if (paneGroupOrientaion.Orientation != System.Windows.Controls.Orientation.Horizontal)
+						if (!allowMixedOrientation && paneGroup.Orientation != System.Windows.Controls.Orientation.Horizontal)
 						{
 							paneGroup.Orientation = System.Windows.Controls.Orientation.Horizontal;
 						}
@@ -186,7 +201,7 @@ namespace AvalonDock.Controls
 					#region DropTargetType.DocumentPaneDockRight
 
 					{
-						if (paneGroupOrientaion.Orientation != System.Windows.Controls.Orientation.Horizontal)
+						if (!allowMixedOrientation && paneGroup.Orientation != System.Windows.Controls.Orientation.Horizontal)
 						{
 							paneGroup.Orientation = System.Windows.Controls.Orientation.Horizontal;
 						}
