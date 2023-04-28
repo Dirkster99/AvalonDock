@@ -224,6 +224,8 @@ namespace AvalonDock.Controls
 
 		bool HitTest(Point dragPoint)
 		{
+			if (dragPoint == default(Point)) 
+				return false;
 			var detectionRect = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
 			return detectionRect.Contains(dragPoint);
 		}
