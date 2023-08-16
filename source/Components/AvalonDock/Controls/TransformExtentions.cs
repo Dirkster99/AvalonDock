@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -59,7 +59,10 @@ namespace AvalonDock.Controls
 
 		public static Point TransformToDeviceDPI(this Visual visual, Point pt)
 		{
-			Matrix m = PresentationSource.FromVisual(visual).CompositionTarget.TransformToDevice;
+			var compositionTarget = PresentationSource.FromVisual(visual).CompositionTarget;
+			if (compositionTarget == null)
+				return default;
+			Matrix m = compositionTarget.TransformToDevice;
 			return new Point(pt.X / m.M11, pt.Y / m.M22);
 		}
 
