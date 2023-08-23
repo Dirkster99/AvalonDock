@@ -121,7 +121,7 @@ to also theme standard elements, such as, button and textblock etc.
 # Mile Stone History
 
 
-## Fixes and Features Added in Version 4.72.0
+## Fixes and Features Added in Version 4.72.1
 
 - [#436 Changed how the next active document is picked on document close.](https://github.com/Dirkster99/AvalonDock/pull/436) (thanx to [FredrikS fredriks123](https://github.com/fredriks123))
 - [#438 NullCheck for DragPoint](https://github.com/Dirkster99/AvalonDock/pull/438) (thanx to [Ben bbuerger](https://github.com/bbuerger))
