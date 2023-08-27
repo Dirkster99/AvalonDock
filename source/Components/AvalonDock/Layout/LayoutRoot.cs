@@ -383,9 +383,9 @@ namespace AvalonDock.Layout
 				//for each pane that is empty
 				foreach (var emptyPane in this.Descendents().OfType<ILayoutPane>().Where(p => p.ChildrenCount == 0))
 				{
-					//...set null any reference coming from contents not yet hosted in a floating window
+					//...set null any reference coming from contents
 					foreach (var contentReferencingEmptyPane in this.Descendents().OfType<LayoutContent>()
-						.Where(c => ((ILayoutPreviousContainer)c).PreviousContainer == emptyPane && !c.IsFloating))
+						.Where(c => ((ILayoutPreviousContainer)c).PreviousContainer == emptyPane))
 					{
 						if (contentReferencingEmptyPane is LayoutAnchorable anchorable &&
 							!anchorable.IsVisible)
