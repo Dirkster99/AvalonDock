@@ -219,9 +219,10 @@ namespace AvalonDock
 				RightSidePanel = CreateUIElementForModel(Layout.RightSide) as LayoutAnchorSideControl;
 				BottomSidePanel = CreateUIElementForModel(Layout.BottomSide) as LayoutAnchorSideControl;
 
-				foreach (var fw in Layout.FloatingWindows.ToArray())
-					if (fw.IsValid)
-						_fwList.Add(CreateUIElementForModel(fw) as LayoutFloatingWindowControl);
+				foreach (var fw in Layout.FloatingWindows.Where(x => x.IsValid).ToArray())
+				{
+					CreateUIElementForModel(fw);
+				}
 
 				foreach (var fw in _fwList.ToArray())
 				{
