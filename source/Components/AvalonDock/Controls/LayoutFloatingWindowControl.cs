@@ -349,7 +349,6 @@ namespace AvalonDock.Controls
 			}
 			else
 			{
-				CaptureMouse();
 				var windowHandle = new WindowInteropHelper(this).Handle;
 				var lParam = new IntPtr(((int)Left & 0xFFFF) | ((int)Top << 16));
 				Win32Helper.SendMessage(windowHandle, Win32Helper.WM_NCLBUTTONDOWN, new IntPtr(Win32Helper.HT_CAPTION), lParam);
