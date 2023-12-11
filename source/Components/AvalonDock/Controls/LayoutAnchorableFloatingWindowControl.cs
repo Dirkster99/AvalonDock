@@ -248,14 +248,17 @@ namespace AvalonDock.Controls
 			switch (msg)
 			{
 				case Win32Helper.WM_ACTIVATE:
-					var isInactive = ((int)wParam & 0xFFFF) == Win32Helper.WA_INACTIVE;
-					if (_model.IsSinglePane)
-					{
-						LayoutFloatingWindowControlHelper.ActiveTheContentOfSinglePane(this, !isInactive);
-					}
-					else
-					{
-						LayoutFloatingWindowControlHelper.ActiveTheContentOfMultiPane(this, !isInactive);
+					var isActive = ((int)wParam & 0xFFFF) != Win32Helper.WA_INACTIVE;
+					if (isActive)
+					{ 
+						if (_model.IsSinglePane)
+						{
+							LayoutFloatingWindowControlHelper.ActiveTheContentOfSinglePane(this);
+						}
+						else
+						{
+							LayoutFloatingWindowControlHelper.ActiveTheContentOfMultiPane(this);
+						}
 					}
 
 					handled = true;
