@@ -262,5 +262,7 @@ namespace TestApp
             anchorable.AddToLayout(dockManager,AnchorableShowStrategy.Most);
             anchorable.Float();
         }
+
+		private void ShowMessageBox_click(object sender, RoutedEventArgs e) => MessageBox.Show("Test messge", "Test");
     }
 }

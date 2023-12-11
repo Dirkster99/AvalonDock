@@ -13,7 +13,7 @@ namespace AvalonDock.Controls
 	{
 		private const string Excp_NotSupportedFloatingWindowType = "Not Supported Floating Window Type: {0}";
 
-		public static void ActiveTheContentOfSinglePane<T>(T fwc, bool isActive) where T : LayoutFloatingWindowControl
+		public static void ActiveTheContentOfSinglePane<T>(T fwc, bool isActive = true) where T : LayoutFloatingWindowControl
 		{
 			ILayoutContentSelector selector = null;
 			if (fwc is LayoutAnchorableFloatingWindowControl)
@@ -52,7 +52,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		public static void ActiveTheContentOfMultiPane<T>(T fwc, bool isActive) where T : LayoutFloatingWindowControl
+		public static void ActiveTheContentOfMultiPane<T>(T fwc, bool isActive = true) where T : LayoutFloatingWindowControl
 		{
 			if (isActive)
 			{
