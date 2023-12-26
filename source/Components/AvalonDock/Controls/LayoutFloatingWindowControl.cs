@@ -516,7 +516,6 @@ namespace AvalonDock.Controls
 			SizeChanged -= OnSizeChanged;
 			if (Content != null)
 			{
-				(Content as FloatingWindowContentHost)?.Dispose();
 				if (_hwndSrc != null)
 				{
 					_hwndSrc.RemoveHook(_hwndSrcHook);
@@ -570,7 +569,7 @@ namespace AvalonDock.Controls
 		{
 			if (!(sender is LayoutFloatingWindowControl lfwc)) return null;
 			if (lfwc.IsLoaded && lfwc.IsContentImmutable) return lfwc.Content;
-			return new FloatingWindowContentHost((LayoutFloatingWindowControl)sender) { Content = content as UIElement };
+			return new FloatingWindowContentHost(/*(LayoutFloatingWindowControl)sender*/) { Content = content as UIElement };
 		}
 
 		private void OnLoaded(object sender, RoutedEventArgs e)
@@ -711,141 +710,8 @@ namespace AvalonDock.Controls
 
 		#region Internal Classes
 
-		protected internal class FloatingWindowContentHost : HwndHost
+		protected internal class FloatingWindowContentHost : ContentControl
 		{
-			#region fields
-
-			private readonly LayoutFloatingWindowControl _owner;
-			private HwndSource _wpfContentHost = null;
-			private Border _rootPresenter = null;
-			private DockingManager _manager = null;
-
-			#endregion fields
-
-			#region Constructors
-
-			public FloatingWindowContentHost(LayoutFloatingWindowControl owner)
-			{
-				_owner = owner;
-				var binding = new Binding(nameof(SizeToContent)) { Source = _owner };
-				BindingOperations.SetBinding(this, SizeToContentProperty, binding);
-			}
-
-			#endregion Constructors
-
-			#region Properties
-
-			public Visual RootVisual => _rootPresenter;
-
-			#region Content
-
-			/// <summary><see cref="Content"/> dependency property. </summary>
-			public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(nameof(Content), typeof(UIElement), typeof(FloatingWindowContentHost),
-					new FrameworkPropertyMetadata(null, OnContentChanged));
-
-			/// <summary>
-			/// Gets or sets the <see cref="Content"/> property.  This dependency property
-			/// indicates ....
-			/// </summary>
-			public UIElement Content
-			{
-				get => (UIElement)GetValue(ContentProperty);
-				set => SetValue(ContentProperty, value);
-			}
-
-			/// <summary>Handles changes to the <see cref="Content"/> property.</summary>
-			private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((FloatingWindowContentHost)d).OnContentChanged((UIElement)e.OldValue, (UIElement)e.NewValue);
-
-			/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Content"/> property.</summary>
-			protected virtual void OnContentChanged(UIElement oldValue, UIElement newValue)
-			{
-				if (_rootPresenter != null) _rootPresenter.Child = Content;
-				if (oldValue is FrameworkElement oldContent) oldContent.SizeChanged -= Content_SizeChanged;
-				if (newValue is FrameworkElement newContent) newContent.SizeChanged += Content_SizeChanged;
-			}
-
-			#endregion Content
-
-			#region SizeToContent
-
-			/// <summary><see cref="SizeToContent"/> dependency property.</summary>
-			public static readonly DependencyProperty SizeToContentProperty = DependencyProperty.Register(nameof(SizeToContent), typeof(SizeToContent), typeof(FloatingWindowContentHost),
-					new FrameworkPropertyMetadata(SizeToContent.Manual, OnSizeToContentChanged));
-
-			/// <summary>Gets or sets the <see cref="SizeToContent"/> property.</summary>
-			public SizeToContent SizeToContent
-			{
-				get => (SizeToContent)GetValue(SizeToContentProperty);
-				set => SetValue(SizeToContentProperty, value);
-			}
-
-			/// <summary>Handles changes to the <see cref="SizeToContent"/> property.</summary>
-			private static void OnSizeToContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((FloatingWindowContentHost)d).OnSizeToContentChanged((SizeToContent)e.OldValue, (SizeToContent)e.NewValue);
-
-			/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="SizeToContent"/> property.</summary>
-			protected virtual void OnSizeToContentChanged(SizeToContent oldValue, SizeToContent newValue)
-			{
-				if (_wpfContentHost != null) _wpfContentHost.SizeToContent = newValue;
-			}
-
-			#endregion SizeToContent
-
-			#endregion Properties
-
-			#region Overrides
-
-			/// <inheritdoc />
-			protected override HandleRef BuildWindowCore(HandleRef hwndParent)
-			{
-				_wpfContentHost = new HwndSource(new HwndSourceParameters
-				{
-					ParentWindow = hwndParent.Handle,
-					WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_VISIBLE | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
-					Width = 1,
-					Height = 1,
-					UsesPerPixelOpacity = true,
-				});
-
-				_rootPresenter = new Border { Child = new AdornerDecorator { Child = Content }, Focusable = true };
-				AutomationProperties.SetName(_rootPresenter, "FloatingWindowHost");
-				_rootPresenter.SetBinding(Border.BackgroundProperty, new Binding(nameof(Background)) { Source = _owner });
-				_wpfContentHost.RootVisual = _rootPresenter;
-				_manager = _owner.Model.Root.Manager;
-				_manager.InternalAddLogicalChild(_rootPresenter);
-				return new HandleRef(this, _wpfContentHost.Handle);
-			}
-
-			/// <inheritdoc />
-			protected override void DestroyWindowCore(HandleRef hwnd)
-			{
-				_manager.InternalRemoveLogicalChild(_rootPresenter);
-				if (_wpfContentHost == null) return;
-				_wpfContentHost.Dispose();
-				_wpfContentHost = null;
-			}
-
-			/// <inheritdoc />
-			protected override Size MeasureOverride(Size constraint)
-			{
-				if (Content == null) return base.MeasureOverride(constraint);
-				Content.Measure(constraint);
-				return Content.DesiredSize;
-			}
-
-			#endregion Overrides
-
-			#region Methods
-
-			/// <summary>
-			/// Content_SizeChanged event handler.
-			/// </summary>
-			private void Content_SizeChanged(object sender, SizeChangedEventArgs e)
-			{
-				InvalidateMeasure();
-				InvalidateArrange();
-			}
-
-			#endregion Methods
 		}
 
 		#endregion Internal Classes

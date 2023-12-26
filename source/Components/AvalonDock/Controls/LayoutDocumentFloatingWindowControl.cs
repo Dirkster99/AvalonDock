@@ -291,7 +291,7 @@ namespace AvalonDock.Controls
 				}
 			}
 
-			var rootVisual = ((FloatingWindowContentHost)Content).RootVisual;
+			var rootVisual = ((FloatingWindowContentHost)Content).FindVisualTreeRoot();
 
 			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>())
 				_dropAreas.Add(new DropArea<LayoutAnchorablePaneControl>(areaHost, DropAreaType.AnchorablePane));

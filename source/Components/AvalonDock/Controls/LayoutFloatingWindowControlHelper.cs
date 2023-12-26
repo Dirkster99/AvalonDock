@@ -130,7 +130,7 @@ namespace AvalonDock.Controls
 		private static T GetLayoutControlByMousePosition<T>(LayoutFloatingWindowControl fwc) where T : FrameworkElement, ILayoutControl
 		{
 			var mousePosition = fwc.PointToScreenDPI(Mouse.GetPosition(fwc));
-			var rootVisual = ((LayoutFloatingWindowControl.FloatingWindowContentHost)fwc.Content).RootVisual;
+			var rootVisual = ((LayoutFloatingWindowControl.FloatingWindowContentHost)fwc.Content).FindVisualTreeRoot();
 
 			foreach (var areaHost in rootVisual.FindVisualChildren<T>())
 			{

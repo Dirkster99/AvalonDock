@@ -177,7 +177,7 @@ namespace AvalonDock.Controls
 			if (_dropAreas != null) return _dropAreas;
 			_dropAreas = new List<IDropArea>();
 			if (draggingWindow.Model is LayoutDocumentFloatingWindow) return _dropAreas;
-			var rootVisual = (Content as FloatingWindowContentHost).RootVisual;
+			var rootVisual = (Content as FloatingWindowContentHost).FindVisualTreeRoot();
 			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>())
 				_dropAreas.Add(new DropArea<LayoutAnchorablePaneControl>(areaHost, DropAreaType.AnchorablePane));
 			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutDocumentPaneControl>())
