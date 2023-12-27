@@ -2268,6 +2268,7 @@
 						</Grid>
 						<Border
 							x:Name="WindowBorder"
+							IsHitTestVisible="False"
 							Background="Transparent"
 							BorderBrush="{TemplateBinding BorderBrush}"
 							BorderThickness="1">
