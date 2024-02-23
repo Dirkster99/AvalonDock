@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -9,6 +9,7 @@
 
 using AvalonDock.Layout;
 using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -61,6 +62,23 @@ namespace AvalonDock.Controls
 						{
 							var childPositionableModelWidthActualSize = _model.Children[i] as ILayoutPositionableElement as ILayoutPositionableElementWithActualSize;
 							var childDockMinWidth = (_model.Children[i] as ILayoutPositionableElement).CalculatedDockMinWidth();
+							if (childPositionableModelWidthActualSize.ActualWidth == 0)
+							{
+								if (childPositionableModelWidthActualSize.DockWidth.IsStar)
+								{
+									childPositionableModelWidthActualSize.ActualWidth = (ActualWidth - _model.Children.Cast<ILayoutPositionableElement>()
+										.Where(j => j.DockWidth.IsAbsolute)
+										.Select(j => j.DockWidth.Value)
+										.Sum()) * childPositionableModelWidthActualSize.DockWidth.Value / _model.Children.Cast<ILayoutPositionableElement>()
+										.Where(j => j.DockWidth.IsStar)
+										.Select(j => j.DockWidth.Value)
+										.Sum();
+								}
+								else if (childPositionableModelWidthActualSize.DockWidth.IsAbsolute)
+								{
+									childPositionableModelWidthActualSize.ActualWidth = childPositionableModelWidthActualSize.DockWidth.Value;
+								}
+							}
 							var widthToSet = Math.Max(childPositionableModelWidthActualSize.ActualWidth, childDockMinWidth);
 
 							widthToSet = Math.Min(widthToSet, ActualWidth / 2.0);
@@ -99,6 +117,23 @@ namespace AvalonDock.Controls
 						{
 							var childPositionableModelWidthActualSize = _model.Children[i] as ILayoutPositionableElement as ILayoutPositionableElementWithActualSize;
 							var childDockMinHeight = (_model.Children[i] as ILayoutPositionableElement).CalculatedDockMinHeight();
+							if (childPositionableModelWidthActualSize.ActualHeight == 0)
+							{
+								if (childPositionableModelWidthActualSize.DockHeight.IsStar)
+								{
+									childPositionableModelWidthActualSize.ActualHeight = ((ActualHeight - _model.Children.Cast<ILayoutPositionableElement>()
+										.Where(j => j.DockHeight.IsAbsolute)
+										.Select(j => j.DockHeight.Value)
+										.Sum())) * childPositionableModelWidthActualSize.DockHeight.Value / _model.Children.Cast<ILayoutPositionableElement>()
+										.Where(j => j.DockHeight.IsStar)
+										.Select(j => j.DockHeight.Value)
+										.Sum();
+								}
+								else if (childPositionableModelWidthActualSize.DockHeight.IsAbsolute)
+								{
+									childPositionableModelWidthActualSize.ActualHeight = childPositionableModelWidthActualSize.DockHeight.Value;
+								}
+							}
 							var heightToSet = Math.Max(childPositionableModelWidthActualSize.ActualHeight, childDockMinHeight);
 							heightToSet = Math.Min(heightToSet, ActualHeight / 2.0);
 							heightToSet = Math.Max(heightToSet, childDockMinHeight);
