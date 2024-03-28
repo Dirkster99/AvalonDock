@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -272,6 +272,31 @@ namespace AvalonDock.Controls
 		protected virtual void OnCanFloatChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (LayoutElement != null) LayoutElement.CanFloat = (bool)e.NewValue;
+		}
+
+		#endregion CanFloat
+
+		#region CanUserResize
+
+		/// <summary><see cref="CanResize"/> dependency property.</summary>
+		public static readonly DependencyProperty CanResizeProperty = DependencyProperty.Register(nameof(CanResize), typeof(bool), typeof(LayoutItem),
+				new FrameworkPropertyMetadata(true, OnCanResizeChanged));
+
+		/// <summary>Gets/sets wether the user can move the layout element dragging it to another position.</summary>
+		[Bindable(true), Description("Gets/sets wether the user can resize the layout element."), Category("Other")]
+		public bool CanResize
+		{
+			get => (bool)GetValue(CanResizeProperty);
+			set => SetValue(CanResizeProperty, value);
+		}
+
+		/// <summary>Handles changes to the <see cref="CanResize"/> property.</summary>
+		private static void OnCanResizeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnCanResizeChanged(e);
+
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="CanResize"/> property.</summary>
+		protected virtual void OnCanResizeChanged(DependencyPropertyChangedEventArgs e)
+		{
+			if (LayoutElement != null) LayoutElement.CanResize = (bool)e.NewValue;
 		}
 
 		#endregion CanFloat

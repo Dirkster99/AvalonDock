@@ -740,7 +740,6 @@
     <!--  LayoutGridResizerControl  -->
     <Style x:Key="{x:Type avalonDockControls:LayoutGridResizerControl}" TargetType="{x:Type avalonDockControls:LayoutGridResizerControl}">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="IsEnabled" Value="{Binding CanUserResize}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type avalonDockControls:LayoutGridResizerControl}">

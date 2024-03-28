@@ -98,18 +98,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		/// <summary>Gets or sets the parent container of the element</summary>
-		[XmlIgnore]
-		public bool CanUserResize
-		{
-			get => _canUserResize;
-			set
-			{
-				if (_canUserResize == value) return;
-				_canUserResize = value;
-				RaisePropertyChanged(nameof(CanUserResize));
-			}
-		}
 
 		#endregion Properties
 

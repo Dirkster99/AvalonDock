@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -36,7 +37,6 @@ namespace AvalonDock.Controls
 		#region fields
 
 		private readonly LayoutPositionableGroup<T> _model;
-		private readonly Orientation _orientation;
 		private bool _initialized;
 		private ChildrenTreeChange? _asyncRefreshCalled;
 		private readonly ReentrantFlag _fixingChildrenDockLengths = new ReentrantFlag();
@@ -191,8 +191,20 @@ namespace AvalonDock.Controls
 			}
 			else if (e.PropertyName == nameof(ILayoutPositionableElement.IsVisible))
 				UpdateRowColDefinitions();
-		}
 
+			UpdateSpliterStatus();
+
+		}
+		private void UpdateSpliterStatus()
+		{
+			var resizers = Children.OfType<LayoutGridResizerControl>().ToList();
+			foreach (var resizer in resizers)
+			{
+				var index = Children.IndexOf(resizer);
+				resizer.IsEnabled = ((Children[index + 1] as ILayoutControl).Model as ICanResize).CanResize;
+
+			}
+		}
 		private void UpdateRowColDefinitions()
 		{
 			var root = _model.Root;
@@ -294,7 +306,8 @@ namespace AvalonDock.Controls
 			{
 				var splitter = new LayoutGridResizerControl();
 				var previousChild = Children[iChild - 1] as ILayoutControl;
-				splitter.DataContext = previousChild.Model;
+
+				splitter.DataContext = previousChild;
 
 				if (Orientation == Orientation.Horizontal)
 				{

@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -170,6 +170,8 @@ namespace AvalonDock.Layout
 				//return Parent != null && Parent.ChildrenCount == 1 && Parent.Parent is LayoutFloatingWindow;
 			}
 		}
+
+		public bool CanResize => Children.All(a=> a.CanResize);
 
 		/// <inheritdoc/>
 		public override void WriteXml(System.Xml.XmlWriter writer)

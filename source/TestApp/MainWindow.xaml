@@ -17,6 +17,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:TestApp"
     xmlns:winformsIntegration="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+    Name="MainWindow"
     Title="MainWindow"
     Width="525"
     Height="350"
@@ -81,13 +82,13 @@
             </DockingManager.DocumentHeaderTemplate>
             <LayoutRoot PropertyChanged="OnLayoutRootPropertyChanged">
                 <LayoutPanel Orientation="Horizontal">
-                    <LayoutAnchorablePane  DockWidth="50">
+                    <LayoutAnchorablePane DockWidth="50">
                         <LayoutAnchorable
                             x:Name="WinFormsWindow"
                             Title="WinForms Window"
                             CanClose="False"
                             CanHide="False"
-							CanUserResize="False"
+                            CanUserResize="{Binding}"
                             ContentId="WinFormsWindow"
                             ToolTip="My WinForms Tool">
                             <winformsIntegration:WindowsFormsHost x:Name="winFormsHost" Background="White" />

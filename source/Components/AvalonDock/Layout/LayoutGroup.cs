@@ -45,7 +45,6 @@ namespace AvalonDock.Layout
 
 		/// <summary>Gets a collection of children objects below this object.</summary>
 		public ObservableCollection<T> Children => _children;
-
 		/// <summary>Gets the number of of children objects below this object.</summary>
 		public int ChildrenCount => _children.Count;
 

@@ -206,6 +206,8 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		public bool CanResize => Children.All(c => c.CanResize);
+
 		#endregion Public Methods
 
 		#region Internal Methods
