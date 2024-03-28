@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -95,16 +95,19 @@ namespace AvalonDock.Layout
 			}
 		}
 
+
 		#endregion Properties
 
 		#region Public Methods
 
 #if TRACE
+
 		public virtual void ConsoleDump(int tab)
 		{
 			System.Diagnostics.Trace.Write(new String(' ', tab * 4));
 			System.Diagnostics.Trace.WriteLine(this.ToString());
 		}
+
 #endif
 
 		#endregion Public Methods

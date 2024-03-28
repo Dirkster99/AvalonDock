@@ -462,6 +462,28 @@ namespace AvalonDock.Layout
 
 		#endregion CanFloat
 
+		#region CanResize
+
+		public static readonly DependencyProperty CanResizeProperty = DependencyProperty.Register(nameof(CanResize), typeof(bool), typeof(LayoutContent), new UIPropertyMetadata(true));
+		private bool _canResize = true;
+
+		public bool CanResize
+		{
+			get => _canResize;
+			set
+			{
+				if (value == _canResize) return;
+				_canResize = value;
+				RaisePropertyChanged(nameof(CanResize));
+				if (Parent is LayoutGroupBase)
+				{
+					(Parent as LayoutGroupBase).RaisePropertyChangedFromOutSite(nameof(CanResize));
+				}
+			}
+		}
+
+		#endregion CanResize
+
 		#region CanShowOnHover
 
 		private bool _canShowOnHover = true;
@@ -469,7 +491,7 @@ namespace AvalonDock.Layout
 		/// <summary>
 		/// Set to false to disable the behavior of auto-showing
 		/// a <see cref="LayoutAnchorableControl"/> on mouse over.
-		/// When true, hovering the mouse over an anchorable tab 
+		/// When true, hovering the mouse over an anchorable tab
 		/// will cause the anchorable to show itself.
 		/// </summary>
 		/// <remarks>Defaults to true</remarks>
@@ -639,12 +661,12 @@ namespace AvalonDock.Layout
 				IsActive = true;
 			}
 
-            // BD: 14.08.2020 raise IsFloating property changed
-            RaisePropertyChanged(nameof(IsFloating));
-        }
+			// BD: 14.08.2020 raise IsFloating property changed
+			RaisePropertyChanged(nameof(IsFloating));
+		}
 
-        /// <summary>Dock the content as document.</summary>
-        public void DockAsDocument()
+		/// <summary>Dock the content as document.</summary>
+		public void DockAsDocument()
 		{
 			if (!(Root is LayoutRoot root)) throw new InvalidOperationException();
 
@@ -670,10 +692,10 @@ namespace AvalonDock.Layout
 
 			// BD: 14.08.2020 raise IsFloating property changed
 			RaisePropertyChanged(nameof(IsFloating));
-        }
+		}
 
-        /// <summary>Re-dock the content to its previous container</summary>
-        public void Dock()
+		/// <summary>Re-dock the content to its previous container</summary>
+		public void Dock()
 		{
 			if (PreviousContainer != null)
 			{
@@ -707,7 +729,7 @@ namespace AvalonDock.Layout
 
 			// BD: 14.08.2020 raise IsFloating property changed
 			RaisePropertyChanged(nameof(IsFloating));
-        }
+		}
 
 		#endregion Public Methods
 
@@ -776,7 +798,7 @@ namespace AvalonDock.Layout
 			}
 
 			parentAsContainer.RemoveChild(this);
-			root?.CollectGarbage();			
+			root?.CollectGarbage();
 			OnClosed();
 		}
 

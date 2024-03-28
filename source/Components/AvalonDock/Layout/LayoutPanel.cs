@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -8,6 +8,7 @@
  ************************************************************************/
 
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -82,6 +83,8 @@ namespace AvalonDock.Layout
 			get { return (bool)GetValue(CanDockProperty); }
 			set { SetValue(CanDockProperty, value); }
 		}
+
+		public bool CanResize => Children.All(c => CanResize) && Children.Any();
 
 		#endregion CanDock
 

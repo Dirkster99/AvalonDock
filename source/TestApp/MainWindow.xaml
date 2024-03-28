@@ -1,21 +1,23 @@
 <!--
     ************************************************************************
     AvalonDock
-
+    
     Copyright (C) 2007-2013 Xceed Software Inc.
-
+    
     This program is provided to you under the terms of the Microsoft Public
     License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
     ************************************************************************
 -->
 
-<Window x:Class="TestApp.MainWindow"
+<Window
+    x:Class="TestApp.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:TestApp"
     xmlns:winformsIntegration="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+    Name="MainWindow"
     Title="MainWindow"
     Width="525"
     Height="350"
@@ -59,7 +61,8 @@
             </MenuItem>
         </Menu>
 
-        <DockingManager x:Name="dockManager"
+        <DockingManager
+            x:Name="dockManager"
             Grid.Row="1"
             AllowMixedOrientation="True"
             AutoWindowSizeWhenOpened="True"
@@ -80,10 +83,12 @@
             <LayoutRoot PropertyChanged="OnLayoutRootPropertyChanged">
                 <LayoutPanel Orientation="Horizontal">
                     <LayoutAnchorablePane DockWidth="50">
-                        <LayoutAnchorable x:Name="WinFormsWindow"
+                        <LayoutAnchorable
+                            x:Name="WinFormsWindow"
                             Title="WinForms Window"
                             CanClose="False"
                             CanHide="False"
+                            CanUserResize="{Binding}"
                             ContentId="WinFormsWindow"
                             ToolTip="My WinForms Tool">
                             <winformsIntegration:WindowsFormsHost x:Name="winFormsHost" Background="White" />

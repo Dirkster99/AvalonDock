@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -36,7 +37,6 @@ namespace AvalonDock.Controls
 		#region fields
 
 		private readonly LayoutPositionableGroup<T> _model;
-		private readonly Orientation _orientation;
 		private bool _initialized;
 		private ChildrenTreeChange? _asyncRefreshCalled;
 		private readonly ReentrantFlag _fixingChildrenDockLengths = new ReentrantFlag();
@@ -56,8 +56,7 @@ namespace AvalonDock.Controls
 		internal LayoutGridControl(LayoutPositionableGroup<T> model, Orientation orientation)
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));
-			_orientation = orientation;
-			FlowDirection = System.Windows.FlowDirection.LeftToRight;
+			FlowDirection = FlowDirection.LeftToRight;
 			Unloaded += OnUnloaded;
 		}
 
@@ -191,6 +190,29 @@ namespace AvalonDock.Controls
 			}
 			else if (e.PropertyName == nameof(ILayoutPositionableElement.IsVisible))
 				UpdateRowColDefinitions();
+
+			UpdateSpliterStatus();
+		}
+
+		private void UpdateSpliterStatus()
+		{
+			var resizers = Children.OfType<LayoutGridResizerControl>().ToList();
+			foreach (var resizer in resizers)
+			{
+				var index = Children.IndexOf(resizer);
+				resizer.IsEnabled = IsCanResize(index);
+			}
+		}
+
+		private bool IsCanResize(int index)
+		{
+			bool canResize = ((Children[index - 1] as ILayoutControl).Model as ICanResize).CanResize;
+
+			if (Children.Count > index + 1)
+			{
+				canResize &= ((Children[index + 1] as ILayoutControl).Model as ICanResize).CanResize;
+			}
+			return canResize;
 		}
 
 		private void UpdateRowColDefinitions()
@@ -305,8 +327,10 @@ namespace AvalonDock.Controls
 					splitter.Style = _model.Root?.Manager?.GridSplitterHorizontalStyle;
 				}
 
-
 				Children.Insert(iChild, splitter);
+
+				splitter.IsEnabled = IsCanResize(iChild);
+
 				// TODO: MK Is this a bug????
 				iChild++;
 			}

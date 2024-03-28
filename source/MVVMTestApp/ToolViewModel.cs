@@ -1,12 +1,16 @@
-﻿namespace AvalonDock.MVVMTestApp
+namespace AvalonDock.MVVMTestApp
 {
 	internal class ToolViewModel : PaneViewModel
 	{
 		#region fields
+
 		private bool _isVisible = true;
+		private bool _canResize = false;
+
 		#endregion fields
 
 		#region constructor
+
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -16,9 +20,11 @@
 			Name = name;
 			Title = name;
 		}
+
 		#endregion constructor
 
 		#region Properties
+
 		public string Name { get; private set; }
 
 		public bool IsVisible
@@ -33,6 +39,20 @@
 				}
 			}
 		}
+
+		public bool CanResize
+		{
+			get => _canResize;
+			set
+			{
+				if (_canResize != value)
+				{
+					_canResize = value;
+					RaisePropertyChanged(nameof(CanResize));
+				}
+			}
+		}
+
 		#endregion Properties
 	}
 }

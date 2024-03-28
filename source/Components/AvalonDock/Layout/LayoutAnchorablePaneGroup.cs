@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -60,6 +60,8 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(Orientation));
 			}
 		}
+
+		public bool CanResize => Children.All(c => c.CanResize) && Children.Any();
 
 		#endregion Properties
 

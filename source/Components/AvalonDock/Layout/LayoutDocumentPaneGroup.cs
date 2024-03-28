@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -8,6 +8,7 @@
  ************************************************************************/
 
 using System;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Markup;
 
@@ -57,6 +58,8 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		public bool CanResize => Children.All(c => c.CanResize) && Children.Any();
+
 		#endregion Properties
 
 		#region Overrides
@@ -79,6 +82,7 @@ namespace AvalonDock.Layout
 		}
 
 #if TRACE
+
 		/// <inheritdoc />
 		public override void ConsoleDump(int tab)
 		{
@@ -88,6 +92,7 @@ namespace AvalonDock.Layout
 			foreach (LayoutElement child in Children)
 				child.ConsoleDump(tab + 1);
 		}
+
 #endif
 
 		#endregion Overrides
