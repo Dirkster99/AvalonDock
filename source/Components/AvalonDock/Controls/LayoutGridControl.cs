@@ -56,8 +56,7 @@ namespace AvalonDock.Controls
 		internal LayoutGridControl(LayoutPositionableGroup<T> model, Orientation orientation)
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));
-			_orientation = orientation;
-			FlowDirection = System.Windows.FlowDirection.LeftToRight;
+			FlowDirection = FlowDirection.LeftToRight;
 			Unloaded += OnUnloaded;
 		}
 
