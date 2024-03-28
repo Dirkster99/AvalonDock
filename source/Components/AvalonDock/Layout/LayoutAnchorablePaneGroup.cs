@@ -61,7 +61,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		public bool CanResize => Children.All(c => c.CanResize);
+		public bool CanResize => Children.All(c => c.CanResize) && Children.Any();
 
 		#endregion Properties
 

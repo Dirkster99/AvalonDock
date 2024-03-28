@@ -84,7 +84,7 @@ namespace AvalonDock.Layout
 			set { SetValue(CanDockProperty, value); }
 		}
 
-		public bool CanResize => Children.All(c => CanResize);
+		public bool CanResize => Children.All(c => CanResize) && Children.Any();
 
 		#endregion CanDock
 

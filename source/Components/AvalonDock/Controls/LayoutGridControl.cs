@@ -192,18 +192,29 @@ namespace AvalonDock.Controls
 				UpdateRowColDefinitions();
 
 			UpdateSpliterStatus();
-
 		}
+
 		private void UpdateSpliterStatus()
 		{
 			var resizers = Children.OfType<LayoutGridResizerControl>().ToList();
 			foreach (var resizer in resizers)
 			{
 				var index = Children.IndexOf(resizer);
-				resizer.IsEnabled = ((Children[index + 1] as ILayoutControl).Model as ICanResize).CanResize;
-
+				resizer.IsEnabled = IsCanResize(index);
 			}
 		}
+
+		private bool IsCanResize(int index)
+		{
+			bool canResize = ((Children[index - 1] as ILayoutControl).Model as ICanResize).CanResize;
+
+			if (Children.Count > index + 1)
+			{
+				canResize &= ((Children[index + 1] as ILayoutControl).Model as ICanResize).CanResize;
+			}
+			return canResize;
+		}
+
 		private void UpdateRowColDefinitions()
 		{
 			var root = _model.Root;
@@ -304,9 +315,6 @@ namespace AvalonDock.Controls
 			for (var iChild = 1; iChild < Children.Count; iChild++)
 			{
 				var splitter = new LayoutGridResizerControl();
-				var previousChild = Children[iChild - 1] as ILayoutControl;
-
-				splitter.DataContext = previousChild;
 
 				if (Orientation == Orientation.Horizontal)
 				{
@@ -320,6 +328,9 @@ namespace AvalonDock.Controls
 				}
 
 				Children.Insert(iChild, splitter);
+
+				splitter.IsEnabled = IsCanResize(iChild);
+
 				// TODO: MK Is this a bug????
 				iChild++;
 			}
