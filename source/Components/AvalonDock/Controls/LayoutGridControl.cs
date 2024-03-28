@@ -293,6 +293,8 @@ namespace AvalonDock.Controls
 			for (var iChild = 1; iChild < Children.Count; iChild++)
 			{
 				var splitter = new LayoutGridResizerControl();
+				var previousChild = Children[iChild - 1] as ILayoutControl;
+				splitter.DataContext = previousChild.Model;
 
 				if (Orientation == Orientation.Horizontal)
 				{
@@ -304,7 +306,6 @@ namespace AvalonDock.Controls
 					splitter.Cursor = Cursors.SizeNS;
 					splitter.Style = _model.Root?.Manager?.GridSplitterHorizontalStyle;
 				}
-
 
 				Children.Insert(iChild, splitter);
 				// TODO: MK Is this a bug????

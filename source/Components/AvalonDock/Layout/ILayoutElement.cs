@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -22,5 +22,6 @@ namespace AvalonDock.Layout
 
 		/// <summary>Gets the <see cref="LayoutRoot"/> for this layout element.</summary>
 		ILayoutRoot Root { get; }
+		bool CanUserResize { get; set; }
 	}
 }

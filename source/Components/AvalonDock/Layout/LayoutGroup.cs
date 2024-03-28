@@ -53,6 +53,8 @@ namespace AvalonDock.Layout
 		IEnumerable<ILayoutElement> ILayoutContainer.Children => _children.Cast<ILayoutElement>();
 
 		/// <summary>Gets whether this object is visible or not.</summary>
+		public bool CanUserResize => Children.All(x => x.CanUserResize);
+
 		public bool IsVisible
 		{
 			get => _isVisible;

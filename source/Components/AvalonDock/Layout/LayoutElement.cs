@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -32,6 +32,9 @@ namespace AvalonDock.Layout
 
 		[NonSerialized]
 		private ILayoutRoot _root = null;
+
+		[NonSerialized]
+		private bool _canUserResize = true;
 
 		#endregion fields
 
@@ -95,16 +98,31 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>Gets or sets the parent container of the element</summary>
+		[XmlIgnore]
+		public bool CanUserResize
+		{
+			get => _canUserResize;
+			set
+			{
+				if (_canUserResize == value) return;
+				_canUserResize = value;
+				RaisePropertyChanged(nameof(CanUserResize));
+			}
+		}
+
 		#endregion Properties
 
 		#region Public Methods
 
 #if TRACE
+
 		public virtual void ConsoleDump(int tab)
 		{
 			System.Diagnostics.Trace.Write(new String(' ', tab * 4));
 			System.Diagnostics.Trace.WriteLine(this.ToString());
 		}
+
 #endif
 
 		#endregion Public Methods

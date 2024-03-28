@@ -1,15 +1,16 @@
 <!--
     ************************************************************************
     AvalonDock
-
+    
     Copyright (C) 2007-2013 Xceed Software Inc.
-
+    
     This program is provided to you under the terms of the Microsoft Public
     License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
     ************************************************************************
 -->
 
-<Window x:Class="TestApp.MainWindow"
+<Window
+    x:Class="TestApp.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
@@ -59,7 +60,8 @@
             </MenuItem>
         </Menu>
 
-        <DockingManager x:Name="dockManager"
+        <DockingManager
+            x:Name="dockManager"
             Grid.Row="1"
             AllowMixedOrientation="True"
             AutoWindowSizeWhenOpened="True"
@@ -79,11 +81,13 @@
             </DockingManager.DocumentHeaderTemplate>
             <LayoutRoot PropertyChanged="OnLayoutRootPropertyChanged">
                 <LayoutPanel Orientation="Horizontal">
-                    <LayoutAnchorablePane DockWidth="50">
-                        <LayoutAnchorable x:Name="WinFormsWindow"
+                    <LayoutAnchorablePane  DockWidth="50">
+                        <LayoutAnchorable
+                            x:Name="WinFormsWindow"
                             Title="WinForms Window"
                             CanClose="False"
                             CanHide="False"
+							CanUserResize="False"
                             ContentId="WinFormsWindow"
                             ToolTip="My WinForms Tool">
                             <winformsIntegration:WindowsFormsHost x:Name="winFormsHost" Background="White" />
