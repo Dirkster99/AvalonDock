@@ -276,7 +276,7 @@ namespace AvalonDock.Controls
 
 		#endregion CanFloat
 
-		#region CanUserResize
+		#region CanResize
 
 		/// <summary><see cref="CanResize"/> dependency property.</summary>
 		public static readonly DependencyProperty CanResizeProperty = DependencyProperty.Register(nameof(CanResize), typeof(bool), typeof(LayoutItem),
@@ -299,7 +299,7 @@ namespace AvalonDock.Controls
 			if (LayoutElement != null) LayoutElement.CanResize = (bool)e.NewValue;
 		}
 
-		#endregion CanFloat
+		#endregion CanResize
 
 		#region CloseCommand
 

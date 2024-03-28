@@ -5,7 +5,7 @@ namespace AvalonDock.MVVMTestApp
 		#region fields
 
 		private bool _isVisible = true;
-		private bool _canResize = true;
+		private bool _canResize = false;
 
 		#endregion fields
 

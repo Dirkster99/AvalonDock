@@ -33,9 +33,6 @@ namespace AvalonDock.Layout
 		[NonSerialized]
 		private ILayoutRoot _root = null;
 
-		[NonSerialized]
-		private bool _canUserResize = true;
-
 		#endregion fields
 
 		#region Constructors
