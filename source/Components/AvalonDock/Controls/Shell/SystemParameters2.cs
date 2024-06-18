@@ -28,7 +28,7 @@ namespace Microsoft.Windows.Shell
 		private delegate void _SystemMetricUpdate(IntPtr wParam, IntPtr lParam);
 
 		[ThreadStatic]
-		private static readonly SystemParameters2 _threadLocalSingleton;
+		private static SystemParameters2 _threadLocalSingleton;
 
 		private MessageWindow _messageHwnd;
 
@@ -333,7 +333,7 @@ namespace Microsoft.Windows.Shell
 			};
 		}
 
-		public static SystemParameters2 Current => _threadLocalSingleton ?? new SystemParameters2();
+		public static SystemParameters2 Current => _threadLocalSingleton ??= new SystemParameters2();
 
 		private IntPtr _WndProc(IntPtr hwnd, WM msg, IntPtr wParam, IntPtr lParam)
 		{
