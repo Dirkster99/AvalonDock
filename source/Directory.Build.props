@@ -24,7 +24,7 @@
 	<ItemGroup>
 		<AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeMetricsConfig.txt"
 			Condition="Exists('$(MSBuildThisFileDirectory)CodeMetricsConfig.txt')" />
-		<PackageReference Include="Microsoft.CodeAnalysis.Metrics" Version="3.3.4">
+		<PackageReference Include="Microsoft.CodeAnalysis.Metrics" Version="4.14.0">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 	</ItemGroup>
