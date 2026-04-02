@@ -53,7 +53,7 @@ jobs:
         run: >
           dotnet test source/AvalonDock.sln
           --configuration Release
-          --no-restore
+          --no-build
           --logger "trx;LogFilePrefix=test-results"
           --results-directory TestResults
           -m:1
@@ -66,14 +66,22 @@ jobs:
           path: TestResults/*.trx
           retention-days: 14
 
-      - name: Collect NuGet packages
+      - name: Pack NuGet packages
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Path nupkg -Force | Out-Null
-          Get-ChildItem -Path source/Components -Recurse -Filter "*.nupkg" | 
-            Where-Object { $_.Directory.Name -eq "Release" } |
-            Copy-Item -Destination nupkg/
-          Get-ChildItem nupkg/*.nupkg | ForEach-Object { Write-Host "Found: $($_.Name)" }
+          
+          $packArgs = "--configuration Release --no-build -o nupkg/ ${{ steps.version.outputs.VERSION_ARGS }}"
+          
+          dotnet pack source/Components/AvalonDock/AvalonDock.csproj $packArgs
+          dotnet pack source/Components/AvalonDock.Themes.Aero/AvalonDock.Themes.Aero.csproj $packArgs
+          dotnet pack source/Components/AvalonDock.Themes.Metro/AvalonDock.Themes.Metro.csproj $packArgs
+          dotnet pack source/Components/AvalonDock.Themes.Expression/AvalonDock.Themes.Expression.csproj $packArgs
+          dotnet pack source/Components/AvalonDock.Themes.VS2010/AvalonDock.Themes.VS2010.csproj $packArgs
+          dotnet pack source/Components/AvalonDock.Themes.VS2013/AvalonDock.Themes.VS2013.csproj $packArgs
+          
+          Write-Host "`nCreated packages:"
+          Get-ChildItem nupkg/*.nupkg | ForEach-Object { Write-Host "  - $($_.Name)" }
 
       - name: Upload NuGet packages
         uses: actions/upload-artifact@v4
