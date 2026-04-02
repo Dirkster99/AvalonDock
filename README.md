@@ -10,7 +10,7 @@
 ![Net4](https://badgen.net/badge/Framework/.Net&nbsp;4/blue) ![NetCore3](https://badgen.net/badge/Framework/NetCore&nbsp;3/blue) ![Net4](https://badgen.net/badge/Framework/.NET&nbsp;5/blue)
 
 ## Master Branch
-[![Build status](https://ci.appveyor.com/api/projects/status/kq2wyupx5hm7fok2/branch/master?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock/branch/master)[![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)&nbsp;[Continuous Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts)
+[![CI](https://github.com/Dirkster99/AvalonDock/actions/workflows/ci.yml/badge.svg)](https://github.com/Dirkster99/AvalonDock/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)
 
 <a href="https://github.com/Dirkster99/AvalonDock/issues">
     <img src="https://img.shields.io/github/issues-raw/Dirkster99/AvalonDock.svg?style=flat-square">
@@ -50,8 +50,18 @@ Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">
 
 ## Building AvalonDock from Source
 
-This project supports multitargeting frameworks (NetCore 3 and .Net 4). This means that it requires
-Visual Studio Community 2019 or better to build.
+This project targets **.NET Core 3.0**, **.NET 5**, and **.NET Framework 4.0**. You need:
+- [.NET Core 3.0 SDK](https://dotnet.microsoft.com/download/dotnet/3.0)
+- [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0)
+- Windows (WPF is Windows-only)
+- Visual Studio 2019 or later (recommended)
+
+```bash
+dotnet build source/AvalonDock.sln
+dotnet test source/AvalonDock.sln -m:1
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 # Feature Added - Dark and Light VS 2013 Theme
 
