@@ -61,7 +61,7 @@ jobs:
           -m:1
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results
@@ -91,7 +91,7 @@ jobs:
           ls -1 nupkg/*.nupkg
 
       - name: Upload NuGet packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nuget-packages
           path: nupkg/*.nupkg
