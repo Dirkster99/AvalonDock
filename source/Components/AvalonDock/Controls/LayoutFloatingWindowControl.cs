@@ -11,6 +11,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
@@ -626,36 +627,88 @@ namespace AvalonDock.Controls
 		}
 
 		private void OnActivated(object sender, EventArgs e)
-		{
-			Activated -= OnActivated;
+        {
+            InternalOnActivated(sender, e);
+        }
 
-			if (!_attachDrag || Mouse.LeftButton != MouseButtonState.Pressed) return;
-			var windowHandle = new WindowInteropHelper(this).Handle;
-			var mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
+        private void InternalOnActivated(object sender, EventArgs e, int retryCount = 0)
+        {
+            Activated -= OnActivated;
 
-			var area = this.GetScreenArea();
+            if (!_attachDrag || Mouse.LeftButton != MouseButtonState.Pressed)
+            {
+                return;
+            }
+            
+            var windowHandle = new WindowInteropHelper(this).Handle;
+			
+            // Check if the visual is connected to a PresentationSource to avoid InvalidOperationException
+            // in multi-DPI scenarios where the window might not be fully initialized yet
+            if (PresentationSource.FromVisual(this) == null)
+            {
+                if (retryCount >= 5)
+                {
+                    // Give up after several retries to avoid infinite loops
+                    _attachDrag = false;
+                    return;
+                }
+                
+                // If not connected, defer the operation until the visual is properly initialized
+#if NET40
+                // .NET 4.0 doesn't support Task.Delay or async lambdas in Dispatcher.Invoke
+                var timer = new System.Windows.Threading.DispatcherTimer();
+                timer.Interval = TimeSpan.FromMilliseconds(10);
+                timer.Tick += (s, args) => {
+                    timer.Stop();
+                    if (_attachDrag && Mouse.LeftButton == MouseButtonState.Pressed)
+                    {
+                        retryCount++;
+                        InternalOnActivated(sender, e, retryCount);
+                    }
+                };
+                timer.Start();
+#else
+                Dispatcher.Invoke(async () => {
+                    if (_attachDrag && Mouse.LeftButton == MouseButtonState.Pressed)
+                    {
+                        await Task.Delay(10);
+                        retryCount++;
+                        InternalOnActivated(sender, e, retryCount);
+                    }
+                }, System.Windows.Threading.DispatcherPriority.Loaded);
+#endif
+                return;
+            }
+			
+            var mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
 
-			// BugFix Issue #6
-			// This code is initializes the drag when content (document or toolwindow) is dragged
-			// A second chance back up plan if DragDelta is not set
-			if (DragDelta == default) DragDelta = new Point(3, 3);
-			Left = mousePosition.X - DragDelta.X;                 // BugFix Issue #6
-			Top = mousePosition.Y - DragDelta.Y;
+            var area = this.GetScreenArea();
 
-			if (this.GetScreenArea().Size != area.Size) // setting the top/left co-ordinates has changed the size - this means moving to a screen with a different DPI. Recalculate mouse position based on new DPI to avoid wrong drag location
-			{
-				mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
-				Left = mousePosition.X - DragDelta.X;
-				Top = mousePosition.Y - DragDelta.Y;
-			}
+            // BugFix Issue #6
+            // This code is initializes the drag when content (document or toolwindow) is dragged
+            // A second chance back up plan if DragDelta is not set
+            if (DragDelta == default) DragDelta = new Point(3, 3);
+            Left = mousePosition.X - DragDelta.X;                 // BugFix Issue #6
+            Top = mousePosition.Y - DragDelta.Y;
 
-			_attachDrag = false;
-			Show();
-			var lParam = new IntPtr(((int)mousePosition.X & 0xFFFF) | ((int)mousePosition.Y << 16));
-			Win32Helper.SendMessage(windowHandle, Win32Helper.WM_NCLBUTTONDOWN, new IntPtr(Win32Helper.HT_CAPTION), lParam);
-		}
+            if (this.GetScreenArea().Size != area.Size) // setting the top/left co-ordinates has changed the size - this means moving to a screen with a different DPI. Recalculate mouse position based on new DPI to avoid wrong drag location
+            {
+                // Ensure the visual is still connected before recalculating mouse position
+                if (PresentationSource.FromVisual(this) != null)
+                {
+                    mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
+                    Left = mousePosition.X - DragDelta.X;
+                    Top = mousePosition.Y - DragDelta.Y;
+                }
+            }
 
-		private void UpdatePositionAndSizeOfPanes()
+            _attachDrag = false;
+            Show();
+            var lParam = new IntPtr(((int)mousePosition.X & 0xFFFF) | ((int)mousePosition.Y << 16));
+            Win32Helper.SendMessage(windowHandle, Win32Helper.WM_NCLBUTTONDOWN, new IntPtr(Win32Helper.HT_CAPTION), lParam);
+        }
+
+        private void UpdatePositionAndSizeOfPanes()
 		{
 			foreach (var posElement in Model.Descendents().OfType<ILayoutElementForFloatingWindow>())
 			{

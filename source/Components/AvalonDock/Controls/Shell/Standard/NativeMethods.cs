@@ -11,6 +11,7 @@
     Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
+#pragma warning disable SYSLIB0004
 namespace Standard
 {
 	using Microsoft.Win32.SafeHandles;
@@ -2779,8 +2780,7 @@ namespace Standard
 		public static IntPtr GetStockObject(StockObject fnObject)
 		{
 			var retPtr = _GetStockObject(fnObject);
-			if (retPtr == null) HRESULT.ThrowLastError();
-			return retPtr;
+            return retPtr;
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]

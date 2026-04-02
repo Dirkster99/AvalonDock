@@ -4,10 +4,9 @@ Thank you for considering contributing to AvalonDock! Here's how to get started.
 
 ## Prerequisites
 
-- [.NET Core 3.0 SDK](https://dotnet.microsoft.com/download/dotnet/3.0)
-- [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0)
+- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) or [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) (or later)
 - Windows (WPF is Windows-only)
-- Visual Studio 2019 or later (recommended), or any editor with .NET support
+- Visual Studio 2022 or later (recommended), or any editor with .NET support
 
 ## Building
 
@@ -17,7 +16,7 @@ dotnet build source/AvalonDock.sln
 
 ## Running Tests
 
-The test suite uses **MSTest** with STA extensions and requires single-threaded execution for WPF compatibility:
+The test suite uses **NUnit** and requires single-threaded execution for WPF/STA compatibility:
 
 ```bash
 dotnet test source/AvalonDock.sln -m:1

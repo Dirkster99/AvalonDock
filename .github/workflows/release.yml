@@ -20,15 +20,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup .NET Core 3.0
+      - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 3.0.x
-
-      - name: Setup .NET 5
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 5.0.x
+          dotnet-version: 9.0.x
 
       - name: Determine version
         id: version

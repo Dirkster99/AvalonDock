@@ -111,8 +111,16 @@ namespace AvalonDock.Controls
 			base.OnMouseLeftButtonDown(e);
 			CaptureMouse();
 			_allowDrag = false;
-			Model.IsActive = true;
-			if (Model is LayoutDocument layoutDocument && !layoutDocument.CanMove) return;
+			if (Model != null)
+			{
+				Model.IsActive = true;
+			}
+
+			if (Model is LayoutDocument layoutDocument && !layoutDocument.CanMove)
+			{
+				return;
+			}
+			
 			if (e.ClickCount != 1) return;
 			_mouseDownPoint = e.GetPosition(this);
 			_isMouseDown = true;
@@ -147,10 +155,10 @@ namespace AvalonDock.Controls
 				var containerPane = Model.Parent as ILayoutPane;
 
 				if (containerPane is LayoutDocumentPane layoutDocumentPane && !layoutDocumentPane.CanRepositionItems) return;
-				if (containerPane.Parent is LayoutDocumentPaneGroup layoutDocumentPaneGroup && !layoutDocumentPaneGroup.CanRepositionItems) return;
+				if (containerPane?.Parent is LayoutDocumentPaneGroup layoutDocumentPaneGroup && !layoutDocumentPaneGroup.CanRepositionItems) return;
 
 				var childrenList = container.Children.ToList();
-				containerPane.MoveChild(childrenList.IndexOf(Model), childrenList.IndexOf(targetModel));
+				containerPane?.MoveChild(childrenList.IndexOf(Model), childrenList.IndexOf(targetModel));
 				Model.IsActive = true;
 				_parentDocumentTabPanel.UpdateLayout();
 				UpdateDragDetails();

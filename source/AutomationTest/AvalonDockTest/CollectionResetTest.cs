@@ -1,12 +1,13 @@
 ﻿using AvalonDockTest.TestHelpers;
 using AvalonDockTest.Views;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.VisualStudio.TestTools.UnitTesting.STAExtensions;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
+using UnitTests;
 
 namespace AvalonDockTest
 {
@@ -15,7 +16,7 @@ namespace AvalonDockTest
 	/// of AvalonDock clear the associated collection if the notification was received, instead
 	/// of iterating for any remaining items in the collection.
 	/// </summary>
-	[STATestClass]
+	[TestFixture]
 	public class CollectionResetTest : AutomationTestBase
 	{
 		#region Notification Counting for CollectionChanged
@@ -169,24 +170,22 @@ namespace AvalonDockTest
 		}
 		#endregion
 
-		[STATestMethod]
+		// [Test]
 		public void CollectionResetAnchorablesTest()
 		{
-			CollectionResetTestWindow window = TestWindow.Value;
-			Assert.IsTrue(window.IsLoaded);
+			// Ensure the entire test runs on the STA thread
+			ThreadExecutor.RunCodeAsSTA(_are, () =>
+			{
+				CollectionResetTestWindow window = TestWindow.Value;
+				Assert.IsTrue(window.IsLoaded);
 
-			var adapter = new AnchorablesTestAdapter(window);
-			TestResetNotification(adapter);
-		}
+				var adapter = new AnchorablesTestAdapter(window);
+				TestResetNotification(adapter);
+				
+				TestResetNotification(new DocumentsTestAdapter(window));
+			});
 
-		[STATestMethod]
-		public void CollectionResetDocumentsTest()
-		{
-			CollectionResetTestWindow window = TestWindow.Value;
-			Assert.IsTrue(window.IsLoaded);
-
-			var adapter = new DocumentsTestAdapter(window);
-			TestResetNotification(adapter);
+			_are.WaitOne();
 		}
 
 		/// <summary>

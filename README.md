@@ -7,7 +7,7 @@
 | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2010.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010)          | [Dirkster.AvalonDock.Themes.VS2010](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010)
 | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2013.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013)          | [Dirkster.AvalonDock.Themes.VS2013](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013) (see [Wiki](https://github.com/Dirkster99/AvalonDock/wiki/WPF-VS-2013-Dark-Light-Demo-Client) )
 
-![Net4](https://badgen.net/badge/Framework/.Net&nbsp;4/blue) ![NetCore3](https://badgen.net/badge/Framework/NetCore&nbsp;3/blue) ![Net4](https://badgen.net/badge/Framework/.NET&nbsp;5/blue)
+![Net40](https://badgen.net/badge/Framework/.NET&nbsp;4.0/blue) ![Net452](https://badgen.net/badge/Framework/.NET&nbsp;4.5.2/blue) ![Net48](https://badgen.net/badge/Framework/.NET&nbsp;4.8/blue) ![NetCore3](https://badgen.net/badge/Framework/.NET&nbsp;Core&nbsp;3.0/blue) ![Net5](https://badgen.net/badge/Framework/.NET&nbsp;5/blue) ![Net9](https://badgen.net/badge/Framework/.NET&nbsp;9/blue) ![Net10](https://badgen.net/badge/Framework/.NET&nbsp;10/blue)
 
 ## Master Branch
 [![CI](https://github.com/Dirkster99/AvalonDock/actions/workflows/ci.yml/badge.svg)](https://github.com/Dirkster99/AvalonDock/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)
@@ -50,11 +50,9 @@ Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">
 
 ## Building AvalonDock from Source
 
-This project targets **.NET Core 3.0**, **.NET 5**, and **.NET Framework 4.0**. You need:
-- [.NET Core 3.0 SDK](https://dotnet.microsoft.com/download/dotnet/3.0)
-- [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0)
+This project targets **.NET 9**, **.NET 10**, and **.NET Framework 4.8**. You need:
 - Windows (WPF is Windows-only)
-- Visual Studio 2019 or later (recommended)
+- Visual Studio 2022 or later (recommended)
 
 ```bash
 dotnet build source/AvalonDock.sln

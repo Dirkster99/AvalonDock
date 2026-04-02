@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,7 +40,8 @@ namespace AvalonDock
 	/// <seealso cref="IOverlayWindowHost"/>
 	[ContentProperty(nameof(Layout))]
 	[TemplatePart(Name = "PART_AutoHideArea")]
-	public class DockingManager : Control, IOverlayWindowHost//, ILogicalChildrenContainer
+    [SuppressMessage("Maintainability", "CA1506:Avoid excessive class coupling")]
+    public class DockingManager : Control, IOverlayWindowHost//, ILogicalChildrenContainer
 	{
 		#region fields
 		// ShortCut to current AvalonDock theme if OnThemeChanged() is invoked with DictionaryTheme instance
@@ -1035,6 +1037,38 @@ namespace AvalonDock
 
 		#endregion AnchorableContextMenu
 
+		#region AllowAnchorDoubleClickDock
+
+		/// <summary><see cref="AllowAnchorDoubleClickDock"/> dependency property.</summary>
+		public static readonly DependencyProperty AllowAnchorDoubleClickDockProperty = DependencyProperty.Register(nameof(AllowAnchorDoubleClickDock), typeof(bool), typeof(DockingManager),
+				new FrameworkPropertyMetadata(false));
+
+		/// <summary>Gets/sets whether double-clicking an auto-hide anchor tab toggles the docked (pinned) state.</summary>
+		[Bindable(true), Description("Gets/sets whether double-clicking an auto-hide anchor tab toggles the docked (pinned) state."), Category("Anchor")]
+		public bool AllowAnchorDoubleClickDock
+		{
+			get => (bool)GetValue(AllowAnchorDoubleClickDockProperty);
+			set => SetValue(AllowAnchorDoubleClickDockProperty, value);
+		}
+
+		#endregion AllowAnchorDoubleClickDock
+
+		#region AllowAnchorRightClickContextMenu
+
+		/// <summary><see cref="AllowAnchorRightClickContextMenu"/> dependency property.</summary>
+		public static readonly DependencyProperty AllowAnchorRightClickContextMenuProperty = DependencyProperty.Register(nameof(AllowAnchorRightClickContextMenu), typeof(bool), typeof(DockingManager),
+				new FrameworkPropertyMetadata(false));
+
+		/// <summary>Gets/sets whether right-clicking an auto-hide anchor tab shows the anchorable context menu.</summary>
+		[Bindable(true), Description("Gets/sets whether right-clicking an auto-hide anchor tab shows the anchorable context menu."), Category("Anchor")]
+		public bool AllowAnchorRightClickContextMenu
+		{
+			get => (bool)GetValue(AllowAnchorRightClickContextMenuProperty);
+			set => SetValue(AllowAnchorRightClickContextMenuProperty, value);
+		}
+
+		#endregion AllowAnchorRightClickContextMenu
+
 		#region Theme
 
 		/// <summary><see cref="Theme"/> dependency property.</summary>
@@ -1619,7 +1653,8 @@ namespace AvalonDock
 		/// </summary>
 		/// <param name="model">The layout element.</param>
 		/// <returns></returns>
-		internal UIElement CreateUIElementForModel(ILayoutElement model)
+		[SuppressMessage("Maintainability", "CA1506:Avoid excessive class coupling")]
+        internal UIElement CreateUIElementForModel(ILayoutElement model)
 		{
 			if (model is LayoutPanel)
 				return new LayoutPanelControl(model as LayoutPanel);
@@ -2474,8 +2509,10 @@ namespace AvalonDock
 				anchorablesSourceAsNotifier.CollectionChanged += AnchorablesSourceElementsChanged;
 		}
 
-		private void AnchorablesSourceElementsChanged(object sender, NotifyCollectionChangedEventArgs e)
-		{
+#pragma warning disable CA1502
+        private void AnchorablesSourceElementsChanged(object sender, NotifyCollectionChangedEventArgs e)
+#pragma warning restore CA1502
+        {
 			if (Layout == null) return;
 
 			//When deserializing documents are created automatically by the deserializer

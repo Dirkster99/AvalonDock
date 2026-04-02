@@ -28,9 +28,11 @@ namespace Microsoft.Windows.Shell
 		private delegate void _SystemMetricUpdate(IntPtr wParam, IntPtr lParam);
 
 		[ThreadStatic]
-		private static readonly SystemParameters2 _threadLocalSingleton;
+#pragma warning disable CS0649 // Field is never assigned to, and will always have its default value
+        private static readonly SystemParameters2 _threadLocalSingleton;
+#pragma warning restore CS0649 // Field is never assigned to, and will always have its default value
 
-		private MessageWindow _messageHwnd;
+        private MessageWindow _messageHwnd;
 
 		private bool _isGlassEnabled;
 		private Color _glassColor;
