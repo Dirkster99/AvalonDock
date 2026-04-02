@@ -9,6 +9,7 @@
 		<UseWPF>true</UseWPF>
 		<IsPackable>false</IsPackable>
 		<LangVersion>latest</LangVersion>
+		<NoWarn>$(NoWarn);NUnit2005</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>

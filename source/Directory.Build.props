@@ -16,6 +16,9 @@
 		<RepositoryUrl>https://gestvh01.eu.apn.local/git/ATAT/AvalonDock</RepositoryUrl>
 		<Authors>https://gestvh01.eu.apn.local/git/ATAT/AvalonDock</Authors>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		
+		<!-- Enforce zero warnings policy -->
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 	</PropertyGroup>
     <ItemGroup>
         <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeMetricsConfig.txt"

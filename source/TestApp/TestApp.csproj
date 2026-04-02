@@ -9,6 +9,8 @@
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <StartupObject />
         <AssemblyName>TestApp</AssemblyName>
+        <!-- Sample app: allow warnings -->
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
        </PropertyGroup>
     <ItemGroup>
         <Resource Include="**\*.png" />

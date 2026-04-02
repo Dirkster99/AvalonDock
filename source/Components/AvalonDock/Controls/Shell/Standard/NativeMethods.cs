@@ -1363,7 +1363,13 @@ namespace Standard
 
 	internal sealed class SafeFindHandle : SafeHandleZeroOrMinusOneIsInvalid
 	{
+#if NET5_0_OR_GREATER
+#pragma warning disable SYSLIB0003 // SecurityPermissionAttribute is obsolete
+#endif
 		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+#if NET5_0_OR_GREATER
+#pragma warning restore SYSLIB0003
+#endif
 		private SafeFindHandle() : base(true) { }
 
 		/// <inheritdoc />
