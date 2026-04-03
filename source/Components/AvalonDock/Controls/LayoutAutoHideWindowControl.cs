@@ -298,7 +298,7 @@ namespace AvalonDock.Controls
 		{
 			_internalGrid = new Grid { FlowDirection = FlowDirection.LeftToRight, Style = AnchorableGridStyle };
 			_internalGrid.SetBinding(Panel.BackgroundProperty, new Binding(nameof(Grid.Background)) { Source = this });
-			_internalGrid.SizeChanged += (e, s) => InvalidateMeasure();
+			_internalGrid.SizeChanged += OnInternalGridSizeChanged;
 
 			_internalHost = new LayoutAnchorableControl { Model = _model, Style = AnchorableStyle };
 			_internalHost.SetBinding(FlowDirectionProperty, new Binding("Model.Root.Manager.FlowDirection") { Source = this });
@@ -363,6 +363,7 @@ namespace AvalonDock.Controls
 			_resizer.DragDelta -= OnResizerDragDelta;
 			_resizer.DragCompleted -= OnResizerDragCompleted;
 			_internalHostPresenter.Content = null;
+			_internalGrid.SizeChanged -= OnInternalGridSizeChanged;
 		}
 
 		private void ShowResizerOverlayWindow(LayoutGridResizerControl splitter)
@@ -501,6 +502,11 @@ namespace AvalonDock.Controls
 		{
 			ShowResizerOverlayWindow(sender as LayoutGridResizerControl);
 			IsResizing = true;
+		}
+
+		private void OnInternalGridSizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			InvalidateMeasure();
 		}
 
 		#endregion Private Methods
