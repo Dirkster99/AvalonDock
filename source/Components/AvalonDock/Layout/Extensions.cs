@@ -70,8 +70,8 @@ namespace AvalonDock.Layout
 				if (layoutPanel != null && layoutPanel.Children.Count > 0)
 				{
 					if (layoutPanel.Orientation == System.Windows.Controls.Orientation.Horizontal)
-						return element.InAnchorablePaneAtStartOfPanel(layoutPanel) ? AnchorSide.Left : AnchorSide.Right;
-					return element.InAnchorablePaneAtStartOfPanel(layoutPanel) ? AnchorSide.Top : AnchorSide.Bottom;
+						return element.IsInAnchorablePaneAtStartOfPanel(layoutPanel) ? AnchorSide.Left : AnchorSide.Right;
+					return element.IsInAnchorablePaneAtStartOfPanel(layoutPanel) ? AnchorSide.Top : AnchorSide.Bottom;
 				}
 			}
 			Debug.Fail("Unable to find the side for an element, possible layout problem!");
@@ -116,7 +116,7 @@ namespace AvalonDock.Layout
 				paneInsideFloatingWindow.FloatingTop = monitorInfo.Work.Bottom - (paneInsideFloatingWindow.FloatingHeight + 10);
 		}
 
-		private static bool InAnchorablePaneAtStartOfPanel(this ILayoutElement element, LayoutPanel layoutPanel)
+		private static bool IsInAnchorablePaneAtStartOfPanel(this ILayoutElement element, LayoutPanel layoutPanel)
 		{
 			foreach (var child in layoutPanel.Children)
 			{
