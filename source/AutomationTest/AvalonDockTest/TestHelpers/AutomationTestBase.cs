@@ -14,7 +14,7 @@ namespace AvalonDockTest.TestHelpers
     /// This is the base class for all of our UI tests.
     /// </summary>
     [TestFixture]
-    public class AutomationTestBase
+    public abstract class AutomationTestBase
     {
         protected AutoResetEvent _are;
         
