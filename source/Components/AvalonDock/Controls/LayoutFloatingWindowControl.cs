@@ -514,7 +514,10 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnClosed(EventArgs e)
 		{
+			// Unsubscribe from window events to prevent memory leaks.
 			SizeChanged -= OnSizeChanged;
+
+			// Clean up native window resources and message hook.
 			if (Content != null)
 			{
 				(Content as FloatingWindowContentHost)?.Dispose();
@@ -525,6 +528,29 @@ namespace AvalonDock.Controls
 					_hwndSrc = null;
 				}
 			}
+
+			var root = Model?.Root;
+			var modelToRemove = _model as LayoutFloatingWindow;
+			if (root != null)
+			{
+				// Notify the manager to remove this view instance from its tracking list (_fwList).
+				root.Manager?.RemoveFloatingWindow(this);
+
+				// Remove the model from the LayoutRoot's collection only if closed externally
+				// AND if the model wasn't already detached (e.g., by CollectGarbage during the closing process).
+				if (!_internalCloseFlag && modelToRemove?.Parent == root)
+				{
+					root.FloatingWindows?.Remove(modelToRemove);
+				}
+
+				// Clean up the layout tree (e.g., remove empty parent panes).
+				root.CollectGarbage();
+			}
+
+			// Ensure derived classes clean up model event handlers and bindings
+			// to prevent leaks between view and model.
+			DisableBindings();
+
 			base.OnClosed(e);
 		}
 

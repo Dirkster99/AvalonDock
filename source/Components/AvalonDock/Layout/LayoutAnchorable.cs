@@ -646,6 +646,13 @@ namespace AvalonDock.Layout
 		//	_canClose = _canCloseValueBeforeInternalSet;
 		//}
 
+		internal bool TestCanHide()
+		{
+			var args = new CancelEventArgs();
+			OnHiding(args);
+			return !args.Cancel;
+		}
+		
 		#endregion Internal Methods
 
 		#region Private Methods

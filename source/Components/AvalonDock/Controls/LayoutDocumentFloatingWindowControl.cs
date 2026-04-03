@@ -69,6 +69,28 @@ namespace AvalonDock.Controls
 
 		#endregion Constructors
 
+		#region Public Methods
+
+		/// <inheritdoc />
+		public override void EnableBindings()
+		{
+			_model.PropertyChanged += Model_PropertyChanged;
+			_model.IsVisibleChanged += _model_IsVisibleChanged;
+			
+			base.EnableBindings();
+		}
+
+		/// <inheritdoc />
+		public override void DisableBindings()
+		{
+			_model.PropertyChanged -= Model_PropertyChanged;
+			_model.IsVisibleChanged -= _model_IsVisibleChanged;
+
+			base.DisableBindings();
+		}
+
+		#endregion
+		
 		#region Overrides
 
 		/// <inheritdoc />
@@ -105,16 +127,10 @@ namespace AvalonDock.Controls
 			base.OnInitialized(e);
 			var manager = _model.Root.Manager;
 			Content = manager.CreateUIElementForModel(_model.RootPanel);
-			// TODO IsVisibleChanged
+			EnableBindings();
 			//SetBinding(SingleContentLayoutItemProperty, new Binding("Model.SinglePane.SelectedContent") { Source = this, Converter = new LayoutItemFromLayoutModelConverter() });
 			_model.RootPanel.ChildrenCollectionChanged += RootPanelOnChildrenCollectionChanged;
 		}
-
-		private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			if (e.PropertyName == nameof(LayoutDocumentFloatingWindow.RootPanel) && _model.RootPanel == null) InternalClose();
-		}
-
 		/// <inheritdoc />
 		protected override IntPtr FilterMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
 		{
@@ -150,17 +166,6 @@ namespace AvalonDock.Controls
 						}
 					}
 					break;
-
-				case Win32Helper.WM_CLOSE:
-					if (CloseInitiatedByUser)
-					{
-						// We want to force the window to go through our standard logic for closing.
-						// So, if the window close is initiated outside of our code (such as from the taskbar),
-						// we cancel that close and trigger our close logic instead.
-						this.CloseWindowCommand.Execute(null);
-						handled = true;
-					}
-					break;
 			}
 			return base.FilterMessage(hwnd, msg, wParam, lParam, ref handled);
 		}
@@ -168,20 +173,12 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnClosed(EventArgs e)
 		{
-			var root = Model.Root;
-			// MK sometimes root is null, prevent crash, or should it always be set??
-			if (root != null)
-			{
-				root.Manager.RemoveFloatingWindow(this);
-				root.CollectGarbage();
-			}
 			if (_overlayWindow != null)
 			{
 				_overlayWindow.Close();
 				_overlayWindow = null;
 			}
 			base.OnClosed(e);
-			if (!CloseInitiatedByUser) root?.FloatingWindows.Remove(_model);
 			_model.PropertyChanged -= Model_PropertyChanged;
 		}
 
@@ -189,6 +186,28 @@ namespace AvalonDock.Controls
 
 		#region Private Methods
 
+		private void _model_IsVisibleChanged(object sender, EventArgs e)
+		{
+			if (!IsVisible && _model.IsVisible) Show();
+		}
+		
+		private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			switch (e.PropertyName)
+			{
+				case nameof(LayoutDocumentFloatingWindow.RootPanel):
+					if (_model.RootPanel == null) InternalClose();
+					break;
+
+				case nameof(LayoutDocumentFloatingWindow.IsVisible):
+					if (_model.IsVisible != IsVisible)
+					{
+						Visibility = _model.IsVisible ? Visibility.Visible : Visibility.Hidden;
+					}
+					break;
+			}
+		}
+		
 		private void RootPanelOnChildrenCollectionChanged(object sender, EventArgs e)
 		{
 			if (_model.RootPanel == null || _model.RootPanel.Children.Count == 0) InternalClose();
@@ -208,15 +227,192 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
 		{
-			// TODO
-			if (CloseInitiatedByUser && !KeepContentVisibleOnClose)
+			// Allow base Window class and attached Closing event handlers to potentially cancel first.
+			base.OnClosing(e);
+
+			if (e.Cancel) // If already cancelled by base or others, do nothing.
+				return;
+
+			// If closed programmatically by AvalonDock (e.g., dragging last doc out), skip user checks.
+			if (!CloseInitiatedByUser)
+				return;
+
+			// Handle user-initiated close (Taskbar, Alt+F4, Window's 'X' button).
+			var manager = Model?.Root?.Manager;
+			if (manager == null)
+				return;
+
+			var documentsToClose = this.Model.Descendents().OfType<LayoutDocument>().ToArray();
+			var anchorablesToProcess = Model.Descendents().OfType<LayoutAnchorable>().ToArray();
+
+			// Phase 1.1: Validate if ALL documents can be closed
+			// This checks properties and fires Closing events without actually closing yet.
+			// - Check explicit property first.
+			// - Check internal LayoutContent.Closing event subscribers.
+			// - Check external DockingManager.DocumentClosing event subscribers.
+			// - Check command CanExecute.
+			var cancelAllFromDocuments = documentsToClose.Any(
+				doc => !doc.CanClose 
+				       || !doc.TestCanClose() 
+				       || !ManagerTestCanClose(doc)
+				       || !(manager.GetLayoutItemFromModel(doc)?.CloseCommand?.CanExecute(null) ?? false));
+			
+			// Phase 1.2: Validate if ALL anchorables can be processed (closed or hidden)
+			// Priority: Try Close Path
+			// Fallback: Try Hide Path
+			// Fallback 2: Cannot Close AND Cannot Hide
+			var cancelAllFromAnchorables = anchorablesToProcess.Any(anch =>
+			{
+				var closeCommand = manager.GetLayoutItemFromModel(anch)?.CloseCommand;
+				var hideCommand = (manager.GetLayoutItemFromModel(anch) as LayoutAnchorableItem)?.HideCommand;
+				return anch.CanClose && (!anch.TestCanClose() || !ManagerTestCanClose(anch) || closeCommand?.CanExecute(null) is false) ||
+				       anch.CanHide && (!anch.TestCanHide() || !ManagerTestCanHide(anch) || hideCommand?.CanExecute(null) is false) ||
+				       !anch.CanClose && !anch.CanHide;
+			});
+			var cancelAll = cancelAllFromDocuments || cancelAllFromAnchorables;
+			
+			// If any document prevents closing, cancel the window closing.
+			if (cancelAll)
 			{
 				e.Cancel = true;
-				//_model.Descendents().OfType<LayoutDocument>().ToArray().ForEach<LayoutDocument>((a) => a.Hide());
+				return;
 			}
-			base.OnClosing(e);
+
+			// Phase 2: Execute actions
+			foreach (var doc in documentsToClose.ToList())
+			{
+				var layoutItem = manager.GetLayoutItemFromModel(doc) as LayoutDocumentItem;
+
+				if (layoutItem != null && !layoutItem.IsDefaultCloseCommand)
+				{
+					// User Custom Command Path
+					// Execute the user's command. Assume user handles risks.
+					layoutItem.CloseCommand?.Execute(null); // CanExecute already checked in Phase 1
+				}
+				else
+				{
+					// Default AvalonDock Logic Path
+					// 1. Perform internal close logic (removes from parent, etc.)
+					doc.CloseInternal(); // Does NOT raise manager's DocumentClosed event
+
+					// 2. Clean up view/logical tree elements
+					if (layoutItem?.IsViewExists() == true)
+						manager.InternalRemoveLogicalChild(layoutItem.View);
+					
+					if (doc.Content is UIElement uiElement)
+						manager.InternalRemoveLogicalChild(uiElement);
+					
+					doc.Content = null; // Final content cleanup
+
+					// 3. Raise the manager's final event
+					manager.RaiseDocumentClosed(doc);
+				}
+			}
+			
+			// We use the compromise: execute user command if provided, otherwise execute default logic directly.
+            var wasAnyContentHidden = false;
+            foreach (var anch in anchorablesToProcess.ToList()) // Use ToList() as actions might modify the underlying collection.
+            {
+                var layoutItem = manager.GetLayoutItemFromModel(anch) as LayoutAnchorableItem;
+                bool useDefaultLogic = layoutItem == null; // Should not happen, but safe default
+
+                if (anch.CanClose) // Priority Action: Close
+                {
+                    if (!useDefaultLogic) useDefaultLogic = layoutItem.IsDefaultCloseCommand;
+
+                    if (!useDefaultLogic)
+                    {
+                        // User Custom Command Path
+                        layoutItem.CloseCommand?.Execute(null);
+                    }
+                    else
+                    {
+                        // Default AvalonDock Logic Path
+                        anch.CloseInternal(); // Does NOT raise manager's Closing/Closed events again
+                        if (layoutItem?.IsViewExists() == true)
+	                        manager.InternalRemoveLogicalChild(layoutItem.View);
+                        manager.RaiseAnchorableClosed(anch); // Raise final event
+                    }
+                }
+                else if (anch.CanHide) // Fallback Action: Hide
+                {
+                     if (!useDefaultLogic) useDefaultLogic = layoutItem.IsDefaultHideCommand;
+
+                    if (!useDefaultLogic)
+                    {
+                        // User Custom Command Path
+                        layoutItem.HideCommand?.Execute(null);
+                    }
+                    else
+                    {
+                        // Default AvalonDock Logic Path
+                        // Use 'false' to bypass internal cancel checks already done in Phase 1.
+                        if (anch.HideAnchorable(false)) // Does NOT raise manager's Hiding/Hidden events again
+                        {
+                            // View removal for Hide is typically handled by DockingManager logic or CollectGarbage.
+                            manager.RaiseAnchorableHidden(anch); // Raise final event
+                        }
+                    }
+                    
+                    wasAnyContentHidden = true;
+                }
+			    // If neither CanClose nor CanHide, do nothing (already validated in Phase 1).
+		    }
+            
+			if (wasAnyContentHidden)
+			{
+				// Close the window only if all anchorables were closed
+				e.Cancel = true;
+			}
+			
+			// Window will close naturally as e.Cancel was not set to true.
 		}
 
+		/// <summary>
+		/// Helper method to check DockingManager's DocumentClosing event for cancellation.
+		/// </summary>
+		private bool ManagerTestCanClose(LayoutDocument doc)
+		{
+			var docClosingArgs = new DocumentClosingEventArgs(doc);
+			Model?.Root?.Manager.RaiseDocumentClosing(docClosingArgs);
+			return !docClosingArgs.Cancel;
+		}
+		
+		/// <summary>
+		/// Helper method to check DockingManager's AnchorableClosing event for cancellation.
+		/// </summary>
+		private bool ManagerTestCanClose(LayoutAnchorable anch)
+		{
+			var ancClosingArgs = new AnchorableClosingEventArgs(anch);
+			Model?.Root?.Manager.RaiseAnchorableClosing(ancClosingArgs);
+			return !ancClosingArgs.Cancel;
+		}
+		
+		/// <summary>
+		/// Helper method to check DockingManager's AnchorableHiding event for cancellation,
+		/// including the CloseInsteadOfHide request when CanClose is false.
+		/// </summary>
+		private bool ManagerTestCanHide(LayoutAnchorable anch)
+		{
+			var hidingArgs = new AnchorableHidingEventArgs(anch);
+			Model?.Root?.Manager.RaiseAnchorableHiding(hidingArgs);
+			
+			// If the Hiding event itself was cancelled, prevent the action.
+			if (hidingArgs.Cancel)
+				return false; 
+			
+			// If Hiding requests Close instead, but CanClose is false (which it must be
+			// to reach this point), then the requested action cannot be performed, so cancel.
+			if (hidingArgs.CloseInsteadOfHide)
+			{
+				// Log warning maybe? "CloseInsteadOfHide requested for an anchorable where CanClose=false."
+				return false;
+			}
+			
+			// Hiding was not cancelled and not replaced by an impossible Close action.
+			return true;
+		}
+		
 		bool IOverlayWindowHost.HitTestScreen(Point dragPoint)
 		{
 			return HitTest(this.TransformToDeviceDPI(dragPoint));

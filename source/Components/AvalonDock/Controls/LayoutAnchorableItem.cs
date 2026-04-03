@@ -69,6 +69,9 @@ namespace AvalonDock.Controls
 			set => SetValue(HideCommandProperty, value);
 		}
 
+		/// <summary>Gets a value indicating whether the <see cref="HideCommand"/> is the default value.</summary>
+		internal bool IsDefaultHideCommand => HideCommand == _defaultHideCommand;
+		
 		/// <summary>Handles changes to the <see cref="HideCommand"/> property.</summary>
 		private static void OnHideCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutAnchorableItem)d).OnHideCommandChanged(e);
 

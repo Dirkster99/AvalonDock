@@ -8,6 +8,7 @@
  ************************************************************************/
 
 using System;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Markup;
 
@@ -60,9 +61,10 @@ namespace AvalonDock.Layout
 		#endregion Properties
 
 		#region Overrides
-
+		
 		/// <inheritdoc />
-		protected override bool GetVisibility() => true;
+		protected override bool GetVisibility() => 
+			Children.Count > 0 && Children.Any(c => c.IsVisible);
 
 		/// <inheritdoc />
 		public override void WriteXml(System.Xml.XmlWriter writer)

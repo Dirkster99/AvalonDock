@@ -289,6 +289,9 @@ namespace AvalonDock.Controls
 			get => (ICommand)GetValue(CloseCommandProperty);
 			set => SetValue(CloseCommandProperty, value);
 		}
+		
+		/// <summary>Gets wether the <see cref="CloseCommand"/> property has its default value.</summary>
+		internal bool IsDefaultCloseCommand => CloseCommand == _defaultCloseCommand;
 
 		/// <summary>Handles changes to the <see cref="CloseCommand"/> property.</summary>
 		private static void OnCloseCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnCloseCommandChanged(e);
