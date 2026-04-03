@@ -17,6 +17,7 @@
 		<RepositoryUrl>https://github.com/Dirkster99/AvalonDock</RepositoryUrl>
 		<Authors>https://github.com/Dirkster99/AvalonDock</Authors>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageTags>WPF avalondock docking layout MVVM</PackageTags>
 
 		<!-- Enforce zero warnings policy -->
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
