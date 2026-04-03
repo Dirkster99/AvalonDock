@@ -27,3 +27,4 @@ tmp/
 /.vscode
 TestResults/
 nupkg/
+.nuget/
