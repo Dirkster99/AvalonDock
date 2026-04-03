@@ -6,7 +6,6 @@
         <UseWindowsForms>true</UseWindowsForms>
         <ApplicationIcon />
         <OutputType>WinExe</OutputType>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <StartupObject />
         <AssemblyName>TestApp</AssemblyName>
         <!-- Sample app: allow warnings -->

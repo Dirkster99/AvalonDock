@@ -7,8 +7,8 @@
 
 		<!-- Version Information -->
 		<VersionPrefix>4.72.2</VersionPrefix>
-		<AssemblyVersion>$(VersionPrefix)</AssemblyVersion>
-		<FileVersion>$(VersionPrefix)</FileVersion>
+		<AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+		<FileVersion>$(VersionPrefix).0</FileVersion>
 		<Company>Open Source</Company>
 		<Product>Dirkster.AvalonDock</Product>
 		<Copyright>2017-2026</Copyright>
