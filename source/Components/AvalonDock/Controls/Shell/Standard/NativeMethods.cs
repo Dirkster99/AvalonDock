@@ -11,6 +11,7 @@
     Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
+#pragma warning disable CS0169 // Field is never used
 #pragma warning disable SYSLIB0004
 namespace Standard
 {
