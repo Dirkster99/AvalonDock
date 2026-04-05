@@ -163,12 +163,12 @@ namespace AvalonDockTest.FlaUITests
         {
             // Click a tool window to change active state
             var tool1 = FindToolWindowTab("Tool Window 1");
-            tool1?.Click();
+            tool1?.Click(true);
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(200);
+            System.Threading.Thread.Sleep(500);
 
             // Save
-            ClickMenuItemByName("Layout", "Save", "Layout_4");
+            ClickMenuItemByName(true, "Layout", "Save", "Layout_4");
             System.Threading.Thread.Sleep(500);
 
             // Activate a document
@@ -176,7 +176,7 @@ namespace AvalonDockTest.FlaUITests
             System.Threading.Thread.Sleep(200);
 
             // Load
-            ClickMenuItemByName("Layout", "Load", "Layout_4");
+            ClickMenuItemByName(true, "Layout", "Load", "Layout_4");
             System.Threading.Thread.Sleep(1000);
 
             Assert.That(App.HasExited, Is.False,

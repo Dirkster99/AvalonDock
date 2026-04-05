@@ -28,7 +28,7 @@ namespace AvalonDockTest.FlaUITests
         /// TestApp shows a "Are you sure?" MessageBox on DocumentClosing.
         /// Regression for #184 - All documents disappear if close cancelled.
         /// </summary>
-        [Test, Order(1)]
+        [Test, Order(5)]
         public void CancelDocumentClose_DocumentRemains_Issue184()
         {
             var doc1Before = FindDocumentTab("Document 1");
@@ -83,7 +83,7 @@ namespace AvalonDockTest.FlaUITests
         /// Verifies that rapidly clicking document tabs doesn't crash the application.
         /// Regression for #7 - Click header quickly causes exception.
         /// </summary>
-        [Test, Order(3)]
+        [Test, Order(1)]
         public void RapidTabClicking_DoesNotCrash_Issue7()
         {
             for (int i = 0; i < 10; i++)
@@ -103,7 +103,7 @@ namespace AvalonDockTest.FlaUITests
         /// or at least cannot be closed.
         /// Regression for #196 - CanClose false but showing close button.
         /// </summary>
-        [Test, Order(4)]
+        [Test, Order(3)]
         public void CanCloseFalse_CannotCloseWindow_Issue196()
         {
             var winForms = FindToolWindowTab("WinForms Window");
@@ -132,7 +132,7 @@ namespace AvalonDockTest.FlaUITests
         /// Verifies that closing and re-adding documents works correctly.
         /// Regression for #232 - Closing behavior difference between LayoutAnchorable and LayoutDocument.
         /// </summary>
-        [Test, Order(5)]
+        [Test, Order(2)]
         public void CloseAndReAddDocuments_Works_Issue232()
         {
             // Add documents

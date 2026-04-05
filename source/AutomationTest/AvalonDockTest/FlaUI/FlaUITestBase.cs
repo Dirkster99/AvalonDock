@@ -256,6 +256,11 @@ namespace AvalonDockTest.FlaUITests
 
 		protected void ClickMenuItemByName(params string[] menuPath)
 		{
+			ClickMenuItemByName(false, menuPath);
+		}
+		
+		protected void ClickMenuItemByName(bool moveMouse, params string[] menuPath)
+		{
 			for (int i = 0; i < menuPath.Length; i++)
 			{
 				var menuName = menuPath[i];
@@ -288,7 +293,7 @@ namespace AvalonDockTest.FlaUITests
 					interval: TimeSpan.FromMilliseconds(200));
 
 				Assert.That(result.Result, Is.Not.Null, $"Menu item '{menuName}' not found.");
-				result.Result.Click();
+				result.Result.Click(moveMouse);
 				Wait.UntilInputIsProcessed();
 				System.Threading.Thread.Sleep(300);
 			}
