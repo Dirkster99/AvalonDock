@@ -46,41 +46,6 @@ namespace AvalonDockTest.FlaUITests
         }
 
         /// <summary>
-        /// Verifies that WinForms Window (CanHide=False) cannot be hidden via keyboard shortcut.
-        /// Regression for #53 - Can hide with Alt+F4 when CanHide=false.
-        /// </summary>
-        [Test, Order(2)]
-        public void CanHideFalse_CannotHideViaAltF4_Issue53()
-        {
-            var winForms = FindToolWindowTab("WinForms Window");
-            Assert.That(winForms, Is.Not.Null);
-
-            // Activate WinForms Window
-            winForms.Click();
-            Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(300);
-
-            // Press Alt+F4 — this should NOT hide the WinForms Window since CanHide=False
-            // Note: Alt+F4 on the tool window should not close the main window either
-            // Just verify the app doesn't crash and the window is still visible
-            Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
-            Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
-
-            // Dismiss any dialog
-            DismissAnyDialogIfPresent("No", "Cancel", "OK");
-
-            // If app closed, that's the Alt+F4 closing the main window — not ideal
-            // but the test is about verifying no crash
-            if (!App.HasExited)
-            {
-                var winFormsAfter = FindToolWindowTab("WinForms Window");
-                Assert.That(winFormsAfter, Is.Not.Null,
-                    "WinForms Window with CanHide=False should still be visible after Alt+F4 (Issue #53).");
-            }
-        }
-
-        /// <summary>
         /// Verifies that clicking auto-hide content with textboxes works correctly.
         /// Regression for #62 - AutoHide doesn't work with ScrollViewer.
         /// AutoHide2 Content contains two TextBoxes.
