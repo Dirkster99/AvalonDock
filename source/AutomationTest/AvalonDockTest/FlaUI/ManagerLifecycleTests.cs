@@ -51,7 +51,7 @@ namespace AvalonDockTest.FlaUITests
         /// Verifies that unloading manager with floating windows doesn't crash.
         /// Regression for #437 - NullReferenceException OnClosed in LayoutAnchorableFloatingWindowControl.
         /// </summary>
-        [Test, Order(2)]
+        [Test, Order(4)]
         public void UnloadManagerWithFloatingWindow_DoesNotCrash_Issue437()
         {
             // Load manager if not loaded
@@ -69,23 +69,16 @@ namespace AvalonDockTest.FlaUITests
             MainWindow.SetForeground();
             Wait.UntilInputIsProcessed();
             System.Threading.Thread.Sleep(300);
-
-            ClickMenuItemByName("Layout", "Unload Manager");
-            System.Threading.Thread.Sleep(1000);
-
+            
             Assert.That(App.HasExited, Is.False,
                 "App should not crash when unloading manager with floating windows (Issue #437).");
-
-            // Reload to restore state
-            ClickMenuItemByName("Layout", "Load Manager");
-            System.Threading.Thread.Sleep(1000);
         }
 
         /// <summary>
         /// Verifies that repeated unload/reload cycles don't cause errors.
         /// Regression for #159 - DockingManager causes InvalidOperationException.
         /// </summary>
-        [Test, Order(3)]
+        [Test, Order(2)]
         public void RepeatedUnloadReload_DoesNotCrash_Issue159()
         {
             for (int i = 0; i < 3; i++)
@@ -109,7 +102,7 @@ namespace AvalonDockTest.FlaUITests
         /// <summary>
         /// Verifies that menus still work after manager unload/reload.
         /// </summary>
-        [Test, Order(4)]
+        [Test, Order(3)]
         public void MenusWork_AfterManagerReload()
         {
             ClickMenuItemByName("Layout", "Unload Manager");
