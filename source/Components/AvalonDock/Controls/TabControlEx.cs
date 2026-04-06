@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace AvalonDock.Controls
 {
@@ -22,6 +23,7 @@ namespace AvalonDock.Controls
 
 		private Panel ItemsHolderPanel = null;
 		private readonly bool _IsVirtualizing;
+		private readonly bool _IgnoreTabControlKeyBindings;
 
 		#endregion fields
 
@@ -31,10 +33,11 @@ namespace AvalonDock.Controls
 		/// Class constructor from virtualization parameter.
 		/// </summary>
 		/// <param name="isVirtualizing">Whether tabbed items are virtualized or not.</param>
-		public TabControlEx(bool isVirtualizing)
+		public TabControlEx(bool isVirtualizing, bool ignoreTabControlKeyBindingBindings)
 			: this()
 		{
 			_IsVirtualizing = isVirtualizing;
+			_IgnoreTabControlKeyBindings = ignoreTabControlKeyBindingBindings;
 		}
 
 		/// <summary>
@@ -57,6 +60,8 @@ namespace AvalonDock.Controls
 		[Bindable(false), Description("Gets whether the control and its inheriting classes are virtualizing their items or not."), Category("Other")]
 		public bool IsVirtualiting => _IsVirtualizing;
 
+		[Bindable(false), Description("Gets whether the TabControl keybindings are ignored or not.")]
+		public bool IgnoreTabControlKeyBindings => _IgnoreTabControlKeyBindings;
 		#endregion properties
 
 		#region methods
@@ -263,5 +268,11 @@ namespace AvalonDock.Controls
 		}
 
 		#endregion methods
+
+		protected override void OnKeyDown(KeyEventArgs e)
+		{
+			if (!IgnoreTabControlKeyBindings) base.OnKeyDown(e); 
+			// Else: bypass all TabControl key processing
+		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -43,8 +43,9 @@ namespace AvalonDock.Controls
 		/// <summary>Class constructor from model and virtualization parameter.</summary>
 		/// <param name="model"></param>
 		/// <param name="IsVirtualizing">Whether tabbed items are virtualized or not.</param>
-		internal LayoutAnchorablePaneControl(LayoutAnchorablePane model, bool IsVirtualizing)
-			: base(IsVirtualizing)
+		/// <param name="ignoreTabControlKeyBindingBindings">Whether TabControl keybindings are ignored or not.</param>
+		internal LayoutAnchorablePaneControl(LayoutAnchorablePane model, bool IsVirtualizing, bool ignoreTabControlKeyBindingBindings = false)
+			: base(IsVirtualizing, ignoreTabControlKeyBindingBindings)
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));
 			SetBinding(ItemsSourceProperty, new Binding("Model.Children") { Source = this });

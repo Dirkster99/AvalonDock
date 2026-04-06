@@ -1400,6 +1400,22 @@ namespace AvalonDock
 
 		#endregion IsVirtualizingLayoutDocument IsVirtualizingLayoutAnchorable
 
+		#region IgnoreTabControlKeyBindings
+
+		/// <summary><see cref="IgnoreTabControlKeyBindings"/> dependency property.</summary>
+		public static readonly DependencyProperty IgnoreTabControlKeyBindingsProperty = DependencyProperty.Register(nameof(IgnoreTabControlKeyBindings), typeof(bool), typeof(DockingManager),
+					new FrameworkPropertyMetadata(null));
+
+		/// <summary>Gets/sets the <see cref="Style"/> to apply to a <see cref="LayoutDocumentItem"/> object.</summary>
+		[Bindable(true), Description("Gets/sets the Style to apply to a LayoutDocumentItem object."), Category("Layout")]
+		public bool IgnoreTabControlKeyBindings
+		{
+			get => (bool)GetValue(IgnoreTabControlKeyBindingsProperty);
+			set => SetValue(IgnoreTabControlKeyBindingsProperty, value);
+		}
+
+		#endregion IgnoreTabControlKeyBindings
+
 		#region AutoWindowSizeWhenOpened
 
 		/// <summary>
@@ -1679,7 +1695,7 @@ namespace AvalonDock
 
 			if (model is LayoutDocumentPane)
 			{
-				var templateModelView = new LayoutDocumentPaneControl(model as LayoutDocumentPane, IsVirtualizingDocument);
+				var templateModelView = new LayoutDocumentPaneControl(model as LayoutDocumentPane, IsVirtualizingDocument, IgnoreTabControlKeyBindings);
 				templateModelView.SetBinding(StyleProperty, new Binding(DocumentPaneControlStyleProperty.Name) { Source = this });
 				return templateModelView;
 			}

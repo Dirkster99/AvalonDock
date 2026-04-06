@@ -1,4 +1,4 @@
-﻿<Window
+<Window
 	x:Class="AvalonDock.MVVMTestApp.MainWindow"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -58,7 +58,8 @@
 			AllowAnchorDoubleClickDock="True"
        		AllowAnchorRightClickContextMenu="True"
 			DocumentsSource="{Binding Files}"
-			Theme="{Binding SelectedTheme.Item2}">
+			Theme="{Binding SelectedTheme.Item2}"
+			IgnoreTabControlKeyBindings="True">
 			<DockingManager.LayoutItemTemplateSelector>
 				<local:PanesTemplateSelector>
 					<local:PanesTemplateSelector.FileViewTemplate>

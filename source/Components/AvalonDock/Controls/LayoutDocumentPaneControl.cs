@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace AvalonDock.Controls
 {
@@ -45,8 +46,9 @@ namespace AvalonDock.Controls
 		/// <summary>Class constructor from model and virtualization parameter.</summary>
 		/// <param name="model"></param>
 		/// <param name="isVirtualizing">Whether tabbed items are virtualized or not.</param>
-		internal LayoutDocumentPaneControl(LayoutDocumentPane model, bool isVirtualizing)
-			: base(isVirtualizing)
+		/// <param name="ignoreTabControlKeyBindingBindings">Whether TabControl keybindings are ignored or not.</param>
+		internal LayoutDocumentPaneControl(LayoutDocumentPane model, bool isVirtualizing, bool ignoreTabControlKeyBindingBindings = false)
+			: base(isVirtualizing, ignoreTabControlKeyBindingBindings)
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));
 			SetBinding(ItemsSourceProperty, new Binding("Model.Children") { Source = this });
