@@ -25,3 +25,6 @@ tmp/
 *.user
 *.coverage
 /.vscode
+TestResults/
+nupkg/
+.nuget/

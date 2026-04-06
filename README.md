@@ -7,10 +7,10 @@
 | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2010.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010)          | [Dirkster.AvalonDock.Themes.VS2010](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010)
 | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2013.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013)          | [Dirkster.AvalonDock.Themes.VS2013](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013) (see [Wiki](https://github.com/Dirkster99/AvalonDock/wiki/WPF-VS-2013-Dark-Light-Demo-Client) )
 
-![Net4](https://badgen.net/badge/Framework/.Net&nbsp;4/blue) ![NetCore3](https://badgen.net/badge/Framework/NetCore&nbsp;3/blue) ![Net4](https://badgen.net/badge/Framework/.NET&nbsp;5/blue)
+![Net40](https://badgen.net/badge/Framework/.NET&nbsp;4.0/blue) ![Net452](https://badgen.net/badge/Framework/.NET&nbsp;4.5.2/blue) ![Net48](https://badgen.net/badge/Framework/.NET&nbsp;4.8/blue) ![NetCore3](https://badgen.net/badge/Framework/.NET&nbsp;Core&nbsp;3.0/blue) ![Net5](https://badgen.net/badge/Framework/.NET&nbsp;5/blue) ![Net9](https://badgen.net/badge/Framework/.NET&nbsp;9/blue) ![Net10](https://badgen.net/badge/Framework/.NET&nbsp;10/blue)
 
 ## Master Branch
-[![Build status](https://ci.appveyor.com/api/projects/status/kq2wyupx5hm7fok2/branch/master?svg=true)](https://ci.appveyor.com/project/Dirkster99/avalondock/branch/master)[![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)&nbsp;[Continuous Integration](https://ci.appveyor.com/project/Dirkster99/AvalonDock/build/artifacts)
+[![CI](https://github.com/Dirkster99/AvalonDock/actions/workflows/ci.yml/badge.svg)](https://github.com/Dirkster99/AvalonDock/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)
 
 <a href="https://github.com/Dirkster99/AvalonDock/issues">
     <img src="https://img.shields.io/github/issues-raw/Dirkster99/AvalonDock.svg?style=flat-square">
@@ -50,8 +50,16 @@ Be sure to checkout the <a href="https://github.com/Dirkster99/AvalonDock/wiki">
 
 ## Building AvalonDock from Source
 
-This project supports multitargeting frameworks (NetCore 3 and .Net 4). This means that it requires
-Visual Studio Community 2019 or better to build.
+This project targets **.NET 9**, **.NET 10**, and **.NET Framework 4.8**. You need:
+- Windows (WPF is Windows-only)
+- Visual Studio 2022 or later (recommended)
+
+```bash
+dotnet build source/AvalonDock.sln
+dotnet test source/AvalonDock.sln -m:1
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 # Feature Added - Dark and Light VS 2013 Theme
 
@@ -121,7 +129,7 @@ to also theme standard elements, such as, button and textblock etc.
 # Mile Stone History
 
 
-## Fixes and Features Added in Version 4.72.0
+## Fixes and Features Added in Version 4.72.1
 
 - [#436 Changed how the next active document is picked on document close.](https://github.com/Dirkster99/AvalonDock/pull/436) (thanx to [FredrikS fredriks123](https://github.com/fredriks123))
 - [#438 NullCheck for DragPoint](https://github.com/Dirkster99/AvalonDock/pull/438) (thanx to [Ben bbuerger](https://github.com/bbuerger))

@@ -1,0 +1,113 @@
+name: Release
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*']
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-test-publish:
+    name: Build, Test & Publish
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Determine version
+        id: version
+        shell: bash
+        run: |
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            # Stable release from tag
+            version="${GITHUB_REF#refs/tags/v}"
+            version_args="/p:Version=$version /p:PackageVersion=$version /p:AssemblyVersion=$version /p:FileVersion=$version"
+            is_release='true'
+            echo "Stable release: $version"
+          else
+            # Pre-release from master branch
+            version_suffix="preview.${{ github.run_number }}"
+            version_args="--version-suffix $version_suffix"
+            is_release='false'
+            echo "Pre-release with suffix: $version_suffix"
+          fi
+          echo "VERSION_ARGS=$version_args" >> $GITHUB_OUTPUT
+          echo "IS_RELEASE=$is_release" >> $GITHUB_OUTPUT
+
+      - name: Restore dependencies
+        run: dotnet restore source/AvalonDock.sln
+
+      - name: Build
+        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore ${{ steps.version.outputs.VERSION_ARGS }}
+
+      - name: Test
+        run: >
+          dotnet test source/AvalonDock.sln
+          --configuration Release
+          --no-build
+          --logger "trx;LogFilePrefix=test-results"
+          --results-directory TestResults
+          -m:1
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: test-results
+          path: TestResults/*.trx
+          retention-days: 14
+
+      - name: Pack NuGet packages
+        shell: bash
+        run: |
+          mkdir -p nupkg
+          
+          projects=(
+            "source/Components/AvalonDock/AvalonDock.csproj"
+            "source/Components/AvalonDock.Themes.Aero/AvalonDock.Themes.Aero.csproj"
+            "source/Components/AvalonDock.Themes.Metro/AvalonDock.Themes.Metro.csproj"
+            "source/Components/AvalonDock.Themes.Expression/AvalonDock.Themes.Expression.csproj"
+            "source/Components/AvalonDock.Themes.VS2010/AvalonDock.Themes.VS2010.csproj"
+            "source/Components/AvalonDock.Themes.VS2013/AvalonDock.Themes.VS2013.csproj"
+          )
+          
+          for project in "${projects[@]}"; do
+            echo "Packing: $project"
+            dotnet pack "$project" --configuration Release --no-build -o nupkg/ ${{ steps.version.outputs.VERSION_ARGS }}
+          done
+          
+          echo -e "\nCreated packages:"
+          ls -1 nupkg/*.nupkg
+
+      - name: Upload NuGet packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: nuget-packages
+          path: nupkg/*.nupkg
+          retention-days: 30
+
+      - name: Push to NuGet.org
+        shell: bash
+        run: |
+          dotnet nuget push nupkg/*.nupkg \
+          --api-key "${{ secrets.AVALONDOCK_APP_KEY }}" \
+          --source https://api.nuget.org/v3/index.json \
+          --skip-duplicate
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.IS_RELEASE == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: nupkg/*.nupkg

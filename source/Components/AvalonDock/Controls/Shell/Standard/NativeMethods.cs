@@ -11,6 +11,8 @@
     Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
+#pragma warning disable CS0169 // Field is never used
+#pragma warning disable SYSLIB0004
 namespace Standard
 {
 	using Microsoft.Win32.SafeHandles;
@@ -1362,7 +1364,13 @@ namespace Standard
 
 	internal sealed class SafeFindHandle : SafeHandleZeroOrMinusOneIsInvalid
 	{
+#if NET5_0_OR_GREATER
+#pragma warning disable SYSLIB0003 // SecurityPermissionAttribute is obsolete
+#endif
 		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+#if NET5_0_OR_GREATER
+#pragma warning restore SYSLIB0003
+#endif
 		private SafeFindHandle() : base(true) { }
 
 		/// <inheritdoc />
@@ -2779,8 +2787,7 @@ namespace Standard
 		public static IntPtr GetStockObject(StockObject fnObject)
 		{
 			var retPtr = _GetStockObject(fnObject);
-			if (retPtr == null) HRESULT.ThrowLastError();
-			return retPtr;
+            return retPtr;
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]

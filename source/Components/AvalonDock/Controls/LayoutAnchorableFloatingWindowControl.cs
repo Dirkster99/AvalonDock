@@ -208,11 +208,11 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnClosed(EventArgs e)
 		{
-			var root = Model.Root;
+			var root = Model?.Root;
 			if (root != null)
 			{
 				if (root is LayoutRoot layoutRoot) layoutRoot.Updated -= OnRootUpdated;
-				root.Manager.RemoveFloatingWindow(this);
+				root.Manager?.RemoveFloatingWindow(this);
 				root.CollectGarbage();
 			}
 			if (_overlayWindow != null)

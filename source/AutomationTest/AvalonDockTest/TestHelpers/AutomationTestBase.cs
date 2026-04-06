@@ -1,60 +1,78 @@
-﻿namespace AvalonDockTest.TestHelpers
+﻿using UnitTests;
+
+namespace AvalonDockTest.TestHelpers
 {
-	using Microsoft.VisualStudio.TestTools.UnitTesting;
-	using System;
-	using System.Diagnostics;
-	using System.Linq;
-	using System.Threading;
-	using System.Windows;
-	using System.Windows.Threading;
+    using NUnit.Framework;
+    using System;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Threading;
+    using System.Windows;
+    using System.Windows.Threading;
 
-	/// <summary>
-	/// This is the base class for all of our UI tests.
-	/// </summary>
-	[TestClass]
-	public class AutomationTestBase
-	{
-		public TestContext TestContext { get; set; }
+    /// <summary>
+    /// This is the base class for all of our UI tests.
+    /// </summary>
+    [TestFixture]
+    public abstract class AutomationTestBase
+    {
+        protected AutoResetEvent _are;
+        
+        [TearDown]
+        public void After()
+        {
+            ThreadExecutor.RunCodeAsSTA(
+                _are,
+                () =>
+                {
+                    Application.Current?.Dispatcher?.Invoke(() =>
+                    {
+                        var windows = Application.Current?.Windows?.OfType<Window>().ToList();
+                        if (windows == null)
+                        {
+                            return;
+                        }
+                        
+                        foreach (Window window in windows)
+                        {
+                            window.Close();
+                        }
+                    });
+                });
 
-		[TestInitialize]
-		public void Before()
-		{
-			var message = $"Setup for test '{this.TestContext.TestName}' with Thread.CurrentThread: {Thread.CurrentThread.ManagedThreadId}" +
-						  $" and Current.Dispatcher.Thread: {Application.Current.Dispatcher.Thread.ManagedThreadId}";
-			this.TestContext.WriteLine(message);
-		}
+            _are.WaitOne();
+        }
 
-		[TestCleanup]
-		public void After()
-		{
-			Application.Current.Invoke(() =>
-			{
-				var windows = Application.Current.Windows.OfType<Window>().ToList();
-				foreach (Window window in windows)
-				{
-					window.Close();
-				}
-			});
+        [OneTimeSetUp]
+        public void ApplicationInitialize()
+        {
+            _are = new AutoResetEvent(false);
+            ThreadExecutor.RunCodeAsSTA(
+                _are,
+                () =>
+                {
+                    Debug.WriteLine("OneTimeSetUp");
+                    TestHost.Initialize();
+                });
 
-			var message = $"TearDown for test '{this.TestContext.TestName}' with Thread.CurrentThread: {Thread.CurrentThread.ManagedThreadId}" +
-						  $" and Current.Dispatcher.Thread: {Application.Current.Dispatcher.Thread.ManagedThreadId}";
-			this.TestContext.WriteLine(message);
-		}
+            _are.WaitOne();
+        }
 
-		[AssemblyInitialize]
-		public static void ApplicationInitialize(TestContext testContext)
-		{
-			Debug.WriteLine("AssemblyInitialize");
-			TestHost.Initialize();
-		}
+        [OneTimeTearDown]
+        public void ApplicationCleanup()
+        {
+            ThreadExecutor.RunCodeAsSTA(
+                _are,
+                () =>
+                {
+                    GC.Collect();
+                    Dispatcher.ExitAllFrames();
+                    Application.Current.Dispatcher.Invoke(Application.Current.Shutdown);
+                    Debug.WriteLine("OneTimeTearDown");
+                });
 
-		[AssemblyCleanup]
-		public static void ApplicationCleanup()
-		{
-			GC.Collect();
-			Dispatcher.ExitAllFrames();
-			Application.Current.Dispatcher.Invoke(Application.Current.Shutdown);
-			Debug.WriteLine("AssemblyCleanup");
-		}
-	}
+            _are.WaitOne();
+            _are.Dispose();
+        }
+    }
 }
