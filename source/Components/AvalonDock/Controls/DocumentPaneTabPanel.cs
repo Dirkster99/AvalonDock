@@ -7,7 +7,6 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Linq;
 using System.Windows;
@@ -57,26 +56,10 @@ namespace AvalonDock.Controls
 			{
 				if (skipAllOthers || offset + doc.DesiredSize.Width > finalSize.Width)
 				{
-					bool isLayoutContentSelected = false;
-					var layoutContent = doc.Content as LayoutContent;
-
-					if (layoutContent != null)
-						isLayoutContentSelected = layoutContent.IsSelected;
-
-					if (isLayoutContentSelected && !doc.IsVisible)
-					{
-						var parentContainer = layoutContent.Parent as ILayoutContainer;
-						var parentSelector = layoutContent.Parent as ILayoutContentSelector;
-						var parentPane = layoutContent.Parent as ILayoutPane;
-						int contentIndex = parentSelector.IndexOf(layoutContent);
-						if (contentIndex > 0 &&
-							parentContainer.ChildrenCount > 1)
-						{
-							parentPane.MoveChild(contentIndex, 0);
-							parentSelector.SelectedContentIndex = 0;
-							return ArrangeOverride(finalSize);
-						}
-					}
+					// Original code called parentPane.MoveChild(contentIndex, 0) here when the
+					// selected tab overflowed. This corrupted the model order (moved selected tab
+					// to index 0) which then got serialized to XML, breaking tab order persistence
+					// across restarts. Removed — the tab header is simply hidden on overflow.
 					doc.Visibility = System.Windows.Visibility.Hidden;
 					skipAllOthers = true;
 				}
