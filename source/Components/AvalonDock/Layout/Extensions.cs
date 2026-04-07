@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -70,8 +70,8 @@ namespace AvalonDock.Layout
 				if (layoutPanel != null && layoutPanel.Children.Count > 0)
 				{
 					if (layoutPanel.Orientation == System.Windows.Controls.Orientation.Horizontal)
-						return layoutPanel.Children[0].Equals(element) || layoutPanel.Children[0].Descendents().Contains(element) ? AnchorSide.Left : AnchorSide.Right;
-					return layoutPanel.Children[0].Equals(element) || layoutPanel.Children[0].Descendents().Contains(element) ? AnchorSide.Top : AnchorSide.Bottom;
+						return element.IsInAnchorablePaneAtStartOfPanel(layoutPanel) ? AnchorSide.Left : AnchorSide.Right;
+					return element.IsInAnchorablePaneAtStartOfPanel(layoutPanel) ? AnchorSide.Top : AnchorSide.Bottom;
 				}
 			}
 			Debug.Fail("Unable to find the side for an element, possible layout problem!");
@@ -114,6 +114,24 @@ namespace AvalonDock.Layout
 				paneInsideFloatingWindow.FloatingTop = monitorInfo.Work.Top + 10;
 			if (paneInsideFloatingWindow.FloatingTop + paneInsideFloatingWindow.FloatingHeight > monitorInfo.Work.Bottom)
 				paneInsideFloatingWindow.FloatingTop = monitorInfo.Work.Bottom - (paneInsideFloatingWindow.FloatingHeight + 10);
+		}
+
+		private static bool IsInAnchorablePaneAtStartOfPanel(this ILayoutElement element, LayoutPanel layoutPanel)
+		{
+			foreach (var child in layoutPanel.Children)
+			{
+				if (!(child is LayoutAnchorablePane || child is LayoutAnchorablePaneGroup))
+				{
+					return false;
+				}
+
+				if (child.Equals(element) || child.Descendents().Contains(element))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		#endregion Internal Methods

@@ -1,233 +1,266 @@
+using UnitTests;
+
 namespace AvalonDockTest
 {
-	using Microsoft.VisualStudio.TestTools.UnitTesting;
-	using Microsoft.VisualStudio.TestTools.UnitTesting.STAExtensions;
-	using System.Threading.Tasks;
-	using AvalonDock.Layout;
-	using AvalonDockTest.TestHelpers;
-	using AvalonDockTest.views;
-	using AvalonDock;
-	using System.Collections.Generic;
-	using System.Linq;
-	using AvalonDock.Controls;
+    using NUnit.Framework;
+    using System.Threading.Tasks;
+    using AvalonDock.Layout;
+    using TestHelpers;
+    using AvalonDockTest.views;
+    using AvalonDock;
+    using System.Collections.Generic;
+    using System.Linq;
 
-	[STATestClass]
-	public class AnchorablePaneTest : AutomationTestBase
-	{
-		[STATestMethod]
-		public void AnchorablePaneHideCloseTest()
-		{
-			TestHost.SwitchToAppThread();
+    [TestFixture]
+    [Apartment(System.Threading.ApartmentState.STA)]
+    public class AnchorablePaneTest : AutomationTestBase
+    {
+        [Test]
+        public void AnchorablePaneHideCloseTest()
+        {
+            ThreadExecutor.RunCodeAsSTA(
+                _are,
+                () =>
+                {
+                    TestHost.SwitchToAppThread();
 
-			Task<AnchorablePaneTestWindow> taskResult = WindowHelpers.CreateInvisibleWindowAsync<AnchorablePaneTestWindow>();
+                    Task<AnchorablePaneTestWindow> taskResult =
+                        WindowHelpers.CreateInvisibleWindowAsync<AnchorablePaneTestWindow>();
 
-			taskResult.Wait();
+                    taskResult.Wait();
 
-			AnchorablePaneTestWindow windows = taskResult.Result;
+                    AnchorablePaneTestWindow windows = taskResult.Result;
 
-			ILayoutContainer expectedContainer = windows.Screen3.Parent;
-			windows.Screen3.Hide();
-			Assert.IsTrue(windows.Screen3.IsHidden);
-			windows.Screen2.Close();
-			windows.Screen3.Show();
-			Assert.IsFalse(windows.Screen3.IsHidden);
-			ILayoutContainer actualContainer = windows.Screen3.Parent;
-			Assert.AreEqual(expectedContainer, actualContainer);
-		}
+                    ILayoutContainer expectedContainer = windows.Screen3.Parent;
+                    windows.Screen3.Hide();
+                    Assert.IsTrue(windows.Screen3.IsHidden);
+                    windows.Screen2.Close();
+                    windows.Screen3.Show();
+                    Assert.IsFalse(windows.Screen3.IsHidden);
+                    ILayoutContainer actualContainer = windows.Screen3.Parent;
+                    Assert.AreEqual(expectedContainer, actualContainer);
+                });
 
-		[STATestMethod]
-		public void AnchorablePaneHideCloseEventsFiredTest()
-		{
-			// Create the window with 2 LayoutAnchorable items
+            _are.WaitOne();
+        }
 
-			TestHost.SwitchToAppThread();
+        [Test]
+        public void AnchorablePaneHideCloseEventsFiredTest()
+        {
+            ThreadExecutor.RunCodeAsSTA(
+                _are,
+                () =>
+                {
+                    // Create the window with 2 LayoutAnchorable items
 
-			Task<AnchorablePaneTestWindow> taskResult = WindowHelpers.CreateInvisibleWindowAsync<AnchorablePaneTestWindow>();
+                    TestHost.SwitchToAppThread();
 
-			taskResult.Wait();
+                    Task<AnchorablePaneTestWindow> taskResult =
+                        WindowHelpers.CreateInvisibleWindowAsync<AnchorablePaneTestWindow>();
 
-			AnchorablePaneTestWindow windows = taskResult.Result;
-			DockingManager dockingManager = windows.dockingManager;
+                    taskResult.Wait();
 
-			// These lists hold a record of the anchorable hide and close events
+                    AnchorablePaneTestWindow windows = taskResult.Result;
+                    DockingManager dockingManager = windows.dockingManager;
 
-			List<LayoutAnchorable> isHidingRaised = new List<LayoutAnchorable>();
-			List<LayoutAnchorable> isHiddenRaised = new List<LayoutAnchorable>();
-			List<LayoutAnchorable> isClosingRaised = new List<LayoutAnchorable>();
-			List<LayoutAnchorable> isClosedRaised = new List<LayoutAnchorable>();
+                    // These lists hold a record of the anchorable hide and close events
 
-			// Event handlers for the hide and close events
+                    List<LayoutAnchorable> isHidingRaised = new List<LayoutAnchorable>();
+                    List<LayoutAnchorable> isHiddenRaised = new List<LayoutAnchorable>();
+                    List<LayoutAnchorable> isClosingRaised = new List<LayoutAnchorable>();
+                    List<LayoutAnchorable> isClosedRaised = new List<LayoutAnchorable>();
 
-			dockingManager.AnchorableClosing += (s, e) => isClosingRaised.Add(e.Anchorable);
-			dockingManager.AnchorableClosed += (s, e) => isClosedRaised.Add(e.Anchorable);
-			dockingManager.AnchorableHiding += (s, e) => isHidingRaised.Add(e.Anchorable);
-			dockingManager.AnchorableHidden += (s, e) => isHiddenRaised.Add(e.Anchorable);
+                    // Event handlers for the hide and close events
 
-			// Ensure the items can be hidden and closed
-			windows.Screen2.CanHide = true;
-			windows.Screen3.CanHide = true;
-			windows.Screen2.CanClose = true;
-			windows.Screen3.CanClose = true;
+                    dockingManager.AnchorableClosing += (s, e) => isClosingRaised.Add(e.Anchorable);
+                    dockingManager.AnchorableClosed += (s, e) => isClosedRaised.Add(e.Anchorable);
+                    dockingManager.AnchorableHiding += (s, e) => isHidingRaised.Add(e.Anchorable);
+                    dockingManager.AnchorableHidden += (s, e) => isHiddenRaised.Add(e.Anchorable);
 
-			// Hide item3
+                    // Ensure the items can be hidden and closed
+                    windows.Screen2.CanHide = true;
+                    windows.Screen3.CanHide = true;
+                    windows.Screen2.CanClose = true;
+                    windows.Screen3.CanClose = true;
 
-			windows.Screen3.Hide();
+                    // Hide item3
 
-			// Ensure only item3 is hidden, and check the correct events were fired
+                    windows.Screen3.Hide();
 
-			Assert.IsFalse(windows.Screen2.IsHidden);
-			Assert.IsTrue(windows.Screen3.IsHidden);
-			Assert.AreEqual(1, isHidingRaised.Count);
-			Assert.AreEqual(1, isHiddenRaised.Count);
-			Assert.AreEqual(0, isClosingRaised.Count);
-			Assert.AreEqual(0, isClosedRaised.Count);
+                    // Ensure only item3 is hidden, and check the correct events were fired
 
-			Assert.AreEqual(windows.Screen3, isHidingRaised.First());
-			Assert.AreEqual(windows.Screen3, isHiddenRaised.First());
+                    Assert.IsFalse(windows.Screen2.IsHidden);
+                    Assert.IsTrue(windows.Screen3.IsHidden);
+                    Assert.AreEqual(1, isHidingRaised.Count);
+                    Assert.AreEqual(1, isHiddenRaised.Count);
+                    Assert.AreEqual(0, isClosingRaised.Count);
+                    Assert.AreEqual(0, isClosedRaised.Count);
 
-			isHidingRaised.Clear();
-			isHiddenRaised.Clear();
+                    Assert.AreEqual(windows.Screen3, isHidingRaised.First());
+                    Assert.AreEqual(windows.Screen3, isHiddenRaised.First());
 
-			// Close item2
+                    isHidingRaised.Clear();
+                    isHiddenRaised.Clear();
 
-			windows.Screen2.Close();
+                    // Close item2
 
-			// Check the correct events were fired
+                    windows.Screen2.Close();
 
-			Assert.AreEqual(0, isHidingRaised.Count);
-			Assert.AreEqual(0, isHiddenRaised.Count);
-			Assert.AreEqual(1, isClosingRaised.Count);
-			Assert.AreEqual(1, isClosedRaised.Count);
+                    // Check the correct events were fired
 
-			Assert.AreEqual(windows.Screen2, isClosingRaised.First());
-			Assert.AreEqual(windows.Screen2, isClosedRaised.First());
-		}
+                    Assert.AreEqual(0, isHidingRaised.Count);
+                    Assert.AreEqual(0, isHiddenRaised.Count);
+                    Assert.AreEqual(1, isClosingRaised.Count);
+                    Assert.AreEqual(1, isClosedRaised.Count);
 
-		[STATestMethod]
-		public void AnchorablePaneHideCloseEventsCancelledTest()
-		{
-			// Create the window with 2 LayoutAnchorable items
+                    Assert.AreEqual(windows.Screen2, isClosingRaised.First());
+                    Assert.AreEqual(windows.Screen2, isClosedRaised.First());
+                });
 
-			TestHost.SwitchToAppThread();
+            _are.WaitOne();
+        }
 
-			Task<AnchorablePaneTestWindow> taskResult = WindowHelpers.CreateInvisibleWindowAsync<AnchorablePaneTestWindow>();
+        [Test]
+        public void AnchorablePaneHideCloseEventsCancelledTest()
+        {
+            ThreadExecutor.RunCodeAsSTA(
+                _are,
+                () =>
+                {
+                    // Create the window with 2 LayoutAnchorable items
+                    TestHost.SwitchToAppThread();
 
-			taskResult.Wait();
+                    Task<AnchorablePaneTestWindow> taskResult =
+                        WindowHelpers.CreateInvisibleWindowAsync<AnchorablePaneTestWindow>();
 
-			AnchorablePaneTestWindow windows = taskResult.Result;
-			DockingManager dockingManager = windows.dockingManager;
+                    taskResult.Wait();
 
-			// These lists hold a record of the anchorable hide and close events
+                    AnchorablePaneTestWindow windows = taskResult.Result;
+                    DockingManager dockingManager = windows.dockingManager;
 
-			List<LayoutAnchorable> isHidingRaised = new List<LayoutAnchorable>();
-			List<LayoutAnchorable> isHiddenRaised = new List<LayoutAnchorable>();
-			List<LayoutAnchorable> isClosingRaised = new List<LayoutAnchorable>();
-			List<LayoutAnchorable> isClosedRaised = new List<LayoutAnchorable>();
 
-			// Event handlers for the hide and close events
+                    // These lists hold a record of the anchorable hide and close events
 
-			dockingManager.AnchorableClosing += (s, e) =>
-			{
-				e.Cancel = true;
-				isClosingRaised.Add(e.Anchorable);
-			};
-			dockingManager.AnchorableClosed += (s, e) => isClosedRaised.Add(e.Anchorable);
-			dockingManager.AnchorableHiding += (s, e) =>
-			{
-				e.Cancel = true;
-				isHidingRaised.Add(e.Anchorable);
-			};
-			dockingManager.AnchorableHidden += (s, e) => isHiddenRaised.Add(e.Anchorable);
+                    List<LayoutAnchorable> isHidingRaised = new List<LayoutAnchorable>();
+                    List<LayoutAnchorable> isHiddenRaised = new List<LayoutAnchorable>();
+                    List<LayoutAnchorable> isClosingRaised = new List<LayoutAnchorable>();
+                    List<LayoutAnchorable> isClosedRaised = new List<LayoutAnchorable>();
 
-			// Ensure the items can be hidden and closed
-			windows.Screen2.CanHide = true;
-			windows.Screen3.CanHide = true;
-			windows.Screen2.CanClose = true;
-			windows.Screen3.CanClose = true;
+                    // Event handlers for the hide and close events
 
-			// Hide Screen3
+                    dockingManager.AnchorableClosing += (s, e) =>
+                    {
+                        e.Cancel = true;
+                        isClosingRaised.Add(e.Anchorable);
+                    };
+                    dockingManager.AnchorableClosed += (s, e) => isClosedRaised.Add(e.Anchorable);
+                    dockingManager.AnchorableHiding += (s, e) =>
+                    {
+                        e.Cancel = true;
+                        isHidingRaised.Add(e.Anchorable);
+                    };
+                    dockingManager.AnchorableHidden += (s, e) => isHiddenRaised.Add(e.Anchorable);
 
-			windows.Screen3.Hide();
+                    // Ensure the items can be hidden and closed
+                    windows.Screen2.CanHide = true;
+                    windows.Screen3.CanHide = true;
+                    windows.Screen2.CanClose = true;
+                    windows.Screen3.CanClose = true;
 
-			// Ensure nothing was hidden but cancelled instead, and check the correct events were fired
+                    // Hide Screen3
 
-			Assert.IsFalse(windows.Screen2.IsHidden);
-			Assert.IsFalse(windows.Screen3.IsHidden);
-			Assert.AreEqual(1, isHidingRaised.Count);
-			Assert.AreEqual(0, isHiddenRaised.Count);
-			Assert.AreEqual(0, isClosingRaised.Count);
-			Assert.AreEqual(0, isClosedRaised.Count);
+                    windows.Screen3.Hide();
 
-			Assert.AreEqual(windows.Screen3, isHidingRaised.First());
+                    // Ensure nothing was hidden but cancelled instead, and check the correct events were fired
 
-			isHidingRaised.Clear();
+                    Assert.IsFalse(windows.Screen2.IsHidden);
+                    Assert.IsFalse(windows.Screen3.IsHidden);
+                    Assert.AreEqual(1, isHidingRaised.Count);
+                    Assert.AreEqual(0, isHiddenRaised.Count);
+                    Assert.AreEqual(0, isClosingRaised.Count);
+                    Assert.AreEqual(0, isClosedRaised.Count);
 
-			// Close Screen2
+                    Assert.AreEqual(windows.Screen3, isHidingRaised.First());
 
-			windows.Screen2.Close();
+                    isHidingRaised.Clear();
 
-			// Ensure nothing was closed, and check the correct events were fired
+                    // Close Screen2
 
-			Assert.AreEqual(0, isHidingRaised.Count);
-			Assert.AreEqual(0, isHiddenRaised.Count);
-			Assert.AreEqual(1, isClosingRaised.Count);
-			Assert.AreEqual(0, isClosedRaised.Count);
+                    windows.Screen2.Close();
 
-			Assert.AreEqual(windows.Screen2, isClosingRaised.First());
-		}
+                    // Ensure nothing was closed, and check the correct events were fired
 
-		[STATestMethod]
-		public void AnchorablePaneHideEventRedirectTest()
-		{
-			// Create the window with 2 LayoutAnchorable items
+                    Assert.AreEqual(0, isHidingRaised.Count);
+                    Assert.AreEqual(0, isHiddenRaised.Count);
+                    Assert.AreEqual(1, isClosingRaised.Count);
+                    Assert.AreEqual(0, isClosedRaised.Count);
 
-			TestHost.SwitchToAppThread();
+                    Assert.AreEqual(windows.Screen2, isClosingRaised.First());
+                });
 
-			Task<AnchorablePaneTestWindow> taskResult = WindowHelpers.CreateInvisibleWindowAsync<AnchorablePaneTestWindow>();
+            _are.WaitOne();
+        }
 
-			taskResult.Wait();
+        [Test]
+        public void AnchorablePaneHideEventRedirectTest()
+        {
+            ThreadExecutor.RunCodeAsSTA(
+                _are,
+                () =>
+                {
+                    // Create the window with 2 LayoutAnchorable items
 
-			AnchorablePaneTestWindow windows = taskResult.Result;
-			DockingManager dockingManager = windows.dockingManager;
+                    //TestHost.SwitchToAppThread();
 
-			// These lists hold a record of the anchorable hide and close events
+                    Task<AnchorablePaneTestWindow> taskResult =
+                        WindowHelpers.CreateInvisibleWindowAsync<AnchorablePaneTestWindow>();
 
-			List<LayoutAnchorable> isHidingRaised = new List<LayoutAnchorable>();
-			List<LayoutAnchorable> isHiddenRaised = new List<LayoutAnchorable>();
-			List<LayoutAnchorable> isClosingRaised = new List<LayoutAnchorable>();
-			List<LayoutAnchorable> isClosedRaised = new List<LayoutAnchorable>();
+                    taskResult.Wait();
 
-			// Event handlers for the hide and close events
+                    AnchorablePaneTestWindow windows = taskResult.Result;
+                    DockingManager dockingManager = windows.dockingManager;
 
-			dockingManager.AnchorableClosing += (s, e) => isClosingRaised.Add(e.Anchorable);
-			dockingManager.AnchorableClosed += (s, e) => isClosedRaised.Add(e.Anchorable);
-			dockingManager.AnchorableHiding += (s, e) =>
-			{
-				e.CloseInsteadOfHide = true;
-				isHidingRaised.Add(e.Anchorable);
-			};
-			dockingManager.AnchorableHidden += (s, e) => isHiddenRaised.Add(e.Anchorable);
+                    // These lists hold a record of the anchorable hide and close events
 
-			// Ensure the Screen3 can be hidden and closed
-			windows.Screen3.CanHide = true;
-			windows.Screen3.CanClose = true;
+                    List<LayoutAnchorable> isHidingRaised = new List<LayoutAnchorable>();
+                    List<LayoutAnchorable> isHiddenRaised = new List<LayoutAnchorable>();
+                    List<LayoutAnchorable> isClosingRaised = new List<LayoutAnchorable>();
+                    List<LayoutAnchorable> isClosedRaised = new List<LayoutAnchorable>();
 
-			// Hide Screen3
+                    // Event handlers for the hide and close events
 
-			windows.Screen3.Hide();
+                    dockingManager.AnchorableClosing += (s, e) => isClosingRaised.Add(e.Anchorable);
+                    dockingManager.AnchorableClosed += (s, e) => isClosedRaised.Add(e.Anchorable);
+                    dockingManager.AnchorableHiding += (s, e) =>
+                    {
+                        e.CloseInsteadOfHide = true;
+                        isHidingRaised.Add(e.Anchorable);
+                    };
+                    dockingManager.AnchorableHidden += (s, e) => isHiddenRaised.Add(e.Anchorable);
 
-			// Ensure nothing was hidden but cancelled instead, and check the correct events were fired
+                    // Ensure the Screen3 can be hidden and closed
+                    windows.Screen3.CanHide = true;
+                    windows.Screen3.CanClose = true;
 
-			Assert.IsFalse(windows.Screen2.IsHidden);
-			Assert.IsFalse(windows.Screen3.IsHidden);
-			Assert.AreEqual(1, isHidingRaised.Count);
-			Assert.AreEqual(0, isHiddenRaised.Count);
-			Assert.AreEqual(1, isClosingRaised.Count);
-			Assert.AreEqual(1, isClosedRaised.Count);
+                    // Hide Screen3
 
-			Assert.AreEqual(windows.Screen3, isHidingRaised.First());
-			Assert.AreEqual(windows.Screen3, isClosingRaised.First());
-			Assert.AreEqual(windows.Screen3, isClosedRaised.First());
-		}
-	}
+                    windows.Screen3.Hide();
+
+                    // Ensure nothing was hidden but cancelled instead, and check the correct events were fired
+
+                    Assert.IsFalse(windows.Screen2.IsHidden);
+                    Assert.IsFalse(windows.Screen3.IsHidden);
+                    Assert.AreEqual(1, isHidingRaised.Count);
+                    Assert.AreEqual(0, isHiddenRaised.Count);
+                    Assert.AreEqual(1, isClosingRaised.Count);
+                    Assert.AreEqual(1, isClosedRaised.Count);
+
+                    Assert.AreEqual(windows.Screen3, isHidingRaised.First());
+                    Assert.AreEqual(windows.Screen3, isClosingRaised.First());
+                    Assert.AreEqual(windows.Screen3, isClosedRaised.First());
+                });
+
+            _are.WaitOne();
+        }
+    }
 }

@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore source/AvalonDock.sln
+
+      - name: Build
+        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore
+
+      - name: Test (Unit Tests)
+        run: >
+          dotnet test source/AvalonDock.sln
+          --configuration Release
+          --no-restore
+          --filter "Category!=FlaUI"
+          --logger "trx;LogFilePrefix=unit-test-results"
+          --results-directory TestResults
+          -m:1
+
+      - name: Test (FlaUI UI Tests)
+        run: >
+          dotnet test source/AvalonDock.sln
+          --configuration Release
+          --no-restore
+          --filter "Category=FlaUI"
+          --framework net10.0-windows
+          --logger "trx;LogFilePrefix=flaui-test-results"
+          --results-directory TestResults
+          -m:1
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: test-results
+          path: TestResults/*.trx
+          retention-days: 14

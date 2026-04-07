@@ -55,6 +55,8 @@
 			Grid.Row="1"
 			ActiveContent="{Binding ActiveDocument, Mode=TwoWay, Converter={StaticResource ActiveDocumentConverter}}"
 			AnchorablesSource="{Binding Tools}"
+			AllowAnchorDoubleClickDock="True"
+       		AllowAnchorRightClickContextMenu="True"
 			DocumentsSource="{Binding Files}"
 			Theme="{Binding SelectedTheme.Item2}">
 			<DockingManager.LayoutItemTemplateSelector>

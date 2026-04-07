@@ -518,8 +518,10 @@ namespace AvalonDock.Controls
 		}
 
 		/// <inheritdoc cref="IOverlayWindow"/>
-		void IOverlayWindow.DragEnter(IDropArea area)
-		{
+#pragma warning disable CA1502
+        void IOverlayWindow.DragEnter(IDropArea area)
+#pragma warning restore CA1502
+        {
 			var floatingWindowManager = _floatingWindow.Model.Root.Manager;
 
 			_visibleAreas.Add(area);

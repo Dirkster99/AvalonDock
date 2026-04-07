@@ -1,18 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
     <PropertyGroup>
         <RootNamespace>TestApp</RootNamespace>
-        <TargetFrameworks>netcoreapp3.0;net5.0-windows;net40</TargetFrameworks>
+        <TargetFrameworks>net9.0-windows;net48</TargetFrameworks>
         <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
         <ApplicationIcon />
         <OutputType>WinExe</OutputType>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <StartupObject />
         <AssemblyName>TestApp</AssemblyName>
+        <!-- Sample app: allow warnings -->
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
        </PropertyGroup>
     <ItemGroup>
         <Resource Include="**\*.png" />
     </ItemGroup>
+    <PropertyGroup>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
     <ItemGroup>
       <ProjectReference Include="..\Components\AvalonDock.Themes.VS2010\AvalonDock.Themes.VS2010.csproj" />
       <ProjectReference Include="..\Components\AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj" />

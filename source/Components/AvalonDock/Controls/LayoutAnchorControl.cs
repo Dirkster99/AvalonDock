@@ -12,6 +12,8 @@ using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace AvalonDock.Controls
@@ -131,6 +133,45 @@ namespace AvalonDock.Controls
 			{
 				_model.Root.Manager.ShowAutoHideWindow(this);
 				_model.IsActive = true;
+			}
+		}
+
+		/// <summary>
+		/// Handles double-click to toggle auto-hide (dock/pin the anchorable).
+		/// </summary>
+		protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
+		{
+			base.OnMouseDoubleClick(e);
+
+			if (!e.Handled && e.ChangedButton == MouseButton.Left
+				&& _model.Root.Manager.AllowAnchorDoubleClickDock)
+			{
+				_model.Root.Manager.ExecuteAutoHideCommand(_model);
+				e.Handled = true;
+			}
+		}
+
+		/// <summary>
+		/// Handles right-click to show the anchorable context menu (Float, Dock, Auto Hide, etc.).
+		/// </summary>
+		protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
+		{
+			base.OnMouseRightButtonUp(e);
+
+			if (!e.Handled)
+			{
+				var manager = _model.Root?.Manager;
+				if (manager == null || !manager.AllowAnchorRightClickContextMenu) return;
+
+				var layoutItem = manager.GetLayoutItemFromModel(_model);
+				var contextMenu = manager.AnchorableContextMenu;
+				if (contextMenu == null || layoutItem == null) return;
+
+				contextMenu.PlacementTarget = this;
+				contextMenu.Placement = PlacementMode.MousePoint;
+				contextMenu.DataContext = layoutItem;
+				contextMenu.IsOpen = true;
+				e.Handled = true;
 			}
 		}
 

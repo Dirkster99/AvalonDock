@@ -59,7 +59,7 @@ namespace AvalonDock.Controls
 
 		public static Point TransformToDeviceDPI(this Visual visual, Point pt)
 		{
-			var compositionTarget = PresentationSource.FromVisual(visual).CompositionTarget;
+			var compositionTarget = PresentationSource.FromVisual(visual)?.CompositionTarget ?? null;
 			if (compositionTarget == null)
 				return default;
 			Matrix m = compositionTarget.TransformToDevice;
