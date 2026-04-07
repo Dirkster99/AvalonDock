@@ -2010,7 +2010,7 @@ namespace AvalonDock
 				AnchorableHidden?.Invoke(this, new AnchorableHiddenEventArgs(model));
 		}
 
-		internal void ExecuteAutoHideCommand(LayoutAnchorable _anchorable) => _anchorable.ToggleAutoHide();
+		internal virtual void ExecuteAutoHideCommand(LayoutAnchorable _anchorable) => _anchorable.ToggleAutoHide();
 
 		/// <summary>
 		/// Method executes when the user clicks the Float button in the context menu of an <see cref="LayoutAnchorable"/>.

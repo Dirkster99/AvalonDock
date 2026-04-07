@@ -70,15 +70,61 @@ namespace AvalonDock
 
 			// Refresh button states
 			RefreshButtonStates();
+
+			// Update pin buttons to show "Minimize" tooltip after layout settles
+			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
+				new System.Action(UpdatePinButtonsToMinimize));
 		}
 
 		#endregion Public Methods
+
+		#region Internal Methods
+
+		/// <summary>
+		/// Overrides the pin/auto-hide button behavior. In toggle mode, the pin button
+		/// acts as a "minimize" button that sends the anchorable back to the sidebar.
+		/// </summary>
+		internal override void ExecuteAutoHideCommand(LayoutAnchorable anchorable)
+		{
+			if (anchorable == null) return;
+
+			// Determine which section this anchorable belongs to
+			var section = GetAnchorableSection(anchorable);
+
+			// Use the toggle logic (which handles exclusive activation and button state refresh)
+			ToggleAnchorable(anchorable, section);
+		}
+
+		#endregion Internal Methods
 
 		#region Private Methods
 
 		private void ToggleDockingManager_Loaded(object sender, RoutedEventArgs e)
 		{
 			SetupToggleDockButtonBars();
+		}
+
+		private void UpdatePinButtonsToMinimize()
+		{
+			var pinButtons = FindVisualChildren<System.Windows.Controls.Button>(this)
+				.Where(b => b.Name == "PART_AutoHidePin");
+
+			foreach (var pin in pinButtons)
+			{
+				pin.ToolTip = "Minimize";
+			}
+		}
+
+		private static System.Collections.Generic.IEnumerable<T> FindVisualChildren<T>(DependencyObject parent) where T : DependencyObject
+		{
+			if (parent == null) yield break;
+			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+			{
+				var child = VisualTreeHelper.GetChild(parent, i);
+				if (child is T t) yield return t;
+				foreach (var c in FindVisualChildren<T>(child))
+					yield return c;
+			}
 		}
 
 		private void SetupToggleDockButtonBars()
@@ -221,6 +267,33 @@ namespace AvalonDock
 				if (item is ToggleDockButton btn && btn.Anchorable != null)
 					btn.IsChecked = !btn.Anchorable.IsAutoHidden;
 			}
+		}
+
+		/// <summary>Determines which sidebar section an anchorable belongs to by checking button bars.</summary>
+		private AnchorSide GetAnchorableSection(LayoutAnchorable anchorable)
+		{
+			if (ContainsAnchorable(_leftTopButtonBar, anchorable)) return AnchorSide.Left;
+			if (ContainsAnchorable(_rightTopButtonBar, anchorable)) return AnchorSide.Right;
+			if (ContainsAnchorable(_leftBottomButtonBar, anchorable)) return AnchorSide.Bottom;
+
+			// Fallback: infer from current layout position
+			if (anchorable.Parent is LayoutAnchorablePane pane)
+				return pane.GetSide();
+			if (anchorable.Parent is LayoutAnchorGroup group && group.Parent is LayoutAnchorSide side)
+				return side.Side;
+
+			return AnchorSide.Left;
+		}
+
+		private static bool ContainsAnchorable(ToggleDockButtonBar bar, LayoutAnchorable anchorable)
+		{
+			if (bar == null) return false;
+			foreach (var item in bar.Items)
+			{
+				if (item is ToggleDockButton btn && btn.Anchorable == anchorable)
+					return true;
+			}
+			return false;
 		}
 
 		#endregion Private Methods

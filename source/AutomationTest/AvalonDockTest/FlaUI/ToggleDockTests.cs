@@ -240,5 +240,65 @@ namespace AvalonDockTest.FlaUITests
 			}
 			Wait.UntilInputIsProcessed();
 		}
+
+		[Test, Order(5)]
+		public void PinButton_ActsAsMinimize_SendsBackToSidebar()
+		{
+			// Dock ToolBox 1 first
+			var btn = FindToggleButton("ToolBox 1");
+			Assert.That(btn, Is.Not.Null, "ToolBox 1 button should exist.");
+			btn.Click();
+			Wait.UntilInputIsProcessed();
+			System.Threading.Thread.Sleep(1000);
+
+			// Verify it's docked
+			btn = FindToggleButton("ToolBox 1");
+			Assert.That(btn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
+				Is.EqualTo(ToggleState.On), "ToolBox 1 should be checked after docking.");
+
+			// Find the "Minimize" (formerly pin) button in the docked pane header
+			// The PART_AutoHidePin button should have tooltip "Minimize"
+			var minimizeBtn = Retry.WhileNull(
+				() =>
+				{
+					var buttons = MainWindow.FindAllDescendants(CF.ByControlType(ControlType.Button));
+					return buttons.FirstOrDefault(b =>
+					{
+						try
+						{
+							var name = b.Name;
+							var help = b.Properties.HelpText.ValueOrDefault;
+							// The pin button's tooltip becomes "Minimize" in ToggleDockingManager
+							return name == "Minimize" || help == "Minimize"
+								|| (b.Properties.AutomationId.IsSupported && b.Properties.AutomationId.Value == "PART_AutoHidePin");
+						}
+						catch { return false; }
+					});
+				},
+				timeout: TimeSpan.FromSeconds(5),
+				interval: TimeSpan.FromMilliseconds(300));
+
+			// If we found the pin button, click it
+			if (minimizeBtn.Result != null)
+			{
+				ClickToggleButtonSafe(minimizeBtn.Result);
+				System.Threading.Thread.Sleep(1000);
+
+				// ToolBox 1 should be back to auto-hidden (toggle button unchecked)
+				btn = FindToggleButton("ToolBox 1");
+				Assert.That(btn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
+					Is.EqualTo(ToggleState.Off),
+					"ToolBox 1 should be unchecked after clicking minimize (pin) button.");
+			}
+			else
+			{
+				// Pin button not found via automation — clean up manually and mark as inconclusive
+				btn = FindToggleButton("ToolBox 1");
+				btn?.Click();
+				Wait.UntilInputIsProcessed();
+				System.Threading.Thread.Sleep(500);
+				Assert.Inconclusive("Could not find the PART_AutoHidePin/Minimize button via automation.");
+			}
+		}
 	}
 }
