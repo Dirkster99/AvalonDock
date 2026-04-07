@@ -622,6 +622,117 @@ namespace AvalonDock.Layout
 			#endregion Anchorable is docked
 		}
 
+		/// <summary>
+		/// Toggles only THIS anchorable between auto-hidden and docked states,
+		/// without affecting other anchorables in the same pane/group.
+		/// Used by <see cref="ToggleDockingManager"/> for per-anchorable toggle behavior.
+		/// </summary>
+		public void ToggleSingleAutoHide()
+		{
+			if (IsAutoHidden)
+			{
+				// Move from LayoutAnchorGroup back to a docked pane (same logic as ToggleAutoHide for single item)
+				var parentGroup = Parent as LayoutAnchorGroup;
+				if (parentGroup == null) return;
+				var parentSide = parentGroup.Parent as LayoutAnchorSide;
+				if (parentSide == null) return;
+
+				var previousContainer = ((ILayoutPreviousContainer)parentGroup).PreviousContainer as LayoutAnchorablePane;
+				if (previousContainer == null)
+				{
+					var side = parentSide.Side;
+					previousContainer = new LayoutAnchorablePane
+					{
+						DockMinWidth = AutoHideMinWidth,
+						DockMinHeight = AutoHideMinHeight
+					};
+
+					switch (side)
+					{
+						case AnchorSide.Right:
+							if (parentGroup.Root.RootPanel.Orientation == Orientation.Horizontal)
+								parentGroup.Root.RootPanel.Children.Add(previousContainer);
+							else
+							{
+								var panel = new LayoutPanel { Orientation = Orientation.Horizontal };
+								var root = parentGroup.Root as LayoutRoot;
+								var oldRootPanel = parentGroup.Root.RootPanel;
+								root.RootPanel = panel;
+								panel.Children.Add(oldRootPanel);
+								panel.Children.Add(previousContainer);
+							}
+							break;
+						case AnchorSide.Left:
+							if (parentGroup.Root.RootPanel.Orientation == Orientation.Horizontal)
+								parentGroup.Root.RootPanel.Children.Insert(0, previousContainer);
+							else
+							{
+								var panel = new LayoutPanel { Orientation = Orientation.Horizontal };
+								var root = parentGroup.Root as LayoutRoot;
+								var oldRootPanel = parentGroup.Root.RootPanel;
+								root.RootPanel = panel;
+								panel.Children.Add(previousContainer);
+								panel.Children.Add(oldRootPanel);
+							}
+							break;
+						case AnchorSide.Top:
+							if (parentGroup.Root.RootPanel.Orientation == Orientation.Vertical)
+								parentGroup.Root.RootPanel.Children.Insert(0, previousContainer);
+							else
+							{
+								var panel = new LayoutPanel { Orientation = Orientation.Vertical };
+								var root = parentGroup.Root as LayoutRoot;
+								var oldRootPanel = parentGroup.Root.RootPanel;
+								root.RootPanel = panel;
+								panel.Children.Add(previousContainer);
+								panel.Children.Add(oldRootPanel);
+							}
+							break;
+						case AnchorSide.Bottom:
+							if (parentGroup.Root.RootPanel.Orientation == Orientation.Vertical)
+								parentGroup.Root.RootPanel.Children.Add(previousContainer);
+							else
+							{
+								var panel = new LayoutPanel { Orientation = Orientation.Vertical };
+								var root = parentGroup.Root as LayoutRoot;
+								var oldRootPanel = parentGroup.Root.RootPanel;
+								root.RootPanel = panel;
+								panel.Children.Add(oldRootPanel);
+								panel.Children.Add(previousContainer);
+							}
+							break;
+					}
+				}
+
+				// Move only THIS anchorable (not siblings)
+				parentGroup.Children.Remove(this);
+				previousContainer.Children.Add(this);
+
+				// Clean up empty group
+				if (parentGroup.Children.Count == 0)
+					parentSide.Children.Remove(parentGroup);
+			}
+			else if (Parent is LayoutAnchorablePane parentPane)
+			{
+				// Move from docked pane to auto-hide anchor group (only this one)
+				var root = Root;
+				var anchorSide = parentPane.GetSide();
+				var newAnchorGroup = new LayoutAnchorGroup();
+				((ILayoutPreviousContainer)newAnchorGroup).PreviousContainer = parentPane;
+
+				parentPane.Children.Remove(this);
+				newAnchorGroup.Children.Add(this);
+
+				switch (anchorSide)
+				{
+					case AnchorSide.Right: root.RightSide?.Children.Add(newAnchorGroup); break;
+					case AnchorSide.Left: root.LeftSide?.Children.Add(newAnchorGroup); break;
+					case AnchorSide.Top: root.TopSide?.Children.Add(newAnchorGroup); break;
+					case AnchorSide.Bottom: root.BottomSide?.Children.Add(newAnchorGroup); break;
+				}
+			}
+		}
+
 		#endregion Public Methods
 
 		#region Internal Methods
