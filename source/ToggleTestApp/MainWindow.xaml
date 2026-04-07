@@ -1,0 +1,72 @@
+<Window x:Class="ToggleTestApp.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
+    xmlns:avalonDockControls="clr-namespace:AvalonDock.Controls;assembly=AvalonDock"
+    Title="ToggleTestApp"
+    Width="800"
+    Height="600"
+    UseLayoutRounding="True">
+    <Window.Resources />
+    <Grid x:Name="layoutRoot">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
+            <MenuItem Header="Layout">
+                <MenuItem Click="OnDumpToConsole" Header="Dump To Console" />
+            </MenuItem>
+        </Menu>
+
+        <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1">
+            <avalonDock:LayoutRoot>
+                <avalonDock:LayoutPanel Orientation="Horizontal">
+                    <avalonDock:LayoutDocumentPaneGroup>
+                        <avalonDock:LayoutDocumentPane x:Name="LayoutDocumentPane">
+                            <avalonDock:LayoutDocument Title="Document 1" ContentId="document1">
+                                <TextBox Text="Document 1 Content" />
+                            </avalonDock:LayoutDocument>
+                            <avalonDock:LayoutDocument Title="Document 2" ContentId="document2">
+                                <TextBox Text="Document 2 Content" />
+                            </avalonDock:LayoutDocument>
+                        </avalonDock:LayoutDocumentPane>
+                    </avalonDock:LayoutDocumentPaneGroup>
+                </avalonDock:LayoutPanel>
+
+                <avalonDock:LayoutRoot.LeftSide>
+                    <avalonDock:LayoutAnchorSide>
+                        <avalonDock:LayoutAnchorGroup>
+                            <avalonDock:LayoutAnchorable Title="ToolBox 1" ContentId="ToolBox1">
+                                <TextBlock Text="ToolBox 1 Content" Margin="8" />
+                            </avalonDock:LayoutAnchorable>
+                            <avalonDock:LayoutAnchorable Title="ToolBox 2" ContentId="ToolBox2">
+                                <TextBlock Text="ToolBox 2 Content" Margin="8" />
+                            </avalonDock:LayoutAnchorable>
+                        </avalonDock:LayoutAnchorGroup>
+                    </avalonDock:LayoutAnchorSide>
+                </avalonDock:LayoutRoot.LeftSide>
+
+                <avalonDock:LayoutRoot.RightSide>
+                    <avalonDock:LayoutAnchorSide>
+                        <avalonDock:LayoutAnchorGroup>
+                            <avalonDock:LayoutAnchorable Title="Properties" ContentId="Properties">
+                                <TextBlock Text="Properties Content" Margin="8" />
+                            </avalonDock:LayoutAnchorable>
+                        </avalonDock:LayoutAnchorGroup>
+                    </avalonDock:LayoutAnchorSide>
+                </avalonDock:LayoutRoot.RightSide>
+
+                <avalonDock:LayoutRoot.BottomSide>
+                    <avalonDock:LayoutAnchorSide>
+                        <avalonDock:LayoutAnchorGroup>
+                            <avalonDock:LayoutAnchorable Title="Output" ContentId="Output">
+                                <TextBlock Text="Output Content" Margin="8" />
+                            </avalonDock:LayoutAnchorable>
+                        </avalonDock:LayoutAnchorGroup>
+                    </avalonDock:LayoutAnchorSide>
+                </avalonDock:LayoutRoot.BottomSide>
+            </avalonDock:LayoutRoot>
+        </avalonDock:ToggleDockingManager>
+    </Grid>
+</Window>

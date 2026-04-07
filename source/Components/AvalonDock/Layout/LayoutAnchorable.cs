@@ -638,6 +638,11 @@ namespace AvalonDock.Layout
 				if (parentSide == null) return;
 
 				var previousContainer = ((ILayoutPreviousContainer)parentGroup).PreviousContainer as LayoutAnchorablePane;
+
+				// If previousContainer was removed from the tree (detached), treat as null
+				if (previousContainer != null && previousContainer.Root == null)
+					previousContainer = null;
+
 				if (previousContainer == null)
 				{
 					var side = parentSide.Side;

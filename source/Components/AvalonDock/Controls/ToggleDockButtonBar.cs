@@ -10,12 +10,27 @@
 using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Returns true when the value is not null. Used in XAML triggers to show/hide icon elements.
+	/// </summary>
+	public sealed class NullToFalseConverter : IValueConverter
+	{
+		public static readonly NullToFalseConverter Instance = new NullToFalseConverter();
+
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+			=> value != null;
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+			=> throw new NotSupportedException();
+	}
 	/// <summary>
 	/// A vertical/horizontal bar of toggle buttons representing anchorable tool windows.
 	/// Used by <see cref="ToggleDockingManager"/> to provide VSCode/Rider-style sidebar buttons.
@@ -85,12 +100,34 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty SectionProperty =
 			DependencyProperty.Register(nameof(Section), typeof(AnchorSide), typeof(ToggleDockButton), new PropertyMetadata(AnchorSide.Left));
 
+		/// <summary>Icon source from the associated anchorable.</summary>
+		public System.Windows.Media.ImageSource IconSource
+		{
+			get => (System.Windows.Media.ImageSource)GetValue(IconSourceProperty);
+			set => SetValue(IconSourceProperty, value);
+		}
+
+		public static readonly DependencyProperty IconSourceProperty =
+			DependencyProperty.Register(nameof(IconSource), typeof(System.Windows.Media.ImageSource), typeof(ToggleDockButton), new PropertyMetadata(null));
+
+		/// <summary>Icon content (e.g. a Path or any UIElement) displayed before the title.</summary>
+		public object IconContent
+		{
+			get => GetValue(IconContentProperty);
+			set => SetValue(IconContentProperty, value);
+		}
+
+		public static readonly DependencyProperty IconContentProperty =
+			DependencyProperty.Register(nameof(IconContent), typeof(object), typeof(ToggleDockButton), new PropertyMetadata(null));
+
 		private static void OnAnchorableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
 			var btn = (ToggleDockButton)d;
 			if (e.NewValue is LayoutAnchorable anc)
 			{
 				btn.Content = anc.Title;
+				btn.ToolTip = anc.Title;
+				btn.IconSource = anc.IconSource;
 				btn.IsChecked = !anc.IsAutoHidden;
 			}
 		}
