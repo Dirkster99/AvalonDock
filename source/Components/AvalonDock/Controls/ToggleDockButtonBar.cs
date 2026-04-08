@@ -257,14 +257,21 @@ namespace AvalonDock.Controls
 			base.OnMouseLeftButtonUp(e);
 		}
 
-		protected override void OnMouseLeave(MouseEventArgs e)
+		protected override void OnMouseMove(MouseEventArgs e)
 		{
-			base.OnMouseLeave(e);
+			base.OnMouseMove(e);
 			if (!_isMouseDown || e.LeftButton != MouseButtonState.Pressed) return;
 
-			_isMouseDown = false;
-			var data = new DataObject(typeof(ToggleDockButton), this);
-			DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
+			var pos = e.GetPosition(this);
+			var diff = pos - _dragStartPoint;
+			if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
+				Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
+			{
+				_isMouseDown = false;
+				ReleaseMouseCapture();
+				var data = new DataObject(typeof(ToggleDockButton), this);
+				DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
+			}
 		}
 
 		protected override void OnDragOver(DragEventArgs e)
