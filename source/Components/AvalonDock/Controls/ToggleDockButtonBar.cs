@@ -10,11 +10,15 @@
 using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace AvalonDock.Controls
 {
@@ -66,14 +70,84 @@ namespace AvalonDock.Controls
 				Items.Add(btn);
 			}
 		}
+
+		/// <summary>
+		/// Merges <paramref name="source"/> into <paramref name="target"/> to form a group.
+		/// If target is already a group, the source's anchorable is added.
+		/// Otherwise, both are replaced with a new <see cref="ToggleDockButtonGroup"/>.
+		/// </summary>
+		internal void MergeButtons(ToggleButton target, ToggleDockButton source)
+		{
+			if (target == source) return;
+
+			var sourceAnc = source.Anchorable;
+			if (sourceAnc == null) return;
+
+			int targetIdx = Items.IndexOf(target);
+			int sourceIdx = Items.IndexOf(source);
+			if (targetIdx < 0 || sourceIdx < 0) return;
+
+			if (target is ToggleDockButtonGroup group)
+			{
+				// Add to existing group
+				group.AddAnchorable(sourceAnc);
+				Items.RemoveAt(sourceIdx);
+			}
+			else if (target is ToggleDockButton targetBtn)
+			{
+				var targetAnc = targetBtn.Anchorable;
+				if (targetAnc == null) return;
+
+				// Create new group replacing both
+				var newGroup = new ToggleDockButtonGroup { Section = Section };
+				newGroup.AddAnchorable(targetAnc);
+				newGroup.AddAnchorable(sourceAnc);
+
+				Items.RemoveAt(sourceIdx > targetIdx ? sourceIdx : targetIdx);
+				Items.RemoveAt(sourceIdx > targetIdx ? targetIdx : sourceIdx);
+				Items.Insert(Math.Min(sourceIdx, targetIdx), newGroup);
+			}
+		}
+
+		/// <summary>Splits a group back into individual buttons at the group's position.</summary>
+		internal void UngroupButton(ToggleDockButtonGroup group)
+		{
+			int idx = Items.IndexOf(group);
+			if (idx < 0) return;
+
+			var anchorables = group.Anchorables.ToList();
+			Items.RemoveAt(idx);
+			foreach (var anc in anchorables)
+			{
+				var btn = new ToggleDockButton { Anchorable = anc, Section = Section };
+				Items.Insert(idx++, btn);
+			}
+		}
+
+		/// <summary>Checks whether any button or group in this bar references the given anchorable.</summary>
+		internal bool ContainsAnchorable(LayoutAnchorable anchorable)
+		{
+			foreach (var item in Items)
+			{
+				if (item is ToggleDockButton btn && btn.Anchorable == anchorable)
+					return true;
+				if (item is ToggleDockButtonGroup grp && grp.Anchorables.Contains(anchorable))
+					return true;
+			}
+			return false;
+		}
 	}
 
 	/// <summary>
 	/// A toggle button that represents a single anchorable tool window in the sidebar.
 	/// Clicking it toggles the anchorable between auto-hidden and docked states.
+	/// Supports drag to reorder or group with other buttons.
 	/// </summary>
 	public class ToggleDockButton : ToggleButton
 	{
+		private Point _dragStartPoint;
+		private bool _isDragging;
+
 		static ToggleDockButton()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(ToggleDockButton), new FrameworkPropertyMetadata(typeof(ToggleDockButton)));
@@ -101,14 +175,14 @@ namespace AvalonDock.Controls
 			DependencyProperty.Register(nameof(Section), typeof(AnchorSide), typeof(ToggleDockButton), new PropertyMetadata(AnchorSide.Left));
 
 		/// <summary>Icon source from the associated anchorable.</summary>
-		public System.Windows.Media.ImageSource IconSource
+		public ImageSource IconSource
 		{
-			get => (System.Windows.Media.ImageSource)GetValue(IconSourceProperty);
+			get => (ImageSource)GetValue(IconSourceProperty);
 			set => SetValue(IconSourceProperty, value);
 		}
 
 		public static readonly DependencyProperty IconSourceProperty =
-			DependencyProperty.Register(nameof(IconSource), typeof(System.Windows.Media.ImageSource), typeof(ToggleDockButton), new PropertyMetadata(null));
+			DependencyProperty.Register(nameof(IconSource), typeof(ImageSource), typeof(ToggleDockButton), new PropertyMetadata(null));
 
 		/// <summary>Icon content (e.g. a Path or any UIElement) displayed before the title.</summary>
 		public object IconContent
@@ -161,11 +235,284 @@ namespace AvalonDock.Controls
 		protected override void OnClick()
 		{
 			base.OnClick();
-			if (Anchorable == null) return;
+			if (_isDragging || Anchorable == null) return;
 
-			// Find the ToggleDockingManager to coordinate exclusive activation
 			var manager = Anchorable.Root?.Manager as ToggleDockingManager;
 			manager?.ToggleAnchorable(Anchorable, Section);
 		}
+
+		#region Drag Support
+
+		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+		{
+			base.OnMouseLeftButtonDown(e);
+			_dragStartPoint = e.GetPosition(this);
+			_isDragging = false;
+		}
+
+		protected override void OnMouseMove(MouseEventArgs e)
+		{
+			base.OnMouseMove(e);
+			if (e.LeftButton != MouseButtonState.Pressed || _isDragging) return;
+
+			var pos = e.GetPosition(this);
+			var diff = pos - _dragStartPoint;
+			if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
+				Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
+			{
+				_isDragging = true;
+				var data = new DataObject(typeof(ToggleDockButton), this);
+				DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
+				_isDragging = false;
+			}
+		}
+
+		protected override void OnDragOver(DragEventArgs e)
+		{
+			base.OnDragOver(e);
+			if (e.Data.GetDataPresent(typeof(ToggleDockButton)))
+			{
+				var source = e.Data.GetData(typeof(ToggleDockButton)) as ToggleDockButton;
+				e.Effects = (source != null && source != this) ? DragDropEffects.Move : DragDropEffects.None;
+			}
+			else
+			{
+				e.Effects = DragDropEffects.None;
+			}
+			e.Handled = true;
+		}
+
+		protected override void OnDrop(DragEventArgs e)
+		{
+			base.OnDrop(e);
+			if (!e.Data.GetDataPresent(typeof(ToggleDockButton))) return;
+
+			var source = e.Data.GetData(typeof(ToggleDockButton)) as ToggleDockButton;
+			if (source == null || source == this) return;
+
+			// Find the button bar and merge
+			var bar = ItemsControl.ItemsControlFromItemContainer(this) as ToggleDockButtonBar
+				?? FindParent<ToggleDockButtonBar>(this);
+			bar?.MergeButtons(this, source);
+			e.Handled = true;
+		}
+
+		private static T FindParent<T>(DependencyObject child) where T : DependencyObject
+		{
+			var parent = VisualTreeHelper.GetParent(child);
+			while (parent != null)
+			{
+				if (parent is T t) return t;
+				parent = VisualTreeHelper.GetParent(parent);
+			}
+			return null;
+		}
+
+		#endregion Drag Support
+	}
+
+	/// <summary>
+	/// A toggle button that represents a group of anchorable tool windows stacked together.
+	/// Clicking it toggles all anchorables in the group as tabs in a single docked pane.
+	/// Displays combined icons separated by "/" visuals.
+	/// </summary>
+	public class ToggleDockButtonGroup : ToggleButton
+	{
+		private readonly ObservableCollection<LayoutAnchorable> _anchorables = new ObservableCollection<LayoutAnchorable>();
+
+		static ToggleDockButtonGroup()
+		{
+			DefaultStyleKeyProperty.OverrideMetadata(typeof(ToggleDockButtonGroup), new FrameworkPropertyMetadata(typeof(ToggleDockButtonGroup)));
+		}
+
+		/// <summary>The anchorables in this group.</summary>
+		public ReadOnlyObservableCollection<LayoutAnchorable> Anchorables { get; }
+
+		/// <summary>Which anchor side section this group belongs to.</summary>
+		public AnchorSide Section
+		{
+			get => (AnchorSide)GetValue(SectionProperty);
+			set => SetValue(SectionProperty, value);
+		}
+
+		public static readonly DependencyProperty SectionProperty =
+			DependencyProperty.Register(nameof(Section), typeof(AnchorSide), typeof(ToggleDockButtonGroup), new PropertyMetadata(AnchorSide.Left));
+
+		public ToggleDockButtonGroup()
+		{
+			Anchorables = new ReadOnlyObservableCollection<LayoutAnchorable>(_anchorables);
+			AllowDrop = true;
+			ContextMenu = CreateContextMenu();
+		}
+
+		/// <summary>Adds an anchorable to this group and refreshes the visual.</summary>
+		public void AddAnchorable(LayoutAnchorable anchorable)
+		{
+			if (anchorable == null || _anchorables.Contains(anchorable)) return;
+			_anchorables.Add(anchorable);
+			UpdateVisual();
+		}
+
+		/// <summary>Removes an anchorable from this group.</summary>
+		public bool RemoveAnchorable(LayoutAnchorable anchorable)
+		{
+			bool removed = _anchorables.Remove(anchorable);
+			if (removed) UpdateVisual();
+			return removed;
+		}
+
+		/// <summary>Refreshes IsChecked based on whether any anchorable in the group is docked.</summary>
+		public void RefreshState()
+		{
+			IsChecked = _anchorables.Any(a => !a.IsAutoHidden);
+		}
+
+		protected override void OnClick()
+		{
+			base.OnClick();
+			if (_anchorables.Count == 0) return;
+
+			var firstAnc = _anchorables.FirstOrDefault();
+			var manager = firstAnc?.Root?.Manager as ToggleDockingManager;
+			if (manager == null) return;
+
+			manager.ToggleGroup(this);
+		}
+
+		#region Drag/Drop Support
+
+		protected override void OnDragOver(DragEventArgs e)
+		{
+			base.OnDragOver(e);
+			if (e.Data.GetDataPresent(typeof(ToggleDockButton)))
+			{
+				e.Effects = DragDropEffects.Move;
+			}
+			else
+			{
+				e.Effects = DragDropEffects.None;
+			}
+			e.Handled = true;
+		}
+
+		protected override void OnDrop(DragEventArgs e)
+		{
+			base.OnDrop(e);
+			if (!e.Data.GetDataPresent(typeof(ToggleDockButton))) return;
+
+			var source = e.Data.GetData(typeof(ToggleDockButton)) as ToggleDockButton;
+			if (source == null) return;
+
+			var bar = ItemsControl.ItemsControlFromItemContainer(this) as ToggleDockButtonBar
+				?? FindParent<ToggleDockButtonBar>(this);
+			bar?.MergeButtons(this, source);
+			e.Handled = true;
+		}
+
+		#endregion Drag/Drop Support
+
+		#region Private Methods
+
+		private void UpdateVisual()
+		{
+			// Build combined icon panel: icon1 / icon2 / icon3
+			var panel = new StackPanel { Orientation = Orientation.Horizontal };
+			for (int i = 0; i < _anchorables.Count; i++)
+			{
+				if (i > 0)
+				{
+					panel.Children.Add(new TextBlock
+					{
+						Text = "/",
+						Margin = new Thickness(2, 0, 2, 0),
+						VerticalAlignment = VerticalAlignment.Center,
+						Foreground = new SolidColorBrush(Color.FromRgb(0x88, 0x88, 0x88)),
+						FontSize = 10
+					});
+				}
+
+				var anc = _anchorables[i];
+				var icon = ToggleDock.GetIcon(anc);
+				if (icon is UIElement uiIcon)
+				{
+					// Clone the icon via XamlWriter/XamlReader for reuse
+					var iconCopy = CloneUIElement(uiIcon);
+					if (iconCopy != null)
+						panel.Children.Add(iconCopy);
+					else
+						panel.Children.Add(CreateFallbackIcon(anc.Title));
+				}
+				else if (anc.IconSource != null)
+				{
+					panel.Children.Add(new Image
+					{
+						Source = anc.IconSource,
+						Width = 14, Height = 14,
+						Stretch = Stretch.Uniform,
+						VerticalAlignment = VerticalAlignment.Center
+					});
+				}
+				else
+				{
+					panel.Children.Add(CreateFallbackIcon(anc.Title));
+				}
+			}
+
+			Content = panel;
+			ToolTip = string.Join(" / ", _anchorables.Select(a => a.Title));
+			RefreshState();
+		}
+
+		private static UIElement CloneUIElement(UIElement element)
+		{
+			try
+			{
+				var xaml = System.Windows.Markup.XamlWriter.Save(element);
+				return System.Windows.Markup.XamlReader.Parse(xaml) as UIElement;
+			}
+			catch
+			{
+				return null;
+			}
+		}
+
+		private static UIElement CreateFallbackIcon(string title)
+		{
+			return new TextBlock
+			{
+				Text = string.IsNullOrEmpty(title) ? "?" : title.Substring(0, 1),
+				FontSize = 11,
+				FontWeight = FontWeights.Bold,
+				VerticalAlignment = VerticalAlignment.Center,
+				Foreground = new SolidColorBrush(Color.FromRgb(0x55, 0x55, 0x55))
+			};
+		}
+
+		private ContextMenu CreateContextMenu()
+		{
+			var menu = new ContextMenu();
+			var ungroupItem = new MenuItem { Header = "Ungroup" };
+			ungroupItem.Click += (s, e) =>
+			{
+				var bar = ItemsControl.ItemsControlFromItemContainer(this) as ToggleDockButtonBar
+					?? FindParent<ToggleDockButtonBar>(this);
+				bar?.UngroupButton(this);
+			};
+			menu.Items.Add(ungroupItem);
+			return menu;
+		}
+
+		private static T FindParent<T>(DependencyObject child) where T : DependencyObject
+		{
+			var parent = VisualTreeHelper.GetParent(child);
+			while (parent != null)
+			{
+				if (parent is T t) return t;
+				parent = VisualTreeHelper.GetParent(parent);
+			}
+			return null;
+		}
+
+		#endregion Private Methods
 	}
 }

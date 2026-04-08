@@ -76,6 +76,53 @@ namespace AvalonDock
 				new System.Action(UpdatePinButtonsToMinimize));
 		}
 
+		/// <summary>
+		/// Toggles an entire button group. When activating, docks all anchorables
+		/// in the group as tabs in a single pane. When deactivating, sends all back to auto-hide.
+		/// </summary>
+		public void ToggleGroup(ToggleDockButtonGroup group)
+		{
+			if (group == null || group.Anchorables.Count == 0) return;
+
+			var section = group.Section;
+			bool anyDocked = group.Anchorables.Any(a => !a.IsAutoHidden);
+
+			if (anyDocked)
+			{
+				// Send all back to auto-hide
+				foreach (var anc in group.Anchorables.Where(a => !a.IsAutoHidden).ToList())
+					anc.ToggleSingleAutoHide();
+			}
+			else
+			{
+				// Hide any currently docked anchorable in this section
+				HideDockedInSection(section);
+
+				// Dock the first one
+				var first = group.Anchorables.First();
+				first.ToggleSingleAutoHide();
+
+				// Add the rest into the same pane (as tabs)
+				var pane = first.Parent as LayoutAnchorablePane;
+				if (pane != null)
+				{
+					foreach (var anc in group.Anchorables.Skip(1).ToList())
+					{
+						// Move from auto-hide side to the docked pane
+						if (anc.Parent is LayoutAnchorGroup anchorGroup)
+						{
+							anchorGroup.RemoveChild(anc);
+							pane.Children.Add(anc);
+						}
+					}
+				}
+			}
+
+			RefreshButtonStates();
+			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
+				new System.Action(UpdatePinButtonsToMinimize));
+		}
+
 		#endregion Public Methods
 
 		#region Internal Methods
@@ -110,23 +157,26 @@ namespace AvalonDock
 
 		private void UpdatePinButtonsToMinimize()
 		{
-			var pinButtons = FindVisualChildren<System.Windows.Controls.Button>(this)
-				.Where(b => b.Name == "PART_AutoHidePin");
-
-			foreach (var pin in pinButtons)
+			foreach (var btn in FindVisualChildren<System.Windows.Controls.Button>(this))
 			{
-				pin.ToolTip = "Minimize";
-
-				// Replace the pin image with a minimize icon (underscore / dash at bottom)
-				var border = pin.Content as Border;
-				if (border == null)
+				if (btn.Name == "PART_AutoHidePin")
 				{
-					// Wrap in a transparent border for hit testing
-					border = new Border { Background = Brushes.Transparent };
-					pin.Content = border;
-				}
+					btn.ToolTip = "Minimize";
 
-				border.Child = CreateMinimizeIcon();
+					// Replace the pin image with a minimize icon
+					var border = btn.Content as Border;
+					if (border == null)
+					{
+						border = new Border { Background = Brushes.Transparent };
+						btn.Content = border;
+					}
+					border.Child = CreateMinimizeIcon();
+				}
+				else if (btn.Name == "PART_HidePin")
+				{
+					// Hide the close/hide button — toggle mode uses Minimize instead
+					btn.Visibility = Visibility.Collapsed;
+				}
 			}
 		}
 
@@ -297,15 +347,17 @@ namespace AvalonDock
 			{
 				if (item is ToggleDockButton btn && btn.Anchorable != null)
 					btn.IsChecked = !btn.Anchorable.IsAutoHidden;
+				else if (item is ToggleDockButtonGroup grp)
+					grp.RefreshState();
 			}
 		}
 
 		/// <summary>Determines which sidebar section an anchorable belongs to by checking button bars.</summary>
 		private AnchorSide GetAnchorableSection(LayoutAnchorable anchorable)
 		{
-			if (ContainsAnchorable(_leftTopButtonBar, anchorable)) return AnchorSide.Left;
-			if (ContainsAnchorable(_rightTopButtonBar, anchorable)) return AnchorSide.Right;
-			if (ContainsAnchorable(_leftBottomButtonBar, anchorable)) return AnchorSide.Bottom;
+			if (_leftTopButtonBar?.ContainsAnchorable(anchorable) == true) return AnchorSide.Left;
+			if (_rightTopButtonBar?.ContainsAnchorable(anchorable) == true) return AnchorSide.Right;
+			if (_leftBottomButtonBar?.ContainsAnchorable(anchorable) == true) return AnchorSide.Bottom;
 
 			// Fallback: infer from current layout position
 			if (anchorable.Parent is LayoutAnchorablePane pane)
@@ -318,13 +370,7 @@ namespace AvalonDock
 
 		private static bool ContainsAnchorable(ToggleDockButtonBar bar, LayoutAnchorable anchorable)
 		{
-			if (bar == null) return false;
-			foreach (var item in bar.Items)
-			{
-				if (item is ToggleDockButton btn && btn.Anchorable == anchorable)
-					return true;
-			}
-			return false;
+			return bar?.ContainsAnchorable(anchorable) == true;
 		}
 
 		#endregion Private Methods

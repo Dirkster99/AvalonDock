@@ -1412,4 +1412,41 @@
 		   BasedOn="{StaticResource {x:Type avalonDock:DockingManager}}">
 	</Style>
 
+	<!--  ToggleDockButtonGroup - grouped anchorables showing combined icons  -->
+	<Style x:Key="{x:Type avalonDockControls:ToggleDockButtonGroup}" TargetType="{x:Type avalonDockControls:ToggleDockButtonGroup}">
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="BorderBrush" Value="Gray" />
+		<Setter Property="BorderThickness" Value="1" />
+		<Setter Property="Padding" Value="4,6" />
+		<Setter Property="Margin" Value="1" />
+		<Setter Property="HorizontalContentAlignment" Value="Center" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type avalonDockControls:ToggleDockButtonGroup}">
+					<Border
+						x:Name="Bd"
+						Background="{TemplateBinding Background}"
+						BorderBrush="{TemplateBinding BorderBrush}"
+						BorderThickness="{TemplateBinding BorderThickness}"
+						Padding="{TemplateBinding Padding}"
+						SnapsToDevicePixels="True">
+						<ContentPresenter
+							HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+							VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+					</Border>
+					<ControlTemplate.Triggers>
+						<Trigger Property="IsMouseOver" Value="True">
+							<Setter TargetName="Bd" Property="Background" Value="#E0E0E0" />
+						</Trigger>
+						<Trigger Property="IsChecked" Value="True">
+							<Setter TargetName="Bd" Property="Background" Value="#CCE5FF" />
+							<Setter TargetName="Bd" Property="BorderBrush" Value="#007ACC" />
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
 </ResourceDictionary>
