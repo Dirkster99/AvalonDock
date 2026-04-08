@@ -269,8 +269,25 @@ namespace AvalonDock.Controls
 			{
 				_isMouseDown = false;
 				ReleaseMouseCapture();
+
+				// Show drag adorner
+				var adornerLayer = System.Windows.Documents.AdornerLayer.GetAdornerLayer(this);
+				ToggleDockDragAdorner adorner = null;
+				if (adornerLayer != null)
+				{
+					adorner = new ToggleDockDragAdorner(this);
+					adornerLayer.Add(adorner);
+				}
+
 				var data = new DataObject(typeof(ToggleDockButton), this);
 				DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
+
+				// Remove adorner after drop
+				if (adorner != null && adornerLayer != null)
+				{
+					adorner.Detach();
+					adornerLayer.Remove(adorner);
+				}
 			}
 		}
 
@@ -280,7 +297,19 @@ namespace AvalonDock.Controls
 			if (e.Data.GetDataPresent(typeof(ToggleDockButton)))
 			{
 				var source = e.Data.GetData(typeof(ToggleDockButton)) as ToggleDockButton;
-				e.Effects = (source != null && source != this) ? DragDropEffects.Move : DragDropEffects.None;
+				if (source != null && source != this)
+				{
+					e.Effects = DragDropEffects.Move;
+					// Highlight this button as a drop target
+					_savedBorderBrush = _savedBorderBrush ?? BorderBrush;
+					_savedBorderThickness = _savedBorderThickness ?? BorderThickness;
+					BorderBrush = new SolidColorBrush(Color.FromRgb(0x00, 0x7A, 0xCC));
+					BorderThickness = new Thickness(2);
+				}
+				else
+				{
+					e.Effects = DragDropEffects.None;
+				}
 			}
 			else
 			{
@@ -289,9 +318,16 @@ namespace AvalonDock.Controls
 			e.Handled = true;
 		}
 
+		protected override void OnDragLeave(DragEventArgs e)
+		{
+			base.OnDragLeave(e);
+			RestoreBorder();
+		}
+
 		protected override void OnDrop(DragEventArgs e)
 		{
 			base.OnDrop(e);
+			RestoreBorder();
 			if (!e.Data.GetDataPresent(typeof(ToggleDockButton))) return;
 
 			var source = e.Data.GetData(typeof(ToggleDockButton)) as ToggleDockButton;
@@ -302,6 +338,23 @@ namespace AvalonDock.Controls
 				?? FindParent<ToggleDockButtonBar>(this);
 			bar?.MergeButtons(this, source);
 			e.Handled = true;
+		}
+
+		private Brush _savedBorderBrush;
+		private Thickness? _savedBorderThickness;
+
+		private void RestoreBorder()
+		{
+			if (_savedBorderBrush != null)
+			{
+				BorderBrush = _savedBorderBrush;
+				_savedBorderBrush = null;
+			}
+			if (_savedBorderThickness.HasValue)
+			{
+				BorderThickness = _savedBorderThickness.Value;
+				_savedBorderThickness = null;
+			}
 		}
 
 		private static T FindParent<T>(DependencyObject child) where T : DependencyObject
@@ -388,12 +441,19 @@ namespace AvalonDock.Controls
 
 		#region Drag/Drop Support
 
+		private Brush _savedBorderBrush;
+		private Thickness? _savedBorderThickness;
+
 		protected override void OnDragOver(DragEventArgs e)
 		{
 			base.OnDragOver(e);
 			if (e.Data.GetDataPresent(typeof(ToggleDockButton)))
 			{
 				e.Effects = DragDropEffects.Move;
+				_savedBorderBrush = _savedBorderBrush ?? BorderBrush;
+				_savedBorderThickness = _savedBorderThickness ?? BorderThickness;
+				BorderBrush = new SolidColorBrush(Color.FromRgb(0x00, 0x7A, 0xCC));
+				BorderThickness = new Thickness(2);
 			}
 			else
 			{
@@ -402,9 +462,16 @@ namespace AvalonDock.Controls
 			e.Handled = true;
 		}
 
+		protected override void OnDragLeave(DragEventArgs e)
+		{
+			base.OnDragLeave(e);
+			RestoreBorder();
+		}
+
 		protected override void OnDrop(DragEventArgs e)
 		{
 			base.OnDrop(e);
+			RestoreBorder();
 			if (!e.Data.GetDataPresent(typeof(ToggleDockButton))) return;
 
 			var source = e.Data.GetData(typeof(ToggleDockButton)) as ToggleDockButton;
@@ -419,6 +486,20 @@ namespace AvalonDock.Controls
 		#endregion Drag/Drop Support
 
 		#region Private Methods
+
+		private void RestoreBorder()
+		{
+			if (_savedBorderBrush != null)
+			{
+				BorderBrush = _savedBorderBrush;
+				_savedBorderBrush = null;
+			}
+			if (_savedBorderThickness.HasValue)
+			{
+				BorderThickness = _savedBorderThickness.Value;
+				_savedBorderThickness = null;
+			}
+		}
 
 		private void UpdateVisual()
 		{
@@ -521,5 +602,47 @@ namespace AvalonDock.Controls
 		}
 
 		#endregion Private Methods
+	}
+
+	/// <summary>
+	/// Adorner that renders a semi-transparent snapshot of the dragged button following the mouse cursor.
+	/// </summary>
+	internal class ToggleDockDragAdorner : System.Windows.Documents.Adorner
+	{
+		private readonly VisualBrush _visualBrush;
+		private readonly Size _renderSize;
+		private Point _lastPoint;
+
+		public ToggleDockDragAdorner(UIElement adornedElement) : base(adornedElement)
+		{
+			IsHitTestVisible = false;
+			_renderSize = adornedElement.RenderSize;
+			_visualBrush = new VisualBrush(adornedElement) { Opacity = 0.7 };
+
+			// Track mouse position via DragOver on the adorner layer's parent
+			var window = Window.GetWindow(adornedElement);
+			if (window != null)
+				window.PreviewDragOver += OnWindowDragOver;
+		}
+
+		private void OnWindowDragOver(object sender, DragEventArgs e)
+		{
+			_lastPoint = e.GetPosition(AdornedElement);
+			InvalidateVisual();
+		}
+
+		protected override void OnRender(DrawingContext drawingContext)
+		{
+			var offset = new Point(_lastPoint.X + 8, _lastPoint.Y - _renderSize.Height / 2);
+			var rect = new Rect(offset, _renderSize);
+			drawingContext.DrawRectangle(_visualBrush, new Pen(new SolidColorBrush(Color.FromRgb(0x00, 0x7A, 0xCC)), 1), rect);
+		}
+
+		public void Detach()
+		{
+			var window = Window.GetWindow(AdornedElement);
+			if (window != null)
+				window.PreviewDragOver -= OnWindowDragOver;
+		}
 	}
 }
