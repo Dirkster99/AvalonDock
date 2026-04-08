@@ -1,4 +1,4 @@
-﻿using AvalonDockTest.TestHelpers;
+using AvalonDockTest.TestHelpers;
 using AvalonDockTest.Views;
 using NUnit.Framework;
 using System;
@@ -19,7 +19,6 @@ namespace AvalonDockTest
 	[TestFixture]
 	public class CollectionResetTest : AutomationTestBase
 	{
-		#region Notification Counting for CollectionChanged
 		public class NotifyActionCount
 		{
 			public int AddCount;
@@ -58,9 +57,7 @@ namespace AvalonDockTest
 					break;
 			}
 		}
-		#endregion
 
-		#region Shared Main Test Window for both Anchorables and Documents
 		static Lazy<CollectionResetTestWindow> TestWindow =
 			new Lazy<CollectionResetTestWindow>(() => CreateTestWindow());
 
@@ -94,9 +91,7 @@ namespace AvalonDockTest
 
 			return window;
 		}
-		#endregion
 
-		#region Adapter for testing Anchorables and Documents
 		const int ExpectedAnchorableCount = 5;
 		const int ExpectedDocumentCount = 7;
 
@@ -168,7 +163,6 @@ namespace AvalonDockTest
 				return _window.DockManager.DocumentsSource.Cast<object>();
 			}
 		}
-		#endregion
 
 		// [Test]
 		public void CollectionResetAnchorablesTest()

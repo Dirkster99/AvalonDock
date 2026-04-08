@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -20,13 +20,7 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutPanel : LayoutPositionableGroup<ILayoutPanelElement>, ILayoutPanelElement, ILayoutOrientableGroup
 	{
-		#region fields
-
 		private Orientation _orientation;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>Class constructor</summary>
 		public LayoutPanel()
@@ -40,10 +34,6 @@ namespace AvalonDock.Layout
 			Children.Add(firstChild);
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
 		/// <summary>Gets/sets the orientation for this panel.</summary>
 		public Orientation Orientation
 		{
@@ -56,8 +46,6 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(Orientation));
 			}
 		}
-
-		#region CanDock
 
 		/// <summary>
 		/// Using a DependencyProperty as the backing store for thhe <see cref="CanDock"/> property.
@@ -82,12 +70,6 @@ namespace AvalonDock.Layout
 			get { return (bool)GetValue(CanDockProperty); }
 			set { SetValue(CanDockProperty, value); }
 		}
-
-		#endregion CanDock
-
-		#endregion Properties
-
-		#region Overrides
 
 		/// <inheritdoc />
 		protected override bool GetVisibility() => Children.Any(c => c.IsVisible);
@@ -118,6 +100,7 @@ namespace AvalonDock.Layout
 				if (canDockStr != null)
 					CanDock = bool.Parse(canDockStr);
 			}
+
 			base.ReadXml(reader);
 		}
 
@@ -133,6 +116,5 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion Overrides
 	}
 }

@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,12 +7,12 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -22,14 +22,8 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public class LayoutAnchorGroupControl : Control, ILayoutControl
 	{
-		#region fields
-
 		private ObservableCollection<LayoutAnchorControl> _childViews = new ObservableCollection<LayoutAnchorControl>();
 		private LayoutAnchorGroup _model;
-
-		#endregion fields
-
-		#region Constructors
 
 		static LayoutAnchorGroupControl()
 		{
@@ -43,10 +37,6 @@ namespace AvalonDock.Controls
 
 			_model.Children.CollectionChanged += (s, e) => OnModelChildrenCollectionChanged(e);
 		}
-
-		#endregion Constructors
-
-		#region Properties
 
 		public ObservableCollection<LayoutAnchorControl> Children
 		{
@@ -63,10 +53,6 @@ namespace AvalonDock.Controls
 				return _model;
 			}
 		}
-
-		#endregion Properties
-
-		#region Private Methods
 
 		private void CreateChildrenViews()
 		{
@@ -112,7 +98,5 @@ namespace AvalonDock.Controls
 				}
 			}
 		}
-
-		#endregion Private Methods
 	}
 }

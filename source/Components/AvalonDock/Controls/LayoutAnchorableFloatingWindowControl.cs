@@ -33,15 +33,9 @@ namespace AvalonDock.Controls
 	/// <seealso cref="IOverlayWindowHost"/>
 	public class LayoutAnchorableFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
 	{
-		#region fields
-
 		private readonly LayoutAnchorableFloatingWindow _model;
 		private OverlayWindow _overlayWindow = null;
 		private List<IDropArea> _dropAreas = null;
-
-		#endregion fields
-
-		#region Constructors
 
 		static LayoutAnchorableFloatingWindowControl()
 		{
@@ -81,21 +75,17 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
 		/// <inheritdoc />
 		public override ILayoutElement Model => _model;
-
-		#region SingleContentLayoutItem
 
 		/// <summary><see cref="SingleContentLayoutItem"/> dependency property.</summary>
 		public static readonly DependencyProperty SingleContentLayoutItemProperty = DependencyProperty.Register(nameof(SingleContentLayoutItem), typeof(LayoutItem), typeof(LayoutAnchorableFloatingWindowControl),
 				new FrameworkPropertyMetadata(null, OnSingleContentLayoutItemChanged));
 
 		/// <summary>Gets/sets the layout item of the selected content when shown in a single anchorable pane.</summary>
-		[Bindable(true), Description("Gets/sets the layout item of the selected content when shown in a single anchorable pane."), Category("Anchorable")]
+		[Bindable(true)]
+		[Description("Gets/sets the layout item of the selected content when shown in a single anchorable pane.")]
+		[Category("Anchorable")]
 		public LayoutItem SingleContentLayoutItem
 		{
 			get => (LayoutItem)GetValue(SingleContentLayoutItemProperty);
@@ -110,17 +100,11 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion SingleContentLayoutItem
-
 		public ICommand HideWindowCommand { get; }
 
 		public ICommand CloseWindowCommand { get; }
 
 		DockingManager IOverlayWindowHost.Manager => _model.Root.Manager;
-
-		#endregion Properties
-
-		#region Public Methods
 
 		/// <inheritdoc />
 		public override void EnableBindings()
@@ -139,8 +123,6 @@ namespace AvalonDock.Controls
 			_model.PropertyChanged -= _model_PropertyChanged;
 			base.DisableBindings();
 		}
-
-		#region IOverlayWindowHost
 
 		bool IOverlayWindowHost.HitTestScreen(Point dragPoint)
 		{
@@ -185,21 +167,15 @@ namespace AvalonDock.Controls
 			return _dropAreas;
 		}
 
-		#endregion IOverlayWindowHost
-
-		#endregion Public Methods
-
-		#region Overrides
-
 		/// <inheritdoc />
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
 			var manager = _model.Root.Manager;
 			Content = manager.CreateUIElementForModel(_model.RootPanel);
-			//SetBinding(VisibilityProperty, new Binding("IsVisible") { Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden });
+			// SetBinding(VisibilityProperty, new Binding("IsVisible") { Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden });
 
-			//Issue: http://avalondock.codeplex.com/workitem/15036
+			// Issue: http://avalondock.codeplex.com/workitem/15036
 			IsVisibleChanged += LayoutAnchorableFloatingWindowControl_IsVisibleChanged;
 			SetBinding(SingleContentLayoutItemProperty, new Binding("Model.SinglePane.SelectedContent") { Source = this, Converter = new LayoutItemFromLayoutModelConverter() });
 			_model.PropertyChanged += _model_PropertyChanged;
@@ -215,11 +191,13 @@ namespace AvalonDock.Controls
 				root.Manager?.RemoveFloatingWindow(this);
 				root.CollectGarbage();
 			}
+
 			if (_overlayWindow != null)
 			{
 				_overlayWindow.Close();
 				_overlayWindow = null;
 			}
+
 			base.OnClosed(e);
 			if (!CloseInitiatedByUser) root?.FloatingWindows.Remove(_model);
 
@@ -271,8 +249,10 @@ namespace AvalonDock.Controls
 							windowChrome.ShowSystemMenu = _model.Root.Manager.ShowSystemMenu && !handled;
 						}
 					}
+
 					break;
 			}
+
 			return base.FilterMessage(hwnd, msg, wParam, lParam, ref handled);
 		}
 
@@ -282,10 +262,6 @@ namespace AvalonDock.Controls
 			base.UpdateThemeResources(oldTheme);
 			_overlayWindow?.UpdateThemeResources(oldTheme);
 		}
-
-		#endregion Overrides
-
-		#region Private Methods
 
 		private void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
@@ -347,8 +323,7 @@ namespace AvalonDock.Controls
 				  Converter = new BoolToVisibilityConverter(),
 				  Mode = BindingMode.OneWay,
 				  ConverterParameter = Visibility.Hidden
-			  }
-			);
+			  });
 		}
 
 		/// <summary>IsVisibleChanged Event Handler.</summary>
@@ -356,11 +331,11 @@ namespace AvalonDock.Controls
 		{
 			var visibilityBinding = GetBindingExpression(VisibilityProperty);
 			if (IsVisible && visibilityBinding == null)
+			{
 				SetBinding(VisibilityProperty, new Binding(nameof(IsVisible))
 				{ Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden });
+			}
 		}
-
-		#region HideWindowCommand
 
 		private bool CanExecuteHideWindowCommand(object parameter)
 		{
@@ -374,14 +349,17 @@ namespace AvalonDock.Controls
 					canExecute = false;
 					break;
 				}
+
 				var anchorableLayoutItem = manager.GetLayoutItemFromModel(anchorable) as LayoutAnchorableItem;
 				if (anchorableLayoutItem?.HideCommand == null || !anchorableLayoutItem.HideCommand.CanExecute(parameter))
 				{
 					canExecute = false;
 					break;
 				}
+
 				canExecute = true;
 			}
+
 			return canExecute;
 		}
 
@@ -393,12 +371,9 @@ namespace AvalonDock.Controls
 				var anchorableLayoutItem = manager.GetLayoutItemFromModel(anchorable) as LayoutAnchorableItem;
 				anchorableLayoutItem.HideCommand.Execute(parameter);
 			}
+
 			Hide(); // Bring toolwindows inside hidden FloatingWindow back requires restart of app
 		}
-
-		#endregion HideWindowCommand
-
-		#region CloseWindowCommand
 
 		private bool CanExecuteCloseWindowCommand(object parameter)
 		{
@@ -412,14 +387,17 @@ namespace AvalonDock.Controls
 					canExecute = false;
 					break;
 				}
+
 				var anchorableLayoutItem = manager.GetLayoutItemFromModel(anchorable) as LayoutAnchorableItem;
 				if (anchorableLayoutItem?.CloseCommand == null || !anchorableLayoutItem.CloseCommand.CanExecute(parameter))
 				{
 					canExecute = false;
 					break;
 				}
+
 				canExecute = true;
 			}
+
 			return canExecute;
 		}
 
@@ -432,9 +410,5 @@ namespace AvalonDock.Controls
 				anchorableLayoutItem.CloseCommand.Execute(parameter);
 			}
 		}
-
-		#endregion CloseWindowCommand
-
-		#endregion Private Methods
 	}
 }

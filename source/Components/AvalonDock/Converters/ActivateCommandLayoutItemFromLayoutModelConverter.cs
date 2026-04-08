@@ -7,10 +7,10 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Windows.Data;
 using System.Windows.Markup;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Converters
 {
@@ -33,7 +33,7 @@ namespace AvalonDock.Converters
 		/// <returns>A converted value. If the method returns null, the valid null value is used.</returns>
 		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
-			//when this converter is called layout could be constructing so many properties here are potentially not valid
+			// when this converter is called layout could be constructing so many properties here are potentially not valid
 			if (!(value is LayoutContent layoutModel))
 				return null;
 

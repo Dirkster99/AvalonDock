@@ -8,7 +8,7 @@
  ************************************************************************/
 
 /**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 // This file contains general utilities to aid in development.
@@ -57,7 +57,7 @@ namespace Standard
 			// Notice that ArgumentNullException and ArgumentException take the parameters in opposite order :P
 			const string errorMessage = "The parameter can not be either null or empty.";
 			if (null == value) throw new ArgumentNullException(name, errorMessage);
-			if (value == "") throw new ArgumentException(errorMessage, name);
+			if (value == string.Empty) throw new ArgumentException(errorMessage, name);
 		}
 
 		/// <summary>
@@ -76,7 +76,7 @@ namespace Standard
 			// Notice that ArgumentNullException and ArgumentException take the parameters in opposite order :P
 			const string errorMessage = "The parameter can not be either null or empty or consist only of white space characters.";
 			if (value == null) throw new ArgumentNullException(name, errorMessage);
-			if (value.Trim() == "") throw new ArgumentException(errorMessage, name);
+			if (value.Trim() == string.Empty) throw new ArgumentException(errorMessage, name);
 		}
 
 		/// <summary>Verifies that an argument is not <c>null</c>.</summary>
@@ -85,7 +85,8 @@ namespace Standard
 		/// <param name="name">The name of the parameter that will be presented if an exception is thrown.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[DebuggerStepThrough]
-		public static void IsNotDefault<T>(T obj, string name) where T : struct
+		public static void IsNotDefault<T>(T obj, string name)
+			where T : struct
 		{
 			if (default(T).Equals(obj)) throw new ArgumentException("The parameter must not be the default value.", name);
 		}
@@ -96,7 +97,8 @@ namespace Standard
 		/// <param name="name">The name of the parameter that will be presented if an exception is thrown.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[DebuggerStepThrough]
-		public static void IsNotNull<T>(T obj, string name) where T : class
+		public static void IsNotNull<T>(T obj, string name)
+			where T : class
 		{
 			if (obj == null) throw new ArgumentNullException(name);
 		}
@@ -107,14 +109,16 @@ namespace Standard
 		/// <param name="name">The name of the parameter that will be presented if an exception is thrown.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[DebuggerStepThrough]
-		public static void IsNull<T>(T obj, string name) where T : class
+		public static void IsNull<T>(T obj, string name)
+			where T : class
 		{
 			if (obj != null) throw new ArgumentException("The parameter must be null.", name);
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[DebuggerStepThrough]
-		public static void PropertyIsNotNull<T>(T obj, string name) where T : class
+		public static void PropertyIsNotNull<T>(T obj, string name)
+			where T : class
 		{
 			if (obj == null)
 				throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "The property {0} cannot be null at this time.", name));
@@ -122,7 +126,8 @@ namespace Standard
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[DebuggerStepThrough]
-		public static void PropertyIsNull<T>(T obj, string name) where T : class
+		public static void PropertyIsNull<T>(T obj, string name)
+			where T : class
 		{
 			if (obj != null)
 				throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "The property {0} must be null at this time.", name));
@@ -135,7 +140,7 @@ namespace Standard
 		[DebuggerStepThrough]
 		public static void IsTrue(bool statement, string name)
 		{
-			if (!statement) throw new ArgumentException("", name);
+			if (!statement) throw new ArgumentException(string.Empty, name);
 		}
 
 		/// <summary> Verifies the specified statement is true. Throws an <see cref="ArgumentException"/> if it's not.</summary>
@@ -158,7 +163,10 @@ namespace Standard
 				// Two nulls are considered equal, regardless of type semantics.
 				if (actual != null && !actual.Equals(expected)) throw new ArgumentException(message, parameterName);
 			}
-			else if (!expected.Equals(actual)) throw new ArgumentException(message, parameterName);
+			else if (!expected.Equals(actual))
+			{
+				throw new ArgumentException(message, parameterName);
+			}
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
@@ -171,7 +179,9 @@ namespace Standard
 				if (actual == null || actual.Equals(notExpected)) throw new ArgumentException(message, parameterName);
 			}
 			else if (notExpected.Equals(actual))
+			{
 				throw new ArgumentException(message, parameterName);
+			}
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
@@ -236,6 +246,7 @@ namespace Standard
 				isImplemented = true;
 				break;
 			}
+
 			if (!isImplemented)
 				throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "The parameter must implement interface {0}.", interfaceType.ToString()), parameterName);
 		}

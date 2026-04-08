@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -25,17 +25,11 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public abstract class LayoutElement : DependencyObject, ILayoutElement
 	{
-		#region fields
-
 		[NonSerialized]
 		private ILayoutContainer _parent = null;
 
 		[NonSerialized]
 		private ILayoutRoot _root = null;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>
 		/// Class constructor
@@ -43,10 +37,6 @@ namespace AvalonDock.Layout
 		internal LayoutElement()
 		{
 		}
-
-		#endregion Constructors
-
-		#region Events
 
 		/// <summary>Raised when a property has changed (after the change has taken place).</summary>
 		[field: NonSerialized]
@@ -57,10 +47,6 @@ namespace AvalonDock.Layout
 		[field: NonSerialized]
 		[field: XmlIgnore]
 		public event PropertyChangingEventHandler PropertyChanging;
-
-		#endregion Events
-
-		#region Properties
 
 		/// <summary>Gets or sets the parent container of the element</summary>
 		[XmlIgnore]
@@ -95,21 +81,13 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion Properties
-
-		#region Public Methods
-
 #if TRACE
 		public virtual void ConsoleDump(int tab)
 		{
-			System.Diagnostics.Trace.Write(new String(' ', tab * 4));
+			System.Diagnostics.Trace.Write(new string(' ', tab * 4));
 			System.Diagnostics.Trace.WriteLine(this.ToString());
 		}
 #endif
-
-		#endregion Public Methods
-
-		#region Internal Methods
 
 		/// <summary>
 		/// When deserializing layout enclosing element parent is set later than this parent
@@ -120,10 +98,6 @@ namespace AvalonDock.Layout
 			if (_root == null)
 				_root = Root;
 		}
-
-		#endregion Internal Methods
-
-		#region protected methods
 
 		/// <summary>Provides derived classes an opportunity to handle execute code before to the <see cref="Parent"/> property changes.</summary>
 		protected virtual void OnParentChanging(ILayoutContainer oldValue, ILayoutContainer newValue)
@@ -151,7 +125,5 @@ namespace AvalonDock.Layout
 		/// This event should be fired BEFORE changing properties with viewmodel binding support.
 		/// </summary>
 		protected virtual void RaisePropertyChanging(string propertyName) => PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
-
-		#endregion protected methods
 	}
 }

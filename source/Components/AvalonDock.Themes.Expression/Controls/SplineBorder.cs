@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -15,13 +15,9 @@ namespace AvalonDock.Themes.Controls
 {
 	public class SplineBorder : Control
 	{
-
 		public SplineBorder()
 		{
 		}
-
-
-		#region Thickness
 
 		/// <summary>
 		/// Thickness Dependency Property
@@ -40,10 +36,6 @@ namespace AvalonDock.Themes.Controls
 			set => SetValue(ThicknessProperty, value);
 		}
 
-		#endregion
-
-		#region Fill
-
 		/// <summary>
 		/// Fill Dependency Property
 		/// </summary>
@@ -60,10 +52,6 @@ namespace AvalonDock.Themes.Controls
 			get => (Brush)GetValue(FillProperty);
 			set => SetValue(FillProperty, value);
 		}
-
-		#endregion
-
-		#region Stroke
 
 		/// <summary>
 		/// Stroke Dependency Property
@@ -82,10 +70,6 @@ namespace AvalonDock.Themes.Controls
 			set => SetValue(StrokeProperty, value);
 		}
 
-		#endregion
-
-		#region BottomBorderMargin
-
 		/// <summary>
 		/// BottomBorderMargin Dependency Property
 		/// </summary>
@@ -103,11 +87,8 @@ namespace AvalonDock.Themes.Controls
 			set => SetValue(BottomBorderMarginProperty, value);
 		}
 
-		#endregion
-
 		protected override void OnRender(DrawingContext drawingContext)
 		{
-
 			var pgFill = new PathGeometry();
 			var pfFill = new PathFigure() { IsFilled = true, IsClosed = true };
 			pfFill.StartPoint = new Point(0.0, 0.0);

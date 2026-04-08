@@ -1,4 +1,4 @@
-﻿namespace MLibTest.Demos.ViewModels
+namespace MLibTest.Demos.ViewModels
 {
 	using AvalonDock.Tools;
 	using Microsoft.Win32;
@@ -14,7 +14,6 @@
     using System.Windows;
 	using System.Windows.Input;
 
-	#region Helper Test Classes
 	/// <summary>
 	/// This class is uses to create a type safe list
 	/// of enumeration members for selection in combobox.
@@ -85,14 +84,12 @@
 			}
 		}
 	}
-	#endregion Helper Test Classes
 
 	/// <summary>
 	/// The WorkSpaceViewModel implements AvalonDock demo specific properties, events and methods.
 	/// </summary>
 	internal class WorkSpaceViewModel : MLibTest.ViewModels.Base.ViewModelBase, IWorkSpaceViewModel
 	{
-		#region fields
 		private readonly ObservableCollection<DocumentViewModel> _files = new ObservableCollection<DocumentViewModel>();
 		private ToolViewModel[] _tools = null;
 
@@ -108,23 +105,19 @@
 		private DocumentViewModel _activeDocument = null;
 
 		private int _newDocumentCounter = 0;
-		#endregion fields
 
-		#region constructors
 		/// <summary>
 		/// Class constructor
 		/// </summary>
 		public WorkSpaceViewModel()
 		{
 		}
-		#endregion constructors
 
 		/// <summary>
 		/// Event is raised when AvalonDock (or the user) selects a new document.
 		/// </summary>
 		public event EventHandler ActiveDocumentChanged;
 
-		#region Properties
 		/// <summary>
 		/// Gets/Sets the currently active document.
 		/// </summary>
@@ -276,9 +269,7 @@
 				return _newCommand;
 			}
 		}
-		#endregion Properties
 
-		#region methods
 		/// <summary>
 		/// Checks if a document can be closed and asks the user whether
 		/// to save before closing if the document appears to be dirty.
@@ -334,7 +325,6 @@
 			ActiveDocument.IsDirty = false;
 		}
 
-		#region OpenCommand
 		/// <summary>
 		/// Determines if application can currently open a document or not.
 		/// </summary>
@@ -378,9 +368,7 @@
 
 			return null;
 		}
-		#endregion  OpenCommand
 
-		#region NewCommand
 		/// <summary>
 		/// Determines if application can currently create a new document or not.
 		/// </summary>
@@ -400,7 +388,5 @@
 			ActiveDocument = newFile;
 		}
 
-		#endregion
-		#endregion methods
 	}
 }

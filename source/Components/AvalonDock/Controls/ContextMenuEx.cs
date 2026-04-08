@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -17,8 +17,6 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public class ContextMenuEx : ContextMenu
 	{
-		#region Constructors
-
 		static ContextMenuEx()
 		{
 		}
@@ -26,10 +24,6 @@ namespace AvalonDock.Controls
 		public ContextMenuEx()
 		{
 		}
-
-		#endregion Constructors
-
-		#region Overrides
 
 		protected override System.Windows.DependencyObject GetContainerForItemOverride()
 		{
@@ -42,7 +36,5 @@ namespace AvalonDock.Controls
 
 			base.OnOpened(e);
 		}
-
-		#endregion Overrides
 	}
 }

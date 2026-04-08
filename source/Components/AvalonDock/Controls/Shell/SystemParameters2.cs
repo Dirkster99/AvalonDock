@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -8,12 +8,11 @@
  ************************************************************************/
 
 /**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 namespace Microsoft.Windows.Shell
 {
-	using Standard;
 	using System;
 	using System.Collections.Generic;
 	using System.ComponentModel;
@@ -21,6 +20,7 @@ namespace Microsoft.Windows.Shell
 	using System.Runtime.InteropServices;
 	using System.Windows;
 	using System.Windows.Media;
+	using Standard;
 
 	[SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
 	public class SystemParameters2 : INotifyPropertyChanged
@@ -29,10 +29,10 @@ namespace Microsoft.Windows.Shell
 
 		[ThreadStatic]
 #pragma warning disable CS0649 // Field is never assigned to, and will always have its default value
-        private static readonly SystemParameters2 _threadLocalSingleton;
+		private static readonly SystemParameters2 _threadLocalSingleton;
 #pragma warning restore CS0649 // Field is never assigned to, and will always have its default value
 
-        private MessageWindow _messageHwnd;
+		private MessageWindow _messageHwnd;
 
 		private bool _isGlassEnabled;
 		private Color _glassColor;
@@ -49,12 +49,9 @@ namespace Microsoft.Windows.Shell
 
 		private readonly Dictionary<WM, List<_SystemMetricUpdate>> _UpdateTable;
 
-		#region Initialization and Update Methods
-
 		// Most properties exposed here have a way of being queried directly
 		// and a way of being notified of updates via a window message.
 		// This region is a grouping of both, for each of the exposed properties.
-
 		private void _InitializeIsGlassEnabled()
 		{
 			IsGlassEnabled = NativeMethods.DwmIsCompositionEnabled();
@@ -216,7 +213,7 @@ namespace Microsoft.Windows.Shell
 			if (!NativeMethods.IsThemeActive())
 			{
 				UxThemeName = "Classic";
-				UxThemeColor = "";
+				UxThemeColor = string.Empty;
 				return;
 			}
 
@@ -266,6 +263,7 @@ namespace Microsoft.Windows.Shell
 					{
 						cornerRadius = new CornerRadius(6, 6, 0, 0);
 					}
+
 					break;
 
 				case "CLASSIC":
@@ -285,8 +283,6 @@ namespace Microsoft.Windows.Shell
 			_InitializeWindowCornerRadius();
 		}
 
-		#endregion Initialization and Update Methods
-
 		/// <summary>
 		/// Private constructor.  The public way to access this class is through the static Current property.
 		/// </summary>
@@ -295,7 +291,7 @@ namespace Microsoft.Windows.Shell
 			// This window gets used for calculations about standard caption button locations
 			// so it has WS_OVERLAPPEDWINDOW as a style to give it normal caption buttons.
 			// This window may be shown during calculations of caption bar information, so create it at a location that's likely offscreen.
-			_messageHwnd = new MessageWindow((CS)0, WS.OVERLAPPEDWINDOW | WS.DISABLED, (WS_EX)0, new Rect(-16000, -16000, 100, 100), "", _WndProc);
+			_messageHwnd = new MessageWindow((CS)0, WS.OVERLAPPEDWINDOW | WS.DISABLED, (WS_EX)0, new Rect(-16000, -16000, 100, 100), string.Empty, _WndProc);
 			_messageHwnd.Dispatcher.ShutdownStarted += (sender, e) => Utility.SafeDispose(ref _messageHwnd);
 
 			// Fixup the default values of the DPs.
@@ -313,14 +309,18 @@ namespace Microsoft.Windows.Shell
 
 			_UpdateTable = new Dictionary<WM, List<_SystemMetricUpdate>>
 			{
-				{ WM.THEMECHANGED,
+				{
+					WM.THEMECHANGED,
 					new List<_SystemMetricUpdate>
 					{
 						_UpdateThemeInfo,
 						_UpdateHighContrast,
 						_UpdateWindowCornerRadius,
-						_UpdateCaptionButtonLocation, } },
-				{ WM.SETTINGCHANGE,
+						_UpdateCaptionButtonLocation,
+					}
+				},
+				{
+					WM.SETTINGCHANGE,
 					new List<_SystemMetricUpdate>
 					{
 						_UpdateCaptionHeight,
@@ -328,7 +328,9 @@ namespace Microsoft.Windows.Shell
 						_UpdateSmallIconSize,
 						_UpdateHighContrast,
 						_UpdateWindowNonClientFrameThickness,
-						_UpdateCaptionButtonLocation, } },
+						_UpdateCaptionButtonLocation,
+					}
+				},
 				{ WM.DWMNCRENDERINGCHANGED, new List<_SystemMetricUpdate> { _UpdateIsGlassEnabled } },
 				{ WM.DWMCOMPOSITIONCHANGED, new List<_SystemMetricUpdate> { _UpdateIsGlassEnabled } },
 				{ WM.DWMCOLORIZATIONCOLORCHANGED, new List<_SystemMetricUpdate> { _UpdateGlassColor } },
@@ -488,8 +490,6 @@ namespace Microsoft.Windows.Shell
 			}
 		}
 
-		#region INotifyPropertyChanged Members
-
 		private void _NotifyPropertyChanged(string propertyName)
 		{
 			Assert.IsNeitherNullNorEmpty(propertyName);
@@ -497,7 +497,5 @@ namespace Microsoft.Windows.Shell
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
-
-		#endregion INotifyPropertyChanged Members
 	}
 }

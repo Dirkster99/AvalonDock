@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -8,12 +8,11 @@
  ************************************************************************/
 
 /**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 namespace Microsoft.Windows.Shell
 {
-	using Standard;
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics.CodeAnalysis;
@@ -23,14 +22,13 @@ namespace Microsoft.Windows.Shell
 	using System.Windows.Interop;
 	using System.Windows.Media;
 	using System.Windows.Threading;
+	using Standard;
 	using HANDLE_MESSAGE = System.Collections.Generic.KeyValuePair<Standard.WM, Standard.MessageHandler>;
 
 	internal class WindowChromeWorker : DependencyObject
 	{
 		// Delegate signature used for Dispatcher.BeginInvoke.
 		private delegate void _Action();
-
-		#region fields
 
 		private const SWP _SwpFlags = SWP.FRAMECHANGED | SWP.NOSIZE | SWP.NOMOVE | SWP.NOZORDER | SWP.NOOWNERZORDER | SWP.NOACTIVATE;
 
@@ -64,8 +62,6 @@ namespace Microsoft.Windows.Shell
 
 		private WindowState _lastMenuState;
 		private bool _isGlassEnabled;
-
-		#endregion fields
 
 		public WindowChromeWorker()
 		{
@@ -140,6 +136,7 @@ namespace Microsoft.Windows.Shell
 				Utility.AddDependencyPropertyChangeListener(_window, Window.TemplateProperty, _OnWindowPropertyChangedThatRequiresTemplateFixup);
 				Utility.AddDependencyPropertyChangeListener(_window, Window.FlowDirectionProperty, _OnWindowPropertyChangedThatRequiresTemplateFixup);
 			}
+
 			_window.Closed += _UnsetWindow;
 			// Use whether we can get an HWND to determine if the Window has been loaded.
 			if (_hwnd != IntPtr.Zero)
@@ -171,6 +168,7 @@ namespace Microsoft.Windows.Shell
 				Utility.RemoveDependencyPropertyChangeListener(_window, Window.TemplateProperty, _OnWindowPropertyChangedThatRequiresTemplateFixup);
 				Utility.RemoveDependencyPropertyChangeListener(_window, Window.FlowDirectionProperty, _OnWindowPropertyChangedThatRequiresTemplateFixup);
 			}
+
 			if (_chromeInfo != null) _chromeInfo.PropertyChangedThatRequiresRepaint -= _OnChromePropertyChangedThatRequiresRepaint;
 			_RestoreStandardChromeState(true);
 		}
@@ -210,11 +208,13 @@ namespace Microsoft.Windows.Shell
 				_RestoreStandardChromeState(false);
 				return;
 			}
+
 			if (!_isHooked)
 			{
 				_hwndSource.AddHook(_WndProc);
 				_isHooked = true;
 			}
+
 			_FixupFrameworkIssues();
 			// Force this the first time.
 			_UpdateSystemMenu(_window.WindowState);
@@ -241,6 +241,7 @@ namespace Microsoft.Windows.Shell
 				_window.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, (_Action)_FixupFrameworkIssues);
 				return;
 			}
+
 			var rootElement = (FrameworkElement)VisualTreeHelper.GetChild(_window, 0);
 
 			var rcWindow = NativeMethods.GetWindowRect(_hwnd);
@@ -311,7 +312,7 @@ namespace Microsoft.Windows.Shell
 				// Since we have a limited number of retries and this method isn't actually critical, just repost.
 
 				// Disabling this for the published code to reduce debug noise.  This will get compiled away for retail binaries anyways.
-				//Assert.Fail(e.Message);
+				// Assert.Fail(e.Message);
 			}
 
 			// NativeMethods.DwmGetCompositionTimingInfo swallows E_PENDING.
@@ -368,8 +369,6 @@ namespace Microsoft.Windows.Shell
 			}
 		}
 
-		#region WindowProc and Message Handlers
-
 		private IntPtr _WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
 		{
 			// Only expecting messages for our cached HWND.
@@ -377,8 +376,11 @@ namespace Microsoft.Windows.Shell
 
 			var message = (WM)msg;
 			foreach (var handlePair in _messageTable)
+			{
 				if (handlePair.Key == message)
 					return handlePair.Value(message, wParam, lParam, out handled);
+			}
+
 			return IntPtr.Zero;
 		}
 
@@ -449,6 +451,7 @@ namespace Microsoft.Windows.Shell
 				var inputElement = _window.InputHitTest(mousePosWindow);
 				if (inputElement != null && WindowChrome.GetIsHitTestVisibleInChrome(inputElement)) ht = HT.CLIENT;
 			}
+
 			handled = true;
 			lRet = new IntPtr((int)ht);
 			return lRet;
@@ -466,8 +469,11 @@ namespace Microsoft.Windows.Shell
 					_window.ContextMenu.IsOpen = true;
 				}
 				else if (WindowChrome.GetWindowChrome(_window).ShowSystemMenu)
+				{
 					SystemCommands.ShowSystemMenuPhysicalCoordinates(_window, new Point(Utility.GET_X_LPARAM(lParam), Utility.GET_Y_LPARAM(lParam)));
+				}
 			}
+
 			handled = false;
 			return IntPtr.Zero;
 		}
@@ -497,7 +503,6 @@ namespace Microsoft.Windows.Shell
 			// notifications, WM_MOVE, WM_SIZE, and WM_SHOWWINDOW. But it doesn't
 			// suffer from the same limitations as WM_SHOWWINDOW, so you can
 			// reliably use it to react to the window being shown or hidden.
-
 			_UpdateSystemMenu(null);
 
 			if (!_isGlassEnabled)
@@ -547,6 +552,7 @@ namespace Microsoft.Windows.Shell
 				{
 					_windowPosAtStartOfUserMove = new Point(_window.Left, _window.Top);
 				}
+
 				// Realistically we also don't want to update the start position when moving from one docked state to another (or to and from maximized),
 				// but it's tricky to detect and this is already a workaround for a bug that's fixed in newer versions of the framework.
 				// Not going to try to handle all cases.
@@ -569,6 +575,7 @@ namespace Microsoft.Windows.Shell
 				_window.Top = _windowPosAtStartOfUserMove.Y;
 				_window.Left = _windowPosAtStartOfUserMove.X;
 			}
+
 			handled = false;
 			return IntPtr.Zero;
 		}
@@ -581,8 +588,6 @@ namespace Microsoft.Windows.Shell
 			handled = false;
 			return IntPtr.Zero;
 		}
-
-		#endregion WindowProc and Message Handlers
 
 		/// <summary>Add and remove a native WindowStyle from the HWND.</summary>
 		/// <param name="removeStyle">The styles to be removed.  These can be bitwise combined.</param>
@@ -612,6 +617,7 @@ namespace Microsoft.Windows.Shell
 				case SW.SHOWMAXIMIZED:
 					return WindowState.Maximized;
 			}
+
 			return WindowState.Normal;
 		}
 
@@ -682,6 +688,7 @@ namespace Microsoft.Windows.Shell
 						break;
 				}
 			}
+
 			if (modified) _ModifyStyle(0, WS.VISIBLE);
 		}
 
@@ -701,7 +708,10 @@ namespace Microsoft.Windows.Shell
 				_FixupWindows7Issues();
 			}
 			else
+			{
 				_SetRoundingRegion(null);
+			}
+
 			NativeMethods.SetWindowPos(_hwnd, IntPtr.Zero, 0, 0, 0, 0, _SwpFlags);
 		}
 
@@ -830,8 +840,10 @@ namespace Microsoft.Windows.Shell
 		{
 			// Round outwards.
 			if (DoubleUtilities.AreClose(0, radius))
+			{
 				return NativeMethods.CreateRectRgn((int)Math.Floor(region.Left), (int)Math.Floor(region.Top),
 													(int)Math.Ceiling(region.Right), (int)Math.Ceiling(region.Bottom));
+			}
 
 			// RoundedRect HRGNs require an additional pixel of padding on the bottom right to look correct.
 			return NativeMethods.CreateRoundRectRgn(
@@ -879,14 +891,18 @@ namespace Microsoft.Windows.Shell
 				// Not an error.  Just not on Vista so we're not going to get glass.
 				return;
 			}
+
 			if (_hwnd == IntPtr.Zero)
 			{
 				// Can't do anything with this call until the Window has been shown.
 				return;
 			}
+
 			// Ensure standard HWND background painting when DWM isn't enabled.
 			if (!NativeMethods.DwmIsCompositionEnabled())
+			{
 				_hwndSource.CompositionTarget.BackgroundColor = SystemColors.WindowColor;
+			}
 			else
 			{
 				// This makes the glass visible at a Win32 level so long as nothing else is covering it.
@@ -916,9 +932,10 @@ namespace Microsoft.Windows.Shell
 		/// Matrix of the HT values to return when responding to NC window messages.
 		/// </summary>
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Member")]
-		private static readonly HT[,] _HitTestBorders = {
-			{ HT.TOPLEFT,    HT.TOP,     HT.TOPRIGHT    },
-			{ HT.LEFT,       HT.CLIENT,  HT.RIGHT       },
+		private static readonly HT[,] _HitTestBorders =
+		{
+			{ HT.TOPLEFT,    HT.TOP,     HT.TOPRIGHT },
+			{ HT.LEFT,       HT.CLIENT,  HT.RIGHT },
 			{ HT.BOTTOMLEFT, HT.BOTTOM,  HT.BOTTOMRIGHT },
 		};
 
@@ -932,11 +949,13 @@ namespace Microsoft.Windows.Shell
 			// Determine if the point is at the top or bottom of the window.
 			if (mousePosition.Y >= windowPosition.Top && mousePosition.Y < windowPosition.Top + _chromeInfo.ResizeBorderThickness.Top + _chromeInfo.CaptionHeight)
 			{
-				onResizeBorder = (mousePosition.Y < (windowPosition.Top + _chromeInfo.ResizeBorderThickness.Top));
+				onResizeBorder = mousePosition.Y < (windowPosition.Top + _chromeInfo.ResizeBorderThickness.Top);
 				uRow = 0; // top (caption or resize border)
 			}
 			else if (mousePosition.Y < windowPosition.Bottom && mousePosition.Y >= windowPosition.Bottom - (int)_chromeInfo.ResizeBorderThickness.Bottom)
+			{
 				uRow = 2; // bottom
+			}
 
 			// Determine if the point is at the left or right of the window.
 			if (mousePosition.X >= windowPosition.Left && mousePosition.X < windowPosition.Left + (int)_chromeInfo.ResizeBorderThickness.Left)
@@ -951,8 +970,6 @@ namespace Microsoft.Windows.Shell
 			if (ht == HT.TOP && !onResizeBorder) ht = HT.CAPTION;
 			return ht;
 		}
-
-		#region Remove Custom Chrome Methods
 
 		private void _RestoreStandardChromeState(bool isClosing)
 		{
@@ -986,6 +1003,7 @@ namespace Microsoft.Windows.Shell
 				// Undo anything that was done before.
 				rootElement.Margin = new Thickness();
 			}
+
 			_window.StateChanged -= _FixupRestoreBounds;
 			_isFixedUp = false;
 		}
@@ -1010,7 +1028,5 @@ namespace Microsoft.Windows.Shell
 			_ClearRoundingRegion();
 			NativeMethods.SetWindowPos(_hwnd, IntPtr.Zero, 0, 0, 0, 0, _SwpFlags);
 		}
-
-		#endregion Remove Custom Chrome Methods
 	}
 }

@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -21,13 +21,7 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutDocumentPaneGroup : LayoutPositionableGroup<ILayoutDocumentPane>, ILayoutDocumentPane, ILayoutOrientableGroup
 	{
-		#region fields
-
 		private Orientation _orientation;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>Class constructor</summary>
 		public LayoutDocumentPaneGroup()
@@ -39,10 +33,6 @@ namespace AvalonDock.Layout
 		{
 			Children.Add(documentPane);
 		}
-
-		#endregion Constructors
-
-		#region Properties
 
 		/// <summary>Gets/sets the (Horizontal, Vertical) <see cref="System.Windows.Controls.Orientation"/> of this group.</summary>
 		public Orientation Orientation
@@ -56,10 +46,6 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(Orientation));
 			}
 		}
-
-		#endregion Properties
-
-		#region Overrides
 
 		/// <inheritdoc />
 		protected override bool GetVisibility() => true;
@@ -90,6 +76,5 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion Overrides
 	}
 }

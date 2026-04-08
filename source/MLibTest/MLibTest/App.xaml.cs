@@ -1,4 +1,4 @@
-﻿namespace MLibTest
+namespace MLibTest
 {
 	using MLib.Interfaces;
 	using MLibTest.Models;
@@ -18,12 +18,9 @@
 	/// </summary>
 	public partial class App : Application
 	{
-		#region fields
 		private readonly ViewModels.AppViewModel _appVM;
 		private readonly MainWindow _mainWindow;
-		#endregion fields
 
-		#region constructors
 		static App()
 		{
 			// Create service model to ensure available services
@@ -39,7 +36,6 @@
 			_appVM = new ViewModels.AppViewModel(new AppLifeCycleViewModel());
 			LayoutLoaded = new LayoutLoader(@".\AvalonDock.Layout.config");
 		}
-		#endregion constructors
 
 		/// <summary>
 		/// Gets an object that loads the AvalonDock Xml layout string
@@ -47,7 +43,6 @@
 		/// </summary>
 		internal LayoutLoader LayoutLoaded { get; set; }
 
-		#region methods
 		private void Application_Startup(object sender, StartupEventArgs e)
 		{
 			// Set shutdown mode here (and reset further below) to enable showing custom dialogs (messageboxes)
@@ -260,6 +255,5 @@
 		{
 			return ServiceLocator.ServiceContainer.Instance.GetService<TServiceContract>();
 		}
-		#endregion methods
 	}
 }

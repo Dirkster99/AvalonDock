@@ -7,9 +7,6 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Controls;
-using AvalonDock.Layout;
-using AvalonDock.Themes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,6 +22,9 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Markup;
 using System.Windows.Threading;
+using AvalonDock.Controls;
+using AvalonDock.Layout;
+using AvalonDock.Themes;
 
 namespace AvalonDock
 {
@@ -40,10 +40,9 @@ namespace AvalonDock
 	/// <seealso cref="IOverlayWindowHost"/>
 	[ContentProperty(nameof(Layout))]
 	[TemplatePart(Name = "PART_AutoHideArea")]
-    [SuppressMessage("Maintainability", "CA1506:Avoid excessive class coupling")]
-    public class DockingManager : Control, IOverlayWindowHost//, ILogicalChildrenContainer
+	[SuppressMessage("Maintainability", "CA1506:Avoid excessive class coupling")]
+	public class DockingManager : Control, IOverlayWindowHost// , ILogicalChildrenContainer
 	{
-		#region fields
 		// ShortCut to current AvalonDock theme if OnThemeChanged() is invoked with DictionaryTheme instance
 		// in e.OldValue and e.NewValue of the passed event
 		private ResourceDictionary currentThemeResourceDictionary;
@@ -66,10 +65,6 @@ namespace AvalonDock
 
 		internal bool SuspendDocumentsSourceBinding = false;
 		internal bool SuspendAnchorablesSourceBinding = false;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>
 		/// Static class constructor to support WPF property control registration.
@@ -97,10 +92,6 @@ namespace AvalonDock
 			Loaded += DockingManager_Loaded;
 			Unloaded += DockingManager_Unloaded;
 		}
-
-		#endregion Constructors
-
-		#region Events
 
 		/// <summary>Event fired when <see cref="DockingManager.Layout"/> property changes.</summary>
 		/// <seealso cref="Layout"/>
@@ -145,19 +136,14 @@ namespace AvalonDock
 		/// </summary>
 		public event EventHandler<LayoutFloatingWindowControlClosedEventArgs> LayoutFloatingWindowControlClosed;
 
-
-		#endregion Events
-
-		#region Public Properties
-
-		#region Layout
-
 		/// <summary><see cref="Layout"/> dependency property.</summary>
 		public static readonly DependencyProperty LayoutProperty = DependencyProperty.Register(nameof(Layout), typeof(LayoutRoot), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnLayoutChanged, CoerceLayoutValue));
 
 		/// <summary>Gets/sets the layout root of the layout tree managed in this framework.</summary>
-		[Bindable(true), Description("Gets/sets the layout root of the layout tree managed in this framework."), Category("Layout")]
+		[Bindable(true)]
+		[Description("Gets/sets the layout root of the layout tree managed in this framework.")]
+		[Category("Layout")]
 		public LayoutRoot Layout
 		{
 			get => (LayoutRoot)GetValue(LayoutProperty);
@@ -242,8 +228,8 @@ namespace AvalonDock
 							fw.Hide();
 					}
 
-					//fw.Owner = Window.GetWindow(this);
-					//fw.SetParentToMainWindowOf(this);
+					// fw.Owner = Window.GetWindow(this);
+					// fw.SetParentToMainWindowOf(this);
 				}
 
 				// In order to prevent resource leaks, unsubscribe from SizeChanged event for case when user call loading of Layout Settigns.
@@ -258,13 +244,9 @@ namespace AvalonDock
 			}
 
 			LayoutChanged?.Invoke(this, EventArgs.Empty);
-			//    Layout?.CollectGarbage();
+			// Layout?.CollectGarbage();
 			CommandManager.InvalidateRequerySuggested();
 		}
-
-		#endregion Layout
-
-		#region LayoutUpdateStrategy
 
 		/// <summary><see cref="LayoutUpdateStrategy"/> dependency property.</summary>
 		public static readonly DependencyProperty LayoutUpdateStrategyProperty = DependencyProperty.Register(nameof(LayoutUpdateStrategy), typeof(ILayoutUpdateStrategy), typeof(DockingManager),
@@ -275,23 +257,23 @@ namespace AvalonDock
 		/// </summary>
 		/// <remarks>Sometimes it's impossible to automatically insert an anchorable in the layout without specifing the target parent pane.
 		/// Set this property to an object that will be asked to insert the anchorable to the desidered position.</remarks>
-		[Bindable(true), Description("Gets/sets the layout strategy class that can be to called by the framework when it needs to position a LayoutAnchorable inside an existing layout."), Category("Layout")]
+		[Bindable(true)]
+		[Description("Gets/sets the layout strategy class that can be to called by the framework when it needs to position a LayoutAnchorable inside an existing layout.")]
+		[Category("Layout")]
 		public ILayoutUpdateStrategy LayoutUpdateStrategy
 		{
 			get => (ILayoutUpdateStrategy)GetValue(LayoutUpdateStrategyProperty);
 			set => SetValue(LayoutUpdateStrategyProperty, value);
 		}
 
-		#endregion LayoutUpdateStrategy
-
-		#region DocumentPaneTemplate
-
 		/// <summary><see cref="DocumentPaneTemplate"/> dependency property.</summary>
 		public static readonly DependencyProperty DocumentPaneTemplateProperty = DependencyProperty.Register(nameof(DocumentPaneTemplate), typeof(ControlTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnDocumentPaneTemplateChanged));
 
 		/// <summary>Gets/sets the <see cref="ControlTemplate"/> that can be used to render the <see cref="LayoutDocumentPaneControl"/>.</summary>
-		[Bindable(true), Description("Gets/sets the ControlTemplate´that can be used to render the LayoutDocumentPaneControl."), Category("Document")]
+		[Bindable(true)]
+		[Description("Gets/sets the ControlTemplate´that can be used to render the LayoutDocumentPaneControl.")]
+		[Category("Document")]
 		public ControlTemplate DocumentPaneTemplate
 		{
 			get => (ControlTemplate)GetValue(DocumentPaneTemplateProperty);
@@ -309,10 +291,6 @@ namespace AvalonDock
 		{
 		}
 
-		#endregion DocumentPaneTemplate
-
-		#region AnchorablePaneTemplate
-
 		/// <summary>
 		/// <see cref="AnchorablePaneTemplate"/> dependency property
 		/// </summary>
@@ -320,7 +298,9 @@ namespace AvalonDock
 				new FrameworkPropertyMetadata(null, OnAnchorablePaneTemplateChanged));
 
 		/// <summary>Gets/sets the <see cref="ControlTemplate"/> used to render <see cref="LayoutAnchorablePaneControl"/>.</summary>
-		[Bindable(true), Description("Gets/sets the ControlTemplate used to render LayoutAnchorablePaneControl"), Category("Anchorable")]
+		[Bindable(true)]
+		[Description("Gets/sets the ControlTemplate used to render LayoutAnchorablePaneControl")]
+		[Category("Anchorable")]
 		public ControlTemplate AnchorablePaneTemplate
 		{
 			get => (ControlTemplate)GetValue(AnchorablePaneTemplateProperty);
@@ -335,64 +315,56 @@ namespace AvalonDock
 		{
 		}
 
-		#endregion AnchorablePaneTemplate
-
-		#region AnchorSideTemplate
-
 		/// <summary>The <see cref="AnchorSideTemplate"/> dependency property.</summary>
 		public static readonly DependencyProperty AnchorSideTemplateProperty = DependencyProperty.Register(nameof(AnchorSideTemplate), typeof(ControlTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata((ControlTemplate)null));
 
 		/// <summary>Gets/sets the <see cref="ControlTemplate"/> used to render <see cref="LayoutAnchorSideControl"/>.</summary>
-		[Bindable(true), Description("Gets/sets the ControlTemplate used to render LayoutAnchorSideControl."), Category("Anchor")]
+		[Bindable(true)]
+		[Description("Gets/sets the ControlTemplate used to render LayoutAnchorSideControl.")]
+		[Category("Anchor")]
 		public ControlTemplate AnchorSideTemplate
 		{
 			get => (ControlTemplate)GetValue(AnchorSideTemplateProperty);
 			set => SetValue(AnchorSideTemplateProperty, value);
 		}
 
-		#endregion AnchorSideTemplate
-
-		#region AnchorGroupTemplate
-
 		/// <summary><see cref="AnchorGroupTemplate"/> dependency property.</summary>
 		public static readonly DependencyProperty AnchorGroupTemplateProperty = DependencyProperty.Register(nameof(AnchorGroupTemplate), typeof(ControlTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata((ControlTemplate)null));
 
 		/// <summary>Gets/sets the <see cref="ControlTemplate"/> used to render the <see cref="LayoutAnchorGroupControl"/>.</summary>
-		[Bindable(true), Description("Gets/sets the ControlTemplate used to render LayoutAnchorGroupControl."), Category("Anchor")]
+		[Bindable(true)]
+		[Description("Gets/sets the ControlTemplate used to render LayoutAnchorGroupControl.")]
+		[Category("Anchor")]
 		public ControlTemplate AnchorGroupTemplate
 		{
 			get => (ControlTemplate)GetValue(AnchorGroupTemplateProperty);
 			set => SetValue(AnchorGroupTemplateProperty, value);
 		}
 
-		#endregion AnchorGroupTemplate
-
-		#region AnchorTemplate
-
 		/// <summary><see cref="AnchorTemplate"/> dependency property.</summary>
 		public static readonly DependencyProperty AnchorTemplateProperty = DependencyProperty.Register(nameof(AnchorTemplate), typeof(ControlTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata((ControlTemplate)null));
 
 		/// <summary>Gets/sets the <see cref="ControlTemplate"/> used to render a <see cref="LayoutAnchorControl"/>.</summary>
-		[Bindable(true), Description("Gets/sets the ControlTemplate used to render a LayoutAnchorControl."), Category("Anchor")]
+		[Bindable(true)]
+		[Description("Gets/sets the ControlTemplate used to render a LayoutAnchorControl.")]
+		[Category("Anchor")]
 		public ControlTemplate AnchorTemplate
 		{
 			get => (ControlTemplate)GetValue(AnchorTemplateProperty);
 			set => SetValue(AnchorTemplateProperty, value);
 		}
 
-		#endregion AnchorTemplate
-
-		#region DocumentPaneControlStyle
-
 		/// <summary><see cref="DocumentPaneControlStyle"/> dependency property.</summary>
 		public static readonly DependencyProperty DocumentPaneControlStyleProperty = DependencyProperty.Register(nameof(DocumentPaneControlStyle), typeof(Style), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnDocumentPaneControlStyleChanged));
 
 		/// <summary>Gets/sets the style of a <see cref="LayoutDocumentPaneControl"/>.</summary>
-		[Bindable(true), Description("Gets/sets the style of a LayoutDocumentPaneControl."), Category("Document")]
+		[Bindable(true)]
+		[Description("Gets/sets the style of a LayoutDocumentPaneControl.")]
+		[Category("Document")]
 		public Style DocumentPaneControlStyle
 		{
 			get => (Style)GetValue(DocumentPaneControlStyleProperty);
@@ -407,16 +379,14 @@ namespace AvalonDock
 		{
 		}
 
-		#endregion DocumentPaneControlStyle
-
-		#region AnchorablePaneControlStyle
-
 		/// <summary><see cref="AnchorablePaneControlStyle"/> dependency property.</summary>
 		public static readonly DependencyProperty AnchorablePaneControlStyleProperty = DependencyProperty.Register(nameof(AnchorablePaneControlStyle), typeof(Style), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnAnchorablePaneControlStyleChanged));
 
 		/// <summary>Gets/sets the <see cref="Style"/> to apply to <see cref="LayoutAnchorablePaneControl"/>.</summary>
-		[Bindable(true), Description("Gets/sets the Style to apply to LayoutAnchorablePaneControl."), Category("Anchorable")]
+		[Bindable(true)]
+		[Description("Gets/sets the Style to apply to LayoutAnchorablePaneControl.")]
+		[Category("Anchorable")]
 		public Style AnchorablePaneControlStyle
 		{
 			get => (Style)GetValue(AnchorablePaneControlStyleProperty);
@@ -431,16 +401,14 @@ namespace AvalonDock
 		{
 		}
 
-		#endregion AnchorablePaneControlStyle
-
-		#region DocumentHeaderTemplate
-
 		/// <summary><see cref="DocumentHeaderTemplate"/> dependency property.</summary>
 		public static readonly DependencyProperty DocumentHeaderTemplateProperty = DependencyProperty.Register(nameof(DocumentHeaderTemplate), typeof(DataTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata((DataTemplate)null, OnDocumentHeaderTemplateChanged, CoerceDocumentHeaderTemplateValue));
 
 		/// <summary>Gets/sets the <see cref="DataTemplate"/> to use for document headers.</summary>
-		[Bindable(true), Description("Gets/sets the DataTemplate to use for document headers."), Category("Document")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataTemplate to use for document headers.")]
+		[Category("Document")]
 		public DataTemplate DocumentHeaderTemplate
 		{
 			get => (DataTemplate)GetValue(DocumentHeaderTemplateProperty);
@@ -463,16 +431,14 @@ namespace AvalonDock
 			return value;
 		}
 
-		#endregion DocumentHeaderTemplate
-
-		#region DocumentHeaderTemplateSelector
-
 		/// <summary><see cref="DocumentHeaderTemplateSelector"/> dependency property.</summary>
 		public static readonly DependencyProperty DocumentHeaderTemplateSelectorProperty = DependencyProperty.Register(nameof(DocumentHeaderTemplateSelector), typeof(DataTemplateSelector), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnDocumentHeaderTemplateSelectorChanged, CoerceDocumentHeaderTemplateSelectorValue));
 
 		/// <summary>Gets /sets the <see cref="DataTemplateSelector"/> that can be used for selecting a <see cref="DataTemplate"/> for a document header.</summary>
-		[Bindable(true), Description("Gets /sets the DataTemplateSelector that can be used for selecting a DataTemplates for a document header."), Category("Document")]
+		[Bindable(true)]
+		[Description("Gets /sets the DataTemplateSelector that can be used for selecting a DataTemplates for a document header.")]
+		[Category("Document")]
 		public DataTemplateSelector DocumentHeaderTemplateSelector
 		{
 			get => (DataTemplateSelector)GetValue(DocumentHeaderTemplateSelectorProperty);
@@ -494,16 +460,14 @@ namespace AvalonDock
 		/// <summary>Coerces the <see cref="DocumentHeaderTemplateSelector"/> value.</summary>
 		private static object CoerceDocumentHeaderTemplateSelectorValue(DependencyObject d, object value) => value;
 
-		#endregion DocumentHeaderTemplateSelector
-
-		#region DocumentTitleTemplate
-
 		/// <summary><see cref="DocumentTitleTemplate"/> dependency property.</summary>
 		public static readonly DependencyProperty DocumentTitleTemplateProperty = DependencyProperty.Register(nameof(DocumentTitleTemplate), typeof(DataTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnDocumentTitleTemplateChanged, CoerceDocumentTitleTemplateValue));
 
 		/// <summary>Gets/sets the <see cref="DataTemplate"/> to use for displaying the title of a document.</summary>
-		[Bindable(true), Description("Gets/sets the DataTemplate to use for displaying the title of a document."), Category("Document")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataTemplate to use for displaying the title of a document.")]
+		[Category("Document")]
 		public DataTemplate DocumentTitleTemplate
 		{
 			get => (DataTemplate)GetValue(DocumentTitleTemplateProperty);
@@ -526,16 +490,14 @@ namespace AvalonDock
 			return value;
 		}
 
-		#endregion DocumentTitleTemplate
-
-		#region DocumentTitleTemplateSelector
-
 		/// <summary><see cref="DocumentTitleTemplateSelector"/> dependency property.</summary>
 		public static readonly DependencyProperty DocumentTitleTemplateSelectorProperty = DependencyProperty.Register(nameof(DocumentTitleTemplateSelector), typeof(DataTemplateSelector), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnDocumentTitleTemplateSelectorChanged, CoerceDocumentTitleTemplateSelectorValue));
 
 		/// <summary>Gets/sets the <see cref="DataTemplateSelector"/> to use for displaying the <see cref="DataTemplate"/> of a document's title.</summary>
-		[Bindable(true), Description("Gets/sets the DataTemplateSelector to use for displaying the DataTemplate of a document's title."), Category("Document")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataTemplateSelector to use for displaying the DataTemplate of a document's title.")]
+		[Category("Document")]
 		public DataTemplateSelector DocumentTitleTemplateSelector
 		{
 			get => (DataTemplateSelector)GetValue(DocumentTitleTemplateSelectorProperty);
@@ -555,16 +517,14 @@ namespace AvalonDock
 		/// <summary>Coerces the <see cref="DocumentTitleTemplateSelector"/> value.</summary>
 		private static object CoerceDocumentTitleTemplateSelectorValue(DependencyObject d, object value) => value;
 
-		#endregion DocumentTitleTemplateSelector
-
-		#region AnchorableTitleTemplate
-
 		/// <summary><see cref="AnchorableTitleTemplate"/> dependency property.</summary>
 		public static readonly DependencyProperty AnchorableTitleTemplateProperty = DependencyProperty.Register(nameof(AnchorableTitleTemplate), typeof(DataTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata((DataTemplate)null, OnAnchorableTitleTemplateChanged, CoerceAnchorableTitleTemplateValue));
 
 		/// <summary>Gets/sets the <see cref="DataTemplate"/> to use for the title of an anchorable.</summary>
-		[Bindable(true), Description("Gets/sets the DataTemplate to use for the title of an anchorable."), Category("Anchorable")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataTemplate to use for the title of an anchorable.")]
+		[Category("Anchorable")]
 		public DataTemplate AnchorableTitleTemplate
 		{
 			get => (DataTemplate)GetValue(AnchorableTitleTemplateProperty);
@@ -587,16 +547,14 @@ namespace AvalonDock
 			return value;
 		}
 
-		#endregion AnchorableTitleTemplate
-
-		#region AnchorableTitleTemplateSelector
-
 		/// <summary><see cref="AnchorableTitleTemplateSelector"/> dependency property.</summary>
 		public static readonly DependencyProperty AnchorableTitleTemplateSelectorProperty = DependencyProperty.Register(nameof(AnchorableTitleTemplateSelector), typeof(DataTemplateSelector), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnAnchorableTitleTemplateSelectorChanged));
 
 		/// <summary>Gets/sets the <see cref="DataTemplateSelector"/> to use when selecting a <see cref="DataTemplate"/> for the title of an anchorable.</summary>
-		[Bindable(true), Description("Gets/sets the DataTemplateSelector to use when selecting a DataTemplate for the title of an anchorable."), Category("Anchorable")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataTemplateSelector to use when selecting a DataTemplate for the title of an anchorable.")]
+		[Category("Anchorable")]
 		public DataTemplateSelector AnchorableTitleTemplateSelector
 		{
 			get => (DataTemplateSelector)GetValue(AnchorableTitleTemplateSelectorProperty);
@@ -613,16 +571,14 @@ namespace AvalonDock
 				AnchorableTitleTemplate = null;
 		}
 
-		#endregion AnchorableTitleTemplateSelector
-
-		#region AnchorableHeaderTemplate
-
 		/// <summary><see cref="AnchorableHeaderTemplate"/> dependency property.</summary>
 		public static readonly DependencyProperty AnchorableHeaderTemplateProperty = DependencyProperty.Register(nameof(AnchorableHeaderTemplate), typeof(DataTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnAnchorableHeaderTemplateChanged, CoerceAnchorableHeaderTemplateValue));
 
 		/// <summary>Gets/sets the <see cref="DataTemplate"/> to use for a header of an anchorable.</summary>
-		[Bindable(true), Description("Gets/sets the DataTemplate to use for a header of an anchorable"), Category("Anchorable")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataTemplate to use for a header of an anchorable")]
+		[Category("Anchorable")]
 		public DataTemplate AnchorableHeaderTemplate
 		{
 			get => (DataTemplate)GetValue(AnchorableHeaderTemplateProperty);
@@ -645,16 +601,14 @@ namespace AvalonDock
 			return value;
 		}
 
-		#endregion AnchorableHeaderTemplate
-
-		#region AnchorableHeaderTemplateSelector
-
 		/// <summary><see cref="AnchorableHeaderTemplateSelector"/> dependency property.</summary>
 		public static readonly DependencyProperty AnchorableHeaderTemplateSelectorProperty = DependencyProperty.Register(nameof(AnchorableHeaderTemplateSelector), typeof(DataTemplateSelector), typeof(DockingManager),
 				new FrameworkPropertyMetadata((DataTemplateSelector)null, OnAnchorableHeaderTemplateSelectorChanged));
 
 		/// <summary>Gets/sets the <see cref="DataTemplateSelector"/> to use for selecting the <see cref="DataTemplate"/> for the header of an anchorable.</summary>
-		[Bindable(true), Description("Gets/sets the DataTemplateSelector to use for selecting the DataTemplate for the header of an anchorable."), Category("Anchorable")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataTemplateSelector to use for selecting the DataTemplate for the header of an anchorable.")]
+		[Category("Anchorable")]
 		public DataTemplateSelector AnchorableHeaderTemplateSelector
 		{
 			get => (DataTemplateSelector)GetValue(AnchorableHeaderTemplateSelectorProperty);
@@ -671,16 +625,14 @@ namespace AvalonDock
 				AnchorableHeaderTemplate = null;
 		}
 
-		#endregion AnchorableHeaderTemplateSelector
-
-		#region LayoutRootPanel
-
 		/// <summary><see cref="LayoutRootPanel"/> dependency property.</summary>
 		public static readonly DependencyProperty LayoutRootPanelProperty = DependencyProperty.Register(nameof(LayoutRootPanel), typeof(LayoutPanelControl), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnLayoutRootPanelChanged));
 
 		/// <summary>Gets/sets the layout <see cref="LayoutPanelControl"/> which is attached to the Layout.Root property.</summary>
-		[Bindable(true), Description("Gets/sets the layout LayoutPanelControl which is attached to the Layout.Root property."), Category("Layout")]
+		[Bindable(true)]
+		[Description("Gets/sets the layout LayoutPanelControl which is attached to the Layout.Root property.")]
+		[Category("Layout")]
 		public LayoutPanelControl LayoutRootPanel
 		{
 			get => (LayoutPanelControl)GetValue(LayoutRootPanelProperty);
@@ -699,16 +651,14 @@ namespace AvalonDock
 				InternalAddLogicalChild(e.NewValue);
 		}
 
-		#endregion LayoutRootPanel
-
-		#region RightSidePanel
-
 		/// <summary><see cref="RightSidePanel"/> dependency property.</summary>
 		public static readonly DependencyProperty RightSidePanelProperty = DependencyProperty.Register(nameof(RightSidePanel), typeof(LayoutAnchorSideControl), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnRightSidePanelChanged));
 
 		/// <summary>Gets/sets the <see cref="LayoutAnchorSideControl"/> that is displayed as right side panel control.</summary>
-		[Bindable(true), Description("Gets/sets the LayoutAnchorSideControl that is displayed as right side panel control."), Category("Side Panel")]
+		[Bindable(true)]
+		[Description("Gets/sets the LayoutAnchorSideControl that is displayed as right side panel control.")]
+		[Category("Side Panel")]
 		public LayoutAnchorSideControl RightSidePanel
 		{
 			get => (LayoutAnchorSideControl)GetValue(RightSidePanelProperty);
@@ -727,16 +677,14 @@ namespace AvalonDock
 				InternalAddLogicalChild(e.NewValue);
 		}
 
-		#endregion RightSidePanel
-
-		#region LeftSidePanel
-
 		/// <summary><see cref="LeftSidePanel"/> dependency property.</summary>
 		public static readonly DependencyProperty LeftSidePanelProperty = DependencyProperty.Register(nameof(LeftSidePanel), typeof(LayoutAnchorSideControl), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnLeftSidePanelChanged));
 
 		/// <summary>Gets/sets the <see cref="LayoutAnchorSideControl"/> that is displayed as left side panel control.</summary>
-		[Bindable(true), Description("Gets/sets the LayoutAnchorSideControl that is displayed as left side panel control."), Category("Side Panel")]
+		[Bindable(true)]
+		[Description("Gets/sets the LayoutAnchorSideControl that is displayed as left side panel control.")]
+		[Category("Side Panel")]
 		public LayoutAnchorSideControl LeftSidePanel
 		{
 			get => (LayoutAnchorSideControl)GetValue(LeftSidePanelProperty);
@@ -755,16 +703,14 @@ namespace AvalonDock
 				InternalAddLogicalChild(e.NewValue);
 		}
 
-		#endregion LeftSidePanel
-
-		#region TopSidePanel
-
 		/// <summary><see cref="TopSidePanel"/> dependency property.</summary>
 		public static readonly DependencyProperty TopSidePanelProperty = DependencyProperty.Register(nameof(TopSidePanel), typeof(LayoutAnchorSideControl), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnTopSidePanelChanged));
 
 		/// <summary>Gets/sets the <see cref="LayoutAnchorSideControl"/> that is displayed as top side panel control.</summary>
-		[Bindable(true), Description("Gets/sets the LayoutAnchorSideControl that is displayed as top side panel control."), Category("Side Panel")]
+		[Bindable(true)]
+		[Description("Gets/sets the LayoutAnchorSideControl that is displayed as top side panel control.")]
+		[Category("Side Panel")]
 		public LayoutAnchorSideControl TopSidePanel
 		{
 			get => (LayoutAnchorSideControl)GetValue(TopSidePanelProperty);
@@ -783,16 +729,14 @@ namespace AvalonDock
 				InternalAddLogicalChild(e.NewValue);
 		}
 
-		#endregion TopSidePanel
-
-		#region BottomSidePanel
-
 		/// <summary><see cref="BottomSidePanel"/> dependency property. </summary>
 		public static readonly DependencyProperty BottomSidePanelProperty = DependencyProperty.Register(nameof(BottomSidePanel), typeof(LayoutAnchorSideControl), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnBottomSidePanelChanged));
 
 		/// <summary>Gets/sets the <see cref="LayoutAnchorSideControl"/> that is displayed as bottom side panel control.</summary>
-		[Bindable(true), Description("Gets/sets the LayoutAnchorSideControl that is displayed as bottom side panel control."), Category("Side Panel")]
+		[Bindable(true)]
+		[Description("Gets/sets the LayoutAnchorSideControl that is displayed as bottom side panel control.")]
+		[Category("Side Panel")]
 		public LayoutAnchorSideControl BottomSidePanel
 		{
 			get => (LayoutAnchorSideControl)GetValue(BottomSidePanelProperty);
@@ -811,10 +755,6 @@ namespace AvalonDock
 				InternalAddLogicalChild(e.NewValue);
 		}
 
-		#endregion BottomSidePanel
-
-		#region AutoHideWindow
-
 		/// <summary><see cref="AutoHideWindow"/> Read-Only dependency property.</summary>
 		private static readonly DependencyPropertyKey AutoHideWindowPropertyKey = DependencyProperty.RegisterReadOnly(nameof(AutoHideWindow), typeof(LayoutAutoHideWindowControl), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnAutoHideWindowChanged));
@@ -822,7 +762,9 @@ namespace AvalonDock
 		public static readonly DependencyProperty AutoHideWindowProperty = AutoHideWindowPropertyKey.DependencyProperty;
 
 		/// <summary>Gets the <see cref="LayoutAutoHideWindowControl"/> that is currently shown as autohide window.</summary>
-		[Bindable(true), Description("Gets the LayoutAutoHideWindowControl that is currently shown as autohide window."), Category("AutoHideWindow")]
+		[Bindable(true)]
+		[Description("Gets the LayoutAutoHideWindowControl that is currently shown as autohide window.")]
+		[Category("AutoHideWindow")]
 		public LayoutAutoHideWindowControl AutoHideWindow => (LayoutAutoHideWindowControl)GetValue(AutoHideWindowProperty);
 
 		/// <summary>
@@ -844,10 +786,6 @@ namespace AvalonDock
 				InternalAddLogicalChild(e.NewValue);
 		}
 
-		#endregion AutoHideWindow
-
-		#region AutoHideDelay
-
 		/// <summary>
 		/// Implements the backing store of the <see cref="AutoHideDelay"/> dependency property.
 		/// </summary>
@@ -867,27 +805,29 @@ namespace AvalonDock
 		/// Expected behavior: The system waits for the configured time and reduces the <see cref="LayoutAnchorableControl"/> (into its side anchor).
 		/// Recommended configuration value range should be between 0 and 1500 milliseconds.
 		/// </summary>
-		[Bindable(true), Description("Gets/sets the wait time in milliseconds that is applicable when the system AutoHides a LayoutAnchorableControl (reduces it to a side anchor)."), Category("AutoHideWindow")]
+		[Bindable(true)]
+		[Description("Gets/sets the wait time in milliseconds that is applicable when the system AutoHides a LayoutAnchorableControl (reduces it to a side anchor).")]
+		[Category("AutoHideWindow")]
 		public int AutoHideDelay
 		{
 			get => (int)GetValue(AutoHideDelayProperty);
 			set => SetValue(AutoHideDelayProperty, value);
 		}
 
-		#endregion AutoHideDelay
-
 		/// <summary>Enumerates all <see cref="LayoutFloatingWindowControl"/>s managed by this framework.</summary>
-		[Bindable(false), Description("Enumerates all LayoutFloatingWindowControls managed by this framework."), Category("FloatingWindow")]
+		[Bindable(false)]
+		[Description("Enumerates all LayoutFloatingWindowControls managed by this framework.")]
+		[Category("FloatingWindow")]
 		public IEnumerable<LayoutFloatingWindowControl> FloatingWindows => _fwList;
-
-		#region LayoutItemTemplate
 
 		/// <summary><see cref="LayoutItemTemplate"/> dependency property.</summary>
 		public static readonly DependencyProperty LayoutItemTemplateProperty = DependencyProperty.Register(nameof(LayoutItemTemplate), typeof(DataTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata((DataTemplate)null, OnLayoutItemTemplateChanged));
 
 		/// <summary>Gets/sets the <see cref="DataTemplate"/> used to render anchorable and document content.</summary>
-		[Bindable(true), Description("Gets/sets the DataTemplate used to render anchorable and document content."), Category("Layout")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataTemplate used to render anchorable and document content.")]
+		[Category("Layout")]
 		public DataTemplate LayoutItemTemplate
 		{
 			get => (DataTemplate)GetValue(LayoutItemTemplateProperty);
@@ -902,16 +842,14 @@ namespace AvalonDock
 		{
 		}
 
-		#endregion LayoutItemTemplate
-
-		#region LayoutItemTemplateSelector
-
 		/// <summary><see cref="LayoutItemTemplateSelector"/> dependency property.</summary>
 		public static readonly DependencyProperty LayoutItemTemplateSelectorProperty = DependencyProperty.Register(nameof(LayoutItemTemplateSelector), typeof(DataTemplateSelector), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnLayoutItemTemplateSelectorChanged));
 
 		/// <summary>Gets/sets the <see cref="DataTemplateSelector"/> to select a <see cref="DataTemplate"/> of an anchorable.</summary>
-		[Bindable(true), Description("Gets/sets the DataTemplateSelector to select a DataTemplate of an anchorable."), Category("Layout")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataTemplateSelector to select a DataTemplate of an anchorable.")]
+		[Category("Layout")]
 		public DataTemplateSelector LayoutItemTemplateSelector
 		{
 			get => (DataTemplateSelector)GetValue(LayoutItemTemplateSelectorProperty);
@@ -926,16 +864,14 @@ namespace AvalonDock
 		{
 		}
 
-		#endregion LayoutItemTemplateSelector
-
-		#region DocumentsSource
-
 		/// <summary><see cref="DocumentsSource"/> dependency property.</summary>
 		public static readonly DependencyProperty DocumentsSourceProperty = DependencyProperty.Register(nameof(DocumentsSource), typeof(IEnumerable), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnDocumentsSourceChanged));
 
 		/// <summary>Gets/sets the source collection of <see cref="LayoutDocument"/> objects.</summary>
-		[Bindable(true), Description("Gets/sets the source collection of LayoutDocument objects."), Category("Document")]
+		[Bindable(true)]
+		[Description("Gets/sets the source collection of LayoutDocument objects.")]
+		[Category("Document")]
 		public IEnumerable DocumentsSource
 		{
 			get => (IEnumerable)GetValue(DocumentsSourceProperty);
@@ -952,32 +888,28 @@ namespace AvalonDock
 			AttachDocumentsSource(Layout, e.NewValue as IEnumerable);
 		}
 
-		#endregion DocumentsSource
-
-		#region DocumentContextMenu
-
 		/// <summary><see cref="DocumentContextMenu"/> dependency property.</summary>
 		public static readonly DependencyProperty DocumentContextMenuProperty = DependencyProperty.Register(nameof(DocumentContextMenu), typeof(ContextMenu), typeof(DockingManager),
 				new FrameworkPropertyMetadata((ContextMenu)null, OnContextMenuPropertyChanged));
 
 		/// <summary>Gets/sets the <see cref="ContextMenu"/> to show for a document.</summary>
-		[Bindable(true), Description("Gets/sets the ContextMenu to show for a document."), Category("Document")]
+		[Bindable(true)]
+		[Description("Gets/sets the ContextMenu to show for a document.")]
+		[Category("Document")]
 		public ContextMenu DocumentContextMenu
 		{
 			get => (ContextMenu)GetValue(DocumentContextMenuProperty);
 			set => SetValue(DocumentContextMenuProperty, value);
 		}
 
-		#endregion DocumentContextMenu
-
-		#region AnchorablesSource
-
 		/// <summary><see cref="AnchorablesSource"/> dependency property.</summary>
 		public static readonly DependencyProperty AnchorablesSourceProperty = DependencyProperty.Register(nameof(AnchorablesSource), typeof(IEnumerable), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnAnchorablesSourceChanged));
 
 		/// <summary>Gets/sets the source collection for all <see cref="LayoutAnchorable"/> objects managed in this framework.</summary>
-		[Bindable(true), Description("Gets/sets the source collection for all LayoutAnchorable objects managed in this framework."), Category("Anchorable")]
+		[Bindable(true)]
+		[Description("Gets/sets the source collection for all LayoutAnchorable objects managed in this framework.")]
+		[Category("Anchorable")]
 		public IEnumerable AnchorablesSource
 		{
 			get => (IEnumerable)GetValue(AnchorablesSourceProperty);
@@ -994,16 +926,14 @@ namespace AvalonDock
 			AttachAnchorablesSource(Layout, e.NewValue as IEnumerable);
 		}
 
-		#endregion AnchorablesSource
-
-		#region ActiveContent
-
 		/// <summary><see cref="ActiveContent"/> dependency property.</summary>
 		public static readonly DependencyProperty ActiveContentProperty = DependencyProperty.Register(nameof(ActiveContent), typeof(object), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnActiveContentChanged));
 
 		/// <summary>Gets/sets the content that is currently active (document,anchoreable, or null).</summary>
-		[Bindable(true), Description("Gets/sets the content that is currently active (document,anchoreable, or null)."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets/sets the content that is currently active (document,anchoreable, or null).")]
+		[Category("Other")]
 		public object ActiveContent
 		{
 			get => (object)GetValue(ActiveContentProperty);
@@ -1020,64 +950,56 @@ namespace AvalonDock
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="ActiveContent"/> property.</summary>
 		protected virtual void OnActiveContentChanged(DependencyPropertyChangedEventArgs e) => ActiveContentChanged?.Invoke(this, EventArgs.Empty);
 
-		#endregion ActiveContent
-
-		#region AnchorableContextMenu
-
 		/// <summary><see cref="AnchorableContextMenu"/> dependency property.</summary>
 		public static readonly DependencyProperty AnchorableContextMenuProperty = DependencyProperty.Register(nameof(AnchorableContextMenu), typeof(ContextMenu), typeof(DockingManager),
 				new FrameworkPropertyMetadata((ContextMenu)null, OnContextMenuPropertyChanged));
 
 		/// <summary>Gets/sets the <see cref="ContextMenu"/> to show on an anchorable.</summary>
-		[Bindable(true), Description("Gets/sets the ContextMenu to show on an anchorable."), Category("Anchorable")]
+		[Bindable(true)]
+		[Description("Gets/sets the ContextMenu to show on an anchorable.")]
+		[Category("Anchorable")]
 		public ContextMenu AnchorableContextMenu
 		{
 			get => (ContextMenu)GetValue(AnchorableContextMenuProperty);
 			set => SetValue(AnchorableContextMenuProperty, value);
 		}
 
-		#endregion AnchorableContextMenu
-
-		#region AllowAnchorDoubleClickDock
-
 		/// <summary><see cref="AllowAnchorDoubleClickDock"/> dependency property.</summary>
 		public static readonly DependencyProperty AllowAnchorDoubleClickDockProperty = DependencyProperty.Register(nameof(AllowAnchorDoubleClickDock), typeof(bool), typeof(DockingManager),
 				new FrameworkPropertyMetadata(false));
 
 		/// <summary>Gets/sets whether double-clicking an auto-hide anchor tab toggles the docked (pinned) state.</summary>
-		[Bindable(true), Description("Gets/sets whether double-clicking an auto-hide anchor tab toggles the docked (pinned) state."), Category("Anchor")]
+		[Bindable(true)]
+		[Description("Gets/sets whether double-clicking an auto-hide anchor tab toggles the docked (pinned) state.")]
+		[Category("Anchor")]
 		public bool AllowAnchorDoubleClickDock
 		{
 			get => (bool)GetValue(AllowAnchorDoubleClickDockProperty);
 			set => SetValue(AllowAnchorDoubleClickDockProperty, value);
 		}
 
-		#endregion AllowAnchorDoubleClickDock
-
-		#region AllowAnchorRightClickContextMenu
-
 		/// <summary><see cref="AllowAnchorRightClickContextMenu"/> dependency property.</summary>
 		public static readonly DependencyProperty AllowAnchorRightClickContextMenuProperty = DependencyProperty.Register(nameof(AllowAnchorRightClickContextMenu), typeof(bool), typeof(DockingManager),
 				new FrameworkPropertyMetadata(false));
 
 		/// <summary>Gets/sets whether right-clicking an auto-hide anchor tab shows the anchorable context menu.</summary>
-		[Bindable(true), Description("Gets/sets whether right-clicking an auto-hide anchor tab shows the anchorable context menu."), Category("Anchor")]
+		[Bindable(true)]
+		[Description("Gets/sets whether right-clicking an auto-hide anchor tab shows the anchorable context menu.")]
+		[Category("Anchor")]
 		public bool AllowAnchorRightClickContextMenu
 		{
 			get => (bool)GetValue(AllowAnchorRightClickContextMenuProperty);
 			set => SetValue(AllowAnchorRightClickContextMenuProperty, value);
 		}
 
-		#endregion AllowAnchorRightClickContextMenu
-
-		#region Theme
-
 		/// <summary><see cref="Theme"/> dependency property.</summary>
 		public static readonly DependencyProperty ThemeProperty = DependencyProperty.Register(nameof(Theme), typeof(Theme), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnThemeChanged));
 
 		/// <summary>Gets/sets the <see cref="Theme"/> to be used for the controls in this framework.</summary>
-		[Bindable(true), Description("Gets/sets the Theme to be used for the controls in this framework."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets/sets the Theme to be used for the controls in this framework.")]
+		[Category("Other")]
 		public Theme Theme
 		{
 			get => (Theme)GetValue(ThemeProperty);
@@ -1092,9 +1014,9 @@ namespace AvalonDock
 		{
 			var oldTheme = e.OldValue as Theme;
 			var resources = Resources;
-			if (oldTheme != null)        // remove old theme from resource dictionary if present
+			if (oldTheme != null) // remove old theme from resource dictionary if present
 			{
-				if (oldTheme is DictionaryTheme)  // We are using AvalonDock's own DictionaryTheme class
+				if (oldTheme is DictionaryTheme) // We are using AvalonDock's own DictionaryTheme class
 				{
 					if (currentThemeResourceDictionary != null)
 					{
@@ -1102,13 +1024,15 @@ namespace AvalonDock
 						currentThemeResourceDictionary = null;
 					}
 				}
-				else                              // We are using standard ResourceDictionaries
-				{                                // Lockup the old theme and remove it from resource dictionary
+				else // We are using standard ResourceDictionaries
+				{ // Lockup the old theme and remove it from resource dictionary
 					var resourceDictionaryToRemove =
 						resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
 					if (resourceDictionaryToRemove != null)
+					{
 						resources.MergedDictionaries.Remove(
 							resourceDictionaryToRemove);
+					}
 				}
 			}
 
@@ -1119,52 +1043,46 @@ namespace AvalonDock
 					currentThemeResourceDictionary = theme.ThemeResourceDictionary;
 					resources.MergedDictionaries.Add(currentThemeResourceDictionary);
 				}
-				else                              // We are using standard ResourceDictionaries -> Add new theme resource
+				else // We are using standard ResourceDictionaries -> Add new theme resource
+				{
 					resources.MergedDictionaries.Add(new ResourceDictionary { Source = (e.NewValue as Theme).GetResourceUri() });
+				}
 			}
 
-			foreach (var fwc in _fwList)               // Update theme resources in floating window controls
+			foreach (var fwc in _fwList) // Update theme resources in floating window controls
 				fwc.UpdateThemeResources(oldTheme);
 
 			_navigatorWindow?.UpdateThemeResources();  // Update theme resources in related AvalonDock controls
 			_overlayWindow?.UpdateThemeResources();
 		}
 
-		#endregion Theme
-
-		#region GridSplitterWidth
-
 		/// <summary><see cref="GridSplitterWidth"/> dependency property.</summary>
 		public static readonly DependencyProperty GridSplitterWidthProperty = DependencyProperty.Register(nameof(GridSplitterWidth), typeof(double), typeof(DockingManager),
 				new FrameworkPropertyMetadata(6.0));
 
 		/// <summary>Gets/sets the width of a grid splitter.</summary>
-		[Bindable(true), Description("Gets/sets the width of a grid splitter"), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets/sets the width of a grid splitter")]
+		[Category("Other")]
 		public double GridSplitterWidth
 		{
 			get => (double)GetValue(GridSplitterWidthProperty);
 			set => SetValue(GridSplitterWidthProperty, value);
 		}
 
-		#endregion GridSplitterWidth
-
-		#region GridSplitterHeight
-
 		/// <summary><see cref="GridSplitterHeight"/> dependency property.</summary>
 		public static readonly DependencyProperty GridSplitterHeightProperty = DependencyProperty.Register(nameof(GridSplitterHeight), typeof(double), typeof(DockingManager),
 				new FrameworkPropertyMetadata(6.0));
 
 		/// <summary>Gets/sets the height of a grid splitter.</summary>
-		[Bindable(true), Description("Gets/sets the height of a grid splitter"), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets/sets the height of a grid splitter")]
+		[Category("Other")]
 		public double GridSplitterHeight
 		{
 			get => (double)GetValue(GridSplitterHeightProperty);
 			set => SetValue(GridSplitterHeightProperty, value);
 		}
-
-		#endregion GridSplitterHeight
-
-		#region GridSplitterVerticalStyle
 
 		/// <summary>
 		/// GridSplitterVerticalStyle Dependency Property
@@ -1188,10 +1106,6 @@ namespace AvalonDock
 			}
 		}
 
-		#endregion
-
-		#region GridSplitterHorizontalStyle
-
 		/// <summary>
 		/// GridSplitterHorizontalStyle Dependency Property
 		/// </summary>
@@ -1214,17 +1128,14 @@ namespace AvalonDock
 			}
 		}
 
-		#endregion
-
-
-		#region DocumentPaneMenuItemHeaderTemplate
-
 		/// <summary><see cref="DocumentPaneMenuItemHeaderTemplate"/> dependency property.</summary>
 		public static readonly DependencyProperty DocumentPaneMenuItemHeaderTemplateProperty = DependencyProperty.Register(nameof(DocumentPaneMenuItemHeaderTemplate), typeof(DataTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnDocumentPaneMenuItemHeaderTemplateChanged, CoerceDocumentPaneMenuItemHeaderTemplateValue));
 
 		/// <summary>Gets/sets the <see cref="DataTemplate"/> for the header to display menu dropdown items on a document pane.</summary>
-		[Bindable(true), Description("Gets/sets the DataTemplate for the header to display menu dropdown items on a document pane."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataTemplate for the header to display menu dropdown items on a document pane.")]
+		[Category("Other")]
 		public DataTemplate DocumentPaneMenuItemHeaderTemplate
 		{
 			get => (DataTemplate)GetValue(DocumentPaneMenuItemHeaderTemplateProperty);
@@ -1247,16 +1158,14 @@ namespace AvalonDock
 			return value ?? d.GetValue(DocumentHeaderTemplateProperty);
 		}
 
-		#endregion DocumentPaneMenuItemHeaderTemplate
-
-		#region DocumentPaneMenuItemHeaderTemplateSelector
-
 		/// <summary><see cref="DocumentPaneMenuItemHeaderTemplateSelector"/> dependency property.</summary>
 		public static readonly DependencyProperty DocumentPaneMenuItemHeaderTemplateSelectorProperty = DependencyProperty.Register(nameof(DocumentPaneMenuItemHeaderTemplateSelector), typeof(DataTemplateSelector), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnDocumentPaneMenuItemHeaderTemplateSelectorChanged, CoerceDocumentPaneMenuItemHeaderTemplateSelectorValue));
 
 		/// <summary>Gets/sets the <see cref="DataTemplateSelector"/> to select a <see cref="DataTemplate"/> for the menu items shown when user selects the <see cref="LayoutDocumentPaneControl"/> context menu switch.</summary>
-		[Bindable(true), Description("Gets/sets the DataTemplateSelector to select a DataTemplate for the menu items shown when user selects the LayoutDocumentPaneControl context menu switch."), Category("Document")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataTemplateSelector to select a DataTemplate for the menu items shown when user selects the LayoutDocumentPaneControl context menu switch.")]
+		[Category("Document")]
 		public DataTemplateSelector DocumentPaneMenuItemHeaderTemplateSelector
 		{
 			get => (DataTemplateSelector)GetValue(DocumentPaneMenuItemHeaderTemplateSelectorProperty);
@@ -1276,48 +1185,42 @@ namespace AvalonDock
 		/// <summary>Coerces the <see cref="DocumentPaneMenuItemHeaderTemplateSelector"/> value.</summary>
 		private static object CoerceDocumentPaneMenuItemHeaderTemplateSelectorValue(DependencyObject d, object value) => value;
 
-		#endregion DocumentPaneMenuItemHeaderTemplateSelector
-
-		#region IconContentTemplate
-
 		/// <summary><see cref="IconContentTemplate"/> dependency property.</summary>
 		public static readonly DependencyProperty IconContentTemplateProperty = DependencyProperty.Register(nameof(IconContentTemplate), typeof(DataTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata((DataTemplate)null));
 
 		/// <summary>Gets/sets the <see cref="DataTemplate"/> to use on the icon extracted from the layout model.</summary>
-		[Bindable(true), Description("Gets/sets the DataTemplate to use on the icon extracted from the layout model."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataTemplate to use on the icon extracted from the layout model.")]
+		[Category("Other")]
 		public DataTemplate IconContentTemplate
 		{
 			get => (DataTemplate)GetValue(IconContentTemplateProperty);
 			set => SetValue(IconContentTemplateProperty, value);
 		}
 
-		#endregion IconContentTemplate
-
-		#region IconContentTemplateSelector
-
 		/// <summary><see cref="IconContentTemplateSelector"/> dependency property.</summary>
 		public static readonly DependencyProperty IconContentTemplateSelectorProperty = DependencyProperty.Register(nameof(IconContentTemplateSelector), typeof(DataTemplateSelector), typeof(DockingManager),
 				new FrameworkPropertyMetadata((DataTemplateSelector)null));
 
 		/// <summary>Gets/sets the <see cref="DataTemplateSelector"/> to select a <see cref="DataTemplate"/> for a content icon.</summary>
-		[Bindable(true), Description("Gets/sets the DataTemplateSelector to select a DataTemplate for a content icon."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataTemplateSelector to select a DataTemplate for a content icon.")]
+		[Category("Other")]
 		public DataTemplateSelector IconContentTemplateSelector
 		{
 			get => (DataTemplateSelector)GetValue(IconContentTemplateSelectorProperty);
 			set => SetValue(IconContentTemplateSelectorProperty, value);
 		}
 
-		#endregion IconContentTemplateSelector
-
-		#region LayoutItemContainerStyle
-
 		/// <summary><see cref="LayoutItemContainerStyle"/> dependency property.</summary>
 		public static readonly DependencyProperty LayoutItemContainerStyleProperty = DependencyProperty.Register(nameof(LayoutItemContainerStyle), typeof(Style), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnLayoutItemContainerStyleChanged));
 
 		/// <summary>Gets/sets the <see cref="Style"/> to apply to a <see cref="LayoutDocumentItem"/> object.</summary>
-		[Bindable(true), Description("Gets/sets the Style to apply to a LayoutDocumentItem object."), Category("Layout")]
+		[Bindable(true)]
+		[Description("Gets/sets the Style to apply to a LayoutDocumentItem object.")]
+		[Category("Layout")]
 		public Style LayoutItemContainerStyle
 		{
 			get => (Style)GetValue(LayoutItemContainerStyleProperty);
@@ -1330,16 +1233,14 @@ namespace AvalonDock
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="LayoutItemContainerStyle"/> property.</summary>
 		protected virtual void OnLayoutItemContainerStyleChanged(DependencyPropertyChangedEventArgs e) => AttachLayoutItems();
 
-		#endregion LayoutItemContainerStyle
-
-		#region LayoutItemContainerStyleSelector
-
 		/// <summary><see cref="LayoutItemContainerStyleSelector"/> dependency property.</summary>
 		public static readonly DependencyProperty LayoutItemContainerStyleSelectorProperty = DependencyProperty.Register(nameof(LayoutItemContainerStyleSelector), typeof(StyleSelector), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnLayoutItemContainerStyleSelectorChanged));
 
 		/// <summary>Gets/sets the <see cref="StyleSelector"/> to select the <see cref="Style"/> for a <see cref="LayoutDocumentItem"/>.</summary>
-		[Bindable(true), Description("Gets/sets the StyleSelector to select the Style for a LayoutDocumentItem."), Category("Layout")]
+		[Bindable(true)]
+		[Description("Gets/sets the StyleSelector to select the Style for a LayoutDocumentItem.")]
+		[Category("Layout")]
 		public StyleSelector LayoutItemContainerStyleSelector
 		{
 			get => (StyleSelector)GetValue(LayoutItemContainerStyleSelectorProperty);
@@ -1352,61 +1253,55 @@ namespace AvalonDock
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="LayoutItemContainerStyleSelector"/> property.</summary>
 		protected virtual void OnLayoutItemContainerStyleSelectorChanged(DependencyPropertyChangedEventArgs e) => AttachLayoutItems();
 
-		#endregion LayoutItemContainerStyleSelector
-
-		#region ShowSystemMenu
-
 		/// <summary><see cref="ShowSystemMenu"/> dependency property.</summary>
 		public static readonly DependencyProperty ShowSystemMenuProperty = DependencyProperty.Register(nameof(ShowSystemMenu), typeof(bool), typeof(DockingManager),
 				new FrameworkPropertyMetadata(true));
 
 		/// <summary>Gets/sets whether floating windows should show the system menu when a custom context menu is not defined.</summary>
-		[Bindable(true), Description("Gets/sets whether floating windows should show the system menu when a custom context menu is not defined."), Category("FloatingWindow")]
+		[Bindable(true)]
+		[Description("Gets/sets whether floating windows should show the system menu when a custom context menu is not defined.")]
+		[Category("FloatingWindow")]
 		public bool ShowSystemMenu
 		{
 			get => (bool)GetValue(ShowSystemMenuProperty);
 			set => SetValue(ShowSystemMenuProperty, value);
 		}
 
-		#endregion ShowSystemMenu
-
-		#region AllowMixedOrientation
-
 		/// <summary><see cref="AllowMixedOrientation"/> dependency property.</summary>
 		public static readonly DependencyProperty AllowMixedOrientationProperty = DependencyProperty.Register(nameof(AllowMixedOrientation), typeof(bool), typeof(DockingManager),
 				new FrameworkPropertyMetadata(false));
 
 		/// <summary>Gets/sets whether the DockingManager should allow mixed orientation for document panes.</summary>
-		[Bindable(true), Description("Gets/sets whether the DockingManager should allow mixed orientation for document panes."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets/sets whether the DockingManager should allow mixed orientation for document panes.")]
+		[Category("Other")]
 		public bool AllowMixedOrientation
 		{
 			get => (bool)GetValue(AllowMixedOrientationProperty);
 			set => SetValue(AllowMixedOrientationProperty, value);
 		}
 
-		#endregion AllowMixedOrientation
-
-		#region IsVirtualizingLayoutDocument IsVirtualizingLayoutAnchorable
-
 		/// <summary>Gets/sets (a simple non-dependency property) to determine whether the
 		/// <see cref="LayoutDocumentPaneControl"/> is virtualizing its tabbed item child controls or not.</summary>
-		[Bindable(false), Description("Gets/sets whether the LayoutDocumentPaneControl is virtualizing its tabbed item child controls or not."), Category("Document")]
+		[Bindable(false)]
+		[Description("Gets/sets whether the LayoutDocumentPaneControl is virtualizing its tabbed item child controls or not.")]
+		[Category("Document")]
 		public bool IsVirtualizingDocument { get; set; }
 
 		/// <summary>Gets/sets (a simple non-dependency property) to determine whether the
 		/// <see cref="LayoutAnchorablePaneControl"/> is virtualizing its tabbed item child controls or not.</summary>
-		[Bindable(false), Description("Gets/sets whether the LayoutAnchorablePaneControl is virtualizing its tabbed item child controls or not."), Category("Anchorable")]
+		[Bindable(false)]
+		[Description("Gets/sets whether the LayoutAnchorablePaneControl is virtualizing its tabbed item child controls or not.")]
+		[Category("Anchorable")]
 		public bool IsVirtualizingAnchorable { get; set; }
-
-		#endregion IsVirtualizingLayoutDocument IsVirtualizingLayoutAnchorable
-
-		#region AutoWindowSizeWhenOpened
 
 		/// <summary>
 		/// Gets/sets whether the floating window size of a <see cref="LayoutFloatingWindowControl"/> is auto sized when it is dragged out.
 		/// If true the MinHeight and MinWidth of the content will be used together with the margins to determine the initial size of the floating window.
 		/// </summary>
-		[Bindable(true), Description("Gets/sets whether the floating window is auto sized when it is dragged out."), Category("FloatingWindow")]
+		[Bindable(true)]
+		[Description("Gets/sets whether the floating window is auto sized when it is dragged out.")]
+		[Category("FloatingWindow")]
 		public bool AutoWindowSizeWhenOpened
 		{
 			get { return (bool)GetValue(AutoWindowSizeWhenOpenedProperty); }
@@ -1416,27 +1311,19 @@ namespace AvalonDock
 		public static readonly DependencyProperty AutoWindowSizeWhenOpenedProperty =
 			DependencyProperty.Register("AutoWindowSizeWhenOpened", typeof(bool), typeof(DockingManager), new PropertyMetadata(false));
 
-		#endregion AutoWindowSizeWhenOpened
-
-		#region ShowNavigator
-
 		/// <summary><see cref="ShowNavigator"/> dependency property.</summary>
 		public static readonly DependencyProperty ShowNavigatorProperty = DependencyProperty.Register(nameof(ShowNavigator), typeof(bool), typeof(DockingManager),
 				new FrameworkPropertyMetadata(true));
 
 		/// <summary>Gets/sets whether the navigator window should be shown when the user presses Control + Tab.</summary>
-		[Bindable(true), Description("Gets/sets whether floating windows should show the system menu when a custom context menu is not defined."), Category("FloatingWindow")]
+		[Bindable(true)]
+		[Description("Gets/sets whether floating windows should show the system menu when a custom context menu is not defined.")]
+		[Category("FloatingWindow")]
 		public bool ShowNavigator
 		{
 			get => (bool)GetValue(ShowNavigatorProperty);
 			set => SetValue(ShowNavigatorProperty, value);
 		}
-
-		#endregion ShowNavigator
-
-		#endregion Public Properties
-
-		#region LogicalChildren
 
 		private readonly List<WeakReference> _logicalChildren = new List<WeakReference>();
 
@@ -1473,17 +1360,9 @@ namespace AvalonDock
 			_logicalChildren.Clear();
 		}
 
-		#endregion LogicalChildren
-
-		#region Private Properties
-
 		private bool IsNavigatorWindowActive => _navigatorWindow != null;
 
 		private bool CanShowNavigatorWindow => ShowNavigator && _layoutItems.Any();
-
-		#endregion Private Properties
-
-		#region IOverlayWindowHost Interface
 
 		/// <inheritdoc/>
 		bool IOverlayWindowHost.HitTestScreen(Point dragPoint)
@@ -1582,16 +1461,17 @@ namespace AvalonDock
 		private IEnumerable<LayoutAnchorable> GetAnchorableInFloatingWindow(LayoutFloatingWindowControl draggingWindow)
 		{
 			if (!(draggingWindow.Model is LayoutAnchorableFloatingWindow layoutAnchorableFloatingWindow)) yield break;
-			//big part of code for getting type
-
+			// big part of code for getting type
 			if (layoutAnchorableFloatingWindow.SinglePane is LayoutAnchorablePane layoutAnchorablePane && (layoutAnchorableFloatingWindow.IsSinglePane && layoutAnchorablePane.SelectedContent != null))
 			{
 				var layoutAnchorable = ((LayoutAnchorablePane)layoutAnchorableFloatingWindow.SinglePane).SelectedContent as LayoutAnchorable;
 				yield return layoutAnchorable;
 			}
 			else
+			{
 				foreach (var item in GetLayoutAnchorable(layoutAnchorableFloatingWindow.RootPanel))
 					yield return item;
+			}
 		}
 
 		/// <summary>
@@ -1608,10 +1488,6 @@ namespace AvalonDock
 			foreach (var anchorable in layoutAnchPaneGroup.Descendents().OfType<LayoutAnchorable>())
 				yield return anchorable;
 		}
-
-		#endregion IOverlayWindowHost Interface
-
-		#region Public Methods
 
 		/// <summary>Return the LayoutItem wrapper for the content passed as argument.</summary>
 		/// <param name="content">LayoutContent to search</param>
@@ -1641,10 +1517,6 @@ namespace AvalonDock
 			return CreateFloatingWindowCore(contentModel, isContentImmutable);
 		}
 
-		#endregion Public Methods
-
-		#region Internal Methods
-
 		/// <summary>
 		/// Method is invoked to create the actual visible UI element from a given layout model. It is invoked when:
 		///
@@ -1655,7 +1527,7 @@ namespace AvalonDock
 		/// <param name="model">The layout element.</param>
 		/// <returns></returns>
 		[SuppressMessage("Maintainability", "CA1506:Avoid excessive class coupling")]
-        internal UIElement CreateUIElementForModel(ILayoutElement model)
+		internal UIElement CreateUIElementForModel(ILayoutElement model)
 		{
 			if (model is LayoutPanel)
 				return new LayoutPanelControl(model as LayoutPanel);
@@ -1670,6 +1542,7 @@ namespace AvalonDock
 				templateModelView.SetBinding(TemplateProperty, new Binding(AnchorSideTemplateProperty.Name) { Source = this });
 				return templateModelView;
 			}
+
 			if (model is LayoutAnchorGroup)
 			{
 				var templateModelView = new LayoutAnchorGroupControl(model as LayoutAnchorGroup);
@@ -1683,6 +1556,7 @@ namespace AvalonDock
 				templateModelView.SetBinding(StyleProperty, new Binding(DocumentPaneControlStyleProperty.Name) { Source = this });
 				return templateModelView;
 			}
+
 			if (model is LayoutAnchorablePane)
 			{
 				var templateModelView = new LayoutAnchorablePaneControl(model as LayoutAnchorablePane, IsVirtualizingAnchorable);
@@ -1696,7 +1570,7 @@ namespace AvalonDock
 				var modelFW = model as LayoutAnchorableFloatingWindow;
 				var newFW = new LayoutAnchorableFloatingWindowControl(modelFW)
 				{
-					//Owner = Window.GetWindow(this)
+					// Owner = Window.GetWindow(this)
 				};
 
 				newFW.UpdateOwnership();
@@ -1720,14 +1594,15 @@ namespace AvalonDock
 
 				newFW.ShowInTaskbar = false;
 
-				Dispatcher.BeginInvoke(new Action(() =>
+				Dispatcher.BeginInvoke(
+					new Action(() =>
 				{
 					if (newFW.Content != null || (newFW.Model as LayoutAnchorableFloatingWindow)?.IsVisible == true)
 						newFW.Show();
 					else
 						newFW.Hide();
-      
-      					if (panegroup != null && panegroup.IsMaximized)
+	  
+					if (panegroup != null && panegroup.IsMaximized)
 						newFW.WindowState = WindowState.Maximized;
 				}), DispatcherPriority.Send);
 
@@ -1741,7 +1616,7 @@ namespace AvalonDock
 				var modelFW = model as LayoutDocumentFloatingWindow;
 				var newFW = new LayoutDocumentFloatingWindowControl(modelFW)
 				{
-					//Owner = Window.GetWindow(this)
+					// Owner = Window.GetWindow(this)
 				};
 
 				newFW.UpdateOwnership();
@@ -1752,7 +1627,7 @@ namespace AvalonDock
 				var paneForExtensions = modelFW.RootPanel;
 				if (paneForExtensions != null)
 				{
-					//ensure that floating window position is inside current (or nearest) monitor
+					// ensure that floating window position is inside current (or nearest) monitor
 					paneForExtensions.KeepInsideNearestMonitor();
 
 					newFW.Left = paneForExtensions.FloatingLeft;
@@ -1760,6 +1635,7 @@ namespace AvalonDock
 					newFW.Width = paneForExtensions.FloatingWidth;
 					newFW.Height = paneForExtensions.FloatingHeight;
 				}
+
 				newFW.ShowInTaskbar = false;
 				newFW.Show();
 				// Do not set the WindowState before showing or it will be lost
@@ -1767,11 +1643,13 @@ namespace AvalonDock
 					newFW.WindowState = WindowState.Maximized;
 				return newFW;
 			}
+
 			if (model is LayoutDocument layoutDocument)
 			{
 				var templateModelView = new LayoutDocumentControl { Model = layoutDocument };
 				return templateModelView;
 			}
+
 			return null;
 		}
 
@@ -1822,7 +1700,8 @@ namespace AvalonDock
 
 			if (fwc != null)
 			{
-				Dispatcher.BeginInvoke(new Action(() =>
+				Dispatcher.BeginInvoke(
+					new Action(() =>
 				{
 					// Activate only inactive document
 					if (startDrag) fwc.AttachDrag();
@@ -1907,8 +1786,6 @@ namespace AvalonDock
 			LayoutFloatingWindowControlClosed?.Invoke(this, new LayoutFloatingWindowControlClosedEventArgs(floatingWindow));
 		}
 
-		
-
 		internal void ExecuteCloseAllButThisCommand(LayoutContent contentSelected)
 		{
 			foreach (var contentToClose in Layout.Descendents().OfType<LayoutContent>().Where(d => d != contentSelected && (d.Parent is LayoutDocumentPane || d.Parent is LayoutDocumentFloatingWindow)).ToArray())
@@ -1956,13 +1833,11 @@ namespace AvalonDock
 				RemoveLogicalChild(uIElement);
 			DocumentClosed?.Invoke(this, new DocumentClosedEventArgs(document));
 
-			//get rid of the closed document content
+			// get rid of the closed document content
 			document.Content = null;
 
-			//
 			// Activate the document determined to be the next active document.
 			// This doesn't only update the layout, but also all related (dependency) properties.
-			//
 			if (documentToActivate != null)
 			{
 				documentToActivate.IsActive = true;
@@ -2004,9 +1879,10 @@ namespace AvalonDock
 				ExecuteCloseCommand(model);
 				return;
 			}
+
 			if (hidingArgs?.Cancel == true) return;
 
-			if(model.HideAnchorable(true))
+			if (model.HideAnchorable(true))
 				AnchorableHidden?.Invoke(this, new AnchorableHiddenEventArgs(model));
 		}
 
@@ -2026,10 +1902,6 @@ namespace AvalonDock
 		internal void ExecuteDockAsDocumentCommand(LayoutContent content) => content.DockAsDocument();
 
 		internal void ExecuteContentActivateCommand(LayoutContent content) => content.IsActive = true;
-
-		#endregion Internal Methods
-
-		#region Overrides
 
 		public override void OnApplyTemplate()
 		{
@@ -2060,10 +1932,6 @@ namespace AvalonDock
 			base.OnPreviewKeyDown(e);
 		}
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		/// <summary>
 		/// OnContextMenuPropertyChanged(Fix ContextMenu's Resources is null,drop down menu style error)
 		/// </summary>
@@ -2088,22 +1956,23 @@ namespace AvalonDock
 							var layoutRootPanel = CreateUIElementForModel(Layout.RootPanel) as LayoutPanelControl;
 							LayoutRootPanel = layoutRootPanel;
 						}
+
 						break;
 					}
+
 				case nameof(LayoutRoot.ActiveContent):
 					{
-						//set focus on active element only after a layout pass is completed
-						//it's possible that it is not yet visible in the visual tree
-						//if (_setFocusAsyncOperation == null)
-						//{
+						// set focus on active element only after a layout pass is completed
+						// it's possible that it is not yet visible in the visual tree
+						// if (_setFocusAsyncOperation == null)
+						// {
 						//    _setFocusAsyncOperation = Dispatcher.BeginInvoke(new Action(() =>
 						// {
 						if (Layout.ActiveContent != null)
 							FocusElementManager.SetFocusOnLastElement(Layout.ActiveContent);
-						//_setFocusAsyncOperation = null;
+						// _setFocusAsyncOperation = null;
 						//  } ), DispatcherPriority.Input );
-						//}
-
+						// }
 						if (!_insideInternalSetActiveContent)
 							ActiveContent = Layout.ActiveContent?.Content;
 						break;
@@ -2144,13 +2013,14 @@ namespace AvalonDock
 
 				_fwList.Add(fwc);
 			}
+
 			_fwHiddenList.Clear();
 
 			// load floating windows not already loaded! (issue #59 & #254 & #426)
 			foreach (var fw in Layout.FloatingWindows.Where(fw => !_fwList.Any(fwc => fwc.Model == fw)))
 				CreateUIElementForModel(fw);
 
-			//create the overlaywindow if it's possible
+			// create the overlaywindow if it's possible
 			if (IsVisible)
 				CreateOverlayWindow();
 			FocusElementManager.SetupFocusManagement(this);
@@ -2180,10 +2050,10 @@ namespace AvalonDock
 			foreach (var fw in _fwList.ToArray())
 			{
 				////fw.Owner = null;
-				//fw.SetParentWindowToNull();
-				//fw.KeepContentVisibleOnClose = true;
+				// fw.SetParentWindowToNull();
+				// fw.KeepContentVisibleOnClose = true;
 				//// To avoid calling Close method multiple times.
-				//fw.InternalClose(true);
+				// fw.InternalClose(true);
 
 				// Unloaded can occure not only after closing of the application, but after switching between tabs.
 				// For such case it's better to hide the floating windows instead of closing it.
@@ -2193,6 +2063,7 @@ namespace AvalonDock
 					fw.KeepContentVisibleOnClose = true;
 					fw.Hide();
 				}
+
 				fw.DisableBindings();
 				_fwHiddenList.Add(fw);
 			}
@@ -2248,7 +2119,7 @@ namespace AvalonDock
 			if (documentsSource == null) return;
 			if (layout == null) return;
 
-			//if (layout.Descendents().OfType<LayoutDocument>().Any())
+			// if (layout.Descendents().OfType<LayoutDocument>().Any())
 			//    throw new InvalidOperationException("Unable to set the DocumentsSource property if LayoutDocument objects are already present in the model");
 			var documentsImported = layout.Descendents().OfType<LayoutDocument>().Select(d => d.Content).ToArray();
 			var documents = documentsSource as IEnumerable;
@@ -2267,13 +2138,12 @@ namespace AvalonDock
 			if (documentPane == null)
 				documentPane = layout.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
 
-			//if (documentPane == null)
+			// if (documentPane == null)
 			//    throw new InvalidOperationException("Layout must contains at least one LayoutDocumentPane in order to host documents");
-
 			_suspendLayoutItemCreation = true;
 			foreach (var documentContentToImport in listOfDocumentsToImport)
 			{
-				//documentPane.Children.Add(new LayoutDocument() { Content = documentToImport });
+				// documentPane.Children.Add(new LayoutDocument() { Content = documentToImport });
 				var documentToImport = new LayoutDocument { Content = documentContentToImport };
 
 				var added = false;
@@ -2291,6 +2161,7 @@ namespace AvalonDock
 				LayoutUpdateStrategy?.AfterInsertDocument(layout, documentToImport);
 				CreateDocumentLayoutItem(documentToImport);
 			}
+
 			_suspendLayoutItemCreation = false;
 			if (documentsSource is INotifyCollectionChanged documentsSourceAsNotifier)
 				documentsSourceAsNotifier.CollectionChanged += DocumentsSourceElementsChanged;
@@ -2299,10 +2170,10 @@ namespace AvalonDock
 		private void DocumentsSourceElementsChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			if (Layout == null) return;
-			//When deserializing documents are created automatically by the deserializer
+			// When deserializing documents are created automatically by the deserializer
 			if (SuspendDocumentsSourceBinding) return;
 
-			//handle remove
+			// handle remove
 			if (e.Action == NotifyCollectionChangedAction.Remove ||
 				e.Action == NotifyCollectionChangedAction.Replace)
 			{
@@ -2318,7 +2189,7 @@ namespace AvalonDock
 				}
 			}
 
-			//handle add
+			// handle add
 			if (e.NewItems != null && (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Replace))
 			{
 				if (e.NewItems != null)
@@ -2328,11 +2199,13 @@ namespace AvalonDock
 					{
 						documentPane = Layout.LastFocusedDocument.Parent as LayoutDocumentPane;
 					}
+
 					if (documentPane == null)
 					{
 						documentPane = Layout.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
 					}
-					//if (documentPane == null)
+
+					// if (documentPane == null)
 					//    throw new InvalidOperationException("Layout must contains at least one LayoutDocumentPane in order to host documents");
 					_suspendLayoutItemCreation = true;
 					foreach (var documentContentToImport in e.NewItems)
@@ -2364,13 +2237,14 @@ namespace AvalonDock
 							CreateDocumentLayoutItem(documentToImport);
 						}
 					}
+
 					_suspendLayoutItemCreation = false;
 				}
 			}
 
 			if (e.Action == NotifyCollectionChangedAction.Reset)
 			{
-				//Remove documents that are no longer in the DocumentSource.
+				// Remove documents that are no longer in the DocumentSource.
 				var documentsToRemove = GetItemsToRemoveAfterReset<LayoutDocument>(DocumentsSource);
 				foreach (var documentToRemove in documentsToRemove)
 				{
@@ -2397,9 +2271,9 @@ namespace AvalonDock
 		private TLayoutType[] GetItemsToRemoveAfterReset<TLayoutType>(IEnumerable source)
 			where TLayoutType : LayoutContent
 		{
-			//Find remaining items in source
+			// Find remaining items in source
 			var itemsThatRemain = new HashSet<object>(source.Cast<object>(), ReferenceEqualityComparer.Default);
-			//Find the removed items that are not in the remaining collection
+			// Find the removed items that are not in the remaining collection
 			return Layout.Descendents()
 						 .OfType<TLayoutType>()
 						 .Where(x => !itemsThatRemain.Contains(x.Content))
@@ -2449,7 +2323,7 @@ namespace AvalonDock
 			if (anchorablesSource == null) return;
 			if (layout == null) return;
 
-			//if (layout.Descendents().OfType<LayoutAnchorable>().Any())
+			// if (layout.Descendents().OfType<LayoutAnchorable>().Any())
 			//    throw new InvalidOperationException("Unable to set the AnchorablesSource property if LayoutAnchorable objects are already present in the model");
 			var anchorablesImported = layout.Descendents().OfType<LayoutAnchorable>().Select(d => d.Content).ToArray();
 			var anchorables = anchorablesSource as IEnumerable;
@@ -2460,22 +2334,26 @@ namespace AvalonDock
 				if (anchorablesImported.Contains(document))
 					listOfAnchorablesToImport.Remove(document);
 			}
+
 			LayoutAnchorablePane anchorablePane = null;
 			if (layout.ActiveContent != null)
 			{
-				//look for active content parent pane
+				// look for active content parent pane
 				anchorablePane = layout.ActiveContent.Parent as LayoutAnchorablePane;
 			}
+
 			if (anchorablePane == null)
 			{
-				//look for a pane on the right side
+				// look for a pane on the right side
 				anchorablePane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(pane => !pane.IsHostedInFloatingWindow && pane.GetSide() == AnchorSide.Right);
 			}
+
 			if (anchorablePane == null)
 			{
-				//look for an available pane
+				// look for an available pane
 				anchorablePane = layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault();
 			}
+
 			_suspendLayoutItemCreation = true;
 			foreach (var anchorableContentToImport in listOfAnchorablesToImport)
 			{
@@ -2506,21 +2384,22 @@ namespace AvalonDock
 				LayoutUpdateStrategy?.AfterInsertAnchorable(layout, anchorableToImport);
 				CreateAnchorableLayoutItem(anchorableToImport);
 			}
+
 			_suspendLayoutItemCreation = false;
 			if (anchorablesSource is INotifyCollectionChanged anchorablesSourceAsNotifier)
 				anchorablesSourceAsNotifier.CollectionChanged += AnchorablesSourceElementsChanged;
 		}
 
 #pragma warning disable CA1502
-        private void AnchorablesSourceElementsChanged(object sender, NotifyCollectionChangedEventArgs e)
+		private void AnchorablesSourceElementsChanged(object sender, NotifyCollectionChangedEventArgs e)
 #pragma warning restore CA1502
-        {
+		{
 			if (Layout == null) return;
 
-			//When deserializing documents are created automatically by the deserializer
+			// When deserializing documents are created automatically by the deserializer
 			if (SuspendAnchorablesSourceBinding) return;
 
-			//handle remove
+			// handle remove
 			if (e.Action == NotifyCollectionChangedAction.Remove || e.Action == NotifyCollectionChangedAction.Replace)
 			{
 				if (e.OldItems != null)
@@ -2535,7 +2414,7 @@ namespace AvalonDock
 				}
 			}
 
-			//handle add
+			// handle add
 			if (e.NewItems != null && (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Replace))
 			{
 				if (e.NewItems != null)
@@ -2543,19 +2422,22 @@ namespace AvalonDock
 					LayoutAnchorablePane anchorablePane = null;
 					if (Layout.ActiveContent != null)
 					{
-						//look for active content parent pane
+						// look for active content parent pane
 						anchorablePane = Layout.ActiveContent.Parent as LayoutAnchorablePane;
 					}
+
 					if (anchorablePane == null)
 					{
-						//look for a pane on the right side
+						// look for a pane on the right side
 						anchorablePane = Layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(pane => !pane.IsHostedInFloatingWindow && pane.GetSide() == AnchorSide.Right);
 					}
+
 					if (anchorablePane == null)
 					{
-						//look for an available pane
+						// look for an available pane
 						anchorablePane = Layout.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault();
 					}
+
 					_suspendLayoutItemCreation = true;
 					foreach (var anchorableContentToImport in e.NewItems)
 					{
@@ -2572,25 +2454,29 @@ namespace AvalonDock
 								{
 									mainLayoutPanel.Children.Add(Layout.RootPanel);
 								}
+
 								Layout.RootPanel = mainLayoutPanel;
 								anchorablePane = new LayoutAnchorablePane { DockWidth = new GridLength(200.0, GridUnitType.Pixel) };
 								mainLayoutPanel.Children.Add(anchorablePane);
 							}
+
 							anchorablePane.Children.Add(anchorableToImport);
 							added = true;
 						}
+
 						LayoutUpdateStrategy?.AfterInsertAnchorable(Layout, anchorableToImport);
 						var root = anchorableToImport.Root;
 						if (root != null && root.Manager == this)
 							CreateAnchorableLayoutItem(anchorableToImport);
 					}
+
 					_suspendLayoutItemCreation = false;
 				}
 			}
 
 			if (e.Action == NotifyCollectionChangedAction.Reset)
 			{
-				//Remove anchorables that are no longer in the AnchorablesSource.
+				// Remove anchorables that are no longer in the AnchorablesSource.
 				var anchorablesToRemove = GetItemsToRemoveAfterReset<LayoutAnchorable>(AnchorablesSource);
 				foreach (var anchorableToRemove in anchorablesToRemove)
 				{
@@ -2639,8 +2525,6 @@ namespace AvalonDock
 			_insideInternalSetActiveContent = false;
 		}
 
-		#region LayoutItems
-
 		/// <summary>
 		/// Implements the EventHandler for the <see cref="LayoutRoot.ElementRemoved"/> event.
 		/// </summary>
@@ -2664,9 +2548,10 @@ namespace AvalonDock
 			{
 				if (content is LayoutDocument)
 					CreateDocumentLayoutItem(content as LayoutDocument);
-				else //if (content is LayoutAnchorable)
+				else // if (content is LayoutAnchorable)
 					CreateAnchorableLayoutItem(content as LayoutAnchorable);
 			}
+
 			CollectLayoutItemsDeleted();
 		}
 
@@ -2775,8 +2660,6 @@ namespace AvalonDock
 			if (contentToAttach?.Content is UIElement) InternalAddLogicalChild(contentToAttach.Content);
 		}
 
-		#endregion LayoutItems
-
 		private void ShowNavigatorWindow()
 		{
 			if (_navigatorWindow == null)
@@ -2798,9 +2681,9 @@ namespace AvalonDock
 			var fwTop = paneAsPositionableElement.FloatingTop;
 
 			if (fwWidth == 0.0)
-				fwWidth = paneAsWithActualSize.ActualWidth + 10;       //10 includes BorderThickness and Margins inside LayoutAnchorableFloatingWindowControl.
+				fwWidth = paneAsWithActualSize.ActualWidth + 10;       // 10 includes BorderThickness and Margins inside LayoutAnchorableFloatingWindowControl.
 			if (fwHeight == 0.0)
-				fwHeight = paneAsWithActualSize.ActualHeight + 10;   //10 includes BorderThickness and Margins inside LayoutAnchorableFloatingWindowControl.
+				fwHeight = paneAsWithActualSize.ActualHeight + 10;   // 10 includes BorderThickness and Margins inside LayoutAnchorableFloatingWindowControl.
 
 			var destPane = new LayoutAnchorablePane
 			{
@@ -2853,8 +2736,8 @@ namespace AvalonDock
 				Top = fwTop,
 				Left = fwLeft
 			};
-			//fwc.Owner = Window.GetWindow(this);
-			//fwc.SetParentToMainWindowOf(this);
+			// fwc.Owner = Window.GetWindow(this);
+			// fwc.SetParentToMainWindowOf(this);
 			_fwList.Add(fwc);
 			Layout.CollectGarbage();
 			InvalidateArrange();
@@ -2889,9 +2772,9 @@ namespace AvalonDock
 				fwHeight = parentPaneAsPositionableElement.FloatingHeight;
 
 			if (fwWidth == 0.0)
-				fwWidth = parentPaneAsWithActualSize.ActualWidth + 10;      //10 includes BorderThickness and Margins inside LayoutDocumentFloatingWindowControl.
+				fwWidth = parentPaneAsWithActualSize.ActualWidth + 10;      // 10 includes BorderThickness and Margins inside LayoutDocumentFloatingWindowControl.
 			if (fwHeight == 0.0)
-				fwHeight = parentPaneAsWithActualSize.ActualHeight + 10;    //10 includes BorderThickness and Margins inside LayoutDocumentFloatingWindowControl.
+				fwHeight = parentPaneAsWithActualSize.ActualHeight + 10;    // 10 includes BorderThickness and Margins inside LayoutDocumentFloatingWindowControl.
 
 			LayoutFloatingWindow fw;
 			LayoutFloatingWindowControl fwc;
@@ -2949,14 +2832,13 @@ namespace AvalonDock
 					Top = contentModel.FloatingTop
 				};
 			}
-			//fwc.Owner = Window.GetWindow(this);
-			//fwc.SetParentToMainWindowOf(this);
+
+			// fwc.Owner = Window.GetWindow(this);
+			// fwc.SetParentToMainWindowOf(this);
 			_fwList.Add(fwc);
 			Layout.CollectGarbage();
 			UpdateLayout();
 			return fwc;
 		}
-
-		#endregion Private Methods
 	}
 }

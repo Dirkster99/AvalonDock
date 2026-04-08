@@ -1,5 +1,5 @@
-using AvalonDock.Controls;
 using System;
+using AvalonDock.Controls;
 
 namespace AvalonDock
 {
@@ -12,5 +12,4 @@ namespace AvalonDock
 
 		public LayoutFloatingWindowControl LayoutFloatingWindowControl { get; }
 	}
-
 }

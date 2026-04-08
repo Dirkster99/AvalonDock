@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -23,13 +23,7 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutAnchorablePaneGroup : LayoutPositionableGroup<ILayoutAnchorablePane>, ILayoutAnchorablePane, ILayoutOrientableGroup
 	{
-		#region fields
-
 		private Orientation _orientation;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>Class constructor</summary>
 		public LayoutAnchorablePaneGroup()
@@ -41,10 +35,6 @@ namespace AvalonDock.Layout
 		{
 			Children.Add(firstChild);
 		}
-
-		#endregion Constructors
-
-		#region Properties
 
 		/// <summary>
 		/// Gets/sets the <see cref="System.Windows.Controls.Orientation"/> of this object.
@@ -60,10 +50,6 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(Orientation));
 			}
 		}
-
-		#endregion Properties
-
-		#region Overrides
 
 		/// <inheritdoc />
 		protected override bool GetVisibility() => Children.Count > 0 && Children.Any(c => c.IsVisible);
@@ -128,15 +114,9 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		private void UpdateParentVisibility()
 		{
 			if (Parent is ILayoutElementWithVisibility parentPane) parentPane.ComputeVisibility();
 		}
-
-		#endregion Private Methods
 	}
 }

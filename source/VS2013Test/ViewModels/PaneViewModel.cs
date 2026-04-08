@@ -4,20 +4,15 @@ namespace AvalonDock.VS2013Test.ViewModels
 {
 	class PaneViewModel : ViewModelBase
 	{
-		#region fields
 		private string _title = null;
 		private string _contentId = null;
 		private bool _isSelected = false;
 		private bool _isActive = false;
-		#endregion fields
 
-		#region constructors
 		public PaneViewModel()
 		{
 		}
-		#endregion constructors
 
-		#region Properties
 		public string Title
 		{
 			get => _title;
@@ -71,6 +66,5 @@ namespace AvalonDock.VS2013Test.ViewModels
 				}
 			}
 		}
-		#endregion Properties
 	}
 }

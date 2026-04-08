@@ -7,7 +7,6 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,6 +14,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -27,8 +27,6 @@ namespace AvalonDock.Controls
 	/// <seealso cref="Control"/>
 	public class LayoutDocumentTabItem : ContentControl
 	{
-		#region fields
-
 		private List<Rect> _otherTabsScreenArea = null;
 		private List<TabItem> _otherTabs = null;
 		private Rect _parentDocumentTabPanelScreenArea;
@@ -37,28 +35,20 @@ namespace AvalonDock.Controls
 		private Point _mouseDownPoint;
 		private bool _allowDrag = false;
 
-		#endregion fields
-
-		#region Contructors
-
 		/// <summary>Static class constructor to register WPF style keys.</summary>
 		static LayoutDocumentTabItem()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutDocumentTabItem), new FrameworkPropertyMetadata(typeof(LayoutDocumentTabItem)));
 		}
 
-		#endregion Contructors
-
-		#region Properties
-
-		#region Model
-
 		/// <summary><see cref="Model"/> dependency property.</summary>
 		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(nameof(Model), typeof(LayoutContent), typeof(LayoutDocumentTabItem),
 				new FrameworkPropertyMetadata(null, OnModelChanged));
 
 		/// <summary>Gets/sets the layout content model attached to the tab item.</summary>
-		[Bindable(true), Description("Gets wether this floating window is being dragged."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets wether this floating window is being dragged.")]
+		[Category("Other")]
 		public LayoutContent Model
 		{
 			get => (LayoutContent)GetValue(ModelProperty);
@@ -75,12 +65,8 @@ namespace AvalonDock.Controls
 			SetLayoutItem(layoutItem);
 			if (layoutItem != null)
 				Model.TabItem = this;
-			//UpdateLogicalParent();
+			// UpdateLogicalParent();
 		}
-
-		#endregion Model
-
-		#region LayoutItem
 
 		/// <summary><see cref="LayoutItem"/> Read-Only dependency property.</summary>
 		private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(LayoutItem), typeof(LayoutItem), typeof(LayoutDocumentTabItem),
@@ -89,14 +75,10 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
 		/// <summary>Gets the LayoutItem attached to this tag item.</summary>
-		[Bindable(true), Description("Gets the LayoutItem attached to this tag item."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets the LayoutItem attached to this tag item.")]
+		[Category("Other")]
 		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
-
-		#endregion LayoutItem
-
-		#endregion Properties
-
-		#region Overrides
 
 		/// <summary>
 		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.
@@ -142,10 +124,13 @@ namespace AvalonDock.Controls
 					_allowDrag = true;
 				}
 			}
+
 			if (!IsMouseCaptured || !_allowDrag) return;
 			var mousePosInScreenCoord = this.PointToScreenDPI(e.GetPosition(this));
 			if (!_parentDocumentTabPanelScreenArea.Contains(mousePosInScreenCoord))
+			{
 				StartDraggingFloatingWindowForContent();
+			}
 			else
 			{
 				var indexOfTabItemWithMouseOver = _otherTabsScreenArea.FindIndex(r => r.Contains(mousePosInScreenCoord));
@@ -199,10 +184,6 @@ namespace AvalonDock.Controls
 			base.OnMouseDown(e);
 		}
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		private void UpdateDragDetails()
 		{
 			_parentDocumentTabPanel = this.FindLogicalAncestor<DocumentPaneTabPanel>();
@@ -225,11 +206,9 @@ namespace AvalonDock.Controls
 		{
 			ReleaseMouseCapture();
 			// BD: 17.08.2020 Remove that bodge and handle CanClose=false && CanHide=true in XAML
-			//if (Model is LayoutAnchorable layoutAnchorable) layoutAnchorable.ResetCanCloseInternal();
+			// if (Model is LayoutAnchorable layoutAnchorable) layoutAnchorable.ResetCanCloseInternal();
 			var manager = Model.Root.Manager;
 			manager.StartDraggingFloatingWindowForContent(Model);
 		}
-
-		#endregion Private Methods
 	}
 }

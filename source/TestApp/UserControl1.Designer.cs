@@ -31,7 +31,6 @@ namespace TestApp
             base.Dispose(disposing);
         }
 
-        #region Component Designer generated code
 
         /// <summary> 
         /// Required method for Designer support - do not modify 
@@ -101,7 +100,6 @@ namespace TestApp
 
         }
 
-        #endregion
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;

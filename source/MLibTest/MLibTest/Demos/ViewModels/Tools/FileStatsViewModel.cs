@@ -1,4 +1,4 @@
-﻿namespace AvalonDock.Tools
+namespace AvalonDock.Tools
 {
 	using MLibTest.Demos.ViewModels.AD;
 	using MLibTest.Demos.ViewModels.Interfaces;
@@ -11,7 +11,6 @@
 	/// </summary>
 	internal class FileStatsViewModel : ToolViewModel
 	{
-		#region fields
 		/// <summary>
 		/// Identifies the <see ref="ContentId"/> of this tool window.
 		/// </summary>
@@ -26,9 +25,7 @@
 
 		private DateTime _lastModified;
 		private long _fileSize;
-		#endregion fields
 
-		#region constructors
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -56,9 +53,7 @@
 		  : base(ToolTitle)
 		{
 		}
-		#endregion constructors
 
-		#region properties
 		/// <summary>
 		/// Gets the byte size of the on disc file (if any).
 		/// </summary>
@@ -90,9 +85,7 @@
 				}
 			}
 		}
-		#endregion properties
 
-		#region methods
 		/// <summary>
 		/// Update this tool windows content with file based properties,
 		/// if the current document has changed.
@@ -117,6 +110,5 @@
 				LastModified = DateTime.MinValue;
 			}
 		}
-		#endregion methods
 	}
 }

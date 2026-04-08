@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,11 +7,11 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -20,16 +20,10 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public class AnchorablePaneTabPanel : Panel
 	{
-		#region Constructors
-
 		public AnchorablePaneTabPanel()
 		{
 			this.FlowDirection = System.Windows.FlowDirection.LeftToRight;
 		}
-
-		#endregion Constructors
-
-		#region Overrides
 
 		protected override Size MeasureOverride(Size availableSize)
 		{
@@ -101,7 +95,5 @@ namespace AvalonDock.Controls
 
 			base.OnMouseLeave(e);
 		}
-
-		#endregion Overrides
 	}
 }

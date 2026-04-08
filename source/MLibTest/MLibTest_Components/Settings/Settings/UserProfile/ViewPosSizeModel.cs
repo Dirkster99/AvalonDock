@@ -1,4 +1,4 @@
-﻿namespace Settings.UserProfile
+namespace Settings.UserProfile
 {
 	using System;
 	using System.Windows;
@@ -15,12 +15,9 @@
 	[XmlRoot(ElementName = "ControlPos", IsNullable = true)]
 	public class ViewPosSizeModel : Settings.Interfaces.IViewPosSizeModel
 	{
-		#region fields
 		private double mX, mY, mWidth, mHeight;
 		private bool mIsMaximized;
-		#endregion fields
 
-		#region constructors
 		/// <summary>
 		/// Standard class constructor
 		/// </summary>
@@ -63,9 +60,7 @@
 			: this(vs.X, vs.Y, vs.Width, vs.Height)
 		{
 		}
-		#endregion constructors
 
-		#region properties
 		/// <summary>
 		/// Gets a default view size that is used when everything else fails.
 		/// </summary>
@@ -183,9 +178,7 @@
 				}
 			}
 		}
-		#endregion properties
 
-		#region methods
 		/// <summary>
 		/// Convinience function to set the position of a view to a valid position
 		/// </summary>
@@ -234,6 +227,5 @@
 			this.Height = view.Height;
 			this.IsMaximized = (view.WindowState == WindowState.Maximized ? true : false);
 		}
-		#endregion methods
 	}
 }

@@ -1,24 +1,19 @@
-﻿namespace MLibTest.Demos.ViewModels.AD
+namespace MLibTest.Demos.ViewModels.AD
 {
 	using MLibTest.ViewModels.Base;
 	using System.Windows.Media;
 
 	internal class PaneViewModel : ViewModelBase
 	{
-		#region fields
 		private string _title = null;
 		private string _contentId = null;
 		private bool _isSelected = false;
 		private bool _isActive = false;
-		#endregion fields
 
-		#region constructors
 		public PaneViewModel()
 		{
 		}
-		#endregion constructors
 
-		#region Properties
 
 		public string Title
 		{
@@ -78,6 +73,5 @@
 			}
 		}
 
-		#endregion Properties
 	}
 }

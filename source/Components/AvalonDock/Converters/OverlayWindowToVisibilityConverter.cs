@@ -7,12 +7,12 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Controls;
-using AvalonDock.Layout;
 using System;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Markup;
+using AvalonDock.Controls;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Converters
 {

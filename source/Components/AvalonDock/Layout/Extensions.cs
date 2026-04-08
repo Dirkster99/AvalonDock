@@ -16,8 +16,6 @@ namespace AvalonDock.Layout
 	/// <summary>Provides extension methods for WPF specific (Visual Tree) capabilities.</summary>
 	public static class Extensions
 	{
-		#region Public Methods
-
 		public static IEnumerable<ILayoutElement> Descendents(this ILayoutElement element)
 		{
 			if (!(element is ILayoutContainer container)) yield break;
@@ -29,7 +27,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		public static T FindParent<T>(this ILayoutElement element) //where T : ILayoutContainer
+		public static T FindParent<T>(this ILayoutElement element) // where T : ILayoutContainer
 		{
 			var parent = element.Parent;
 			while (parent != null && !(parent is T))
@@ -37,7 +35,7 @@ namespace AvalonDock.Layout
 			return (T)parent;
 		}
 
-		public static ILayoutRoot GetRoot(this ILayoutElement element) //where T : ILayoutContainer
+		public static ILayoutRoot GetRoot(this ILayoutElement element) // where T : ILayoutContainer
 		{
 			if (element is ILayoutRoot layoutRoot) return layoutRoot;
 			var parent = element.Parent;
@@ -74,13 +72,10 @@ namespace AvalonDock.Layout
 					return element.IsInAnchorablePaneAtStartOfPanel(layoutPanel) ? AnchorSide.Top : AnchorSide.Bottom;
 				}
 			}
+
 			Debug.Fail("Unable to find the side for an element, possible layout problem!");
 			return AnchorSide.Right;
 		}
-
-		#endregion Public Methods
-
-		#region Internal Methods
 
 		/// <summary>
 		/// Removed with Issue 20 since Win32 definition seems to be buggy here
@@ -133,7 +128,5 @@ namespace AvalonDock.Layout
 
 			return false;
 		}
-
-		#endregion Internal Methods
 	}
 }
