@@ -7,7 +7,35 @@
     Width="800"
     Height="600"
     UseLayoutRounding="True">
-    <Window.Resources />
+    <Window.Resources>
+        <!-- Wrench icon for tool boxes -->
+        <Path x:Key="WrenchIcon1" x:Shared="False"
+              Data="M14.7,6.3l-1.6-1.6c-0.2-0.2-0.5-0.2-0.7,0L8.3,8.8L7.2,7.7l4.1-4.1c0.2-0.2,0.2-0.5,0-0.7L9.7,1.3C9.1,0.7,8.3,0.5,7.5,0.7L5.9,2.3L7.5,3.9L6.1,5.3L4.5,3.7L2.3,5.9C2.1,6.5,2.3,7.3,2.9,7.9l0,0l-2.6,2.6c-0.4,0.4-0.4,1,0,1.4l1.8,1.8c0.4,0.4,1,0.4,1.4,0l2.6-2.6c0.6,0.6,1.4,0.8,2,0.6l1.6-1.6L8.1,8.5l1.4-1.4l1.6,1.6l4.1-4.1C15.3,4.5,14.7,6.3,14.7,6.3z"
+              Fill="#555555" Stretch="Uniform" Width="14" Height="14" />
+        <Path x:Key="WrenchIcon2" x:Shared="False"
+              Data="M14.7,6.3l-1.6-1.6c-0.2-0.2-0.5-0.2-0.7,0L8.3,8.8L7.2,7.7l4.1-4.1c0.2-0.2,0.2-0.5,0-0.7L9.7,1.3C9.1,0.7,8.3,0.5,7.5,0.7L5.9,2.3L7.5,3.9L6.1,5.3L4.5,3.7L2.3,5.9C2.1,6.5,2.3,7.3,2.9,7.9l0,0l-2.6,2.6c-0.4,0.4-0.4,1,0,1.4l1.8,1.8c0.4,0.4,1,0.4,1.4,0l2.6-2.6c0.6,0.6,1.4,0.8,2,0.6l1.6-1.6L8.1,8.5l1.4-1.4l1.6,1.6l4.1-4.1C15.3,4.5,14.7,6.3,14.7,6.3z"
+              Fill="#555555" Stretch="Uniform" Width="14" Height="14" />
+        <!-- Sliders icon for Properties -->
+        <Viewbox x:Key="SlidersIcon" x:Shared="False" Width="14" Height="14">
+            <Canvas Width="16" Height="16">
+                <Rectangle Canvas.Left="1" Canvas.Top="2" Width="14" Height="2" RadiusX="1" RadiusY="1" Fill="#555555" />
+                <Ellipse Canvas.Left="9" Canvas.Top="1" Width="4" Height="4" Fill="#007ACC" />
+                <Rectangle Canvas.Left="1" Canvas.Top="7" Width="14" Height="2" RadiusX="1" RadiusY="1" Fill="#555555" />
+                <Ellipse Canvas.Left="3" Canvas.Top="6" Width="4" Height="4" Fill="#007ACC" />
+                <Rectangle Canvas.Left="1" Canvas.Top="12" Width="14" Height="2" RadiusX="1" RadiusY="1" Fill="#555555" />
+                <Ellipse Canvas.Left="7" Canvas.Top="11" Width="4" Height="4" Fill="#007ACC" />
+            </Canvas>
+        </Viewbox>
+        <!-- Terminal icon for Output -->
+        <Viewbox x:Key="TerminalIcon" x:Shared="False" Width="14" Height="14">
+            <Canvas Width="16" Height="16">
+                <Rectangle Canvas.Left="1" Canvas.Top="2" Width="14" Height="12"
+                           Stroke="#555555" StrokeThickness="1.2" RadiusX="1" RadiusY="1" Fill="Transparent" />
+                <Path Data="M4,7 L7,9.5 L4,12" Stroke="#007ACC" StrokeThickness="1.5" Fill="Transparent" />
+                <Rectangle Canvas.Left="8" Canvas.Top="11" Width="4" Height="1.2" Fill="#555555" />
+            </Canvas>
+        </Viewbox>
+    </Window.Resources>
     <Grid x:Name="layoutRoot">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -37,10 +65,14 @@
                 <avalonDock:LayoutRoot.LeftSide>
                     <avalonDock:LayoutAnchorSide>
                         <avalonDock:LayoutAnchorGroup>
-                            <avalonDock:LayoutAnchorable Title="ToolBox 1" ContentId="ToolBox1">
+                            <avalonDock:LayoutAnchorable Title="ToolBox 1" ContentId="ToolBox1"
+                                avalonDockControls:ToggleDock.Icon="{StaticResource WrenchIcon1}"
+                                avalonDockControls:ToggleDock.ToolTip="Toggle ToolBox 1 panel">
                                 <TextBlock Text="ToolBox 1 Content" Margin="8" />
                             </avalonDock:LayoutAnchorable>
-                            <avalonDock:LayoutAnchorable Title="ToolBox 2" ContentId="ToolBox2">
+                            <avalonDock:LayoutAnchorable Title="ToolBox 2" ContentId="ToolBox2"
+                                avalonDockControls:ToggleDock.Icon="{StaticResource WrenchIcon2}"
+                                avalonDockControls:ToggleDock.ToolTip="Toggle ToolBox 2 panel">
                                 <TextBlock Text="ToolBox 2 Content" Margin="8" />
                             </avalonDock:LayoutAnchorable>
                         </avalonDock:LayoutAnchorGroup>
@@ -50,7 +82,9 @@
                 <avalonDock:LayoutRoot.RightSide>
                     <avalonDock:LayoutAnchorSide>
                         <avalonDock:LayoutAnchorGroup>
-                            <avalonDock:LayoutAnchorable Title="Properties" ContentId="Properties">
+                            <avalonDock:LayoutAnchorable Title="Properties" ContentId="Properties"
+                                avalonDockControls:ToggleDock.Icon="{StaticResource SlidersIcon}"
+                                avalonDockControls:ToggleDock.ToolTip="Toggle Properties panel">
                                 <TextBlock Text="Properties Content" Margin="8" />
                             </avalonDock:LayoutAnchorable>
                         </avalonDock:LayoutAnchorGroup>
@@ -60,7 +94,9 @@
                 <avalonDock:LayoutRoot.BottomSide>
                     <avalonDock:LayoutAnchorSide>
                         <avalonDock:LayoutAnchorGroup>
-                            <avalonDock:LayoutAnchorable Title="Output" ContentId="Output">
+                            <avalonDock:LayoutAnchorable Title="Output" ContentId="Output"
+                                avalonDockControls:ToggleDock.Icon="{StaticResource TerminalIcon}"
+                                avalonDockControls:ToggleDock.ToolTip="Toggle Output panel">
                                 <TextBlock Text="Output Content" Margin="8" />
                             </avalonDock:LayoutAnchorable>
                         </avalonDock:LayoutAnchorGroup>

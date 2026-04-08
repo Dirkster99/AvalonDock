@@ -102,6 +102,10 @@ namespace AvalonDock
 		private void ToggleDockingManager_Loaded(object sender, RoutedEventArgs e)
 		{
 			SetupToggleDockButtonBars();
+
+			// Replace pin icons with minimize icons after layout settles
+			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
+				new System.Action(UpdatePinButtonsToMinimize));
 		}
 
 		private void UpdatePinButtonsToMinimize()
@@ -112,7 +116,34 @@ namespace AvalonDock
 			foreach (var pin in pinButtons)
 			{
 				pin.ToolTip = "Minimize";
+
+				// Replace the pin image with a minimize icon (underscore / dash at bottom)
+				var border = pin.Content as Border;
+				if (border == null)
+				{
+					// Wrap in a transparent border for hit testing
+					border = new Border { Background = Brushes.Transparent };
+					pin.Content = border;
+				}
+
+				border.Child = CreateMinimizeIcon();
 			}
+		}
+
+		/// <summary>Creates a vector minimize icon (underscore line at bottom).</summary>
+		private static UIElement CreateMinimizeIcon()
+		{
+			var path = new System.Windows.Shapes.Path
+			{
+				Data = Geometry.Parse("M2,11 L11,11"),
+				Stroke = new SolidColorBrush(Color.FromRgb(0x55, 0x55, 0x55)),
+				StrokeThickness = 1.5,
+				Width = 13,
+				Height = 13,
+				Stretch = Stretch.None,
+				SnapsToDevicePixels = true
+			};
+			return path;
 		}
 
 		private static System.Collections.Generic.IEnumerable<T> FindVisualChildren<T>(DependencyObject parent) where T : DependencyObject

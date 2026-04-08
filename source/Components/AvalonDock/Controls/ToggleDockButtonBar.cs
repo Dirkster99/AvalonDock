@@ -120,15 +120,41 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty IconContentProperty =
 			DependencyProperty.Register(nameof(IconContent), typeof(object), typeof(ToggleDockButton), new PropertyMetadata(null));
 
+		/// <summary>DataTemplate for rendering the icon. When set, <see cref="IconContent"/> is used as the DataContext.</summary>
+		public DataTemplate IconTemplate
+		{
+			get => (DataTemplate)GetValue(IconTemplateProperty);
+			set => SetValue(IconTemplateProperty, value);
+		}
+
+		public static readonly DependencyProperty IconTemplateProperty =
+			DependencyProperty.Register(nameof(IconTemplate), typeof(DataTemplate), typeof(ToggleDockButton), new PropertyMetadata(null));
+
 		private static void OnAnchorableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
 			var btn = (ToggleDockButton)d;
 			if (e.NewValue is LayoutAnchorable anc)
 			{
 				btn.Content = anc.Title;
-				btn.ToolTip = anc.Title;
-				btn.IconSource = anc.IconSource;
 				btn.IsChecked = !anc.IsAutoHidden;
+
+				// Read attached properties from the LayoutAnchorable (set by developer in XAML)
+				var attachedIcon = ToggleDock.GetIcon(anc);
+				var attachedToolTip = ToggleDock.GetToolTip(anc);
+				var attachedIconTemplate = ToggleDock.GetIconTemplate(anc);
+
+				// Icon: prefer attached ToggleDock.Icon, fall back to LayoutAnchorable.IconSource
+				if (attachedIcon != null)
+					btn.IconContent = attachedIcon;
+				else if (anc.IconSource != null)
+					btn.IconSource = anc.IconSource;
+
+				// IconTemplate: if set, apply as the button's ContentTemplate for the icon presenter
+				if (attachedIconTemplate != null)
+					btn.IconTemplate = attachedIconTemplate;
+
+				// ToolTip: prefer attached ToggleDock.ToolTip, fall back to Title
+				btn.ToolTip = attachedToolTip ?? anc.Title;
 			}
 		}
 
