@@ -147,11 +147,11 @@ namespace AvalonDock.Controls
 	{
 		private Point _dragStartPoint;
 		private bool _isMouseDown;
+		private bool _isDragging;
 
 		static ToggleDockButton()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(ToggleDockButton), new FrameworkPropertyMetadata(typeof(ToggleDockButton)));
-			AllowDropProperty.OverrideMetadata(typeof(ToggleDockButton), new FrameworkPropertyMetadata(true));
 		}
 
 		/// <summary>The anchorable model this button controls.</summary>
@@ -249,18 +249,21 @@ namespace AvalonDock.Controls
 			base.OnMouseLeftButtonDown(e);
 			_dragStartPoint = e.GetPosition(this);
 			_isMouseDown = true;
+			_isDragging = false;
 		}
 
 		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
 			_isMouseDown = false;
-			base.OnMouseLeftButtonUp(e);
+			if (!_isDragging)
+				base.OnMouseLeftButtonUp(e);
+			_isDragging = false;
 		}
 
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			base.OnMouseMove(e);
-			if (!_isMouseDown || e.LeftButton != MouseButtonState.Pressed) return;
+			if (!_isMouseDown || e.LeftButton != MouseButtonState.Pressed || _isDragging) return;
 
 			var pos = e.GetPosition(this);
 			var diff = pos - _dragStartPoint;
@@ -268,96 +271,20 @@ namespace AvalonDock.Controls
 				Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
 			{
 				_isMouseDown = false;
+				_isDragging = true;
 				ReleaseMouseCapture();
 
-				// Show drag adorner
-				var adornerLayer = System.Windows.Documents.AdornerLayer.GetAdornerLayer(this);
-				ToggleDockDragAdorner adorner = null;
-				if (adornerLayer != null)
-				{
-					adorner = new ToggleDockDragAdorner(this);
-					adornerLayer.Add(adorner);
-				}
+				// Find the parent bar
+				var bar = ItemsControl.ItemsControlFromItemContainer(this) as ToggleDockButtonBar
+					?? FindParent<ToggleDockButtonBar>(this);
+				if (bar == null) return;
 
-				var data = new DataObject(typeof(ToggleDockButton), this);
-				DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
-
-				// Remove adorner after drop
-				if (adorner != null && adornerLayer != null)
-				{
-					adorner.Detach();
-					adornerLayer.Remove(adorner);
-				}
+				// Start overlay-based drag
+				ToggleDockDragOverlay.StartDrag(this, bar);
 			}
 		}
 
-		protected override void OnDragOver(DragEventArgs e)
-		{
-			base.OnDragOver(e);
-			if (e.Data.GetDataPresent(typeof(ToggleDockButton)))
-			{
-				var source = e.Data.GetData(typeof(ToggleDockButton)) as ToggleDockButton;
-				if (source != null && source != this)
-				{
-					e.Effects = DragDropEffects.Move;
-					// Highlight this button as a drop target
-					_savedBorderBrush = _savedBorderBrush ?? BorderBrush;
-					_savedBorderThickness = _savedBorderThickness ?? BorderThickness;
-					BorderBrush = new SolidColorBrush(Color.FromRgb(0x00, 0x7A, 0xCC));
-					BorderThickness = new Thickness(2);
-				}
-				else
-				{
-					e.Effects = DragDropEffects.None;
-				}
-			}
-			else
-			{
-				e.Effects = DragDropEffects.None;
-			}
-			e.Handled = true;
-		}
-
-		protected override void OnDragLeave(DragEventArgs e)
-		{
-			base.OnDragLeave(e);
-			RestoreBorder();
-		}
-
-		protected override void OnDrop(DragEventArgs e)
-		{
-			base.OnDrop(e);
-			RestoreBorder();
-			if (!e.Data.GetDataPresent(typeof(ToggleDockButton))) return;
-
-			var source = e.Data.GetData(typeof(ToggleDockButton)) as ToggleDockButton;
-			if (source == null || source == this) return;
-
-			// Find the button bar and merge
-			var bar = ItemsControl.ItemsControlFromItemContainer(this) as ToggleDockButtonBar
-				?? FindParent<ToggleDockButtonBar>(this);
-			bar?.MergeButtons(this, source);
-			e.Handled = true;
-		}
-
-		private Brush _savedBorderBrush;
-		private Thickness? _savedBorderThickness;
-
-		private void RestoreBorder()
-		{
-			if (_savedBorderBrush != null)
-			{
-				BorderBrush = _savedBorderBrush;
-				_savedBorderBrush = null;
-			}
-			if (_savedBorderThickness.HasValue)
-			{
-				BorderThickness = _savedBorderThickness.Value;
-				_savedBorderThickness = null;
-			}
-		}
-
-		private static T FindParent<T>(DependencyObject child) where T : DependencyObject
+		internal static T FindParent<T>(DependencyObject child) where T : DependencyObject
 		{
 			var parent = VisualTreeHelper.GetParent(child);
 			while (parent != null)
@@ -439,67 +366,7 @@ namespace AvalonDock.Controls
 			manager.ToggleGroup(this);
 		}
 
-		#region Drag/Drop Support
-
-		private Brush _savedBorderBrush;
-		private Thickness? _savedBorderThickness;
-
-		protected override void OnDragOver(DragEventArgs e)
-		{
-			base.OnDragOver(e);
-			if (e.Data.GetDataPresent(typeof(ToggleDockButton)))
-			{
-				e.Effects = DragDropEffects.Move;
-				_savedBorderBrush = _savedBorderBrush ?? BorderBrush;
-				_savedBorderThickness = _savedBorderThickness ?? BorderThickness;
-				BorderBrush = new SolidColorBrush(Color.FromRgb(0x00, 0x7A, 0xCC));
-				BorderThickness = new Thickness(2);
-			}
-			else
-			{
-				e.Effects = DragDropEffects.None;
-			}
-			e.Handled = true;
-		}
-
-		protected override void OnDragLeave(DragEventArgs e)
-		{
-			base.OnDragLeave(e);
-			RestoreBorder();
-		}
-
-		protected override void OnDrop(DragEventArgs e)
-		{
-			base.OnDrop(e);
-			RestoreBorder();
-			if (!e.Data.GetDataPresent(typeof(ToggleDockButton))) return;
-
-			var source = e.Data.GetData(typeof(ToggleDockButton)) as ToggleDockButton;
-			if (source == null) return;
-
-			var bar = ItemsControl.ItemsControlFromItemContainer(this) as ToggleDockButtonBar
-				?? FindParent<ToggleDockButtonBar>(this);
-			bar?.MergeButtons(this, source);
-			e.Handled = true;
-		}
-
-		#endregion Drag/Drop Support
-
 		#region Private Methods
-
-		private void RestoreBorder()
-		{
-			if (_savedBorderBrush != null)
-			{
-				BorderBrush = _savedBorderBrush;
-				_savedBorderBrush = null;
-			}
-			if (_savedBorderThickness.HasValue)
-			{
-				BorderThickness = _savedBorderThickness.Value;
-				_savedBorderThickness = null;
-			}
-		}
 
 		private void UpdateVisual()
 		{
@@ -605,44 +472,186 @@ namespace AvalonDock.Controls
 	}
 
 	/// <summary>
-	/// Adorner that renders a semi-transparent snapshot of the dragged button following the mouse cursor.
+	/// A transparent overlay window used for drag-and-drop of toggle dock buttons.
+	/// Shows drop target indicators over valid buttons and handles mouse tracking.
+	/// This avoids the WPF DragDrop system which conflicts with ToggleButton mouse capture.
 	/// </summary>
-	internal class ToggleDockDragAdorner : System.Windows.Documents.Adorner
+	internal class ToggleDockDragOverlay : Window
 	{
-		private readonly VisualBrush _visualBrush;
-		private readonly Size _renderSize;
-		private Point _lastPoint;
+		private readonly ToggleDockButton _sourceButton;
+		private readonly ToggleDockButtonBar _sourceBar;
+		private readonly Window _ownerWindow;
+		private readonly List<DropTarget> _dropTargets = new List<DropTarget>();
+		private int _hoveredTargetIndex = -1;
 
-		public ToggleDockDragAdorner(UIElement adornedElement) : base(adornedElement)
+		// Visual for the dragged button ghost
+		private readonly VisualBrush _ghostBrush;
+		private readonly Size _ghostSize;
+
+		private struct DropTarget
 		{
-			IsHitTestVisible = false;
-			_renderSize = adornedElement.RenderSize;
-			_visualBrush = new VisualBrush(adornedElement) { Opacity = 0.7 };
-
-			// Track mouse position via DragOver on the adorner layer's parent
-			var window = Window.GetWindow(adornedElement);
-			if (window != null)
-				window.PreviewDragOver += OnWindowDragOver;
+			public Rect ScreenRect;
+			public ToggleButton Button;
 		}
 
-		private void OnWindowDragOver(object sender, DragEventArgs e)
+		private ToggleDockDragOverlay(ToggleDockButton source, ToggleDockButtonBar sourceBar, Window owner)
 		{
-			_lastPoint = e.GetPosition(AdornedElement);
+			_sourceButton = source;
+			_sourceBar = sourceBar;
+			_ownerWindow = owner;
+
+			_ghostBrush = new VisualBrush(source) { Opacity = 0.6 };
+			_ghostSize = source.RenderSize;
+
+			WindowStyle = WindowStyle.None;
+			AllowsTransparency = true;
+			Background = System.Windows.Media.Brushes.Transparent;
+			ShowInTaskbar = false;
+			Topmost = true;
+			ResizeMode = ResizeMode.NoResize;
+
+			// Cover the entire owner window
+			Left = owner.Left;
+			Top = owner.Top;
+			Width = owner.ActualWidth;
+			Height = owner.ActualHeight;
+
+			Cursor = Cursors.Hand;
+		}
+
+		internal static void StartDrag(ToggleDockButton source, ToggleDockButtonBar sourceBar)
+		{
+			var owner = Window.GetWindow(source);
+			if (owner == null) return;
+
+			var overlay = new ToggleDockDragOverlay(source, sourceBar, owner);
+			overlay.CollectDropTargets(owner);
+			overlay.Show();
+			overlay.CaptureMouse();
+		}
+
+		private void CollectDropTargets(Window owner)
+		{
+			// Find all ToggleDockButtons and ToggleDockButtonGroups in the window
+			CollectTargetsRecursive(owner);
+		}
+
+		private void CollectTargetsRecursive(DependencyObject parent)
+		{
+			int childCount = VisualTreeHelper.GetChildrenCount(parent);
+			for (int i = 0; i < childCount; i++)
+			{
+				var child = VisualTreeHelper.GetChild(parent, i);
+
+				if (child is ToggleDockButton btn && btn != _sourceButton && btn.IsVisible)
+				{
+					var screenPos = btn.PointToScreen(new Point(0, 0));
+					var rect = new Rect(
+						screenPos.X - _ownerWindow.Left,
+						screenPos.Y - _ownerWindow.Top,
+						btn.ActualWidth,
+						btn.ActualHeight);
+					_dropTargets.Add(new DropTarget { ScreenRect = rect, Button = btn });
+				}
+				else if (child is ToggleDockButtonGroup grp && grp.IsVisible)
+				{
+					var screenPos = grp.PointToScreen(new Point(0, 0));
+					var rect = new Rect(
+						screenPos.X - _ownerWindow.Left,
+						screenPos.Y - _ownerWindow.Top,
+						grp.ActualWidth,
+						grp.ActualHeight);
+					_dropTargets.Add(new DropTarget { ScreenRect = rect, Button = grp });
+				}
+
+				CollectTargetsRecursive(child);
+			}
+		}
+
+		protected override void OnMouseMove(MouseEventArgs e)
+		{
+			base.OnMouseMove(e);
 			InvalidateVisual();
 		}
 
-		protected override void OnRender(DrawingContext drawingContext)
+		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
-			var offset = new Point(_lastPoint.X + 8, _lastPoint.Y - _renderSize.Height / 2);
-			var rect = new Rect(offset, _renderSize);
-			drawingContext.DrawRectangle(_visualBrush, new Pen(new SolidColorBrush(Color.FromRgb(0x00, 0x7A, 0xCC)), 1), rect);
+			base.OnMouseLeftButtonUp(e);
+			ReleaseMouseCapture();
+
+			var pos = e.GetPosition(this);
+			ToggleButton hitButton = null;
+			foreach (var target in _dropTargets)
+			{
+				if (target.ScreenRect.Contains(pos))
+				{
+					hitButton = target.Button;
+					break;
+				}
+			}
+
+			Close();
+
+			if (hitButton != null)
+			{
+				// Merge source into target
+				_sourceBar.MergeButtons(hitButton, _sourceButton);
+			}
 		}
 
-		public void Detach()
+		protected override void OnKeyDown(KeyEventArgs e)
 		{
-			var window = Window.GetWindow(AdornedElement);
-			if (window != null)
-				window.PreviewDragOver -= OnWindowDragOver;
+			if (e.Key == Key.Escape)
+			{
+				ReleaseMouseCapture();
+				Close();
+				e.Handled = true;
+			}
+			base.OnKeyDown(e);
+		}
+
+		protected override void OnLostMouseCapture(MouseEventArgs e)
+		{
+			base.OnLostMouseCapture(e);
+			// If we lost capture unexpectedly, close
+			if (IsVisible)
+				Close();
+		}
+
+		protected override void OnRender(DrawingContext dc)
+		{
+			base.OnRender(dc);
+
+			var mousePos = Mouse.GetPosition(this);
+
+			// Draw drop target indicators
+			var normalBrush = new SolidColorBrush(Color.FromArgb(0x40, 0x00, 0x7A, 0xCC));
+			var hoverBrush = new SolidColorBrush(Color.FromArgb(0x80, 0x00, 0x7A, 0xCC));
+			var borderPen = new Pen(new SolidColorBrush(Color.FromRgb(0x00, 0x7A, 0xCC)), 2);
+
+			_hoveredTargetIndex = -1;
+			for (int i = 0; i < _dropTargets.Count; i++)
+			{
+				var target = _dropTargets[i];
+				bool isHovered = target.ScreenRect.Contains(mousePos);
+				if (isHovered) _hoveredTargetIndex = i;
+
+				var inflated = target.ScreenRect;
+				inflated.Inflate(3, 3);
+				dc.DrawRoundedRectangle(
+					isHovered ? hoverBrush : normalBrush,
+					borderPen,
+					inflated,
+					3, 3);
+			}
+
+			// Draw ghost of dragged button near cursor
+			var ghostRect = new Rect(
+				mousePos.X + 12,
+				mousePos.Y - _ghostSize.Height / 2,
+				_ghostSize.Width,
+				_ghostSize.Height);
+			dc.DrawRectangle(_ghostBrush, new Pen(new SolidColorBrush(Color.FromRgb(0x00, 0x7A, 0xCC)), 1), ghostRect);
 		}
 	}
 }
