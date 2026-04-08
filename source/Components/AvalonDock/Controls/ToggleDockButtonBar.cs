@@ -146,11 +146,12 @@ namespace AvalonDock.Controls
 	public class ToggleDockButton : ToggleButton
 	{
 		private Point _dragStartPoint;
-		private bool _isDragging;
+		private bool _isMouseDown;
 
 		static ToggleDockButton()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(ToggleDockButton), new FrameworkPropertyMetadata(typeof(ToggleDockButton)));
+			AllowDropProperty.OverrideMetadata(typeof(ToggleDockButton), new FrameworkPropertyMetadata(true));
 		}
 
 		/// <summary>The anchorable model this button controls.</summary>
@@ -235,7 +236,7 @@ namespace AvalonDock.Controls
 		protected override void OnClick()
 		{
 			base.OnClick();
-			if (_isDragging || Anchorable == null) return;
+			if (Anchorable == null) return;
 
 			var manager = Anchorable.Root?.Manager as ToggleDockingManager;
 			manager?.ToggleAnchorable(Anchorable, Section);
@@ -247,24 +248,23 @@ namespace AvalonDock.Controls
 		{
 			base.OnMouseLeftButtonDown(e);
 			_dragStartPoint = e.GetPosition(this);
-			_isDragging = false;
+			_isMouseDown = true;
 		}
 
-		protected override void OnMouseMove(MouseEventArgs e)
+		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
-			base.OnMouseMove(e);
-			if (e.LeftButton != MouseButtonState.Pressed || _isDragging) return;
+			_isMouseDown = false;
+			base.OnMouseLeftButtonUp(e);
+		}
 
-			var pos = e.GetPosition(this);
-			var diff = pos - _dragStartPoint;
-			if (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
-				Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)
-			{
-				_isDragging = true;
-				var data = new DataObject(typeof(ToggleDockButton), this);
-				DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
-				_isDragging = false;
-			}
+		protected override void OnMouseLeave(MouseEventArgs e)
+		{
+			base.OnMouseLeave(e);
+			if (!_isMouseDown || e.LeftButton != MouseButtonState.Pressed) return;
+
+			_isMouseDown = false;
+			var data = new DataObject(typeof(ToggleDockButton), this);
+			DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
 		}
 
 		protected override void OnDragOver(DragEventArgs e)
