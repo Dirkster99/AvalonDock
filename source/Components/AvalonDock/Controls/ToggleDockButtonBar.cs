@@ -472,32 +472,34 @@ namespace AvalonDock.Controls
 	}
 
 	/// <summary>
-	/// A transparent overlay window used for drag-and-drop of toggle dock buttons.
-	/// Shows drop target indicators over valid buttons and handles mouse tracking.
-	/// This avoids the WPF DragDrop system which conflicts with ToggleButton mouse capture.
+	/// A transparent overlay window that shows 6 edge drop zones when dragging a toggle button.
+	/// Zones: Left-Top, Left-Bottom, Right-Top, Right-Bottom, Bottom-Left, Bottom-Right.
+	/// If a dock is already open, its actual width/height is used for the zone size.
 	/// </summary>
 	internal class ToggleDockDragOverlay : Window
 	{
 		private readonly ToggleDockButton _sourceButton;
 		private readonly ToggleDockButtonBar _sourceBar;
+		private readonly ToggleDockingManager _manager;
 		private readonly Window _ownerWindow;
-		private readonly List<DropTarget> _dropTargets = new List<DropTarget>();
-		private int _hoveredTargetIndex = -1;
+		private readonly List<DropZone> _dropZones = new List<DropZone>();
 
 		// Visual for the dragged button ghost
 		private readonly VisualBrush _ghostBrush;
 		private readonly Size _ghostSize;
 
-		private struct DropTarget
+		internal struct DropZone
 		{
-			public Rect ScreenRect;
-			public ToggleButton Button;
+			public Rect Rect;
+			public AnchorSide Section;
+			public string Label;
 		}
 
-		private ToggleDockDragOverlay(ToggleDockButton source, ToggleDockButtonBar sourceBar, Window owner)
+		private ToggleDockDragOverlay(ToggleDockButton source, ToggleDockButtonBar sourceBar, ToggleDockingManager manager, Window owner)
 		{
 			_sourceButton = source;
 			_sourceBar = sourceBar;
+			_manager = manager;
 			_ownerWindow = owner;
 
 			_ghostBrush = new VisualBrush(source) { Opacity = 0.6 };
@@ -524,47 +526,116 @@ namespace AvalonDock.Controls
 			var owner = Window.GetWindow(source);
 			if (owner == null) return;
 
-			var overlay = new ToggleDockDragOverlay(source, sourceBar, owner);
-			overlay.CollectDropTargets(owner);
+			var manager = source.Anchorable?.Root?.Manager as ToggleDockingManager;
+			if (manager == null) return;
+
+			var overlay = new ToggleDockDragOverlay(source, sourceBar, manager, owner);
+			overlay.BuildDropZones();
 			overlay.Show();
 			overlay.CaptureMouse();
 		}
 
-		private void CollectDropTargets(Window owner)
+		private void BuildDropZones()
 		{
-			// Find all ToggleDockButtons and ToggleDockButtonGroups in the window
-			CollectTargetsRecursive(owner);
+			// Get the manager's content area in window coordinates
+			var managerScreenPos = _manager.PointToScreen(new Point(0, 0));
+			double offsetX = managerScreenPos.X - _ownerWindow.Left;
+			double offsetY = managerScreenPos.Y - _ownerWindow.Top;
+			double w = _manager.ActualWidth;
+			double h = _manager.ActualHeight;
+
+			// Determine zone sizes: use open dock size if available, otherwise default fractions
+			double leftW = GetOpenDockWidth(AnchorSide.Left, w * 0.25);
+			double rightW = GetOpenDockWidth(AnchorSide.Right, w * 0.25);
+			double bottomH = GetOpenDockHeight(AnchorSide.Bottom, h * 0.25);
+
+			double halfH = (h - bottomH) / 2.0;
+			double middleW = w - leftW - rightW;
+
+			// Left-Top
+			_dropZones.Add(new DropZone
+			{
+				Rect = new Rect(offsetX, offsetY, leftW, halfH),
+				Section = AnchorSide.Left,
+				Label = "Left Top"
+			});
+			// Left-Bottom
+			_dropZones.Add(new DropZone
+			{
+				Rect = new Rect(offsetX, offsetY + halfH, leftW, halfH),
+				Section = AnchorSide.Left,
+				Label = "Left Bottom"
+			});
+			// Right-Top
+			_dropZones.Add(new DropZone
+			{
+				Rect = new Rect(offsetX + w - rightW, offsetY, rightW, halfH),
+				Section = AnchorSide.Right,
+				Label = "Right Top"
+			});
+			// Right-Bottom
+			_dropZones.Add(new DropZone
+			{
+				Rect = new Rect(offsetX + w - rightW, offsetY + halfH, rightW, halfH),
+				Section = AnchorSide.Right,
+				Label = "Right Bottom"
+			});
+			// Bottom-Left
+			_dropZones.Add(new DropZone
+			{
+				Rect = new Rect(offsetX, offsetY + h - bottomH, middleW / 2 + leftW, bottomH),
+				Section = AnchorSide.Bottom,
+				Label = "Bottom Left"
+			});
+			// Bottom-Right
+			_dropZones.Add(new DropZone
+			{
+				Rect = new Rect(offsetX + middleW / 2 + leftW, offsetY + h - bottomH, middleW / 2 + rightW, bottomH),
+				Section = AnchorSide.Bottom,
+				Label = "Bottom Right"
+			});
 		}
 
-		private void CollectTargetsRecursive(DependencyObject parent)
+		private double GetOpenDockWidth(AnchorSide side, double fallback)
 		{
-			int childCount = VisualTreeHelper.GetChildrenCount(parent);
-			for (int i = 0; i < childCount; i++)
+			// Find any visible LayoutAnchorablePaneControl docked on this side
+			foreach (var paneCtrl in FindVisualChildren<LayoutAnchorablePaneControl>(_manager))
+			{
+				if (paneCtrl.Model is LayoutAnchorablePane pane
+					&& pane.GetSide() == side
+					&& pane.Children.Any(a => !a.IsAutoHidden)
+					&& paneCtrl.ActualWidth > 10)
+				{
+					return paneCtrl.ActualWidth;
+				}
+			}
+			return fallback;
+		}
+
+		private double GetOpenDockHeight(AnchorSide side, double fallback)
+		{
+			foreach (var paneCtrl in FindVisualChildren<LayoutAnchorablePaneControl>(_manager))
+			{
+				if (paneCtrl.Model is LayoutAnchorablePane pane
+					&& pane.GetSide() == side
+					&& pane.Children.Any(a => !a.IsAutoHidden)
+					&& paneCtrl.ActualHeight > 10)
+				{
+					return paneCtrl.ActualHeight;
+				}
+			}
+			return fallback;
+		}
+
+		private static IEnumerable<T> FindVisualChildren<T>(DependencyObject parent) where T : DependencyObject
+		{
+			if (parent == null) yield break;
+			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
 			{
 				var child = VisualTreeHelper.GetChild(parent, i);
-
-				if (child is ToggleDockButton btn && btn != _sourceButton && btn.IsVisible)
-				{
-					var screenPos = btn.PointToScreen(new Point(0, 0));
-					var rect = new Rect(
-						screenPos.X - _ownerWindow.Left,
-						screenPos.Y - _ownerWindow.Top,
-						btn.ActualWidth,
-						btn.ActualHeight);
-					_dropTargets.Add(new DropTarget { ScreenRect = rect, Button = btn });
-				}
-				else if (child is ToggleDockButtonGroup grp && grp.IsVisible)
-				{
-					var screenPos = grp.PointToScreen(new Point(0, 0));
-					var rect = new Rect(
-						screenPos.X - _ownerWindow.Left,
-						screenPos.Y - _ownerWindow.Top,
-						grp.ActualWidth,
-						grp.ActualHeight);
-					_dropTargets.Add(new DropTarget { ScreenRect = rect, Button = grp });
-				}
-
-				CollectTargetsRecursive(child);
+				if (child is T t) yield return t;
+				foreach (var c in FindVisualChildren<T>(child))
+					yield return c;
 			}
 		}
 
@@ -580,22 +651,22 @@ namespace AvalonDock.Controls
 			ReleaseMouseCapture();
 
 			var pos = e.GetPosition(this);
-			ToggleButton hitButton = null;
-			foreach (var target in _dropTargets)
+			DropZone? hitZone = null;
+			// Check bottom zones first (higher priority at corners)
+			for (int i = _dropZones.Count - 1; i >= 0; i--)
 			{
-				if (target.ScreenRect.Contains(pos))
+				if (_dropZones[i].Rect.Contains(pos))
 				{
-					hitButton = target.Button;
+					hitZone = _dropZones[i];
 					break;
 				}
 			}
 
 			Close();
 
-			if (hitButton != null)
+			if (hitZone.HasValue && _sourceButton.Anchorable != null)
 			{
-				// Merge source into target
-				_sourceBar.MergeButtons(hitButton, _sourceButton);
+				_manager.MoveAnchorableToSection(_sourceButton.Anchorable, hitZone.Value.Section);
 			}
 		}
 
@@ -613,7 +684,6 @@ namespace AvalonDock.Controls
 		protected override void OnLostMouseCapture(MouseEventArgs e)
 		{
 			base.OnLostMouseCapture(e);
-			// If we lost capture unexpectedly, close
 			if (IsVisible)
 				Close();
 		}
@@ -624,25 +694,49 @@ namespace AvalonDock.Controls
 
 			var mousePos = Mouse.GetPosition(this);
 
-			// Draw drop target indicators
-			var normalBrush = new SolidColorBrush(Color.FromArgb(0x40, 0x00, 0x7A, 0xCC));
-			var hoverBrush = new SolidColorBrush(Color.FromArgb(0x80, 0x00, 0x7A, 0xCC));
-			var borderPen = new Pen(new SolidColorBrush(Color.FromRgb(0x00, 0x7A, 0xCC)), 2);
+			var normalBrush = new SolidColorBrush(Color.FromArgb(0x30, 0x00, 0x7A, 0xCC));
+			var hoverBrush = new SolidColorBrush(Color.FromArgb(0x60, 0x00, 0x7A, 0xCC));
+			var borderPen = new Pen(new SolidColorBrush(Color.FromArgb(0x80, 0x00, 0x7A, 0xCC)), 1.5);
+			var labelTypeface = new Typeface("Segoe UI");
 
-			_hoveredTargetIndex = -1;
-			for (int i = 0; i < _dropTargets.Count; i++)
+			// Check bottom zones first for hover priority (same as drop)
+			int hoveredIndex = -1;
+			for (int i = _dropZones.Count - 1; i >= 0; i--)
 			{
-				var target = _dropTargets[i];
-				bool isHovered = target.ScreenRect.Contains(mousePos);
-				if (isHovered) _hoveredTargetIndex = i;
+				if (_dropZones[i].Rect.Contains(mousePos))
+				{
+					hoveredIndex = i;
+					break;
+				}
+			}
 
-				var inflated = target.ScreenRect;
-				inflated.Inflate(3, 3);
+			for (int i = 0; i < _dropZones.Count; i++)
+			{
+				var zone = _dropZones[i];
+				bool isHovered = i == hoveredIndex;
+
 				dc.DrawRoundedRectangle(
 					isHovered ? hoverBrush : normalBrush,
 					borderPen,
-					inflated,
-					3, 3);
+					zone.Rect,
+					4, 4);
+
+				// Draw zone label
+				var formattedText = new FormattedText(
+					zone.Label,
+					System.Globalization.CultureInfo.CurrentCulture,
+					FlowDirection.LeftToRight,
+					labelTypeface,
+					14,
+					new SolidColorBrush(Color.FromArgb(isHovered ? (byte)0xCC : (byte)0x66, 0x00, 0x7A, 0xCC))
+#if !NET40
+					, 1.0
+#endif
+					);
+
+				var textX = zone.Rect.X + (zone.Rect.Width - formattedText.Width) / 2;
+				var textY = zone.Rect.Y + (zone.Rect.Height - formattedText.Height) / 2;
+				dc.DrawText(formattedText, new Point(textX, textY));
 			}
 
 			// Draw ghost of dragged button near cursor

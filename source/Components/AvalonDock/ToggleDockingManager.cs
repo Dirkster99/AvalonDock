@@ -144,6 +144,42 @@ namespace AvalonDock
 
 		#endregion Internal Methods
 
+		#region Public Methods — Drag Support
+
+		/// <summary>
+		/// Moves an anchorable from its current section to a new section.
+		/// Removes it from the old button bar and adds it to the new one, then toggles it on.
+		/// </summary>
+		public void MoveAnchorableToSection(LayoutAnchorable anchorable, AnchorSide targetSection)
+		{
+			if (anchorable == null) return;
+
+			// Ensure it's auto-hidden first
+			if (!anchorable.IsAutoHidden)
+				anchorable.ToggleSingleAutoHide();
+
+			// Remove from old button bar
+			RemoveFromButtonBar(_leftTopButtonBar, anchorable);
+			RemoveFromButtonBar(_leftBottomButtonBar, anchorable);
+			RemoveFromButtonBar(_rightTopButtonBar, anchorable);
+
+			// Move the anchorable in the layout model to the target side
+			MoveAnchorableToSide(anchorable, targetSection);
+
+			// Add to the target button bar
+			var targetBar = GetButtonBarForSection(targetSection);
+			if (targetBar != null)
+			{
+				var btn = new ToggleDockButton { Anchorable = anchorable, Section = targetSection };
+				targetBar.Items.Add(btn);
+			}
+
+			// Toggle it on
+			ToggleAnchorable(anchorable, targetSection);
+		}
+
+		#endregion Public Methods — Drag Support
+
 		#region Private Methods
 
 		private void ToggleDockingManager_Loaded(object sender, RoutedEventArgs e)
@@ -371,6 +407,76 @@ namespace AvalonDock
 		private static bool ContainsAnchorable(ToggleDockButtonBar bar, LayoutAnchorable anchorable)
 		{
 			return bar?.ContainsAnchorable(anchorable) == true;
+		}
+
+		private void RemoveFromButtonBar(ToggleDockButtonBar bar, LayoutAnchorable anchorable)
+		{
+			if (bar == null) return;
+			for (int i = bar.Items.Count - 1; i >= 0; i--)
+			{
+				if (bar.Items[i] is ToggleDockButton btn && btn.Anchorable == anchorable)
+				{
+					bar.Items.RemoveAt(i);
+					return;
+				}
+				if (bar.Items[i] is ToggleDockButtonGroup grp && grp.RemoveAnchorable(anchorable))
+				{
+					if (grp.Anchorables.Count == 0)
+						bar.Items.RemoveAt(i);
+					else if (grp.Anchorables.Count == 1)
+					{
+						// Ungroup single remaining
+						var remaining = grp.Anchorables.First();
+						bar.Items.RemoveAt(i);
+						bar.Items.Insert(i, new ToggleDockButton { Anchorable = remaining, Section = bar.Section });
+					}
+					return;
+				}
+			}
+		}
+
+		private ToggleDockButtonBar GetButtonBarForSection(AnchorSide section)
+		{
+			switch (section)
+			{
+				case AnchorSide.Left: return _leftTopButtonBar;
+				case AnchorSide.Right: return _rightTopButtonBar;
+				case AnchorSide.Bottom: return _leftBottomButtonBar;
+				default: return _leftTopButtonBar;
+			}
+		}
+
+		private void MoveAnchorableToSide(LayoutAnchorable anchorable, AnchorSide targetSide)
+		{
+			// Remove from current parent
+			if (anchorable.Parent is LayoutAnchorGroup oldGroup)
+				oldGroup.RemoveChild(anchorable);
+			else if (anchorable.Parent is LayoutAnchorablePane oldPane)
+				oldPane.RemoveChild(anchorable);
+
+			// Find or create the target LayoutAnchorSide and add to it
+			LayoutAnchorSide layoutSide;
+			switch (targetSide)
+			{
+				case AnchorSide.Left: layoutSide = Layout.LeftSide; break;
+				case AnchorSide.Right: layoutSide = Layout.RightSide; break;
+				case AnchorSide.Bottom: layoutSide = Layout.BottomSide; break;
+				case AnchorSide.Top: layoutSide = Layout.TopSide; break;
+				default: layoutSide = Layout.LeftSide; break;
+			}
+
+			LayoutAnchorGroup targetGroup;
+			if (layoutSide.Children.Count > 0)
+			{
+				targetGroup = layoutSide.Children.First();
+			}
+			else
+			{
+				targetGroup = new LayoutAnchorGroup();
+				layoutSide.Children.Add(targetGroup);
+			}
+
+			targetGroup.Children.Add(anchorable);
 		}
 
 		#endregion Private Methods
