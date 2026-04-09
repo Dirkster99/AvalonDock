@@ -50,6 +50,8 @@ namespace AvalonDock
 		internal ToggleDockButtonBar _bottomRightBar;
 		internal DockPanel _injectedLeftDockPanel;
 		internal DockPanel _injectedRightDockPanel;
+		internal FrameworkElement _leftSeparator;
+		internal FrameworkElement _rightSeparator;
 
 		#endregion fields
 
@@ -471,6 +473,7 @@ namespace AvalonDock
 			DockPanel.SetDock(_bottomLeftBar, Dock.Bottom);
 
 			var leftSep = CreateSeparator();
+			_leftSeparator = leftSep;
 			DockPanel.SetDock(leftSep, Dock.Top);
 			DockPanel.SetDock(_leftBottomBar, Dock.Top);
 
@@ -490,6 +493,7 @@ namespace AvalonDock
 			DockPanel.SetDock(_bottomRightBar, Dock.Bottom);
 
 			var rightSep = CreateSeparator();
+			_rightSeparator = rightSep;
 			DockPanel.SetDock(rightSep, Dock.Top);
 			DockPanel.SetDock(_rightBottomBar, Dock.Top);
 

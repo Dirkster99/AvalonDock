@@ -444,26 +444,40 @@ namespace AvalonDock.Controls
 			double usableHeight = panelRect.Height - bottomBarHeight;
 			if (usableHeight < 10) return;
 
-			double midY = panelRect.Y + usableHeight / 2.0;
+			// Find actual separator position
+			var separator = topZone.ToString().StartsWith("Left") ? _manager._leftSeparator : _manager._rightSeparator;
+			double splitY;
+			if (separator != null && separator.IsVisible)
+			{
+				var sepScreen = separator.GetScreenArea();
+				splitY = sepScreen.Top + sepScreen.Height / 2.0 - managerScreenPos.Y;
+			}
+			else
+			{
+				splitY = panelRect.Y + usableHeight / 2.0;
+			}
 
-			// Top half → topZone, insertion line at bottom of top half
+			double topHeight = splitY - panelRect.Y;
+			double bottomHeight = panelRect.Y + usableHeight - splitY;
+
+			// Top half → topZone
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(panelRect.X, panelRect.Y, panelRect.Width, usableHeight / 2.0),
+				Rect = new Rect(panelRect.X, panelRect.Y, panelRect.Width, topHeight),
 				Zone = topZone,
 				Label = null,
-				InsertionLineStart = new Point(panelRect.X + 2, midY),
-				InsertionLineEnd = new Point(panelRect.X + panelRect.Width - 2, midY)
+				InsertionLineStart = new Point(panelRect.X + 2, splitY),
+				InsertionLineEnd = new Point(panelRect.X + panelRect.Width - 2, splitY)
 			});
 
-			// Bottom half → bottomZone, insertion line at top of bottom half
+			// Bottom half → bottomZone
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(panelRect.X, midY, panelRect.Width, usableHeight / 2.0),
+				Rect = new Rect(panelRect.X, splitY, panelRect.Width, bottomHeight),
 				Zone = bottomZone,
 				Label = null,
-				InsertionLineStart = new Point(panelRect.X + 2, midY),
-				InsertionLineEnd = new Point(panelRect.X + panelRect.Width - 2, midY)
+				InsertionLineStart = new Point(panelRect.X + 2, splitY),
+				InsertionLineEnd = new Point(panelRect.X + panelRect.Width - 2, splitY)
 			});
 		}
 
