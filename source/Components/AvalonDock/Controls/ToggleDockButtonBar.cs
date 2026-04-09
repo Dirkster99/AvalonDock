@@ -537,60 +537,74 @@ namespace AvalonDock.Controls
 
 		private void BuildDropZones()
 		{
-			// Get the manager's content area in window coordinates
+			// Calculate the content area between the sidebar button bars
+			double leftBarWidth = 0;
+			double rightBarWidth = 0;
+
+			if (_manager._injectedLeftDockPanel != null && _manager._injectedLeftDockPanel.IsVisible)
+				leftBarWidth = _manager._injectedLeftDockPanel.ActualWidth;
+			if (_manager._rightTopButtonBar != null && _manager._rightTopButtonBar.IsVisible)
+				rightBarWidth = _manager._rightTopButtonBar.ActualWidth;
+
 			var managerScreenPos = _manager.PointToScreen(new Point(0, 0));
 			double offsetX = managerScreenPos.X - _ownerWindow.Left;
 			double offsetY = managerScreenPos.Y - _ownerWindow.Top;
-			double w = _manager.ActualWidth;
-			double h = _manager.ActualHeight;
+			double totalW = _manager.ActualWidth;
+			double totalH = _manager.ActualHeight;
+
+			// Content area starts after left bar, ends before right bar
+			double contentX = offsetX + leftBarWidth;
+			double contentW = totalW - leftBarWidth - rightBarWidth;
+			double contentH = totalH;
 
 			// Determine zone sizes: use open dock size if available, otherwise default fractions
-			double leftW = GetOpenDockWidth(AnchorSide.Left, w * 0.25);
-			double rightW = GetOpenDockWidth(AnchorSide.Right, w * 0.25);
-			double bottomH = GetOpenDockHeight(AnchorSide.Bottom, h * 0.25);
+			double leftW = GetOpenDockWidth(AnchorSide.Left, contentW * 0.25);
+			double rightW = GetOpenDockWidth(AnchorSide.Right, contentW * 0.25);
+			double bottomH = GetOpenDockHeight(AnchorSide.Bottom, contentH * 0.25);
 
-			double halfH = (h - bottomH) / 2.0;
-			double middleW = w - leftW - rightW;
+			double sideH = contentH - bottomH;
+			double halfSideH = sideH / 2.0;
+			double middleW = contentW - leftW - rightW;
 
 			// Left-Top
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(offsetX, offsetY, leftW, halfH),
+				Rect = new Rect(contentX, offsetY, leftW, halfSideH),
 				Section = AnchorSide.Left,
 				Label = "Left Top"
 			});
 			// Left-Bottom
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(offsetX, offsetY + halfH, leftW, halfH),
+				Rect = new Rect(contentX, offsetY + halfSideH, leftW, halfSideH),
 				Section = AnchorSide.Left,
 				Label = "Left Bottom"
 			});
 			// Right-Top
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(offsetX + w - rightW, offsetY, rightW, halfH),
+				Rect = new Rect(contentX + contentW - rightW, offsetY, rightW, halfSideH),
 				Section = AnchorSide.Right,
 				Label = "Right Top"
 			});
 			// Right-Bottom
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(offsetX + w - rightW, offsetY + halfH, rightW, halfH),
+				Rect = new Rect(contentX + contentW - rightW, offsetY + halfSideH, rightW, halfSideH),
 				Section = AnchorSide.Right,
 				Label = "Right Bottom"
 			});
 			// Bottom-Left
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(offsetX, offsetY + h - bottomH, middleW / 2 + leftW, bottomH),
+				Rect = new Rect(contentX, offsetY + sideH, contentW / 2, bottomH),
 				Section = AnchorSide.Bottom,
 				Label = "Bottom Left"
 			});
 			// Bottom-Right
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(offsetX + middleW / 2 + leftW, offsetY + h - bottomH, middleW / 2 + rightW, bottomH),
+				Rect = new Rect(contentX + contentW / 2, offsetY + sideH, contentW / 2, bottomH),
 				Section = AnchorSide.Bottom,
 				Label = "Bottom Right"
 			});
@@ -648,11 +662,9 @@ namespace AvalonDock.Controls
 		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonUp(e);
-			ReleaseMouseCapture();
 
 			var pos = e.GetPosition(this);
 			DropZone? hitZone = null;
-			// Check bottom zones first (higher priority at corners)
 			for (int i = _dropZones.Count - 1; i >= 0; i--)
 			{
 				if (_dropZones[i].Rect.Contains(pos))
@@ -662,6 +674,9 @@ namespace AvalonDock.Controls
 				}
 			}
 
+			// Prevent OnLostMouseCapture from closing before we act
+			_isClosing = true;
+			ReleaseMouseCapture();
 			Close();
 
 			if (hitZone.HasValue && _sourceButton.Anchorable != null)
@@ -669,6 +684,8 @@ namespace AvalonDock.Controls
 				_manager.MoveAnchorableToSection(_sourceButton.Anchorable, hitZone.Value.Section);
 			}
 		}
+
+		private bool _isClosing;
 
 		protected override void OnKeyDown(KeyEventArgs e)
 		{
@@ -684,7 +701,7 @@ namespace AvalonDock.Controls
 		protected override void OnLostMouseCapture(MouseEventArgs e)
 		{
 			base.OnLostMouseCapture(e);
-			if (IsVisible)
+			if (IsVisible && !_isClosing)
 				Close();
 		}
 

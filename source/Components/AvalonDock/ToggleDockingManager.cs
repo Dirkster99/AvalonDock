@@ -26,10 +26,10 @@ namespace AvalonDock
 	{
 		#region fields
 
-		private ToggleDockButtonBar _leftTopButtonBar;
-		private ToggleDockButtonBar _leftBottomButtonBar;
-		private ToggleDockButtonBar _rightTopButtonBar;
-		private DockPanel _injectedLeftDockPanel;
+		internal ToggleDockButtonBar _leftTopButtonBar;
+		internal ToggleDockButtonBar _leftBottomButtonBar;
+		internal ToggleDockButtonBar _rightTopButtonBar;
+		internal DockPanel _injectedLeftDockPanel;
 
 		#endregion fields
 
@@ -154,17 +154,48 @@ namespace AvalonDock
 		{
 			if (anchorable == null) return;
 
-			// Ensure it's auto-hidden first
+			var currentSection = GetAnchorableSection(anchorable);
+
+			// If already in the target section, just toggle it on
+			if (currentSection == targetSection)
+			{
+				if (anchorable.IsAutoHidden)
+					ToggleAnchorable(anchorable, targetSection);
+				return;
+			}
+
+			// Ensure it's auto-hidden first (detached from any docked pane)
 			if (!anchorable.IsAutoHidden)
 				anchorable.ToggleSingleAutoHide();
+
+			// Remove from current layout parent
+			if (anchorable.Parent is LayoutAnchorGroup oldGroup)
+				oldGroup.RemoveChild(anchorable);
+
+			// Add to the target side in the layout model
+			LayoutAnchorSide layoutSide;
+			switch (targetSection)
+			{
+				case AnchorSide.Right: layoutSide = Layout.RightSide; break;
+				case AnchorSide.Bottom: layoutSide = Layout.BottomSide; break;
+				case AnchorSide.Top: layoutSide = Layout.TopSide; break;
+				default: layoutSide = Layout.LeftSide; break;
+			}
+
+			LayoutAnchorGroup targetGroup;
+			if (layoutSide.Children.Count > 0)
+				targetGroup = layoutSide.Children.First();
+			else
+			{
+				targetGroup = new LayoutAnchorGroup();
+				layoutSide.Children.Add(targetGroup);
+			}
+			targetGroup.Children.Add(anchorable);
 
 			// Remove from old button bar
 			RemoveFromButtonBar(_leftTopButtonBar, anchorable);
 			RemoveFromButtonBar(_leftBottomButtonBar, anchorable);
 			RemoveFromButtonBar(_rightTopButtonBar, anchorable);
-
-			// Move the anchorable in the layout model to the target side
-			MoveAnchorableToSide(anchorable, targetSection);
 
 			// Add to the target button bar
 			var targetBar = GetButtonBarForSection(targetSection);
@@ -174,7 +205,7 @@ namespace AvalonDock
 				targetBar.Items.Add(btn);
 			}
 
-			// Toggle it on
+			// Toggle it on in the new section
 			ToggleAnchorable(anchorable, targetSection);
 		}
 
@@ -444,39 +475,6 @@ namespace AvalonDock
 				case AnchorSide.Bottom: return _leftBottomButtonBar;
 				default: return _leftTopButtonBar;
 			}
-		}
-
-		private void MoveAnchorableToSide(LayoutAnchorable anchorable, AnchorSide targetSide)
-		{
-			// Remove from current parent
-			if (anchorable.Parent is LayoutAnchorGroup oldGroup)
-				oldGroup.RemoveChild(anchorable);
-			else if (anchorable.Parent is LayoutAnchorablePane oldPane)
-				oldPane.RemoveChild(anchorable);
-
-			// Find or create the target LayoutAnchorSide and add to it
-			LayoutAnchorSide layoutSide;
-			switch (targetSide)
-			{
-				case AnchorSide.Left: layoutSide = Layout.LeftSide; break;
-				case AnchorSide.Right: layoutSide = Layout.RightSide; break;
-				case AnchorSide.Bottom: layoutSide = Layout.BottomSide; break;
-				case AnchorSide.Top: layoutSide = Layout.TopSide; break;
-				default: layoutSide = Layout.LeftSide; break;
-			}
-
-			LayoutAnchorGroup targetGroup;
-			if (layoutSide.Children.Count > 0)
-			{
-				targetGroup = layoutSide.Children.First();
-			}
-			else
-			{
-				targetGroup = new LayoutAnchorGroup();
-				layoutSide.Children.Add(targetGroup);
-			}
-
-			targetGroup.Children.Add(anchorable);
 		}
 
 		#endregion Private Methods
