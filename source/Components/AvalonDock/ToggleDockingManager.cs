@@ -32,6 +32,19 @@ namespace AvalonDock
 	}
 
 	/// <summary>
+	/// Controls which docked panes get priority for full extent.
+	/// </summary>
+	public enum DockLayoutPriority
+	{
+		/// <summary>Bottom panes span full width; side panes share remaining height (Rider-style).</summary>
+		BottomFullWidth,
+		/// <summary>Side panes span full height; bottom panes share remaining width (VSCode-style).</summary>
+		SidesFullHeight,
+		/// <summary>No restructuring — use AvalonDock's default nesting order.</summary>
+		Default
+	}
+
+	/// <summary>
 	/// A docking manager with Rider-style toggle-dock behavior.
 	/// Two sidebars (left + right), each with 3 button sections separated by separators:
 	/// [SideTop] — separator — [SideBottom] — gap — [BottomSide].
@@ -54,6 +67,25 @@ namespace AvalonDock
 		internal FrameworkElement _rightSeparator;
 
 		#endregion fields
+
+		#region Dependency Properties
+
+		/// <summary><see cref="LayoutPriority"/> dependency property.</summary>
+		public static readonly DependencyProperty LayoutPriorityProperty =
+			DependencyProperty.Register(nameof(LayoutPriority), typeof(DockLayoutPriority), typeof(ToggleDockingManager),
+				new PropertyMetadata(DockLayoutPriority.BottomFullWidth));
+
+		/// <summary>
+		/// Gets or sets which docked panes get priority for full extent.
+		/// Default is <see cref="DockLayoutPriority.BottomFullWidth"/> (Rider-style).
+		/// </summary>
+		public DockLayoutPriority LayoutPriority
+		{
+			get => (DockLayoutPriority)GetValue(LayoutPriorityProperty);
+			set => SetValue(LayoutPriorityProperty, value);
+		}
+
+		#endregion Dependency Properties
 
 		#region Constructors
 
@@ -85,6 +117,7 @@ namespace AvalonDock
 				HideDockedInBar(GetBarForZone(zone));
 				anchorable.ToggleSingleAutoHide();
 				FixSplitOrientation(anchorable, zone);
+				EnsureBottomFullWidth();
 			}
 			else
 			{
@@ -421,6 +454,129 @@ namespace AvalonDock
 		private static bool IsBottomZone(DockZone zone)
 		{
 			return zone == DockZone.BottomLeft || zone == DockZone.BottomRight;
+		}
+
+		/// <summary>
+		/// Restructures the RootPanel based on <see cref="LayoutPriority"/>.
+		/// BottomFullWidth: RootPanel (Vertical) → [ InnerPanel (Horizontal) → [Left | Docs | Right], BottomPane ]
+		/// SidesFullHeight: RootPanel (Horizontal) → [ LeftPane, InnerPanel (Vertical) → [Docs | Bottom], RightPane ]
+		/// </summary>
+		private void EnsureBottomFullWidth()
+		{
+			if (LayoutPriority == DockLayoutPriority.Default) return;
+
+			var rootPanel = Layout?.RootPanel;
+			if (rootPanel == null) return;
+
+			if (LayoutPriority == DockLayoutPriority.BottomFullWidth)
+				RestructureBottomFullWidth(rootPanel);
+			else if (LayoutPriority == DockLayoutPriority.SidesFullHeight)
+				RestructureSidesFullHeight(rootPanel);
+		}
+
+		private static void RestructureBottomFullWidth(LayoutPanel rootPanel)
+		{
+			var bottomPanes = rootPanel.Children
+				.OfType<ILayoutPanelElement>()
+				.Where(c =>
+				{
+					if (c is LayoutAnchorablePane p) return p.GetSide() == AnchorSide.Bottom;
+					if (c is LayoutAnchorablePaneGroup g) return g.Children.OfType<LayoutAnchorablePane>().Any(pp => pp.GetSide() == AnchorSide.Bottom);
+					return false;
+				})
+				.ToList();
+
+			if (bottomPanes.Count == 0) return;
+
+			if (rootPanel.Orientation == Orientation.Vertical)
+			{
+				// Already vertical — ensure bottom panes are at the end
+				var children = rootPanel.Children.ToList();
+				bool seenBottom = false;
+				bool needsReorder = false;
+				for (int i = 0; i < children.Count; i++)
+				{
+					bool isBottom = bottomPanes.Contains(children[i]);
+					if (seenBottom && !isBottom) { needsReorder = true; break; }
+					if (isBottom) seenBottom = true;
+				}
+				if (!needsReorder) return;
+			}
+
+			if (rootPanel.Orientation == Orientation.Horizontal)
+			{
+				var nonBottomChildren = rootPanel.Children
+					.Where(c => !bottomPanes.Contains(c))
+					.OfType<ILayoutPanelElement>()
+					.ToList();
+
+				if (nonBottomChildren.Count == 0) return;
+
+				var allChildren = rootPanel.Children.ToList();
+				foreach (var c in allChildren)
+					rootPanel.Children.Remove(c);
+
+				var innerPanel = new LayoutPanel { Orientation = Orientation.Horizontal };
+				foreach (var c in nonBottomChildren)
+					innerPanel.Children.Add(c);
+
+				rootPanel.Orientation = Orientation.Vertical;
+				rootPanel.Children.Add(innerPanel);
+				foreach (var bp in bottomPanes)
+					rootPanel.Children.Add(bp);
+			}
+		}
+
+		private static void RestructureSidesFullHeight(LayoutPanel rootPanel)
+		{
+			var sidePanes = rootPanel.Children
+				.OfType<ILayoutPanelElement>()
+				.Where(c =>
+				{
+					if (c is LayoutAnchorablePane p) { var s = p.GetSide(); return s == AnchorSide.Left || s == AnchorSide.Right; }
+					if (c is LayoutAnchorablePaneGroup g) return g.Children.OfType<LayoutAnchorablePane>().Any(pp => { var s = pp.GetSide(); return s == AnchorSide.Left || s == AnchorSide.Right; });
+					return false;
+				})
+				.ToList();
+
+			if (sidePanes.Count == 0) return;
+
+			if (rootPanel.Orientation == Orientation.Horizontal) return; // already horizontal = sides get full height
+
+			if (rootPanel.Orientation == Orientation.Vertical)
+			{
+				var nonSideChildren = rootPanel.Children
+					.Where(c => !sidePanes.Contains(c))
+					.OfType<ILayoutPanelElement>()
+					.ToList();
+
+				if (nonSideChildren.Count == 0) return;
+
+				var allChildren = rootPanel.Children.ToList();
+				foreach (var c in allChildren)
+					rootPanel.Children.Remove(c);
+
+				var innerPanel = new LayoutPanel { Orientation = Orientation.Vertical };
+				foreach (var c in nonSideChildren)
+					innerPanel.Children.Add(c);
+
+				rootPanel.Orientation = Orientation.Horizontal;
+
+				// Left panes first, then inner, then right panes
+				var leftPanes = sidePanes.Where(c =>
+				{
+					if (c is LayoutAnchorablePane p) return p.GetSide() == AnchorSide.Left;
+					if (c is LayoutAnchorablePaneGroup g) return g.Children.OfType<LayoutAnchorablePane>().Any(pp => pp.GetSide() == AnchorSide.Left);
+					return false;
+				}).ToList();
+				var rightPanes = sidePanes.Where(c => !leftPanes.Contains(c)).ToList();
+
+				foreach (var lp in leftPanes)
+					rootPanel.Children.Add(lp);
+				rootPanel.Children.Add(innerPanel);
+				foreach (var rp in rightPanes)
+					rootPanel.Children.Add(rp);
+			}
 		}
 
 		private void SetupToggleDockButtonBars()
