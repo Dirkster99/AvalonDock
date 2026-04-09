@@ -32,19 +32,6 @@ namespace AvalonDock
 	}
 
 	/// <summary>
-	/// Controls which docked panes get priority for full extent.
-	/// </summary>
-	public enum DockLayoutPriority
-	{
-		/// <summary>Bottom panes span full width; side panes share remaining height (Rider-style).</summary>
-		BottomFullWidth,
-		/// <summary>Side panes span full height; bottom panes share remaining width (VSCode-style).</summary>
-		SidesFullHeight,
-		/// <summary>No restructuring — use AvalonDock's default nesting order.</summary>
-		Default
-	}
-
-	/// <summary>
 	/// A docking manager with Rider-style toggle-dock behavior.
 	/// Two sidebars (left + right), each with 3 button sections separated by separators:
 	/// [SideTop] — separator — [SideBottom] — gap — [BottomSide].
@@ -67,25 +54,6 @@ namespace AvalonDock
 		internal FrameworkElement _rightSeparator;
 
 		#endregion fields
-
-		#region Dependency Properties
-
-		/// <summary><see cref="LayoutPriority"/> dependency property.</summary>
-		public static readonly DependencyProperty LayoutPriorityProperty =
-			DependencyProperty.Register(nameof(LayoutPriority), typeof(DockLayoutPriority), typeof(ToggleDockingManager),
-				new PropertyMetadata(DockLayoutPriority.Default));
-
-		/// <summary>
-		/// Gets or sets which docked panes get priority for full extent.
-		/// Default is <see cref="DockLayoutPriority.BottomFullWidth"/> (Rider-style).
-		/// </summary>
-		public DockLayoutPriority LayoutPriority
-		{
-			get => (DockLayoutPriority)GetValue(LayoutPriorityProperty);
-			set => SetValue(LayoutPriorityProperty, value);
-		}
-
-		#endregion Dependency Properties
 
 		#region Constructors
 
@@ -117,6 +85,7 @@ namespace AvalonDock
 				HideDockedInBar(GetBarForZone(zone));
 				DockFromAutoHide(anchorable, zone);
 				FixSplitOrientation(anchorable, zone);
+				EnsureBottomFullWidth();
 			}
 			else
 			{
@@ -470,6 +439,86 @@ namespace AvalonDock
 			if (IsLeftZone(zone)) return AnchorSide.Left;
 			if (IsRightZone(zone)) return AnchorSide.Right;
 			return AnchorSide.Bottom;
+		}
+
+		/// <summary>
+		/// Ensures bottom panes are at the outermost vertical level for full width (Rider-style).
+		/// If a bottom pane ended up nested inside a horizontal panel (because it was docked
+		/// before side panes), this restructures the tree so bottom is a sibling of the
+		/// horizontal panel, not a child of it.
+		/// 
+		/// Target layout: Vertical[ Horizontal[Left?, Docs, Right?], Bottom? ]
+		/// </summary>
+		private void EnsureBottomFullWidth()
+		{
+			var root = Layout as LayoutRoot;
+			if (root == null) return;
+			var rootPanel = root.RootPanel;
+			if (rootPanel == null) return;
+
+			// If root is horizontal, check if any bottom panes are nested inside it
+			if (rootPanel.Orientation == Orientation.Horizontal)
+			{
+				// Look for bottom anchorable panes that are children of sub-vertical panels
+				// within this horizontal root. If found, we need to lift them out.
+				var bottomPanes = new List<LayoutAnchorablePane>();
+				foreach (var child in rootPanel.Children.OfType<LayoutPanel>().ToList())
+				{
+					if (child.Orientation == Orientation.Vertical)
+					{
+						foreach (var pane in child.Children.OfType<LayoutAnchorablePane>().ToList())
+						{
+							// Check if this pane is at the end of a vertical sub-panel → it's a bottom pane
+							if (child.Children.IndexOf(pane) == child.Children.Count - 1 && child.Children.Count > 1)
+								bottomPanes.Add(pane);
+						}
+					}
+				}
+
+				if (bottomPanes.Count > 0)
+				{
+					// Wrap root in vertical, move bottom panes to outermost level
+					var vPanel = new LayoutPanel { Orientation = Orientation.Vertical };
+					root.RootPanel = vPanel;
+
+					// Clean bottom panes from their current parents
+					foreach (var bp in bottomPanes)
+						((ILayoutContainer)bp.Parent).RemoveChild(bp);
+
+					vPanel.Children.Add(rootPanel);
+					foreach (var bp in bottomPanes)
+						vPanel.Children.Add(bp);
+				}
+			}
+			else if (rootPanel.Orientation == Orientation.Vertical)
+			{
+				// Root is already vertical. Check if bottom panes are in the right place.
+				// Bottom panes should be direct children at the end, not nested in horizontal sub-panels.
+				var bottomPanesToLift = new List<LayoutAnchorablePane>();
+				foreach (var child in rootPanel.Children.OfType<LayoutPanel>().ToList())
+				{
+					if (child.Orientation == Orientation.Horizontal)
+					{
+						foreach (var subChild in child.Children.OfType<LayoutPanel>().ToList())
+						{
+							if (subChild.Orientation == Orientation.Vertical)
+							{
+								foreach (var pane in subChild.Children.OfType<LayoutAnchorablePane>().ToList())
+								{
+									if (subChild.Children.IndexOf(pane) == subChild.Children.Count - 1 && subChild.Children.Count > 1)
+										bottomPanesToLift.Add(pane);
+								}
+							}
+						}
+					}
+				}
+
+				foreach (var bp in bottomPanesToLift)
+				{
+					((ILayoutContainer)bp.Parent).RemoveChild(bp);
+					rootPanel.Children.Add(bp);
+				}
+			}
 		}
 
 		/// <summary>
