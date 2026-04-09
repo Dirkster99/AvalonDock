@@ -234,9 +234,16 @@ namespace AvalonDock
 				if (grid != null && !grid.Children.OfType<System.Windows.Controls.Button>().Any(b => b.Name == "PART_ToggleMenu"))
 				{
 					grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+					int newCol = grid.ColumnDefinitions.Count - 1;
 
+					// Move minimize button (PART_AutoHidePin) to the last column
+					var autoHideBtn = grid.Children.OfType<System.Windows.Controls.Button>().FirstOrDefault(b => b.Name == "PART_AutoHidePin");
+					if (autoHideBtn != null)
+						Grid.SetColumn(autoHideBtn, newCol);
+
+					// Put three-dot menu in the old auto-hide column (2)
 					var menuBtn = CreateThreeDotMenuButton(title);
-					Grid.SetColumn(menuBtn, grid.ColumnDefinitions.Count - 1);
+					Grid.SetColumn(menuBtn, 2);
 					grid.Children.Add(menuBtn);
 				}
 			}

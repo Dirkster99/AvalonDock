@@ -1327,11 +1327,11 @@
 
 	<!--  ToggleDockButton - modern square borderless styling  -->
 	<Style x:Key="{x:Type avalonDockControls:ToggleDockButton}" TargetType="{x:Type avalonDockControls:ToggleDockButton}">
-		<Setter Property="Background" Value="#E8E8E8" />
+		<Setter Property="Background" Value="Transparent" />
 		<Setter Property="BorderBrush" Value="Transparent" />
 		<Setter Property="BorderThickness" Value="0" />
-		<Setter Property="Width" Value="30" />
-		<Setter Property="Height" Value="30" />
+		<Setter Property="Width" Value="25" />
+		<Setter Property="Height" Value="25" />
 		<Setter Property="Padding" Value="0" />
 		<Setter Property="Margin" Value="2" />
 		<Setter Property="FontSize" Value="10.5" />
