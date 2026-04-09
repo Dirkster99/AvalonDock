@@ -1400,6 +1400,10 @@
 							<Setter TargetName="Bd" Property="BorderBrush" Value="#C0C0C0" />
 						</Trigger>
 						<Trigger Property="IsChecked" Value="True">
+							<Setter TargetName="Bd" Property="Background" Value="#F0F0F0" />
+							<Setter TargetName="Bd" Property="BorderBrush" Value="#B0B0B0" />
+						</Trigger>
+						<Trigger Property="IsAnchorableFocused" Value="True">
 							<Setter TargetName="Bd" Property="Background" Value="#D6EBFF" />
 							<Setter TargetName="Bd" Property="BorderBrush" Value="#4DA3E8" />
 						</Trigger>

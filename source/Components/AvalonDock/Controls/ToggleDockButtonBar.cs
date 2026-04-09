@@ -150,6 +150,16 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty IconTemplateProperty =
 			DependencyProperty.Register(nameof(IconTemplate), typeof(DataTemplate), typeof(ToggleDockButton), new PropertyMetadata(null));
 
+		/// <summary>True when this button's anchorable is the active (focused) content in the DockingManager.</summary>
+		public bool IsAnchorableFocused
+		{
+			get => (bool)GetValue(IsAnchorableFocusedProperty);
+			set => SetValue(IsAnchorableFocusedProperty, value);
+		}
+
+		public static readonly DependencyProperty IsAnchorableFocusedProperty =
+			DependencyProperty.Register(nameof(IsAnchorableFocused), typeof(bool), typeof(ToggleDockButton), new PropertyMetadata(false));
+
 		private static void OnAnchorableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
 			var btn = (ToggleDockButton)d;

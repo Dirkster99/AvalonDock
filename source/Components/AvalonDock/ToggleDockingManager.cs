@@ -63,6 +63,7 @@ namespace AvalonDock
 		public ToggleDockingManager()
 		{
 			Loaded += ToggleDockingManager_Loaded;
+			ActiveContentChanged += (s, e) => RefreshButtonStates();
 		}
 
 		#endregion Constructors
@@ -473,21 +474,27 @@ namespace AvalonDock
 
 		private void RefreshButtonStates()
 		{
-			RefreshBarStates(_leftTopBar);
-			RefreshBarStates(_leftBottomBar);
-			RefreshBarStates(_rightTopBar);
-			RefreshBarStates(_rightBottomBar);
-			RefreshBarStates(_bottomLeftBar);
-			RefreshBarStates(_bottomRightBar);
+			var activeContent = ActiveContent;
+			RefreshBarStates(_leftTopBar, activeContent);
+			RefreshBarStates(_leftBottomBar, activeContent);
+			RefreshBarStates(_rightTopBar, activeContent);
+			RefreshBarStates(_rightBottomBar, activeContent);
+			RefreshBarStates(_bottomLeftBar, activeContent);
+			RefreshBarStates(_bottomRightBar, activeContent);
 		}
 
-		private static void RefreshBarStates(ToggleDockButtonBar bar)
+		private static void RefreshBarStates(ToggleDockButtonBar bar, object activeContent)
 		{
 			if (bar == null) return;
 			foreach (var item in bar.Items)
 			{
 				if (item is ToggleDockButton btn && btn.Anchorable != null)
+				{
 					btn.IsChecked = !btn.Anchorable.IsAutoHidden;
+					btn.IsAnchorableFocused = !btn.Anchorable.IsAutoHidden
+						&& activeContent != null
+						&& activeContent == btn.Anchorable.Content;
+				}
 			}
 		}
 
