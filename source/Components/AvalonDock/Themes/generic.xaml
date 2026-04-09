@@ -1325,12 +1325,14 @@
 
 	</Style>
 
-	<!--  ToggleDockButton - modern rounded styling  -->
+	<!--  ToggleDockButton - modern square borderless styling  -->
 	<Style x:Key="{x:Type avalonDockControls:ToggleDockButton}" TargetType="{x:Type avalonDockControls:ToggleDockButton}">
-		<Setter Property="Background" Value="Transparent" />
-		<Setter Property="BorderBrush" Value="#D0D0D0" />
-		<Setter Property="BorderThickness" Value="1" />
-		<Setter Property="Padding" Value="3,4" />
+		<Setter Property="Background" Value="#E8E8E8" />
+		<Setter Property="BorderBrush" Value="Transparent" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="Width" Value="30" />
+		<Setter Property="Height" Value="30" />
+		<Setter Property="Padding" Value="0" />
 		<Setter Property="Margin" Value="2" />
 		<Setter Property="FontSize" Value="10.5" />
 		<Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -1343,17 +1345,18 @@
 						Background="{TemplateBinding Background}"
 						BorderBrush="{TemplateBinding BorderBrush}"
 						BorderThickness="{TemplateBinding BorderThickness}"
-						CornerRadius="5"
+						CornerRadius="4"
 						Padding="{TemplateBinding Padding}"
 						SnapsToDevicePixels="True">
-						<StackPanel x:Name="ContentPanel" Orientation="Horizontal" HorizontalAlignment="Center">
+						<StackPanel x:Name="ContentPanel" Orientation="Horizontal"
+							HorizontalAlignment="Center" VerticalAlignment="Center">
 							<StackPanel.LayoutTransform>
 								<RotateTransform Angle="-90" />
 							</StackPanel.LayoutTransform>
 							<!-- Icon (ImageSource) -->
 							<Image x:Name="PART_Icon"
 								Source="{TemplateBinding IconSource}"
-								Width="14" Height="14"
+								Width="16" Height="16"
 								Margin="0,0,3,0"
 								Stretch="Uniform"
 								VerticalAlignment="Center"
@@ -1396,16 +1399,13 @@
 							</Setter>
 						</DataTrigger>
 						<Trigger Property="IsMouseOver" Value="True">
-							<Setter TargetName="Bd" Property="Background" Value="#EBEBEB" />
-							<Setter TargetName="Bd" Property="BorderBrush" Value="#C0C0C0" />
+							<Setter TargetName="Bd" Property="Background" Value="#D8D8D8" />
 						</Trigger>
 						<Trigger Property="IsChecked" Value="True">
-							<Setter TargetName="Bd" Property="Background" Value="#F0F0F0" />
-							<Setter TargetName="Bd" Property="BorderBrush" Value="#B0B0B0" />
+							<Setter TargetName="Bd" Property="Background" Value="#DCDCDC" />
 						</Trigger>
 						<Trigger Property="IsAnchorableFocused" Value="True">
-							<Setter TargetName="Bd" Property="Background" Value="#D6EBFF" />
-							<Setter TargetName="Bd" Property="BorderBrush" Value="#4DA3E8" />
+							<Setter TargetName="Bd" Property="Background" Value="#CCE4F7" />
 						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
@@ -1463,7 +1463,77 @@
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
-		<Setter Property="ItemContainerStyle" Value="{DynamicResource {x:Type TabItem}}" />
+		<Setter Property="ItemContainerStyle">
+			<Setter.Value>
+				<Style TargetType="{x:Type TabItem}">
+					<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+					<Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+					<Setter Property="ToolTip" Value="{Binding ToolTip}" />
+					<Setter Property="Template">
+						<Setter.Value>
+							<ControlTemplate TargetType="{x:Type TabItem}">
+								<Grid SnapsToDevicePixels="true">
+									<Border
+										x:Name="Bd"
+										Padding="{TemplateBinding Padding}"
+										Background="{TemplateBinding Background}"
+										BorderBrush="{TemplateBinding BorderBrush}"
+										BorderThickness="1,0,1,1">
+										<ContentPresenter
+											x:Name="Content"
+											HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+											VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+											ContentSource="Header"
+											RecognizesAccessKey="True"
+											SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+									</Border>
+								</Grid>
+								<ControlTemplate.Triggers>
+									<Trigger Property="Selector.IsSelected" Value="true">
+										<Setter Property="Background" Value="White" />
+										<Setter Property="Panel.ZIndex" Value="1" />
+										<Setter Property="Margin" Value="0,-1,-1,-2" />
+									</Trigger>
+									<MultiTrigger>
+										<MultiTrigger.Conditions>
+											<Condition Property="IsMouseOver" Value="true" />
+											<Condition Property="Selector.IsSelected" Value="false" />
+										</MultiTrigger.Conditions>
+										<Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" />
+										<Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+										<Setter Property="Panel.ZIndex" Value="0" />
+									</MultiTrigger>
+									<Trigger Property="IsEnabled" Value="false">
+										<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+									</Trigger>
+								</ControlTemplate.Triggers>
+							</ControlTemplate>
+						</Setter.Value>
+					</Setter>
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type TabControl}}, Path=Items.Count, FallbackValue=1}" Value="1">
+							<Setter Property="Visibility" Value="Collapsed" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</Setter.Value>
+		</Setter>
+
+		<Setter Property="ItemTemplate">
+			<Setter.Value>
+				<DataTemplate>
+					<avalonDockControls:LayoutAnchorableTabItem Model="{Binding}" />
+				</DataTemplate>
+			</Setter.Value>
+		</Setter>
+
+		<Setter Property="ContentTemplate">
+			<Setter.Value>
+				<DataTemplate>
+					<avalonDockControls:LayoutAnchorableControl Model="{Binding}" />
+				</DataTemplate>
+			</Setter.Value>
+		</Setter>
 	</Style>
 
 	<Style x:Key="{x:Type avalonDock:ToggleDockingManager}" TargetType="{x:Type avalonDock:ToggleDockingManager}"
