@@ -437,25 +437,38 @@ namespace AvalonDock
 				return;
 			}
 
-			// Case 2: Multiple loose LayoutAnchorablePane siblings — wrap them in a group
-			var siblingPanes = parentPanel.Children.OfType<LayoutAnchorablePane>().ToList();
-			if (siblingPanes.Count < 2) return;
+			// Case 2: Multiple contiguous LayoutAnchorablePane siblings on the same side —
+			// wrap them in a group. Only group panes that are adjacent (no document pane
+			// or other element between them), so left-side and right-side panes aren't
+			// accidentally merged.
+			var paneIdx = parentPanel.Children.IndexOf(pane);
+			var contiguousPanes = new List<LayoutAnchorablePane> { pane };
 
+			// Scan backward from the pane
+			for (int i = paneIdx - 1; i >= 0; i--)
+			{
+				if (parentPanel.Children[i] is LayoutAnchorablePane adjPane)
+					contiguousPanes.Insert(0, adjPane);
+				else break;
+			}
+			// Scan forward from the pane
+			for (int i = paneIdx + 1; i < parentPanel.Children.Count; i++)
+			{
+				if (parentPanel.Children[i] is LayoutAnchorablePane adjPane)
+					contiguousPanes.Add(adjPane);
+				else break;
+			}
+
+			if (contiguousPanes.Count < 2) return;
 			if (parentPanel.Orientation == desiredOrientation) return;
 
 			var group = new LayoutAnchorablePaneGroup { Orientation = desiredOrientation };
-			int firstIdx = -1;
+			int firstIdx = parentPanel.Children.IndexOf(contiguousPanes[0]);
 
-			foreach (var sp in siblingPanes)
-			{
-				int idx = parentPanel.Children.IndexOf(sp);
-				if (firstIdx < 0) firstIdx = idx;
-			}
+			for (int i = contiguousPanes.Count - 1; i >= 0; i--)
+				parentPanel.Children.Remove(contiguousPanes[i]);
 
-			for (int i = siblingPanes.Count - 1; i >= 0; i--)
-				parentPanel.Children.Remove(siblingPanes[i]);
-
-			foreach (var sp in siblingPanes)
+			foreach (var sp in contiguousPanes)
 				group.Children.Add(sp);
 
 			parentPanel.Children.Insert(Math.Min(firstIdx, parentPanel.Children.Count), group);
