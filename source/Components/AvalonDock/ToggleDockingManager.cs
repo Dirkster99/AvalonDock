@@ -204,24 +204,135 @@ namespace AvalonDock
 
 		private void UpdatePinButtonsToMinimize()
 		{
-			foreach (var btn in FindVisualChildren<System.Windows.Controls.Button>(this))
+			foreach (var title in FindVisualChildren<AnchorablePaneTitle>(this))
 			{
-				if (btn.Name == "PART_AutoHidePin")
+				foreach (var btn in FindVisualChildren<System.Windows.Controls.Button>(title))
 				{
-					btn.ToolTip = "Minimize";
-					var border = btn.Content as Border;
-					if (border == null)
+					if (btn.Name == "PART_AutoHidePin")
 					{
-						border = new Border { Background = Brushes.Transparent };
-						btn.Content = border;
+						btn.ToolTip = "Minimize";
+						var border = btn.Content as Border;
+						if (border == null)
+						{
+							border = new Border { Background = Brushes.Transparent };
+							btn.Content = border;
+						}
+						border.Child = CreateMinimizeIcon();
 					}
-					border.Child = CreateMinimizeIcon();
+					else if (btn.Name == "PART_HidePin")
+					{
+						btn.Visibility = Visibility.Collapsed;
+					}
 				}
-				else if (btn.Name == "PART_HidePin")
+
+				// Hide the old DropDownButton (pin menu)
+				foreach (var dd in FindVisualChildren<DropDownButton>(title))
+					dd.Visibility = Visibility.Collapsed;
+
+				// Inject three-dot menu button if not already present
+				var grid = FindVisualChildren<Grid>(title).FirstOrDefault();
+				if (grid != null && !grid.Children.OfType<System.Windows.Controls.Button>().Any(b => b.Name == "PART_ToggleMenu"))
 				{
-					btn.Visibility = Visibility.Collapsed;
+					grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+					var menuBtn = CreateThreeDotMenuButton(title);
+					Grid.SetColumn(menuBtn, grid.ColumnDefinitions.Count - 1);
+					grid.Children.Add(menuBtn);
 				}
 			}
+		}
+
+		private System.Windows.Controls.Button CreateThreeDotMenuButton(AnchorablePaneTitle title)
+		{
+			var btn = new System.Windows.Controls.Button
+			{
+				Name = "PART_ToggleMenu",
+				Content = new System.Windows.Controls.TextBlock
+				{
+					Text = "⋯",
+					FontSize = 14,
+					FontWeight = FontWeights.Bold,
+					Foreground = new SolidColorBrush(Color.FromRgb(0x55, 0x55, 0x55)),
+					VerticalAlignment = VerticalAlignment.Center,
+					HorizontalAlignment = HorizontalAlignment.Center,
+					Margin = new Thickness(0, -2, 0, 0)
+				},
+				Width = 20,
+				Height = 20,
+				Padding = new Thickness(0),
+				Margin = new Thickness(2, 0, 2, 0),
+				Focusable = false,
+				Style = (Style)FindResource(ToolBar.ButtonStyleKey),
+				ToolTip = "Options"
+			};
+
+			btn.Click += (s, e) =>
+			{
+				var anchorable = title.Model;
+				if (anchorable == null) return;
+
+				var menu = BuildToggleContextMenu(anchorable);
+				menu.PlacementTarget = btn;
+				menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+				menu.IsOpen = true;
+			};
+
+			return btn;
+		}
+
+		private ContextMenu BuildToggleContextMenu(LayoutAnchorable anchorable)
+		{
+			var menu = new ContextMenu();
+
+			// "Move To" submenu
+			var moveToItem = new MenuItem { Header = "Move To" };
+			foreach (DockZone zone in Enum.GetValues(typeof(DockZone)))
+			{
+				var zoneLabel = System.Text.RegularExpressions.Regex.Replace(zone.ToString(), "(\\B[A-Z])", " $1");
+				var z = zone;
+				var mi = new MenuItem { Header = zoneLabel };
+				mi.Click += (s, e) => MoveAnchorableToZone(anchorable, z);
+				moveToItem.Items.Add(mi);
+			}
+			menu.Items.Add(moveToItem);
+
+			menu.Items.Add(new Separator());
+
+			// "View Mode" submenu
+			var viewModeItem = new MenuItem { Header = "View Mode" };
+
+			var floatItem = new MenuItem { Header = "Float" };
+			floatItem.Click += (s, e) =>
+			{
+				if (anchorable.IsAutoHidden)
+					anchorable.ToggleSingleAutoHide();
+				var layoutItem = GetLayoutItemFromModel(anchorable) as LayoutAnchorableItem;
+				layoutItem?.FloatCommand?.Execute(null);
+			};
+			viewModeItem.Items.Add(floatItem);
+
+			var dockedItem = new MenuItem { Header = "Docked" };
+			dockedItem.Click += (s, e) =>
+			{
+				if (anchorable.IsAutoHidden)
+				{
+					var zone = GetAnchorableZone(anchorable);
+					ToggleAnchorable(anchorable, zone);
+				}
+			};
+			viewModeItem.Items.Add(dockedItem);
+
+			var hiddenItem = new MenuItem { Header = "Hidden" };
+			hiddenItem.Click += (s, e) =>
+			{
+				var layoutItem = GetLayoutItemFromModel(anchorable) as LayoutAnchorableItem;
+				layoutItem?.HideCommand?.Execute(null);
+			};
+			viewModeItem.Items.Add(hiddenItem);
+
+			menu.Items.Add(viewModeItem);
+
+			return menu;
 		}
 
 		private static UIElement CreateMinimizeIcon()
