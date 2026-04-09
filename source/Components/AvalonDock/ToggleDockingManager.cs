@@ -18,18 +18,37 @@ using System.Windows.Media;
 namespace AvalonDock
 {
 	/// <summary>
-	/// A docking manager with VSCode/Rider-style toggle-dock behavior.
-	/// Sidebar button bars replace the auto-hide flyout overlay. Clicking a button toggles
-	/// the corresponding anchorable panel in-place. Only one anchorable per section is active at a time.
+	/// Identifies one of the 6 sidebar button positions / dock zones.
+	/// </summary>
+	public enum DockZone
+	{
+		LeftTop,
+		LeftBottom,
+		RightTop,
+		RightBottom,
+		BottomLeft,
+		BottomRight
+	}
+
+	/// <summary>
+	/// A docking manager with Rider-style toggle-dock behavior.
+	/// Two sidebars (left + right), each with 3 button sections separated by separators:
+	/// [SideTop] — separator — [SideBottom] — gap — [BottomSide].
+	/// Clicking a button toggles the corresponding anchorable. Exclusivity is per-bar.
+	/// Two tools from the same side (one top, one bottom) can coexist as a vertical split.
 	/// </summary>
 	public class ToggleDockingManager : DockingManager
 	{
 		#region fields
 
-		internal ToggleDockButtonBar _leftTopButtonBar;
-		internal ToggleDockButtonBar _leftBottomButtonBar;
-		internal ToggleDockButtonBar _rightTopButtonBar;
+		internal ToggleDockButtonBar _leftTopBar;
+		internal ToggleDockButtonBar _leftBottomBar;
+		internal ToggleDockButtonBar _rightTopBar;
+		internal ToggleDockButtonBar _rightBottomBar;
+		internal ToggleDockButtonBar _bottomLeftBar;
+		internal ToggleDockButtonBar _bottomRightBar;
 		internal DockPanel _injectedLeftDockPanel;
+		internal DockPanel _injectedRightDockPanel;
 
 		#endregion fields
 
@@ -50,72 +69,21 @@ namespace AvalonDock
 		#region Public Methods
 
 		/// <summary>
-		/// Toggles an anchorable in the specified section. Ensures only one anchorable
-		/// per section is docked at a time (exclusive toggle).
+		/// Toggles an anchorable in the specified zone. Exclusivity is per button-bar:
+		/// only one anchorable per bar is docked at a time. But two bars on the same side
+		/// (e.g. LeftTop + LeftBottom) can both have an active dock — they split the space.
 		/// </summary>
-		public void ToggleAnchorable(LayoutAnchorable anchorable, AnchorSide section)
+		public void ToggleAnchorable(LayoutAnchorable anchorable, DockZone zone)
 		{
 			if (anchorable.IsAutoHidden)
 			{
-				// First, hide any currently docked anchorable in this section
-				HideDockedInSection(section);
-				// Then dock this one
+				// Hide any currently docked anchorable in the SAME bar only
+				HideDockedInBar(GetBarForZone(zone));
 				anchorable.ToggleSingleAutoHide();
 			}
 			else
 			{
-				// Hide it (send back to auto-hide)
 				anchorable.ToggleSingleAutoHide();
-			}
-
-			// Refresh button states
-			RefreshButtonStates();
-
-			// Update pin buttons to show "Minimize" tooltip after layout settles
-			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
-				new System.Action(UpdatePinButtonsToMinimize));
-		}
-
-		/// <summary>
-		/// Toggles an entire button group. When activating, docks all anchorables
-		/// in the group as tabs in a single pane. When deactivating, sends all back to auto-hide.
-		/// </summary>
-		public void ToggleGroup(ToggleDockButtonGroup group)
-		{
-			if (group == null || group.Anchorables.Count == 0) return;
-
-			var section = group.Section;
-			bool anyDocked = group.Anchorables.Any(a => !a.IsAutoHidden);
-
-			if (anyDocked)
-			{
-				// Send all back to auto-hide
-				foreach (var anc in group.Anchorables.Where(a => !a.IsAutoHidden).ToList())
-					anc.ToggleSingleAutoHide();
-			}
-			else
-			{
-				// Hide any currently docked anchorable in this section
-				HideDockedInSection(section);
-
-				// Dock the first one
-				var first = group.Anchorables.First();
-				first.ToggleSingleAutoHide();
-
-				// Add the rest into the same pane (as tabs)
-				var pane = first.Parent as LayoutAnchorablePane;
-				if (pane != null)
-				{
-					foreach (var anc in group.Anchorables.Skip(1).ToList())
-					{
-						// Move from auto-hide side to the docked pane
-						if (anc.Parent is LayoutAnchorGroup anchorGroup)
-						{
-							anchorGroup.RemoveChild(anc);
-							pane.Children.Add(anc);
-						}
-					}
-				}
 			}
 
 			RefreshButtonStates();
@@ -123,58 +91,26 @@ namespace AvalonDock
 				new System.Action(UpdatePinButtonsToMinimize));
 		}
 
-		#endregion Public Methods
-
-		#region Internal Methods
-
 		/// <summary>
-		/// Overrides the pin/auto-hide button behavior. In toggle mode, the pin button
-		/// acts as a "minimize" button that sends the anchorable back to the sidebar.
+		/// Moves an anchorable to a different zone. Updates button bars and layout model.
+		/// If there's already a docked anchorable on the same side (different sub-zone),
+		/// both coexist as a vertical/horizontal split.
 		/// </summary>
-		internal override void ExecuteAutoHideCommand(LayoutAnchorable anchorable)
+		public void MoveAnchorableToZone(LayoutAnchorable anchorable, DockZone targetZone)
 		{
 			if (anchorable == null) return;
 
-			// Determine which section this anchorable belongs to
-			var section = GetAnchorableSection(anchorable);
+			var currentZone = GetAnchorableZone(anchorable);
 
-			// Use the toggle logic (which handles exclusive activation and button state refresh)
-			ToggleAnchorable(anchorable, section);
-		}
-
-		#endregion Internal Methods
-
-		#region Public Methods — Drag Support
-
-		/// <summary>
-		/// Moves an anchorable from its current section to a new section.
-		/// If there's already a docked anchorable in the target section, creates a split layout.
-		/// </summary>
-		public void MoveAnchorableToSection(LayoutAnchorable anchorable, AnchorSide targetSection, DropSubPosition subPosition = DropSubPosition.First)
-		{
-			if (anchorable == null) return;
-
-			var currentSection = GetAnchorableSection(anchorable);
-
-			// If already in the target section, just toggle it on
-			if (currentSection == targetSection)
+			// If already in the target zone, just toggle on
+			if (currentZone == targetZone)
 			{
-				// Check if there's already a docked anchorable — if so, split
-				var existingDocked = FindDockedInSection(targetSection);
-				if (existingDocked != null && existingDocked != anchorable)
-				{
-					// Dock alongside existing one
-					if (anchorable.IsAutoHidden)
-						DockAlongside(anchorable, existingDocked, targetSection, subPosition);
-					return;
-				}
-
 				if (anchorable.IsAutoHidden)
-					ToggleAnchorable(anchorable, targetSection);
+					ToggleAnchorable(anchorable, targetZone);
 				return;
 			}
 
-			// Ensure it's auto-hidden first (detached from any docked pane)
+			// Ensure auto-hidden first
 			if (!anchorable.IsAutoHidden)
 				anchorable.ToggleSingleAutoHide();
 
@@ -183,59 +119,54 @@ namespace AvalonDock
 				oldGroup.RemoveChild(anchorable);
 
 			// Add to the target side in the layout model
-			LayoutAnchorSide layoutSide;
-			switch (targetSection)
-			{
-				case AnchorSide.Right: layoutSide = Layout.RightSide; break;
-				case AnchorSide.Bottom: layoutSide = Layout.BottomSide; break;
-				case AnchorSide.Top: layoutSide = Layout.TopSide; break;
-				default: layoutSide = Layout.LeftSide; break;
-			}
-
+			var targetSide = GetLayoutSideForZone(targetZone);
 			LayoutAnchorGroup targetGroup;
-			if (layoutSide.Children.Count > 0)
-				targetGroup = layoutSide.Children.First();
+			if (targetSide.Children.Count > 0)
+				targetGroup = targetSide.Children.First();
 			else
 			{
 				targetGroup = new LayoutAnchorGroup();
-				layoutSide.Children.Add(targetGroup);
+				targetSide.Children.Add(targetGroup);
 			}
 			targetGroup.Children.Add(anchorable);
 
-			// Remove from old button bar
-			RemoveFromButtonBar(_leftTopButtonBar, anchorable);
-			RemoveFromButtonBar(_leftBottomButtonBar, anchorable);
-			RemoveFromButtonBar(_rightTopButtonBar, anchorable);
+			// Remove from all button bars
+			RemoveFromAllBars(anchorable);
 
 			// Add to the target button bar
-			var targetBar = GetButtonBarForSection(targetSection);
+			var targetBar = GetBarForZone(targetZone);
 			if (targetBar != null)
 			{
-				var btn = new ToggleDockButton { Anchorable = anchorable, Section = targetSection };
+				var btn = new ToggleDockButton { Anchorable = anchorable, Zone = targetZone };
 				targetBar.Items.Add(btn);
 			}
 
-			// Check if there's already a docked anchorable in the target section
-			var alreadyDocked = FindDockedInSection(targetSection);
-			if (alreadyDocked != null && alreadyDocked != anchorable)
-			{
-				DockAlongside(anchorable, alreadyDocked, targetSection, subPosition);
-			}
-			else
-			{
-				ToggleAnchorable(anchorable, targetSection);
-			}
+			// Toggle it on
+			ToggleAnchorable(anchorable, targetZone);
 		}
 
-		#endregion Public Methods — Drag Support
+		#endregion Public Methods
+
+		#region Internal Methods
+
+		/// <summary>
+		/// Overrides the pin/auto-hide button behavior. The pin button
+		/// acts as a "minimize" button that sends the anchorable back to the sidebar.
+		/// </summary>
+		internal override void ExecuteAutoHideCommand(LayoutAnchorable anchorable)
+		{
+			if (anchorable == null) return;
+			var zone = GetAnchorableZone(anchorable);
+			ToggleAnchorable(anchorable, zone);
+		}
+
+		#endregion Internal Methods
 
 		#region Private Methods
 
 		private void ToggleDockingManager_Loaded(object sender, RoutedEventArgs e)
 		{
 			SetupToggleDockButtonBars();
-
-			// Replace pin icons with minimize icons after layout settles
 			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
 				new System.Action(UpdatePinButtonsToMinimize));
 		}
@@ -247,8 +178,6 @@ namespace AvalonDock
 				if (btn.Name == "PART_AutoHidePin")
 				{
 					btn.ToolTip = "Minimize";
-
-					// Replace the pin image with a minimize icon
 					var border = btn.Content as Border;
 					if (border == null)
 					{
@@ -259,29 +188,25 @@ namespace AvalonDock
 				}
 				else if (btn.Name == "PART_HidePin")
 				{
-					// Hide the close/hide button — toggle mode uses Minimize instead
 					btn.Visibility = Visibility.Collapsed;
 				}
 			}
 		}
 
-		/// <summary>Creates a vector minimize icon (underscore line at bottom).</summary>
 		private static UIElement CreateMinimizeIcon()
 		{
-			var path = new System.Windows.Shapes.Path
+			return new System.Windows.Shapes.Path
 			{
 				Data = Geometry.Parse("M2,11 L11,11"),
 				Stroke = new SolidColorBrush(Color.FromRgb(0x55, 0x55, 0x55)),
 				StrokeThickness = 1.5,
-				Width = 13,
-				Height = 13,
+				Width = 13, Height = 13,
 				Stretch = Stretch.None,
 				SnapsToDevicePixels = true
 			};
-			return path;
 		}
 
-		private static System.Collections.Generic.IEnumerable<T> FindVisualChildren<T>(DependencyObject parent) where T : DependencyObject
+		private static IEnumerable<T> FindVisualChildren<T>(DependencyObject parent) where T : DependencyObject
 		{
 			if (parent == null) yield break;
 			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
@@ -297,55 +222,99 @@ namespace AvalonDock
 		{
 			RemoveToggleDockButtonBars();
 
-			// Hide the standard auto-hide side panels — we use button bars instead
+			// Hide the standard auto-hide side panels
 			if (LeftSidePanel != null) LeftSidePanel.Visibility = Visibility.Collapsed;
 			if (RightSidePanel != null) RightSidePanel.Visibility = Visibility.Collapsed;
 			if (TopSidePanel != null) TopSidePanel.Visibility = Visibility.Collapsed;
 			if (BottomSidePanel != null) BottomSidePanel.Visibility = Visibility.Collapsed;
 
-			// Move all docked anchorables to auto-hide so they appear in button bars
 			AutoHideAllDockedAnchorables();
 
-			// Collect anchorables from each side
+			// Collect anchorables
 			var leftAnchorables = CollectAnchorables(Layout.LeftSide);
 			var rightAnchorables = CollectAnchorables(Layout.RightSide);
 			var bottomAnchorables = CollectAnchorables(Layout.BottomSide);
 
-			// Create button bars
-			_leftTopButtonBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Section = AnchorSide.Left };
-			_leftTopButtonBar.SetAnchorables(leftAnchorables);
+			// Split bottom anchorables: first half → BottomLeft, second half → BottomRight
+			var bottomLeft = bottomAnchorables.Take((bottomAnchorables.Count + 1) / 2).ToList();
+			var bottomRight = bottomAnchorables.Skip((bottomAnchorables.Count + 1) / 2).ToList();
 
-			_leftBottomButtonBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Section = AnchorSide.Bottom };
-			_leftBottomButtonBar.SetAnchorables(bottomAnchorables);
+			// Create 6 button bars
+			_leftTopBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.LeftTop };
+			_leftTopBar.SetAnchorables(leftAnchorables, DockZone.LeftTop);
 
-			_rightTopButtonBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Section = AnchorSide.Right };
-			_rightTopButtonBar.SetAnchorables(rightAnchorables);
+			_leftBottomBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.LeftBottom };
+			// LeftBottom starts empty — user drags buttons there
+
+			_rightTopBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.RightTop };
+			_rightTopBar.SetAnchorables(rightAnchorables, DockZone.RightTop);
+
+			_rightBottomBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.RightBottom };
+			// RightBottom starts empty
+
+			_bottomLeftBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.BottomLeft };
+			_bottomLeftBar.SetAnchorables(bottomLeft, DockZone.BottomLeft);
+
+			_bottomRightBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.BottomRight };
+			_bottomRightBar.SetAnchorables(bottomRight, DockZone.BottomRight);
 
 			// Inject into the template grid
 			var rootGrid = FindTemplateRootGrid();
 			if (rootGrid == null) return;
 
-			// Wrap left bars in a DockPanel (top + bottom)
-			var leftDockPanel = new DockPanel();
-			DockPanel.SetDock(_leftTopButtonBar, Dock.Top);
-			DockPanel.SetDock(_leftBottomButtonBar, Dock.Bottom);
-			leftDockPanel.Children.Add(_leftTopButtonBar);
-			leftDockPanel.Children.Add(_leftBottomButtonBar);
-			leftDockPanel.Children.Add(new Border()); // fill remaining space
+			// Left sidebar: [LeftTop] — separator — [LeftBottom] — gap — [BottomLeft]
+			var leftPanel = new DockPanel();
+			DockPanel.SetDock(_leftTopBar, Dock.Top);
+			DockPanel.SetDock(_bottomLeftBar, Dock.Bottom);
 
-			Grid.SetRow(leftDockPanel, 0);
-			Grid.SetRowSpan(leftDockPanel, 3);
-			Grid.SetColumn(leftDockPanel, 0);
+			var leftSep = CreateSeparator();
+			DockPanel.SetDock(leftSep, Dock.Top);
+			DockPanel.SetDock(_leftBottomBar, Dock.Top);
 
-			Grid.SetRow(_rightTopButtonBar, 0);
-			Grid.SetRowSpan(_rightTopButtonBar, 3);
-			Grid.SetColumn(_rightTopButtonBar, 2);
-			_rightTopButtonBar.VerticalAlignment = VerticalAlignment.Top;
+			leftPanel.Children.Add(_leftTopBar);
+			leftPanel.Children.Add(leftSep);
+			leftPanel.Children.Add(_leftBottomBar);
+			leftPanel.Children.Add(_bottomLeftBar);
+			leftPanel.Children.Add(new Border()); // fill gap
 
-			rootGrid.Children.Add(leftDockPanel);
-			rootGrid.Children.Add(_rightTopButtonBar);
+			Grid.SetRow(leftPanel, 0);
+			Grid.SetRowSpan(leftPanel, 3);
+			Grid.SetColumn(leftPanel, 0);
 
-			_injectedLeftDockPanel = leftDockPanel;
+			// Right sidebar: [RightTop] — separator — [RightBottom] — gap — [BottomRight]
+			var rightPanel = new DockPanel();
+			DockPanel.SetDock(_rightTopBar, Dock.Top);
+			DockPanel.SetDock(_bottomRightBar, Dock.Bottom);
+
+			var rightSep = CreateSeparator();
+			DockPanel.SetDock(rightSep, Dock.Top);
+			DockPanel.SetDock(_rightBottomBar, Dock.Top);
+
+			rightPanel.Children.Add(_rightTopBar);
+			rightPanel.Children.Add(rightSep);
+			rightPanel.Children.Add(_rightBottomBar);
+			rightPanel.Children.Add(_bottomRightBar);
+			rightPanel.Children.Add(new Border()); // fill gap
+
+			Grid.SetRow(rightPanel, 0);
+			Grid.SetRowSpan(rightPanel, 3);
+			Grid.SetColumn(rightPanel, 2);
+
+			rootGrid.Children.Add(leftPanel);
+			rootGrid.Children.Add(rightPanel);
+
+			_injectedLeftDockPanel = leftPanel;
+			_injectedRightDockPanel = rightPanel;
+		}
+
+		private static FrameworkElement CreateSeparator()
+		{
+			return new Border
+			{
+				Height = 1,
+				Margin = new Thickness(4, 6, 4, 6),
+				Background = new SolidColorBrush(Color.FromRgb(0xCC, 0xCC, 0xCC))
+			};
 		}
 
 		private void RemoveToggleDockButtonBars()
@@ -355,16 +324,19 @@ namespace AvalonDock
 				(VisualTreeHelper.GetParent(_injectedLeftDockPanel) as Grid)?.Children.Remove(_injectedLeftDockPanel);
 				_injectedLeftDockPanel = null;
 			}
-			if (_rightTopButtonBar != null)
+			if (_injectedRightDockPanel != null)
 			{
-				(VisualTreeHelper.GetParent(_rightTopButtonBar) as Grid)?.Children.Remove(_rightTopButtonBar);
+				(VisualTreeHelper.GetParent(_injectedRightDockPanel) as Grid)?.Children.Remove(_injectedRightDockPanel);
+				_injectedRightDockPanel = null;
 			}
-			_leftTopButtonBar = null;
-			_leftBottomButtonBar = null;
-			_rightTopButtonBar = null;
+			_leftTopBar = null;
+			_leftBottomBar = null;
+			_rightTopBar = null;
+			_rightBottomBar = null;
+			_bottomLeftBar = null;
+			_bottomRightBar = null;
 		}
 
-		/// <summary>Walks the visual tree to find the 3×3 Grid inside the DockingManager template.</summary>
 		private Grid FindTemplateRootGrid()
 		{
 			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(this); i++)
@@ -394,35 +366,35 @@ namespace AvalonDock
 			return result;
 		}
 
-		/// <summary>Moves all currently docked anchorables to auto-hide state.</summary>
 		private void AutoHideAllDockedAnchorables()
 		{
-			var dockedAnchorables = Layout.Descendents()
+			var docked = Layout.Descendents()
 				.OfType<LayoutAnchorable>()
 				.Where(a => a.Parent is LayoutAnchorablePane && !a.IsFloating)
 				.ToList();
-
-			foreach (var anchorable in dockedAnchorables)
-				anchorable.ToggleSingleAutoHide();
+			foreach (var a in docked)
+				a.ToggleSingleAutoHide();
 		}
 
-		/// <summary>Hides any currently docked anchorable in the given section by sending it back to auto-hide.</summary>
-		private void HideDockedInSection(AnchorSide section)
+		/// <summary>Hides any docked anchorable that belongs to the specified button bar.</summary>
+		private void HideDockedInBar(ToggleDockButtonBar bar)
 		{
-			var dockedInSection = Layout.Descendents()
-				.OfType<LayoutAnchorable>()
-				.Where(a => a.Parent is LayoutAnchorablePane pane && !a.IsFloating && pane.GetSide() == section)
-				.ToList();
-
-			foreach (var anc in dockedInSection)
-				anc.ToggleSingleAutoHide();
+			if (bar == null) return;
+			foreach (var item in bar.Items)
+			{
+				if (item is ToggleDockButton btn && btn.Anchorable != null && !btn.Anchorable.IsAutoHidden)
+					btn.Anchorable.ToggleSingleAutoHide();
+			}
 		}
 
 		private void RefreshButtonStates()
 		{
-			RefreshBarStates(_leftTopButtonBar);
-			RefreshBarStates(_leftBottomButtonBar);
-			RefreshBarStates(_rightTopButtonBar);
+			RefreshBarStates(_leftTopBar);
+			RefreshBarStates(_leftBottomBar);
+			RefreshBarStates(_rightTopBar);
+			RefreshBarStates(_rightBottomBar);
+			RefreshBarStates(_bottomLeftBar);
+			RefreshBarStates(_bottomRightBar);
 		}
 
 		private static void RefreshBarStates(ToggleDockButtonBar bar)
@@ -432,33 +404,76 @@ namespace AvalonDock
 			{
 				if (item is ToggleDockButton btn && btn.Anchorable != null)
 					btn.IsChecked = !btn.Anchorable.IsAutoHidden;
-				else if (item is ToggleDockButtonGroup grp)
-					grp.RefreshState();
 			}
 		}
 
-		/// <summary>Determines which sidebar section an anchorable belongs to by checking button bars.</summary>
-		private AnchorSide GetAnchorableSection(LayoutAnchorable anchorable)
+		/// <summary>Determines which zone an anchorable belongs to by checking all button bars.</summary>
+		private DockZone GetAnchorableZone(LayoutAnchorable anchorable)
 		{
-			if (_leftTopButtonBar?.ContainsAnchorable(anchorable) == true) return AnchorSide.Left;
-			if (_rightTopButtonBar?.ContainsAnchorable(anchorable) == true) return AnchorSide.Right;
-			if (_leftBottomButtonBar?.ContainsAnchorable(anchorable) == true) return AnchorSide.Bottom;
+			if (_leftTopBar?.ContainsAnchorable(anchorable) == true) return DockZone.LeftTop;
+			if (_leftBottomBar?.ContainsAnchorable(anchorable) == true) return DockZone.LeftBottom;
+			if (_rightTopBar?.ContainsAnchorable(anchorable) == true) return DockZone.RightTop;
+			if (_rightBottomBar?.ContainsAnchorable(anchorable) == true) return DockZone.RightBottom;
+			if (_bottomLeftBar?.ContainsAnchorable(anchorable) == true) return DockZone.BottomLeft;
+			if (_bottomRightBar?.ContainsAnchorable(anchorable) == true) return DockZone.BottomRight;
 
-			// Fallback: infer from current layout position
-			if (anchorable.Parent is LayoutAnchorablePane pane)
-				return pane.GetSide();
+			// Fallback
 			if (anchorable.Parent is LayoutAnchorGroup group && group.Parent is LayoutAnchorSide side)
-				return side.Side;
-
-			return AnchorSide.Left;
+			{
+				switch (side.Side)
+				{
+					case AnchorSide.Left: return DockZone.LeftTop;
+					case AnchorSide.Right: return DockZone.RightTop;
+					case AnchorSide.Bottom: return DockZone.BottomLeft;
+				}
+			}
+			return DockZone.LeftTop;
 		}
 
-		private static bool ContainsAnchorable(ToggleDockButtonBar bar, LayoutAnchorable anchorable)
+		internal ToggleDockButtonBar GetBarForZone(DockZone zone)
 		{
-			return bar?.ContainsAnchorable(anchorable) == true;
+			switch (zone)
+			{
+				case DockZone.LeftTop: return _leftTopBar;
+				case DockZone.LeftBottom: return _leftBottomBar;
+				case DockZone.RightTop: return _rightTopBar;
+				case DockZone.RightBottom: return _rightBottomBar;
+				case DockZone.BottomLeft: return _bottomLeftBar;
+				case DockZone.BottomRight: return _bottomRightBar;
+				default: return _leftTopBar;
+			}
 		}
 
-		private void RemoveFromButtonBar(ToggleDockButtonBar bar, LayoutAnchorable anchorable)
+		/// <summary>Maps a DockZone to its LayoutAnchorSide in the layout model.</summary>
+		private LayoutAnchorSide GetLayoutSideForZone(DockZone zone)
+		{
+			switch (zone)
+			{
+				case DockZone.LeftTop:
+				case DockZone.LeftBottom:
+					return Layout.LeftSide;
+				case DockZone.RightTop:
+				case DockZone.RightBottom:
+					return Layout.RightSide;
+				case DockZone.BottomLeft:
+				case DockZone.BottomRight:
+					return Layout.BottomSide;
+				default:
+					return Layout.LeftSide;
+			}
+		}
+
+		private void RemoveFromAllBars(LayoutAnchorable anchorable)
+		{
+			RemoveFromBar(_leftTopBar, anchorable);
+			RemoveFromBar(_leftBottomBar, anchorable);
+			RemoveFromBar(_rightTopBar, anchorable);
+			RemoveFromBar(_rightBottomBar, anchorable);
+			RemoveFromBar(_bottomLeftBar, anchorable);
+			RemoveFromBar(_bottomRightBar, anchorable);
+		}
+
+		private static void RemoveFromBar(ToggleDockButtonBar bar, LayoutAnchorable anchorable)
 		{
 			if (bar == null) return;
 			for (int i = bar.Items.Count - 1; i >= 0; i--)
@@ -468,113 +483,7 @@ namespace AvalonDock
 					bar.Items.RemoveAt(i);
 					return;
 				}
-				if (bar.Items[i] is ToggleDockButtonGroup grp && grp.RemoveAnchorable(anchorable))
-				{
-					if (grp.Anchorables.Count == 0)
-						bar.Items.RemoveAt(i);
-					else if (grp.Anchorables.Count == 1)
-					{
-						// Ungroup single remaining
-						var remaining = grp.Anchorables.First();
-						bar.Items.RemoveAt(i);
-						bar.Items.Insert(i, new ToggleDockButton { Anchorable = remaining, Section = bar.Section });
-					}
-					return;
-				}
 			}
-		}
-
-		private ToggleDockButtonBar GetButtonBarForSection(AnchorSide section)
-		{
-			switch (section)
-			{
-				case AnchorSide.Left: return _leftTopButtonBar;
-				case AnchorSide.Right: return _rightTopButtonBar;
-				case AnchorSide.Bottom: return _leftBottomButtonBar;
-				default: return _leftTopButtonBar;
-			}
-		}
-
-		/// <summary>Finds the first docked (non-auto-hidden) anchorable in the given section, or null.</summary>
-		private LayoutAnchorable FindDockedInSection(AnchorSide section)
-		{
-			return Layout.Descendents()
-				.OfType<LayoutAnchorable>()
-				.FirstOrDefault(a => a.Parent is LayoutAnchorablePane pane && !a.IsFloating && pane.GetSide() == section);
-		}
-
-		/// <summary>
-		/// Docks the anchorable alongside an already-docked one, creating a split pane layout.
-		/// For Left/Right sections: vertical split (top/bottom).
-		/// For Bottom section: horizontal split (left/right).
-		/// </summary>
-		private void DockAlongside(LayoutAnchorable anchorable, LayoutAnchorable existingDocked, AnchorSide section, DropSubPosition subPosition)
-		{
-			var existingPane = existingDocked.Parent as LayoutAnchorablePane;
-			if (existingPane == null) return;
-
-			// Move anchorable out of auto-hide into a new pane
-			if (anchorable.Parent is LayoutAnchorGroup anchorGroup)
-				anchorGroup.RemoveChild(anchorable);
-
-			var newPane = new LayoutAnchorablePane(anchorable);
-
-			// Create a pane group with the appropriate orientation
-			var orientation = (section == AnchorSide.Bottom) ? Orientation.Horizontal : Orientation.Vertical;
-
-			// Check if existing pane is already inside a pane group with the same orientation
-			if (existingPane.Parent is LayoutAnchorablePaneGroup existingGroup && existingGroup.Orientation == orientation)
-			{
-				// Just add to existing group
-				int idx = existingGroup.Children.IndexOf(existingPane);
-				if (subPosition == DropSubPosition.First)
-					existingGroup.Children.Insert(idx, newPane);
-				else
-					existingGroup.Children.Insert(idx + 1, newPane);
-			}
-			else
-			{
-				// Wrap existing pane and new pane in a new pane group
-				var parentContainer = existingPane.Parent;
-				var paneGroup = new LayoutAnchorablePaneGroup { Orientation = orientation };
-
-				if (parentContainer is LayoutPanel panel)
-				{
-					int idx = panel.Children.IndexOf(existingPane);
-					panel.RemoveChild(existingPane);
-					if (subPosition == DropSubPosition.First)
-					{
-						paneGroup.Children.Add(newPane);
-						paneGroup.Children.Add(existingPane);
-					}
-					else
-					{
-						paneGroup.Children.Add(existingPane);
-						paneGroup.Children.Add(newPane);
-					}
-					panel.Children.Insert(idx, paneGroup);
-				}
-				else if (parentContainer is LayoutAnchorablePaneGroup parentGroup)
-				{
-					int idx = parentGroup.Children.IndexOf(existingPane);
-					parentGroup.RemoveChild(existingPane);
-					if (subPosition == DropSubPosition.First)
-					{
-						paneGroup.Children.Add(newPane);
-						paneGroup.Children.Add(existingPane);
-					}
-					else
-					{
-						paneGroup.Children.Add(existingPane);
-						paneGroup.Children.Add(newPane);
-					}
-					parentGroup.Children.Insert(idx, paneGroup);
-				}
-			}
-
-			RefreshButtonStates();
-			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
-				new System.Action(UpdatePinButtonsToMinimize));
 		}
 
 		#endregion Private Methods
