@@ -512,11 +512,14 @@ namespace AvalonDock.Controls
 			Topmost = true;
 			ResizeMode = ResizeMode.NoResize;
 
-			// Cover the entire owner window
-			Left = owner.Left;
-			Top = owner.Top;
-			Width = owner.ActualWidth;
-			Height = owner.ActualHeight;
+			// Position using the same DPI-aware approach as AvalonDock's OverlayWindow
+			var rectWindow = new Rect(
+				_manager.PointToScreenDPIWithoutFlowDirection(new Point()),
+				_manager.TransformActualSizeToAncestor());
+			Left = rectWindow.Left;
+			Top = rectWindow.Top;
+			Width = rectWindow.Width;
+			Height = rectWindow.Height;
 
 			Cursor = Cursors.Hand;
 		}
@@ -537,25 +540,31 @@ namespace AvalonDock.Controls
 
 		private void BuildDropZones()
 		{
-			// Calculate the content area between the sidebar button bars
+			// The overlay covers the manager. All coordinates are relative to (0,0) of the overlay.
+			double totalW = Width;
+			double totalH = Height;
+
+			// Get sidebar bar widths using their actual rendered sizes
 			double leftBarWidth = 0;
 			double rightBarWidth = 0;
 
 			if (_manager._injectedLeftDockPanel != null && _manager._injectedLeftDockPanel.IsVisible)
-				leftBarWidth = _manager._injectedLeftDockPanel.ActualWidth;
+			{
+				var leftBarRect = _manager._injectedLeftDockPanel.GetScreenArea();
+				leftBarWidth = leftBarRect.Width;
+			}
 			if (_manager._rightTopButtonBar != null && _manager._rightTopButtonBar.IsVisible)
-				rightBarWidth = _manager._rightTopButtonBar.ActualWidth;
-
-			var managerScreenPos = _manager.PointToScreen(new Point(0, 0));
-			double offsetX = managerScreenPos.X - _ownerWindow.Left;
-			double offsetY = managerScreenPos.Y - _ownerWindow.Top;
-			double totalW = _manager.ActualWidth;
-			double totalH = _manager.ActualHeight;
+			{
+				var rightBarRect = _manager._rightTopButtonBar.GetScreenArea();
+				rightBarWidth = rightBarRect.Width;
+			}
 
 			// Content area starts after left bar, ends before right bar
-			double contentX = offsetX + leftBarWidth;
+			double contentX = leftBarWidth;
 			double contentW = totalW - leftBarWidth - rightBarWidth;
 			double contentH = totalH;
+
+			if (contentW < 50 || contentH < 50) return;
 
 			// Determine zone sizes: use open dock size if available, otherwise default fractions
 			double leftW = GetOpenDockWidth(AnchorSide.Left, contentW * 0.25);
@@ -564,47 +573,46 @@ namespace AvalonDock.Controls
 
 			double sideH = contentH - bottomH;
 			double halfSideH = sideH / 2.0;
-			double middleW = contentW - leftW - rightW;
 
 			// Left-Top
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(contentX, offsetY, leftW, halfSideH),
+				Rect = new Rect(contentX, 0, leftW, halfSideH),
 				Section = AnchorSide.Left,
 				Label = "Left Top"
 			});
 			// Left-Bottom
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(contentX, offsetY + halfSideH, leftW, halfSideH),
+				Rect = new Rect(contentX, halfSideH, leftW, halfSideH),
 				Section = AnchorSide.Left,
 				Label = "Left Bottom"
 			});
 			// Right-Top
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(contentX + contentW - rightW, offsetY, rightW, halfSideH),
+				Rect = new Rect(contentX + contentW - rightW, 0, rightW, halfSideH),
 				Section = AnchorSide.Right,
 				Label = "Right Top"
 			});
 			// Right-Bottom
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(contentX + contentW - rightW, offsetY + halfSideH, rightW, halfSideH),
+				Rect = new Rect(contentX + contentW - rightW, halfSideH, rightW, halfSideH),
 				Section = AnchorSide.Right,
 				Label = "Right Bottom"
 			});
 			// Bottom-Left
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(contentX, offsetY + sideH, contentW / 2, bottomH),
+				Rect = new Rect(contentX, sideH, contentW / 2, bottomH),
 				Section = AnchorSide.Bottom,
 				Label = "Bottom Left"
 			});
 			// Bottom-Right
 			_dropZones.Add(new DropZone
 			{
-				Rect = new Rect(contentX + contentW / 2, offsetY + sideH, contentW / 2, bottomH),
+				Rect = new Rect(contentX + contentW / 2, sideH, contentW / 2, bottomH),
 				Section = AnchorSide.Bottom,
 				Label = "Bottom Right"
 			});
