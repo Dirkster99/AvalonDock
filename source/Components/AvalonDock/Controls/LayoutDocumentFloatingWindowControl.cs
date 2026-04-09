@@ -112,11 +112,11 @@ namespace AvalonDock.Controls
 					{
 						if (_model.IsSinglePane)
 						{
-							LayoutFloatingWindowControlHelper.ActiveTheContentOfSinglePane(this);
+							LayoutFloatingWindowControlHelper.ActiveTheContentOfSinglePane(this, true);
 						}
 						else
 						{
-							LayoutFloatingWindowControlHelper.ActiveTheContentOfMultiPane(this);
+							LayoutFloatingWindowControlHelper.ActiveTheContentOfMultiPane(this, true);
 						}
 					}
 
