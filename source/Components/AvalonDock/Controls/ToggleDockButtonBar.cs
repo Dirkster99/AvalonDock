@@ -249,8 +249,7 @@ namespace AvalonDock.Controls
 	/// </summary>
 	internal class ToggleDockDragOverlay : Window
 	{
-		private readonly ToggleDockButton _sourceButton;
-		private readonly ToggleDockButtonBar _sourceBar;
+		private readonly LayoutAnchorable _sourceAnchorable;
 		private readonly ToggleDockingManager _manager;
 		private readonly Window _ownerWindow;
 		private readonly List<DropZone> _dropZones = new List<DropZone>();
@@ -266,15 +265,14 @@ namespace AvalonDock.Controls
 			public string Label;
 		}
 
-		private ToggleDockDragOverlay(ToggleDockButton source, ToggleDockButtonBar sourceBar, ToggleDockingManager manager, Window owner)
+		private ToggleDockDragOverlay(LayoutAnchorable anchorable, Visual ghostVisual, Size ghostSize, ToggleDockingManager manager, Window owner)
 		{
-			_sourceButton = source;
-			_sourceBar = sourceBar;
+			_sourceAnchorable = anchorable;
 			_manager = manager;
 			_ownerWindow = owner;
 
-			_ghostBrush = new VisualBrush(source) { Opacity = 0.6 };
-			_ghostSize = source.RenderSize;
+			_ghostBrush = new VisualBrush(ghostVisual) { Opacity = 0.6 };
+			_ghostSize = ghostSize;
 
 			WindowStyle = WindowStyle.None;
 			AllowsTransparency = true;
@@ -303,7 +301,19 @@ namespace AvalonDock.Controls
 			var manager = source.Anchorable?.Root?.Manager as ToggleDockingManager;
 			if (manager == null) return;
 
-			var overlay = new ToggleDockDragOverlay(source, sourceBar, manager, owner);
+			var overlay = new ToggleDockDragOverlay(source.Anchorable, source, source.RenderSize, manager, owner);
+			overlay.BuildDropZones();
+			overlay.Show();
+			overlay.CaptureMouse();
+		}
+
+		/// <summary>Starts drag from a docked anchorable pane (title bar drag).</summary>
+		internal static void StartDragFromPane(LayoutAnchorable anchorable, ToggleDockingManager manager)
+		{
+			var owner = Window.GetWindow(manager);
+			if (owner == null || anchorable == null) return;
+
+			var overlay = new ToggleDockDragOverlay(anchorable, manager, new Size(24, 24), manager, owner);
 			overlay.BuildDropZones();
 			overlay.Show();
 			overlay.CaptureMouse();
@@ -449,9 +459,9 @@ namespace AvalonDock.Controls
 			ReleaseMouseCapture();
 			Close();
 
-			if (hitZone.HasValue && _sourceButton.Anchorable != null)
+			if (hitZone.HasValue && _sourceAnchorable != null)
 			{
-				_manager.MoveAnchorableToZone(_sourceButton.Anchorable, hitZone.Value.Zone);
+				_manager.MoveAnchorableToZone(_sourceAnchorable, hitZone.Value.Zone);
 			}
 		}
 

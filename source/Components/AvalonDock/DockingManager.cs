@@ -1792,7 +1792,7 @@ namespace AvalonDock
 		/// </summary>
 		/// <param name="contentModel"></param>
 		/// <param name="startDrag"></param>
-		internal void StartDraggingFloatingWindowForContent(LayoutContent contentModel, bool startDrag = true)
+		internal virtual void StartDraggingFloatingWindowForContent(LayoutContent contentModel, bool startDrag = true)
 		{
 			// Ensure window can float only if corresponding property is set accordingly
 			if (contentModel == null) return;
@@ -1836,7 +1836,7 @@ namespace AvalonDock
 		/// by dragging its title bar (top header of a tool window).
 		/// </summary>
 		/// <param name="paneModel"></param>
-		internal void StartDraggingFloatingWindowForPane(LayoutAnchorablePane paneModel)
+		internal virtual void StartDraggingFloatingWindowForPane(LayoutAnchorablePane paneModel)
 		{
 			var fwc = CreateFloatingWindowForLayoutAnchorableWithoutParent(paneModel, false);
 			if (fwc == null) return;

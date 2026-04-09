@@ -162,6 +162,34 @@ namespace AvalonDock
 			ToggleAnchorable(anchorable, zone);
 		}
 
+		/// <summary>
+		/// Overrides pane title bar drag to use the toggle overlay instead of floating windows.
+		/// </summary>
+		internal override void StartDraggingFloatingWindowForPane(LayoutAnchorablePane paneModel)
+		{
+			if (paneModel == null) return;
+			var anchorable = paneModel.Children.OfType<LayoutAnchorable>().FirstOrDefault();
+			if (anchorable != null)
+			{
+				ToggleDockDragOverlay.StartDragFromPane(anchorable, this);
+				return;
+			}
+			base.StartDraggingFloatingWindowForPane(paneModel);
+		}
+
+		/// <summary>
+		/// Overrides content drag to use the toggle overlay for anchorables.
+		/// </summary>
+		internal override void StartDraggingFloatingWindowForContent(LayoutContent contentModel, bool startDrag = true)
+		{
+			if (contentModel is LayoutAnchorable anchorable)
+			{
+				ToggleDockDragOverlay.StartDragFromPane(anchorable, this);
+				return;
+			}
+			base.StartDraggingFloatingWindowForContent(contentModel, startDrag);
+		}
+
 		#endregion Internal Methods
 
 		#region Private Methods
