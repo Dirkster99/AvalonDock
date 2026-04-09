@@ -16,14 +16,21 @@ namespace AvalonDock
 	internal static class Win32Helper
 	{
 		internal const int
-				  WS_CHILD = 0x40000000,
-				  WS_VISIBLE = 0x10000000,
-				  WS_VSCROLL = 0x00200000,
-				  WS_BORDER = 0x00800000,
-				  WS_CLIPSIBLINGS = 0x04000000,
-				  WS_CLIPCHILDREN = 0x02000000,
-				  WS_TABSTOP = 0x00010000,
-				  WS_GROUP = 0x00020000;
+WS_CHILD = 0x40000000;
+		internal const int
+WS_VISIBLE = 0x10000000;
+		internal const int
+WS_VSCROLL = 0x00200000;
+		internal const int
+WS_BORDER = 0x00800000;
+		internal const int
+WS_CLIPSIBLINGS = 0x04000000;
+		internal const int
+WS_CLIPCHILDREN = 0x02000000;
+		internal const int
+WS_TABSTOP = 0x00010000;
+		internal const int
+WS_GROUP = 0x00020000;
 
 		/// <summary>SetWindowPos Flags.</summary>
 		/// <seealso href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowpos"/>
@@ -121,7 +128,7 @@ namespace AvalonDock
 			public int Cx;
 			public int Cy;
 			public int Flags;
-		};
+		}
 
 		[DllImport("user32.dll")]
 		[return: MarshalAs(UnmanagedType.Bool)]
@@ -217,7 +224,8 @@ namespace AvalonDock
 			IntPtr lParam);
 
 		[DllImport("user32.dll")]
-		public static extern IntPtr SetWindowsHookEx(HookType code,
+		public static extern IntPtr SetWindowsHookEx(
+			HookType code,
 			HookProc func,
 			IntPtr hInstance,
 			int threadID);
@@ -226,10 +234,12 @@ namespace AvalonDock
 		public static extern int UnhookWindowsHookEx(IntPtr hhook);
 
 		[DllImport("user32.dll")]
-		public static extern int CallNextHookEx(IntPtr hhook,
+		public static extern int CallNextHookEx(
+			IntPtr hhook,
 			int code, IntPtr wParam, IntPtr lParam);
 
-		[Serializable, StructLayout(LayoutKind.Sequential)]
+		[Serializable]
+		[StructLayout(LayoutKind.Sequential)]
 		internal struct RECT
 		{
 			public int Left;
@@ -293,8 +303,6 @@ namespace AvalonDock
 				return Left ^ ((Top << 13) | (Top >> 0x13)) ^ ((Width << 0x1a) | (Width >> 6)) ^ ((Height << 7) | (Height >> 0x19));
 			}
 
-			#region Operator overloads
-
 			public static implicit operator Rect(RECT rect)
 			{
 				return rect.ToRectangle();
@@ -304,8 +312,6 @@ namespace AvalonDock
 			{
 				return FromRectangle(rect);
 			}
-
-			#endregion Operator overloads
 		}
 
 		internal static RECT GetClientRect(IntPtr hWnd)
@@ -384,9 +390,9 @@ namespace AvalonDock
 		[StructLayout(LayoutKind.Sequential)]
 		internal struct Win32Point
 		{
-			public Int32 X;
-			public Int32 Y;
-		};
+			public int X;
+			public int Y;
+		}
 
 		internal static Point GetMousePosition()
 		{
@@ -451,7 +457,7 @@ namespace AvalonDock
 			return GetWindowLongPtr(childHandle, -8);
 		}
 
-		//Monitor Patch #13440
+		// Monitor Patch #13440
 
 		/// <summary>
 		/// The MonitorFromRect function retrieves a handle to the display monitor that

@@ -1,4 +1,4 @@
-﻿using AvalonDock.Themes;
+using AvalonDock.Themes;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,6 @@ namespace AvalonDock.MVVMTestApp
 {
 	internal class Workspace : ViewModelBase
 	{
-		#region fields
 
 		private static Workspace _this = new Workspace();
 
@@ -25,9 +24,7 @@ namespace AvalonDock.MVVMTestApp
 		private RelayCommand _newCommand = null;
 		private Tuple<string, Theme> selectedTheme;
 
-		#endregion fields
 
-		#region constructors
 
 		/// <summary>
 		/// Class constructor
@@ -49,11 +46,9 @@ namespace AvalonDock.MVVMTestApp
 			this.SelectedTheme = Themes.First();
 		}
 
-		#endregion constructors
 
 		public event EventHandler ActiveDocumentChanged;
 
-		#region properties
 
 		public static Workspace This => _this;
 
@@ -142,9 +137,7 @@ namespace AvalonDock.MVVMTestApp
 			}
 		}
 
-		#endregion properties
 
-		#region methods
 
 		internal void Close(FileViewModel fileToClose)
 		{
@@ -189,7 +182,6 @@ namespace AvalonDock.MVVMTestApp
 			return fileViewModel;
 		}
 
-		#region OpenCommand
 
 		private bool CanOpen(object parameter) => true;
 
@@ -203,9 +195,7 @@ namespace AvalonDock.MVVMTestApp
 			}
 		}
 
-		#endregion OpenCommand
 
-		#region NewCommand
 
 		private bool CanNew(object parameter)
 		{
@@ -218,8 +208,6 @@ namespace AvalonDock.MVVMTestApp
 			ActiveDocument = _files.Last();
 		}
 
-		#endregion NewCommand
 
-		#endregion methods
 	}
 }

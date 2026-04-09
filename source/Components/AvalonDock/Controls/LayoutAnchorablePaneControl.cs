@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,12 +7,12 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -24,15 +24,9 @@ namespace AvalonDock.Controls
 	/// </summary>
 	/// <seealso cref="TabControlEx"/>
 	/// <seealso cref="ILayoutControl"/>
-	public class LayoutAnchorablePaneControl : TabControlEx, ILayoutControl//, ILogicalChildrenContainer
+	public class LayoutAnchorablePaneControl : TabControlEx, ILayoutControl// , ILogicalChildrenContainer
 	{
-		#region fields
-
 		private readonly LayoutAnchorablePane _model;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>Static class constructor to register WPF style keys.</summary>
 		static LayoutAnchorablePaneControl()
@@ -54,17 +48,11 @@ namespace AvalonDock.Controls
 			SizeChanged += OnSizeChanged;
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
 		/// <summary>Gets the layout model of this control.</summary>
-		[Bindable(false), Description("Gets the layout model of this control."), Category("Other")]
+		[Bindable(false)]
+		[Description("Gets the layout model of this control.")]
+		[Category("Other")]
 		public ILayoutElement Model => _model;
-
-		#endregion Properties
-
-		#region Overrides
 
 		/// <summary>
 		/// Invoked when an unhandled <see cref="System.Windows.Input.Keyboard.GotKeyboardFocus"/> attached
@@ -104,17 +92,11 @@ namespace AvalonDock.Controls
 			if (!e.Handled && _model?.SelectedContent != null) _model.SelectedContent.IsActive = true;
 		}
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		private void OnSizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			var modelWithActualSize = _model as ILayoutPositionableElementWithActualSize;
 			modelWithActualSize.ActualWidth = ActualWidth;
 			modelWithActualSize.ActualHeight = ActualHeight;
 		}
-
-		#endregion Private Methods
 	}
 }

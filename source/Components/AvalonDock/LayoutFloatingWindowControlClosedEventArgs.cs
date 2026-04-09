@@ -12,5 +12,4 @@ namespace AvalonDock
 
 		public LayoutFloatingWindowControl LayoutFloatingWindowControl { get; }
 	}
-
 }

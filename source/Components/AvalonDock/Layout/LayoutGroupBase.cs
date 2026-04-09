@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -19,8 +19,6 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public abstract class LayoutGroupBase : LayoutElement
 	{
-		#region Events
-
 		/// <summary>Raise an event to inform supscribers that the children collection down the tree of this object has changed.</summary>
 		[field: NonSerialized]
 		[field: XmlIgnore]
@@ -33,10 +31,6 @@ namespace AvalonDock.Layout
 		[field: NonSerialized]
 		[field: XmlIgnore]
 		public event EventHandler<ChildrenTreeChangedEventArgs> ChildrenTreeChanged;
-
-		#endregion Events
-
-		#region Internal Methods
 
 		/// <summary>
 		/// Raises an event to make parents update their children up the tree.
@@ -72,7 +66,5 @@ namespace AvalonDock.Layout
 			if (parentGroup != null)
 				parentGroup.NotifyChildrenTreeChanged(ChildrenTreeChange.TreeChanged);
 		}
-
-		#endregion Internal Methods
 	}
 }

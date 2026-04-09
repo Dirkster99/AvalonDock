@@ -18,17 +18,11 @@ namespace AvalonDock.Controls
 	/// </summary>
 	internal interface IOverlayWindowHost
 	{
-		#region Properties
-
 		/// <summary>
 		/// Gets the <see cref="DockingManager"/> control that should be invoked to do the actual docking
 		/// if docking into this <see cref="IOverlayWindowHost"/> should be performed.
 		/// </summary>
 		DockingManager Manager { get; }
-
-		#endregion Properties
-
-		#region Methods
 
 		/// <summary>
 		/// Determines whether the given screen coordinates are part of the <see cref="IOverlayWindowHost"/>
@@ -62,7 +56,5 @@ namespace AvalonDock.Controls
 		/// <param name="draggingWindow">The window to examine.</param>
 		/// <returns>The associated drop areas.</returns>
 		IEnumerable<IDropArea> GetDropAreas(LayoutFloatingWindowControl draggingWindow);
-
-		#endregion Methods
 	}
 }

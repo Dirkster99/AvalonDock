@@ -28,14 +28,8 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public class LayoutDocumentFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
 	{
-		#region fields
-
 		private readonly LayoutDocumentFloatingWindow _model;
 		private List<IDropArea> _dropAreas = null;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>Static class constructor</summary>
 		static LayoutDocumentFloatingWindowControl()
@@ -67,14 +61,8 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion Constructors
-
-		#region Overrides
-
 		/// <inheritdoc />
 		public override ILayoutElement Model => _model;
-
-		#region SingleContentLayoutItem
 
 		/// <summary><see cref="SingleContentLayoutItem"/> dependency property.</summary>
 		public static readonly DependencyProperty SingleContentLayoutItemProperty = DependencyProperty.Register(nameof(SingleContentLayoutItem), typeof(LayoutItem), typeof(LayoutDocumentFloatingWindowControl),
@@ -98,15 +86,13 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion SingleContentLayoutItem
-
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
 			var manager = _model.Root.Manager;
 			Content = manager.CreateUIElementForModel(_model.RootPanel);
 			// TODO IsVisibleChanged
-			//SetBinding(SingleContentLayoutItemProperty, new Binding("Model.SinglePane.SelectedContent") { Source = this, Converter = new LayoutItemFromLayoutModelConverter() });
+			// SetBinding(SingleContentLayoutItemProperty, new Binding("Model.SinglePane.SelectedContent") { Source = this, Converter = new LayoutItemFromLayoutModelConverter() });
 			_model.RootPanel.ChildrenCollectionChanged += RootPanelOnChildrenCollectionChanged;
 		}
 
@@ -149,6 +135,7 @@ namespace AvalonDock.Controls
 								windowChrome.ShowSystemMenu = false;
 						}
 					}
+
 					break;
 
 				case Win32Helper.WM_CLOSE:
@@ -160,8 +147,10 @@ namespace AvalonDock.Controls
 						this.CloseWindowCommand.Execute(null);
 						handled = true;
 					}
+
 					break;
 			}
+
 			return base.FilterMessage(hwnd, msg, wParam, lParam, ref handled);
 		}
 
@@ -175,19 +164,17 @@ namespace AvalonDock.Controls
 				root.Manager.RemoveFloatingWindow(this);
 				root.CollectGarbage();
 			}
+
 			if (_overlayWindow != null)
 			{
 				_overlayWindow.Close();
 				_overlayWindow = null;
 			}
+
 			base.OnClosed(e);
 			if (!CloseInitiatedByUser) root?.FloatingWindows.Remove(_model);
 			_model.PropertyChanged -= Model_PropertyChanged;
 		}
-
-		#endregion Overrides
-
-		#region Private Methods
 
 		private void RootPanelOnChildrenCollectionChanged(object sender, EventArgs e)
 		{
@@ -212,8 +199,9 @@ namespace AvalonDock.Controls
 			if (CloseInitiatedByUser && !KeepContentVisibleOnClose)
 			{
 				e.Cancel = true;
-				//_model.Descendents().OfType<LayoutDocument>().ToArray().ForEach<LayoutDocument>((a) => a.Hide());
+				// _model.Descendents().OfType<LayoutDocument>().ToArray().ForEach<LayoutDocument>((a) => a.Hide());
 			}
+
 			base.OnClosing(e);
 		}
 
@@ -317,16 +305,17 @@ namespace AvalonDock.Controls
 		private IEnumerable<LayoutAnchorable> GetAnchorableInFloatingWindow(LayoutFloatingWindowControl draggingWindow)
 		{
 			if (!(draggingWindow.Model is LayoutAnchorableFloatingWindow layoutAnchorableFloatingWindow)) yield break;
-			//big part of code for getting type
-
+			// big part of code for getting type
 			if (layoutAnchorableFloatingWindow.SinglePane is LayoutAnchorablePane layoutAnchorablePane && (layoutAnchorableFloatingWindow.IsSinglePane && layoutAnchorablePane.SelectedContent != null))
 			{
 				var layoutAnchorable = ((LayoutAnchorablePane)layoutAnchorableFloatingWindow.SinglePane).SelectedContent as LayoutAnchorable;
 				yield return layoutAnchorable;
 			}
 			else
+			{
 				foreach (var item in GetLayoutAnchorable(layoutAnchorableFloatingWindow.RootPanel))
 					yield return item;
+			}
 		}
 
 		/// <summary>
@@ -343,8 +332,6 @@ namespace AvalonDock.Controls
 			foreach (var anchorable in layoutAnchPaneGroup.Descendents().OfType<LayoutAnchorable>())
 				yield return anchorable;
 		}
-
-		#region HideWindowCommand
 
 		public ICommand HideWindowCommand { get; }
 
@@ -364,20 +351,22 @@ namespace AvalonDock.Controls
 					break;
 				}
 
-				//if (!(manager.GetLayoutItemFromModel(content) is LayoutAnchorableItem layoutAnchorableItem) ||
-				//	 layoutAnchorableItem.HideCommand == null ||
-				//	 !layoutAnchorableItem.HideCommand.CanExecute(parameter))
-				//{
-				//	canExecute = false;
-				//	break;
-				//}
+				// if (!(manager.GetLayoutItemFromModel(content) is LayoutAnchorableItem layoutAnchorableItem) ||
+				// layoutAnchorableItem.HideCommand == null ||
+				// !layoutAnchorableItem.HideCommand.CanExecute(parameter))
+				// {
+				// canExecute = false;
+				// break;
+				// }
 				if (!(manager.GetLayoutItemFromModel(content) is LayoutItem layoutItem) || layoutItem.CloseCommand == null || !layoutItem.CloseCommand.CanExecute(parameter))
 				{
 					canExecute = false;
 					break;
 				}
+
 				canExecute = true;
 			}
+
 			return canExecute;
 		}
 
@@ -386,15 +375,11 @@ namespace AvalonDock.Controls
 			var manager = Model.Root.Manager;
 			foreach (var anchorable in this.Model.Descendents().OfType<LayoutContent>().ToArray())
 			{
-				//if (manager.GetLayoutItemFromModel(anchorable) is LayoutAnchorableItem layoutAnchorableItem) layoutAnchorableItem.HideCommand.Execute(parameter);
-				//else
+				// if (manager.GetLayoutItemFromModel(anchorable) is LayoutAnchorableItem layoutAnchorableItem) layoutAnchorableItem.HideCommand.Execute(parameter);
+				// else
 				if (manager.GetLayoutItemFromModel(anchorable) is LayoutItem layoutItem) layoutItem.CloseCommand.Execute(parameter);
 			}
 		}
-
-		#endregion HideWindowCommand
-
-		#region CloseWindowCommand
 
 		public ICommand CloseWindowCommand { get; }
 
@@ -417,8 +402,10 @@ namespace AvalonDock.Controls
 					canExecute = false;
 					break;
 				}
+
 				canExecute = true;
 			}
+
 			return canExecute;
 		}
 
@@ -431,9 +418,5 @@ namespace AvalonDock.Controls
 				documentLayoutItem?.CloseCommand.Execute(parameter);
 			}
 		}
-
-		#endregion CloseWindowCommand
-
-		#endregion Private Methods
 	}
 }

@@ -8,7 +8,6 @@ namespace MLibTest.Models
 	/// </summary>
 	internal class LayoutLoaderResult
 	{
-		#region ctors
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -26,9 +25,7 @@ namespace MLibTest.Models
 		protected LayoutLoaderResult()
 		{
 		}
-		#endregion ctors
 
-		#region properties
 		/// <summary>
 		/// Gets the Xml definition of the AvalonDock layout with a string object.
 		/// </summary>
@@ -44,6 +41,5 @@ namespace MLibTest.Models
 		/// was not succesful and additional error information is available.
 		/// </summary>
 		public Exception LoadError { get; }
-		#endregion properties
 	}
 }

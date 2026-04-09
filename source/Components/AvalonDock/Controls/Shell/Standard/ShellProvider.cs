@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -8,7 +8,7 @@
  ************************************************************************/
 
 /**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 namespace Standard
@@ -19,8 +19,6 @@ namespace Standard
 	using System.Text;
 
 	using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
-
-	#region Enums and Static Property Classes
 
 	/// <summary>ShellItem attribute flags.  SIATTRIBFLAGS_*</summary>
 	internal enum SIATTRIBFLAGS
@@ -312,13 +310,13 @@ namespace Standard
 		CANONICAL = 0x10000000,
 
 		TEST_FILESYSPATH_IF_NOT_EQUAL = 0x20000000,
-	};
+	}
 
 	/// <summary>
 	/// ShellItem enum.  SIGDN_*.
 	/// </summary>
 	internal enum SIGDN : uint
-	{                                             // lower word (& with 0xFFFF)
+	{ // lower word (& with 0xFFFF)
 		NORMALDISPLAY = 0x00000000, // SHGDN_NORMAL
 		PARENTRELATIVEPARSING = 0x80018001, // SHGDN_INFOLDER | SHGDN_FORPARSING
 		DESKTOPABSOLUTEPARSING = 0x80028000, // SHGDN_FORPARSING
@@ -357,10 +355,6 @@ namespace Standard
 		public const string BESTEFFORT = "GPS_BESTEFFORT";
 		public const string NO_OPLOCK = "GPS_NO_OPLOCK";
 	}
-
-	#endregion Enums and Static Property Classes
-
-	#region Structs
 
 	[StructLayout(LayoutKind.Sequential, Pack = 8, CharSet = CharSet.Unicode)]
 	internal struct THUMBBUTTON
@@ -415,15 +409,9 @@ namespace Standard
 		public static readonly PKEY AppUserModel_RelaunchIconResource = new PKEY(new Guid("9F4C2855-9F79-4B39-A8D0-E1D42DE1D5F3"), 3);
 	}
 
-	#endregion Structs
-
-	#region Interfaces
-
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.EnumIdList),
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.EnumIdList)]
 	internal interface IEnumIDList
 	{
 		[PreserveSig()]
@@ -437,14 +425,12 @@ namespace Standard
 		void Clone([Out, MarshalAs(UnmanagedType.Interface)] out IEnumIDList ppenum);
 	}
 
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.EnumObjects),
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.EnumObjects)]
 	internal interface IEnumObjects
 	{
-		//[local]
+		// [local]
 		// This signature might not work... Hopefully don't need this interface though.
 		void Next(uint celt, [In] ref Guid riid, [Out, MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.IUnknown, IidParameterIndex = 1, SizeParamIndex = 0)] object[] rgelt, [Out] out uint pceltFetched);
 
@@ -464,11 +450,9 @@ namespace Standard
 	}
 
 	/// <summary>Unknown Object Array</summary>
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.ObjectArray),
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.ObjectArray)]
 	internal interface IObjectArray
 	{
 		uint GetCount();
@@ -477,21 +461,15 @@ namespace Standard
 		object GetAt([In] uint uiIndex, [In] ref Guid riid);
 	}
 
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.ObjectArray),
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.ObjectArray)]
 	internal interface IObjectCollection : IObjectArray
 	{
-		#region IObjectArray redeclarations
-
 		new uint GetCount();
 
 		[return: MarshalAs(UnmanagedType.IUnknown)]
 		new object GetAt([In] uint uiIndex, [In] ref Guid riid);
-
-		#endregion IObjectArray redeclarations
 
 		void AddObject([MarshalAs(UnmanagedType.IUnknown)] object punk);
 
@@ -502,11 +480,9 @@ namespace Standard
 		void Clear();
 	}
 
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.PropertyStore)
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.PropertyStore)]
 	internal interface IPropertyStore
 	{
 		uint GetCount();
@@ -520,11 +496,9 @@ namespace Standard
 		void Commit();
 	}
 
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.ShellFolder),
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.ShellFolder)]
 	internal interface IShellFolder
 	{
 		void ParseDisplayName(
@@ -607,7 +581,8 @@ namespace Standard
 		// sets the display name of the specified object.
 		// If it changes the ID as well, it returns the new ID which is
 		// alocated by the task allocator.
-		void SetNameOf([In] IntPtr hwnd,
+		void SetNameOf(
+			[In] IntPtr hwnd,
 			[In] IntPtr pidl,
 			[In, MarshalAs(UnmanagedType.LPWStr)] string pszName,
 			[In] SHGDN uFlags,
@@ -617,11 +592,9 @@ namespace Standard
 	/// <summary>
 	/// Shell Namespace helper
 	/// </summary>
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.ShellItem),
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.ShellItem)]
 	internal interface IShellItem
 	{
 		[return: MarshalAs(UnmanagedType.Interface)]
@@ -637,11 +610,9 @@ namespace Standard
 		int Compare(IShellItem psi, SICHINT hint);
 	}
 
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.ShellItemArray),
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.ShellItemArray)]
 	internal interface IShellItemArray
 	{
 		[return: MarshalAs(UnmanagedType.Interface)]
@@ -666,15 +637,11 @@ namespace Standard
 	/// <summary>
 	/// Shell Namespace helper 2
 	/// </summary>
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.ShellItem2),
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.ShellItem2)]
 	internal interface IShellItem2 : IShellItem
 	{
-		#region IShellItem redeclarations
-
 		[return: MarshalAs(UnmanagedType.Interface)]
 		new object BindToHandler([In] IBindCtx pbc, [In] ref Guid bhid, [In] ref Guid riid);
 
@@ -686,8 +653,6 @@ namespace Standard
 		new SFGAO GetAttributes(SFGAO sfgaoMask);
 
 		new int Compare(IShellItem psi, SICHINT hint);
-
-		#endregion IShellItem redeclarations
 
 		[return: MarshalAs(UnmanagedType.Interface)]
 		object GetPropertyStore(
@@ -734,11 +699,9 @@ namespace Standard
 		void GetBool(IntPtr key);
 	}
 
-	[
-		ComImport,
-		InterfaceTypeAttribute(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.ShellLink),
-	]
+	[ComImport]
+	[InterfaceTypeAttribute(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.ShellLink)]
 	internal interface IShellLinkW
 	{
 		void GetPath([Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxPath, [In, Out] WIN32_FIND_DATAW pfd, SLGP fFlags);
@@ -778,11 +741,9 @@ namespace Standard
 		void SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
 	}
 
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.TaskbarList),
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.TaskbarList)]
 	internal interface ITaskbarList
 	{
 		/// <summary>
@@ -815,15 +776,11 @@ namespace Standard
 		void SetActiveAlt(IntPtr hwnd);
 	}
 
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.TaskbarList2),
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.TaskbarList2)]
 	internal interface ITaskbarList2 : ITaskbarList
 	{
-		#region ITaskbarList redeclaration
-
 		new void HrInit();
 
 		new void AddTab(IntPtr hwnd);
@@ -833,8 +790,6 @@ namespace Standard
 		new void ActivateTab(IntPtr hwnd);
 
 		new void SetActiveAlt(IntPtr hwnd);
-
-		#endregion ITaskbarList redeclaration
 
 		/// <summary>
 		/// Marks a window as full-screen.
@@ -852,11 +807,9 @@ namespace Standard
 	}
 
 	// Used to remove items from the automatic destination lists created when apps or the system call SHAddToRecentDocs to report usage of a document.
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.ApplicationDestinations)
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.ApplicationDestinations)]
 	internal interface IApplicationDestinations
 	{
 		// Set the App User Model ID for the application removing destinations from its list.  If an AppID is not provided
@@ -874,11 +827,9 @@ namespace Standard
 	/// <summary>
 	/// Allows an application to retrieve the most recent and frequent documents opened in that app, as reported via SHAddToRecentDocs
 	/// </summary>
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.ApplicationDocumentLists)
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.ApplicationDocumentLists)]
 	internal interface IApplicationDocumentLists
 	{
 		/// <summary>
@@ -899,11 +850,9 @@ namespace Standard
 	}
 
 	// Custom Destination List
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.CustomDestinationList)
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.CustomDestinationList)]
 	internal interface ICustomDestinationList
 	{
 		void SetAppID([In, MarshalAs(UnmanagedType.LPWStr)] string pszAppID);
@@ -936,46 +885,36 @@ namespace Standard
 	/// <summary>
 	/// Provides access to the App User Model ID on objects supporting this value.
 	/// </summary>
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.ObjectWithAppUserModelId)
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.ObjectWithAppUserModelId)]
 	internal interface IObjectWithAppUserModelId
 	{
 		void SetAppID([MarshalAs(UnmanagedType.LPWStr)] string pszAppID);
 
 		[return: MarshalAs(UnmanagedType.LPWStr)]
 		string GetAppID();
-	};
+	}
 
 	/// <summary>
 	/// Provides access to the ProgID associated with an object
 	/// </summary>
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.ObjectWithProgId)
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.ObjectWithProgId)]
 	internal interface IObjectWithProgId
 	{
 		void SetProgID([MarshalAs(UnmanagedType.LPWStr)] string pszProgID);
 
 		[return: MarshalAs(UnmanagedType.LPWStr)]
 		string GetProgID();
-	};
+	}
 
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.TaskbarList3),
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.TaskbarList3)]
 	internal interface ITaskbarList3 : ITaskbarList2
 	{
-		#region ITaskbarList2 redeclaration
-
-		#region ITaskbarList redeclaration
-
 		new void HrInit();
 
 		new void AddTab(IntPtr hwnd);
@@ -986,11 +925,7 @@ namespace Standard
 
 		new void SetActiveAlt(IntPtr hwnd);
 
-		#endregion ITaskbarList redeclaration
-
 		new void MarkFullscreenWindow(IntPtr hwnd, [MarshalAs(UnmanagedType.Bool)] bool fFullscreen);
-
-		#endregion ITaskbarList2 redeclaration
 
 		[PreserveSig]
 		HRESULT SetProgressValue(IntPtr hwnd, ulong ullCompleted, ulong ullTotal);
@@ -1030,19 +965,11 @@ namespace Standard
 		HRESULT SetThumbnailClip(IntPtr hwnd, RefRECT prcClip);
 	}
 
-	[
-		ComImport,
-		InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
-		Guid(IID.TaskbarList3),
-	]
+	[ComImport]
+	[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+	[Guid(IID.TaskbarList3)]
 	internal interface ITaskbarList4 : ITaskbarList3
 	{
-		#region ITaskbarList3 redeclaration
-
-		#region ITaskbarList2 redeclaration
-
-		#region ITaskbarList redeclaration
-
 		new void HrInit();
 
 		new void AddTab(IntPtr hwnd);
@@ -1053,11 +980,7 @@ namespace Standard
 
 		new void SetActiveAlt(IntPtr hwnd);
 
-		#endregion ITaskbarList redeclaration
-
 		new void MarkFullscreenWindow(IntPtr hwnd, [MarshalAs(UnmanagedType.Bool)] bool fFullscreen);
-
-		#endregion ITaskbarList2 redeclaration
 
 		[PreserveSig]
 		new HRESULT SetProgressValue(IntPtr hwnd, ulong ullCompleted, ulong ullTotal);
@@ -1096,10 +1019,6 @@ namespace Standard
 		[PreserveSig]
 		new HRESULT SetThumbnailClip(IntPtr hwnd, RefRECT prcClip);
 
-		#endregion ITaskbarList3 redeclaration
-
 		void SetTabProperties(IntPtr hwndTab, STPF stpFlags);
 	}
-
-	#endregion Interfaces
 }

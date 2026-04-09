@@ -1,4 +1,4 @@
-﻿namespace SettingsModel.Interfaces
+namespace SettingsModel.Interfaces
 {
 	using SettingsModel.Models;
 	using System;
@@ -41,7 +41,6 @@
 		/// </summary>
 		object DefaultValue { get; }
 
-		#region methods
 		/// <summary>
 		/// Removes the value with the specified key
 		/// from the internal dictionary.
@@ -119,6 +118,5 @@
 		/// </summary>
 		/// <returns></returns>
 		IEnumerable<KeyValuePair<object, object>> List_GetListOfKeyValues();
-		#endregion methods
 	}
 }

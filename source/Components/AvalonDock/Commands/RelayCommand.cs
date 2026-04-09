@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -29,8 +29,6 @@ namespace AvalonDock.Commands
 	/// <seealso cref="System.Windows.Input.ICommand" />
 	internal class RelayCommand<T> : ICommand
 	{
-		#region Private Fields
-
 		/// <summary>
 		/// The can execute
 		/// </summary>
@@ -40,10 +38,6 @@ namespace AvalonDock.Commands
 		/// The execute
 		/// </summary>
 		private readonly WeakAction<T> _execute;
-
-		#endregion Private Fields
-
-		#region Public Constructors
 
 		/// <summary>
 		/// Initializes a new instance of the RelayCommand class that
@@ -80,10 +74,6 @@ namespace AvalonDock.Commands
 			}
 		}
 
-		#endregion Public Constructors
-
-		#region Public Events
-
 		/// <summary>
 		/// Occurs when changes occur that affect whether the command should execute.
 		/// </summary>
@@ -105,10 +95,6 @@ namespace AvalonDock.Commands
 				}
 			}
 		}
-
-		#endregion Public Events
-
-		#region Public Methods
 
 		/// <summary>
 		/// Defines the method that determines whether the command can execute in its current state.
@@ -132,7 +118,7 @@ namespace AvalonDock.Commands
 
 				if (parameter == null || parameter is T)
 				{
-					return (_canExecute.Execute((T)parameter));
+					return _canExecute.Execute((T)parameter);
 				}
 			}
 
@@ -200,7 +186,5 @@ namespace AvalonDock.Commands
 		{
 			CommandManager.InvalidateRequerySuggested();
 		}
-
-		#endregion Public Methods
 	}
 }

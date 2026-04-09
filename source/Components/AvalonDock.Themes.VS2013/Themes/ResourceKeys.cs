@@ -8,7 +8,6 @@ namespace AvalonDock.Themes.VS2013.Themes
 	/// </summary>
 	public static class ResourceKeys
 	{
-		#region Accent Keys
 		/// <summary>
 		/// Accent Color Key - This Color key is used to accent elements in the UI
 		/// (e.g.: Color of Activated Normal Window Frame, ResizeGrip, Focus or MouseOver input elements)
@@ -20,9 +19,7 @@ namespace AvalonDock.Themes.VS2013.Themes
 		/// (e.g.: Color of Activated Normal Window Frame, ResizeGrip, Focus or MouseOver input elements)
 		/// </summary>
 		public static readonly ComponentResourceKey ControlAccentBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "ControlAccentBrushKey");
-		#endregion Accent Keys
 
-		#region Brush Keys
 		// General
 		public static readonly ComponentResourceKey Background = new ComponentResourceKey(typeof(ResourceKeys), "Background");
 		public static readonly ComponentResourceKey PanelBorderBrush = new ComponentResourceKey(typeof(ResourceKeys), "PanelBorderBrush");
@@ -158,7 +155,6 @@ namespace AvalonDock.Themes.VS2013.Themes
 		public static readonly ComponentResourceKey NavigatorWindowSelectedBackground = new ComponentResourceKey(typeof(ResourceKeys), "NavigatorWindowSelectedBackground");
 		public static readonly ComponentResourceKey NavigatorWindowSelectedText = new ComponentResourceKey(typeof(ResourceKeys), "NavigatorWindowSelectedText");
 
-		#region DockingBrushKeys
 		// Defines the height and width of the docking indicator buttons that are shown when
 		// documents or tool windows are dragged
 		public static readonly ComponentResourceKey DockingButtonWidthKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonWidthKey");
@@ -174,7 +170,5 @@ namespace AvalonDock.Themes.VS2013.Themes
 		// Preview Box is the highlighted rectangle that shows when a drop area in a window is indicated
 		public static readonly ComponentResourceKey PreviewBoxBorderBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "PreviewBoxBorderBrushKey");
 		public static readonly ComponentResourceKey PreviewBoxBackgroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "PreviewBoxBackgroundBrushKey");
-		#endregion DockingBrushKeys
-		#endregion Brush Keys
 	}
 }

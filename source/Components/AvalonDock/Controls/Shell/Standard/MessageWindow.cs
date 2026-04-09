@@ -8,7 +8,7 @@
  ************************************************************************/
 
 /**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 namespace Standard
@@ -50,7 +50,7 @@ namespace Standard
 				lpfnWndProc = s_WndProc,
 				hInstance = NativeMethods.GetModuleHandle(null),
 				hbrBackground = NativeMethods.GetStockObject(StockObject.NULL_BRUSH),
-				lpszMenuName = "",
+				lpszMenuName = string.Empty,
 				lpszClassName = _className,
 			};
 
@@ -105,7 +105,9 @@ namespace Standard
 			var className = _className;
 
 			if (isHwndBeingDestroyed)
+			{
 				Dispatcher.BeginInvoke(DispatcherPriority.Normal, (DispatcherOperationCallback)(arg => _DestroyWindow(IntPtr.Zero, className)));
+			}
 			else if (Handle != IntPtr.Zero)
 			{
 				if (CheckAccess())
@@ -113,6 +115,7 @@ namespace Standard
 				else
 					Dispatcher.BeginInvoke(DispatcherPriority.Normal, (DispatcherOperationCallback)(arg => _DestroyWindow(hwnd, className)));
 			}
+
 			s_windowLookup.Remove(hwnd);
 			_className = null;
 			Handle = IntPtr.Zero;
@@ -136,6 +139,7 @@ namespace Standard
 				if (!s_windowLookup.TryGetValue(hwnd, out hwndWrapper))
 					return NativeMethods.DefWindowProc(hwnd, msg, wParam, lParam);
 			}
+
 			Assert.IsNotNull(hwndWrapper);
 
 			var callback = hwndWrapper._wndProcCallback;

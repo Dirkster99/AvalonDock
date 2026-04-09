@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 
@@ -39,7 +39,6 @@ namespace AvalonDock.MVVMTestApp
 			serializer.Serialize(@".\AvalonDock.config");
 		}
 
-		#region LoadLayoutCommand
 
 		private RelayCommand _loadLayoutCommand = null;
 
@@ -82,9 +81,7 @@ namespace AvalonDock.MVVMTestApp
 			layoutSerializer.Deserialize(@".\AvalonDock.Layout.config");
 		}
 
-		#endregion LoadLayoutCommand
 
-		#region SaveLayoutCommand
 
 		private RelayCommand _saveLayoutCommand = null;
 
@@ -112,7 +109,6 @@ namespace AvalonDock.MVVMTestApp
 			layoutSerializer.Serialize(@".\AvalonDock.Layout.config");
 		}
 
-		#endregion SaveLayoutCommand
 
 		private void OnDumpToConsole(object sender, RoutedEventArgs e)
 		{

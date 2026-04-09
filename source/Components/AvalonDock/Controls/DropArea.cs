@@ -48,10 +48,9 @@ namespace AvalonDock.Controls
 	/// <typeparam name="T"></typeparam>
 	/// <seealso cref="IDropArea"/>
 	/// <seealso cref="FrameworkElement"/>
-	public class DropArea<T> : IDropArea where T : FrameworkElement
+	public class DropArea<T> : IDropArea
+		where T : FrameworkElement
 	{
-		#region Constructors
-
 		/// <summary>Class constructor from control that can be used as drop target and it's type of drop area. </summary>
 		/// <param name="areaElement"></param>
 		/// <param name="type">the type of drop area for this drop target.</param>
@@ -61,10 +60,6 @@ namespace AvalonDock.Controls
 			DetectionRect = areaElement.GetScreenArea();
 			Type = type;
 		}
-
-		#endregion Constructors
-
-		#region IDropArea
 
 		/// <inheritdoc />
 		public Rect DetectionRect { get; }
@@ -77,14 +72,10 @@ namespace AvalonDock.Controls
 			return AreaElement.TransformToDeviceDPI(dragPosition);
 		}
 
-		#endregion IDropArea
-
-		#region Properties
-
 		/// <summary>Gets the <see cref="FrameworkElement"/> that implements a drop target for a drag & drop (dock) operation.</summary>
-		[Bindable(false), Description("Gets the FrameworkElement that implements a drop target for a drag & drop (dock) operation."), Category("Other")]
+		[Bindable(false)]
+		[Description("Gets the FrameworkElement that implements a drop target for a drag & drop (dock) operation.")]
+		[Category("Other")]
 		public T AreaElement { get; }
-
-		#endregion Properties
 	}
 }

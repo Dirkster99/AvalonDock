@@ -21,8 +21,6 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public abstract class LayoutFloatingWindow : LayoutElement, ILayoutContainer, IXmlSerializable
 	{
-		#region Properties
-
 		/// <summary>Gets the list of <see cref="ILayoutElement"/> based children below this object.</summary>
 		public abstract IEnumerable<ILayoutElement> Children { get; }
 
@@ -30,10 +28,6 @@ namespace AvalonDock.Layout
 		public abstract int ChildrenCount { get; }
 
 		public abstract bool IsValid { get; }
-
-		#endregion Properties
-
-		#region Public Methods
 
 		/// <summary>Remove the child element from the collection of children.</summary>
 		/// <param name="element"></param>
@@ -43,8 +37,6 @@ namespace AvalonDock.Layout
 		/// <param name="oldElement"></param>
 		/// <param name="newElement"></param>
 		public abstract void ReplaceChild(ILayoutElement oldElement, ILayoutElement newElement);
-
-		#region IXmlSerializable interface members
 
 		/// <inheritdoc cref="IXmlSerializable"/>
 		public XmlSchema GetSchema()
@@ -65,9 +57,5 @@ namespace AvalonDock.Layout
 				serializer.Serialize(writer, child);
 			}
 		}
-
-		#endregion IXmlSerializable interface members
-
-		#endregion Public Methods
 	}
 }

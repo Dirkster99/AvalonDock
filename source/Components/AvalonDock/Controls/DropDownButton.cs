@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -24,25 +24,19 @@ namespace AvalonDock.Controls
 	/// <seealso cref="ToggleButton"/>
 	public class DropDownButton : ToggleButton
 	{
-		#region Constructors
-
 		public DropDownButton()
 		{
 			Unloaded += DropDownButton_Unloaded;
 		}
-
-		#endregion Constructors
-
-		#region Properties
-
-		#region DropDownContextMenu
 
 		/// <summary><see cref="DropDownContextMenu"/> dependency property.</summary>
 		public static readonly DependencyProperty DropDownContextMenuProperty = DependencyProperty.Register(nameof(DropDownContextMenu), typeof(ContextMenu), typeof(DropDownButton),
 				new FrameworkPropertyMetadata(null, OnDropDownContextMenuChanged));
 
 		/// <summary>Gets/sets the drop down menu to show up when user click on an anchorable menu pin.</summary>
-		[Bindable(true), Description("Gets/sets the drop down menu to show up when user click on an anchorable menu pin."), Category("Menu")]
+		[Bindable(true)]
+		[Description("Gets/sets the drop down menu to show up when user click on an anchorable menu pin.")]
+		[Category("Menu")]
 		public ContextMenu DropDownContextMenu
 		{
 			get => (ContextMenu)GetValue(DropDownContextMenuProperty);
@@ -59,50 +53,39 @@ namespace AvalonDock.Controls
 				oldContextMenu.Closed -= OnContextMenuClosed;
 		}
 
-		#endregion DropDownContextMenu
-
-		#region DropDownContextMenuDataContext
-
 		/// <summary><see cref="DropDownContextMenuDataContext"/> dependency property.</summary>
 		public static readonly DependencyProperty DropDownContextMenuDataContextProperty = DependencyProperty.Register(nameof(DropDownContextMenuDataContext), typeof(object), typeof(DropDownButton),
 				new FrameworkPropertyMetadata(null));
 
 		/// <summary>Gets/sets the DataContext to set for the DropDownContext menu property.</summary>
-		[Bindable(true), Description("Gets/sets the DataContext to set for the DropDownContext menu property."), Category("Menu")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataContext to set for the DropDownContext menu property.")]
+		[Category("Menu")]
 		public object DropDownContextMenuDataContext
 		{
 			get => GetValue(DropDownContextMenuDataContextProperty);
 			set => SetValue(DropDownContextMenuDataContextProperty, value);
 		}
 
-		#endregion DropDownContextMenuDataContext
-
-		#endregion Properties
-
-		#region Overrides
-
 		/// <inheritdoc />
 		protected override void OnClick()
 		{
 			if (DropDownContextMenu != null)
 			{
-				//IsChecked = true;
+				// IsChecked = true;
 				DropDownContextMenu.PlacementTarget = this;
 				DropDownContextMenu.Placement = PlacementMode.Bottom;
 				DropDownContextMenu.DataContext = DropDownContextMenuDataContext;
 				DropDownContextMenu.Closed += OnContextMenuClosed;
 				DropDownContextMenu.IsOpen = true;
 			}
+
 			base.OnClick();
 		}
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		private void OnContextMenuClosed(object sender, RoutedEventArgs e)
 		{
-			//Debug.Assert(IsChecked.GetValueOrDefault());
+			// Debug.Assert(IsChecked.GetValueOrDefault());
 			var ctxMenu = sender as ContextMenu;
 			ctxMenu.Closed -= OnContextMenuClosed;
 			IsChecked = false;
@@ -114,7 +97,5 @@ namespace AvalonDock.Controls
 			// Prevent this on theme changes.
 			if (IsLoaded) DropDownContextMenu = null;
 		}
-
-		#endregion Private Methods
 	}
 }

@@ -1,4 +1,4 @@
-﻿namespace SettingsModel.Models
+namespace SettingsModel.Models
 {
 	using SettingsModel.Interfaces;
 	using System;
@@ -25,11 +25,8 @@
 	/// </summary>
 	internal class OptionsSchema : IOptionsSchema
 	{
-		#region fields
 		private Dictionary<object, object> mValues;
-		#endregion fields
 
-		#region constructors
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -84,9 +81,7 @@
 			foreach (var item in values)
 				mValues.Add(item, item);
 		}
-		#endregion constructors
 
-		#region properties
 
 		public OptionSchemaType SchemaType { get; private set; }
 
@@ -116,9 +111,7 @@
 		/// Gets/sets the default value of this option.
 		/// </summary>
 		public object DefaultValue { get; private set; }
-		#endregion properties
 
-		#region methods
 		/// <summary>
 		/// Removes the value with the specified key
 		/// from the internal dictionary.
@@ -276,6 +269,5 @@
 				yield break; // End of list reached
 			}
 		}
-		#endregion methods
 	}
 }

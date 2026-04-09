@@ -7,9 +7,9 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System.Windows;
 using System.Windows.Media;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -26,14 +26,8 @@ namespace AvalonDock.Controls
 	/// </summary>
 	internal interface IDropTarget
 	{
-		#region Properties
-
 		/// <summary>Gets the type of a drop target that descries a specific docking position inside a <see cref="DropAreaType"/>.</summary>
 		DropTargetType Type { get; }
-
-		#endregion Properties
-
-		#region Methods
 
 		/// <summary>
 		/// Gets a <see cref="Geometry"/> that is used to highlight/preview the docking position
@@ -68,7 +62,5 @@ namespace AvalonDock.Controls
 		/// (while dragging a <see cref="LayoutFloatingWindow"/>) over this drop target.
 		/// </summary>
 		void DragLeave();
-
-		#endregion Methods
 	}
 }

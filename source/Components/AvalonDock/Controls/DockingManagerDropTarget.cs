@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,11 +7,11 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -25,13 +25,7 @@ namespace AvalonDock.Controls
 	/// </summary>
 	internal class DockingManagerDropTarget : DropTarget<DockingManager>
 	{
-		#region fields
-
 		private DockingManager _manager;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>
 		/// Class constructor
@@ -39,17 +33,14 @@ namespace AvalonDock.Controls
 		/// <param name="manager"></param>
 		/// <param name="detectionRect"></param>
 		/// <param name="type"></param>
-		internal DockingManagerDropTarget(DockingManager manager,
-										  Rect detectionRect,
-										  DropTargetType type)
+		internal DockingManagerDropTarget(
+			DockingManager manager,
+			Rect detectionRect,
+			DropTargetType type)
 			: base(manager, detectionRect, type)
 		{
 			_manager = manager;
 		}
-
-		#endregion Constructors
-
-		#region Overrides
 
 		/// <summary>
 		/// Method is invoked to complete a drag & drop operation with a (new) docking position
@@ -61,9 +52,6 @@ namespace AvalonDock.Controls
 			switch (Type)
 			{
 				case DropTargetType.DockingManagerDockLeft:
-
-					#region DropTargetType.DockingManagerDockLeft
-
 					{
 						if (_manager.Layout.RootPanel.Orientation != System.Windows.Controls.Orientation.Horizontal &&
 							_manager.Layout.RootPanel.Children.Count == 1)
@@ -80,7 +68,9 @@ namespace AvalonDock.Controls
 									_manager.Layout.RootPanel.Children.Insert(i, childrenToTransfer[i]);
 							}
 							else
+							{
 								_manager.Layout.RootPanel.Children.Insert(0, floatingWindow.RootPanel);
+							}
 						}
 						else
 						{
@@ -95,14 +85,10 @@ namespace AvalonDock.Controls
 							_manager.Layout.RootPanel = newOrientedPanel;
 						}
 					}
-					break;
 
-				#endregion DropTargetType.DockingManagerDockLeft
+					break;
 
 				case DropTargetType.DockingManagerDockRight:
-
-					#region DropTargetType.DockingManagerDockRight
-
 					{
 						if (_manager.Layout.RootPanel.Orientation != System.Windows.Controls.Orientation.Horizontal &&
 							_manager.Layout.RootPanel.Children.Count == 1)
@@ -119,7 +105,9 @@ namespace AvalonDock.Controls
 									_manager.Layout.RootPanel.Children.Add(childrenToTransfer[i]);
 							}
 							else
+							{
 								_manager.Layout.RootPanel.Children.Add(floatingWindow.RootPanel);
+							}
 						}
 						else
 						{
@@ -134,14 +122,10 @@ namespace AvalonDock.Controls
 							_manager.Layout.RootPanel = newOrientedPanel;
 						}
 					}
+
 					break;
 
-				#endregion DropTargetType.DockingManagerDockRight
-
 				case DropTargetType.DockingManagerDockTop:
-
-					#region DropTargetType.DockingManagerDockTop
-
 					{
 						if (_manager.Layout.RootPanel.Orientation != System.Windows.Controls.Orientation.Vertical &&
 							_manager.Layout.RootPanel.Children.Count == 1)
@@ -158,7 +142,9 @@ namespace AvalonDock.Controls
 									_manager.Layout.RootPanel.Children.Insert(i, childrenToTransfer[i]);
 							}
 							else
+							{
 								_manager.Layout.RootPanel.Children.Insert(0, floatingWindow.RootPanel);
+							}
 						}
 						else
 						{
@@ -173,14 +159,10 @@ namespace AvalonDock.Controls
 							_manager.Layout.RootPanel = newOrientedPanel;
 						}
 					}
+
 					break;
 
-				#endregion DropTargetType.DockingManagerDockTop
-
 				case DropTargetType.DockingManagerDockBottom:
-
-					#region DropTargetType.DockingManagerDockBottom
-
 					{
 						if (_manager.Layout.RootPanel.Orientation != System.Windows.Controls.Orientation.Vertical &&
 							_manager.Layout.RootPanel.Children.Count == 1)
@@ -197,7 +179,9 @@ namespace AvalonDock.Controls
 									_manager.Layout.RootPanel.Children.Add(childrenToTransfer[i]);
 							}
 							else
+							{
 								_manager.Layout.RootPanel.Children.Add(floatingWindow.RootPanel);
+							}
 						}
 						else
 						{
@@ -212,9 +196,8 @@ namespace AvalonDock.Controls
 							_manager.Layout.RootPanel = newOrientedPanel;
 						}
 					}
-					break;
 
-					#endregion DropTargetType.DockingManagerDockBottom
+					break;
 			}
 
 			base.Drop(floatingWindow);
@@ -228,8 +211,9 @@ namespace AvalonDock.Controls
 		/// <param name="overlayWindow"></param>
 		/// <param name="floatingWindowModel"></param>
 		/// <returns>The geometry of the preview/highlighting WPF figure path.</returns>
-		public override Geometry GetPreviewPath(OverlayWindow overlayWindow,
-												LayoutFloatingWindow floatingWindowModel)
+		public override Geometry GetPreviewPath(
+			OverlayWindow overlayWindow,
+			LayoutFloatingWindow floatingWindowModel)
 		{
 			var anchorableFloatingWindowModel = floatingWindowModel as LayoutAnchorableFloatingWindow;
 			var layoutAnchorablePane = anchorableFloatingWindowModel.RootPanel as ILayoutPositionableElement;
@@ -290,7 +274,5 @@ namespace AvalonDock.Controls
 
 			throw new InvalidOperationException();
 		}
-
-		#endregion Overrides
 	}
 }

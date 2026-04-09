@@ -6,14 +6,14 @@ using System.Windows.Input;
 
 using AvalonDock.Layout;
 
-
 namespace AvalonDock.Controls
 {
 	internal static class LayoutFloatingWindowControlHelper
 	{
 		private const string Excp_NotSupportedFloatingWindowType = "Not Supported Floating Window Type: {0}";
 
-		public static void ActiveTheContentOfSinglePane<T>(T fwc, bool isActive) where T : LayoutFloatingWindowControl
+		public static void ActiveTheContentOfSinglePane<T>(T fwc, bool isActive)
+			where T : LayoutFloatingWindowControl
 		{
 			ILayoutContentSelector selector = null;
 			if (fwc is LayoutAnchorableFloatingWindowControl)
@@ -52,7 +52,8 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		public static void ActiveTheContentOfMultiPane<T>(T fwc, bool isActive) where T : LayoutFloatingWindowControl
+		public static void ActiveTheContentOfMultiPane<T>(T fwc, bool isActive)
+			where T : LayoutFloatingWindowControl
 		{
 			if (isActive)
 			{
@@ -127,7 +128,8 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		private static T GetLayoutControlByMousePosition<T>(LayoutFloatingWindowControl fwc) where T : FrameworkElement, ILayoutControl
+		private static T GetLayoutControlByMousePosition<T>(LayoutFloatingWindowControl fwc)
+			where T : FrameworkElement, ILayoutControl
 		{
 			var mousePosition = fwc.PointToScreenDPI(Mouse.GetPosition(fwc));
 			var rootVisual = ((LayoutFloatingWindowControl.FloatingWindowContentHost)fwc.Content).RootVisual;
@@ -144,7 +146,8 @@ namespace AvalonDock.Controls
 			return null;
 		}
 
-		private static int IndexOfLastActivedContent<T>(IList<T> list) where T : LayoutContent
+		private static int IndexOfLastActivedContent<T>(IList<T> list)
+			where T : LayoutContent
 		{
 			if (list.Count > 0)
 			{

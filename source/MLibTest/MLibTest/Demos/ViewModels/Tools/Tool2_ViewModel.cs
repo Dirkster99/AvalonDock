@@ -1,4 +1,4 @@
-﻿namespace AvalonDock.Tools
+namespace AvalonDock.Tools
 {
     using MLibTest.Demos.ViewModels.Interfaces;
     using System;
@@ -15,7 +15,6 @@
     /// </summary>
     internal class Tool2_ViewModel : ToolViewModel
     {
-        #region fields
         /// <summary>
         /// Identifies the <see ref="ContentId"/> of this tool window.
         /// </summary>
@@ -31,9 +30,7 @@
         private Color _SelectedBackgroundColor;
         private Color _SelectedAccentColor;
         private ICommand _ResetAccentColorCommand;
-        #endregion fields
 
-        #region constructors
         /// <summary>
         /// Class constructor
         /// </summary>
@@ -57,9 +54,7 @@
             SetupADToolDefaults();
             SetupToolDefaults();
         }
-        #endregion constructors
 
-        #region properties
         /// <summary>
         /// Gets/sets the currently selected accent color for the color picker in the tool window's view.
         /// </summary>
@@ -154,9 +149,7 @@
                 return "Define a custom color.";
             }
         }
-        #endregion properties
 
-        #region methods
         /// <summary>
         /// Initialize Avalondock specific defaults that are specific to this tool window.
         /// </summary>
@@ -179,6 +172,5 @@
             SelectedBackgroundColor = Color.FromArgb(255, 0, 0, 0);
             SelectedAccentColor = Color.FromArgb(128, 0, 180, 0);
         }
-        #endregion methods
     }
 }
