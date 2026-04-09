@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -20,8 +20,6 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutAnchorGroup : LayoutGroup<LayoutAnchorable>, ILayoutPreviousContainer, ILayoutPaneSerializable
 	{
-		#region Overrides
-
 		/// <inheritdoc />
 		protected override bool GetVisibility() => Children.Count > 0;
 
@@ -40,12 +38,6 @@ namespace AvalonDock.Layout
 			base.ReadXml(reader);
 		}
 
-		#endregion Overrides
-
-		#region ILayoutPreviousContainer Interface
-
-		#region PreviousContainer
-
 		[field: NonSerialized]
 		private ILayoutContainer _previousContainer = null;
 
@@ -63,19 +55,11 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion PreviousContainer
-
 		string ILayoutPreviousContainer.PreviousContainerId { get; set; }
-
-		#endregion ILayoutPreviousContainer Interface
-
-		#region ILayoutPaneSerializable Interface
 
 		private string _id;
 
 		/// <inheritdoc />
 		string ILayoutPaneSerializable.Id { get => _id; set => _id = value; }
-
-		#endregion ILayoutPaneSerializable Interface
 	}
 }

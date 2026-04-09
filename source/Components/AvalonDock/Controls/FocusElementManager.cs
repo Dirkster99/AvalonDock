@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,7 +7,6 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,13 +17,12 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
 	internal static class FocusElementManager
 	{
-		#region fields
-
 		private static List<DockingManager> _managers = new List<DockingManager>();
 		private static FullWeakDictionary<ILayoutElement, IInputElement> _modelFocusedElement = new FullWeakDictionary<ILayoutElement, IInputElement>();
 		private static WeakDictionary<ILayoutElement, IntPtr> _modelFocusedWindowHandle = new WeakDictionary<ILayoutElement, IntPtr>();
@@ -33,24 +31,20 @@ namespace AvalonDock.Controls
 		private static DispatcherOperation _setFocusAsyncOperation;
 		private static WeakReference _lastFocusedElementBeforeEnterMenuMode = null;
 
-		#endregion fields
-
-		#region Internal Methods
-
 		internal static void SetupFocusManagement(DockingManager manager)
 		{
 			if (_managers.Count == 0)
 			{
-				//InputManager.Current.EnterMenuMode += new EventHandler(InputManager_EnterMenuMode);
-				//InputManager.Current.LeaveMenuMode += new EventHandler(InputManager_LeaveMenuMode);
+				// InputManager.Current.EnterMenuMode += new EventHandler(InputManager_EnterMenuMode);
+				// InputManager.Current.LeaveMenuMode += new EventHandler(InputManager_LeaveMenuMode);
 				_windowHandler = new WindowHookHandler();
 				_windowHandler.FocusChanged += new EventHandler<FocusChangeEventArgs>(WindowFocusChanging);
-				//_windowHandler.Activate += new EventHandler<WindowActivateEventArgs>(WindowActivating);
+				// _windowHandler.Activate += new EventHandler<WindowActivateEventArgs>(WindowActivating);
 				_windowHandler.Attach();
 				if (Application.Current != null)
 				{
-					//Application.Current.Exit += new ExitEventHandler( Current_Exit );
-					//Application.Current.Dispatcher.Invoke(new Action(() => Application.Current.Exit += new ExitEventHandler(Current_Exit)));
+					// Application.Current.Exit += new ExitEventHandler( Current_Exit );
+					// Application.Current.Dispatcher.Invoke(new Action(() => Application.Current.Exit += new ExitEventHandler(Current_Exit)));
 					var disp = Application.Current.Dispatcher;
 					Action subscribeToExitAction = new Action(() => Application.Current.Exit += new ExitEventHandler(Current_Exit));
 					if (disp.CheckAccess())
@@ -82,12 +76,12 @@ namespace AvalonDock.Controls
 
 			if (_managers.Count == 0)
 			{
-				//InputManager.Current.EnterMenuMode -= new EventHandler(InputManager_EnterMenuMode);
-				//InputManager.Current.LeaveMenuMode -= new EventHandler(InputManager_LeaveMenuMode);
+				// InputManager.Current.EnterMenuMode -= new EventHandler(InputManager_EnterMenuMode);
+				// InputManager.Current.LeaveMenuMode -= new EventHandler(InputManager_LeaveMenuMode);
 				if (_windowHandler != null)
 				{
 					_windowHandler.FocusChanged -= new EventHandler<FocusChangeEventArgs>(WindowFocusChanging);
-					//_windowHandler.Activate -= new EventHandler<WindowActivateEventArgs>(WindowActivating);
+					// _windowHandler.Activate -= new EventHandler<WindowActivateEventArgs>(WindowActivating);
 					_windowHandler.Detach();
 					_windowHandler = null;
 				}
@@ -145,10 +139,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion Internal Methods
-
-		#region Private Methods
-
 		private static void Current_Exit(object sender, ExitEventArgs e)
 		{
 			if (Application.Current != null)
@@ -157,7 +147,7 @@ namespace AvalonDock.Controls
 			if (_windowHandler != null)
 			{
 				_windowHandler.FocusChanged -= new EventHandler<FocusChangeEventArgs>(WindowFocusChanging);
-				//_windowHandler.Activate -= new EventHandler<WindowActivateEventArgs>(WindowActivating);
+				// _windowHandler.Activate -= new EventHandler<WindowActivateEventArgs>(WindowActivating);
 				_windowHandler.Detach();
 				_windowHandler = null;
 			}
@@ -168,7 +158,7 @@ namespace AvalonDock.Controls
 			var focusedElement = e.NewFocus as Visual;
 			if (focusedElement != null &&
 				!(focusedElement is LayoutAnchorableTabItem || focusedElement is LayoutDocumentTabItem))
-			//Avoid tracking focus for elements like this
+			// Avoid tracking focus for elements like this
 			{
 				var parentAnchorable = focusedElement.FindVisualAncestor<LayoutAnchorableControl>();
 				if (parentAnchorable != null)
@@ -235,7 +225,8 @@ namespace AvalonDock.Controls
 					if (e.HwndActivating != parentHwnd)
 						return;
 
-					_setFocusAsyncOperation = Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
+					_setFocusAsyncOperation = Dispatcher.CurrentDispatcher.BeginInvoke(
+						new Action(() =>
 				  {
 					  try
 					  {
@@ -278,7 +269,5 @@ namespace AvalonDock.Controls
 				}
 			}
 		}
-
-		#endregion Private Methods
 	}
 }

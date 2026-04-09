@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -16,8 +16,6 @@ namespace AvalonDock.Layout
 	/// <summary>Provides extension methods for WPF specific (Visual Tree) capabilities.</summary>
 	public static class Extensions
 	{
-		#region Public Methods
-
 		public static IEnumerable<ILayoutElement> Descendents(this ILayoutElement element)
 		{
 			if (!(element is ILayoutContainer container)) yield break;
@@ -29,7 +27,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		public static T FindParent<T>(this ILayoutElement element) //where T : ILayoutContainer
+		public static T FindParent<T>(this ILayoutElement element) // where T : ILayoutContainer
 		{
 			var parent = element.Parent;
 			while (parent != null && !(parent is T))
@@ -37,7 +35,7 @@ namespace AvalonDock.Layout
 			return (T)parent;
 		}
 
-		public static ILayoutRoot GetRoot(this ILayoutElement element) //where T : ILayoutContainer
+		public static ILayoutRoot GetRoot(this ILayoutElement element) // where T : ILayoutContainer
 		{
 			if (element is ILayoutRoot layoutRoot) return layoutRoot;
 			var parent = element.Parent;
@@ -70,17 +68,14 @@ namespace AvalonDock.Layout
 				if (layoutPanel != null && layoutPanel.Children.Count > 0)
 				{
 					if (layoutPanel.Orientation == System.Windows.Controls.Orientation.Horizontal)
-						return layoutPanel.Children[0].Equals(element) || layoutPanel.Children[0].Descendents().Contains(element) ? AnchorSide.Left : AnchorSide.Right;
-					return layoutPanel.Children[0].Equals(element) || layoutPanel.Children[0].Descendents().Contains(element) ? AnchorSide.Top : AnchorSide.Bottom;
+						return element.IsInAnchorablePaneAtStartOfPanel(layoutPanel) ? AnchorSide.Left : AnchorSide.Right;
+					return element.IsInAnchorablePaneAtStartOfPanel(layoutPanel) ? AnchorSide.Top : AnchorSide.Bottom;
 				}
 			}
+
 			Debug.Fail("Unable to find the side for an element, possible layout problem!");
 			return AnchorSide.Right;
 		}
-
-		#endregion Public Methods
-
-		#region Internal Methods
 
 		/// <summary>
 		/// Removed with Issue 20 since Win32 definition seems to be buggy here
@@ -116,6 +111,22 @@ namespace AvalonDock.Layout
 				paneInsideFloatingWindow.FloatingTop = monitorInfo.Work.Bottom - (paneInsideFloatingWindow.FloatingHeight + 10);
 		}
 
-		#endregion Internal Methods
+		private static bool IsInAnchorablePaneAtStartOfPanel(this ILayoutElement element, LayoutPanel layoutPanel)
+		{
+			foreach (var child in layoutPanel.Children)
+			{
+				if (!(child is LayoutAnchorablePane || child is LayoutAnchorablePaneGroup))
+				{
+					return false;
+				}
+
+				if (child.Equals(element) || child.Descendents().Contains(element))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
 	}
 }

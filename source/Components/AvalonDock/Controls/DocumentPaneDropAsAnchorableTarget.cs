@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,11 +7,11 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -21,14 +21,8 @@ namespace AvalonDock.Controls
 	/// </summary>
 	internal class DocumentPaneDropAsAnchorableTarget : DropTarget<LayoutDocumentPaneControl>
 	{
-		#region fields
-
 		private LayoutDocumentPaneControl _targetPane;
 		private int _tabIndex = -1;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>
 		/// Class constructor from parameters without a specific tabindex as dock position.
@@ -36,9 +30,10 @@ namespace AvalonDock.Controls
 		/// <param name="paneControl"></param>
 		/// <param name="detectionRect"></param>
 		/// <param name="type"></param>
-		internal DocumentPaneDropAsAnchorableTarget(LayoutDocumentPaneControl paneControl,
-													Rect detectionRect,
-													DropTargetType type)
+		internal DocumentPaneDropAsAnchorableTarget(
+			LayoutDocumentPaneControl paneControl,
+			Rect detectionRect,
+			DropTargetType type)
 			: base(paneControl, detectionRect, type)
 		{
 			_targetPane = paneControl;
@@ -52,19 +47,16 @@ namespace AvalonDock.Controls
 		/// <param name="detectionRect"></param>
 		/// <param name="type"></param>
 		/// <param name="tabIndex"></param>
-		internal DocumentPaneDropAsAnchorableTarget(LayoutDocumentPaneControl paneControl,
-													Rect detectionRect,
-													DropTargetType type,
-													int tabIndex)
+		internal DocumentPaneDropAsAnchorableTarget(
+			LayoutDocumentPaneControl paneControl,
+			Rect detectionRect,
+			DropTargetType type,
+			int tabIndex)
 			: base(paneControl, detectionRect, type)
 		{
 			_targetPane = paneControl;
 			_tabIndex = tabIndex;
 		}
-
-		#endregion Constructors
-
-		#region Overrides
 
 		/// <summary>
 		/// Method is invoked to complete a drag & drop operation with a (new) docking position
@@ -81,9 +73,6 @@ namespace AvalonDock.Controls
 			switch (Type)
 			{
 				case DropTargetType.DocumentPaneDockAsAnchorableBottom:
-
-					#region DropTargetType.DocumentPaneDockAsAnchorableBottom
-
 					{
 						if (parentGroupPanel != null &&
 							parentGroupPanel.ChildrenCount == 1)
@@ -108,14 +97,10 @@ namespace AvalonDock.Controls
 							throw new NotImplementedException();
 						}
 					}
-					break;
 
-				#endregion DropTargetType.DocumentPaneDockAsAnchorableBottom
+					break;
 
 				case DropTargetType.DocumentPaneDockAsAnchorableTop:
-
-					#region DropTargetType.DocumentPaneDockAsAnchorableTop
-
 					{
 						if (parentGroupPanel != null &&
 							parentGroupPanel.ChildrenCount == 1)
@@ -140,14 +125,10 @@ namespace AvalonDock.Controls
 							throw new NotImplementedException();
 						}
 					}
+
 					break;
 
-				#endregion DropTargetType.DocumentPaneDockAsAnchorableTop
-
 				case DropTargetType.DocumentPaneDockAsAnchorableLeft:
-
-					#region DropTargetType.DocumentPaneDockAsAnchorableLeft
-
 					{
 						if (parentGroupPanel != null &&
 							parentGroupPanel.ChildrenCount == 1)
@@ -172,14 +153,10 @@ namespace AvalonDock.Controls
 							throw new NotImplementedException();
 						}
 					}
+
 					break;
 
-				#endregion DropTargetType.DocumentPaneDockAsAnchorableLeft
-
 				case DropTargetType.DocumentPaneDockAsAnchorableRight:
-
-					#region DropTargetType.DocumentPaneDockAsAnchorableRight
-
 					{
 						if (parentGroupPanel != null &&
 							parentGroupPanel.ChildrenCount == 1)
@@ -204,9 +181,8 @@ namespace AvalonDock.Controls
 							throw new NotImplementedException();
 						}
 					}
-					break;
 
-					#endregion DropTargetType.DocumentPaneDockAsAnchorableRight
+					break;
 			}
 
 			base.Drop(floatingWindow);
@@ -226,25 +202,25 @@ namespace AvalonDock.Controls
 			ILayoutDocumentPane targetModel = _targetPane.Model as ILayoutDocumentPane;
 			var manager = targetModel.Root.Manager;
 
-			//ILayoutDocumentPane targetModel = _targetPane.Model as ILayoutDocumentPane;
+			// ILayoutDocumentPane targetModel = _targetPane.Model as ILayoutDocumentPane;
 			LayoutDocumentPaneGroup parentGroup;
 			LayoutPanel parentGroupPanel;
 			if (!FindParentLayoutDocumentPane(targetModel, out parentGroup, out parentGroupPanel))
 				return null;
 
-			//if (targetModel.Parent is LayoutDocumentPaneGroup)
-			//{
+			// if (targetModel.Parent is LayoutDocumentPaneGroup)
+			// {
 			//    var parentGroup = targetModel.Parent as LayoutDocumentPaneGroup;
 			//    var documentPaneGroupControl = manager.FindLogicalChildren<LayoutDocumentPaneGroupControl>().First(d => d.Model == parentGroup);
 			//    targetScreenRect = documentPaneGroupControl.GetScreenArea();
-			//}
-			//else
-			//{
+			// }
+			// else
+			// {
 			//    var documentPaneControl = manager.FindLogicalChildren<LayoutDocumentPaneControl>().First(d => d.Model == targetModel);
 			//    targetScreenRect = documentPaneControl.GetScreenArea();
-			//}
+			// }
 
-			//var parentPanel = targetModel.FindParent<LayoutPanel>();
+			// var parentPanel = targetModel.FindParent<LayoutPanel>();
 			var documentPaneControl = manager.FindLogicalChildren<FrameworkElement>().OfType<ILayoutControl>().First(d => parentGroup != null ? d.Model == parentGroup : d.Model == parentGroupPanel) as FrameworkElement;
 			targetScreenRect = documentPaneControl.GetScreenArea();
 
@@ -284,10 +260,6 @@ namespace AvalonDock.Controls
 			return null;
 		}
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		private bool FindParentLayoutDocumentPane(ILayoutDocumentPane documentPane, out LayoutDocumentPaneGroup containerPaneGroup, out LayoutPanel containerPanel)
 		{
 			containerPaneGroup = null;
@@ -320,7 +292,5 @@ namespace AvalonDock.Controls
 
 			return false;
 		}
-
-		#endregion Private Methods
 	}
 }

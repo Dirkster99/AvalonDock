@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -23,8 +23,6 @@ namespace AvalonDock.Layout.Serialization
 	/// </summary>
 	public class LayoutSerializationCallbackEventArgs : CancelEventArgs
 	{
-		#region constructors
-
 		/// <summary>
 		/// Class constructor from <see cref="LayoutContent"/> and <paramref name="previousContent"/> object.
 		/// </summary>
@@ -36,10 +34,6 @@ namespace AvalonDock.Layout.Serialization
 			Model = model;
 			Content = previousContent;
 		}
-
-		#endregion constructors
-
-		#region Properties
 
 		/// <summary>
 		/// Gets the model of the view that is about to be deserialized.
@@ -53,7 +47,5 @@ namespace AvalonDock.Layout.Serialization
 		/// Gets/sets the content for the <see cref="Model"/> that is about to be deserialized.
 		/// </summary>
 		public object Content { get; set; }
-
-		#endregion Properties
 	}
 }

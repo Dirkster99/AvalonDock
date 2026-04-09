@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,9 +7,9 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System.Windows;
 using System.Windows.Controls;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -21,13 +21,7 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public class LayoutAnchorablePaneGroupControl : LayoutGridControl<ILayoutAnchorablePane>, ILayoutControl
 	{
-		#region fields
-
 		private LayoutAnchorablePaneGroup _model;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>
 		/// Class constructor from layout model.
@@ -38,10 +32,6 @@ namespace AvalonDock.Controls
 		{
 			_model = model;
 		}
-
-		#endregion Constructors
-
-		#region Overrides
 
 		protected override void OnFixChildrenDockLengths()
 		{
@@ -70,7 +60,5 @@ namespace AvalonDock.Controls
 				}
 			}
 		}
-
-		#endregion Overrides
 	}
 }

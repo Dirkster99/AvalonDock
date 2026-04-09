@@ -25,8 +25,6 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutAnchorable : LayoutContent
 	{
-		#region fields
-
 		private double _autohideWidth = 0.0;
 		private double _autohideMinWidth = 100.0;
 		private double _autohideHeight = 0.0;
@@ -35,12 +33,8 @@ namespace AvalonDock.Layout
 		private bool _canAutoHide = true;
 		private bool _canDockAsTabbedDocument = true;
 		// BD: 17.08.2020 Remove that bodge and handle CanClose=false && CanHide=true in XAML
-		//private bool _canCloseValueBeforeInternalSet;
+		// private bool _canCloseValueBeforeInternalSet;
 		private bool _canMove = true;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>Class constructor</summary>
 		public LayoutAnchorable()
@@ -51,18 +45,10 @@ namespace AvalonDock.Layout
 			_canClose = _canCloseDefault = false;
 		}
 
-		#endregion Constructors
-
-		#region Events
-
 		/// <summary>Event is invoked when the visibility of this object has changed.</summary>
 		public event EventHandler IsVisibleChanged;
 
 		public event EventHandler<CancelEventArgs> Hiding;
-
-		#endregion Events
-
-		#region Properties
 
 		/// <summary>Gets/sets the width for this anchorable in AutoHide mode.</summary>
 		public double AutoHideWidth
@@ -186,10 +172,6 @@ namespace AvalonDock.Layout
 			set { if (value) Show(); else Hide(); }
 		}
 
-		#endregion Properties
-
-		#region Overrides
-
 		/// <inheritdoc />
 		protected override void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
@@ -207,11 +189,11 @@ namespace AvalonDock.Layout
 			var root = Root as LayoutRoot;
 			LayoutAnchorablePane anchorablePane = null;
 
-			//look for active content parent pane
+			// look for active content parent pane
 			if (root.ActiveContent != null && root.ActiveContent != this) anchorablePane = root.ActiveContent.Parent as LayoutAnchorablePane;
-			//look for a pane on the right side
+			// look for a pane on the right side
 			if (anchorablePane == null) anchorablePane = root.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault(pane => !pane.IsHostedInFloatingWindow && pane.GetSide() == AnchorSide.Right);
-			//look for an available pane
+			// look for an available pane
 			if (anchorablePane == null) anchorablePane = root.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault();
 			var added = false;
 			if (root.Manager.LayoutUpdateStrategy != null)
@@ -229,8 +211,10 @@ namespace AvalonDock.Layout
 					anchorablePane = new LayoutAnchorablePane { DockWidth = new GridLength(200.0, GridUnitType.Pixel) };
 					mainLayoutPanel.Children.Add(anchorablePane);
 				}
+
 				anchorablePane.Children.Add(this);
 			}
+
 			root.Manager.LayoutUpdateStrategy?.AfterInsertAnchorable(root, this);
 			base.InternalDock();
 		}
@@ -288,7 +272,9 @@ namespace AvalonDock.Layout
 				dockingManager.ExecuteCloseCommand(this);
 			}
 			else
+			{
 				CloseAnchorable();
+			}
 		}
 
 #if TRACE
@@ -304,9 +290,6 @@ namespace AvalonDock.Layout
 		/// <param name="args"></param>
 		protected virtual void OnHiding(CancelEventArgs args) => Hiding?.Invoke(this, args);
 
-		#endregion Overrides
-
-		#region Public Methods
 		public void Hide()
 		{
 			if (Root?.Manager is DockingManager dockingManager)
@@ -342,6 +325,7 @@ namespace AvalonDock.Layout
 				PreviousContainer = parentAsGroup;
 				PreviousContainerIndex = parentAsGroup.IndexOfChild(this);
 			}
+
 			Root?.Hidden?.Add(this);
 			RaisePropertyChanged(nameof(IsVisible));
 			RaisePropertyChanged(nameof(IsHidden));
@@ -444,8 +428,6 @@ namespace AvalonDock.Layout
 		/// </summary>
 		public void ToggleAutoHide()
 		{
-			#region Anchorable is already auto hidden
-
 			if (IsAutoHidden)
 			{
 				var parentGroup = Parent as LayoutAnchorGroup;
@@ -481,6 +463,7 @@ namespace AvalonDock.Layout
 								panel.Children.Add(oldRootPanel);
 								panel.Children.Add(previousContainer);
 							}
+
 							break;
 
 						case AnchorSide.Left:
@@ -507,6 +490,7 @@ namespace AvalonDock.Layout
 								panel.Children.Add(previousContainer);
 								panel.Children.Add(oldRootPanel);
 							}
+
 							break;
 
 						case AnchorSide.Top:
@@ -533,6 +517,7 @@ namespace AvalonDock.Layout
 								panel.Children.Add(previousContainer);
 								panel.Children.Add(oldRootPanel);
 							}
+
 							break;
 
 						case AnchorSide.Bottom:
@@ -548,10 +533,10 @@ namespace AvalonDock.Layout
 							else
 							{
 								previousContainer = new LayoutAnchorablePane
-                                {
-                                    DockMinWidth = AutoHideMinWidth,
+								{
+									DockMinWidth = AutoHideMinWidth,
 									DockMinHeight = AutoHideMinHeight
-                                };
+								};
 								var panel = new LayoutPanel { Orientation = Orientation.Vertical };
 								var root = parentGroup.Root as LayoutRoot;
 								var oldRootPanel = parentGroup.Root.RootPanel;
@@ -559,13 +544,14 @@ namespace AvalonDock.Layout
 								panel.Children.Add(oldRootPanel);
 								panel.Children.Add(previousContainer);
 							}
+
 							break;
 					}
 				}
 				else
 				{
-					//I'm about to remove parentGroup, redirect any content (ie hidden contents) that point to it
-					//to previousContainer
+					// I'm about to remove parentGroup, redirect any content (ie hidden contents) that point to it
+					// to previousContainer
 					var root = parentGroup.Root as LayoutRoot;
 					foreach (var cnt in root.Descendents().OfType<ILayoutPreviousContainer>().Where(c => c.PreviousContainer == parentGroup))
 						cnt.PreviousContainer = previousContainer;
@@ -592,11 +578,6 @@ namespace AvalonDock.Layout
 					parent = parent.Parent as LayoutGroupBase;
 				}
 			}
-
-			#endregion Anchorable is already auto hidden
-
-			#region Anchorable is docked
-
 			else if (Parent is LayoutAnchorablePane)
 			{
 				var root = Root;
@@ -607,7 +588,7 @@ namespace AvalonDock.Layout
 				foreach (var anchorableToImport in parentPane.Children.ToArray())
 					newAnchorGroup.Children.Add(anchorableToImport);
 
-				//detect anchor side for the pane
+				// detect anchor side for the pane
 				var anchorSide = parentPane.GetSide();
 
 				switch (anchorSide)
@@ -618,13 +599,7 @@ namespace AvalonDock.Layout
 					case AnchorSide.Bottom: root.BottomSide?.Children.Add(newAnchorGroup); break;
 				}
 			}
-
-			#endregion Anchorable is docked
 		}
-
-		#endregion Public Methods
-
-		#region Internal Methods
 
 		internal bool CloseAnchorable()
 		{
@@ -635,21 +610,16 @@ namespace AvalonDock.Layout
 		}
 
 		// BD: 17.08.2020 Remove that bodge and handle CanClose=false && CanHide=true in XAML
-		//internal void SetCanCloseInternal(bool canClose)
-		//{
-		//	_canCloseValueBeforeInternalSet = _canClose;
-		//	_canClose = canClose;
-		//}
+		// internal void SetCanCloseInternal(bool canClose)
+		// {
+		// _canCloseValueBeforeInternalSet = _canClose;
+		// _canClose = canClose;
+		// }
 
-		//internal void ResetCanCloseInternal()
-		//{
-		//	_canClose = _canCloseValueBeforeInternalSet;
-		//}
-
-		#endregion Internal Methods
-
-		#region Private Methods
-
+		// internal void ResetCanCloseInternal()
+		// {
+		// _canClose = _canCloseValueBeforeInternalSet;
+		// }
 		private void NotifyIsVisibleChanged() => IsVisibleChanged?.Invoke(this, EventArgs.Empty);
 
 		private void UpdateParentVisibility()
@@ -665,7 +635,5 @@ namespace AvalonDock.Layout
 			if (Parent is ILayoutElementWithVisibility parentPane)
 				parentPane.ComputeVisibility();
 		}
-
-		#endregion Private Methods
 	}
 }

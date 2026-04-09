@@ -7,7 +7,6 @@ namespace MLibTest.Models
 	/// </summary>
 	internal class LayoutLoadedEventArgs : EventArgs
 	{
-		#region ctors
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -15,14 +14,11 @@ namespace MLibTest.Models
 		{
 			Result = paramResult;
 		}
-		#endregion ctors
 
-		#region properties
 		/// <summary>
 		/// Gets the layout result event including exceptions (if any)
 		/// and whether loading was succesful...
 		/// </summary>
 		public LayoutLoaderResult Result { get; }
-		#endregion properties
 	}
 }

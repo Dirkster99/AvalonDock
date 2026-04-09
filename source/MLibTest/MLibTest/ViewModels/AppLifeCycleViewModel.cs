@@ -1,4 +1,4 @@
-﻿namespace MLibTest.ViewModels
+namespace MLibTest.ViewModels
 {
 	using MLib.Interfaces;
 	using Settings.Interfaces;
@@ -16,15 +16,12 @@
 	/// </summary>
 	internal class AppLifeCycleViewModel : Base.ViewModelBase
 	{
-		#region fields
 		private bool? mDialogCloseResult = null;
 		private bool mShutDownInProgress = false;
 		private bool mShutDownInProgress_Cancel = false;
 
 		private ICommand mExitApp = null;
-		#endregion fields
 
-		#region properties
 		/// <summary>
 		/// Gets a string for display of the application title.
 		/// </summary>
@@ -112,9 +109,7 @@
 					mShutDownInProgress_Cancel = value;
 			}
 		}
-		#endregion properties
 
-		#region methods
 		private void CreateDefaultsSettings(ISettingsManager settings
 										  , IAppearanceManager appearance)
 		{
@@ -303,7 +298,6 @@
 			}
 		}
 
-		#region Save Load Application configuration
 		/// <summary>
 		/// Save application settings when the application is being closed down
 		/// </summary>
@@ -364,9 +358,7 @@
 			{
 			}
 		}
-		#endregion Save Load Application configuration
 
-		#region StartUp/ShutDown
 		private void AppExit_CommandExecuted()
 		{
 			try
@@ -433,7 +425,6 @@
 			return true;
 		}
 
-		#region RequestClose [event]
 		/// <summary>
 		/// Raised when this workspace should be removed from the UI.
 		/// </summary>
@@ -486,8 +477,5 @@
 		{
 			DialogCloseResult = null;
 		}
-		#endregion RequestClose [event]
-		#endregion StartUp/ShutDown
-		#endregion methods
 	}
 }

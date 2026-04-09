@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -18,16 +18,11 @@ namespace AvalonDock.Controls
 	/// </summary>
 	/// <typeparam name="K"></typeparam>
 	/// <typeparam name="V"></typeparam>
-	internal class WeakDictionary<K, V> where K : class
+	internal class WeakDictionary<K, V>
+		where K : class
 	{
-		#region fields
-
 		private List<WeakReference> _keys = new List<WeakReference>();
 		private List<V> _values = new List<V>();
-
-		#endregion fields
-
-		#region Public Methods
 
 		/// <summary>
 		/// Get a value by its key index.
@@ -73,7 +68,9 @@ namespace AvalonDock.Controls
 			CollectGarbage();
 			int vIndex = _keys.FindIndex(k => k.GetValueOrDefault<K>() == key);
 			if (vIndex > -1)
+			{
 				_values[vIndex] = value;
+			}
 			else
 			{
 				_values.Add(value);
@@ -98,10 +95,6 @@ namespace AvalonDock.Controls
 			return true;
 		}
 
-		#endregion Public Methods
-
-		#region Private Methods
-
 		/// <summary>
 		/// Removes all entries where the key has already been garbage collected.
 		/// </summary>
@@ -120,7 +113,5 @@ namespace AvalonDock.Controls
 			}
 			while (vIndex >= 0);
 		}
-
-		#endregion Private Methods
 	}
 }

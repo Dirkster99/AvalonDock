@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -18,15 +18,9 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutDocument : LayoutContent
 	{
-		#region fields
-
 		private bool _canMove = true;
 		private bool _isVisible = true;
 		private string _description = null;
-
-		#endregion fields
-
-		#region Properties
 
 		/// <summary>Gets/sets whether a document can be dragged (to be dropped in a different location) or not.
 		/// Use this property in conjunction with <see cref="CanMove"/> and <see cref="CanClose"/> and <see cref="LayoutPanel.CanDock"/>
@@ -66,20 +60,12 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion Properties
-
-		#region Internal Methods
-
 		internal bool CloseDocument()
 		{
 			if (!TestCanClose()) return false;
 			CloseInternal();
 			return true;
 		}
-
-		#endregion Internal Methods
-
-		#region Overrides
 
 		/// <inheritdoc />
 		public override void WriteXml(System.Xml.XmlWriter writer)
@@ -106,7 +92,9 @@ namespace AvalonDock.Layout
 				dockingManager.ExecuteCloseCommand(this);
 			}
 			else
+			{
 				CloseDocument();
+			}
 		}
 
 #if TRACE
@@ -130,10 +118,9 @@ namespace AvalonDock.Layout
 				if (documentPane == null) throw new InvalidOperationException("Layout must contains at least one LayoutDocumentPane in order to host documents");
 				documentPane.Children.Add(this);
 			}
+
 			root?.Manager.LayoutUpdateStrategy?.AfterInsertDocument(root, this);
 			base.InternalDock();
 		}
-
-		#endregion Overrides
 	}
 }

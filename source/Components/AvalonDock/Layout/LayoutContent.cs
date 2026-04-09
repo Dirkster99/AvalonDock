@@ -7,7 +7,6 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Controls;
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -16,6 +15,7 @@ using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Xml.Serialization;
+using AvalonDock.Controls;
 
 namespace AvalonDock.Layout
 {
@@ -27,18 +27,12 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public abstract class LayoutContent : LayoutElement, IXmlSerializable, ILayoutElementForFloatingWindow, IComparable<LayoutContent>, ILayoutPreviousContainer
 	{
-		#region Constructors
-
 		/// <summary>
 		/// Class constructor
 		/// </summary>
 		internal LayoutContent()
 		{
 		}
-
-		#endregion Constructors
-
-		#region Events
 
 		/// <summary>Event fired when the content is closed (i.e. removed definitely from the layout).</summary>
 		public event EventHandler Closed;
@@ -57,12 +51,6 @@ namespace AvalonDock.Layout
 		/// </summary>
 		public event EventHandler FloatingPropertiesUpdated;
 
-		#endregion Events
-
-		#region Properties
-
-		#region Title
-
 		public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title), typeof(string), typeof(LayoutContent), new UIPropertyMetadata(null, OnTitlePropertyChanged, CoerceTitleValue));
 
 		public string Title
@@ -80,10 +68,6 @@ namespace AvalonDock.Layout
 
 		private static void OnTitlePropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args) => ((LayoutContent)obj).RaisePropertyChanged(TitleProperty.Name);
 
-		#endregion Title
-
-		#region Content
-
 		[NonSerialized]
 		private object _content = null;
 
@@ -100,10 +84,6 @@ namespace AvalonDock.Layout
 				if (ContentId == null) SetContentIdFromContent();
 			}
 		}
-
-		#endregion Content
-
-		#region ContentId
 
 		public static readonly DependencyProperty ContentIdProperty = DependencyProperty.Register(nameof(ContentId), typeof(string), typeof(LayoutContent), new UIPropertyMetadata(null, OnContentIdPropertyChanged));
 
@@ -136,10 +116,6 @@ namespace AvalonDock.Layout
 			if (!string.IsNullOrWhiteSpace(contentAsControl?.Name)) SetCurrentValue(ContentIdProperty, contentAsControl.Name);
 		}
 
-		#endregion ContentId
-
-		#region IsSelected
-
 		private bool _isSelected = false;
 
 		public bool IsSelected
@@ -165,10 +141,6 @@ namespace AvalonDock.Layout
 
 		public event EventHandler IsSelectedChanged;
 
-		#endregion IsSelected
-
-		#region IsActive
-
 		[field: NonSerialized]
 		private bool _isActive = false;
 
@@ -188,6 +160,7 @@ namespace AvalonDock.Layout
 					if (root.ActiveContent != this && value) Root.ActiveContent = this;
 					if (_isActive && root.ActiveContent != this) root.ActiveContent = this;
 				}
+
 				if (_isActive) IsSelected = true;
 				OnIsActiveChanged(oldValue, value);
 				RaisePropertyChanged(nameof(IsActive));
@@ -205,10 +178,6 @@ namespace AvalonDock.Layout
 
 		public event EventHandler IsActiveChanged;
 
-		#endregion IsActive
-
-		#region IsLastFocusedDocument
-
 		private bool _isLastFocusedDocument = false;
 
 		public bool IsLastFocusedDocument
@@ -222,10 +191,6 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(IsLastFocusedDocument));
 			}
 		}
-
-		#endregion IsLastFocusedDocument
-
-		#region PreviousContainer
 
 		[field: NonSerialized]
 		private ILayoutContainer _previousContainer = null;
@@ -259,10 +224,6 @@ namespace AvalonDock.Layout
 			set => ((ILayoutPreviousContainer)this).PreviousContainerId = value;
 		}
 
-		#endregion PreviousContainer
-
-		#region PreviousContainerIndex
-
 		[field: NonSerialized]
 		private int _previousContainerIndex = -1;
 
@@ -278,10 +239,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion PreviousContainerIndex
-
-		#region LastActivationTimeStamp
-
 		private DateTime? _lastActivationTimeStamp = null;
 
 		public DateTime? LastActivationTimeStamp
@@ -294,10 +251,6 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(LastActivationTimeStamp));
 			}
 		}
-
-		#endregion LastActivationTimeStamp
-
-		#region FloatingWidth
 
 		private double _floatingWidth = 0.0;
 
@@ -313,10 +266,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion FloatingWidth
-
-		#region FloatingHeight
-
 		private double _floatingHeight = 0.0;
 
 		public double FloatingHeight
@@ -330,10 +279,6 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(FloatingHeight));
 			}
 		}
-
-		#endregion FloatingHeight
-
-		#region FloatingLeft
 
 		private double _floatingLeft = 0.0;
 
@@ -349,10 +294,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion FloatingLeft
-
-		#region FloatingTop
-
 		private double _floatingTop = 0.0;
 
 		public double FloatingTop
@@ -366,10 +307,6 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(FloatingTop));
 			}
 		}
-
-		#endregion FloatingTop
-
-		#region IsMaximized
 
 		private bool _isMaximized = false;
 
@@ -385,10 +322,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion IsMaximized
-
-		#region ToolTip
-
 		private object _toolTip = null;
 
 		public object ToolTip
@@ -402,13 +335,11 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion ToolTip
-
 		/// <summary>Gets whether the content is currently floating or not.</summary>
-		[Bindable(true), Description("Gets whether the content is currently floating or not."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets whether the content is currently floating or not.")]
+		[Category("Other")]
 		public bool IsFloating => this.FindParent<LayoutFloatingWindow>() != null;
-
-		#region IconSource
 
 		private ImageSource _iconSource = null;
 
@@ -423,14 +354,15 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion IconSource
-
-		#region CanClose
+		// BD: 14.08.2020 added _canCloseDefault to properly implement inverting _canClose default value in inheritors (e.g. LayoutAnchorable)
+		//     Thus CanClose property will be serialized only when not equal to its default for given class
+		//     With previous code it was not possible to serialize CanClose if set to true for LayoutAnchorable instance
+		internal bool _canClose = true;
 
 		// BD: 14.08.2020 added _canCloseDefault to properly implement inverting _canClose default value in inheritors (e.g. LayoutAnchorable)
 		//     Thus CanClose property will be serialized only when not equal to its default for given class
 		//     With previous code it was not possible to serialize CanClose if set to true for LayoutAnchorable instance
-		internal bool _canClose = true, _canCloseDefault = true;
+		internal bool _canCloseDefault = true;
 
 		public bool CanClose
 		{
@@ -442,10 +374,6 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(CanClose));
 			}
 		}
-
-		#endregion CanClose
-
-		#region CanFloat
 
 		private bool _canFloat = true;
 
@@ -459,10 +387,6 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(CanFloat));
 			}
 		}
-
-		#endregion CanFloat
-
-		#region CanShowOnHover
 
 		private bool _canShowOnHover = true;
 
@@ -484,10 +408,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion CanShowOnHover
-
-		#region IsEnabled
-
 		private bool _isEnabled = true;
 
 		public bool IsEnabled
@@ -501,17 +421,7 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion IsEnabled
-
-		#region TabItem
-
 		public LayoutDocumentTabItem TabItem { get; internal set; }
-
-		#endregion TabItem
-
-		#endregion Properties
-
-		#region Public Methods
 
 		/// <summary>Close the content</summary>
 		/// <remarks>Note that the anchorable is only hidden (not closed). By default when user click the X button it only hides the content.</remarks>
@@ -525,9 +435,8 @@ namespace AvalonDock.Layout
 		{
 			if (reader.MoveToAttribute(nameof(Title)))
 				Title = reader.Value;
-			//if (reader.MoveToAttribute("IconSource"))
+			// if (reader.MoveToAttribute("IconSource"))
 			//    IconSource = new Uri(reader.Value, UriKind.RelativeOrAbsolute);
-
 			if (reader.MoveToAttribute(nameof(IsSelected)))
 				IsSelected = bool.Parse(reader.Value);
 			if (reader.MoveToAttribute(nameof(ContentId)))
@@ -567,9 +476,8 @@ namespace AvalonDock.Layout
 			if (!string.IsNullOrWhiteSpace(Title))
 				writer.WriteAttributeString(nameof(Title), Title);
 
-			//if (IconSource != null)
+			// if (IconSource != null)
 			//    writer.WriteAttributeString("IconSource", IconSource.ToString());
-
 			if (IsSelected)
 				writer.WriteAttributeString(nameof(IsSelected), IsSelected.ToString());
 
@@ -639,12 +547,12 @@ namespace AvalonDock.Layout
 				IsActive = true;
 			}
 
-            // BD: 14.08.2020 raise IsFloating property changed
-            RaisePropertyChanged(nameof(IsFloating));
-        }
+			// BD: 14.08.2020 raise IsFloating property changed
+			RaisePropertyChanged(nameof(IsFloating));
+		}
 
-        /// <summary>Dock the content as document.</summary>
-        public void DockAsDocument()
+		/// <summary>Dock the content as document.</summary>
+		public void DockAsDocument()
 		{
 			if (!(Root is LayoutRoot root)) throw new InvalidOperationException();
 
@@ -665,15 +573,16 @@ namespace AvalonDock.Layout
 				newParentPane.Children.Add(this);
 				root.CollectGarbage();
 			}
+
 			IsSelected = true;
 			IsActive = true;
 
 			// BD: 14.08.2020 raise IsFloating property changed
 			RaisePropertyChanged(nameof(IsFloating));
-        }
+		}
 
-        /// <summary>Re-dock the content to its previous container</summary>
-        public void Dock()
+		/// <summary>Re-dock the content to its previous container</summary>
+		public void Dock()
 		{
 			if (PreviousContainer != null)
 			{
@@ -701,17 +610,15 @@ namespace AvalonDock.Layout
 				IsActive = true;
 			}
 			else
+			{
 				InternalDock();
+			}
 
 			Root.CollectGarbage();
 
 			// BD: 14.08.2020 raise IsFloating property changed
 			RaisePropertyChanged(nameof(IsFloating));
-        }
-
-		#endregion Public Methods
-
-		#region Overrides
+		}
 
 		/// <inheritdoc />
 		protected override void OnParentChanging(ILayoutContainer oldValue, ILayoutContainer newValue)
@@ -732,10 +639,6 @@ namespace AvalonDock.Layout
 
 			base.OnParentChanged(oldValue, newValue);
 		}
-
-		#endregion Overrides
-
-		#region Internal Methods
 
 		/// <summary>Test if the content can be closed. </summary>
 		/// <returns></returns>
@@ -776,7 +679,7 @@ namespace AvalonDock.Layout
 			}
 
 			parentAsContainer.RemoveChild(this);
-			root?.CollectGarbage();			
+			root?.CollectGarbage();         
 			OnClosed();
 		}
 
@@ -789,7 +692,5 @@ namespace AvalonDock.Layout
 		}
 
 		void ILayoutElementForFloatingWindow.RaiseFloatingPropertiesUpdated() => FloatingPropertiesUpdated?.Invoke(this, EventArgs.Empty);
-
-		#endregion Internal Methods
 	}
 }

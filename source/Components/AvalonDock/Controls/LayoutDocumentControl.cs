@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,12 +7,12 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -22,8 +22,6 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public class LayoutDocumentControl : Control
 	{
-		#region Constructors
-
 		/// <summary>
 		/// Static class constructor
 		/// </summary>
@@ -32,12 +30,6 @@ namespace AvalonDock.Controls
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutDocumentControl), new FrameworkPropertyMetadata(typeof(LayoutDocumentControl)));
 			FocusableProperty.OverrideMetadata(typeof(LayoutDocumentControl), new FrameworkPropertyMetadata(true));
 		}
-
-		#endregion Constructors
-
-		#region Properties
-
-		#region Model
 
 		/// <summary><see cref="Model"/> dependency property.</summary>
 		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(nameof(Model), typeof(LayoutContent), typeof(LayoutDocumentControl),
@@ -66,7 +58,9 @@ namespace AvalonDock.Controls
 				SetLayoutItem(Model?.Root?.Manager?.GetLayoutItemFromModel(Model));
 			}
 			else
+			{
 				SetLayoutItem(null);
+			}
 		}
 
 		private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -77,10 +71,6 @@ namespace AvalonDock.Controls
 			if (IsEnabled || !Model.IsActive) return;
 			if (Model.Parent is LayoutDocumentPane layoutDocumentPane) layoutDocumentPane.SetNextSelectedIndex();
 		}
-
-		#endregion Model
-
-		#region LayoutItem
 
 		/// <summary><see cref="LayoutItem"/> Read-Only dependency property.</summary>
 		private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(LayoutItem), typeof(LayoutItem), typeof(LayoutDocumentControl),
@@ -100,12 +90,6 @@ namespace AvalonDock.Controls
 		/// </summary>
 		/// <param name="value">The new value for the property.</param>
 		protected void SetLayoutItem(LayoutItem value) => SetValue(LayoutItemPropertyKey, value);
-
-		#endregion LayoutItem
-
-		#endregion Properties
-
-		#region Overrides
 
 		/// <inheritdoc />
 		protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
@@ -129,15 +113,9 @@ namespace AvalonDock.Controls
 			base.OnMouseLeftButtonDown(e);
 		}
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		private void SetIsActive()
 		{
 			if (Model != null && !Model.IsActive) Model.IsActive = true;
 		}
-
-		#endregion Private Methods
 	}
 }

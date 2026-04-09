@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -15,14 +15,10 @@ namespace AvalonDock.Themes.Controls
 {
 	public class SplineBorder : Control
 	{
-
 		public SplineBorder()
 		{
-			//RenderOptions.SetEdgeMode(this, EdgeMode.Aliased);
+			// RenderOptions.SetEdgeMode(this, EdgeMode.Aliased);
 		}
-
-
-		#region Thickness
 
 		/// <summary>
 		/// Thickness Dependency Property
@@ -41,10 +37,6 @@ namespace AvalonDock.Themes.Controls
 			set => SetValue(ThicknessProperty, value);
 		}
 
-		#endregion
-
-		#region Fill
-
 		/// <summary>
 		/// Fill Dependency Property
 		/// </summary>
@@ -61,10 +53,6 @@ namespace AvalonDock.Themes.Controls
 			get => (Brush)GetValue(FillProperty);
 			set => SetValue(FillProperty, value);
 		}
-
-		#endregion
-
-		#region Stroke
 
 		/// <summary>
 		/// Stroke Dependency Property
@@ -83,10 +71,6 @@ namespace AvalonDock.Themes.Controls
 			set => SetValue(StrokeProperty, value);
 		}
 
-		#endregion
-
-		#region BottomBorderMargin
-
 		/// <summary>
 		/// BottomBorderMargin Dependency Property
 		/// </summary>
@@ -103,8 +87,6 @@ namespace AvalonDock.Themes.Controls
 			get => (double)GetValue(BottomBorderMarginProperty);
 			set => SetValue(BottomBorderMarginProperty, value);
 		}
-
-		#endregion
 
 		protected override void OnRender(DrawingContext drawingContext)
 		{

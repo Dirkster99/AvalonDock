@@ -8,7 +8,7 @@
  ************************************************************************/
 
 /**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 // Conditional to use more aggressive fail-fast behaviors when debugging.
@@ -60,10 +60,8 @@ namespace Standard
 		/// <typeparam name="T">The generic type to compare for equality.</typeparam>
 		/// <param name="expected">The first generic type data to compare.  This is is the expected value.</param>
 		/// <param name="actual">The second generic type data to compare.  This is the actual value.</param>
-		[
-			Obsolete("Use Assert.AreEqual instead of Assert.Equals", false),
-			Conditional("DEBUG")
-		]
+		[Obsolete("Use Assert.AreEqual instead of Assert.Equals", false)]
+		[Conditional("DEBUG")]
 		public static void Equals<T>(T expected, T actual)
 		{
 			AreEqual(expected, actual);
@@ -84,7 +82,10 @@ namespace Standard
 				// Two nulls are considered equal, regardless of type semantics.
 				if (actual != null && !actual.Equals(expected)) _Break();
 			}
-			else if (!expected.Equals(actual)) _Break();
+			else if (!expected.Equals(actual))
+			{
+				_Break();
+			}
 		}
 
 		/// <summary>
@@ -102,7 +103,10 @@ namespace Standard
 				// Two nulls are considered equal, regardless of type semantics.
 				if (actual == null || actual.Equals(notExpected)) _Break();
 			}
-			else if (notExpected.Equals(actual)) _Break();
+			else if (notExpected.Equals(actual))
+			{
+				_Break();
+			}
 		}
 
 		/// <summary>
@@ -163,19 +167,22 @@ namespace Standard
 		/// <param name="value">The value to check for nullness.</param>
 		/// <remarks>This breaks into the debugger in the case of a failed assertion.</remarks>
 		[Conditional("DEBUG")]
-		public static void IsNotNull<T>(T value) where T : class
+		public static void IsNotNull<T>(T value)
+			where T : class
 		{
 			if (value == null) _Break();
 		}
 
 		[Conditional("DEBUG")]
-		public static void IsDefault<T>(T value) where T : struct
+		public static void IsDefault<T>(T value)
+			where T : struct
 		{
 			if (!value.Equals(default(T))) Assert.Fail();
 		}
 
 		[Conditional("DEBUG")]
-		public static void IsNotDefault<T>(T value) where T : struct
+		public static void IsNotDefault<T>(T value)
+			where T : struct
 		{
 			if (value.Equals(default(T))) Assert.Fail();
 		}
@@ -246,7 +253,8 @@ namespace Standard
 		/// </summary>
 		/// <param name="item">The item to verify is null.</param>
 		[Conditional("DEBUG")]
-		public static void IsNull<T>(T item) where T : class
+		public static void IsNull<T>(T item)
+			where T : class
 		{
 			if (item != null) _Break();
 		}
@@ -289,13 +297,15 @@ namespace Standard
 		}
 
 		[Conditional("DEBUG")]
-		public static void NullableIsNotNull<T>(T? value) where T : struct
+		public static void NullableIsNotNull<T>(T? value)
+			where T : struct
 		{
 			if (value == null) _Break();
 		}
 
 		[Conditional("DEBUG")]
-		public static void NullableIsNull<T>(T? value) where T : struct
+		public static void NullableIsNull<T>(T? value)
+			where T : struct
 		{
 			if (value != null) _Break();
 		}

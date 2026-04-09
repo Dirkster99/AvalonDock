@@ -1,4 +1,4 @@
-﻿namespace AvalonDock.MVVMTestApp
+namespace AvalonDock.MVVMTestApp
 {
 	using System.IO;
 	using System.Windows.Input;
@@ -6,7 +6,6 @@
 
 	class FileViewModel : PaneViewModel
 	{
-		#region fields
 		private static ImageSourceConverter ISC = new ImageSourceConverter();
 		private string _filePath = null;
 		private string _textContent = string.Empty;
@@ -14,9 +13,7 @@
 		private RelayCommand _saveCommand = null;
 		private RelayCommand _saveAsCommand = null;
 		private RelayCommand _closeCommand = null;
-		#endregion fields
 
-		#region constructors
 		/// <summary>
 		/// Class constructor from file path.
 		/// </summary>
@@ -38,9 +35,7 @@
 			IsDirty = true;
 			Title = FileName;
 		}
-		#endregion constructors
 
-		#region Properties
 		public string FilePath
 		{
 			get => _filePath;
@@ -139,9 +134,7 @@
 				return _closeCommand;
 			}
 		}
-		#endregion  Properties
 
-		#region methods
 		private bool CanClose()
 		{
 			return true;
@@ -171,6 +164,5 @@
 		{
 			Workspace.This.Save(this, true);
 		}
-		#endregion methods
 	}
 }

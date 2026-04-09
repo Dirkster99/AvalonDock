@@ -22,23 +22,13 @@ namespace AvalonDock.Layout
 	[ContentProperty(nameof(RootPanel))]
 	public class LayoutAnchorableFloatingWindow : LayoutFloatingWindow, ILayoutElementWithVisibility
 	{
-		#region fields
-
 		private LayoutAnchorablePaneGroup _rootPanel;
 
 		[NonSerialized]
 		private bool _isVisible = true;
 
-		#endregion fields
-
-		#region Events
-
 		/// <summary>Event is invoked when the visibility of this object has changed.</summary>
 		public event EventHandler IsVisibleChanged;
-
-		#endregion Events
-
-		#region Properties
 
 		public bool IsSinglePane => RootPanel != null && RootPanel.Descendents().OfType<ILayoutAnchorablePane>().Count(p => p.IsVisible) == 1;
 
@@ -92,16 +82,8 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion Properties
-
-		#region ILayoutElementWithVisibility Interface
-
 		/// <inheritdoc />
 		void ILayoutElementWithVisibility.ComputeVisibility() => ComputeVisibility();
-
-		#endregion ILayoutElementWithVisibility Interface
-
-		#region Overrides
 
 		/// <inheritdoc />
 		public override IEnumerable<ILayoutElement> Children
@@ -155,7 +137,9 @@ namespace AvalonDock.Layout
 
 				XmlSerializer serializer;
 				if (reader.LocalName.Equals(nameof(LayoutAnchorablePaneGroup)))
+				{
 					serializer = XmlSerializersCache.GetSerializer<LayoutAnchorablePaneGroup>();
+				}
 				else
 				{
 					var type = LayoutRoot.FindType(reader.LocalName);
@@ -163,8 +147,10 @@ namespace AvalonDock.Layout
 						throw new ArgumentException("AvalonDock.LayoutAnchorableFloatingWindow doesn't know how to deserialize " + reader.LocalName);
 					serializer = XmlSerializersCache.GetSerializer(type);
 				}
+
 				RootPanel = (LayoutAnchorablePaneGroup)serializer.Deserialize(reader);
 			}
+
 			reader.ReadEndElement();
 		}
 
@@ -179,10 +165,6 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		private void _rootPanel_ChildrenTreeChanged(object sender, ChildrenTreeChangedEventArgs e)
 		{
 			RaisePropertyChanged(nameof(IsSinglePane));
@@ -190,7 +172,5 @@ namespace AvalonDock.Layout
 		}
 
 		private void ComputeVisibility() => IsVisible = RootPanel != null && RootPanel.IsVisible;
-
-		#endregion Private Methods
 	}
 }

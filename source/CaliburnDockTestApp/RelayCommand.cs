@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Windows.Input;
 
@@ -7,14 +7,11 @@ using System.Windows.Input;
 /// </summary>
 public class RelayCommand<T> : ICommand
 {
-	#region Fields
 
 	private readonly Action<T> _execute;
 	private readonly Predicate<T> _canExecute;
 
-	#endregion // Fields
 
-	#region Constructors
 
 	public RelayCommand(Action<T> execute)
 		: this(execute, null)
@@ -29,9 +26,7 @@ public class RelayCommand<T> : ICommand
 		_execute = execute;
 		_canExecute = canExecute;
 	}
-	#endregion // Constructors
 
-	#region ICommand Members
 
 	[DebuggerStepThrough]
 	public virtual bool CanExecute(T parameter)
@@ -68,7 +63,6 @@ public class RelayCommand<T> : ICommand
 		CommandManager.InvalidateRequerySuggested();
 		CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 	}
-	#endregion // ICommand Members
 }
 
 public class RelayCommand : RelayCommand<object>

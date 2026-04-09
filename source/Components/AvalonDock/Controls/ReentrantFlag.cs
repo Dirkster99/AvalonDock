@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -13,13 +13,7 @@ namespace AvalonDock.Controls
 {
 	internal class ReentrantFlag
 	{
-		#region fields
-
 		private bool _flag = false;
-
-		#endregion fields
-
-		#region Properties
 
 		public bool CanEnter
 		{
@@ -29,20 +23,12 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion Properties
-
-		#region Public Methods
-
 		public _ReentrantFlagHandler Enter()
 		{
 			if (_flag)
 				throw new InvalidOperationException();
 			return new _ReentrantFlagHandler(this);
 		}
-
-		#endregion Public Methods
-
-		#region Internal Classes
 
 		public class _ReentrantFlagHandler : IDisposable
 		{
@@ -59,7 +45,5 @@ namespace AvalonDock.Controls
 				_owner._flag = false;
 			}
 		}
-
-		#endregion Internal Classes
 	}
 }

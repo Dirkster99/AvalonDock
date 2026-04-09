@@ -1,12 +1,9 @@
-﻿namespace MLibTest.Demos.ViewModels.AD
+namespace MLibTest.Demos.ViewModels.AD
 {
 	internal class ToolViewModel : PaneViewModel
 	{
-		#region Fields
 		private bool _isVisible = false;
-		#endregion Fields
 
-		#region constructors
 		/// <summary>
 		/// Class constructor.
 		/// </summary>
@@ -23,15 +20,12 @@
 		protected ToolViewModel()
 		{
 		}
-		#endregion constructors
 
-		#region properties
 		/// <summary>
 		/// Gets the name of this tool window.
 		/// </summary>
 		public string Name { get; }
 
-		#region IsVisible
 		/// <summary>
 		/// Gets/sets whether this tool window is visible or not.
 		/// </summary>
@@ -47,7 +41,5 @@
 				}
 			}
 		}
-		#endregion IsVisible
-		#endregion properties
 	}
 }

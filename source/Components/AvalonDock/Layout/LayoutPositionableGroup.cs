@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -18,10 +18,9 @@ namespace AvalonDock.Layout
 	/// <summary>Provides a base class for other layout panel models that support a specific class of panel.</summary>
 	/// <typeparam name="T"></typeparam>
 	[Serializable]
-	public abstract class LayoutPositionableGroup<T> : LayoutGroup<T>, ILayoutPositionableElementWithActualSize where T : class, ILayoutElement
+	public abstract class LayoutPositionableGroup<T> : LayoutGroup<T>, ILayoutPositionableElementWithActualSize
+		where T : class, ILayoutElement
 	{
-		#region fields
-
 		private static GridLengthConverter _gridLengthConverter = new GridLengthConverter();
 
 		// DockWidth fields
@@ -52,20 +51,10 @@ namespace AvalonDock.Layout
 		[NonSerialized]
 		private double _actualHeight;
 
-		#endregion fields
-
-		#region Events
-
 		/// <summary>
 		/// Event fired when floating properties were updated.
 		/// </summary>
 		public event EventHandler FloatingPropertiesUpdated;
-
-		#endregion Events
-
-		#region Properties
-
-		#region DockWidth
 
 		public GridLength DockWidth
 		{
@@ -98,13 +87,11 @@ namespace AvalonDock.Layout
 					OnDockWidthChanged();
 				}
 				else if (value > _dockWidth.Value && _resizableAbsoluteDockWidth < _dockWidth.Value)
+				{
 					_resizableAbsoluteDockWidth = _dockWidth.Value;
+				}
 			}
 		}
-
-		#endregion DockWidth
-
-		#region DockHeight
 
 		public GridLength DockHeight
 		{
@@ -137,12 +124,15 @@ namespace AvalonDock.Layout
 					OnDockHeightChanged();
 				}
 				else if (value > _dockHeight.Value && _resizableAbsoluteDockHeight < _dockHeight.Value)
+				{
 					_resizableAbsoluteDockHeight = _dockHeight.Value;
-				else if (value == 0) _resizableAbsoluteDockHeight = DockMinHeight;
+				}
+				else if (value == 0)
+				{
+					_resizableAbsoluteDockHeight = DockMinHeight;
+				}
 			}
 		}
-
-		#endregion DockHeight
 
 		/// <summary>
 		/// Gets or sets the AllowDuplicateContent property.
@@ -184,6 +174,7 @@ namespace AvalonDock.Layout
 					visibleChildren.Max(child => child.CalculatedDockMinWidth())
 				  : visibleChildren.Sum(child => child.CalculatedDockMinWidth() + (Root?.Manager?.GridSplitterWidth ?? 0) * (visibleChildren.Count - 1));
 			}
+
 			return Math.Max(this._dockMinWidth, childrenDockMinWidth);
 		}
 
@@ -310,15 +301,7 @@ namespace AvalonDock.Layout
 			set => _actualHeight = value;
 		}
 
-		#endregion Properties
-
-		#region Internal Methods
-
 		void ILayoutElementForFloatingWindow.RaiseFloatingPropertiesUpdated() => FloatingPropertiesUpdated?.Invoke(this, EventArgs.Empty);
-
-		#endregion Internal Methods
-
-		#region Overrides
 
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{
@@ -357,7 +340,5 @@ namespace AvalonDock.Layout
 		protected virtual void OnDockHeightChanged()
 		{
 		}
-
-		#endregion Overrides
 	}
 }

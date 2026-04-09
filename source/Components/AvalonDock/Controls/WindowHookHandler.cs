@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -13,53 +13,30 @@ namespace AvalonDock.Controls
 {
 	internal class FocusChangeEventArgs : EventArgs
 	{
-		#region Constructors
-
 		public FocusChangeEventArgs(IntPtr gotFocusWinHandle, IntPtr lostFocusWinHandle)
 		{
 			GotFocusWinHandle = gotFocusWinHandle;
 			LostFocusWinHandle = lostFocusWinHandle;
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
 		public IntPtr GotFocusWinHandle { get; private set; }
 
 		public IntPtr LostFocusWinHandle { get; private set; }
-
-		#endregion Properties
 	}
 
 	internal class WindowHookHandler
 	{
-		#region fields
-
 		private IntPtr _windowHook;
 		private Win32Helper.HookProc _hookProc;
 		private ReentrantFlag _insideActivateEvent = new ReentrantFlag();
-
-		#endregion fields
-
-		#region Constructors
 
 		public WindowHookHandler()
 		{
 		}
 
-		#endregion Constructors
-
-		#region Events
-
 		public event EventHandler<FocusChangeEventArgs> FocusChanged;
 
-		//public event EventHandler<WindowActivateEventArgs> Activate;
-
-		#endregion Events
-
-		#region Public Methods
-
+		// public event EventHandler<WindowActivateEventArgs> Activate;
 		public void Attach()
 		{
 			_hookProc = new Win32Helper.HookProc(this.HookProc);
@@ -88,7 +65,7 @@ namespace AvalonDock.Controls
 				{
 					using (_insideActivateEvent.Enter())
 					{
-						//if (Activate != null)
+						// if (Activate != null)
 						//    Activate(this, new WindowActivateEventArgs(wParam));
 					}
 				}
@@ -96,7 +73,5 @@ namespace AvalonDock.Controls
 
 			return Win32Helper.CallNextHookEx(_windowHook, code, wParam, lParam);
 		}
-
-		#endregion Public Methods
 	}
 }

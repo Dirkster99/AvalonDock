@@ -26,7 +26,6 @@ namespace AvalonDock.Controls
 	/// <seealso cref="ContentControl"/>
 	public class DropDownControlArea : ContentControl
 	{
-		#region ctors
 		/// <summary>
 		/// Static class constructor
 		/// </summary>
@@ -38,49 +37,38 @@ namespace AvalonDock.Controls
 			
 			// See PreviewMouseRightButtonUpCallback for details.
 			EventManager.RegisterClassHandler(
-			    typeof(DropDownControlArea),
-			    PreviewMouseRightButtonUpEvent,
-			    new MouseButtonEventHandler((s, e) => (s as DropDownControlArea)?.PreviewMouseRightButtonUpCallback(e)));
+				typeof(DropDownControlArea),
+				PreviewMouseRightButtonUpEvent,
+				new MouseButtonEventHandler((s, e) => (s as DropDownControlArea)?.PreviewMouseRightButtonUpCallback(e)));
 		}
-		#endregion ctors
-		
-		#region Properties
-
-		#region DropDownContextMenu
 
 		/// <summary><see cref="DropDownContextMenu"/> dependency property.</summary>
 		public static readonly DependencyProperty DropDownContextMenuProperty = DependencyProperty.Register(nameof(DropDownContextMenu), typeof(ContextMenu), typeof(DropDownControlArea),
 				new FrameworkPropertyMetadata(null));
 
 		/// <summary>Gets/sets the drop down menu to show up when user click on an anchorable menu pin.</summary>
-		[Bindable(true), Description("Gets/sets the drop down menu to show up when user click on an anchorable menu pin."), Category("Menu")]
+		[Bindable(true)]
+		[Description("Gets/sets the drop down menu to show up when user click on an anchorable menu pin.")]
+		[Category("Menu")]
 		public ContextMenu DropDownContextMenu
 		{
 			get => (ContextMenu)GetValue(DropDownContextMenuProperty);
 			set => SetValue(DropDownContextMenuProperty, value);
 		}
 
-		#endregion DropDownContextMenu
-
-		#region DropDownContextMenuDataContext
-
 		/// <summary><see cref="DropDownContextMenuDataContext"/> dependency property. </summary>
 		public static readonly DependencyProperty DropDownContextMenuDataContextProperty = DependencyProperty.Register(nameof(DropDownContextMenuDataContext), typeof(object), typeof(DropDownControlArea),
 				new FrameworkPropertyMetadata(null));
 
 		/// <summary>Gets/sets the DataContext to set for the DropDownContext menu property.</summary>
-		[Bindable(true), Description("Gets/sets the DataContext to set for the DropDownContext menu property."), Category("Menu")]
+		[Bindable(true)]
+		[Description("Gets/sets the DataContext to set for the DropDownContext menu property.")]
+		[Category("Menu")]
 		public object DropDownContextMenuDataContext
 		{
 			get => (object)GetValue(DropDownContextMenuDataContextProperty);
 			set => SetValue(DropDownContextMenuDataContextProperty, value);
 		}
-
-		#endregion DropDownContextMenuDataContext
-
-		#endregion Properties
-
-		#region Overrides
 
 		// The core code uses OnPreviewMouseButtonUp for this logic. However, this change fixes
 		// a bug when the context menu style has no border. The right click to show the context
@@ -95,7 +83,7 @@ namespace AvalonDock.Controls
 			{
 				// Fix for multi-dpi aware aplications
 				DropDownContextMenu.PlacementTarget = e.Source as UIElement;
-				//DropDownContextMenu.PlacementTarget = null;
+				// DropDownContextMenu.PlacementTarget = null;
 				DropDownContextMenu.Placement = PlacementMode.MousePoint;
 				DropDownContextMenu.HorizontalOffset = 0d;
 				DropDownContextMenu.VerticalOffset = 0d;
@@ -106,15 +94,13 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		//protected override System.Windows.Media.HitTestResult HitTestCore(System.Windows.Media.PointHitTestParameters hitTestParameters)
-		//{
+		// protected override System.Windows.Media.HitTestResult HitTestCore(System.Windows.Media.PointHitTestParameters hitTestParameters)
+		// {
 		//    var hitResult = base.HitTestCore(hitTestParameters);
 		//    if (hitResult == null)
 		//        return new PointHitTestResult(this, hitTestParameters.HitPoint);
 
-		//    return hitResult;
-		//}
-
-		#endregion Overrides
+		// return hitResult;
+		// }
 	}
 }

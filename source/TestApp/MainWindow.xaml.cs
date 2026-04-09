@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -56,7 +56,6 @@ namespace TestApp
 
 		}
 
-		#region TestTimer
 
 		/// <summary>
 		/// TestTimer Dependency Property
@@ -75,9 +74,7 @@ namespace TestApp
 			set => SetValue(TestTimerProperty, value);
 		}
 
-		#endregion
 
-		#region TestBackground
 
 		/// <summary>
 		/// TestBackground Dependency Property
@@ -96,9 +93,7 @@ namespace TestApp
 			set => SetValue(TestBackgroundProperty, value);
 		}
 
-		#endregion
 
-		#region FocusedElement
 
 		/// <summary>
 		/// FocusedElement Dependency Property
@@ -117,7 +112,6 @@ namespace TestApp
 			set => SetValue(FocusedElementProperty, value);
 		}
 
-		#endregion
 
 		private void OnLayoutRootPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{

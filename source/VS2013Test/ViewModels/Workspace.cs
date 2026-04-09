@@ -12,7 +12,6 @@ namespace AvalonDock.VS2013Test.ViewModels
 {
 	internal class Workspace : ViewModelBase
 	{
-		#region fields
 
 		private static Workspace _this = new Workspace();
 		private ToolViewModel[] _tools;
@@ -29,9 +28,7 @@ namespace AvalonDock.VS2013Test.ViewModels
 		private RelayCommand _newCommand;
 		private Tuple<string, Theme> _selectedTheme;
 
-		#endregion fields
 
-		#region constructors
 
 		/// <summary>
 		/// Class constructor
@@ -41,11 +38,9 @@ namespace AvalonDock.VS2013Test.ViewModels
 			SelectedTheme = Themes.First();
 		}
 
-		#endregion constructors
 
 		public event EventHandler ActiveDocumentChanged;
 
-		#region properties
 
 		public static Workspace This => _this;
 
@@ -195,9 +190,7 @@ namespace AvalonDock.VS2013Test.ViewModels
 			}
 		}
 
-		#endregion properties
 
-		#region methods
 
 		private void SwitchExtendedTheme()
 		{
@@ -272,7 +265,6 @@ namespace AvalonDock.VS2013Test.ViewModels
 			return fileViewModel;
 		}
 
-		#region OpenCommand
 
 		private bool CanOpen(object parameter) => true;
 
@@ -286,9 +278,7 @@ namespace AvalonDock.VS2013Test.ViewModels
 			}
 		}
 
-		#endregion OpenCommand
 
-		#region NewCommand
 
 		private bool CanNew(object parameter)
 		{
@@ -301,8 +291,6 @@ namespace AvalonDock.VS2013Test.ViewModels
 			ActiveDocument = _files.Last();
 		}
 
-		#endregion NewCommand
 
-		#endregion methods
 	}
 }

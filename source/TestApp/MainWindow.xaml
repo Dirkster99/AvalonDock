@@ -17,8 +17,8 @@
     xmlns:local="clr-namespace:TestApp"
     xmlns:winformsIntegration="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
     Title="MainWindow"
-    Width="525"
-    Height="350"
+    Width="800"
+    Height="600"
     UseLayoutRounding="True">
     <Grid x:Name="layoutRoot">
         <Grid.RowDefinitions>
