@@ -433,7 +433,11 @@ namespace AvalonDock
 			if (existingGroup != null)
 			{
 				parentPanel.Children.Remove(pane);
-				existingGroup.Children.Insert(0, pane);
+				// "Top" sub-zones (LeftTop, RightTop) go first; "Bottom" sub-zones append
+				if (zone == DockZone.LeftTop || zone == DockZone.RightTop)
+					existingGroup.Children.Insert(0, pane);
+				else
+					existingGroup.Children.Add(pane);
 				return;
 			}
 
@@ -700,7 +704,20 @@ namespace AvalonDock
 				{
 					case AnchorSide.Right:
 						if (rootPanel.Orientation == Orientation.Horizontal)
-							rootPanel.Children.Add(previousContainer);
+						{
+							if (zone == DockZone.RightTop)
+							{
+								// Insert before existing right-side panes/groups (after the document content)
+								int insertIdx = rootPanel.Children.Count;
+								while (insertIdx > 0 &&
+									   (rootPanel.Children[insertIdx - 1] is LayoutAnchorablePane ||
+										rootPanel.Children[insertIdx - 1] is LayoutAnchorablePaneGroup))
+									insertIdx--;
+								rootPanel.Children.Insert(insertIdx, previousContainer);
+							}
+							else
+								rootPanel.Children.Add(previousContainer);
+						}
 						else
 						{
 							var panel = new LayoutPanel { Orientation = Orientation.Horizontal };
@@ -711,7 +728,20 @@ namespace AvalonDock
 						break;
 					case AnchorSide.Left:
 						if (rootPanel.Orientation == Orientation.Horizontal)
-							rootPanel.Children.Insert(0, previousContainer);
+						{
+							if (zone == DockZone.LeftBottom)
+							{
+								// Insert after existing left-side panes/groups (before the document content)
+								int insertIdx = 0;
+								while (insertIdx < rootPanel.Children.Count &&
+									   (rootPanel.Children[insertIdx] is LayoutAnchorablePane ||
+										rootPanel.Children[insertIdx] is LayoutAnchorablePaneGroup))
+									insertIdx++;
+								rootPanel.Children.Insert(insertIdx, previousContainer);
+							}
+							else
+								rootPanel.Children.Insert(0, previousContainer);
+						}
 						else
 						{
 							var panel = new LayoutPanel { Orientation = Orientation.Horizontal };
