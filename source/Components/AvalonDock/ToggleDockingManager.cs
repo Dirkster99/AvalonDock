@@ -115,12 +115,12 @@ namespace AvalonDock
 			{
 				// Hide any currently docked anchorable in the SAME bar only
 				HideDockedInBar(GetBarForZone(zone));
-				anchorable.ToggleSingleAutoHide();
+				DockFromAutoHide(anchorable, zone);
 				FixSplitOrientation(anchorable, zone);
 			}
 			else
 			{
-				anchorable.ToggleSingleAutoHide();
+				AutoHideFromDock(anchorable, zone);
 			}
 
 			RefreshButtonStates();
@@ -149,7 +149,7 @@ namespace AvalonDock
 
 			// Ensure auto-hidden first
 			if (!anchorable.IsAutoHidden)
-				anchorable.ToggleSingleAutoHide();
+				AutoHideFromDock(anchorable, currentZone);
 
 			// Remove from current layout parent
 			if (anchorable.Parent is LayoutAnchorGroup oldGroup)
@@ -455,6 +455,121 @@ namespace AvalonDock
 			return zone == DockZone.BottomLeft || zone == DockZone.BottomRight;
 		}
 
+		private static bool IsLeftZone(DockZone zone)
+		{
+			return zone == DockZone.LeftTop || zone == DockZone.LeftBottom;
+		}
+
+		private static bool IsRightZone(DockZone zone)
+		{
+			return zone == DockZone.RightTop || zone == DockZone.RightBottom;
+		}
+
+		private static AnchorSide ZoneToAnchorSide(DockZone zone)
+		{
+			if (IsLeftZone(zone)) return AnchorSide.Left;
+			if (IsRightZone(zone)) return AnchorSide.Right;
+			return AnchorSide.Bottom;
+		}
+
+		/// <summary>
+		/// Docks an auto-hidden anchorable into the layout, using the DockZone
+		/// to determine placement instead of relying on LayoutAnchorSide.Side.
+		/// </summary>
+		private void DockFromAutoHide(LayoutAnchorable anchorable, DockZone zone)
+		{
+			var parentGroup = anchorable.Parent as LayoutAnchorGroup;
+			if (parentGroup == null) return;
+			var parentSide = parentGroup.Parent as LayoutAnchorSide;
+			if (parentSide == null) return;
+
+			var previousContainer = ((ILayoutPreviousContainer)parentGroup).PreviousContainer as LayoutAnchorablePane;
+			if (previousContainer != null && previousContainer.Root == null)
+				previousContainer = null;
+
+			if (previousContainer == null)
+			{
+				var side = ZoneToAnchorSide(zone);
+				previousContainer = new LayoutAnchorablePane
+				{
+					DockMinWidth = anchorable.AutoHideMinWidth,
+					DockMinHeight = anchorable.AutoHideMinHeight
+				};
+
+				var root = parentGroup.Root as LayoutRoot;
+				var rootPanel = root.RootPanel;
+
+				switch (side)
+				{
+					case AnchorSide.Right:
+						if (rootPanel.Orientation == Orientation.Horizontal)
+							rootPanel.Children.Add(previousContainer);
+						else
+						{
+							var panel = new LayoutPanel { Orientation = Orientation.Horizontal };
+							root.RootPanel = panel;
+							panel.Children.Add(rootPanel);
+							panel.Children.Add(previousContainer);
+						}
+						break;
+					case AnchorSide.Left:
+						if (rootPanel.Orientation == Orientation.Horizontal)
+							rootPanel.Children.Insert(0, previousContainer);
+						else
+						{
+							var panel = new LayoutPanel { Orientation = Orientation.Horizontal };
+							root.RootPanel = panel;
+							panel.Children.Add(previousContainer);
+							panel.Children.Add(rootPanel);
+						}
+						break;
+					case AnchorSide.Bottom:
+						if (rootPanel.Orientation == Orientation.Vertical)
+							rootPanel.Children.Add(previousContainer);
+						else
+						{
+							var panel = new LayoutPanel { Orientation = Orientation.Vertical };
+							root.RootPanel = panel;
+							panel.Children.Add(rootPanel);
+							panel.Children.Add(previousContainer);
+						}
+						break;
+				}
+			}
+
+			parentGroup.Children.Remove(anchorable);
+			previousContainer.Children.Add(anchorable);
+
+			if (parentGroup.Children.Count == 0)
+				parentSide.Children.Remove(parentGroup);
+		}
+
+		/// <summary>
+		/// Auto-hides a docked anchorable, using the DockZone to determine
+		/// the correct LayoutAnchorSide instead of relying on GetSide().
+		/// </summary>
+		private void AutoHideFromDock(LayoutAnchorable anchorable, DockZone zone)
+		{
+			var parentPane = anchorable.Parent as LayoutAnchorablePane;
+			if (parentPane == null) return;
+			var root = anchorable.Root;
+			if (root == null) return;
+
+			var side = ZoneToAnchorSide(zone);
+			var newAnchorGroup = new LayoutAnchorGroup();
+			((ILayoutPreviousContainer)newAnchorGroup).PreviousContainer = parentPane;
+
+			parentPane.Children.Remove(anchorable);
+			newAnchorGroup.Children.Add(anchorable);
+
+			switch (side)
+			{
+				case AnchorSide.Right: root.RightSide?.Children.Add(newAnchorGroup); break;
+				case AnchorSide.Left: root.LeftSide?.Children.Add(newAnchorGroup); break;
+				case AnchorSide.Bottom: root.BottomSide?.Children.Add(newAnchorGroup); break;
+			}
+		}
+
 		private void SetupToggleDockButtonBars()
 		{
 			RemoveToggleDockButtonBars();
@@ -622,7 +737,7 @@ namespace AvalonDock
 			foreach (var item in bar.Items)
 			{
 				if (item is ToggleDockButton btn && btn.Anchorable != null && !btn.Anchorable.IsAutoHidden)
-					btn.Anchorable.ToggleSingleAutoHide();
+					AutoHideFromDock(btn.Anchorable, bar.Zone);
 			}
 		}
 
