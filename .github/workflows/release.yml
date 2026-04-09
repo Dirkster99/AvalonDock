@@ -49,7 +49,7 @@ jobs:
         run: dotnet restore source/AvalonDock.sln
 
       - name: Build
-        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore ${{ steps.version.outputs.VERSION_ARGS }}
+        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore --warnaserror ${{ steps.version.outputs.VERSION_ARGS }}
 
       - name: Test
         run: >
