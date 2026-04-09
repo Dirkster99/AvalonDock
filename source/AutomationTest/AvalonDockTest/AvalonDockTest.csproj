@@ -1,28 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;net5.0-windows;net452</TargetFrameworks>
-    <ProjectGuid>{FE4E16A2-876A-4356-9974-8A89C50B2A5A}</ProjectGuid>
-    <RootNamespace>AvalonDockTest</RootNamespace>
-    <AssemblyName>AvalonDockTest</AssemblyName>
-    <FileVersion>1.0.0.0</FileVersion>
-    <UseWPF>true</UseWPF>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<ProjectGuid>{FE4E16A2-876A-4356-9974-8A89C50B2A5A}</ProjectGuid>
+		<RootNamespace>AvalonDockTest</RootNamespace>
+		<AssemblyName>AvalonDockTest</AssemblyName>
+		<TargetFrameworks>$(TestTargetFrameworks)</TargetFrameworks>
+		<UseWPF>true</UseWPF>
+		<IsPackable>false</IsPackable>
+		<LangVersion>latest</LangVersion>
+		<NoWarn>$(NoWarn);NUnit2005</NoWarn>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.0" />
-    <PackageReference Include="MSTest.STAExtensions" Version="1.0.3-beta" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.1.2" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.1.2" />
-    <PackageReference Include="coverlet.collector" Version="1.3.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0"/>
+		<PackageReference Include="NUnit" Version="4.5.1"/>
+		<PackageReference Include="NUnit3TestAdapter" Version="6.2.0"/>
+		<PackageReference Include="NUnit.Analyzers" Version="4.12.0"/>
+		<PackageReference Include="FlaUI.Core" Version="4.0.0"/>
+		<PackageReference Include="FlaUI.UIA3" Version="4.0.0"/>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Components\AvalonDock\AvalonDock.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Components\AvalonDock\AvalonDock.csproj"/>
+	</ItemGroup>
 
 </Project>

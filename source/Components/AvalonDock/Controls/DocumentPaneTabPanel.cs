@@ -7,11 +7,11 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -20,8 +20,6 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public class DocumentPaneTabPanel : Panel
 	{
-		#region Constructors
-
 		/// <summary>
 		/// Static constructor
 		/// </summary>
@@ -29,10 +27,6 @@ namespace AvalonDock.Controls
 		{
 			this.FlowDirection = System.Windows.FlowDirection.LeftToRight;
 		}
-
-		#endregion Constructors
-
-		#region Overrides
 
 		protected override Size MeasureOverride(Size availableSize)
 		{
@@ -77,6 +71,7 @@ namespace AvalonDock.Controls
 							return ArrangeOverride(finalSize);
 						}
 					}
+
 					doc.Visibility = System.Windows.Visibility.Hidden;
 					skipAllOthers = true;
 				}
@@ -87,25 +82,23 @@ namespace AvalonDock.Controls
 					offset += doc.ActualWidth + doc.Margin.Left + doc.Margin.Right;
 				}
 			}
+
 			return finalSize;
 		}
 
 		protected override void OnMouseLeave(System.Windows.Input.MouseEventArgs e)
 		{
-			//if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed &&
+			// if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed &&
 			//    LayoutDocumentTabItem.IsDraggingItem())
-			//{
+			// {
 			//    var contentModel = LayoutDocumentTabItem.GetDraggingItem().Model;
 			//    var manager = contentModel.Root.Manager;
 			//    LayoutDocumentTabItem.ResetDraggingItem();
 			//    System.Diagnostics.Trace.WriteLine("OnMouseLeave()");
 
-			//    manager.StartDraggingFloatingWindowForContent(contentModel);
-			//}
-
+			// manager.StartDraggingFloatingWindowForContent(contentModel);
+			// }
 			base.OnMouseLeave(e);
 		}
-
-		#endregion Overrides
 	}
 }

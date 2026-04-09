@@ -36,12 +36,12 @@ namespace AvalonDock.Controls
 
 		public static Rect GetScreenArea(this FrameworkElement element)
 		{
-			//    return new Rect(element.PointToScreenDPI(new Point()),
+			// return new Rect(element.PointToScreenDPI(new Point()),
 			//        element.TransformActualSizeToAncestor());
-			//}
+			// }
 
-			//public static Rect GetScreenAreaWithoutFlowDirection(this FrameworkElement element)
-			//{
+			// public static Rect GetScreenAreaWithoutFlowDirection(this FrameworkElement element)
+			// {
 			var point = element.PointToScreenDPI(new Point());
 			if (FrameworkElement.GetFlowDirection(element) == FlowDirection.RightToLeft)
 			{
@@ -49,17 +49,19 @@ namespace AvalonDock.Controls
 				Point leftToRightPoint = new Point(
 					actualSize.Width - point.X,
 					point.Y);
-				return new Rect(leftToRightPoint,
+				return new Rect(
+					leftToRightPoint,
 					actualSize);
 			}
 
-			return new Rect(point,
+			return new Rect(
+				point,
 				element.TransformActualSizeToAncestor());
 		}
 
 		public static Point TransformToDeviceDPI(this Visual visual, Point pt)
 		{
-			var compositionTarget = PresentationSource.FromVisual(visual).CompositionTarget;
+			var compositionTarget = PresentationSource.FromVisual(visual)?.CompositionTarget ?? null;
 			if (compositionTarget == null)
 				return default;
 			Matrix m = compositionTarget.TransformToDevice;

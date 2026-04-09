@@ -1,4 +1,4 @@
-﻿namespace AvalonDock.MVVMTestApp
+namespace AvalonDock.MVVMTestApp
 {
 	using System;
 	using System.IO;
@@ -6,15 +6,12 @@
 
 	internal class FileStatsViewModel : ToolViewModel
 	{
-		#region fields
 		public const string ToolContentId = "FileStatsTool";
 		private DateTime _lastModified;
 		private long _fileSize;
 		private string _FileName;
 		private string _FilePath;
-		#endregion fields
 
-		#region constructors
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -30,9 +27,7 @@
 			bi.EndInit();
 			IconSource = bi;
 		}
-		#endregion constructors
 
-		#region Properties
 
 		public long FileSize
 		{
@@ -86,9 +81,7 @@
 			}
 		}
 
-		#endregion Properties
 
-		#region methods
 		private void OnActiveDocumentChanged(object sender, EventArgs e)
 		{
 			if (Workspace.This.ActiveDocument != null &&
@@ -109,7 +102,6 @@
 				FilePath = string.Empty;
 			}
 		}
-		#endregion methods
 
 	}
 }

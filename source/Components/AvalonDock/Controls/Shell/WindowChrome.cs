@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -8,17 +8,17 @@
  ************************************************************************/
 
 /**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 namespace Microsoft.Windows.Shell
 {
-	using Standard;
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics.CodeAnalysis;
 	using System.Windows;
 	using System.Windows.Data;
+	using Standard;
 
 	public class WindowChrome : Freezable
 	{
@@ -55,8 +55,6 @@ namespace Microsoft.Windows.Shell
 		// Named property available for fully extending the glass frame.
 		public static Thickness GlassFrameCompleteThickness => new Thickness(-1);
 
-		#region Attached Properties
-
 		public static readonly DependencyProperty WindowChromeProperty = DependencyProperty.RegisterAttached("WindowChrome", typeof(WindowChrome), typeof(WindowChrome),
 			new PropertyMetadata(null, _OnChromeChanged));
 
@@ -82,6 +80,7 @@ namespace Microsoft.Windows.Shell
 				chromeWorker = new WindowChromeWorker();
 				WindowChromeWorker.SetWindowChromeWorker(window, chromeWorker);
 			}
+
 			chromeWorker.SetWindowChrome(newChrome);
 		}
 
@@ -124,10 +123,6 @@ namespace Microsoft.Windows.Shell
 				throw new ArgumentException("The element must be a DependencyObject", nameof(inputElement));
 			dobj.SetValue(IsHitTestVisibleInChromeProperty, hitTestVisible);
 		}
-
-		#endregion Attached Properties
-
-		#region Dependency Properties
 
 		public static readonly DependencyProperty CaptionHeightProperty = DependencyProperty.Register(nameof(CaptionHeight), typeof(double), typeof(WindowChrome),
 			new PropertyMetadata(0d, (d, e) => ((WindowChrome)d)._OnPropertyChangedThatRequiresRepaint()), value => (double)value >= 0d);
@@ -175,8 +170,6 @@ namespace Microsoft.Windows.Shell
 
 		/// <summary>Gets or sets the ShowSystemMenu property.  This dependency property indicates if the system menu should be shown at right click on the caption. </summary>
 		public bool ShowSystemMenu { get; set; }
-
-		#endregion Dependency Properties
 
 		/// <inheritdoc />
 		protected override Freezable CreateInstanceCore()

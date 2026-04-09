@@ -7,13 +7,13 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -22,17 +22,12 @@ namespace AvalonDock.Controls
 	/// <see cref="LayoutAnchorablePaneControl"/>, <see cref="LayoutDocumentPaneControl"/> etc.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	internal abstract class DropTarget<T> : DropTargetBase, IDropTarget where T : FrameworkElement
+	internal abstract class DropTarget<T> : DropTargetBase, IDropTarget
+		where T : FrameworkElement
 	{
-		#region fields
-
 		private Rect[] _detectionRect;
 		private T _targetElement;
 		private DropTargetType _type;
-
-		#endregion fields
-
-		#region Constructors
 
 		protected DropTarget(T targetElement, Rect detectionRect, DropTargetType type)
 		{
@@ -47,10 +42,6 @@ namespace AvalonDock.Controls
 			_detectionRect = detectionRects.ToArray();
 			_type = type;
 		}
-
-		#endregion Constructors
-
-		#region Properties
 
 		public Rect[] DetectionRects
 		{
@@ -76,10 +67,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion Properties
-
-		#region Overrides
-
 		/// <summary>
 		/// Method is invoked to complete a drag & drop operation with a (new) docking position
 		/// by docking of the LayoutAnchorable <paramref name="floatingWindow"/> into this drop target.
@@ -102,10 +89,6 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#endregion Overrides
-
-		#region Public Methods
-
 		public bool HitTestScreen(Point dragPoint)
 		{
 			return HitTest(_targetElement.TransformToDeviceDPI(dragPoint));
@@ -126,9 +109,11 @@ namespace AvalonDock.Controls
 				var fwAsDocument = floatingWindow as LayoutDocumentFloatingWindow;
 				this.Drop(fwAsDocument);
 			}
+
 			if (currentActiveContent == null)
 				return;
-			Dispatcher.BeginInvoke(new Action(() =>
+			Dispatcher.BeginInvoke(
+				new Action(() =>
 				{
 					currentActiveContent.IsSelected = false;
 					currentActiveContent.IsActive = false;
@@ -152,7 +137,5 @@ namespace AvalonDock.Controls
 		{
 			SetIsDraggingOver(TargetElement, false);
 		}
-
-		#endregion Public Methods
 	}
 }

@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -23,18 +23,12 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutDocumentPane : LayoutPositionableGroup<LayoutContent>, ILayoutDocumentPane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable
 	{
-		#region fields
-
 		private bool _showHeader = true;
 		private int _selectedIndex = -1;
 		private string _id;
 
 		[XmlIgnore]
 		private readonly bool _autoFixSelectedContent = true;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>Standard class constructor</summary>
 		public LayoutDocumentPane()
@@ -50,10 +44,6 @@ namespace AvalonDock.Layout
 		{
 			Children.Add(firstChild);
 		}
-
-		#endregion Constructors
-
-		#region Properties
 
 		/// <summary>Gets/sets whether to show the header or not.</summary>
 		public bool ShowHeader
@@ -109,10 +99,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion Properties
-
-		#region Overrides
-
 		/// <inheritdoc />
 		protected override bool GetVisibility()
 		{
@@ -130,6 +116,7 @@ namespace AvalonDock.Layout
 				_selectedIndex = newIndex;
 				RaisePropertyChanged(nameof(SelectedContentIndex));
 			}
+
 			base.ChildMoved(oldIndex, newIndex);
 		}
 
@@ -143,9 +130,10 @@ namespace AvalonDock.Layout
 				SelectedContentIndex = i;
 				break;
 			}
+
 			// TODO: MK who's properties are these??
-			//RaisePropertyChanged(nameof(CanClose));
-			//RaisePropertyChanged(nameof(CanHide));
+			// RaisePropertyChanged(nameof(CanClose));
+			// RaisePropertyChanged(nameof(CanHide));
 			RaisePropertyChanged(nameof(IsDirectlyHostedInFloatingWindow));
 			base.OnChildrenCollectionChanged();
 			RaisePropertyChanged(nameof(ChildrenSorted));
@@ -167,7 +155,7 @@ namespace AvalonDock.Layout
 			{
 				var parentFloatingWindow = this.FindParent<LayoutDocumentFloatingWindow>();
 				return parentFloatingWindow != null && parentFloatingWindow.IsSinglePane;
-				//return Parent != null && Parent.ChildrenCount == 1 && Parent.Parent is LayoutFloatingWindow;
+				// return Parent != null && Parent.ChildrenCount == 1 && Parent.Parent is LayoutFloatingWindow;
 			}
 		}
 
@@ -198,10 +186,6 @@ namespace AvalonDock.Layout
 				child.ConsoleDump(tab + 1);
 		}
 #endif
-
-		#endregion Overrides
-
-		#region methods
 
 		/// <summary>Gets the index of the <paramref name="content"/> in the Children collection or -1</summary>
 		/// <param name="content"></param>
@@ -244,7 +228,5 @@ namespace AvalonDock.Layout
 
 		/// <inheritdoc/>
 		private void OnParentChildrenCollectionChanged(object sender, EventArgs e) => RaisePropertyChanged(nameof(IsDirectlyHostedInFloatingWindow));
-
-		#endregion methods
 	}
 }

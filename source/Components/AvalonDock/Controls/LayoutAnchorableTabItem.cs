@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,12 +7,12 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -25,33 +25,23 @@ namespace AvalonDock.Controls
 	/// <seealso cref="Control"/>
 	public class LayoutAnchorableTabItem : Control
 	{
-		#region fields
-
 		private bool _isMouseDown = false;
 		private static LayoutAnchorableTabItem _draggingItem = null;
 		private static bool _cancelMouseLeave = false;
-
-		#endregion fields
-
-		#region Constructors
 
 		static LayoutAnchorableTabItem()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutAnchorableTabItem), new FrameworkPropertyMetadata(typeof(LayoutAnchorableTabItem)));
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
-		#region Model
-
 		/// <summary><see cref="Model"/> dependency property.</summary>
 		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(nameof(Model), typeof(LayoutContent), typeof(LayoutAnchorableTabItem),
 				new FrameworkPropertyMetadata(null, OnModelChanged));
 
 		/// <summary>Gets/sets the model attached to the anchorable tab item.</summary>
-		[Bindable(true), Description("Gets/sets the model attached to the anchorable tab item."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets/sets the model attached to the anchorable tab item.")]
+		[Category("Other")]
 		public LayoutContent Model
 		{
 			get => (LayoutContent)GetValue(ModelProperty);
@@ -65,12 +55,8 @@ namespace AvalonDock.Controls
 		protected virtual void OnModelChanged(DependencyPropertyChangedEventArgs e)
 		{
 			SetLayoutItem(Model?.Root.Manager.GetLayoutItemFromModel(Model));
-			//UpdateLogicalParent();
+			// UpdateLogicalParent();
 		}
-
-		#endregion Model
-
-		#region LayoutItem
 
 		/// <summary><see cref="LayoutItem"/> Read-Only dependency property.</summary>
 		private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(LayoutItem), typeof(LayoutItem), typeof(LayoutAnchorableTabItem),
@@ -79,7 +65,9 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
 		/// <summary>Gets the the LayoutItem attached to this tag item.</summary>
-		[Bindable(true), Description("Gets the the LayoutItem attached to this tag item."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets the the LayoutItem attached to this tag item.")]
+		[Category("Other")]
 		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
 
 		/// <summary>
@@ -89,12 +77,6 @@ namespace AvalonDock.Controls
 		/// <param name="value">The new value for the property.</param>
 		protected void SetLayoutItem(LayoutItem value) => SetValue(LayoutItemPropertyKey, value);
 
-		#endregion LayoutItem
-
-		#endregion Properties
-
-		#region Internal Methods
-
 		internal static bool IsDraggingItem() => _draggingItem != null;
 
 		internal static LayoutAnchorableTabItem GetDraggingItem() => _draggingItem;
@@ -102,10 +84,6 @@ namespace AvalonDock.Controls
 		internal static void ResetDraggingItem() => _draggingItem = null;
 
 		internal static void CancelMouseLeave() => _cancelMouseLeave = true;
-
-		#endregion Internal Methods
-
-		#region Overrides
 
 		/// <inheritdoc />
 		protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
@@ -133,7 +111,9 @@ namespace AvalonDock.Controls
 				_draggingItem = null;
 			}
 			else
+			{
 				_cancelMouseLeave = false;
+			}
 		}
 
 		/// <inheritdoc />
@@ -154,6 +134,7 @@ namespace AvalonDock.Controls
 				// Mouse leave should be canceled when selecting a new tab to prevent automatic undock when Panel size is Auto.
 				_draggingItem = !_cancelMouseLeave ? this : null;
 			}
+
 			_isMouseDown = false;
 			_cancelMouseLeave = false;
 		}
@@ -175,7 +156,5 @@ namespace AvalonDock.Controls
 			var newIndex = childrenList.IndexOf(model);
 			if (newIndex < containerPane.ChildrenCount && oldIndex > -1) containerPane.MoveChild(oldIndex, newIndex);
 		}
-
-		#endregion Overrides
 	}
 }

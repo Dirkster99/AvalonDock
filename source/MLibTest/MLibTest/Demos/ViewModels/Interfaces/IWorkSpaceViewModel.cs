@@ -1,4 +1,4 @@
-﻿namespace MLibTest.Demos.ViewModels.Interfaces
+namespace MLibTest.Demos.ViewModels.Interfaces
 {
 	using MLibTest.Demos.ViewModels.AD;
 	using System;
@@ -24,7 +24,6 @@
 		/// <summary>Gets an enumeration of all currently available document viewmodels.</summary>
 		IEnumerable<DocumentViewModel> Files { get; }
 
-		#region methods
 		/// <summary>
 		/// Checks if a document can be closed and asks the user whether
 		/// to save before closing if the document appears to be dirty.
@@ -54,6 +53,5 @@
 
 		/// <summary>Closing all documents without user interaction to support reload of layout via menu.</summary>
 		void CloseAllDocuments();
-		#endregion methods
 	}
 }

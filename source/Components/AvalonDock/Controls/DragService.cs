@@ -7,12 +7,12 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Interop;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -45,8 +45,6 @@ namespace AvalonDock.Controls
 	/// <seeslso cref="LayoutAnchorableFloatingWindowControl"/>).
 	internal class DragService
 	{
-		#region fields
-
 		private DockingManager _manager;
 		private LayoutFloatingWindowControl _floatingWindow;
 
@@ -59,10 +57,6 @@ namespace AvalonDock.Controls
 		private IDropTarget _currentDropTarget;
 		private bool _isDrag;
 
-		#endregion fields
-
-		#region Constructors
-
 		/// <summary>
 		/// Class constructor from <see cref="LayoutFloatingWindowControl"/> that is using this
 		/// service to implement its drag and drop (dock) behavior.
@@ -74,10 +68,6 @@ namespace AvalonDock.Controls
 			_manager = floatingWindow.Model.Root.Manager;
 		}
 
-		#endregion Constructors
-
-		#region Internal Methods
-
 		/// <summary>
 		/// Method is invoked by the <see cref="LayoutFloatingWindowControl"/> to update the
 		/// current mouse position as the user drags the floating window with the mouse cursor.
@@ -87,7 +77,6 @@ namespace AvalonDock.Controls
 		{
 			////var floatingWindowModel = _floatingWindow.Model as LayoutFloatingWindow;
 			// TODO - pass in without DPI adjustment, screen co-ords, adjust inside the target window
-
 			if (!_isDrag)
 			{
 				GetOverlayWindowHosts();
@@ -98,22 +87,22 @@ namespace AvalonDock.Controls
 
 			if (_currentHost != null || _currentHost != newHost)
 			{
-				//is mouse still inside current overlay window host?
+				// is mouse still inside current overlay window host?
 				if ((_currentHost != null && !_currentHost.HitTestScreen(dragPosition)) ||
 					_currentHost != newHost)
 				{
-					//esit drop target
+					// esit drop target
 					if (_currentDropTarget != null)
 						_currentWindow.DragLeave(_currentDropTarget);
 
 					_currentDropTarget = null;
 
-					//exit area
+					// exit area
 					_currentWindowAreas.ForEach(a =>
 						_currentWindow.DragLeave(a));
 					_currentWindowAreas.Clear();
 
-					//hide current overlay window
+					// hide current overlay window
 					if (_currentWindow != null)
 						_currentWindow.DragLeave(_floatingWindow);
 					if (_currentHost != null)
@@ -165,7 +154,7 @@ namespace AvalonDock.Controls
 			List<IDropArea> areasToRemove = new List<IDropArea>();
 			_currentWindowAreas.ForEach(a =>
 			{
-				//is mouse still inside this area?
+				// is mouse still inside this area?
 				if (!a.DetectionRect.Contains(a.TransformToDeviceDPI(dragPosition)))
 				{
 					_currentWindow.DragLeave(a);
@@ -273,15 +262,12 @@ namespace AvalonDock.Controls
 			_currentHost = null;
 		}
 
-		#endregion Internal Methods
-
-		#region Private Methods
-
 		private void BringWindowToTop2(Window window)
 		{
 			if (window == null) return;
 
-			Win32Helper.SetWindowPos(new WindowInteropHelper(window).Handle,
+			Win32Helper.SetWindowPos(
+				new WindowInteropHelper(window).Handle,
 				IntPtr.Zero, 0, 0, 0, 0, Win32Helper.SetWindowPosFlags.IgnoreResize | Win32Helper.SetWindowPosFlags.IgnoreMove | Win32Helper.SetWindowPosFlags.DoNotActivate);
 		}
 
@@ -298,7 +284,5 @@ namespace AvalonDock.Controls
 				_manager.GetOverlayWindowHostsByZOrder(ref _overlayWindowHosts, _floatingWindow);
 			}
 		}
-
-		#endregion Private Methods
 	}
 }

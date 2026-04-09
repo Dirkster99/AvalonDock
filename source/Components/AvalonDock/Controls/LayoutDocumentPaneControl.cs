@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,13 +7,13 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -26,15 +26,9 @@ namespace AvalonDock.Controls
 	/// </summary>
 	/// <seealso cref="TabControlEx"/>
 	/// <seealso cref="ILayoutControl"/>
-	public class LayoutDocumentPaneControl : TabControlEx, ILayoutControl//, ILogicalChildrenContainer
+	public class LayoutDocumentPaneControl : TabControlEx, ILayoutControl// , ILogicalChildrenContainer
 	{
-		#region fields
-
 		private readonly LayoutDocumentPane _model;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>Static class constructor to register WPF style keys.</summary>
 		static LayoutDocumentPaneControl()
@@ -56,17 +50,11 @@ namespace AvalonDock.Controls
 			this.SizeChanged += OnSizeChanged;
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
 		/// <summary>Gets the layout model of this control.</summary>
-		[Bindable(false), Description("Gets the layout model of this control."), Category("Other")]
+		[Bindable(false)]
+		[Description("Gets the layout model of this control.")]
+		[Category("Other")]
 		public ILayoutElement Model => _model;
-
-		#endregion Properties
-
-		#region Overrides
 
 		/// <summary>
 		/// Invoked when an unhandled SelectionChanged routed event is raised on this element. Implement this method
@@ -129,17 +117,11 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		private void OnSizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			var modelWithAtcualSize = _model as ILayoutPositionableElementWithActualSize;
 			modelWithAtcualSize.ActualWidth = ActualWidth;
 			modelWithAtcualSize.ActualHeight = ActualHeight;
 		}
-
-		#endregion Private Methods
 	}
 }

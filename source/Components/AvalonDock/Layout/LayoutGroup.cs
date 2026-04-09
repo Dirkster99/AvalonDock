@@ -22,26 +22,17 @@ namespace AvalonDock.Layout
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	[Serializable]
-	public abstract class LayoutGroup<T> : LayoutGroupBase, ILayoutGroup, IXmlSerializable where T : class, ILayoutElement
+	public abstract class LayoutGroup<T> : LayoutGroupBase, ILayoutGroup, IXmlSerializable
+		where T : class, ILayoutElement
 	{
-		#region fields
-
 		private readonly ObservableCollection<T> _children = new ObservableCollection<T>();
 		private bool _isVisible = true;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>Class constructor.</summary>
 		internal LayoutGroup()
 		{
 			_children.CollectionChanged += Children_CollectionChanged;
 		}
-
-		#endregion Constructors
-
-		#region Properties
 
 		/// <summary>Gets a collection of children objects below this object.</summary>
 		public ObservableCollection<T> Children => _children;
@@ -65,10 +56,6 @@ namespace AvalonDock.Layout
 				RaisePropertyChanged(nameof(IsVisible));
 			}
 		}
-
-		#endregion Properties
-
-		#region Public Methods
 
 		/// <inheritdoc cref="ILayoutElementWithVisibility" />
 		public void ComputeVisibility() => IsVisible = GetVisibility();
@@ -138,6 +125,7 @@ namespace AvalonDock.Layout
 				ComputeVisibility();
 				return;
 			}
+
 			var localName = reader.LocalName;
 			reader.Read();
 			while (true)
@@ -150,7 +138,7 @@ namespace AvalonDock.Layout
 					continue;
 				}
 
-				string fullName = String.Format("{0}.{1}", GetType().Namespace, reader.LocalName);
+				string fullName = string.Format("{0}.{1}", GetType().Namespace, reader.LocalName);
 				Type typeForSerializer = Type.GetType(fullName);
 
 				if (typeForSerializer == null)
@@ -178,10 +166,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion Public Methods
-
-		#region Internal Methods
-
 		protected virtual void OnIsVisibleChanged()
 		{
 			UpdateParentVisibility();
@@ -193,20 +177,12 @@ namespace AvalonDock.Layout
 		{
 		}
 
-		#endregion Internal Methods
-
-		#region Overrides
-
 		/// <inheritdoc />
 		protected override void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
 			base.OnParentChanged(oldValue, newValue);
 			ComputeVisibility();
 		}
-
-		#endregion Overrides
-
-		#region Private Methods
 
 		private void Children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
@@ -218,6 +194,7 @@ namespace AvalonDock.Layout
 						if (element.Parent == this || e.Action == NotifyCollectionChangedAction.Remove) element.Parent = null;
 				}
 			}
+
 			if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Replace)
 			{
 				if (e.NewItems != null)
@@ -251,11 +228,12 @@ namespace AvalonDock.Layout
 		private Type FindType(string name)
 		{
 			foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+			{
 				foreach (var t in a.GetTypes())
 					if (t.Name.Equals(name)) return t;
+			}
+
 			return null;
 		}
-
-		#endregion Private Methods
 	}
 }

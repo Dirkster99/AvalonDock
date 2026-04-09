@@ -25,7 +25,9 @@ namespace AvalonDock
 		{
 			var wndParent = Window.GetWindow(element);
 			if (wndParent != null)
+			{
 				window.Owner = wndParent;
+			}
 			else
 			{
 				if (GetParentWindowHandle(element, out IntPtr parentHwnd))
@@ -57,7 +59,9 @@ namespace AvalonDock
 		public static void SetParentWindowToNull(this Window window)
 		{
 			if (window.Owner != null)
+			{
 				window.Owner = null;
+			}
 			else
 			{
 				Win32Helper.SetOwner(new WindowInteropHelper(window).Handle, IntPtr.Zero);

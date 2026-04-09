@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -8,7 +8,7 @@
  ************************************************************************/
 
 /**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 namespace Standard
@@ -351,8 +351,6 @@ namespace Standard
 			return (int)(error & 0xFFFF);
 		}
 
-		#region Overrides
-
 		/// <summary>
 		/// Get a string representation of this HRESULT.
 		/// </summary>
@@ -369,7 +367,6 @@ namespace Standard
 			//
 			// CONSIDER: This data is static.  It could be cached
 			// after first usage for fast lookup since the keys are unique.
-			//
 			foreach (var publicStaticField in typeof(HRESULT).GetFields(BindingFlags.Static | BindingFlags.Public))
 			{
 				if (publicStaticField.FieldType == typeof(HRESULT))
@@ -415,8 +412,6 @@ namespace Standard
 		/// <inheritdoc />
 		public override int GetHashCode() => _value.GetHashCode();
 
-		#endregion Overrides
-
 		public static bool operator ==(HRESULT hrLeft, HRESULT hrRight) => hrLeft._value == hrRight._value;
 
 		public static bool operator !=(HRESULT hrLeft, HRESULT hrRight) => !(hrLeft == hrRight);
@@ -427,8 +422,8 @@ namespace Standard
 
 		public void ThrowIfFailed() => ThrowIfFailed(null);
 
-		[SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes", Justification = "Only recreating Exceptions that were already raised."),
-		 SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
+		[SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes", Justification = "Only recreating Exceptions that were already raised.")]
+		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public void ThrowIfFailed(string message)
 		{
 			if (!Failed) return;
@@ -476,6 +471,7 @@ namespace Standard
 					Assert.IsNotNull(e);
 				}
 			}
+
 			throw e;
 		}
 

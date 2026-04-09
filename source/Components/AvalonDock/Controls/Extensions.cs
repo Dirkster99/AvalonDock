@@ -22,7 +22,8 @@ namespace AvalonDock.Controls
 		/// <param name="depObj">The starting point for the search.</param>
 		/// <returns>All the children found.</returns>
 		/// <remarks>Uses <see cref="VisualTreeHelper"/> internally.</remarks>
-		public static IEnumerable<T> FindVisualChildren<T>(this DependencyObject depObj) where T : DependencyObject
+		public static IEnumerable<T> FindVisualChildren<T>(this DependencyObject depObj)
+			where T : DependencyObject
 		{
 			if (depObj == null) yield break;
 			for (var i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
@@ -40,7 +41,8 @@ namespace AvalonDock.Controls
 		/// <param name="depObj">The starting point for the search.</param>
 		/// <returns>All the children found.</returns>
 		/// <remarks>Uses <see cref="LogicalTreeHelper"/> internally.</remarks>
-		public static IEnumerable<T> FindLogicalChildren<T>(this DependencyObject depObj) where T : DependencyObject
+		public static IEnumerable<T> FindLogicalChildren<T>(this DependencyObject depObj)
+			where T : DependencyObject
 		{
 			if (depObj == null) yield break;
 			foreach (var child in LogicalTreeHelper.GetChildren(depObj).OfType<DependencyObject>())
@@ -64,7 +66,9 @@ namespace AvalonDock.Controls
 			{
 				result = current;
 				if (current is Visual || current is Visual3D)
+				{
 					current = VisualTreeHelper.GetParent(current);
+				}
 				else
 				{
 					// If we're in Logical Land then we must walk
@@ -73,6 +77,7 @@ namespace AvalonDock.Controls
 					current = LogicalTreeHelper.GetParent(current);
 				}
 			}
+
 			return result;
 		}
 
@@ -81,7 +86,8 @@ namespace AvalonDock.Controls
 		/// <param name="dependencyObject">The dependency object to find ancestor for.</param>
 		/// <returns>The ancestor, or <c>null</c> if no match found.</returns>
 		/// <remarks>Uses <see cref="VisualTreeHelper.GetParent"/> internally.</remarks>
-		public static T FindVisualAncestor<T>(this DependencyObject dependencyObject) where T : class
+		public static T FindVisualAncestor<T>(this DependencyObject dependencyObject)
+			where T : class
 		{
 			var target = dependencyObject;
 			do
@@ -97,7 +103,8 @@ namespace AvalonDock.Controls
 		/// <param name="dependencyObject">The dependency object to find ancestor for.</param>
 		/// <returns>The ancestor, or <c>null</c> if no match found.</returns>
 		/// <remarks>Uses <see cref="LogicalTreeHelper.GetParent"/> and <see cref="VisualTreeHelper.GetParent"/> internally.</remarks>
-		public static T FindLogicalAncestor<T>(this DependencyObject dependencyObject) where T : class
+		public static T FindLogicalAncestor<T>(this DependencyObject dependencyObject)
+			where T : class
 		{
 			var target = dependencyObject;
 			do

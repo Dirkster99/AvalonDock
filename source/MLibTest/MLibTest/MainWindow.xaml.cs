@@ -1,4 +1,4 @@
-﻿namespace MLibTest
+namespace MLibTest
 {
 	using MLibTest.Models;
 	using MLibTest.ViewModels;
@@ -19,12 +19,9 @@
 	public partial class MainWindow : MWindowLib.MetroWindow
 									, IViewSize  // Implements saving and loading/repositioning of Window
 	{
-		#region fields
 		ICommand _loadLayoutCommand = null;
 		ICommand _saveLayoutCommand = null;
-		#endregion fields
 
-		#region ctors
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -32,10 +29,7 @@
 		{
 			InitializeComponent();
 		}
-		#endregion ctors
 
-		#region methods
-		#region LoadLayoutCommand
 		public ICommand LoadLayoutCommand
 		{
 			get
@@ -181,9 +175,7 @@
 			this.OnLayoutLoaded_Event(null, (LoaderResult == null ? null : new LayoutLoadedEventArgs(LoaderResult)));
 		}
 
-		#endregion
 
-		#region SaveLayoutCommand
 		public ICommand SaveLayoutCommand
 		{
 			get
@@ -208,7 +200,6 @@
 			layoutSerializer.Serialize(@".\AvalonDock.Layout.config");
 		}
 
-		#endregion
 
 		private void OnDumpToConsole(object sender, RoutedEventArgs e)
 		{
@@ -219,6 +210,5 @@
 			dockManager.Layout.ConsoleDump(0);
 #endif
 		}
-		#endregion methods
 	}
 }
