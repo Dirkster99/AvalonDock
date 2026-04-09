@@ -148,9 +148,9 @@ namespace AvalonDock
 
 		/// <summary>
 		/// Moves an anchorable from its current section to a new section.
-		/// Removes it from the old button bar and adds it to the new one, then toggles it on.
+		/// If there's already a docked anchorable in the target section, creates a split layout.
 		/// </summary>
-		public void MoveAnchorableToSection(LayoutAnchorable anchorable, AnchorSide targetSection)
+		public void MoveAnchorableToSection(LayoutAnchorable anchorable, AnchorSide targetSection, DropSubPosition subPosition = DropSubPosition.First)
 		{
 			if (anchorable == null) return;
 
@@ -159,6 +159,16 @@ namespace AvalonDock
 			// If already in the target section, just toggle it on
 			if (currentSection == targetSection)
 			{
+				// Check if there's already a docked anchorable — if so, split
+				var existingDocked = FindDockedInSection(targetSection);
+				if (existingDocked != null && existingDocked != anchorable)
+				{
+					// Dock alongside existing one
+					if (anchorable.IsAutoHidden)
+						DockAlongside(anchorable, existingDocked, targetSection, subPosition);
+					return;
+				}
+
 				if (anchorable.IsAutoHidden)
 					ToggleAnchorable(anchorable, targetSection);
 				return;
@@ -205,8 +215,16 @@ namespace AvalonDock
 				targetBar.Items.Add(btn);
 			}
 
-			// Toggle it on in the new section
-			ToggleAnchorable(anchorable, targetSection);
+			// Check if there's already a docked anchorable in the target section
+			var alreadyDocked = FindDockedInSection(targetSection);
+			if (alreadyDocked != null && alreadyDocked != anchorable)
+			{
+				DockAlongside(anchorable, alreadyDocked, targetSection, subPosition);
+			}
+			else
+			{
+				ToggleAnchorable(anchorable, targetSection);
+			}
 		}
 
 		#endregion Public Methods — Drag Support
@@ -475,6 +493,88 @@ namespace AvalonDock
 				case AnchorSide.Bottom: return _leftBottomButtonBar;
 				default: return _leftTopButtonBar;
 			}
+		}
+
+		/// <summary>Finds the first docked (non-auto-hidden) anchorable in the given section, or null.</summary>
+		private LayoutAnchorable FindDockedInSection(AnchorSide section)
+		{
+			return Layout.Descendents()
+				.OfType<LayoutAnchorable>()
+				.FirstOrDefault(a => a.Parent is LayoutAnchorablePane pane && !a.IsFloating && pane.GetSide() == section);
+		}
+
+		/// <summary>
+		/// Docks the anchorable alongside an already-docked one, creating a split pane layout.
+		/// For Left/Right sections: vertical split (top/bottom).
+		/// For Bottom section: horizontal split (left/right).
+		/// </summary>
+		private void DockAlongside(LayoutAnchorable anchorable, LayoutAnchorable existingDocked, AnchorSide section, DropSubPosition subPosition)
+		{
+			var existingPane = existingDocked.Parent as LayoutAnchorablePane;
+			if (existingPane == null) return;
+
+			// Move anchorable out of auto-hide into a new pane
+			if (anchorable.Parent is LayoutAnchorGroup anchorGroup)
+				anchorGroup.RemoveChild(anchorable);
+
+			var newPane = new LayoutAnchorablePane(anchorable);
+
+			// Create a pane group with the appropriate orientation
+			var orientation = (section == AnchorSide.Bottom) ? Orientation.Horizontal : Orientation.Vertical;
+
+			// Check if existing pane is already inside a pane group with the same orientation
+			if (existingPane.Parent is LayoutAnchorablePaneGroup existingGroup && existingGroup.Orientation == orientation)
+			{
+				// Just add to existing group
+				int idx = existingGroup.Children.IndexOf(existingPane);
+				if (subPosition == DropSubPosition.First)
+					existingGroup.Children.Insert(idx, newPane);
+				else
+					existingGroup.Children.Insert(idx + 1, newPane);
+			}
+			else
+			{
+				// Wrap existing pane and new pane in a new pane group
+				var parentContainer = existingPane.Parent;
+				var paneGroup = new LayoutAnchorablePaneGroup { Orientation = orientation };
+
+				if (parentContainer is LayoutPanel panel)
+				{
+					int idx = panel.Children.IndexOf(existingPane);
+					panel.RemoveChild(existingPane);
+					if (subPosition == DropSubPosition.First)
+					{
+						paneGroup.Children.Add(newPane);
+						paneGroup.Children.Add(existingPane);
+					}
+					else
+					{
+						paneGroup.Children.Add(existingPane);
+						paneGroup.Children.Add(newPane);
+					}
+					panel.Children.Insert(idx, paneGroup);
+				}
+				else if (parentContainer is LayoutAnchorablePaneGroup parentGroup)
+				{
+					int idx = parentGroup.Children.IndexOf(existingPane);
+					parentGroup.RemoveChild(existingPane);
+					if (subPosition == DropSubPosition.First)
+					{
+						paneGroup.Children.Add(newPane);
+						paneGroup.Children.Add(existingPane);
+					}
+					else
+					{
+						paneGroup.Children.Add(existingPane);
+						paneGroup.Children.Add(newPane);
+					}
+					parentGroup.Children.Insert(idx, paneGroup);
+				}
+			}
+
+			RefreshButtonStates();
+			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
+				new System.Action(UpdatePinButtonsToMinimize));
 		}
 
 		#endregion Private Methods

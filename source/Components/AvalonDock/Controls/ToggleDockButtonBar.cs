@@ -471,6 +471,9 @@ namespace AvalonDock.Controls
 		#endregion Private Methods
 	}
 
+	/// <summary>Sub-position within a drop zone (top/bottom half or left/right half).</summary>
+	public enum DropSubPosition { First, Second }
+
 	/// <summary>
 	/// A transparent overlay window that shows 6 edge drop zones when dragging a toggle button.
 	/// Zones: Left-Top, Left-Bottom, Right-Top, Right-Bottom, Bottom-Left, Bottom-Right.
@@ -492,6 +495,7 @@ namespace AvalonDock.Controls
 		{
 			public Rect Rect;
 			public AnchorSide Section;
+			public DropSubPosition SubPosition;
 			public string Label;
 		}
 
@@ -579,6 +583,7 @@ namespace AvalonDock.Controls
 			{
 				Rect = new Rect(contentX, 0, leftW, halfSideH),
 				Section = AnchorSide.Left,
+				SubPosition = DropSubPosition.First,
 				Label = "Left Top"
 			});
 			// Left-Bottom
@@ -586,6 +591,7 @@ namespace AvalonDock.Controls
 			{
 				Rect = new Rect(contentX, halfSideH, leftW, halfSideH),
 				Section = AnchorSide.Left,
+				SubPosition = DropSubPosition.Second,
 				Label = "Left Bottom"
 			});
 			// Right-Top
@@ -593,6 +599,7 @@ namespace AvalonDock.Controls
 			{
 				Rect = new Rect(contentX + contentW - rightW, 0, rightW, halfSideH),
 				Section = AnchorSide.Right,
+				SubPosition = DropSubPosition.First,
 				Label = "Right Top"
 			});
 			// Right-Bottom
@@ -600,6 +607,7 @@ namespace AvalonDock.Controls
 			{
 				Rect = new Rect(contentX + contentW - rightW, halfSideH, rightW, halfSideH),
 				Section = AnchorSide.Right,
+				SubPosition = DropSubPosition.Second,
 				Label = "Right Bottom"
 			});
 			// Bottom-Left
@@ -607,6 +615,7 @@ namespace AvalonDock.Controls
 			{
 				Rect = new Rect(contentX, sideH, contentW / 2, bottomH),
 				Section = AnchorSide.Bottom,
+				SubPosition = DropSubPosition.First,
 				Label = "Bottom Left"
 			});
 			// Bottom-Right
@@ -614,6 +623,7 @@ namespace AvalonDock.Controls
 			{
 				Rect = new Rect(contentX + contentW / 2, sideH, contentW / 2, bottomH),
 				Section = AnchorSide.Bottom,
+				SubPosition = DropSubPosition.Second,
 				Label = "Bottom Right"
 			});
 		}
@@ -689,7 +699,7 @@ namespace AvalonDock.Controls
 
 			if (hitZone.HasValue && _sourceButton.Anchorable != null)
 			{
-				_manager.MoveAnchorableToSection(_sourceButton.Anchorable, hitZone.Value.Section);
+				_manager.MoveAnchorableToSection(_sourceButton.Anchorable, hitZone.Value.Section, hitZone.Value.SubPosition);
 			}
 		}
 
