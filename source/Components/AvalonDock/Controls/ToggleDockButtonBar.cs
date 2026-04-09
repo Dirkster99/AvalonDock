@@ -273,6 +273,9 @@ namespace AvalonDock.Controls
 			public Rect Rect;
 			public DockZone Zone;
 			public string Label;
+			/// <summary>When set, draw a horizontal/vertical insertion line at this position instead of highlighting the whole zone.</summary>
+			public Point? InsertionLineStart;
+			public Point? InsertionLineEnd;
 		}
 
 		private ToggleDockDragOverlay(LayoutAnchorable anchorable, Visual ghostVisual, Size ghostSize, ToggleDockingManager manager, Window owner)
@@ -400,13 +403,68 @@ namespace AvalonDock.Controls
 				Label = "Bottom Right"
 			});
 
-			// Sidebar button bar drop zones — dropping on a bar moves anchorable to that zone
-			AddBarDropZone(_manager._leftTopBar, DockZone.LeftTop);
-			AddBarDropZone(_manager._leftBottomBar, DockZone.LeftBottom);
-			AddBarDropZone(_manager._rightTopBar, DockZone.RightTop);
-			AddBarDropZone(_manager._rightBottomBar, DockZone.RightBottom);
+			// Sidebar panel drop zones — cover entire panel area, split at separator
+			AddSidebarPanelDropZones(_manager._injectedLeftDockPanel,
+				_manager._leftTopBar, DockZone.LeftTop,
+				_manager._leftBottomBar, DockZone.LeftBottom,
+				isVertical: true);
+			AddSidebarPanelDropZones(_manager._injectedRightDockPanel,
+				_manager._rightTopBar, DockZone.RightTop,
+				_manager._rightBottomBar, DockZone.RightBottom,
+				isVertical: true);
+			// Bottom bars sit at the bottom of left/right panels — add them as simple bar zones
 			AddBarDropZone(_manager._bottomLeftBar, DockZone.BottomLeft);
 			AddBarDropZone(_manager._bottomRightBar, DockZone.BottomRight);
+		}
+
+		private void AddSidebarPanelDropZones(DockPanel panel,
+			ToggleDockButtonBar topBar, DockZone topZone,
+			ToggleDockButtonBar bottomBar, DockZone bottomZone,
+			bool isVertical)
+		{
+			if (panel == null || !panel.IsVisible) return;
+
+			var managerScreenPos = new Point(Left, Top);
+			var panelScreen = panel.GetScreenArea();
+			var panelRect = new Rect(
+				panelScreen.Left - managerScreenPos.X,
+				panelScreen.Top - managerScreenPos.Y,
+				Math.Max(panelScreen.Width, 20),
+				Math.Max(panelScreen.Height, 20));
+
+			// Exclude the bottom-dock bar area from the panel zone
+			double bottomBarHeight = 0;
+			var bottomDockBar = topZone.ToString().StartsWith("Left") ? _manager._bottomLeftBar : _manager._bottomRightBar;
+			if (bottomDockBar != null && bottomDockBar.IsVisible)
+			{
+				var bbScreen = bottomDockBar.GetScreenArea();
+				bottomBarHeight = bbScreen.Height;
+			}
+
+			double usableHeight = panelRect.Height - bottomBarHeight;
+			if (usableHeight < 10) return;
+
+			double midY = panelRect.Y + usableHeight / 2.0;
+
+			// Top half → topZone, insertion line at bottom of top half
+			_dropZones.Add(new DropZone
+			{
+				Rect = new Rect(panelRect.X, panelRect.Y, panelRect.Width, usableHeight / 2.0),
+				Zone = topZone,
+				Label = null,
+				InsertionLineStart = new Point(panelRect.X + 2, midY),
+				InsertionLineEnd = new Point(panelRect.X + panelRect.Width - 2, midY)
+			});
+
+			// Bottom half → bottomZone, insertion line at top of bottom half
+			_dropZones.Add(new DropZone
+			{
+				Rect = new Rect(panelRect.X, midY, panelRect.Width, usableHeight / 2.0),
+				Zone = bottomZone,
+				Label = null,
+				InsertionLineStart = new Point(panelRect.X + 2, midY),
+				InsertionLineEnd = new Point(panelRect.X + panelRect.Width - 2, midY)
+			});
 		}
 
 		private void AddBarDropZone(ToggleDockButtonBar bar, DockZone zone)
@@ -550,10 +608,34 @@ namespace AvalonDock.Controls
 
 				if (isBarZone)
 				{
-					// Bar zones: only highlight when hovered, don't draw normally
+					// Bar zones: only show insertion indicator when hovered
 					if (isHovered)
 					{
-						dc.DrawRoundedRectangle(hoverBrush, borderPen, zone.Rect, 2, 2);
+						// Light highlight on the zone
+						dc.DrawRoundedRectangle(
+							new SolidColorBrush(Color.FromArgb(0x20, 0x00, 0x7A, 0xCC)),
+							null, zone.Rect, 2, 2);
+
+						// Draw insertion line if available
+						if (zone.InsertionLineStart.HasValue && zone.InsertionLineEnd.HasValue)
+						{
+							var linePen = new Pen(new SolidColorBrush(Color.FromArgb(0xCC, 0x00, 0x7A, 0xCC)), 3)
+							{
+								DashCap = PenLineCap.Round,
+								StartLineCap = PenLineCap.Round,
+								EndLineCap = PenLineCap.Round
+							};
+							dc.DrawLine(linePen, zone.InsertionLineStart.Value, zone.InsertionLineEnd.Value);
+
+							// Draw small circles at each end
+							var circleBrush = new SolidColorBrush(Color.FromArgb(0xCC, 0x00, 0x7A, 0xCC));
+							dc.DrawEllipse(circleBrush, null, zone.InsertionLineStart.Value, 3, 3);
+							dc.DrawEllipse(circleBrush, null, zone.InsertionLineEnd.Value, 3, 3);
+						}
+						else
+						{
+							dc.DrawRoundedRectangle(hoverBrush, borderPen, zone.Rect, 2, 2);
+						}
 					}
 				}
 				else
