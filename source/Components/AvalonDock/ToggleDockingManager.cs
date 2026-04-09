@@ -32,6 +32,19 @@ namespace AvalonDock
 	}
 
 	/// <summary>
+	/// Controls which docked panes get priority for full extent.
+	/// </summary>
+	public enum DockLayoutPriority
+	{
+		/// <summary>Bottom panes span full width; side panes share remaining height (Rider-style).</summary>
+		BottomFullWidth,
+		/// <summary>Side panes span full height; bottom panes share remaining width (VSCode-style).</summary>
+		SidesFullHeight,
+		/// <summary>No restructuring — use AvalonDock's default nesting order.</summary>
+		Default
+	}
+
+	/// <summary>
 	/// A docking manager with Rider-style toggle-dock behavior.
 	/// Two sidebars (left + right), each with 3 button sections separated by separators:
 	/// [SideTop] — separator — [SideBottom] — gap — [BottomSide].
@@ -54,6 +67,26 @@ namespace AvalonDock
 		internal FrameworkElement _rightSeparator;
 
 		#endregion fields
+
+		#region Dependency Properties
+
+		/// <summary><see cref="LayoutPriority"/> dependency property.</summary>
+		public static readonly DependencyProperty LayoutPriorityProperty =
+			DependencyProperty.Register(nameof(LayoutPriority), typeof(DockLayoutPriority), typeof(ToggleDockingManager),
+				new PropertyMetadata(DockLayoutPriority.BottomFullWidth));
+
+		/// <summary>
+		/// Gets or sets which docked panes get priority for full extent.
+		/// Default is <see cref="DockLayoutPriority.BottomFullWidth"/> (Rider-style).
+		/// Set to <see cref="DockLayoutPriority.SidesFullHeight"/> for VSCode-style.
+		/// </summary>
+		public DockLayoutPriority LayoutPriority
+		{
+			get => (DockLayoutPriority)GetValue(LayoutPriorityProperty);
+			set => SetValue(LayoutPriorityProperty, value);
+		}
+
+		#endregion Dependency Properties
 
 		#region Constructors
 
@@ -85,7 +118,16 @@ namespace AvalonDock
 				HideDockedInBar(GetBarForZone(zone));
 				DockFromAutoHide(anchorable, zone);
 				FixSplitOrientation(anchorable, zone);
-				EnsureBottomFullWidth();
+
+				switch (LayoutPriority)
+				{
+					case DockLayoutPriority.BottomFullWidth:
+						EnsureBottomFullWidth();
+						break;
+					case DockLayoutPriority.SidesFullHeight:
+						EnsureSidesFullHeight();
+						break;
+				}
 			}
 			else
 			{
@@ -517,6 +559,99 @@ namespace AvalonDock
 				{
 					((ILayoutContainer)bp.Parent).RemoveChild(bp);
 					rootPanel.Children.Add(bp);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Ensures side panes are at the outermost horizontal level for full height (VSCode-style).
+		/// If a side pane ended up nested inside a vertical panel (because it was docked
+		/// after bottom panes), this restructures the tree so side panes are siblings of the
+		/// vertical panel, not children of it.
+		/// 
+		/// Target layout: Horizontal[ Left?, Vertical[Docs, Bottom?], Right? ]
+		/// </summary>
+		private void EnsureSidesFullHeight()
+		{
+			var root = Layout as LayoutRoot;
+			if (root == null) return;
+			var rootPanel = root.RootPanel;
+			if (rootPanel == null) return;
+
+			if (rootPanel.Orientation == Orientation.Vertical)
+			{
+				// Root is vertical. Side panes may be nested in horizontal sub-panels.
+				var leftPanes = new List<LayoutAnchorablePane>();
+				var rightPanes = new List<LayoutAnchorablePane>();
+
+				foreach (var child in rootPanel.Children.OfType<LayoutPanel>().ToList())
+				{
+					if (child.Orientation == Orientation.Horizontal)
+					{
+						foreach (var pane in child.Children.OfType<LayoutAnchorablePane>().ToList())
+						{
+							int idx = child.Children.IndexOf(pane);
+							if (idx == 0 && child.Children.Count > 1)
+								leftPanes.Add(pane);
+							else if (idx == child.Children.Count - 1 && child.Children.Count > 1)
+								rightPanes.Add(pane);
+						}
+					}
+				}
+
+				if (leftPanes.Count > 0 || rightPanes.Count > 0)
+				{
+					var hPanel = new LayoutPanel { Orientation = Orientation.Horizontal };
+					root.RootPanel = hPanel;
+
+					foreach (var lp in leftPanes)
+						((ILayoutContainer)lp.Parent).RemoveChild(lp);
+					foreach (var rp in rightPanes)
+						((ILayoutContainer)rp.Parent).RemoveChild(rp);
+
+					foreach (var lp in leftPanes)
+						hPanel.Children.Add(lp);
+					hPanel.Children.Add(rootPanel);
+					foreach (var rp in rightPanes)
+						hPanel.Children.Add(rp);
+				}
+			}
+			else if (rootPanel.Orientation == Orientation.Horizontal)
+			{
+				// Root is already horizontal. Check if side panes are nested in vertical sub-panels.
+				var leftPanesToLift = new List<LayoutAnchorablePane>();
+				var rightPanesToLift = new List<LayoutAnchorablePane>();
+
+				foreach (var child in rootPanel.Children.OfType<LayoutPanel>().ToList())
+				{
+					if (child.Orientation == Orientation.Vertical)
+					{
+						foreach (var subChild in child.Children.OfType<LayoutPanel>().ToList())
+						{
+							if (subChild.Orientation == Orientation.Horizontal)
+							{
+								foreach (var pane in subChild.Children.OfType<LayoutAnchorablePane>().ToList())
+								{
+									int idx = subChild.Children.IndexOf(pane);
+									if (idx == 0 && subChild.Children.Count > 1)
+										leftPanesToLift.Add(pane);
+									else if (idx == subChild.Children.Count - 1 && subChild.Children.Count > 1)
+										rightPanesToLift.Add(pane);
+								}
+							}
+						}
+					}
+				}
+
+				foreach (var lp in leftPanesToLift)
+				{
+					((ILayoutContainer)lp.Parent).RemoveChild(lp);
+					rootPanel.Children.Insert(0, lp);
+				}
+				foreach (var rp in rightPanesToLift)
+				{
+					((ILayoutContainer)rp.Parent).RemoveChild(rp);
+					rootPanel.Children.Add(rp);
 				}
 			}
 		}

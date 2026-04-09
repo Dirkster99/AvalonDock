@@ -44,6 +44,12 @@
         <Menu Grid.Row="0">
             <MenuItem Header="Layout">
                 <MenuItem Click="OnDumpToConsole" Header="Dump To Console" />
+                <Separator />
+                <MenuItem Header="Layout Priority">
+                    <MenuItem x:Name="menuBottomFullWidth" Header="Bottom Full Width (Rider)" IsCheckable="True" IsChecked="True" Click="OnLayoutPriorityChanged" />
+                    <MenuItem x:Name="menuSidesFullHeight" Header="Sides Full Height (VSCode)" IsCheckable="True" Click="OnLayoutPriorityChanged" />
+                    <MenuItem x:Name="menuDefaultPriority" Header="Default (No Restructuring)" IsCheckable="True" Click="OnLayoutPriorityChanged" />
+                </MenuItem>
             </MenuItem>
         </Menu>
 
