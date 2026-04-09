@@ -1325,14 +1325,14 @@
 
 	</Style>
 
-	<!--  ToggleDockButton  -->
+	<!--  ToggleDockButton - modern rounded styling  -->
 	<Style x:Key="{x:Type avalonDockControls:ToggleDockButton}" TargetType="{x:Type avalonDockControls:ToggleDockButton}">
 		<Setter Property="Background" Value="Transparent" />
-		<Setter Property="BorderBrush" Value="Gray" />
+		<Setter Property="BorderBrush" Value="#D0D0D0" />
 		<Setter Property="BorderThickness" Value="1" />
-		<Setter Property="Padding" Value="4,6" />
-		<Setter Property="Margin" Value="1" />
-		<Setter Property="FontSize" Value="11" />
+		<Setter Property="Padding" Value="3,4" />
+		<Setter Property="Margin" Value="2" />
+		<Setter Property="FontSize" Value="10.5" />
 		<Setter Property="HorizontalContentAlignment" Value="Center" />
 		<Setter Property="VerticalContentAlignment" Value="Center" />
 		<Setter Property="Template">
@@ -1343,6 +1343,7 @@
 						Background="{TemplateBinding Background}"
 						BorderBrush="{TemplateBinding BorderBrush}"
 						BorderThickness="{TemplateBinding BorderThickness}"
+						CornerRadius="5"
 						Padding="{TemplateBinding Padding}"
 						SnapsToDevicePixels="True">
 						<StackPanel x:Name="ContentPanel" Orientation="Horizontal" HorizontalAlignment="Center">
@@ -1352,8 +1353,8 @@
 							<!-- Icon (ImageSource) -->
 							<Image x:Name="PART_Icon"
 								Source="{TemplateBinding IconSource}"
-								Width="16" Height="16"
-								Margin="0,0,4,0"
+								Width="14" Height="14"
+								Margin="0,0,3,0"
 								Stretch="Uniform"
 								VerticalAlignment="Center"
 								Visibility="Collapsed" />
@@ -1361,7 +1362,7 @@
 							<ContentPresenter x:Name="PART_IconContent"
 								Content="{TemplateBinding IconContent}"
 								ContentTemplate="{TemplateBinding IconTemplate}"
-								Margin="0,0,4,0"
+								Margin="0,0,3,0"
 								VerticalAlignment="Center"
 								Visibility="Collapsed" />
 							<!-- Title text -->
@@ -1395,11 +1396,12 @@
 							</Setter>
 						</DataTrigger>
 						<Trigger Property="IsMouseOver" Value="True">
-							<Setter TargetName="Bd" Property="Background" Value="#E0E0E0" />
+							<Setter TargetName="Bd" Property="Background" Value="#EBEBEB" />
+							<Setter TargetName="Bd" Property="BorderBrush" Value="#C0C0C0" />
 						</Trigger>
 						<Trigger Property="IsChecked" Value="True">
-							<Setter TargetName="Bd" Property="Background" Value="#CCE5FF" />
-							<Setter TargetName="Bd" Property="BorderBrush" Value="#007ACC" />
+							<Setter TargetName="Bd" Property="Background" Value="#D6EBFF" />
+							<Setter TargetName="Bd" Property="BorderBrush" Value="#4DA3E8" />
 						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
@@ -1407,9 +1409,62 @@
 		</Setter>
 	</Style>
 
-	<!--  ToggleDockingManager - uses same template as DockingManager but with button bar slots  -->
+	<!--  ToggleDockingManager - modern rounded anchorable pane  -->
+	<Style x:Key="ToggleAnchorablePaneControlStyle" TargetType="{x:Type avalonDockControls:LayoutAnchorablePaneControl}">
+		<Setter Property="Foreground" Value="{Binding Model.Root.Manager.Foreground, RelativeSource={RelativeSource Self}}" />
+		<Setter Property="Background" Value="{Binding Model.Root.Manager.Background, RelativeSource={RelativeSource Self}}" />
+		<Setter Property="TabStripPlacement" Value="Bottom" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type avalonDockControls:LayoutAnchorablePaneControl}">
+					<Border
+						CornerRadius="6"
+						Background="{TemplateBinding Background}"
+						BorderBrush="#D0D0D0"
+						BorderThickness="1"
+						ClipToBounds="True"
+						SnapsToDevicePixels="True">
+						<Grid KeyboardNavigation.TabNavigation="Local">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*" />
+								<RowDefinition Height="Auto" />
+							</Grid.RowDefinitions>
+							<Border Grid.RowSpan="2" Background="Transparent" />
+							<Border
+								x:Name="ContentPanel"
+								Grid.Row="0"
+								KeyboardNavigation.DirectionalNavigation="Contained"
+								KeyboardNavigation.TabIndex="2"
+								KeyboardNavigation.TabNavigation="Cycle">
+								<ContentPresenter
+									x:Name="PART_SelectedContentHost"
+									Margin="{TemplateBinding Padding}"
+									ContentSource="SelectedContent"
+									SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+							</Border>
+							<avalonDockControls:AnchorablePaneTabPanel
+								x:Name="HeaderPanel"
+								Grid.Row="1"
+								Margin="4,0,4,4"
+								Panel.ZIndex="1"
+								IsItemsHost="true"
+								KeyboardNavigation.TabIndex="1" />
+						</Grid>
+					</Border>
+					<ControlTemplate.Triggers>
+						<Trigger Property="IsEnabled" Value="false">
+							<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+		<Setter Property="ItemContainerStyle" Value="{DynamicResource {x:Type TabItem}}" />
+	</Style>
+
 	<Style x:Key="{x:Type avalonDock:ToggleDockingManager}" TargetType="{x:Type avalonDock:ToggleDockingManager}"
 		   BasedOn="{StaticResource {x:Type avalonDock:DockingManager}}">
+		<Setter Property="AnchorablePaneControlStyle" Value="{StaticResource ToggleAnchorablePaneControlStyle}" />
 	</Style>
 
 </ResourceDictionary>
