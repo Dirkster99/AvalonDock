@@ -352,6 +352,7 @@ namespace AvalonDock.Controls
 			double sideH = contentH - bottomH;
 			double halfSideH = sideH / 2.0;
 
+			// Content area drop zones
 			_dropZones.Add(new DropZone
 			{
 				Rect = new Rect(contentX, 0, leftW, halfSideH),
@@ -388,6 +389,30 @@ namespace AvalonDock.Controls
 				Zone = DockZone.BottomRight,
 				Label = "Bottom Right"
 			});
+
+			// Sidebar button bar drop zones — dropping on a bar moves anchorable to that zone
+			AddBarDropZone(_manager._leftTopBar, DockZone.LeftTop);
+			AddBarDropZone(_manager._leftBottomBar, DockZone.LeftBottom);
+			AddBarDropZone(_manager._rightTopBar, DockZone.RightTop);
+			AddBarDropZone(_manager._rightBottomBar, DockZone.RightBottom);
+			AddBarDropZone(_manager._bottomLeftBar, DockZone.BottomLeft);
+			AddBarDropZone(_manager._bottomRightBar, DockZone.BottomRight);
+		}
+
+		private void AddBarDropZone(ToggleDockButtonBar bar, DockZone zone)
+		{
+			if (bar == null || !bar.IsVisible) return;
+
+			// Convert bar's screen position to overlay-relative coordinates
+			var managerScreenPos = new Point(Left, Top);
+			var barScreenArea = bar.GetScreenArea();
+			var barRect = new Rect(
+				barScreenArea.Left - managerScreenPos.X,
+				barScreenArea.Top - managerScreenPos.Y,
+				Math.Max(barScreenArea.Width, 20),
+				Math.Max(barScreenArea.Height, 20));
+
+			_dropZones.Add(new DropZone { Rect = barRect, Zone = zone, Label = null });
 		}
 
 		private double GetOpenDockWidth(AnchorSide side, double fallback)
@@ -511,29 +536,41 @@ namespace AvalonDock.Controls
 			{
 				var zone = _dropZones[i];
 				bool isHovered = i == hoveredIndex;
+				bool isBarZone = zone.Label == null;
 
-				dc.DrawRoundedRectangle(
-					isHovered ? hoverBrush : normalBrush,
-					borderPen,
-					zone.Rect,
-					4, 4);
+				if (isBarZone)
+				{
+					// Bar zones: only highlight when hovered, don't draw normally
+					if (isHovered)
+					{
+						dc.DrawRoundedRectangle(hoverBrush, borderPen, zone.Rect, 2, 2);
+					}
+				}
+				else
+				{
+					// Content area zones: always visible with label
+					dc.DrawRoundedRectangle(
+						isHovered ? hoverBrush : normalBrush,
+						borderPen,
+						zone.Rect,
+						4, 4);
 
-				// Draw zone label
-				var formattedText = new FormattedText(
-					zone.Label,
-					System.Globalization.CultureInfo.CurrentCulture,
-					FlowDirection.LeftToRight,
-					labelTypeface,
-					14,
-					new SolidColorBrush(Color.FromArgb(isHovered ? (byte)0xCC : (byte)0x66, 0x00, 0x7A, 0xCC))
+					var formattedText = new FormattedText(
+						zone.Label,
+						System.Globalization.CultureInfo.CurrentCulture,
+						FlowDirection.LeftToRight,
+						labelTypeface,
+						14,
+						new SolidColorBrush(Color.FromArgb(isHovered ? (byte)0xCC : (byte)0x66, 0x00, 0x7A, 0xCC))
 #if !NET40
-					, 1.0
+						, 1.0
 #endif
-					);
+						);
 
-				var textX = zone.Rect.X + (zone.Rect.Width - formattedText.Width) / 2;
-				var textY = zone.Rect.Y + (zone.Rect.Height - formattedText.Height) / 2;
-				dc.DrawText(formattedText, new Point(textX, textY));
+					var textX = zone.Rect.X + (zone.Rect.Width - formattedText.Width) / 2;
+					var textY = zone.Rect.Y + (zone.Rect.Height - formattedText.Height) / 2;
+					dc.DrawText(formattedText, new Point(textX, textY));
+				}
 			}
 
 			// Draw ghost of dragged button near cursor
