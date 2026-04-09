@@ -5,6 +5,7 @@ trim_trailing_whitespace = false
 insert_final_newline = false
 indent_style = tab
 dotnet_diagnostic.ide1006.severity = none
+dotnet_diagnostic.wfo0003.severity = none
 
 # Microsoft .NET properties
 csharp_indent_braces = false
