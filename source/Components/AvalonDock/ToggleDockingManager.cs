@@ -7,6 +7,7 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
+using System;
 using AvalonDock.Controls;
 using AvalonDock.Layout;
 using System.Collections.Generic;
@@ -80,6 +81,7 @@ namespace AvalonDock
 				// Hide any currently docked anchorable in the SAME bar only
 				HideDockedInBar(GetBarForZone(zone));
 				anchorable.ToggleSingleAutoHide();
+				FixSplitOrientation(anchorable, zone);
 			}
 			else
 			{
@@ -216,6 +218,56 @@ namespace AvalonDock
 				foreach (var c in FindVisualChildren<T>(child))
 					yield return c;
 			}
+		}
+
+		/// <summary>
+		/// After docking an anchorable, ensures that if multiple panes share the same side,
+		/// they are split with the correct orientation:
+		/// Left/Right → Vertical (top/bottom), Bottom → Horizontal (left/right).
+		/// </summary>
+		private void FixSplitOrientation(LayoutAnchorable anchorable, DockZone zone)
+		{
+			var pane = anchorable.Parent as LayoutAnchorablePane;
+			if (pane == null) return;
+
+			var parentPanel = pane.Parent as LayoutPanel;
+			if (parentPanel == null) return;
+
+			// Determine the desired orientation for panes on this side
+			var desiredOrientation = IsBottomZone(zone) ? Orientation.Horizontal : Orientation.Vertical;
+
+			// Find all anchorable panes that are siblings in the same panel
+			var siblingPanes = parentPanel.Children.OfType<LayoutAnchorablePane>().ToList();
+			if (siblingPanes.Count < 2) return; // nothing to fix if only one pane
+
+			// Check if the parent panel already has the correct orientation
+			if (parentPanel.Orientation == desiredOrientation) return;
+
+			// If there are exactly 2 anchorable panes and possibly other children (like document pane),
+			// we need to group the anchorable panes into a LayoutAnchorablePaneGroup with the right orientation
+			var group = new LayoutAnchorablePaneGroup { Orientation = desiredOrientation };
+			int firstIdx = -1;
+
+			// Remove sibling panes from parent and add to group
+			foreach (var sp in siblingPanes)
+			{
+				int idx = parentPanel.Children.IndexOf(sp);
+				if (firstIdx < 0) firstIdx = idx;
+			}
+
+			// Remove in reverse order to preserve indices
+			for (int i = siblingPanes.Count - 1; i >= 0; i--)
+				parentPanel.Children.Remove(siblingPanes[i]);
+
+			foreach (var sp in siblingPanes)
+				group.Children.Add(sp);
+
+			parentPanel.Children.Insert(Math.Min(firstIdx, parentPanel.Children.Count), group);
+		}
+
+		private static bool IsBottomZone(DockZone zone)
+		{
+			return zone == DockZone.BottomLeft || zone == DockZone.BottomRight;
 		}
 
 		private void SetupToggleDockButtonBars()
