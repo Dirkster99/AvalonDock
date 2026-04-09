@@ -261,29 +261,33 @@ namespace AvalonDock
 			var parentPanel = pane.Parent as LayoutPanel;
 			if (parentPanel == null) return;
 
-			// Determine the desired orientation for panes on this side
 			var desiredOrientation = IsBottomZone(zone) ? Orientation.Horizontal : Orientation.Vertical;
 
-			// Find all anchorable panes that are siblings in the same panel
-			var siblingPanes = parentPanel.Children.OfType<LayoutAnchorablePane>().ToList();
-			if (siblingPanes.Count < 2) return; // nothing to fix if only one pane
+			// Case 1: There's already a LayoutAnchorablePaneGroup sibling — insert into it
+			var existingGroup = parentPanel.Children.OfType<LayoutAnchorablePaneGroup>()
+				.FirstOrDefault(g => g.Orientation == desiredOrientation);
+			if (existingGroup != null)
+			{
+				parentPanel.Children.Remove(pane);
+				existingGroup.Children.Insert(0, pane);
+				return;
+			}
 
-			// Check if the parent panel already has the correct orientation
+			// Case 2: Multiple loose LayoutAnchorablePane siblings — wrap them in a group
+			var siblingPanes = parentPanel.Children.OfType<LayoutAnchorablePane>().ToList();
+			if (siblingPanes.Count < 2) return;
+
 			if (parentPanel.Orientation == desiredOrientation) return;
 
-			// If there are exactly 2 anchorable panes and possibly other children (like document pane),
-			// we need to group the anchorable panes into a LayoutAnchorablePaneGroup with the right orientation
 			var group = new LayoutAnchorablePaneGroup { Orientation = desiredOrientation };
 			int firstIdx = -1;
 
-			// Remove sibling panes from parent and add to group
 			foreach (var sp in siblingPanes)
 			{
 				int idx = parentPanel.Children.IndexOf(sp);
 				if (firstIdx < 0) firstIdx = idx;
 			}
 
-			// Remove in reverse order to preserve indices
 			for (int i = siblingPanes.Count - 1; i >= 0; i--)
 				parentPanel.Children.Remove(siblingPanes[i]);
 
