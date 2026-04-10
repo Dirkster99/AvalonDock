@@ -42,7 +42,6 @@ namespace AvalonDockTest.FlaUITests
 
             tool1.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(300);
 
             Assert.That(App.HasExited, Is.False,
                 "Clicking tool window tab should activate it without crashing (Issue #375).");
@@ -56,7 +55,6 @@ namespace AvalonDockTest.FlaUITests
 
             tool1.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(300);
 
             Assert.That(App.HasExited, Is.False,
                 "Tool window content should be accessible when activated.");
@@ -100,14 +98,13 @@ namespace AvalonDockTest.FlaUITests
 
             autoHideTab.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             Assert.That(App.HasExited, Is.False,
                 "Clicking auto-hide tab should not crash the application (Issue #169).");
 
             // Click the document area to close the flyout
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(500);
         }
 
         /// <summary>
@@ -118,12 +115,11 @@ namespace AvalonDockTest.FlaUITests
         {
             MainWindow.SetForeground();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(300);
 
             var initialCount = GetFloatingWindows().Length;
 
             ClickMenuItemByName("Tools", "New floating window");
-            System.Threading.Thread.Sleep(1000);
+            WaitForFloatingWindow();
 
             var afterCount = GetFloatingWindows().Length;
             Assert.That(afterCount, Is.GreaterThan(initialCount),

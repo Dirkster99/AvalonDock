@@ -38,7 +38,7 @@ namespace AvalonDockTest.FlaUITests
             // or use Hiding event (which shows MessageBox with Yes/No)
             // Instead, let's show it via menu to test that path
             ClickMenuItemByName("Tools", "Tool Window1");
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             // Tool Window 1 should still be visible (menu toggles or activates it)
             Assert.That(App.HasExited, Is.False,
@@ -58,7 +58,7 @@ namespace AvalonDockTest.FlaUITests
 
             autoHideTab.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             // Find textboxes in the flyout
             var textBoxes = MainWindow.FindAllDescendants(CF.ByControlType(ControlType.Edit));
@@ -69,7 +69,6 @@ namespace AvalonDockTest.FlaUITests
 
             // Close flyout
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(300);
         }
 
         /// <summary>
@@ -110,10 +109,9 @@ namespace AvalonDockTest.FlaUITests
             {
                 autoHideTab.Click();
                 Wait.UntilInputIsProcessed();
-                System.Threading.Thread.Sleep(300);
+                System.Threading.Thread.Sleep(200);
 
                 ActivateDocumentTab("Document 1");
-                System.Threading.Thread.Sleep(300);
             }
 
             Assert.That(App.HasExited, Is.False,
@@ -129,14 +127,13 @@ namespace AvalonDockTest.FlaUITests
         public void AddDynamicTools_DoesNotCrash_Issue382()
         {
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(300);
 
             var addButton = FindByName("Click to add 2 documents");
             Assert.That(addButton, Is.Not.Null, "Add button should be present.");
 
             addButton.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             Assert.That(App.HasExited, Is.False,
                 "App should not crash when adding dynamic tools (Issue #382).");
@@ -154,7 +151,7 @@ namespace AvalonDockTest.FlaUITests
         public void ShowWinFormsWindowViaMenu_Works()
         {
             ClickMenuItemByName("Tools", "WinForms Window");
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             Assert.That(App.HasExited, Is.False,
                 "App should not crash when showing WinForms Window via menu.");

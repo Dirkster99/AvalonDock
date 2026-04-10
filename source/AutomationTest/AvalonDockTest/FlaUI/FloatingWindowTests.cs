@@ -30,7 +30,7 @@ namespace AvalonDockTest.FlaUITests
         public void NewFloatingWindow_CreatesFloatingWindow_Issue254()
         {
             ClickMenuItemByName("Tools", "New floating window");
-            System.Threading.Thread.Sleep(1000);
+            WaitForFloatingWindow();
 
             var floatingWindows = GetFloatingWindows();
             Assert.That(floatingWindows.Length, Is.GreaterThanOrEqualTo(1),
@@ -48,7 +48,7 @@ namespace AvalonDockTest.FlaUITests
             if (floatingWindows.Length == 0)
             {
                 ClickMenuItemByName("Tools", "New floating window");
-                System.Threading.Thread.Sleep(1000);
+                WaitForFloatingWindow();
                 floatingWindows = GetFloatingWindows();
             }
 
@@ -58,7 +58,6 @@ namespace AvalonDockTest.FlaUITests
             var floatingWindow = floatingWindows[0];
             floatingWindow.Focus();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(300);
 
             Assert.That(floatingWindow.IsOffscreen, Is.False,
                 "Floating window should be visible after activation (Issue #408).");
@@ -75,12 +74,11 @@ namespace AvalonDockTest.FlaUITests
             if (floatingWindows.Length == 0)
             {
                 ClickMenuItemByName("Tools", "New floating window");
-                System.Threading.Thread.Sleep(1000);
+                WaitForFloatingWindow();
             }
 
             MainWindow.Focus();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(300);
 
             var doc1 = FindDocumentTab("Document 1");
             Assert.That(doc1, Is.Not.Null,
@@ -98,7 +96,7 @@ namespace AvalonDockTest.FlaUITests
             if (floatingWindows.Length == 0)
             {
                 ClickMenuItemByName("Tools", "New floating window");
-                System.Threading.Thread.Sleep(1000);
+                WaitForFloatingWindow();
                 floatingWindows = GetFloatingWindows();
             }
 
