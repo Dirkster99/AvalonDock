@@ -369,7 +369,7 @@ namespace AvalonDock.Layout
 				{
 					// ...set null any reference coming from contents not yet hosted in a floating window
 					foreach (var contentReferencingEmptyPane in this.Descendents().OfType<LayoutContent>()
-						.Where(c => ((ILayoutPreviousContainer)c).PreviousContainer == emptyPane && !c.IsFloating))
+						.Where(c => ((ILayoutPreviousContainer)c).PreviousContainer == emptyPane))
 					{
 						if (contentReferencingEmptyPane is LayoutAnchorable anchorable &&
 							!anchorable.IsVisible)

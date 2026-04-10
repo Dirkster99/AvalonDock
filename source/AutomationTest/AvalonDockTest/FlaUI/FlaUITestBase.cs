@@ -47,7 +47,7 @@ namespace AvalonDockTest.FlaUITests
 
 			MainWindow.SetForeground();
 			Wait.UntilInputIsProcessed();
-			System.Threading.Thread.Sleep(500);
+			System.Threading.Thread.Sleep(200);
 
 			WaitForAppReady();
 			TestContext.Out.WriteLine("[FlaUITestBase] Application is ready.");
@@ -91,7 +91,6 @@ namespace AvalonDockTest.FlaUITests
 			{
 				MainWindow.SetForeground();
 				Wait.UntilInputIsProcessed();
-				System.Threading.Thread.Sleep(200);
 			}
 		}
 
@@ -101,7 +100,6 @@ namespace AvalonDockTest.FlaUITests
 			// Close any open menus or popups
 			Keyboard.Press(VirtualKeyShort.ESCAPE);
 			Wait.UntilInputIsProcessed();
-			System.Threading.Thread.Sleep(100);
 			DismissAnyDialogIfPresent("OK", "Close", "Yes", "No");
 		}
 
@@ -206,7 +204,7 @@ namespace AvalonDockTest.FlaUITests
 				Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
 
 			Wait.UntilInputIsProcessed();
-			System.Threading.Thread.Sleep(500);
+			System.Threading.Thread.Sleep(300);
 
 			if (confirmClose)
 			{
@@ -261,6 +259,34 @@ namespace AvalonDockTest.FlaUITests
 		
 		protected void ClickMenuItemByName(bool moveMouse, params string[] menuPath)
 		{
+			const int maxAttempts = 3;
+
+			for (int attempt = 1; attempt <= maxAttempts; attempt++)
+			{
+				if (TryClickMenuItemPath(moveMouse, menuPath))
+					return;
+
+				TestContext.Out.WriteLine(
+					$"[ClickMenuItemByName] Attempt {attempt}/{maxAttempts} failed for: {string.Join(" > ", menuPath)}");
+
+				// Dismiss any open menus
+				Keyboard.Press(VirtualKeyShort.ESCAPE);
+				Wait.UntilInputIsProcessed();
+				Keyboard.Press(VirtualKeyShort.ESCAPE);
+				Wait.UntilInputIsProcessed();
+				System.Threading.Thread.Sleep(200);
+
+				// Re-focus main window before retrying
+				MainWindow.SetForeground();
+				Wait.UntilInputIsProcessed();
+				System.Threading.Thread.Sleep(300);
+			}
+
+			Assert.Fail($"Menu path [{string.Join(" > ", menuPath)}] not reachable after {maxAttempts} attempts.");
+		}
+
+		private bool TryClickMenuItemPath(bool moveMouse, string[] menuPath)
+		{
 			for (int i = 0; i < menuPath.Length; i++)
 			{
 				var menuName = menuPath[i];
@@ -292,11 +318,14 @@ namespace AvalonDockTest.FlaUITests
 					timeout: TimeSpan.FromSeconds(5),
 					interval: TimeSpan.FromMilliseconds(200));
 
-				Assert.That(result.Result, Is.Not.Null, $"Menu item '{menuName}' not found.");
+				if (result.Result == null)
+					return false;
+
 				result.Result.Click(moveMouse);
 				Wait.UntilInputIsProcessed();
-				System.Threading.Thread.Sleep(300);
+				System.Threading.Thread.Sleep(200);
 			}
+			return true;
 		}
 
 		// ===== Floating Window Helpers =====
@@ -475,7 +504,7 @@ namespace AvalonDockTest.FlaUITests
 
 			Keyboard.Press(VirtualKeyShort.RETURN);
 			Wait.UntilInputIsProcessed();
-			System.Threading.Thread.Sleep(300);
+			System.Threading.Thread.Sleep(200);
 			if (!IsDialogStillOpen(dialog)) return;
 
 			var buttons = dialog.FindAllDescendants(CF.ByControlType(ControlType.Button));
@@ -502,7 +531,7 @@ namespace AvalonDockTest.FlaUITests
 				{
 					dismissBtn.Click(true);
 					Wait.UntilInputIsProcessed();
-					System.Threading.Thread.Sleep(300);
+					System.Threading.Thread.Sleep(200);
 				}
 				catch
 				{
@@ -513,7 +542,7 @@ namespace AvalonDockTest.FlaUITests
 				{
 					dismissBtn.Patterns.Invoke.PatternOrDefault?.Invoke();
 					Wait.UntilInputIsProcessed();
-					System.Threading.Thread.Sleep(300);
+					System.Threading.Thread.Sleep(200);
 				}
 				catch
 				{
@@ -609,7 +638,20 @@ namespace AvalonDockTest.FlaUITests
 				interval: TimeSpan.FromMilliseconds(500));
 
 			Wait.UntilInputIsProcessed();
-			System.Threading.Thread.Sleep(500);
+		}
+
+		/// <summary>
+		/// Waits for the layout to settle after a load operation by polling
+		/// for a known element. Faster than a fixed Sleep on fast machines,
+		/// more reliable than a short Sleep on slow machines.
+		/// </summary>
+		protected void WaitForLayoutSettled(string expectedElement = "Document 1", int timeoutSeconds = 5)
+		{
+			Retry.WhileNull(
+				() => GetDocument(expectedElement) ?? FindByName(expectedElement),
+				timeout: TimeSpan.FromSeconds(timeoutSeconds),
+				interval: TimeSpan.FromMilliseconds(200));
+			Wait.UntilInputIsProcessed();
 		}
 	}
 }

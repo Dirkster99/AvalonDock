@@ -37,10 +37,7 @@ namespace AvalonDockTest.FlaUITests
         public void SwitchBetweenDocumentTabs_Works()
         {
             ActivateDocumentTab("Document 2");
-            System.Threading.Thread.Sleep(200);
-
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(200);
 
             Assert.That(App.HasExited, Is.False,
                 "Switching between document tabs should work without errors.");
@@ -58,12 +55,11 @@ namespace AvalonDockTest.FlaUITests
 
             tab.RightClick();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             // Dismiss any context menu by pressing Escape
             Keyboard.Press(FlaUI.Core.WindowsAPI.VirtualKeyShort.ESCAPE);
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(200);
 
             var tabAfter = FindDocumentTab("Document 1");
             Assert.That(tabAfter, Is.Not.Null,
@@ -78,7 +74,6 @@ namespace AvalonDockTest.FlaUITests
         public void AddDocumentsViaButton_AppearsAsTabs_Issue493()
         {
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(300);
 
             // Click the "Click to add 2 documents" button inside Document 1
             var addButton = FindByName("Click to add 2 documents");
@@ -86,7 +81,7 @@ namespace AvalonDockTest.FlaUITests
 
             addButton.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             var test1 = FindDocumentTab("Test1");
             var test2 = FindDocumentTab("Test2");
@@ -118,7 +113,6 @@ namespace AvalonDockTest.FlaUITests
         public void ActivateDocument_ContentIsAccessible_Issue240()
         {
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(300);
 
             // Document 1 contains a Button and a TextBox; look for any child control
             var content = MainWindow.FindFirstDescendant(CF.ByControlType(ControlType.Button));

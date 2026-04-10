@@ -38,7 +38,7 @@ namespace AvalonDockTest.FlaUITests
             CloseDocument("Document 1", confirmClose: false);
 
             // The MessageBox should appear; dismiss with "No" to cancel close
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
             DismissAnyDialogIfPresent("No");
 
             // Verify document is still present
@@ -56,18 +56,16 @@ namespace AvalonDockTest.FlaUITests
         {
             // First add extra documents so we have something to work with
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(300);
             var addButton = FindByName("Click to add 2 documents");
             if (addButton != null)
             {
                 addButton.Click();
                 Wait.UntilInputIsProcessed();
-                System.Threading.Thread.Sleep(500);
+                System.Threading.Thread.Sleep(300);
             }
 
             // Close Test1 (confirm with Yes)
             CloseDocument("Test1", confirmClose: true);
-            System.Threading.Thread.Sleep(500);
 
             // Verify Document 1 and Document 2 still exist
             var doc1 = FindDocumentTab("Document 1");
@@ -112,12 +110,11 @@ namespace AvalonDockTest.FlaUITests
             // Click to activate it
             winForms.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(300);
 
             // Try Ctrl+W — should not close because CanClose=False
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             // Dismiss any dialog that may appear
             DismissAnyDialogIfPresent("No", "Cancel");
@@ -137,26 +134,23 @@ namespace AvalonDockTest.FlaUITests
         {
             // Add documents
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(200);
             var addButton = FindByName("Click to add 2 documents");
             addButton?.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             var test1 = FindDocumentTab("Test1");
             Assert.That(test1, Is.Not.Null, "Test1 should have been added.");
 
             // Close Test1
             CloseDocument("Test1", confirmClose: true);
-            System.Threading.Thread.Sleep(500);
 
             // Add documents again
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(200);
             addButton = FindByName("Click to add 2 documents");
             addButton?.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             Assert.That(App.HasExited, Is.False,
                 "App should not crash when re-adding documents after closing (Issue #232).");
