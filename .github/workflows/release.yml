@@ -117,6 +117,42 @@ jobs:
           --source https://api.nuget.org/v3/index.json \
           --skip-duplicate
 
+      - name: Unlist preview NuGet packages
+        if: steps.version.outputs.IS_RELEASE == 'true'
+        shell: bash
+        run: |
+          packages=(
+            "Dirkster.AvalonDock"
+            "Dirkster.AvalonDock.Themes.Aero"
+            "Dirkster.AvalonDock.Themes.Metro"
+            "Dirkster.AvalonDock.Themes.Expression"
+            "Dirkster.AvalonDock.Themes.VS2010"
+            "Dirkster.AvalonDock.Themes.VS2013"
+          )
+
+          for package in "${packages[@]}"; do
+            echo "Checking preview versions for: $package"
+            lower_package=$(echo "$package" | tr '[:upper:]' '[:lower:]')
+            versions_json=$(curl -sf "https://api.nuget.org/v3-flatcontainer/${lower_package}/index.json" || echo '{"versions":[]}')
+            preview_versions=$(echo "$versions_json" | jq -r '.versions[]' | grep -i "preview" || true)
+
+            if [ -z "$preview_versions" ]; then
+              echo "  No preview versions found."
+              continue
+            fi
+
+            echo "  Found preview versions:"
+            echo "$preview_versions" | sed 's/^/    /'
+
+            while IFS= read -r version; do
+              echo "  Unlisting $package $version ..."
+              dotnet nuget delete "$package" "$version" \
+                --api-key "${{ secrets.AVALONDOCK_APP_KEY }}" \
+                --source https://api.nuget.org/v3/index.json \
+                --non-interactive || echo "  Warning: Failed to unlist $package $version"
+            done <<< "$preview_versions"
+          done
+
       - name: Create GitHub Release
         if: steps.version.outputs.IS_RELEASE == 'true'
         uses: softprops/action-gh-release@v2
