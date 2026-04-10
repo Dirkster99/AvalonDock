@@ -30,7 +30,7 @@ namespace AvalonDockTest.FlaUITests
             var tab = WaitForDocumentTab("Document 1");
             tab.RightClick();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             var menus = MainWindow.FindAllDescendants(CF.ByControlType(ControlType.Menu));
             var contextMenuFound = menus.Any(m => m.ClassName?.Contains("ContextMenu") == true)
@@ -39,7 +39,6 @@ namespace AvalonDockTest.FlaUITests
             // Close the context menu
             Keyboard.Press(VirtualKeyShort.ESCAPE);
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(200);
 
             TestContext.Out.WriteLine($"Context menu found: {contextMenuFound}, Menu count: {menus.Length}");
         }
@@ -56,11 +55,10 @@ namespace AvalonDockTest.FlaUITests
 
             tool1.RightClick();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             Keyboard.Press(VirtualKeyShort.ESCAPE);
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(200);
 
             Assert.That(App.HasExited, Is.False,
                 "App should not crash after right-clicking tool window tab (Issue #200).");
@@ -91,7 +89,7 @@ namespace AvalonDockTest.FlaUITests
             var editMenu = WaitForName("Edit");
             editMenu.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(300);
+            System.Threading.Thread.Sleep(200);
 
             // Verify Edit menu sub-items are visible
             var undoItem = FindByName("Undo");
@@ -100,7 +98,6 @@ namespace AvalonDockTest.FlaUITests
             // Close the menu
             Keyboard.Press(VirtualKeyShort.ESCAPE);
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(200);
         }
 
         /// <summary>
@@ -112,7 +109,7 @@ namespace AvalonDockTest.FlaUITests
             var toolsMenu = WaitForName("Tools");
             toolsMenu.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(300);
+            System.Threading.Thread.Sleep(200);
 
             var winFormsItem = FindByName("WinForms Window");
             var toolWindow1Item = FindByName("Tool Window1");
@@ -125,7 +122,6 @@ namespace AvalonDockTest.FlaUITests
             // Close the menu
             Keyboard.Press(VirtualKeyShort.ESCAPE);
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(200);
         }
     }
 }

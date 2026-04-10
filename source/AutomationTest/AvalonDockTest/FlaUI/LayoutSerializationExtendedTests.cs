@@ -35,11 +35,11 @@ namespace AvalonDockTest.FlaUITests
 
             // Save layout
             ClickMenuItemByName("Layout", "Save", "Layout_3");
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             // Load layout
             ClickMenuItemByName("Layout", "Load", "Layout_3");
-            System.Threading.Thread.Sleep(1000);
+            WaitForLayoutSettled();
 
             // Verify tool windows are still present and accessible
             var tool1After = FindToolWindowTab("Tool Window 1");
@@ -60,26 +60,24 @@ namespace AvalonDockTest.FlaUITests
         {
             // Save current layout with all docs
             ClickMenuItemByName("Layout", "Save", "Layout_3");
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             // Add and then close a document
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(200);
             var addButton = FindByName("Click to add 2 documents");
             if (addButton != null)
             {
                 addButton.Click();
                 Wait.UntilInputIsProcessed();
-                System.Threading.Thread.Sleep(500);
+                System.Threading.Thread.Sleep(300);
             }
 
             // Close the added document
             CloseDocument("Test1", confirmClose: true);
-            System.Threading.Thread.Sleep(500);
 
             // Load saved layout — the saved layout might reference docs that no longer exist
             ClickMenuItemByName("Layout", "Load", "Layout_3");
-            System.Threading.Thread.Sleep(1000);
+            WaitForLayoutSettled();
 
             Assert.That(App.HasExited, Is.False,
                 "App should not crash when loading layout with non-existing documents (Issue #38).");
@@ -98,7 +96,7 @@ namespace AvalonDockTest.FlaUITests
         {
             // Save layout with both documents
             ClickMenuItemByName("Layout", "Save", "Layout_4");
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             // Verify both documents are present
             Assert.That(FindDocumentTab("Document 1"), Is.Not.Null);
@@ -106,7 +104,7 @@ namespace AvalonDockTest.FlaUITests
 
             // Load layout
             ClickMenuItemByName("Layout", "Load", "Layout_4");
-            System.Threading.Thread.Sleep(1000);
+            WaitForLayoutSettled();
 
             // Documents should still be present
             var doc1 = FindDocumentTab("Document 1");
@@ -131,19 +129,18 @@ namespace AvalonDockTest.FlaUITests
 
             autoHideTab.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             // Close the flyout
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(300);
 
             // Save layout
             ClickMenuItemByName("Layout", "Save", "Layout_4");
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             // Load layout
             ClickMenuItemByName("Layout", "Load", "Layout_4");
-            System.Threading.Thread.Sleep(1000);
+            WaitForLayoutSettled();
 
             Assert.That(App.HasExited, Is.False,
                 "App should not crash during layout save/load with auto-hide panels (Issue #111).");
@@ -163,21 +160,25 @@ namespace AvalonDockTest.FlaUITests
         {
             // Click a tool window to change active state
             var tool1 = FindToolWindowTab("Tool Window 1");
-            tool1?.Click(true);
+            Assert.That(tool1, Is.Not.Null, "Tool Window 1 should be present.");
+            tool1.Click(true);
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
+
+            // Re-focus main window so menu bar is accessible after tool window click
+            MainWindow.SetForeground();
+            Wait.UntilInputIsProcessed();
 
             // Save
             ClickMenuItemByName(true, "Layout", "Save", "Layout_4");
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             // Activate a document
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(200);
 
             // Load
             ClickMenuItemByName(true, "Layout", "Load", "Layout_4");
-            System.Threading.Thread.Sleep(1000);
+            WaitForLayoutSettled();
 
             Assert.That(App.HasExited, Is.False,
                 "App should not crash during layout save/load with tool windows active (Issue #59).");

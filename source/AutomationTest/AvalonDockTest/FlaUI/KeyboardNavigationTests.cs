@@ -24,7 +24,6 @@ namespace AvalonDockTest.FlaUITests
         public void KeyboardInput_WorksInDocumentContent()
         {
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(300);
 
             // Find any focusable element inside the active document (e.g., a TextBox)
             var textBoxes = MainWindow.FindAllDescendants(CF.ByControlType(ControlType.Edit));
@@ -32,11 +31,9 @@ namespace AvalonDockTest.FlaUITests
             {
                 textBoxes[0].Click();
                 Wait.UntilInputIsProcessed();
-                System.Threading.Thread.Sleep(200);
 
                 Keyboard.Type("Hello FlaUI");
                 Wait.UntilInputIsProcessed();
-                System.Threading.Thread.Sleep(200);
             }
 
             Assert.That(App.HasExited, Is.False,
@@ -55,7 +52,6 @@ namespace AvalonDockTest.FlaUITests
             Assert.That(tool1, Is.Not.Null);
             tool1.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(300);
 
             // Press arrow keys
             Keyboard.Press(VirtualKeyShort.UP);
@@ -63,7 +59,6 @@ namespace AvalonDockTest.FlaUITests
             Keyboard.Press(VirtualKeyShort.LEFT);
             Keyboard.Press(VirtualKeyShort.RIGHT);
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(200);
 
             Assert.That(App.HasExited, Is.False,
                 "App should not crash when using arrow keys in tool window (Issue #225).");
@@ -76,13 +71,12 @@ namespace AvalonDockTest.FlaUITests
         public void TabKey_CyclesFocus()
         {
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(300);
 
             for (int i = 0; i < 5; i++)
             {
                 Keyboard.Press(VirtualKeyShort.TAB);
                 Wait.UntilInputIsProcessed();
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(50);
             }
 
             Assert.That(App.HasExited, Is.False,
@@ -96,14 +90,12 @@ namespace AvalonDockTest.FlaUITests
         public void CtrlTab_SwitchesBetweenDocuments()
         {
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(300);
 
             Keyboard.Press(VirtualKeyShort.CONTROL);
             Keyboard.Press(VirtualKeyShort.TAB);
             Keyboard.Release(VirtualKeyShort.TAB);
             Keyboard.Release(VirtualKeyShort.CONTROL);
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(300);
 
             Assert.That(App.HasExited, Is.False,
                 "App should not crash during Ctrl+Tab document switching.");
