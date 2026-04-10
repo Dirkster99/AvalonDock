@@ -51,12 +51,24 @@ jobs:
       - name: Build
         run: dotnet build source/AvalonDock.sln --configuration Release --no-restore --warnaserror ${{ steps.version.outputs.VERSION_ARGS }}
 
-      - name: Test
+      - name: Test (Unit Tests)
         run: >
           dotnet test source/AvalonDock.sln
           --configuration Release
-          --no-build
-          --logger "trx;LogFilePrefix=test-results"
+          --no-restore
+          --filter "Category!=FlaUI"
+          --logger "trx;LogFilePrefix=unit-test-results"
+          --results-directory TestResults
+          -m:1
+
+      - name: Test (FlaUI UI Tests)
+        run: >
+          dotnet test source/AvalonDock.sln
+          --configuration Release
+          --no-restore
+          --filter "Category=FlaUI"
+          --framework net10.0-windows
+          --logger "trx;LogFilePrefix=flaui-test-results"
           --results-directory TestResults
           -m:1
 
