@@ -90,6 +90,8 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
+			if (!IsLoaded) return;
+
 			base.OnMouseLeftButtonDown(e);
 			CaptureMouse();
 			_allowDrag = false;
@@ -111,6 +113,8 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
+			if (!IsLoaded) return;
+
 			base.OnMouseMove(e);
 			_isMouseDown = Mouse.LeftButton == MouseButtonState.Pressed && _isMouseDown;
 			if (_isMouseDown)
@@ -153,6 +157,8 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
+			if (!IsLoaded) return;
+
 			_isMouseDown = false;
 			_allowDrag = false;
 			if (IsMouseCaptured) ReleaseMouseCapture();
@@ -162,6 +168,8 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnMouseLeave(MouseEventArgs e)
 		{
+			if (!IsLoaded) return;
+
 			base.OnMouseLeave(e);
 			_isMouseDown = false;
 		}
@@ -169,6 +177,8 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnMouseEnter(MouseEventArgs e)
 		{
+			if (!IsLoaded) return;
+
 			base.OnMouseEnter(e);
 			_isMouseDown = false;
 		}
@@ -176,11 +186,13 @@ namespace AvalonDock.Controls
 		/// <inheritdoc />
 		protected override void OnMouseDown(MouseButtonEventArgs e)
 		{
+			if (!IsLoaded) return;
+
 			if (LayoutItem != null && e.ChangedButton == MouseButton.Middle && LayoutItem.CloseCommand.CanExecute(null))
 			{
 				LayoutItem.CloseCommand.Execute(null);
 			}
-			
+
 			base.OnMouseDown(e);
 		}
 
