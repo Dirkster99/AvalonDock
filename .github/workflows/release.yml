@@ -32,7 +32,7 @@ jobs:
           if [[ $GITHUB_REF == refs/tags/v* ]]; then
             # Stable release from tag
             version="${GITHUB_REF#refs/tags/v}"
-            version_args="/p:Version=$version /p:PackageVersion=$version /p:AssemblyVersion=$version /p:FileVersion=$version"
+            version_args=""
             is_release='true'
             echo "Stable release: $version"
           else
