@@ -163,9 +163,15 @@ namespace AvalonDockTest.FlaUITests
         {
             // Click a tool window to change active state
             var tool1 = FindToolWindowTab("Tool Window 1");
-            tool1?.Click(true);
+            Assert.That(tool1, Is.Not.Null, "Tool Window 1 should be present.");
+            tool1.Click(true);
             Wait.UntilInputIsProcessed();
             System.Threading.Thread.Sleep(500);
+
+            // Re-focus main window so menu bar is accessible after tool window click
+            MainWindow.SetForeground();
+            Wait.UntilInputIsProcessed();
+            System.Threading.Thread.Sleep(300);
 
             // Save
             ClickMenuItemByName(true, "Layout", "Save", "Layout_4");

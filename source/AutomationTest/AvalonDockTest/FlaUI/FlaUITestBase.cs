@@ -261,6 +261,35 @@ namespace AvalonDockTest.FlaUITests
 		
 		protected void ClickMenuItemByName(bool moveMouse, params string[] menuPath)
 		{
+			const int maxAttempts = 3;
+
+			for (int attempt = 1; attempt <= maxAttempts; attempt++)
+			{
+				if (TryClickMenuItemPath(moveMouse, menuPath))
+					return;
+
+				TestContext.Out.WriteLine(
+					$"[ClickMenuItemByName] Attempt {attempt}/{maxAttempts} failed for: {string.Join(" > ", menuPath)}");
+
+				// Dismiss any open menus
+				Keyboard.Press(VirtualKeyShort.ESCAPE);
+				Wait.UntilInputIsProcessed();
+				System.Threading.Thread.Sleep(200);
+				Keyboard.Press(VirtualKeyShort.ESCAPE);
+				Wait.UntilInputIsProcessed();
+				System.Threading.Thread.Sleep(300);
+
+				// Re-focus main window before retrying
+				MainWindow.SetForeground();
+				Wait.UntilInputIsProcessed();
+				System.Threading.Thread.Sleep(500);
+			}
+
+			Assert.Fail($"Menu path [{string.Join(" > ", menuPath)}] not reachable after {maxAttempts} attempts.");
+		}
+
+		private bool TryClickMenuItemPath(bool moveMouse, string[] menuPath)
+		{
 			for (int i = 0; i < menuPath.Length; i++)
 			{
 				var menuName = menuPath[i];
@@ -292,11 +321,14 @@ namespace AvalonDockTest.FlaUITests
 					timeout: TimeSpan.FromSeconds(5),
 					interval: TimeSpan.FromMilliseconds(200));
 
-				Assert.That(result.Result, Is.Not.Null, $"Menu item '{menuName}' not found.");
+				if (result.Result == null)
+					return false;
+
 				result.Result.Click(moveMouse);
 				Wait.UntilInputIsProcessed();
 				System.Threading.Thread.Sleep(300);
 			}
+			return true;
 		}
 
 		// ===== Floating Window Helpers =====
