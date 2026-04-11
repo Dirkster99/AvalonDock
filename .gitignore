@@ -28,3 +28,4 @@ tmp/
 TestResults/
 nupkg/
 .nuget/
+.idea/
