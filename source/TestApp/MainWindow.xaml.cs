@@ -9,9 +9,12 @@
 
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using AvalonDock.Layout;
@@ -19,6 +22,7 @@ using System.Diagnostics;
 using System.IO;
 using AvalonDock.Layout.Serialization;
 using AvalonDock;
+using AvalonDock.Themes;
 using System.Diagnostics.CodeAnalysis;
 
 namespace TestApp
@@ -53,6 +57,8 @@ namespace TestApp
 			this.DataContext = this;
 
 			winFormsHost.Child = new UserControl1();
+
+			UpdateThemeColors();
 
 		}
 
@@ -256,5 +262,102 @@ namespace TestApp
             anchorable.AddToLayout(dockManager,AnchorableShowStrategy.Most);
             anchorable.Float();
         }
+
+		private void OnSwitchTheme(object sender, RoutedEventArgs e)
+		{
+			var menuItem = sender as MenuItem;
+			if (menuItem == null)
+				return;
+
+			var themeTag = menuItem.Tag as string;
+			if (themeTag == null)
+				return;
+
+			Theme theme;
+			switch (themeTag)
+			{
+				case "ArcDark": theme = new ArcDarkTheme(); break;
+				case "ArcLight": theme = new ArcLightTheme(); break;
+				case "VS2013Dark": theme = new Vs2013DarkTheme(); break;
+				case "VS2013Light": theme = new Vs2013LightTheme(); break;
+				case "VS2013Blue": theme = new Vs2013BlueTheme(); break;
+				case "VS2010": theme = new VS2010Theme(); break;
+				case "ExpressionDark": theme = new ExpressionDarkTheme(); break;
+				case "ExpressionLight": theme = new ExpressionLightTheme(); break;
+				case "Metro": theme = new MetroTheme(); break;
+				case "Aero": theme = new AeroTheme(); break;
+				case "Generic": theme = new GenericTheme(); break;
+				default: theme = new ArcDarkTheme(); break;
+			}
+
+			dockManager.Theme = theme;
+
+			// Mark only the selected theme in the menu
+			foreach (var item in themeMenu.Items)
+			{
+				if (item is MenuItem mi && mi.IsCheckable)
+					mi.IsChecked = mi == menuItem;
+			}
+
+			// Adapt UI colors to match the theme
+			UpdateThemeColors();
+		}
+
+		private void UpdateThemeColors()
+		{
+			Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
+			{
+				bool isDark = IsDarkBrush(dockManager.Background);
+				var foreground = isDark ? Brushes.White : Brushes.Black;
+
+				// Set foreground on content that needs adaptive text
+				Foreground = foreground;
+				mainMenu.Foreground = foreground;
+				tbToolWindow1Timer.Foreground = foreground;
+				tbAutoHide1Timer.Foreground = foreground;
+				tbDocument2Timer.Foreground = foreground;
+				TextElement.SetForeground(spAutoHide2, foreground);
+
+				// Update window title bar color via DWM
+				UpdateTitleBarColor();
+			}));
+		}
+
+		[DllImport("dwmapi.dll", PreserveSig = true)]
+		private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
+
+		private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+		private const int DWMWA_CAPTION_COLOR = 35;
+
+		private void UpdateTitleBarColor()
+		{
+			var hwnd = new WindowInteropHelper(this).Handle;
+			if (hwnd == IntPtr.Zero)
+				return;
+
+			bool isDark = IsDarkBrush(dockManager.Background);
+			int darkMode = isDark ? 1 : 0;
+			DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref darkMode, sizeof(int));
+
+			// Windows 11+: set exact caption color
+			var scb = dockManager.Background as SolidColorBrush;
+			if (scb != null)
+			{
+				var c = scb.Color;
+				int colorRef = c.R | (c.G << 8) | (c.B << 16);
+				DwmSetWindowAttribute(hwnd, DWMWA_CAPTION_COLOR, ref colorRef, sizeof(int));
+			}
+		}
+
+		private static bool IsDarkBrush(Brush brush)
+		{
+			if (brush is SolidColorBrush scb)
+			{
+				var c = scb.Color;
+				double luminance = 0.299 * c.R + 0.587 * c.G + 0.114 * c.B;
+				return luminance < 128;
+			}
+			return false;
+		}
     }
 }

@@ -1,0 +1,8 @@
+<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceDictionary Source="/AvalonDock.Themes.Arc;component/LightBrushs.xaml" />
+		<ResourceDictionary Source="/AvalonDock.Themes.Arc;component/Themes/Generic.xaml" />
+	</ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
