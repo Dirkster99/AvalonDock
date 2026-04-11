@@ -115,6 +115,13 @@
                                     Foreground="White"
                                     Text="{Binding TestTimer, Mode=OneWay, StringFormat='Document 2 Attached to Timer ->\{0\}'}" />
                             </LayoutDocument>
+							<LayoutDocument Title="Document 3" ContentId="document3">
+								<Button
+									Margin="25"
+									VerticalAlignment="Top"
+									Click="ShowMessageBox_click"
+									Content="Click to open message box" />
+							</LayoutDocument>
                         </LayoutDocumentPane>
                     </LayoutDocumentPaneGroup>
                     <LayoutAnchorablePaneGroup DockWidth="50">
