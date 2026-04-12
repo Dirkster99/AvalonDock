@@ -23,6 +23,7 @@ using System.Windows.Media;
 
 using AvalonDock.Layout;
 using AvalonDock.Themes;
+using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
@@ -171,6 +172,47 @@ namespace AvalonDock.Controls
 		{
 			get { return (bool)GetValue(AllowMinimizeProperty); }
 			set { SetValue(AllowMinimizeProperty, value); }
+		}
+
+		/// <summary><see cref="ResizeBorderThickness"/> dependency property.</summary>
+		public static readonly DependencyProperty ResizeBorderThicknessProperty =
+			DependencyProperty.Register(nameof(ResizeBorderThickness), typeof(Thickness), typeof(LayoutFloatingWindowControl),
+				new PropertyMetadata(default(Thickness), OnResizeBorderThicknessChanged));
+
+		/// <summary>
+		/// Gets/sets the resize border thickness for this floating window.
+		/// When set to a non-default value, overrides the WindowChrome ResizeBorderThickness.
+		/// </summary>
+		[Bindable(true)]
+		[Description("Gets/sets the resize border thickness for this floating window.")]
+		[Category("FloatingWindow")]
+		public Thickness ResizeBorderThickness
+		{
+			get { return (Thickness)GetValue(ResizeBorderThicknessProperty); }
+			set { SetValue(ResizeBorderThicknessProperty, value); }
+		}
+
+		private static void OnResizeBorderThicknessChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			if (d is LayoutFloatingWindowControl w && w.IsLoaded)
+			{
+				w.ApplyResizeBorderThickness();
+			}
+		}
+
+		private void ApplyResizeBorderThickness()
+		{
+			var thickness = ResizeBorderThickness;
+			if (thickness == default(Thickness))
+			{
+				return;
+			}
+
+			var chrome = WindowChrome.GetWindowChrome(this);
+			if (chrome != null)
+			{
+				chrome.ResizeBorderThickness = thickness;
+			}
 		}
 
 		/// <summary><see cref="IsMaximized"/> dependency property.</summary>
@@ -540,6 +582,7 @@ namespace AvalonDock.Controls
 			Loaded -= OnLoaded;
 
 			this.UpdateOwnership();
+			ApplyResizeBorderThickness();
 
 			_hwndSrc = PresentationSource.FromDependencyObject(this) as HwndSource;
 			_hwndSrcHook = FilterMessage;
