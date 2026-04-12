@@ -50,7 +50,7 @@ namespace AvalonDock.Controls
 			ShowInTaskbarProperty.OverrideMetadata(typeof(NavigatorWindow), new FrameworkPropertyMetadata(false));
 		}
 
-		internal NavigatorWindow(DockingManager manager)
+		public NavigatorWindow(DockingManager manager)
 		{
 			_manager = manager;
 			_internalSetSelectedDocument = true;
