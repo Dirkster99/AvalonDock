@@ -578,6 +578,39 @@ namespace AvalonDock.Controls
 				InputBindings.Add(binding);
 		}
 
+		private const double KeyboardMoveStep = 10.0;
+
+		/// <inheritdoc />
+		protected override void OnPreviewKeyDown(KeyEventArgs e)
+		{
+			base.OnPreviewKeyDown(e);
+			var manager = Model?.Root?.Manager;
+			if (manager == null || !manager.AllowMovingFloatingWindowWithKeyboard)
+			{
+				return;
+			}
+
+			switch (e.Key)
+			{
+				case Key.Left:
+					Left -= KeyboardMoveStep;
+					e.Handled = true;
+					break;
+				case Key.Right:
+					Left += KeyboardMoveStep;
+					e.Handled = true;
+					break;
+				case Key.Up:
+					Top -= KeyboardMoveStep;
+					e.Handled = true;
+					break;
+				case Key.Down:
+					Top += KeyboardMoveStep;
+					e.Handled = true;
+					break;
+			}
+		}
+
 		private void OnUnloaded(object sender, RoutedEventArgs e)
 		{
 			Unloaded -= OnUnloaded;
