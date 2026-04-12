@@ -653,12 +653,19 @@ namespace AvalonDock.Layout
 		{
 			var root = Root;
 			var parentAsContainer = Parent;
+			if (parentAsContainer == null)
+			{
+				return;
+			}
 
 			if (PreviousContainer == null)
 			{
 				var parentAsGroup = Parent as ILayoutGroup;
 				PreviousContainer = parentAsContainer;
-				PreviousContainerIndex = parentAsGroup.IndexOfChild(this);
+				if (parentAsGroup != null)
+				{
+					PreviousContainerIndex = parentAsGroup.IndexOfChild(this);
+				}
 
 				if (parentAsGroup is ILayoutPaneSerializable layoutPaneSerializable)
 				{
