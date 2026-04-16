@@ -1311,6 +1311,20 @@ namespace AvalonDock
 		public static readonly DependencyProperty AutoWindowSizeWhenOpenedProperty =
 			DependencyProperty.Register("AutoWindowSizeWhenOpened", typeof(bool), typeof(DockingManager), new PropertyMetadata(false));
 
+		/// <summary><see cref="AllowMovingFloatingWindowWithKeyboard"/> dependency property.</summary>
+		public static readonly DependencyProperty AllowMovingFloatingWindowWithKeyboardProperty =
+			DependencyProperty.Register(nameof(AllowMovingFloatingWindowWithKeyboard), typeof(bool), typeof(DockingManager), new PropertyMetadata(false));
+
+		/// <summary>Gets/sets whether floating windows can be moved using arrow keys when focused.</summary>
+		[Bindable(true)]
+		[Description("Gets/sets whether floating windows can be moved using arrow keys when focused.")]
+		[Category("FloatingWindow")]
+		public bool AllowMovingFloatingWindowWithKeyboard
+		{
+			get { return (bool)GetValue(AllowMovingFloatingWindowWithKeyboardProperty); }
+			set { SetValue(AllowMovingFloatingWindowWithKeyboardProperty, value); }
+		}
+
 		/// <summary><see cref="ShowNavigator"/> dependency property.</summary>
 		public static readonly DependencyProperty ShowNavigatorProperty = DependencyProperty.Register(nameof(ShowNavigator), typeof(bool), typeof(DockingManager),
 				new FrameworkPropertyMetadata(true));
