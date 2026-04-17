@@ -2045,6 +2045,13 @@ namespace AvalonDock
 		/// <param name="e"></param>
 		private void OnSizeChanged(object sender, SizeChangedEventArgs e)
 		{
+			// Panels may be null if the layout has not been loaded yet.
+			if (LayoutRootPanel == null || RightSidePanel == null || LeftSidePanel == null
+				|| TopSidePanel == null || BottomSidePanel == null)
+			{
+				return;
+			}
+
 			// Lets make sure this always remains non-negative to avoid crach in layout system
 			var width = Math.Max(ActualWidth - GridSplitterWidth - RightSidePanel.ActualWidth - LeftSidePanel.ActualWidth, 0);
 			var height = Math.Max(ActualHeight - GridSplitterHeight - TopSidePanel.ActualHeight - BottomSidePanel.ActualHeight, 0);
