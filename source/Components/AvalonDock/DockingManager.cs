@@ -136,6 +136,20 @@ namespace AvalonDock
 		/// </summary>
 		public event EventHandler<LayoutFloatingWindowControlClosedEventArgs> LayoutFloatingWindowControlClosed;
 
+		/// <summary>Event fired before content is floated (undocked to floating window).</summary>
+		/// <remarks>Subscribers can cancel the operation by setting <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to true.</remarks>
+		public event EventHandler<ContentFloatingEventArgs> ContentFloating;
+
+		/// <summary>Event fired after content has been floated.</summary>
+		public event EventHandler<ContentFloatedEventArgs> ContentFloated;
+
+		/// <summary>Event fired before content is docked (re-docked from floating).</summary>
+		/// <remarks>Subscribers can cancel the operation by setting <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to true.</remarks>
+		public event EventHandler<ContentDockingEventArgs> ContentDocking;
+
+		/// <summary>Event fired after content has been docked.</summary>
+		public event EventHandler<ContentDockedEventArgs> ContentDocked;
+
 		/// <summary><see cref="Layout"/> dependency property.</summary>
 		public static readonly DependencyProperty LayoutProperty = DependencyProperty.Register(nameof(Layout), typeof(LayoutRoot), typeof(DockingManager),
 				new FrameworkPropertyMetadata(null, OnLayoutChanged, CoerceLayoutValue));
@@ -1689,6 +1703,14 @@ namespace AvalonDock
 			// Ensure window can float only if corresponding property is set accordingly
 			if (contentModel == null) return;
 			if (!contentModel.CanFloat) return;
+
+			var floatingArgs = new ContentFloatingEventArgs(contentModel);
+			ContentFloating?.Invoke(this, floatingArgs);
+			if (floatingArgs.Cancel)
+			{
+				return;
+			}
+
 			LayoutFloatingWindowControl fwc = null;
 
 			// For last document re-use floating window
@@ -1714,12 +1736,14 @@ namespace AvalonDock
 
 			if (fwc != null)
 			{
+				var content = contentModel;
 				Dispatcher.BeginInvoke(
 					new Action(() =>
 				{
 					// Activate only inactive document
 					if (startDrag) fwc.AttachDrag();
 					fwc.Show();
+					ContentFloated?.Invoke(this, new ContentFloatedEventArgs(content));
 				}), DispatcherPriority.Send);
 			}
 		}
@@ -1731,6 +1755,17 @@ namespace AvalonDock
 		/// <param name="paneModel"></param>
 		internal void StartDraggingFloatingWindowForPane(LayoutAnchorablePane paneModel)
 		{
+			var firstContent = paneModel.Children.FirstOrDefault();
+			if (firstContent != null)
+			{
+				var floatingArgs = new ContentFloatingEventArgs(firstContent);
+				ContentFloating?.Invoke(this, floatingArgs);
+				if (floatingArgs.Cancel)
+				{
+					return;
+				}
+			}
+
 			var fwc = CreateFloatingWindowForLayoutAnchorableWithoutParent(paneModel, false);
 			if (fwc == null) return;
 
@@ -1738,6 +1773,11 @@ namespace AvalonDock
 
 			fwc.AttachDrag();
 			fwc.Show();
+
+			if (firstContent != null)
+			{
+				ContentFloated?.Invoke(this, new ContentFloatedEventArgs(firstContent));
+			}
 		}
 
 		internal IEnumerable<LayoutFloatingWindowControl> GetFloatingWindowsByZOrder()
@@ -1909,11 +1949,44 @@ namespace AvalonDock
 		/// draggable <see cref="LayoutFloatingWindowControl"/>.
 		/// </summary>
 		/// <param name="contentToFloat"></param>
-		internal void ExecuteFloatCommand(LayoutContent contentToFloat) => contentToFloat.Float();
+		internal void ExecuteFloatCommand(LayoutContent contentToFloat)
+		{
+			var floatingArgs = new ContentFloatingEventArgs(contentToFloat);
+			ContentFloating?.Invoke(this, floatingArgs);
+			if (floatingArgs.Cancel)
+			{
+				return;
+			}
 
-		internal void ExecuteDockCommand(LayoutAnchorable anchorable) => anchorable.Dock();
+			contentToFloat.Float();
+			ContentFloated?.Invoke(this, new ContentFloatedEventArgs(contentToFloat));
+		}
 
-		internal void ExecuteDockAsDocumentCommand(LayoutContent content) => content.DockAsDocument();
+		internal void ExecuteDockCommand(LayoutAnchorable anchorable)
+		{
+			var dockingArgs = new ContentDockingEventArgs(anchorable);
+			ContentDocking?.Invoke(this, dockingArgs);
+			if (dockingArgs.Cancel)
+			{
+				return;
+			}
+
+			anchorable.Dock();
+			ContentDocked?.Invoke(this, new ContentDockedEventArgs(anchorable));
+		}
+
+		internal void ExecuteDockAsDocumentCommand(LayoutContent content)
+		{
+			var dockingArgs = new ContentDockingEventArgs(content);
+			ContentDocking?.Invoke(this, dockingArgs);
+			if (dockingArgs.Cancel)
+			{
+				return;
+			}
+
+			content.DockAsDocument();
+			ContentDocked?.Invoke(this, new ContentDockedEventArgs(content));
+		}
 
 		internal void ExecuteContentActivateCommand(LayoutContent content) => content.IsActive = true;
 
