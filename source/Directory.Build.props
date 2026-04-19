@@ -6,7 +6,7 @@
 		<TestTargetFrameworks>net9.0-windows;net10.0-windows;net48</TestTargetFrameworks>
 
 		<!-- Version Information -->
-		<VersionPrefix>4.73.1</VersionPrefix>
+		<VersionPrefix>4.74.0</VersionPrefix>
 		<AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
 		<FileVersion>$(VersionPrefix).0</FileVersion>
 		<Company>Open Source</Company>
