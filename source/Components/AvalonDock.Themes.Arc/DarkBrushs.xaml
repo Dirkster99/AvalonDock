@@ -332,7 +332,7 @@
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.FloatingDocumentWindowBorder}"
 		options:Freeze="true"
-		Color="#141517" />
+		Color="#6B6B6B" />
 
 	<!--  Floating Tool Window  -->
 	<SolidColorBrush
@@ -342,7 +342,7 @@
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.FloatingToolWindowBorder}"
 		options:Freeze="true"
-		Color="#141517" />
+		Color="#6B6B6B" />
 
 	<!--  Navigator Window  -->
 	<SolidColorBrush
