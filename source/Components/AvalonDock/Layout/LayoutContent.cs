@@ -569,9 +569,12 @@ namespace AvalonDock.Layout
 				root.LastFocusedDocument.FindParent<LayoutDocumentFloatingWindow>() == null)
 				newParentPane = root.LastFocusedDocument.Parent as LayoutDocumentPane;
 
-			newParentPane ??= root.Descendents()
-				.OfType<LayoutDocumentPane>()
-				.FirstOrDefault(pane => pane.FindParent<LayoutDocumentFloatingWindow>() == null);
+			if (newParentPane == null)
+			{
+				newParentPane = root.Descendents()
+					.OfType<LayoutDocumentPane>()
+					.FirstOrDefault(pane => pane.FindParent<LayoutDocumentFloatingWindow>() == null);
+			}
 
 			if (newParentPane == null)
 			{
@@ -696,7 +699,7 @@ namespace AvalonDock.Layout
 			}
 
 			parentAsContainer.RemoveChild(this);
-			root?.CollectGarbage();         
+			root?.CollectGarbage();
 			OnClosed();
 		}
 
