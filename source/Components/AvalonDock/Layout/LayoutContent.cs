@@ -573,7 +573,10 @@ namespace AvalonDock.Layout
 				.OfType<LayoutDocumentPane>()
 				.FirstOrDefault(pane => pane.FindParent<LayoutDocumentFloatingWindow>() == null);
 
-			newParentPane ??= root.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
+			if (newParentPane == null)
+			{
+				newParentPane = root.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
+			}
 
 			if (newParentPane != null)
 			{
