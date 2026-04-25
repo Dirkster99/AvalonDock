@@ -556,17 +556,30 @@ namespace AvalonDock.Layout
 		{
 			if (!(Root is LayoutRoot root)) throw new InvalidOperationException();
 
-			if (PreviousContainer is LayoutDocumentPane)
+			if (PreviousContainer is LayoutDocumentPane previousDocumentPane &&
+				previousDocumentPane.FindParent<LayoutDocumentFloatingWindow>() == null)
 			{
 				Dock();
 				return;
 			}
 
-			LayoutDocumentPane newParentPane;
-			if (root.LastFocusedDocument != null)
+			LayoutDocumentPane newParentPane = null;
+			if (root.LastFocusedDocument != null &&
+				root.LastFocusedDocument != this &&
+				root.LastFocusedDocument.FindParent<LayoutDocumentFloatingWindow>() == null)
 				newParentPane = root.LastFocusedDocument.Parent as LayoutDocumentPane;
-			else
+
+			if (newParentPane == null)
+			{
+				newParentPane = root.Descendents()
+					.OfType<LayoutDocumentPane>()
+					.FirstOrDefault(pane => pane.FindParent<LayoutDocumentFloatingWindow>() == null);
+			}
+
+			if (newParentPane == null)
+			{
 				newParentPane = root.Descendents().OfType<LayoutDocumentPane>().FirstOrDefault();
+			}
 
 			if (newParentPane != null)
 			{
@@ -686,7 +699,7 @@ namespace AvalonDock.Layout
 			}
 
 			parentAsContainer.RemoveChild(this);
-			root?.CollectGarbage();         
+			root?.CollectGarbage();
 			OnClosed();
 		}
 
