@@ -108,7 +108,7 @@ namespace AvalonDock.Controls
 			if (index != -1)
 			{
 				anchorablePane.SelectedContentIndex = index;
-				if (!anchorablePane.SelectedContent.IsActive)
+				if (anchorablePane.SelectedContent != null && !anchorablePane.SelectedContent.IsActive)
 				{
 					anchorablePane.SelectedContent.IsActive = true;
 				}
@@ -121,7 +121,7 @@ namespace AvalonDock.Controls
 			if (index != -1)
 			{
 				documentPane.SelectedContentIndex = index;
-				if (!documentPane.SelectedContent.IsActive)
+				if (documentPane.SelectedContent != null && !documentPane.SelectedContent.IsActive)
 				{
 					documentPane.SelectedContent.IsActive = true;
 				}

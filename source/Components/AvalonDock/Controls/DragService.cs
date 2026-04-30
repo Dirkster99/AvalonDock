@@ -279,7 +279,7 @@ namespace AvalonDock.Controls
 		/// </summary>
 		private void GetOverlayWindowHosts()
 		{
-			if (_manager.Layout.RootPanel.CanDock)
+			if (_manager?.Layout?.RootPanel?.CanDock == true)
 			{
 				_manager.GetOverlayWindowHostsByZOrder(ref _overlayWindowHosts, _floatingWindow);
 			}

@@ -708,6 +708,8 @@ namespace AvalonDock.Controls
 					break;
 			}
 
+			if (areaElement == null)
+				return;
 			Canvas.SetLeft(areaElement, area.DetectionRect.Left - Left);
 			Canvas.SetTop(areaElement, area.DetectionRect.Top - Top);
 			areaElement.Width = area.DetectionRect.Width;
