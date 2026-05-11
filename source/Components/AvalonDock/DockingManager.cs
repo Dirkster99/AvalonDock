@@ -1345,13 +1345,20 @@ namespace AvalonDock
 
 		/// <summary>Gets/sets whether the navigator window should be shown when the user presses Control + Tab.</summary>
 		[Bindable(true)]
-		[Description("Gets/sets whether floating windows should show the system menu when a custom context menu is not defined.")]
-		[Category("FloatingWindow")]
+		[Description("Gets/sets whether the navigator window should be shown when the user presses Control + Tab.")]
+		[Category("Navigator")]
 		public bool ShowNavigator
 		{
 			get => (bool)GetValue(ShowNavigatorProperty);
 			set => SetValue(ShowNavigatorProperty, value);
 		}
+
+		/// <summary>Gets/sets a factory function to create a custom navigator window.
+		/// When set, this factory is used instead of the default <see cref="NavigatorWindow"/>.</summary>
+		[Bindable(true)]
+		[Description("Gets/sets a factory function to create a custom navigator window.")]
+		[Category("Navigator")]
+		public Func<DockingManager, NavigatorWindow> NavigatorWindowFactory { get; set; }
 
 		private readonly List<WeakReference> _logicalChildren = new List<WeakReference>();
 
@@ -2757,7 +2764,14 @@ namespace AvalonDock
 		private void ShowNavigatorWindow()
 		{
 			if (_navigatorWindow == null)
-				_navigatorWindow = new NavigatorWindow(this) { Owner = Window.GetWindow(this), WindowStartupLocation = WindowStartupLocation.CenterOwner };
+			{
+				_navigatorWindow = NavigatorWindowFactory != null
+					? NavigatorWindowFactory(this)
+					: new NavigatorWindow(this);
+				_navigatorWindow.Owner = Window.GetWindow(this);
+				_navigatorWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+			}
+
 			_navigatorWindow.ShowDialog();
 			_navigatorWindow = null;
 		}
