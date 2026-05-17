@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net9.0</TargetFrameworks>
+		<RootNamespace>AvalonDock.Core</RootNamespace>
+		<AssemblyName>AvalonDock.Core</AssemblyName>
+		<Description>UI-agnostic core interfaces and base classes for AvalonDock docking layout engine.</Description>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\AvalonDock\sn.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+
+</Project>
