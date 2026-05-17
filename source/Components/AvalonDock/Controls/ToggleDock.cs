@@ -28,8 +28,6 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public static class ToggleDock
 	{
-		#region Icon
-
 		/// <summary>
 		/// Gets or sets the icon content displayed on the toggle dock button.
 		/// Accepts any object: <see cref="System.Windows.Media.ImageSource"/>,
@@ -43,11 +41,8 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata(null));
 
 		public static object GetIcon(DependencyObject element) => element.GetValue(IconProperty);
+
 		public static void SetIcon(DependencyObject element, object value) => element.SetValue(IconProperty, value);
-
-		#endregion Icon
-
-		#region ToolTip
 
 		/// <summary>
 		/// Gets or sets a custom tooltip for the toggle dock button.
@@ -61,11 +56,8 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata(null));
 
 		public static object GetToolTip(DependencyObject element) => element.GetValue(ToolTipProperty);
+
 		public static void SetToolTip(DependencyObject element, object value) => element.SetValue(ToolTipProperty, value);
-
-		#endregion ToolTip
-
-		#region IconTemplate
 
 		/// <summary>
 		/// Gets or sets a <see cref="DataTemplate"/> used to render the icon.
@@ -80,8 +72,7 @@ namespace AvalonDock.Controls
 				new FrameworkPropertyMetadata(null));
 
 		public static DataTemplate GetIconTemplate(DependencyObject element) => (DataTemplate)element.GetValue(IconTemplateProperty);
-		public static void SetIconTemplate(DependencyObject element, DataTemplate value) => element.SetValue(IconTemplateProperty, value);
 
-		#endregion IconTemplate
+		public static void SetIconTemplate(DependencyObject element, DataTemplate value) => element.SetValue(IconTemplateProperty, value);
 	}
 }

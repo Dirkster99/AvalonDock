@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -8,7 +8,7 @@
  ************************************************************************/
 
 /**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 // This file contains general utilities to aid in development.
@@ -41,7 +41,7 @@ namespace Standard
 		private static bool _MemCmp(IntPtr left, IntPtr right, long cb)
 		{
 			var offset = 0;
-			for (; offset < cb - sizeof(Int64); offset += sizeof(Int64))
+			for (; offset < cb - sizeof(long); offset += sizeof(long))
 			{
 				var left64 = Marshal.ReadInt64(left, offset);
 				var right64 = Marshal.ReadInt64(right, offset);
@@ -129,6 +129,7 @@ namespace Standard
 					totalReadLeft += cbReadLeft;
 					totalReadRight += cbReadRight;
 				}
+
 				Assert.AreEqual(cbReadLeft, cbReadRight);
 				Assert.AreEqual(totalReadLeft, totalReadRight);
 				Assert.AreEqual(length, totalReadLeft);
@@ -156,6 +157,7 @@ namespace Standard
 			catch (OverflowException)
 			{
 			}
+
 			// Doesn't seem to be a valid guid.
 			guid = default(Guid);
 			return false;
@@ -203,7 +205,9 @@ namespace Standard
 			// We can use leverage this as a shortcut to get the right 16x16 representation
 			// because DrawImage doesn't do that for us.
 			if (image is BitmapFrame bf)
+			{
 				bf = GetBestMatch(bf.Decoder.Frames, (int)dimensions.Width, (int)dimensions.Height);
+			}
 			else
 			{
 				// Constrain the dimensions based on the aspect ratio.
@@ -213,7 +217,9 @@ namespace Standard
 				var aspectRatio = image.Width / image.Height;
 				// If it's smaller than the requested size, then place it in the middle and pad the image.
 				if (image.Width <= dimensions.Width && image.Height <= dimensions.Height)
+				{
 					drawingDimensions = new Rect((dimensions.Width - image.Width) / 2, (dimensions.Height - image.Height) / 2, image.Width, image.Height);
+				}
 				else if (renderRatio > aspectRatio)
 				{
 					var scaledRenderWidth = image.Width / image.Height * dimensions.Width;
@@ -305,6 +311,7 @@ namespace Standard
 					bestBpp = currentIconBitDepth;
 				}
 			}
+
 			return frames[bestIndex];
 		}
 
@@ -359,7 +366,8 @@ namespace Standard
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static void SafeDispose<T>(ref T disposable) where T : IDisposable
+		public static void SafeDispose<T>(ref T disposable)
+			where T : IDisposable
 		{
 			// Dispose can safely be called on an object multiple times.
 			IDisposable t = disposable;
@@ -397,7 +405,8 @@ namespace Standard
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
-		public static void SafeRelease<T>(ref T comObject) where T : class
+		public static void SafeRelease<T>(ref T comObject)
+			where T : class
 		{
 			var t = comObject;
 			comObject = default(T);
@@ -421,7 +430,9 @@ namespace Standard
 			source.Append(propertyName);
 			source.Append(": ");
 			if (string.IsNullOrEmpty(value))
+			{
 				source.Append("<null>");
+			}
 			else
 			{
 				source.Append('\"');
@@ -441,7 +452,8 @@ namespace Standard
 		/// <returns></returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[Obsolete]
-		public static string GenerateToString<T>(T @object) where T : struct
+		public static string GenerateToString<T>(T @object)
+			where T : struct
 		{
 			var sbRet = new StringBuilder();
 			foreach (var property in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance))
@@ -452,6 +464,7 @@ namespace Standard
 				var format = null == value ? "{0}: <null>" : "{0}: \"{1}\"";
 				sbRet.AppendFormat(format, property.Name, value);
 			}
+
 			return sbRet.ToString();
 		}
 
@@ -469,6 +482,7 @@ namespace Standard
 				// the source stream doesn't know it's size...
 				destination.SetLength(source.Length);
 			}
+
 			var buffer = new byte[4096];
 			int cbRead;
 			do
@@ -557,7 +571,7 @@ namespace Standard
 			public string GetString()
 			{
 				_FlushBytes();
-				return _charCount > 0 ? new string(_charBuffer, 0, _charCount) : "";
+				return _charCount > 0 ? new string(_charBuffer, 0, _charCount) : string.Empty;
 			}
 		}
 
@@ -616,6 +630,7 @@ namespace Standard
 				else
 					decoder.AddChar(ch);
 			}
+
 			return decoder.GetString();
 		}
 
@@ -641,7 +656,9 @@ namespace Standard
 			foreach (var b in bytes)
 			{
 				if (b == ' ')
+				{
 					needsEncoding = true;
+				}
 				else if (!_UrlEncodeIsSafe(b))
 				{
 					++unsafeCharCount;
@@ -655,9 +672,13 @@ namespace Standard
 			foreach (var b in bytes)
 			{
 				if (_UrlEncodeIsSafe(b))
+				{
 					buffer[writeIndex++] = b;
+				}
 				else if (b == ' ')
+				{
 					buffer[writeIndex++] = (byte)'+';
+				}
 				else
 				{
 					buffer[writeIndex++] = (byte)'%';
@@ -665,6 +686,7 @@ namespace Standard
 					buffer[writeIndex++] = _IntToHex(b & 0xF);
 				}
 			}
+
 			bytes = buffer;
 			Assert.AreEqual(buffer.Length, writeIndex);
 			return Encoding.ASCII.GetString(bytes);
@@ -686,7 +708,7 @@ namespace Standard
 				case '_':
 				case '.':
 				case '!':
-				//case '~':
+				// case '~':
 				case '*':
 				case '\'':
 				case '(':
@@ -735,8 +757,6 @@ namespace Standard
 			dpd.RemoveValueChanged(component, listener);
 		}
 
-		#region Extension Methods
-
 		public static bool IsThicknessNonNegative(Thickness thickness)
 		{
 			if (!IsDoubleFiniteAndNonNegative(thickness.Top)) return false;
@@ -756,7 +776,5 @@ namespace Standard
 		}
 
 		public static bool IsDoubleFiniteAndNonNegative(double d) => !double.IsNaN(d) && !double.IsInfinity(d) && !(d < 0);
-
-		#endregion Extension Methods
 	}
 }

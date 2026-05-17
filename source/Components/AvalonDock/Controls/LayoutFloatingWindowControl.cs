@@ -23,6 +23,7 @@ using System.Windows.Media;
 
 using AvalonDock.Layout;
 using AvalonDock.Themes;
+using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
@@ -38,9 +39,8 @@ namespace AvalonDock.Controls
 	/// <seealso cref="ILayoutControl"/>
 	public abstract class LayoutFloatingWindowControl : Window, ILayoutControl
 	{
-		#region fields
 		private ResourceDictionary currentThemeResourceDictionary; // = null
-		private bool _isInternalChange; //false
+		private bool _isInternalChange; // false
 		private readonly ILayoutElement _model;
 		private bool _attachDrag = false;
 		private HwndSource _hwndSrc;
@@ -54,10 +54,6 @@ namespace AvalonDock.Controls
 		/// </summary>
 		/// <see cref="TotalMargin"/>
 		private bool _isTotalMarginSet = false;
-
-		#endregion fields
-
-		#region Constructors
 
 		static LayoutFloatingWindowControl()
 		{
@@ -81,10 +77,6 @@ namespace AvalonDock.Controls
 			IsContentImmutable = isContentImmutable;
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
 		/// <summary>
 		/// Gets/Sets the X,Y delta between the element being dragged and the
 		/// mouse position. The value of this property is used during the drag
@@ -98,23 +90,19 @@ namespace AvalonDock.Controls
 
 		public abstract ILayoutElement Model { get; }
 
-		#region IsContentImmutable
-
 		/// <summary> <see cref="IsContentImmutable"/> dependency property.</summary>
 		public static readonly DependencyProperty IsContentImmutableProperty = DependencyProperty.Register(nameof(IsContentImmutable), typeof(bool), typeof(LayoutFloatingWindowControl),
 				  new FrameworkPropertyMetadata(false));
 
 		/// <summary>Gets/sets wether the content can be modified.</summary>
-		[Bindable(true), Description("Gets/sets wether the content can be modified."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets/sets wether the content can be modified.")]
+		[Category("Other")]
 		public bool IsContentImmutable
 		{
 			get => (bool)GetValue(IsContentImmutableProperty);
 			private set => SetValue(IsContentImmutableProperty, value);
 		}
-
-		#endregion IsContentImmutable
-
-		#region IsDragging
 
 		/// <summary><see cref="IsDragging"/> Read-Only dependency property.</summary>
 		private static readonly DependencyPropertyKey IsDraggingPropertyKey = DependencyProperty.RegisterReadOnly(nameof(IsDragging), typeof(bool), typeof(LayoutFloatingWindowControl),
@@ -123,7 +111,9 @@ namespace AvalonDock.Controls
 		public static readonly DependencyProperty IsDraggingProperty = IsDraggingPropertyKey.DependencyProperty;
 
 		/// <summary>Gets wether this floating window is being dragged.</summary>
-		[Bindable(true), Description("Gets wether this floating window is being dragged."), Category("FloatingWindow")]
+		[Bindable(true)]
+		[Description("Gets wether this floating window is being dragged.")]
+		[Category("FloatingWindow")]
 		public bool IsDragging => (bool)GetValue(IsDraggingProperty);
 
 		/// <summary>
@@ -145,17 +135,9 @@ namespace AvalonDock.Controls
 				ReleaseMouseCapture();
 		}
 
-		#endregion IsDragging
-
-		#region CloseInitiatedByUser
-
 		protected bool CloseInitiatedByUser => !_internalCloseFlag;
 
-		#endregion CloseInitiatedByUser
-
 		internal bool KeepContentVisibleOnClose { get; set; }
-
-		#region OwnedByDockingManagerWindow
 
 		/// <summary><see cref="OwnedByDockingManagerWindow"/> dependency property.</summary>
 		public static readonly DependencyProperty OwnedByDockingManagerWindowProperty =
@@ -179,10 +161,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
-
-		#region AllowMinimize
-
 		/// <summary><see cref="AllowMinimize"/> dependency property.</summary>
 		public static readonly DependencyProperty AllowMinimizeProperty =
 			DependencyProperty.Register("AllowMinimize", typeof(bool), typeof(LayoutFloatingWindowControl), new PropertyMetadata(false));
@@ -196,9 +174,46 @@ namespace AvalonDock.Controls
 			set { SetValue(AllowMinimizeProperty, value); }
 		}
 
-		#endregion AllowMinimize
+		/// <summary><see cref="ResizeBorderThickness"/> dependency property.</summary>
+		public static readonly DependencyProperty ResizeBorderThicknessProperty =
+			DependencyProperty.Register(nameof(ResizeBorderThickness), typeof(Thickness), typeof(LayoutFloatingWindowControl),
+				new PropertyMetadata(default(Thickness), OnResizeBorderThicknessChanged));
 
-		#region IsMaximized
+		/// <summary>
+		/// Gets/sets the resize border thickness for this floating window.
+		/// When set to a non-default value, overrides the WindowChrome ResizeBorderThickness.
+		/// </summary>
+		[Bindable(true)]
+		[Description("Gets/sets the resize border thickness for this floating window.")]
+		[Category("FloatingWindow")]
+		public Thickness ResizeBorderThickness
+		{
+			get { return (Thickness)GetValue(ResizeBorderThicknessProperty); }
+			set { SetValue(ResizeBorderThicknessProperty, value); }
+		}
+
+		private static void OnResizeBorderThicknessChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			if (d is LayoutFloatingWindowControl w && w.IsLoaded)
+			{
+				w.ApplyResizeBorderThickness();
+			}
+		}
+
+		private void ApplyResizeBorderThickness()
+		{
+			var thickness = ResizeBorderThickness;
+			if (thickness == default(Thickness))
+			{
+				return;
+			}
+
+			var chrome = WindowChrome.GetWindowChrome(this);
+			if (chrome != null)
+			{
+				chrome.ResizeBorderThickness = thickness;
+			}
+		}
 
 		/// <summary><see cref="IsMaximized"/> dependency property.</summary>
 		public static readonly DependencyProperty IsMaximizedProperty = DependencyProperty.Register(nameof(IsMaximized), typeof(bool), typeof(LayoutFloatingWindowControl),
@@ -239,12 +254,9 @@ namespace AvalonDock.Controls
 			base.OnStateChanged(e);
 		}
 
-		#endregion IsMaximized
-
-		#region TotalMargin
-
 		private static readonly DependencyPropertyKey TotalMarginPropertyKey =
-			DependencyProperty.RegisterReadOnly(nameof(TotalMargin),
+			DependencyProperty.RegisterReadOnly(
+				nameof(TotalMargin),
 				typeof(Thickness),
 				typeof(LayoutFloatingWindowControl),
 				new FrameworkPropertyMetadata(default(Thickness)));
@@ -262,10 +274,6 @@ namespace AvalonDock.Controls
 			protected set { SetValue(TotalMarginPropertyKey, value); }
 		}
 
-		#endregion TotalMargin
-
-		#region ContentMinHeight
-
 		public static readonly DependencyPropertyKey ContentMinHeightPropertyKey = DependencyProperty.RegisterReadOnly(
 			nameof(ContentMinHeight), typeof(double), typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(0.0));
 
@@ -280,10 +288,6 @@ namespace AvalonDock.Controls
 			get { return (double)GetValue(ContentMinHeightProperty); }
 			set { SetValue(ContentMinHeightPropertyKey, value); }
 		}
-
-		#endregion ContentMinHeight
-
-		#region ContentMinWidth
 
 		public static readonly DependencyPropertyKey ContentMinWidthPropertyKey = DependencyProperty.RegisterReadOnly(
 			nameof(ContentMinWidth), typeof(double), typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(0.0));
@@ -300,11 +304,6 @@ namespace AvalonDock.Controls
 			set { SetValue(ContentMinWidthPropertyKey, value); }
 		}
 
-		#endregion ContentMinWidth
-
-		#endregion Properties
-
-		#region Internal Methods
 		/// <summary>Is Invoked when AvalonDock's WPF Theme changes via the <see cref="DockingManager.OnThemeChanged()"/> method.</summary>
 		/// <param name="oldTheme"></param>
 		internal virtual void UpdateThemeResources(Theme oldTheme = null)
@@ -324,8 +323,10 @@ namespace AvalonDock.Controls
 					var resourceDictionaryToRemove =
 						Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
 					if (resourceDictionaryToRemove != null)
+					{
 						Resources.MergedDictionaries.Remove(
 							resourceDictionaryToRemove);
+					}
 				}
 			}
 
@@ -338,7 +339,9 @@ namespace AvalonDock.Controls
 				Resources.MergedDictionaries.Add(currentThemeResourceDictionary);
 			}
 			else
+			{
 				Resources.MergedDictionaries.Add(new ResourceDictionary { Source = manager.Theme.GetResourceUri() });
+			}
 		}
 
 		internal void AttachDrag(bool onActivated = true)
@@ -350,7 +353,6 @@ namespace AvalonDock.Controls
 			}
 			else
 			{
-				CaptureMouse();
 				var windowHandle = new WindowInteropHelper(this).Handle;
 				var lParam = new IntPtr(((int)Left & 0xFFFF) | ((int)Top << 16));
 				Win32Helper.SendMessage(windowHandle, Win32Helper.WM_NCLBUTTONDOWN, new IntPtr(Win32Helper.HT_CAPTION), lParam);
@@ -372,12 +374,13 @@ namespace AvalonDock.Controls
 
 					if (_dragService != null)
 					{
-						var mousePosition = (Win32Helper.GetMousePosition());
+						var mousePosition = Win32Helper.GetMousePosition();
 						_dragService.Drop(mousePosition, out var dropFlag);
 						_dragService = null;
 						SetIsDragging(false);
 						if (dropFlag) InternalClose();
 					}
+
 					break;
 
 				case Win32Helper.WM_MOVING:
@@ -385,15 +388,17 @@ namespace AvalonDock.Controls
 						UpdateDragPosition();
 						if (IsMaximized) UpdateMaximizedState(false);
 					}
+
 					break;
 
-				case Win32Helper.WM_LBUTTONUP: //set as handled right button click on title area (after showing context menu)
+				case Win32Helper.WM_LBUTTONUP: // set as handled right button click on title area (after showing context menu)
 					if (_dragService != null && Mouse.LeftButton == MouseButtonState.Released)
 					{
 						_dragService.Abort();
 						_dragService = null;
 						SetIsDragging(false);
 					}
+
 					break;
 
 				case Win32Helper.WM_SYSCOMMAND:
@@ -401,6 +406,7 @@ namespace AvalonDock.Controls
 					if (command == Win32Helper.SC_MAXIMIZE || command == Win32Helper.SC_RESTORE) UpdateMaximizedState(command == Win32Helper.SC_MAXIMIZE);
 					break;
 			}
+
 			return IntPtr.Zero;
 		}
 
@@ -507,10 +513,6 @@ namespace AvalonDock.Controls
 			Close();
 		}
 
-		#endregion Internal Methods
-
-		#region Overrides
-
 		/// <inheritdoc />
 		protected override void OnClosed(EventArgs e)
 		{
@@ -525,21 +527,26 @@ namespace AvalonDock.Controls
 					_hwndSrc = null;
 				}
 			}
+
 			base.OnClosed(e);
 		}
 
 		/// <inheritdoc />
 		protected override void OnInitialized(EventArgs e)
 		{
-			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.CloseWindowCommand,
+			CommandBindings.Add(new CommandBinding(
+				Microsoft.Windows.Shell.SystemCommands.CloseWindowCommand,
 				(s, args) => Microsoft.Windows.Shell.SystemCommands.CloseWindow((Window)args.Parameter)));
-			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.MaximizeWindowCommand,
+			CommandBindings.Add(new CommandBinding(
+				Microsoft.Windows.Shell.SystemCommands.MaximizeWindowCommand,
 				(s, args) => Microsoft.Windows.Shell.SystemCommands.MaximizeWindow((Window)args.Parameter)));
-			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.MinimizeWindowCommand,
+			CommandBindings.Add(new CommandBinding(
+				Microsoft.Windows.Shell.SystemCommands.MinimizeWindowCommand,
 				(s, args) => Microsoft.Windows.Shell.SystemCommands.MinimizeWindow((Window)args.Parameter)));
-			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.RestoreWindowCommand,
+			CommandBindings.Add(new CommandBinding(
+				Microsoft.Windows.Shell.SystemCommands.RestoreWindowCommand,
 				(s, args) => Microsoft.Windows.Shell.SystemCommands.RestoreWindow((Window)args.Parameter)));
-			//Debug.Assert(this.Owner != null);
+			// Debug.Assert(this.Owner != null);
 			base.OnInitialized(e);
 		}
 
@@ -563,10 +570,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		private static object CoerceContentValue(DependencyObject sender, object content)
 		{
 			if (!(sender is LayoutFloatingWindowControl lfwc)) return null;
@@ -579,6 +582,7 @@ namespace AvalonDock.Controls
 			Loaded -= OnLoaded;
 
 			this.UpdateOwnership();
+			ApplyResizeBorderThickness();
 
 			_hwndSrc = PresentationSource.FromDependencyObject(this) as HwndSource;
 			_hwndSrcHook = FilterMessage;
@@ -594,9 +598,60 @@ namespace AvalonDock.Controls
 			// according to OwnedByDockingManagerWindow property.
 			var manager = Model?.Root?.Manager;
 			if (OwnedByDockingManagerWindow && manager != null)
+			{
 				this.SetParentToMainWindowOf(manager);
+				CopyInputBindingsFromOwner();
+			}
 			else
+			{
 				this.SetParentWindowToNull();
+			}
+		}
+
+		/// <summary>
+		/// Copies InputBindings from the Owner window so that keyboard shortcuts
+		/// defined on the main window also work in floating windows.
+		/// </summary>
+		private void CopyInputBindingsFromOwner()
+		{
+			if (Owner == null) return;
+
+			InputBindings.Clear();
+			foreach (InputBinding binding in Owner.InputBindings)
+				InputBindings.Add(binding);
+		}
+
+		private const double KeyboardMoveStep = 10.0;
+
+		/// <inheritdoc />
+		protected override void OnPreviewKeyDown(KeyEventArgs e)
+		{
+			base.OnPreviewKeyDown(e);
+			var manager = Model?.Root?.Manager;
+			if (manager == null || !manager.AllowMovingFloatingWindowWithKeyboard)
+			{
+				return;
+			}
+
+			switch (e.Key)
+			{
+				case Key.Left:
+					Left -= KeyboardMoveStep;
+					e.Handled = true;
+					break;
+				case Key.Right:
+					Left += KeyboardMoveStep;
+					e.Handled = true;
+					break;
+				case Key.Up:
+					Top -= KeyboardMoveStep;
+					e.Handled = true;
+					break;
+				case Key.Down:
+					Top += KeyboardMoveStep;
+					e.Handled = true;
+					break;
+			}
 		}
 
 		private void OnUnloaded(object sender, RoutedEventArgs e)
@@ -627,88 +682,91 @@ namespace AvalonDock.Controls
 		}
 
 		private void OnActivated(object sender, EventArgs e)
-        {
-            InternalOnActivated(sender, e);
-        }
+		{
+			InternalOnActivated(sender, e);
+		}
 
-        private void InternalOnActivated(object sender, EventArgs e, int retryCount = 0)
-        {
-            Activated -= OnActivated;
+		private void InternalOnActivated(object sender, EventArgs e, int retryCount = 0)
+		{
+			Activated -= OnActivated;
 
-            if (!_attachDrag || Mouse.LeftButton != MouseButtonState.Pressed)
-            {
-                return;
-            }
-            
-            var windowHandle = new WindowInteropHelper(this).Handle;
+			if (!_attachDrag || Mouse.LeftButton != MouseButtonState.Pressed)
+			{
+				return;
+			}
 			
-            // Check if the visual is connected to a PresentationSource to avoid InvalidOperationException
-            // in multi-DPI scenarios where the window might not be fully initialized yet
-            if (PresentationSource.FromVisual(this) == null)
-            {
-                if (retryCount >= 5)
-                {
-                    // Give up after several retries to avoid infinite loops
-                    _attachDrag = false;
-                    return;
-                }
-                
-                // If not connected, defer the operation until the visual is properly initialized
+			var windowHandle = new WindowInteropHelper(this).Handle;
+			
+			// Check if the visual is connected to a PresentationSource to avoid InvalidOperationException
+			// in multi-DPI scenarios where the window might not be fully initialized yet
+			if (PresentationSource.FromVisual(this) == null)
+			{
+				if (retryCount >= 5)
+				{
+					// Give up after several retries to avoid infinite loops
+					_attachDrag = false;
+					return;
+				}
+				
+				// If not connected, defer the operation until the visual is properly initialized
 #if NET40
-                // .NET 4.0 doesn't support Task.Delay or async lambdas in Dispatcher.Invoke
-                var timer = new System.Windows.Threading.DispatcherTimer();
-                timer.Interval = TimeSpan.FromMilliseconds(10);
-                timer.Tick += (s, args) => {
-                    timer.Stop();
-                    if (_attachDrag && Mouse.LeftButton == MouseButtonState.Pressed)
-                    {
-                        retryCount++;
-                        InternalOnActivated(sender, e, retryCount);
-                    }
-                };
-                timer.Start();
+				// .NET 4.0 doesn't support Task.Delay or async lambdas in Dispatcher.Invoke
+				var timer = new System.Windows.Threading.DispatcherTimer();
+				timer.Interval = TimeSpan.FromMilliseconds(10);
+				timer.Tick += (s, args) =>
+				{
+					timer.Stop();
+					if (_attachDrag && Mouse.LeftButton == MouseButtonState.Pressed)
+					{
+						retryCount++;
+						InternalOnActivated(sender, e, retryCount);
+					}
+				};
+				timer.Start();
 #else
-                Dispatcher.Invoke(async () => {
-                    if (_attachDrag && Mouse.LeftButton == MouseButtonState.Pressed)
-                    {
-                        await Task.Delay(10);
-                        retryCount++;
-                        InternalOnActivated(sender, e, retryCount);
-                    }
-                }, System.Windows.Threading.DispatcherPriority.Loaded);
+				Dispatcher.Invoke(
+					async () =>
+					{
+					if (_attachDrag && Mouse.LeftButton == MouseButtonState.Pressed)
+					{
+						await Task.Delay(10);
+						retryCount++;
+						InternalOnActivated(sender, e, retryCount);
+					}
+				}, System.Windows.Threading.DispatcherPriority.Loaded);
 #endif
-                return;
-            }
+				return;
+			}
 			
-            var mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
+			var mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
 
-            var area = this.GetScreenArea();
+			var area = this.GetScreenArea();
 
-            // BugFix Issue #6
-            // This code is initializes the drag when content (document or toolwindow) is dragged
-            // A second chance back up plan if DragDelta is not set
-            if (DragDelta == default) DragDelta = new Point(3, 3);
-            Left = mousePosition.X - DragDelta.X;                 // BugFix Issue #6
-            Top = mousePosition.Y - DragDelta.Y;
+			// BugFix Issue #6
+			// This code is initializes the drag when content (document or toolwindow) is dragged
+			// A second chance back up plan if DragDelta is not set
+			if (DragDelta == default) DragDelta = new Point(3, 3);
+			Left = mousePosition.X - DragDelta.X;                 // BugFix Issue #6
+			Top = mousePosition.Y - DragDelta.Y;
 
-            if (this.GetScreenArea().Size != area.Size) // setting the top/left co-ordinates has changed the size - this means moving to a screen with a different DPI. Recalculate mouse position based on new DPI to avoid wrong drag location
-            {
-                // Ensure the visual is still connected before recalculating mouse position
-                if (PresentationSource.FromVisual(this) != null)
-                {
-                    mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
-                    Left = mousePosition.X - DragDelta.X;
-                    Top = mousePosition.Y - DragDelta.Y;
-                }
-            }
+			if (this.GetScreenArea().Size != area.Size) // setting the top/left co-ordinates has changed the size - this means moving to a screen with a different DPI. Recalculate mouse position based on new DPI to avoid wrong drag location
+			{
+				// Ensure the visual is still connected before recalculating mouse position
+				if (PresentationSource.FromVisual(this) != null)
+				{
+					mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
+					Left = mousePosition.X - DragDelta.X;
+					Top = mousePosition.Y - DragDelta.Y;
+				}
+			}
 
-            _attachDrag = false;
-            Show();
-            var lParam = new IntPtr(((int)mousePosition.X & 0xFFFF) | ((int)mousePosition.Y << 16));
-            Win32Helper.SendMessage(windowHandle, Win32Helper.WM_NCLBUTTONDOWN, new IntPtr(Win32Helper.HT_CAPTION), lParam);
-        }
+			_attachDrag = false;
+			Show();
+			var lParam = new IntPtr(((int)mousePosition.X & 0xFFFF) | ((int)mousePosition.Y << 16));
+			Win32Helper.SendMessage(windowHandle, Win32Helper.WM_NCLBUTTONDOWN, new IntPtr(Win32Helper.HT_CAPTION), lParam);
+		}
 
-        private void UpdatePositionAndSizeOfPanes()
+		private void UpdatePositionAndSizeOfPanes()
 		{
 			foreach (var posElement in Model.Descendents().OfType<ILayoutElementForFloatingWindow>())
 			{
@@ -745,14 +803,15 @@ namespace AvalonDock.Controls
 		{
 			if (_dragService == null)
 			{
+				if (Model?.Root?.Manager == null)
+					return;
 				_dragService = new DragService(this);
 				SetIsDragging(true);
 			}
-			var mousePosition = (Win32Helper.GetMousePosition());
+
+			var mousePosition = Win32Helper.GetMousePosition();
 			_dragService.UpdateMouseLocation(mousePosition);
 		}
-
-		#endregion Private Methods
 
 		public virtual void EnableBindings()
 		{
@@ -762,20 +821,12 @@ namespace AvalonDock.Controls
 		{
 		}
 
-		#region Internal Classes
-
 		protected internal class FloatingWindowContentHost : HwndHost
 		{
-			#region fields
-
 			private readonly LayoutFloatingWindowControl _owner;
 			private HwndSource _wpfContentHost = null;
 			private Border _rootPresenter = null;
 			private DockingManager _manager = null;
-
-			#endregion fields
-
-			#region Constructors
 
 			public FloatingWindowContentHost(LayoutFloatingWindowControl owner)
 			{
@@ -784,13 +835,7 @@ namespace AvalonDock.Controls
 				BindingOperations.SetBinding(this, SizeToContentProperty, binding);
 			}
 
-			#endregion Constructors
-
-			#region Properties
-
 			public Visual RootVisual => _rootPresenter;
-
-			#region Content
 
 			/// <summary><see cref="Content"/> dependency property. </summary>
 			public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(nameof(Content), typeof(UIElement), typeof(FloatingWindowContentHost),
@@ -817,10 +862,6 @@ namespace AvalonDock.Controls
 				if (newValue is FrameworkElement newContent) newContent.SizeChanged += Content_SizeChanged;
 			}
 
-			#endregion Content
-
-			#region SizeToContent
-
 			/// <summary><see cref="SizeToContent"/> dependency property.</summary>
 			public static readonly DependencyProperty SizeToContentProperty = DependencyProperty.Register(nameof(SizeToContent), typeof(SizeToContent), typeof(FloatingWindowContentHost),
 					new FrameworkPropertyMetadata(SizeToContent.Manual, OnSizeToContentChanged));
@@ -840,12 +881,6 @@ namespace AvalonDock.Controls
 			{
 				if (_wpfContentHost != null) _wpfContentHost.SizeToContent = newValue;
 			}
-
-			#endregion SizeToContent
-
-			#endregion Properties
-
-			#region Overrides
 
 			/// <inheritdoc />
 			protected override HandleRef BuildWindowCore(HandleRef hwndParent)
@@ -885,10 +920,6 @@ namespace AvalonDock.Controls
 				return Content.DesiredSize;
 			}
 
-			#endregion Overrides
-
-			#region Methods
-
 			/// <summary>
 			/// Content_SizeChanged event handler.
 			/// </summary>
@@ -897,10 +928,6 @@ namespace AvalonDock.Controls
 				InvalidateMeasure();
 				InvalidateArrange();
 			}
-
-			#endregion Methods
 		}
-
-		#endregion Internal Classes
 	}
 }

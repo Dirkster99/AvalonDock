@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -7,9 +7,9 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Windows.Threading;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -21,15 +21,9 @@ namespace AvalonDock.Controls
 	/// </summary>
 	internal class AutoHideWindowManager
 	{
-		#region fields
-
 		private DockingManager _manager;
 		private WeakReference _currentAutohiddenAnchor = null;
 		private DispatcherTimer _closeTimer = null;
-
-		#endregion fields
-
-		#region constructors
 
 		/// <summary>Class constructor from <see cref="DockingManager"/>.</summary>
 		/// <param name="manager"></param>
@@ -38,10 +32,6 @@ namespace AvalonDock.Controls
 			_manager = manager;
 			this.SetupCloseTimer();
 		}
-
-		#endregion constructors
-
-		#region public methods
 
 		/// <summary>Method is invoked to pop put an Anchorable that was in AutoHide mode.</summary>
 		/// <param name="anchor"><see cref="LayoutAnchorControl"/> to pop out of the side panel.</param>
@@ -67,12 +57,10 @@ namespace AvalonDock.Controls
 				StopCloseTimer();
 			}
 			else
+			{
 				System.Diagnostics.Debug.Assert(false);
+			}
 		}
-
-		#endregion public methods
-
-		#region private methods
 
 		private void SetupCloseTimer()
 		{
@@ -100,7 +88,5 @@ namespace AvalonDock.Controls
 			_manager.AutoHideWindow.Hide();
 			_currentAutohiddenAnchor = null;
 		}
-
-		#endregion private methods
 	}
 }

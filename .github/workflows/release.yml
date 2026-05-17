@@ -32,7 +32,7 @@ jobs:
           if [[ $GITHUB_REF == refs/tags/v* ]]; then
             # Stable release from tag
             version="${GITHUB_REF#refs/tags/v}"
-            version_args="/p:Version=$version /p:PackageVersion=$version /p:AssemblyVersion=$version /p:FileVersion=$version"
+            version_args=""
             is_release='true'
             echo "Stable release: $version"
           else
@@ -49,14 +49,26 @@ jobs:
         run: dotnet restore source/AvalonDock.sln
 
       - name: Build
-        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore ${{ steps.version.outputs.VERSION_ARGS }}
+        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore --warnaserror ${{ steps.version.outputs.VERSION_ARGS }}
 
-      - name: Test
+      - name: Test (Unit Tests)
         run: >
           dotnet test source/AvalonDock.sln
           --configuration Release
-          --no-build
-          --logger "trx;LogFilePrefix=test-results"
+          --no-restore
+          --filter "Category!=FlaUI"
+          --logger "trx;LogFilePrefix=unit-test-results"
+          --results-directory TestResults
+          -m:1
+
+      - name: Test (FlaUI UI Tests)
+        run: >
+          dotnet test source/AvalonDock.sln
+          --configuration Release
+          --no-restore
+          --filter "Category=FlaUI"
+          --framework net10.0-windows
+          --logger "trx;LogFilePrefix=flaui-test-results"
           --results-directory TestResults
           -m:1
 
@@ -76,6 +88,7 @@ jobs:
           projects=(
             "source/Components/AvalonDock/AvalonDock.csproj"
             "source/Components/AvalonDock.Themes.Aero/AvalonDock.Themes.Aero.csproj"
+            "source/Components/AvalonDock.Themes.Arc/AvalonDock.Themes.Arc.csproj"
             "source/Components/AvalonDock.Themes.Metro/AvalonDock.Themes.Metro.csproj"
             "source/Components/AvalonDock.Themes.Expression/AvalonDock.Themes.Expression.csproj"
             "source/Components/AvalonDock.Themes.VS2010/AvalonDock.Themes.VS2010.csproj"
@@ -105,9 +118,46 @@ jobs:
           --source https://api.nuget.org/v3/index.json \
           --skip-duplicate
 
+      - name: Unlist preview NuGet packages
+        if: steps.version.outputs.IS_RELEASE == 'true'
+        shell: bash
+        run: |
+          packages=(
+            "Dirkster.AvalonDock"
+            "Dirkster.AvalonDock.Themes.Aero"
+            "Dirkster.AvalonDock.Themes.Arc"
+            "Dirkster.AvalonDock.Themes.Metro"
+            "Dirkster.AvalonDock.Themes.Expression"
+            "Dirkster.AvalonDock.Themes.VS2010"
+            "Dirkster.AvalonDock.Themes.VS2013"
+          )
+
+          for package in "${packages[@]}"; do
+            echo "Checking preview versions for: $package"
+            lower_package=$(echo "$package" | tr '[:upper:]' '[:lower:]')
+            versions_json=$(curl -sf "https://api.nuget.org/v3-flatcontainer/${lower_package}/index.json" || echo '{"versions":[]}')
+            preview_versions=$(echo "$versions_json" | jq -r '.versions[]' | grep -i "preview" || true)
+
+            if [ -z "$preview_versions" ]; then
+              echo "  No preview versions found."
+              continue
+            fi
+
+            echo "  Found preview versions:"
+            echo "$preview_versions" | sed 's/^/    /'
+
+            while IFS= read -r version; do
+              echo "  Unlisting $package $version ..."
+              dotnet nuget delete "$package" "$version" \
+                --api-key "${{ secrets.AVALONDOCK_APP_KEY }}" \
+                --source https://api.nuget.org/v3/index.json \
+                --non-interactive || echo "  Warning: Failed to unlist $package $version"
+            done <<< "$preview_versions"
+          done
+
       - name: Create GitHub Release
         if: steps.version.outputs.IS_RELEASE == 'true'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           generate_release_notes: true
           files: nupkg/*.nupkg

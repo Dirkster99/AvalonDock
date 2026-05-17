@@ -30,7 +30,7 @@ namespace AvalonDockTest.FlaUITests
 
             // Unload Manager
             ClickMenuItemByName("Layout", "Unload Manager");
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(500);
 
             Assert.That(App.HasExited, Is.False,
                 "App should not crash after unloading manager.");
@@ -41,7 +41,7 @@ namespace AvalonDockTest.FlaUITests
 
             // Reload Manager
             ClickMenuItemByName("Layout", "Load Manager");
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(500);
 
             Assert.That(App.HasExited, Is.False,
                 "App should not crash after reloading manager (Issue #384).");
@@ -60,7 +60,7 @@ namespace AvalonDockTest.FlaUITests
 
             // Create a floating window
             ClickMenuItemByName("Tools", "New floating window");
-            System.Threading.Thread.Sleep(1000);
+            WaitForFloatingWindow();
 
             var floatingBefore = GetFloatingWindows();
             TestContext.Out.WriteLine($"Floating windows before unload: {floatingBefore.Length}");
@@ -68,7 +68,6 @@ namespace AvalonDockTest.FlaUITests
             // Unload Manager — should not crash even with floating window
             MainWindow.SetForeground();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(300);
             
             Assert.That(App.HasExited, Is.False,
                 "App should not crash when unloading manager with floating windows (Issue #437).");
@@ -84,10 +83,10 @@ namespace AvalonDockTest.FlaUITests
             for (int i = 0; i < 3; i++)
             {
                 ClickMenuItemByName("Layout", "Unload Manager");
-                System.Threading.Thread.Sleep(500);
+                System.Threading.Thread.Sleep(300);
 
                 ClickMenuItemByName("Layout", "Load Manager");
-                System.Threading.Thread.Sleep(500);
+                System.Threading.Thread.Sleep(300);
             }
 
             Assert.That(App.HasExited, Is.False,
@@ -106,10 +105,10 @@ namespace AvalonDockTest.FlaUITests
         public void MenusWork_AfterManagerReload()
         {
             ClickMenuItemByName("Layout", "Unload Manager");
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             ClickMenuItemByName("Layout", "Load Manager");
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(500);
 
             // Verify menus are still functional
             var editMenu = FindByName("Edit");

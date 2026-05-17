@@ -1,18 +1,15 @@
-﻿using System;
+using System;
 using System.Windows.Input;
 
 namespace AvalonDock.MVVMTestApp
 {
 	internal class RelayCommand : ICommand
 	{
-		#region fields
 
 		readonly Action<object> _execute;
 		readonly Predicate<object> _canExecute;
 
-		#endregion fields
 
-		#region Constructors
 
 		public RelayCommand(Action<object> execute) : this(execute, null)
 		{
@@ -23,9 +20,7 @@ namespace AvalonDock.MVVMTestApp
 			_execute = execute ?? throw new ArgumentNullException(nameof(execute));
 			_canExecute = canExecute;
 		}
-		#endregion Constructors
 
-		#region ICommand Members
 
 		public bool CanExecute(object parameter)
 		{
@@ -43,6 +38,5 @@ namespace AvalonDock.MVVMTestApp
 			_execute(parameter);
 		}
 
-		#endregion ICommand Members
 	}
 }

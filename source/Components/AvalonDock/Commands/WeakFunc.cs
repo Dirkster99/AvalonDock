@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -10,16 +10,10 @@ namespace AvalonDock.Commands
 	/// <typeparam name="TResult">The type of the t result.</typeparam>
 	internal class WeakFunc<TResult>
 	{
-		#region Private Fields
-
 		/// <summary>
 		/// The static function
 		/// </summary>
 		private Func<TResult> _staticFunc;
-
-		#endregion Private Fields
-
-		#region Public Constructors
 
 		/// <summary>
 		/// Initializes a new instance of the WeakFunc class.
@@ -55,14 +49,11 @@ namespace AvalonDock.Commands
 
 				return;
 			}
+
 			Method = func.Method;
 			FuncReference = new WeakReference(func.Target);
 			Reference = new WeakReference(target);
 		}
-
-		#endregion Public Constructors
-
-		#region Protected Constructors
 
 		/// <summary>
 		/// Initializes an empty instance of the WeakFunc class.
@@ -70,10 +61,6 @@ namespace AvalonDock.Commands
 		protected WeakFunc()
 		{
 		}
-
-		#endregion Protected Constructors
-
-		#region Public Properties
 
 		/// <summary>
 		/// Gets a value indicating whether the Func's owner is still alive, or if it was collected
@@ -128,6 +115,7 @@ namespace AvalonDock.Commands
 				{
 					return _staticFunc.Method.Name;
 				}
+
 				return Method.Name;
 			}
 		}
@@ -149,10 +137,6 @@ namespace AvalonDock.Commands
 				return Reference.Target;
 			}
 		}
-
-		#endregion Public Properties
-
-		#region Protected Properties
 
 		/// <summary>
 		/// Gets or sets a WeakReference to this WeakFunc's action's target.
@@ -211,10 +195,6 @@ namespace AvalonDock.Commands
 			set;
 		}
 
-		#endregion Protected Properties
-
-		#region Public Methods
-
 		/// <summary>
 		/// Executes the action. This only happens if the Func's owner
 		/// is still alive.
@@ -252,7 +232,5 @@ namespace AvalonDock.Commands
 			Method = null;
 			_staticFunc = null;
 		}
-
-		#endregion Public Methods
 	}
 }

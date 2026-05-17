@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
@@ -18,14 +18,8 @@ namespace AvalonDock.Controls
 	[TemplatePart(Name = "PART_ItemsHolder", Type = typeof(Panel))]
 	public class TabControlEx : TabControl
 	{
-		#region fields
-
 		private Panel ItemsHolderPanel = null;
 		private readonly bool _IsVirtualizing;
-
-		#endregion fields
-
-		#region constructors
 
 		/// <summary>
 		/// Class constructor from virtualization parameter.
@@ -49,17 +43,11 @@ namespace AvalonDock.Controls
 			ItemContainerGenerator.StatusChanged += ItemContainerGenerator_StatusChanged;
 		}
 
-		#endregion constructors
-
-		#region properties
-
 		/// <summary>Gets whether the control and its inheriting classes are virtualizing their items or not.</summary>
-		[Bindable(false), Description("Gets whether the control and its inheriting classes are virtualizing their items or not."), Category("Other")]
+		[Bindable(false)]
+		[Description("Gets whether the control and its inheriting classes are virtualizing their items or not.")]
+		[Category("Other")]
 		public bool IsVirtualiting => _IsVirtualizing;
-
-		#endregion properties
-
-		#region methods
 
 		/// <summary>
 		/// Get the ItemsHolder and generate any children
@@ -131,7 +119,6 @@ namespace AvalonDock.Controls
 
 					// Don't do anything with new items because we don't want to
 					// create visuals that aren't being shown
-
 					UpdateSelectedItem();
 					break;
 
@@ -161,7 +148,7 @@ namespace AvalonDock.Controls
 		/// <returns></returns>
 		protected TabItem GetSelectedTabItem()
 		{
-			object selectedItem = base.SelectedItem;
+			object selectedItem = this.SelectedItem;
 
 			// Code below is required only if virtualization is turned ON
 			if (_IsVirtualizing)
@@ -172,7 +159,7 @@ namespace AvalonDock.Controls
 
 			TabItem item = selectedItem as TabItem;
 			if (item == null)
-				item = base.ItemContainerGenerator.ContainerFromIndex(base.SelectedIndex) as TabItem;
+				item = this.ItemContainerGenerator.ContainerFromIndex(this.SelectedIndex) as TabItem;
 
 			return item;
 		}
@@ -217,7 +204,7 @@ namespace AvalonDock.Controls
 
 			// show the right child
 			foreach (ContentPresenter child in ItemsHolderPanel.Children)
-				child.Visibility = ((child.Tag as TabItem).IsSelected) ? Visibility.Visible : Visibility.Collapsed;
+				child.Visibility = (child.Tag as TabItem).IsSelected ? Visibility.Visible : Visibility.Collapsed;
 		}
 
 		private ContentPresenter CreateChildContentPresenter(object item)
@@ -237,7 +224,7 @@ namespace AvalonDock.Controls
 			cp.ContentTemplateSelector = this.SelectedContentTemplateSelector;
 			cp.ContentStringFormat = this.SelectedContentStringFormat;
 			cp.Visibility = Visibility.Collapsed;
-			cp.Tag = (item is TabItem) ? item : (this.ItemContainerGenerator.ContainerFromItem(item));
+			cp.Tag = (item is TabItem) ? item : this.ItemContainerGenerator.ContainerFromItem(item);
 			ItemsHolderPanel.Children.Add(cp);
 			return cp;
 		}
@@ -261,7 +248,5 @@ namespace AvalonDock.Controls
 
 			return null;
 		}
-
-		#endregion methods
 	}
 }

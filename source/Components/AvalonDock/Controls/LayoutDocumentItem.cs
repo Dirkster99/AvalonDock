@@ -7,9 +7,9 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System.ComponentModel;
 using System.Windows;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -24,31 +24,21 @@ namespace AvalonDock.Controls
 	/// <seealso cref="AvalonDock.Controls.LayoutItem" />
 	public class LayoutDocumentItem : LayoutItem
 	{
-		#region fields
-
 		private LayoutDocument _document;   // The content of this item
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>Class constructor</summary>
 		internal LayoutDocumentItem()
 		{
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
-		#region Description
-
 		/// <summary><see cref="Description"/> dependency property.</summary>
 		public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register(nameof(Description), typeof(string), typeof(LayoutDocumentItem),
 					new FrameworkPropertyMetadata(null, OnDescriptionChanged));
 
 		/// <summary>Gets/sets the description to display (in the <see cref="NavigatorWindow"/>) for the document item.</summary>
-		[Bindable(true), Description("Gets/sets the description to display (in the NavigatorWindow) for the document item."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets/sets the description to display (in the NavigatorWindow) for the document item.")]
+		[Category("Other")]
 		public string Description
 		{
 			get => (string)GetValue(DescriptionProperty);
@@ -60,12 +50,6 @@ namespace AvalonDock.Controls
 
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Description"/> property.</summary>
 		protected virtual void OnDescriptionChanged(DependencyPropertyChangedEventArgs e) => _document.Description = (string)e.NewValue;
-
-		#endregion Description
-
-		#endregion Properties
-
-		#region Overrides
 
 		/// <inheritdoc />
 		protected override void Close()
@@ -83,6 +67,7 @@ namespace AvalonDock.Controls
 				_document.IsVisible = Visibility == Visibility.Visible;
 				if (_document.Parent is LayoutDocumentPane layoutDocumentPane) layoutDocumentPane.ComputeVisibility();
 			}
+
 			base.OnVisibilityChanged();
 		}
 
@@ -102,9 +87,7 @@ namespace AvalonDock.Controls
 
 		protected override bool CanExecuteDockAsDocumentCommand()
 		{
-			return (LayoutElement != null && LayoutElement.FindParent<LayoutDocumentPane>() != null && LayoutElement.IsFloating);
+			return LayoutElement != null && LayoutElement.FindParent<LayoutDocumentPane>() != null && LayoutElement.IsFloating;
 		}
-
-		#endregion Overrides
 	}
 }

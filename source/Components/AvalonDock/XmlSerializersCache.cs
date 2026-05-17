@@ -9,7 +9,6 @@ namespace AvalonDock
 		private static readonly object s_lock = new object();
 		private static readonly ConcurrentDictionary<Type, XmlSerializer> s_cache = new ConcurrentDictionary<Type, XmlSerializer>();
 
-
 		public static XmlSerializer GetSerializer(Type targetType)
 		{
 			if (s_cache.TryGetValue(targetType, out var serializer))

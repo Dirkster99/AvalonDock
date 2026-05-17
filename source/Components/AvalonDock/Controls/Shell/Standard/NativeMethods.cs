@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -8,14 +8,13 @@
  ************************************************************************/
 
 /**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 #pragma warning disable CS0169 // Field is never used
 #pragma warning disable SYSLIB0004
 namespace Standard
 {
-	using Microsoft.Win32.SafeHandles;
 	using System;
 	using System.ComponentModel;
 	using System.Diagnostics.CodeAnalysis;
@@ -25,12 +24,11 @@ namespace Standard
 	using System.Runtime.InteropServices.ComTypes;
 	using System.Security.Permissions;
 	using System.Text;
+	using Microsoft.Win32.SafeHandles;
 
 	// Some COM interfaces and Win32 structures are already declared in the framework.
 	// Interesting ones to remember in System.Runtime.InteropServices.ComTypes are:
 	using IStream = System.Runtime.InteropServices.ComTypes.IStream;
-
-	#region Native Values
 
 	internal static class Win32Value
 	{
@@ -305,13 +303,13 @@ namespace Standard
 	/// </summary>
 	internal enum GWL
 	{
-		WNDPROC = (-4),
-		HINSTANCE = (-6),
-		HWNDPARENT = (-8),
-		STYLE = (-16),
-		EXSTYLE = (-20),
-		USERDATA = (-21),
-		ID = (-12)
+		WNDPROC = -4,
+		HINSTANCE = -6,
+		HWNDPARENT = -8,
+		STYLE = -16,
+		EXSTYLE = -20,
+		USERDATA = -21,
+		ID = -12
 	}
 
 	/// <summary>
@@ -876,8 +874,7 @@ namespace Standard
 		NCMOUSELEAVE = 0x02A2,
 
 		TABLET_DEFBASE = 0x02C0,
-		//WM_TABLET_MAXOFFSET = 0x20,
-
+		// WM_TABLET_MAXOFFSET = 0x20,
 		TABLET_ADDED = TABLET_DEFBASE + 8,
 		TABLET_DELETED = TABLET_DEFBASE + 9,
 		TABLET_FLICK = TABLET_DEFBASE + 11,
@@ -914,18 +911,14 @@ namespace Standard
 
 		GETTITLEBARINFOEX = 0x033F,
 
-		#region Windows 7
-
 		DWMSENDICONICTHUMBNAIL = 0x0323,
 		DWMSENDICONICLIVEPREVIEWBITMAP = 0x0326,
-
-		#endregion Windows 7
 
 		USER = 0x0400,
 
 		// This is the hard-coded message value used by WinForms for Shell_NotifyIcon.
 		// It's relatively safe to reuse.
-		TRAYMOUSEMESSAGE = 0x800, //WM_USER + 1024
+		TRAYMOUSEMESSAGE = 0x800, // WM_USER + 1024
 
 		APP = 0x8000,
 	}
@@ -961,8 +954,8 @@ namespace Standard
 		LAYOUTRTL = 0x00400000, // Right to left mirroring
 		COMPOSITED = 0x02000000,
 		NOACTIVATE = 0x08000000,
-		OVERLAPPEDWINDOW = (WINDOWEDGE | CLIENTEDGE),
-		PALETTEWINDOW = (WINDOWEDGE | TOOLWINDOW | TOPMOST),
+		OVERLAPPEDWINDOW = WINDOWEDGE | CLIENTEDGE,
+		PALETTEWINDOW = WINDOWEDGE | TOOLWINDOW | TOPMOST,
 	}
 
 	/// <summary>
@@ -1053,7 +1046,7 @@ namespace Standard
 		DEFAULT,
 		EXCLUDEBELOW,
 		EXCLUDEABOVE,
-		//LAST
+		// LAST
 	}
 
 	/// <summary>
@@ -1064,7 +1057,7 @@ namespace Standard
 		USEWINDOWSTYLE,
 		DISABLED,
 		ENABLED,
-		//LAST
+		// LAST
 	}
 
 	/// <summary>
@@ -1083,7 +1076,6 @@ namespace Standard
 		EXTENDED_FRAME_BOUNDS,
 
 		// New to Windows 7:
-
 		HAS_ICONIC_BITMAP,
 		DISALLOW_PEEK,
 		EXCLUDED_FROM_PEEK,
@@ -1214,7 +1206,7 @@ namespace Standard
 
 	internal enum MOUSEEVENTF : int
 	{
-		//mouse event constants
+		// mouse event constants
 		LEFTDOWN = 2,
 
 		LEFTUP = 4
@@ -1358,10 +1350,6 @@ namespace Standard
 		REDRAW = HREDRAW | VREDRAW,
 	}
 
-	#endregion Native Values
-
-	#region SafeHandles
-
 	internal sealed class SafeFindHandle : SafeHandleZeroOrMinusOneIsInvalid
 	{
 #if NET5_0_OR_GREATER
@@ -1371,7 +1359,9 @@ namespace Standard
 #if NET5_0_OR_GREATER
 #pragma warning restore SYSLIB0003
 #endif
-		private SafeFindHandle() : base(true) { }
+		private SafeFindHandle() : base(true)
+		{
+		}
 
 		/// <inheritdoc />
 		protected override bool ReleaseHandle() => NativeMethods.FindClose(handle);
@@ -1429,7 +1419,8 @@ namespace Standard
 			return NativeMethods.ReleaseDC(_hwnd.Value, handle) == 1;
 		}
 
-		[SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes"), SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+		[SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
+		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static SafeDC CreateDC(string deviceName)
 		{
 			SafeDC dc = null;
@@ -1442,12 +1433,14 @@ namespace Standard
 			{
 				if (dc != null) dc._created = true;
 			}
+
 			if (!dc.IsInvalid) return dc;
 			dc.Dispose();
 			throw new SystemException("Unable to create a device context from the specified device information.");
 		}
 
-		[SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes"), SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+		[SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
+		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static SafeDC CreateCompatibleDC(SafeDC hdc)
 		{
 			SafeDC dc = null;
@@ -1462,6 +1455,7 @@ namespace Standard
 			{
 				if (dc != null) dc._created = true;
 			}
+
 			if (!dc.IsInvalid) return dc;
 			dc.Dispose();
 			throw new SystemException("Unable to create a device context from the specified device information.");
@@ -1535,6 +1529,7 @@ namespace Standard
 				safeHandle.handle = unsafeHandle;
 				return safeHandle;
 			}
+
 			safeHandle.Dispose();
 			throw new Exception("Unable to initialize GDI+");
 		}
@@ -1544,7 +1539,6 @@ namespace Standard
 	{
 		private IConnectionPoint _cp;
 		// handle holds the cookie value.
-
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "IConnectionPoint")]
 		public SafeConnectionPointCookie(IConnectionPointContainer target, object sink, Guid eventId) : base(true)
@@ -1594,6 +1588,7 @@ namespace Standard
 				{
 					Utility.SafeRelease(ref _cp);
 				}
+
 				return true;
 			}
 			catch
@@ -1602,10 +1597,6 @@ namespace Standard
 			}
 		}
 	}
-
-	#endregion SafeHandles
-
-	#region Native Types
 
 	[StructLayout(LayoutKind.Sequential)]
 	internal struct BLENDFUNCTION
@@ -1629,8 +1620,8 @@ namespace Standard
 		public int cbSize;
 		public HCF dwFlags;
 
-		//[MarshalAs(UnmanagedType.LPWStr, SizeConst=80)]
-		//public String lpszDefaultScheme;
+		// [MarshalAs(UnmanagedType.LPWStr, SizeConst=80)]
+		// public String lpszDefaultScheme;
 		public IntPtr lpszDefaultScheme;
 	}
 
@@ -1850,8 +1841,6 @@ namespace Standard
 			Assert.IsTrue(hr.Succeeded);
 		}
 
-		#region IDisposable Pattern
-
 		/// <inheritdoc />
 		public void Dispose()
 		{
@@ -1869,8 +1858,6 @@ namespace Standard
 		{
 			Clear();
 		}
-
-		#endregion IDisposable Pattern
 	}
 
 	[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
@@ -2028,7 +2015,7 @@ namespace Standard
 
 		/// <summary>Height of bottom border that retains its size.</summary>
 		public int cyBottomHeight;
-	};
+	}
 
 	[StructLayout(LayoutKind.Sequential)]
 	internal class MONITORINFO
@@ -2280,7 +2267,7 @@ namespace Standard
 	{
 		public uint type;
 		public MOUSEINPUT mi;
-	};
+	}
 
 	[StructLayout(LayoutKind.Sequential)]
 	internal struct UNSIGNED_RATIO
@@ -2333,8 +2320,6 @@ namespace Standard
 		public ulong cPixelsDrawn;
 		public ulong cBuffersEmpty;
 	}
-
-	#endregion Native Types
 
 	/// <summary>Delegate declaration that matches native WndProc signatures.</summary>
 	internal delegate IntPtr WndProc(IntPtr hwnd, WM uMsg, IntPtr wParam, IntPtr lParam);
@@ -2424,6 +2409,7 @@ namespace Standard
 					var currArg = Marshal.ReadIntPtr(argv, i * Marshal.SizeOf(typeof(IntPtr)));
 					result[i] = Marshal.PtrToStringUni(currArg);
 				}
+
 				return result;
 			}
 			finally
@@ -2597,6 +2583,7 @@ namespace Standard
 			{
 				return false;
 			}
+
 			return _DwmIsCompositionEnabled();
 		}
 
@@ -2787,7 +2774,7 @@ namespace Standard
 		public static IntPtr GetStockObject(StockObject fnObject)
 		{
 			var retPtr = _GetStockObject(fnObject);
-            return retPtr;
+			return retPtr;
 		}
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
@@ -2871,7 +2858,7 @@ namespace Standard
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[DllImport("gdiplus.dll")]
-		public static extern Status GdipCreateHBITMAPFromBitmap(IntPtr bitmap, out IntPtr hbmReturn, Int32 background);
+		public static extern Status GdipCreateHBITMAPFromBitmap(IntPtr bitmap, out IntPtr hbmReturn, int background);
 
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[DllImport("gdiplus.dll")]
@@ -3179,8 +3166,6 @@ namespace Standard
 				HRESULT.ThrowLastError();
 		}
 
-		#region Win7 declarations
-
 		[DllImport("shell32.dll", EntryPoint = "SHAddToRecentDocs")]
 		private static extern void _SHAddToRecentDocs_String(SHARD uFlags, [MarshalAs(UnmanagedType.LPWStr)] string pv);
 
@@ -3195,7 +3180,6 @@ namespace Standard
 		public static void SHAddToRecentDocs(IShellLinkW shellLink) => _SHAddToRecentDocs_ShellLink(SHARD.LINK, shellLink);
 
 		// #define DWM_SIT_DISPLAYFRAME    0x00000001  // Display a window frame around the provided bitmap
-
 		[DllImport("dwmapi.dll", EntryPoint = "DwmGetCompositionTimingInfo")]
 		private static extern HRESULT _DwmGetCompositionTimingInfo(IntPtr hwnd, ref DWM_TIMING_INFO pTimingInfo);
 
@@ -3249,7 +3233,5 @@ namespace Standard
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[DllImport("shell32.dll")]
 		public static extern HRESULT GetCurrentProcessExplicitAppUserModelID([Out, MarshalAs(UnmanagedType.LPWStr)] out string AppID);
-
-		#endregion Win7 declarations
 	}
 }

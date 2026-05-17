@@ -16,6 +16,11 @@ namespace AvalonDock.Controls
 	{
 		public static Point PointToScreenDPI(this Visual visual, Point pt)
 		{
+			if (PresentationSource.FromVisual(visual) == null)
+			{
+				return pt;
+			}
+
 			Point resultPt = visual.PointToScreen(pt);
 			return TransformToDeviceDPI(visual, resultPt);
 		}
@@ -36,12 +41,12 @@ namespace AvalonDock.Controls
 
 		public static Rect GetScreenArea(this FrameworkElement element)
 		{
-			//    return new Rect(element.PointToScreenDPI(new Point()),
+			// return new Rect(element.PointToScreenDPI(new Point()),
 			//        element.TransformActualSizeToAncestor());
-			//}
+			// }
 
-			//public static Rect GetScreenAreaWithoutFlowDirection(this FrameworkElement element)
-			//{
+			// public static Rect GetScreenAreaWithoutFlowDirection(this FrameworkElement element)
+			// {
 			var point = element.PointToScreenDPI(new Point());
 			if (FrameworkElement.GetFlowDirection(element) == FlowDirection.RightToLeft)
 			{
@@ -49,11 +54,13 @@ namespace AvalonDock.Controls
 				Point leftToRightPoint = new Point(
 					actualSize.Width - point.X,
 					point.Y);
-				return new Rect(leftToRightPoint,
+				return new Rect(
+					leftToRightPoint,
 					actualSize);
 			}
 
-			return new Rect(point,
+			return new Rect(
+				point,
 				element.TransformActualSizeToAncestor());
 		}
 
@@ -68,13 +75,25 @@ namespace AvalonDock.Controls
 
 		public static Size TransformFromDeviceDPI(this Visual visual, Size size)
 		{
-			Matrix m = PresentationSource.FromVisual(visual).CompositionTarget.TransformToDevice;
+			var compositionTarget = PresentationSource.FromVisual(visual)?.CompositionTarget;
+			if (compositionTarget == null)
+			{
+				return size;
+			}
+
+			Matrix m = compositionTarget.TransformToDevice;
 			return new Size(size.Width * m.M11, size.Height * m.M22);
 		}
 
 		public static Point TransformFromDeviceDPI(this Visual visual, Point pt)
 		{
-			Matrix m = PresentationSource.FromVisual(visual).CompositionTarget.TransformToDevice;
+			var compositionTarget = PresentationSource.FromVisual(visual)?.CompositionTarget;
+			if (compositionTarget == null)
+			{
+				return pt;
+			}
+
+			Matrix m = compositionTarget.TransformToDevice;
 			return new Point(pt.X * m.M11, pt.Y * m.M22);
 		}
 

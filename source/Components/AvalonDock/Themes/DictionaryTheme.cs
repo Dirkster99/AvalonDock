@@ -22,7 +22,6 @@ namespace AvalonDock.Themes
 	/// See Issue https://github.com/Dirkster99/AvalonDock/issues/189 for more details.</summary>
 	public abstract class DictionaryTheme : Theme
 	{
-		#region Constructors
 		/// <summary>Class constructor</summary>
 		public DictionaryTheme()
 		{
@@ -34,8 +33,6 @@ namespace AvalonDock.Themes
 		{
 			this.ThemeResourceDictionary = themeResourceDictionary;
 		}
-
-		#endregion Constructors
 
 		/// <summary>Gets the resource dictionary that is associated with this AvalonDock theme.</summary>
 		public ResourceDictionary ThemeResourceDictionary { get; private set; }

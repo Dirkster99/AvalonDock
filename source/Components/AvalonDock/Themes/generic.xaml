@@ -1212,10 +1212,10 @@
 										<TextBlock
 											Margin="0,3,0,4"
 											FontWeight="Bold"
-											Text="{x:Static avalonDockProperties:Resources.Active_ToolWindows}" />
+											Text="{Binding AnchorablesLabel, RelativeSource={RelativeSource AncestorType={x:Type avalonDockControls:NavigatorWindow}}}" />
 										<ListBox
 											x:Name="PART_AnchorableListBox"
-											AutomationProperties.Name="{x:Static avalonDockProperties:Resources.Active_ToolWindows}"
+											AutomationProperties.Name="{Binding AnchorablesLabel, RelativeSource={RelativeSource AncestorType={x:Type avalonDockControls:NavigatorWindow}}}"
 											Grid.Row="1"
 											MaxHeight="400"
 											Background="Transparent"
@@ -1260,10 +1260,10 @@
 										<TextBlock
 											Margin="0,3,0,4"
 											FontWeight="Bold"
-											Text="{x:Static avalonDockProperties:Resources.Active_Files}" />
+											Text="{Binding DocumentsLabel, RelativeSource={RelativeSource AncestorType={x:Type avalonDockControls:NavigatorWindow}}}" />
 										<ListBox
 											x:Name="PART_DocumentListBox"
-											AutomationProperties.Name="{x:Static avalonDockProperties:Resources.Active_Files}"
+											AutomationProperties.Name="{Binding DocumentsLabel, RelativeSource={RelativeSource AncestorType={x:Type avalonDockControls:NavigatorWindow}}}"
 											Grid.Row="1"
 											MaxHeight="400"
 											Background="Transparent"

@@ -13,6 +13,7 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	MinWidth="300"
 	MinHeight="300"
+	Background="Transparent"
 	mc:Ignorable="d">
 	<Grid>
 		<StackPanel Margin="0">

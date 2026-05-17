@@ -27,7 +27,7 @@ jobs:
         run: dotnet restore source/AvalonDock.sln
 
       - name: Build
-        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore
+        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore --warnaserror
 
       - name: Test (Unit Tests)
         run: >

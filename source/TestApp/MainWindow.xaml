@@ -19,13 +19,27 @@
     Title="MainWindow"
     Width="800"
     Height="600"
+    Background="{Binding Background, ElementName=dockManager}"
     UseLayoutRounding="True">
     <Grid x:Name="layoutRoot">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0">
+        <Menu x:Name="mainMenu" Grid.Row="0"
+              Background="{Binding Background, ElementName=dockManager}">
+            <Menu.Resources>
+                <Style TargetType="MenuItem">
+                    <Style.Triggers>
+                        <Trigger Property="Role" Value="SubmenuHeader">
+                            <Setter Property="Foreground" Value="Black" />
+                        </Trigger>
+                        <Trigger Property="Role" Value="SubmenuItem">
+                            <Setter Property="Foreground" Value="Black" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Menu.Resources>
             <MenuItem Header="Edit">
                 <MenuItem Command="Undo" />
                 <MenuItem Command="Redo" />
@@ -57,6 +71,22 @@
                 <MenuItem Click="OnShowToolWindow1" Header="Tool Window1" />
                 <MenuItem Click="OnNewFloatingWindow" Header="New floating window" />
             </MenuItem>
+            <MenuItem x:Name="themeMenu" Header="Theme">
+                <MenuItem Header="Arc Dark" Click="OnSwitchTheme" Tag="ArcDark" IsCheckable="True" IsChecked="True" />
+                <MenuItem Header="Arc Light" Click="OnSwitchTheme" Tag="ArcLight" IsCheckable="True" />
+                <Separator />
+                <MenuItem Header="VS2013 Dark" Click="OnSwitchTheme" Tag="VS2013Dark" IsCheckable="True" />
+                <MenuItem Header="VS2013 Light" Click="OnSwitchTheme" Tag="VS2013Light" IsCheckable="True" />
+                <MenuItem Header="VS2013 Blue" Click="OnSwitchTheme" Tag="VS2013Blue" IsCheckable="True" />
+                <Separator />
+                <MenuItem Header="VS2010" Click="OnSwitchTheme" Tag="VS2010" IsCheckable="True" />
+                <MenuItem Header="Expression Dark" Click="OnSwitchTheme" Tag="ExpressionDark" IsCheckable="True" />
+                <MenuItem Header="Expression Light" Click="OnSwitchTheme" Tag="ExpressionLight" IsCheckable="True" />
+                <MenuItem Header="Metro" Click="OnSwitchTheme" Tag="Metro" IsCheckable="True" />
+                <MenuItem Header="Aero" Click="OnSwitchTheme" Tag="Aero" IsCheckable="True" />
+                <Separator />
+                <MenuItem Header="Generic" Click="OnSwitchTheme" Tag="Generic" IsCheckable="True" />
+            </MenuItem>
         </Menu>
 
         <DockingManager x:Name="dockManager"
@@ -67,13 +97,23 @@
             IsVirtualizingAnchorable="True"
             IsVirtualizingDocument="True">
             <DockingManager.Theme>
-                <Vs2013LightTheme />
+                <ArcDarkTheme />
             </DockingManager.Theme>
             <DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <Image Margin="0,0,4,0" Source="{Binding IconSource}" />
-                        <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                        <Image Width="16" Height="16" Margin="0,0,4,0" Source="{Binding IconSource}">
+                            <Image.Style>
+                                <Style TargetType="Image">
+                                    <Style.Triggers>
+                                        <Trigger Property="Source" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                        </Image>
+                        <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
                     </StackPanel>
                 </DataTemplate>
             </DockingManager.DocumentHeaderTemplate>
@@ -86,7 +126,7 @@
                             CanHide="False"
                             ContentId="WinFormsWindow"
                             ToolTip="My WinForms Tool">
-                            <winformsIntegration:WindowsFormsHost x:Name="winFormsHost" Background="White" />
+                            <winformsIntegration:WindowsFormsHost x:Name="winFormsHost" />
                         </LayoutAnchorable>
                     </LayoutAnchorablePane>
                     <LayoutDocumentPaneGroup>
@@ -95,7 +135,7 @@
                                 Title="Document 1"
                                 ContentId="document1"
                                 IconSource="/TestApp;component/Images/alarm-clock-blue.png">
-                                <Grid>
+                                <Grid Background="Transparent">
                                     <Grid.RowDefinitions>
                                         <RowDefinition />
                                         <RowDefinition Height="Auto" />
@@ -105,14 +145,13 @@
                                         VerticalAlignment="Top"
                                         Click="AddTwoDocuments_click"
                                         Content="Click to add 2 documents" />
-                                    <TextBox Grid.Row="1" Text="Document 1 Content" />
+                                    <TextBox Grid.Row="1" Background="Transparent" Text="Document 1 Content" />
                                 </Grid>
                             </LayoutDocument>
                             <LayoutDocument Title="Document 2" ContentId="document2">
-                                <TextBox
+                                <TextBox x:Name="tbDocument2Timer"
                                     Background="Transparent"
                                     BorderThickness="0"
-                                    Foreground="White"
                                     Text="{Binding TestTimer, Mode=OneWay, StringFormat='Document 2 Attached to Timer ->\{0\}'}" />
                             </LayoutDocument>
                         </LayoutDocumentPane>
@@ -123,9 +162,9 @@
                                 Title="Tool Window 1"
                                 ContentId="toolWindow1"
                                 Hiding="OnToolWindow1Hiding">
-                                <StackPanel MinHeight="450">
+                                <StackPanel MinHeight="450" Background="Transparent">
                                     <local:TestUserControl />
-                                    <TextBox Text="{Binding TestTimer, Mode=OneWay, StringFormat='Tool Window 1 Attached to Timer ->\{0\}'}" />
+                                <TextBox x:Name="tbToolWindow1Timer" Background="Transparent" Text="{Binding TestTimer, Mode=OneWay, StringFormat='Tool Window 1 Attached to Timer ->\{0\}'}" />
                                 </StackPanel>
                             </LayoutAnchorable>
                             <LayoutAnchorable Title="Tool Window 2" ContentId="toolWindow2">
@@ -142,12 +181,12 @@
                                 Title="AutoHide1 Content"
                                 ContentId="AutoHide1Content"
                                 IconSource="/TestApp;component/Images/address-book--pencil.png">
-                                <TextBox Text="{Binding TestTimer, Mode=OneWay, StringFormat='AutoHide Attached to Timer ->\{0\}'}" />
+                                <TextBox x:Name="tbAutoHide1Timer" Background="Transparent" Text="{Binding TestTimer, Mode=OneWay, StringFormat='AutoHide Attached to Timer ->\{0\}'}" />
                             </LayoutAnchorable>
                             <LayoutAnchorable Title="AutoHide2 Content" ContentId="AutoHide2Content">
-                                <StackPanel Orientation="Vertical">
-                                    <TextBox />
-                                    <TextBox />
+                                <StackPanel x:Name="spAutoHide2" Orientation="Vertical" Background="Transparent">
+                                    <TextBox Background="Transparent" />
+                                    <TextBox Background="Transparent" />
                                 </StackPanel>
                             </LayoutAnchorable>
                         </LayoutAnchorGroup>

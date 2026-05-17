@@ -32,11 +32,11 @@ namespace AvalonDockTest.FlaUITests
 
             // Save layout via Layout > Save > Layout_1
             ClickMenuItemByName("Layout", "Save", "Layout_1");
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             // Load layout via Layout > Load > Layout_1
             ClickMenuItemByName("Layout", "Load", "Layout_1");
-            System.Threading.Thread.Sleep(1000);
+            WaitForLayoutSettled();
 
             doc1 = FindDocumentTab("Document 1");
             doc2 = FindDocumentTab("Document 2");
@@ -60,10 +60,10 @@ namespace AvalonDockTest.FlaUITests
             Assert.That(tool2, Is.Not.Null, "Tool Window 2 should exist before save.");
 
             ClickMenuItemByName("Layout", "Save", "Layout_1");
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             ClickMenuItemByName("Layout", "Load", "Layout_1");
-            System.Threading.Thread.Sleep(1000);
+            WaitForLayoutSettled();
 
             tool1 = FindToolWindowTab("Tool Window 1");
             tool2 = FindToolWindowTab("Tool Window 2");
@@ -82,19 +82,18 @@ namespace AvalonDockTest.FlaUITests
         {
             // Save current layout
             ClickMenuItemByName("Layout", "Save", "Layout_2");
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             // Add documents via the button in Document 1
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(300);
             var addButton = FindByName("Click to add 2 documents");
             addButton?.Click();
             Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             // Load saved layout to restore original state
             ClickMenuItemByName("Layout", "Load", "Layout_2");
-            System.Threading.Thread.Sleep(1000);
+            WaitForLayoutSettled();
 
             var doc1 = FindDocumentTab("Document 1");
             Assert.That(doc1, Is.Not.Null,
@@ -111,10 +110,10 @@ namespace AvalonDockTest.FlaUITests
             for (int i = 0; i < 3; i++)
             {
                 ClickMenuItemByName("Layout", "Save", "Layout_3");
-                System.Threading.Thread.Sleep(300);
+                System.Threading.Thread.Sleep(200);
 
                 ClickMenuItemByName("Layout", "Load", "Layout_3");
-                System.Threading.Thread.Sleep(500);
+                System.Threading.Thread.Sleep(300);
             }
 
             Assert.That(App.HasExited, Is.False,
@@ -133,17 +132,16 @@ namespace AvalonDockTest.FlaUITests
         public void AfterLayoutRestore_DocumentsAccessible_Issue443()
         {
             ClickMenuItemByName("Layout", "Save", "Layout_4");
-            System.Threading.Thread.Sleep(300);
+            System.Threading.Thread.Sleep(200);
 
             ClickMenuItemByName("Layout", "Load", "Layout_4");
-            System.Threading.Thread.Sleep(1000);
+            WaitForLayoutSettled();
 
             var doc1 = FindDocumentTab("Document 1");
             if (doc1 != null)
             {
                 doc1.Click();
                 Wait.UntilInputIsProcessed();
-                System.Threading.Thread.Sleep(300);
             }
 
             Assert.That(doc1, Is.Not.Null,

@@ -29,7 +29,8 @@ namespace AvalonDock
 			foreach (var v in collection) action(v);
 		}
 
-		public static int IndexOf<T>(this T[] array, T value) where T : class
+		public static int IndexOf<T>(this T[] array, T value)
+			where T : class
 		{
 			for (var i = 0; i < array.Length; i++)
 				if (array[i] == value) return i;
@@ -109,6 +110,7 @@ namespace AvalonDock
 				right = t.Right;
 				bottom += t.Bottom;
 			}
+
 			return new Thickness(left, top, right, bottom);
 		}
 
@@ -120,7 +122,8 @@ namespace AvalonDock
 		/// <returns>The total thickness</returns>
 		public static Thickness Add(this Thickness thickness, Thickness other)
 		{
-			return new Thickness(thickness.Left + other.Left,
+			return new Thickness(
+				thickness.Left + other.Left,
 				thickness.Top + other.Top,
 				thickness.Right + other.Right,
 				thickness.Bottom + other.Bottom);

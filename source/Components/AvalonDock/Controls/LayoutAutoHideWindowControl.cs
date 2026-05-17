@@ -7,7 +7,6 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,6 +19,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -30,8 +30,6 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public class LayoutAutoHideWindowControl : HwndHost, ILayoutControl
 	{
-		#region fields
-
 		internal LayoutAnchorableControl _internalHost = null;
 
 		private LayoutAnchorControl _anchor;
@@ -49,10 +47,6 @@ namespace AvalonDock.Controls
 		private List<FrameworkElement> _sizeChangedListeningControls;
 		private SizeChangedEventHandler _sizeChangedHandler;
 
-		#endregion fields
-
-		#region Constructors
-
 		static LayoutAutoHideWindowControl()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutAutoHideWindowControl), new FrameworkPropertyMetadata(typeof(LayoutAutoHideWindowControl)));
@@ -66,66 +60,52 @@ namespace AvalonDock.Controls
 			_sizeChangedHandler = ViewboxZoomChanged;
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
-		#region AnchorableStyle
-
 		/// <summary><see cref="AnchorableStyle"/> dependency property.</summary>
 		public static readonly DependencyProperty AnchorableStyleProperty = DependencyProperty.Register(nameof(AnchorableStyle), typeof(Style), typeof(LayoutAutoHideWindowControl),
 				new FrameworkPropertyMetadata(null));
 
 		/// <summary>Gets/sets the style to apply to the <see cref="LayoutAnchorableControl"/> hosted in this auto hide window.</summary>
-		[Bindable(true), Description("Gets/sets the style to apply to the LayoutAnchorableControl hosted in this auto hide window."), Category("Style")]
+		[Bindable(true)]
+		[Description("Gets/sets the style to apply to the LayoutAnchorableControl hosted in this auto hide window.")]
+		[Category("Style")]
 		public Style AnchorableStyle
 		{
 			get => (Style)GetValue(AnchorableStyleProperty);
 			set => SetValue(AnchorableStyleProperty, value);
 		}
 
-		#endregion AnchorableStyle
-
-		#region AnchorableGridStyle
-
 		/// <summary><see cref="AnchorableGridStyle"/> dependency property.</summary>
 		public static readonly DependencyProperty AnchorableGridStyleProperty = DependencyProperty.Register(nameof(AnchorableGridStyle), typeof(Style), typeof(LayoutAutoHideWindowControl),
 				new FrameworkPropertyMetadata(null));
 
 		/// <summary>Gets/sets the style to apply to the parent Grid of the <see cref="LayoutAnchorableControl"/> hosted in this auto hide window.</summary>
-		[Bindable(true), Description("Gets/sets the style to apply to the parent Grid of the LayoutAnchorableControl hosted in this auto hide window."), Category("Style")]
+		[Bindable(true)]
+		[Description("Gets/sets the style to apply to the parent Grid of the LayoutAnchorableControl hosted in this auto hide window.")]
+		[Category("Style")]
 		public Style AnchorableGridStyle
 		{
 			get => (Style)GetValue(AnchorableGridStyleProperty);
 			set => SetValue(AnchorableGridStyleProperty, value);
 		}
 
-		#endregion AnchorableGridStyle
-
-		#region Background
-
 		/// <summary><see cref="Background"/> dependency property.</summary>
 		public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register(nameof(Background), typeof(Brush), typeof(LayoutAutoHideWindowControl),
 				new FrameworkPropertyMetadata(null));
 
 		/// <summary>Gets/sets the background brush of the autohide childwindow.</summary>
-		[Bindable(true), Description("Gets/sets the background brush of the autohide childwindow."), Category("Other")]
+		[Bindable(true)]
+		[Description("Gets/sets the background brush of the autohide childwindow.")]
+		[Category("Other")]
 		public Brush Background
 		{
 			get => (Brush)GetValue(BackgroundProperty);
 			set => SetValue(BackgroundProperty, value);
 		}
 
-		#endregion Background
-
 		public ILayoutElement Model => _model;
 
 		/// <summary>Resizer</summary>
 		internal bool IsResizing { get; private set; }
-
-		#endregion Properties
-
-		#region Internal Methods
 
 		internal void Show(LayoutAnchorControl anchor)
 		{
@@ -172,13 +152,9 @@ namespace AvalonDock.Controls
 				var anchor = manager?.FindVisualChildren<LayoutAnchorControl>().Where(c => c.Model == Model).FirstOrDefault();
 
 				return anchor != null && anchor.IsMouseOver;
-				//location = anchor.PointToScreenDPI(new Point());
+				// location = anchor.PointToScreenDPI(new Point());
 			}
 		}
-
-		#endregion Internal Methods
-
-		#region Overrides
 
 		/// <inheritdoc />
 		protected override HandleRef BuildWindowCore(HandleRef hwndParent)
@@ -217,7 +193,7 @@ namespace AvalonDock.Controls
 		{
 			if (_internalHostPresenter == null) return base.MeasureOverride(constraint);
 			_internalHostPresenter.Measure(constraint);
-			//return base.MeasureOverride(constraint);
+			// return base.MeasureOverride(constraint);
 			return _internalHostPresenter.DesiredSize;
 		}
 
@@ -226,12 +202,8 @@ namespace AvalonDock.Controls
 		{
 			if (_internalHostPresenter == null) return base.ArrangeOverride(finalSize);
 			_internalHostPresenter.Arrange(new Rect(finalSize));
-			return base.ArrangeOverride(finalSize);// new Size(_internalHostPresenter.ActualWidth, _internalHostPresenter.ActualHeight);
+			return base.ArrangeOverride(finalSize); // new Size(_internalHostPresenter.ActualWidth, _internalHostPresenter.ActualHeight);
 		}
-
-		#endregion Overrides
-
-		#region Private Methods
 
 		private void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
@@ -278,17 +250,20 @@ namespace AvalonDock.Controls
 				_internalHostPresenter.LayoutTransform = transform;
 			}
 		}
+
 		private void StartListeningToViewboxZoomChange()
 		{
 			StopListeningToViewboxZoomChange();
 			_sizeChangedListeningControls = _manager.GetParents().OfType<Viewbox>().SelectMany(x => new[] { x, x.Child }).OfType<FrameworkElement>().Distinct().ToList();
 			_sizeChangedListeningControls.ForEach(x => x.SizeChanged += _sizeChangedHandler);
 		}
+
 		private void StopListeningToViewboxZoomChange()
 		{
 			_sizeChangedListeningControls?.ForEach(x => x.SizeChanged -= _sizeChangedHandler);
 			_sizeChangedListeningControls?.Clear();
 		}
+
 		private void ViewboxZoomChanged(object sender, SizeChangedEventArgs e)
 		{
 			SetLayoutTransform();
@@ -352,6 +327,7 @@ namespace AvalonDock.Controls
 					HorizontalAlignment = HorizontalAlignment.Stretch;
 					break;
 			}
+
 			_internalGrid.Children.Add(_resizer);
 			_internalGrid.Children.Add(_internalHost);
 			_internalHostPresenter.Content = _internalGrid;
@@ -370,7 +346,7 @@ namespace AvalonDock.Controls
 		{
 			_resizerGhost = new Border { Background = splitter.BackgroundWhileDragging, Opacity = splitter.OpacityWhileDragging };
 			var areaElement = _manager.GetAutoHideAreaElement();
-			//var modelControlActualSize = this._internalHost.TransformActualSizeToAncestor();
+			// var modelControlActualSize = this._internalHost.TransformActualSizeToAncestor();
 			var ptTopLeftScreen = areaElement.PointToScreenDPIWithoutFlowDirection(new Point());
 			var managerSize = areaElement.TransformActualSizeToAncestor();
 			Size windowSize;
@@ -389,6 +365,7 @@ namespace AvalonDock.Controls
 				_resizerGhost.Width = windowSize.Width;
 				ptTopLeftScreen.Offset(0.0, 25.0);
 			}
+
 			_initialStartPoint = splitter.PointToScreenDPIWithoutFlowDirection(new Point()) - ptTopLeftScreen;
 
 			if (_side == AnchorSide.Right || _side == AnchorSide.Left)
@@ -427,12 +404,11 @@ namespace AvalonDock.Controls
 
 		private void OnResizerDragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
 		{
-			//var splitter = sender as LayoutGridResizerControl;
+			// var splitter = sender as LayoutGridResizerControl;
 			var rootVisual = this.FindVisualTreeRoot() as Visual;
 
 			var trToWnd = TransformToAncestor(rootVisual);
-			//var transformedDelta = trToWnd.Transform(new Point(e.HorizontalChange, e.VerticalChange)) - trToWnd.Transform(new Point());
-
+			// var transformedDelta = trToWnd.Transform(new Point(e.HorizontalChange, e.VerticalChange)) - trToWnd.Transform(new Point());
 			var deltaPoint = ChildLayoutTransform.Inverse.Transform(new Point(Canvas.GetLeft(_resizerGhost) - _initialStartPoint.X, Canvas.GetTop(_resizerGhost) - _initialStartPoint.Y));
 
 			double delta;
@@ -450,6 +426,7 @@ namespace AvalonDock.Controls
 						_internalGrid.ColumnDefinitions[1].Width = new GridLength(_model.AutoHideWidth, GridUnitType.Pixel);
 						break;
 					}
+
 				case AnchorSide.Left:
 					{
 						if (_model.AutoHideWidth == 0.0) _model.AutoHideWidth = _internalHost.ActualWidth + delta;
@@ -457,6 +434,7 @@ namespace AvalonDock.Controls
 						_internalGrid.ColumnDefinitions[0].Width = new GridLength(_model.AutoHideWidth, GridUnitType.Pixel);
 						break;
 					}
+
 				case AnchorSide.Top:
 					{
 						if (_model.AutoHideHeight == 0.0) _model.AutoHideHeight = _internalHost.ActualHeight + delta;
@@ -464,6 +442,7 @@ namespace AvalonDock.Controls
 						_internalGrid.RowDefinitions[0].Height = new GridLength(_model.AutoHideHeight, GridUnitType.Pixel);
 						break;
 					}
+
 				case AnchorSide.Bottom:
 					{
 						if (_model.AutoHideHeight == 0.0) _model.AutoHideHeight = _internalHost.ActualHeight - delta;
@@ -472,6 +451,7 @@ namespace AvalonDock.Controls
 						break;
 					}
 			}
+
 			HideResizerOverlayWindow();
 			IsResizing = false;
 			InvalidateMeasure();
@@ -479,7 +459,7 @@ namespace AvalonDock.Controls
 
 		private void OnResizerDragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
 		{
-			//var splitter = sender as LayoutGridResizerControl;
+			// var splitter = sender as LayoutGridResizerControl;
 			var rootVisual = this.FindVisualTreeRoot() as Visual;
 
 			var trToWnd = TransformToAncestor(rootVisual);
@@ -495,7 +475,9 @@ namespace AvalonDock.Controls
 				Canvas.SetLeft(_resizerGhost, MathHelper.MinMax(_initialStartPoint.X + transformedDelta.X, 0.0, _resizerWindowHost.Width - _resizerGhost.Width));
 			}
 			else
+			{
 				Canvas.SetTop(_resizerGhost, MathHelper.MinMax(_initialStartPoint.Y + transformedDelta.Y, 0.0, _resizerWindowHost.Height - _resizerGhost.Height));
+			}
 		}
 
 		private void OnResizerDragStarted(object sender, System.Windows.Controls.Primitives.DragStartedEventArgs e)
@@ -508,7 +490,5 @@ namespace AvalonDock.Controls
 		{
 			InvalidateMeasure();
 		}
-
-		#endregion Private Methods
 	}
 }

@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -8,7 +8,7 @@
  ************************************************************************/
 
 /**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 namespace Standard
@@ -52,8 +52,6 @@ namespace Standard
 		}
 
 		// Comments are taken from MSDN IStream documentation.
-
-		#region IStream Members
 
 		/// <summary>
 		/// Creates a new stream object with its own seek pointer that
@@ -130,6 +128,7 @@ namespace Standard
 				pstm.Write(buffer, cbRead, IntPtr.Zero);
 				cbWritten += cbRead;
 			}
+
 			if (pcbRead != IntPtr.Zero) Marshal.WriteInt64(pcbRead, cbWritten);
 			if (pcbWritten != IntPtr.Zero) Marshal.WriteInt64(pcbWritten, cbWritten);
 		}
@@ -150,7 +149,8 @@ namespace Standard
 		/// For more information, see the existing documentation for IStream::LockRegion in the MSDN library.
 		/// This class doesn't implement LockRegion.  A COMException is thrown if it is used.
 		/// </remarks>
-		[SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Standard.HRESULT.ThrowIfFailed(System.String)"), Obsolete("The method is not implemented", true)]
+		[SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Standard.HRESULT.ThrowIfFailed(System.String)")]
+		[Obsolete("The method is not implemented", true)]
 		public void LockRegion(long libOffset, long cb, int dwLockType) => HRESULT.STG_E_INVALIDFUNCTION.ThrowIfFailed("The method is not implemented.");
 
 		/// <summary>
@@ -182,7 +182,8 @@ namespace Standard
 		/// <remarks>
 		/// This class doesn't implement Revert.  A COMException is thrown if it is used.
 		/// </remarks>
-		[SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Standard.HRESULT.ThrowIfFailed(System.String)"), Obsolete("The method is not implemented", true)]
+		[SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "Standard.HRESULT.ThrowIfFailed(System.String)")]
+		[Obsolete("The method is not implemented", true)]
 		public void Revert() => HRESULT.STG_E_INVALIDFUNCTION.ThrowIfFailed("The method is not implemented.");
 
 		/// <summary>
@@ -287,13 +288,7 @@ namespace Standard
 			if (pcbWritten != IntPtr.Zero) Marshal.WriteInt32(pcbWritten, cb);
 		}
 
-		#endregion IStream Members
-
-		#region IDisposable Members
-
 		/// <inheritdoc />
 		public void Dispose() => _source = null;
-
-		#endregion IDisposable Members
 	}
 }

@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -22,20 +22,12 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutDocumentFloatingWindow : LayoutFloatingWindow, ILayoutElementWithVisibility
 	{
-		#region fields
-
 		private LayoutDocumentPaneGroup _rootPanel = null;
 
 		[NonSerialized]
 		private bool _isVisible = true;
 
-		#endregion fields
-
 		public event EventHandler IsVisibleChanged;
-
-		#region Properties
-
-		#region RootPanel
 
 		public LayoutDocumentPaneGroup RootPanel
 		{
@@ -64,10 +56,6 @@ namespace AvalonDock.Layout
 			RaisePropertyChanged(nameof(SinglePane));
 		}
 
-		#endregion RootPanel
-
-		#region IsSinglePane
-
 		public bool IsSinglePane => RootPanel?.Descendents().OfType<LayoutDocumentPane>().Count(p => p.IsVisible) == 1;
 
 		public LayoutDocumentPane SinglePane
@@ -76,12 +64,10 @@ namespace AvalonDock.Layout
 			{
 				if (!IsSinglePane) return null;
 				var singlePane = RootPanel.Descendents().OfType<LayoutDocumentPane>().Single(p => p.IsVisible);
-				//singlePane.UpdateIsDirectlyHostedInFloatingWindow();
+				// singlePane.UpdateIsDirectlyHostedInFloatingWindow();
 				return singlePane;
 			}
 		}
-
-		#endregion IsSinglePane
 
 		[XmlIgnore]
 		public bool IsVisible
@@ -96,10 +82,6 @@ namespace AvalonDock.Layout
 				IsVisibleChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
-
-		#endregion Properties
-
-		#region Overrides
 
 		/// <inheritdoc />
 		public override IEnumerable<ILayoutElement> Children
@@ -153,13 +135,16 @@ namespace AvalonDock.Layout
 
 				XmlSerializer serializer;
 				if (reader.LocalName.Equals(nameof(LayoutDocument)))
+				{
 					serializer = XmlSerializersCache.GetSerializer<LayoutDocument>();
+				}
 				else
 				{
 					var type = LayoutRoot.FindType(reader.LocalName);
 					if (type == null) throw new ArgumentException("AvalonDock.LayoutDocumentFloatingWindow doesn't know how to deserialize " + reader.LocalName);
 					serializer = XmlSerializersCache.GetSerializer(type);
 				}
+
 				RootPanel = (LayoutDocumentPaneGroup)serializer.Deserialize(reader);
 			}
 
@@ -176,6 +161,5 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion Overrides
 	}
 }

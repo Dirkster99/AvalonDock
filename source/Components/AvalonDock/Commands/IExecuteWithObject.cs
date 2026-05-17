@@ -1,12 +1,10 @@
-﻿namespace AvalonDock.Commands
+namespace AvalonDock.Commands
 {
 	/// <summary>
 	/// Interface IExecuteWithObject
 	/// </summary>
 	internal interface IExecuteWithObject
 	{
-		#region Public Properties
-
 		/// <summary>
 		/// The target of the WeakAction.
 		/// </summary>
@@ -15,10 +13,6 @@
 		{
 			get;
 		}
-
-		#endregion Public Properties
-
-		#region Public Methods
 
 		/// <summary>
 		/// Executes an action.
@@ -32,7 +26,5 @@
 		/// that this entry must be deleted.
 		/// </summary>
 		void MarkForDeletion();
-
-		#endregion Public Methods
 	}
 }

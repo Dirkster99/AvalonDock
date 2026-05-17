@@ -7,7 +7,6 @@
    License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
  ************************************************************************/
 
-using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,6 +18,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
@@ -35,6 +35,7 @@ namespace AvalonDock.Controls
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 			=> throw new NotSupportedException();
 	}
+
 	/// <summary>
 	/// A vertical/horizontal bar of toggle buttons representing anchorable tool windows.
 	/// Used by <see cref="ToggleDockingManager"/> to provide VSCode/Rider-style sidebar buttons.
@@ -79,6 +80,7 @@ namespace AvalonDock.Controls
 				if (item is ToggleDockButton btn && btn.Anchorable == anchorable)
 					return true;
 			}
+
 			return false;
 		}
 	}
@@ -191,15 +193,18 @@ namespace AvalonDock.Controls
 		protected override void OnClick()
 		{
 			// Don't fire toggle when a drag is in progress
-			if (_isDragging) { _isDragging = false; return; }
+			if (_isDragging)
+			{
+				_isDragging = false;
+				return;
+			}
+
 			base.OnClick();
 			if (Anchorable == null) return;
 
 			var manager = Anchorable.Root?.Manager as ToggleDockingManager;
 			manager?.ToggleAnchorable(Anchorable, Zone);
 		}
-
-		#region Drag Support
 
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
@@ -241,7 +246,8 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		internal static T FindParent<T>(DependencyObject child) where T : DependencyObject
+		internal static T FindParent<T>(DependencyObject child)
+			where T : DependencyObject
 		{
 			var parent = VisualTreeHelper.GetParent(child);
 			while (parent != null)
@@ -249,10 +255,9 @@ namespace AvalonDock.Controls
 				if (parent is T t) return t;
 				parent = VisualTreeHelper.GetParent(parent);
 			}
+
 			return null;
 		}
-
-		#endregion Drag Support
 	}
 
 	/// <summary>
@@ -348,6 +353,7 @@ namespace AvalonDock.Controls
 				var leftBarRect = _manager._injectedLeftDockPanel.GetScreenArea();
 				leftBarWidth = leftBarRect.Width;
 			}
+
 			if (_manager._rightTopBar != null && _manager._rightTopBar.IsVisible)
 			{
 				var rightBarRect = _manager._rightTopBar.GetScreenArea();
@@ -512,6 +518,7 @@ namespace AvalonDock.Controls
 					return paneCtrl.ActualWidth;
 				}
 			}
+
 			return fallback;
 		}
 
@@ -527,10 +534,12 @@ namespace AvalonDock.Controls
 					return paneCtrl.ActualHeight;
 				}
 			}
+
 			return fallback;
 		}
 
-		private static IEnumerable<T> FindVisualChildren<T>(DependencyObject parent) where T : DependencyObject
+		private static IEnumerable<T> FindVisualChildren<T>(DependencyObject parent)
+			where T : DependencyObject
 		{
 			if (parent == null) yield break;
 			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
@@ -584,6 +593,7 @@ namespace AvalonDock.Controls
 				Close();
 				e.Handled = true;
 			}
+
 			base.OnKeyDown(e);
 		}
 
@@ -663,17 +673,24 @@ namespace AvalonDock.Controls
 						zone.Rect,
 						4, 4);
 
+#if !NET40
 					var formattedText = new FormattedText(
 						zone.Label,
 						System.Globalization.CultureInfo.CurrentCulture,
 						FlowDirection.LeftToRight,
 						labelTypeface,
 						14,
-						new SolidColorBrush(Color.FromArgb(isHovered ? (byte)0xCC : (byte)0x66, 0x00, 0x7A, 0xCC))
-#if !NET40
-						, 1.0
+						new SolidColorBrush(Color.FromArgb(isHovered ? (byte)0xCC : (byte)0x66, 0x00, 0x7A, 0xCC)),
+						1.0);
+#else
+					var formattedText = new FormattedText(
+						zone.Label,
+						System.Globalization.CultureInfo.CurrentCulture,
+						FlowDirection.LeftToRight,
+						labelTypeface,
+						14,
+						new SolidColorBrush(Color.FromArgb(isHovered ? (byte)0xCC : (byte)0x66, 0x00, 0x7A, 0xCC)));
 #endif
-						);
 
 					var textX = zone.Rect.X + (zone.Rect.Width - formattedText.Width) / 2;
 					var textY = zone.Rect.Y + (zone.Rect.Height - formattedText.Height) / 2;

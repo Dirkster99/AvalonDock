@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -21,8 +21,6 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutAnchorablePane : LayoutPositionableGroup<LayoutAnchorable>, ILayoutAnchorablePane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable
 	{
-		#region fields
-
 		private int _selectedIndex = -1;
 
 		[XmlIgnore]
@@ -30,10 +28,6 @@ namespace AvalonDock.Layout
 
 		private string _name = null;
 		private string _id;
-
-		#endregion fields
-
-		#region Constructors
 
 		/// <summary>Class constructor</summary>
 		public LayoutAnchorablePane()
@@ -45,10 +39,6 @@ namespace AvalonDock.Layout
 		{
 			Children.Add(anchorable);
 		}
-
-		#endregion Constructors
-
-		#region Properties
 
 		/// <summary>Gets whether the pane can be hidden.</summary>
 		public bool CanHide => Children.All(a => a.CanHide);
@@ -101,10 +91,6 @@ namespace AvalonDock.Layout
 			set => _id = value;
 		}
 
-		#endregion Properties
-
-		#region Overrides
-
 		/// <inheritdoc />
 		protected override bool GetVisibility() => Children.Count > 0 && Children.Any(c => c.IsVisible);
 
@@ -117,6 +103,7 @@ namespace AvalonDock.Layout
 				_selectedIndex = newIndex;
 				RaisePropertyChanged(nameof(SelectedContentIndex));
 			}
+
 			base.ChildMoved(oldIndex, newIndex);
 		}
 
@@ -130,6 +117,7 @@ namespace AvalonDock.Layout
 				SelectedContentIndex = i;
 				break;
 			}
+
 			RaisePropertyChanged(nameof(CanClose));
 			RaisePropertyChanged(nameof(CanHide));
 			RaisePropertyChanged(nameof(IsDirectlyHostedInFloatingWindow));
@@ -176,10 +164,6 @@ namespace AvalonDock.Layout
 		}
 #endif
 
-		#endregion Overrides
-
-		#region Public Methods
-
 		/// <summary>
 		/// Gets the index of the layout content (which is required to be a <see cref="LayoutAnchorable"/>)
 		/// or -1 if the layout content is not a <see cref="LayoutAnchorable"/> or is not part of the childrens collection.
@@ -202,13 +186,9 @@ namespace AvalonDock.Layout
 			{
 				var parentFloatingWindow = this.FindParent<LayoutAnchorableFloatingWindow>();
 				return parentFloatingWindow != null && parentFloatingWindow.IsSinglePane;
-				//return Parent != null && Parent.ChildrenCount == 1 && Parent.Parent is LayoutFloatingWindow;
+				// return Parent != null && Parent.ChildrenCount == 1 && Parent.Parent is LayoutFloatingWindow;
 			}
 		}
-
-		#endregion Public Methods
-
-		#region Internal Methods
 
 		/// <summary>Invalidates the current <see cref="SelectedContentIndex"/> and sets the index for the next avialable child with IsEnabled == true.</summary>
 		internal void SetNextSelectedIndex()
@@ -227,10 +207,6 @@ namespace AvalonDock.Layout
 		/// </summary>
 		internal void UpdateIsDirectlyHostedInFloatingWindow() => RaisePropertyChanged(nameof(IsDirectlyHostedInFloatingWindow));
 
-		#endregion Internal Methods
-
-		#region Private Methods
-
 		private void AutoFixSelectedContent()
 		{
 			if (!_autoFixSelectedContent) return;
@@ -246,7 +222,5 @@ namespace AvalonDock.Layout
 		}
 
 		private void OnParentChildrenCollectionChanged(object sender, EventArgs e) => RaisePropertyChanged(nameof(IsDirectlyHostedInFloatingWindow));
-
-		#endregion Private Methods
 	}
 }

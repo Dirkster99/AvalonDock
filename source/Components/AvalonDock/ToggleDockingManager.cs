@@ -8,13 +8,13 @@
  ************************************************************************/
 
 using System;
-using AvalonDock.Controls;
-using AvalonDock.Layout;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using AvalonDock.Controls;
+using AvalonDock.Layout;
 
 namespace AvalonDock
 {
@@ -53,8 +53,6 @@ namespace AvalonDock
 	/// </summary>
 	public class ToggleDockingManager : DockingManager
 	{
-		#region fields
-
 		internal ToggleDockButtonBar _leftTopBar;
 		internal ToggleDockButtonBar _leftBottomBar;
 		internal ToggleDockButtonBar _rightTopBar;
@@ -65,10 +63,6 @@ namespace AvalonDock
 		internal DockPanel _injectedRightDockPanel;
 		internal FrameworkElement _leftSeparator;
 		internal FrameworkElement _rightSeparator;
-
-		#endregion fields
-
-		#region Dependency Properties
 
 		/// <summary><see cref="LayoutPriority"/> dependency property.</summary>
 		public static readonly DependencyProperty LayoutPriorityProperty =
@@ -86,10 +80,6 @@ namespace AvalonDock
 			set => SetValue(LayoutPriorityProperty, value);
 		}
 
-		#endregion Dependency Properties
-
-		#region Constructors
-
 		static ToggleDockingManager()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(ToggleDockingManager), new FrameworkPropertyMetadata(typeof(ToggleDockingManager)));
@@ -100,10 +90,6 @@ namespace AvalonDock
 			Loaded += ToggleDockingManager_Loaded;
 			ActiveContentChanged += (s, e) => RefreshButtonStates();
 		}
-
-		#endregion Constructors
-
-		#region Public Methods
 
 		/// <summary>
 		/// Toggles an anchorable in the specified zone. Exclusivity is per button-bar:
@@ -116,11 +102,8 @@ namespace AvalonDock
 			{
 				// Hide any currently docked anchorable in the SAME bar only
 				HideDockedInBar(GetBarForZone(zone));
-				DumpLayout("After HideDockedInBar");
 				DockFromAutoHide(anchorable, zone);
-				DumpLayout("After DockFromAutoHide");
 				FixSplitOrientation(anchorable, zone);
-				DumpLayout("After FixSplitOrientation");
 
 				switch (LayoutPriority)
 				{
@@ -131,7 +114,6 @@ namespace AvalonDock
 						EnsureSidesFullHeight();
 						break;
 				}
-				DumpLayout("After LayoutPriority");
 			}
 			else
 			{
@@ -141,48 +123,6 @@ namespace AvalonDock
 			RefreshButtonStates();
 			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
 				new System.Action(UpdatePinButtonsToMinimize));
-		}
-
-		private void DumpLayout(string label)
-		{
-			var root = Layout as LayoutRoot;
-			if (root?.RootPanel == null) return;
-			Console.WriteLine($"=== {label} ===");
-			DumpPanel(root.RootPanel, 0);
-			Console.WriteLine("");
-		}
-
-		private void DumpPanel(ILayoutElement element, int indent)
-		{
-			var prefix = new string(' ', indent * 2);
-			if (element is LayoutPanel lp)
-			{
-				Console.WriteLine($"{prefix}LayoutPanel({lp.Orientation}) [{lp.Children.Count} children]");
-				foreach (var c in lp.Children) DumpPanel(c, indent + 1);
-			}
-			else if (element is LayoutAnchorablePaneGroup pg)
-			{
-				Console.WriteLine($"{prefix}PaneGroup({pg.Orientation}) [{pg.Children.Count} children]");
-				foreach (var c in pg.Children) DumpPanel(c, indent + 1);
-			}
-			else if (element is LayoutAnchorablePane ap)
-			{
-				var names = string.Join(", ", ap.Children.Select(a => a.Title));
-				Console.WriteLine($"{prefix}AnchorablePane [{ap.Children.Count}]: {(names.Length > 0 ? names : "(EMPTY)")}");
-			}
-			else if (element is LayoutDocumentPaneGroup dpg)
-			{
-				Console.WriteLine($"{prefix}DocPaneGroup [{dpg.Children.Count} children]");
-				foreach (var c in dpg.Children) DumpPanel(c, indent + 1);
-			}
-			else if (element is LayoutDocumentPane dp)
-			{
-				Console.WriteLine($"{prefix}DocPane [{dp.Children.Count} docs]");
-			}
-			else
-			{
-				Console.WriteLine($"{prefix}{element.GetType().Name}");
-			}
 		}
 
 		/// <summary>
@@ -234,10 +174,6 @@ namespace AvalonDock
 			ToggleAnchorable(anchorable, targetZone);
 		}
 
-		#endregion Public Methods
-
-		#region Internal Methods
-
 		/// <summary>
 		/// Overrides the pin/auto-hide button behavior. The pin button
 		/// acts as a "minimize" button that sends the anchorable back to the sidebar.
@@ -261,6 +197,7 @@ namespace AvalonDock
 				ToggleDockDragOverlay.StartDragFromPane(anchorable, this);
 				return;
 			}
+
 			base.StartDraggingFloatingWindowForPane(paneModel);
 		}
 
@@ -274,12 +211,9 @@ namespace AvalonDock
 				ToggleDockDragOverlay.StartDragFromPane(anchorable, this);
 				return;
 			}
+
 			base.StartDraggingFloatingWindowForContent(contentModel, startDrag);
 		}
-
-		#endregion Internal Methods
-
-		#region Private Methods
 
 		private void ToggleDockingManager_Loaded(object sender, RoutedEventArgs e)
 		{
@@ -303,6 +237,7 @@ namespace AvalonDock
 							border = new Border { Background = Brushes.Transparent };
 							btn.Content = border;
 						}
+
 						border.Child = CreateMinimizeIcon();
 					}
 					else if (btn.Name == "PART_HidePin")
@@ -387,6 +322,7 @@ namespace AvalonDock
 				mi.Click += (s, e) => MoveAnchorableToZone(anchorable, z);
 				moveToItem.Items.Add(mi);
 			}
+
 			menu.Items.Add(moveToItem);
 
 			menu.Items.Add(new Separator());
@@ -441,7 +377,8 @@ namespace AvalonDock
 			};
 		}
 
-		private static IEnumerable<T> FindVisualChildren<T>(DependencyObject parent) where T : DependencyObject
+		private static IEnumerable<T> FindVisualChildren<T>(DependencyObject parent)
+			where T : DependencyObject
 		{
 			if (parent == null) yield break;
 			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
@@ -504,6 +441,7 @@ namespace AvalonDock
 					contiguousPanes.Insert(0, adjPane);
 				else break;
 			}
+
 			// Scan forward from the pane
 			for (int i = paneIdx + 1; i < parentPanel.Children.Count; i++)
 			{
@@ -714,6 +652,7 @@ namespace AvalonDock
 					((ILayoutContainer)lp.Parent).RemoveChild(lp);
 					rootPanel.Children.Insert(0, lp);
 				}
+
 				foreach (var rp in rightPanesToLift)
 				{
 					((ILayoutContainer)rp.Parent).RemoveChild(rp);
@@ -761,11 +700,16 @@ namespace AvalonDock
 								while (insertIdx > 0 &&
 									   (rootPanel.Children[insertIdx - 1] is LayoutAnchorablePane ||
 										rootPanel.Children[insertIdx - 1] is LayoutAnchorablePaneGroup))
+								{
 									insertIdx--;
+								}
+
 								rootPanel.Children.Insert(insertIdx, previousContainer);
 							}
 							else
+							{
 								rootPanel.Children.Add(previousContainer);
+							}
 						}
 						else
 						{
@@ -774,6 +718,7 @@ namespace AvalonDock
 							panel.Children.Add(rootPanel);
 							panel.Children.Add(previousContainer);
 						}
+
 						break;
 					case AnchorSide.Left:
 						if (rootPanel.Orientation == Orientation.Horizontal)
@@ -785,11 +730,16 @@ namespace AvalonDock
 								while (insertIdx < rootPanel.Children.Count &&
 									   (rootPanel.Children[insertIdx] is LayoutAnchorablePane ||
 										rootPanel.Children[insertIdx] is LayoutAnchorablePaneGroup))
+								{
 									insertIdx++;
+								}
+
 								rootPanel.Children.Insert(insertIdx, previousContainer);
 							}
 							else
+							{
 								rootPanel.Children.Insert(0, previousContainer);
+							}
 						}
 						else
 						{
@@ -798,10 +748,13 @@ namespace AvalonDock
 							panel.Children.Add(previousContainer);
 							panel.Children.Add(rootPanel);
 						}
+
 						break;
 					case AnchorSide.Bottom:
 						if (rootPanel.Orientation == Orientation.Vertical)
+						{
 							rootPanel.Children.Add(previousContainer);
+						}
 						else
 						{
 							var panel = new LayoutPanel { Orientation = Orientation.Vertical };
@@ -809,6 +762,7 @@ namespace AvalonDock
 							panel.Children.Add(rootPanel);
 							panel.Children.Add(previousContainer);
 						}
+
 						break;
 				}
 			}
@@ -873,13 +827,11 @@ namespace AvalonDock
 
 			_leftBottomBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.LeftBottom };
 			// LeftBottom starts empty — user drags buttons there
-
 			_rightTopBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.RightTop };
 			_rightTopBar.SetAnchorables(rightAnchorables, DockZone.RightTop);
 
 			_rightBottomBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.RightBottom };
 			// RightBottom starts empty
-
 			_bottomLeftBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.BottomLeft };
 			_bottomLeftBar.SetAnchorables(bottomLeft, DockZone.BottomLeft);
 
@@ -954,11 +906,13 @@ namespace AvalonDock
 				(VisualTreeHelper.GetParent(_injectedLeftDockPanel) as Grid)?.Children.Remove(_injectedLeftDockPanel);
 				_injectedLeftDockPanel = null;
 			}
+
 			if (_injectedRightDockPanel != null)
 			{
 				(VisualTreeHelper.GetParent(_injectedRightDockPanel) as Grid)?.Children.Remove(_injectedRightDockPanel);
 				_injectedRightDockPanel = null;
 			}
+
 			_leftTopBar = null;
 			_leftBottomBar = null;
 			_rightTopBar = null;
@@ -980,9 +934,11 @@ namespace AvalonDock
 							return grid;
 					}
 				}
+
 				if (child is Grid g)
 					return g;
 			}
+
 			return null;
 		}
 
@@ -990,9 +946,15 @@ namespace AvalonDock
 		{
 			var result = new List<LayoutAnchorable>();
 			if (side == null) return result;
+
 			foreach (var group in side.Children)
+			{
 				foreach (var anchorable in group.Children)
+				{
 					result.Add(anchorable);
+				}
+			}
+
 			return result;
 		}
 
@@ -1063,6 +1025,7 @@ namespace AvalonDock
 					case AnchorSide.Bottom: return DockZone.BottomLeft;
 				}
 			}
+
 			return DockZone.LeftTop;
 		}
 
@@ -1121,7 +1084,5 @@ namespace AvalonDock
 				}
 			}
 		}
-
-		#endregion Private Methods
 	}
 }
