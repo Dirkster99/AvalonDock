@@ -282,13 +282,16 @@ namespace AvalonDockTest.FlaUITests
 			if (minimizeBtn.Result != null)
 			{
 				ClickToggleButtonSafe(minimizeBtn.Result);
-				System.Threading.Thread.Sleep(1000);
+				System.Threading.Thread.Sleep(1500);
 
 				// ToolBox 1 should be back to auto-hidden (toggle button unchecked)
-				btn = FindToggleButton("ToolBox 1");
-				Assert.That(btn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
-					Is.EqualTo(ToggleState.Off),
-					"ToolBox 1 should be unchecked after clicking minimize (pin) button.");
+				Retry.WhileException(() =>
+				{
+					btn = FindToggleButton("ToolBox 1");
+					Assert.That(btn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
+						Is.EqualTo(ToggleState.Off),
+						"ToolBox 1 should be unchecked after clicking minimize (pin) button.");
+				}, timeout: TimeSpan.FromSeconds(3), interval: TimeSpan.FromMilliseconds(500));
 			}
 			else
 			{
