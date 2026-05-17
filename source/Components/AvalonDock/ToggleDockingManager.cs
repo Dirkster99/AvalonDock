@@ -116,8 +116,11 @@ namespace AvalonDock
 			{
 				// Hide any currently docked anchorable in the SAME bar only
 				HideDockedInBar(GetBarForZone(zone));
+				DumpLayout("After HideDockedInBar");
 				DockFromAutoHide(anchorable, zone);
+				DumpLayout("After DockFromAutoHide");
 				FixSplitOrientation(anchorable, zone);
+				DumpLayout("After FixSplitOrientation");
 
 				switch (LayoutPriority)
 				{
@@ -128,6 +131,7 @@ namespace AvalonDock
 						EnsureSidesFullHeight();
 						break;
 				}
+				DumpLayout("After LayoutPriority");
 			}
 			else
 			{
@@ -137,6 +141,48 @@ namespace AvalonDock
 			RefreshButtonStates();
 			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
 				new System.Action(UpdatePinButtonsToMinimize));
+		}
+
+		private void DumpLayout(string label)
+		{
+			var root = Layout as LayoutRoot;
+			if (root?.RootPanel == null) return;
+			Console.WriteLine($"=== {label} ===");
+			DumpPanel(root.RootPanel, 0);
+			Console.WriteLine("");
+		}
+
+		private void DumpPanel(ILayoutElement element, int indent)
+		{
+			var prefix = new string(' ', indent * 2);
+			if (element is LayoutPanel lp)
+			{
+				Console.WriteLine($"{prefix}LayoutPanel({lp.Orientation}) [{lp.Children.Count} children]");
+				foreach (var c in lp.Children) DumpPanel(c, indent + 1);
+			}
+			else if (element is LayoutAnchorablePaneGroup pg)
+			{
+				Console.WriteLine($"{prefix}PaneGroup({pg.Orientation}) [{pg.Children.Count} children]");
+				foreach (var c in pg.Children) DumpPanel(c, indent + 1);
+			}
+			else if (element is LayoutAnchorablePane ap)
+			{
+				var names = string.Join(", ", ap.Children.Select(a => a.Title));
+				Console.WriteLine($"{prefix}AnchorablePane [{ap.Children.Count}]: {(names.Length > 0 ? names : "(EMPTY)")}");
+			}
+			else if (element is LayoutDocumentPaneGroup dpg)
+			{
+				Console.WriteLine($"{prefix}DocPaneGroup [{dpg.Children.Count} children]");
+				foreach (var c in dpg.Children) DumpPanel(c, indent + 1);
+			}
+			else if (element is LayoutDocumentPane dp)
+			{
+				Console.WriteLine($"{prefix}DocPane [{dp.Children.Count} docs]");
+			}
+			else
+			{
+				Console.WriteLine($"{prefix}{element.GetType().Name}");
+			}
 		}
 
 		/// <summary>
@@ -166,16 +212,11 @@ namespace AvalonDock
 			if (anchorable.Parent is LayoutAnchorGroup oldGroup)
 				oldGroup.RemoveChild(anchorable);
 
-			// Add to the target side in the layout model
+			// Add to the target side in the layout model (always create a fresh group
+			// so DockFromAutoHide won't reuse a stale PreviousContainer from another zone)
 			var targetSide = GetLayoutSideForZone(targetZone);
-			LayoutAnchorGroup targetGroup;
-			if (targetSide.Children.Count > 0)
-				targetGroup = targetSide.Children.First();
-			else
-			{
-				targetGroup = new LayoutAnchorGroup();
-				targetSide.Children.Add(targetGroup);
-			}
+			var targetGroup = new LayoutAnchorGroup();
+			targetSide.Children.Add(targetGroup);
 			targetGroup.Children.Add(anchorable);
 
 			// Remove from all button bars
@@ -427,9 +468,17 @@ namespace AvalonDock
 
 			var desiredOrientation = IsBottomZone(zone) ? Orientation.Horizontal : Orientation.Vertical;
 
-			// Case 1: There's already a LayoutAnchorablePaneGroup sibling — insert into it
-			var existingGroup = parentPanel.Children.OfType<LayoutAnchorablePaneGroup>()
-				.FirstOrDefault(g => g.Orientation == desiredOrientation);
+			// Case 1: There's an adjacent LayoutAnchorablePaneGroup sibling — insert into it.
+			// Only join a group that is contiguous with this pane (same side of the document).
+			var paneIdx = parentPanel.Children.IndexOf(pane);
+			LayoutAnchorablePaneGroup existingGroup = null;
+			if (paneIdx > 0 && parentPanel.Children[paneIdx - 1] is LayoutAnchorablePaneGroup leftNeighbor
+				&& leftNeighbor.Orientation == desiredOrientation)
+				existingGroup = leftNeighbor;
+			else if (paneIdx < parentPanel.Children.Count - 1 && parentPanel.Children[paneIdx + 1] is LayoutAnchorablePaneGroup rightNeighbor
+				&& rightNeighbor.Orientation == desiredOrientation)
+				existingGroup = rightNeighbor;
+
 			if (existingGroup != null)
 			{
 				parentPanel.Children.Remove(pane);
@@ -445,7 +494,7 @@ namespace AvalonDock
 			// wrap them in a group. Only group panes that are adjacent (no document pane
 			// or other element between them), so left-side and right-side panes aren't
 			// accidentally merged.
-			var paneIdx = parentPanel.Children.IndexOf(pane);
+			paneIdx = parentPanel.Children.IndexOf(pane);
 			var contiguousPanes = new List<LayoutAnchorablePane> { pane };
 
 			// Scan backward from the pane

@@ -190,6 +190,8 @@ namespace AvalonDock.Controls
 
 		protected override void OnClick()
 		{
+			// Don't fire toggle when a drag is in progress
+			if (_isDragging) { _isDragging = false; return; }
 			base.OnClick();
 			if (Anchorable == null) return;
 
