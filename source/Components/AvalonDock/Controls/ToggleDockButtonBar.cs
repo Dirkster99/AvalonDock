@@ -673,7 +673,6 @@ namespace AvalonDock.Controls
 						zone.Rect,
 						4, 4);
 
-#if !NET40
 					var formattedText = new FormattedText(
 						zone.Label,
 						System.Globalization.CultureInfo.CurrentCulture,
@@ -682,15 +681,6 @@ namespace AvalonDock.Controls
 						14,
 						new SolidColorBrush(Color.FromArgb(isHovered ? (byte)0xCC : (byte)0x66, 0x00, 0x7A, 0xCC)),
 						1.0);
-#else
-					var formattedText = new FormattedText(
-						zone.Label,
-						System.Globalization.CultureInfo.CurrentCulture,
-						FlowDirection.LeftToRight,
-						labelTypeface,
-						14,
-						new SolidColorBrush(Color.FromArgb(isHovered ? (byte)0xCC : (byte)0x66, 0x00, 0x7A, 0xCC)));
-#endif
 
 					var textX = zone.Rect.X + (zone.Rect.Width - formattedText.Width) / 2;
 					var textY = zone.Rect.Y + (zone.Rect.Height - formattedText.Height) / 2;

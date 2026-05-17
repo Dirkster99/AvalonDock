@@ -709,21 +709,6 @@ namespace AvalonDock.Controls
 				}
 				
 				// If not connected, defer the operation until the visual is properly initialized
-#if NET40
-				// .NET 4.0 doesn't support Task.Delay or async lambdas in Dispatcher.Invoke
-				var timer = new System.Windows.Threading.DispatcherTimer();
-				timer.Interval = TimeSpan.FromMilliseconds(10);
-				timer.Tick += (s, args) =>
-				{
-					timer.Stop();
-					if (_attachDrag && Mouse.LeftButton == MouseButtonState.Pressed)
-					{
-						retryCount++;
-						InternalOnActivated(sender, e, retryCount);
-					}
-				};
-				timer.Start();
-#else
 				Dispatcher.Invoke(
 					async () =>
 					{
@@ -734,7 +719,6 @@ namespace AvalonDock.Controls
 						InternalOnActivated(sender, e, retryCount);
 					}
 				}, System.Windows.Threading.DispatcherPriority.Loaded);
-#endif
 				return;
 			}
 			
