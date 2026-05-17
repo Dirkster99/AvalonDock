@@ -63,6 +63,12 @@ namespace AvalonDock
 		private DispatcherOperation _collectLayoutItemsOperations = null;
 		private NavigatorWindow _navigatorWindow = null;
 
+		/// <summary>
+		/// Gets the extender providing factory interfaces for visual component creation.
+		/// Themes can set custom factories to override default visual behavior.
+		/// </summary>
+		public DockingManagerExtender Extender { get; } = new DockingManagerExtender();
+
 		internal bool SuspendDocumentsSourceBinding = false;
 		internal bool SuspendAnchorablesSourceBinding = false;
 

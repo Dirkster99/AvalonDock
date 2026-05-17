@@ -20,6 +20,9 @@
 		<None Include="LICENSE" Pack="true" PackagePath=""/>
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\AvalonDock.Core\AvalonDock.Core.csproj" />
+	</ItemGroup>
+	<ItemGroup>
 		<Compile Update="Properties\Resources.Designer.cs">
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
