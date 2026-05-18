@@ -6,14 +6,14 @@ using AvalonDock.Core;
 namespace AvalonDock.Serializer.Json
 {
 	/// <summary>
-	/// System.Text.Json implementation of <see cref="IDockSerializer"/>.
+	/// System.Text.Json implementation of <see cref="ILayoutSerializer"/>.
 	/// Supports polymorphic serialization of dock layout trees.
 	/// </summary>
-	public sealed class JsonDockSerializer : IDockSerializer
+	public sealed class JsonLayoutSerializer : ILayoutSerializer
 	{
 		private readonly JsonSerializerOptions _options;
 
-		public JsonDockSerializer()
+		public JsonLayoutSerializer()
 		{
 			_options = new JsonSerializerOptions
 			{
@@ -24,7 +24,7 @@ namespace AvalonDock.Serializer.Json
 			};
 		}
 
-		public JsonDockSerializer(JsonSerializerOptions options)
+		public JsonLayoutSerializer(JsonSerializerOptions options)
 		{
 			_options = options;
 		}

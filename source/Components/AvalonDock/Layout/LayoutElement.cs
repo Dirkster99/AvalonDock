@@ -93,7 +93,7 @@ namespace AvalonDock.Layout
 		/// When deserializing layout enclosing element parent is set later than this parent
 		/// We need to update it, otherwise when deleting this element <see cref="LayoutRoot.ElementRemoved" /> will no be called
 		/// </summary>
-		internal void FixCachedRootOnDeserialize()
+		public void FixCachedRootOnDeserialize()
 		{
 			if (_root == null)
 				_root = Root;

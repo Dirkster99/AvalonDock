@@ -41,7 +41,7 @@ public partial class TerminalViewModel : ToolboxBase, IDisposable
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "cmd.exe",
+                    FileName = "powershell",
                     UseShellExecute = false,
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
@@ -103,14 +103,14 @@ public partial class TerminalViewModel : ToolboxBase, IDisposable
 
     public void Dispose()
     {
-        if (_shellProcess is { HasExited: false })
+        try
         {
-            try
+            if (_shellProcess is { HasExited: false })
             {
                 _shellProcess.Kill();
             }
-            catch { }
         }
+        catch { }
 
         _shellProcess?.Dispose();
     }

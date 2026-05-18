@@ -4,7 +4,8 @@ using System.Xml.Serialization;
 
 namespace AvalonDock
 {
-	internal static class XmlSerializersCache
+	/// <summary>Thread-safe cache for XmlSerializer instances to avoid repeated reflection costs.</summary>
+	public static class XmlSerializersCache
 	{
 		private static readonly object s_lock = new object();
 		private static readonly ConcurrentDictionary<Type, XmlSerializer> s_cache = new ConcurrentDictionary<Type, XmlSerializer>();

@@ -301,7 +301,7 @@ namespace AvalonDock.Layout
 		/// <summary>Hide this contents.</summary>
 		/// <remarks>Add this content to <see cref="ILayoutRoot.Hidden"/> collection of parent root.</remarks>
 		/// <param name="cancelable"></param>
-		internal bool HideAnchorable(bool cancelable)
+		public bool HideAnchorable(bool cancelable)
 		{
 			if (!IsVisible)
 			{

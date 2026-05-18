@@ -1,6 +1,7 @@
 using System.Windows;
 using AvalonDock;
 using AvalonDock.DependencyInjection;
+using AvalonDock.Themes;
 using ToggleTestApp.ViewModels;
 
 namespace ToggleTestApp
@@ -39,6 +40,25 @@ namespace ToggleTestApp
 				dockManager.LayoutPriority = DockLayoutPriority.SidesFullHeight;
 			else
 				dockManager.LayoutPriority = DockLayoutPriority.Default;
+		}
+
+		private void OnThemeChanged(object sender, RoutedEventArgs e)
+		{
+			menuArcDark.IsChecked = sender == menuArcDark;
+			menuArcLight.IsChecked = sender == menuArcLight;
+
+			if (menuArcDark.IsChecked)
+			{
+				dockManager.Theme = new ArcDarkTheme();
+				Background = new System.Windows.Media.SolidColorBrush(
+					(System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#252729"));
+			}
+			else
+			{
+				dockManager.Theme = new ArcLightTheme();
+				Background = new System.Windows.Media.SolidColorBrush(
+					(System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#F5F5F5"));
+			}
 		}
 
 		private void OnExit(object sender, RoutedEventArgs e) => Close();

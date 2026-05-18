@@ -4,6 +4,8 @@ using System.Linq;
 using AvalonDock.Core;
 using AvalonDock.DependencyInjection;
 using AvalonDock.Mvvm;
+using AvalonDock.Serializer.Json;
+using AvalonDock.Serializer.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
@@ -152,5 +154,118 @@ namespace AvalonDockTest
 			var result = services.AddToggleDockOptions();
 			Assert.That(result, Is.SameAs(services));
 		}
+
+		[Test]
+		public void AddAvalonDockSerializer_JsonLayoutSerializer_Resolves()
+		{
+			var services = new ServiceCollection();
+			services.AddAvalonDockSerializer<JsonLayoutSerializer>();
+
+			var provider = services.BuildServiceProvider();
+			var serializer = provider.GetRequiredService<ILayoutSerializer>();
+
+			Assert.That(serializer, Is.Not.Null);
+			Assert.That(serializer, Is.InstanceOf<JsonLayoutSerializer>());
+		}
+
+		[Test]
+		public void AddAvalonDockSerializer_XmlDockLayoutSerializer_Resolves()
+		{
+			var services = new ServiceCollection();
+			services.AddAvalonDockSerializer<XmlDockLayoutSerializer>();
+
+			var provider = services.BuildServiceProvider();
+			var serializer = provider.GetRequiredService<ILayoutSerializer>();
+
+			Assert.That(serializer, Is.Not.Null);
+			Assert.That(serializer, Is.InstanceOf<XmlDockLayoutSerializer>());
+		}
+
+		[Test]
+		public void AddAvalonDockSerializer_IsSingleton()
+		{
+			var services = new ServiceCollection();
+			services.AddAvalonDockSerializer<JsonLayoutSerializer>();
+
+			var provider = services.BuildServiceProvider();
+			var s1 = provider.GetRequiredService<ILayoutSerializer>();
+			var s2 = provider.GetRequiredService<ILayoutSerializer>();
+
+			Assert.That(s1, Is.SameAs(s2));
+		}
+
+		[Test]
+		public void AddAvalonDockSerializer_ReturnsSameServiceCollection_ForChaining()
+		{
+			var services = new ServiceCollection();
+			var result = services.AddAvalonDockSerializer<JsonLayoutSerializer>();
+			Assert.That(result, Is.SameAs(services));
+		}
+
+		[Test]
+		public void JsonLayoutSerializer_RoundTrips()
+		{
+			var serializer = new JsonLayoutSerializer();
+			var data = new TestData { Name = "test", Value = 42 };
+
+			var json = serializer.Serialize(data);
+			var result = serializer.Deserialize<TestData>(json);
+
+			Assert.That(result, Is.Not.Null);
+			Assert.That(result!.Name, Is.EqualTo("test"));
+			Assert.That(result.Value, Is.EqualTo(42));
+		}
+
+		[Test]
+		public void XmlDockLayoutSerializer_RoundTrips()
+		{
+			var serializer = new XmlDockLayoutSerializer();
+			var data = new TestData { Name = "test", Value = 42 };
+
+			var xml = serializer.Serialize(data);
+			var result = serializer.Deserialize<TestData>(xml);
+
+			Assert.That(result, Is.Not.Null);
+			Assert.That(result!.Name, Is.EqualTo("test"));
+			Assert.That(result.Value, Is.EqualTo(42));
+		}
+
+		[Test]
+		public void JsonLayoutSerializer_StreamRoundTrips()
+		{
+			var serializer = new JsonLayoutSerializer();
+			var data = new TestData { Name = "stream", Value = 99 };
+
+			using var stream = new System.IO.MemoryStream();
+			serializer.Save(stream, data);
+			stream.Position = 0;
+			var result = serializer.Load<TestData>(stream);
+
+			Assert.That(result, Is.Not.Null);
+			Assert.That(result!.Name, Is.EqualTo("stream"));
+			Assert.That(result.Value, Is.EqualTo(99));
+		}
+
+		[Test]
+		public void XmlDockLayoutSerializer_StreamRoundTrips()
+		{
+			var serializer = new XmlDockLayoutSerializer();
+			var data = new TestData { Name = "stream", Value = 99 };
+
+			using var stream = new System.IO.MemoryStream();
+			serializer.Save(stream, data);
+			stream.Position = 0;
+			var result = serializer.Load<TestData>(stream);
+
+			Assert.That(result, Is.Not.Null);
+			Assert.That(result!.Name, Is.EqualTo("stream"));
+			Assert.That(result.Value, Is.EqualTo(99));
+		}
+	}
+
+	public class TestData
+	{
+		public string? Name { get; set; }
+		public int Value { get; set; }
 	}
 }

@@ -69,8 +69,10 @@ namespace AvalonDock
 		/// </summary>
 		public DockingManagerExtender Extender { get; } = new DockingManagerExtender();
 
-		internal bool SuspendDocumentsSourceBinding = false;
-		internal bool SuspendAnchorablesSourceBinding = false;
+		/// <summary>When true, suspends automatic document source binding during deserialization.</summary>
+		public bool SuspendDocumentsSourceBinding = false;
+		/// <summary>When true, suspends automatic anchorable source binding during deserialization.</summary>
+		public bool SuspendAnchorablesSourceBinding = false;
 
 		/// <summary>
 		/// Static class constructor to support WPF property control registration.

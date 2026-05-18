@@ -5,7 +5,7 @@ namespace AvalonDock.Core
 	/// <summary>
 	/// Abstraction for layout serialization, enabling pluggable serialization backends.
 	/// </summary>
-	public interface IDockSerializer
+	public interface ILayoutSerializer
 	{
 		string Serialize<T>(T value);
 

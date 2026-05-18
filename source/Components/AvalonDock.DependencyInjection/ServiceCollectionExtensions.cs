@@ -32,14 +32,14 @@ namespace AvalonDock.DependencyInjection
 		/// <summary>
 		/// Registers a dock serializer implementation.
 		/// </summary>
-		/// <typeparam name="TSerializer">The concrete serializer type implementing <see cref="IDockSerializer"/>.</typeparam>
+		/// <typeparam name="TSerializer">The concrete serializer type implementing <see cref="ILayoutSerializer"/>.</typeparam>
 		/// <param name="services">The service collection.</param>
 		/// <returns>The service collection for chaining.</returns>
 		public static IServiceCollection AddAvalonDockSerializer<TSerializer>(
 			this IServiceCollection services)
-			where TSerializer : class, IDockSerializer
+			where TSerializer : class, ILayoutSerializer
 		{
-			services.AddSingleton<IDockSerializer, TSerializer>();
+			services.AddSingleton<ILayoutSerializer, TSerializer>();
 			return services;
 		}
 
