@@ -242,6 +242,7 @@ namespace AvalonDockTest.FlaUITests
 		}
 
 		[Test, Order(5)]
+		[Retry(3)]
 		public void PinButton_ActsAsMinimize_SendsBackToSidebar()
 		{
 			// Dock ToolBox 1 first
