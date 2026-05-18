@@ -13,6 +13,7 @@ public partial class TerminalViewModel : ToolboxBase, IDisposable
     private readonly Dispatcher _dispatcher;
     private readonly StringBuilder _pendingOutput = new();
     private bool _outputPending;
+    private bool _initialized;
 
     public event EventHandler<string>? OutputReceived;
     public event EventHandler<string>? PromptReady;
@@ -42,7 +43,7 @@ public partial class TerminalViewModel : ToolboxBase, IDisposable
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "powershell.exe",
-                    Arguments = "-NoLogo -NoProfile -NoExit -Command \"function prompt { }\"",
+                    Arguments = "-NoLogo -NoProfile -NoExit",
                     UseShellExecute = false,
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
@@ -62,7 +63,8 @@ public partial class TerminalViewModel : ToolboxBase, IDisposable
             _shellProcess.BeginOutputReadLine();
             _shellProcess.BeginErrorReadLine();
 
-            // Request initial working directory
+            // Suppress PowerShell's own prompt, then request initial directory
+            _shellProcess.StandardInput.WriteLine("function prompt { return '' }");
             RequestPromptUpdate();
         }
         catch (Exception ex)
@@ -95,9 +97,13 @@ public partial class TerminalViewModel : ToolboxBase, IDisposable
         {
             var dir = e.Data.Substring(7);
             CurrentDirectory = dir;
+            _initialized = true;
             _dispatcher.BeginInvoke(() => PromptReady?.Invoke(this, dir));
             return;
         }
+
+        // Suppress any output before first prompt is ready (startup noise)
+        if (!_initialized) return;
 
         lock (_pendingOutput)
         {

@@ -30,8 +30,8 @@ public partial class TerminalView : UserControl
         {
             newVm.OutputReceived += OnOutputReceived;
             newVm.PromptReady += OnPromptReady;
-            TerminalBox.Text = "PowerShell\n";
-            ShowPrompt(newVm.CurrentDirectory);
+            TerminalBox.Text = "";
+            _inputStartIndex = 0;
         }
     }
 
@@ -58,6 +58,23 @@ public partial class TerminalView : UserControl
 
     private void OnTerminalKeyDown(object sender, KeyEventArgs e)
     {
+        // Ignore modifier keys alone (Ctrl, Shift, Alt)
+        if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl ||
+            e.Key == Key.LeftShift || e.Key == Key.RightShift ||
+            e.Key == Key.LeftAlt || e.Key == Key.RightAlt ||
+            e.Key == Key.System)
+        {
+            return;
+        }
+
+        // Allow Ctrl+C to copy
+        if (e.Key == Key.C && Keyboard.Modifiers == ModifierKeys.Control)
+            return;
+
+        // Allow Ctrl+A to select all
+        if (e.Key == Key.A && Keyboard.Modifiers == ModifierKeys.Control)
+            return;
+
         // Prevent editing before the input area
         if (TerminalBox.CaretIndex < _inputStartIndex &&
             e.Key != Key.Left && e.Key != Key.Right &&
