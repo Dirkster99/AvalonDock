@@ -18,10 +18,14 @@
 		<PackageReference Include="NUnit.Analyzers" Version="4.13.0"/>
 		<PackageReference Include="FlaUI.Core" Version="5.0.0"/>
 		<PackageReference Include="FlaUI.UIA3" Version="5.0.0"/>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0"/>
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\Components\AvalonDock\AvalonDock.csproj"/>
+		<ProjectReference Include="..\..\Components\AvalonDock.Core\AvalonDock.Core.csproj"/>
+		<ProjectReference Include="..\..\Components\AvalonDock.Mvvm\AvalonDock.Mvvm.csproj"/>
+		<ProjectReference Include="..\..\Components\AvalonDock.DependencyInjection\AvalonDock.DependencyInjection.csproj"/>
 	</ItemGroup>
 
 </Project>
