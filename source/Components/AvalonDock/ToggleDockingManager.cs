@@ -157,28 +157,13 @@ namespace AvalonDock
 
 		static ToggleDockingManager()
 		{
-			// Do NOT override DefaultStyleKey — inherit the active theme's DockingManager style
-			// (Arc, VS2013, etc.) so DocumentPaneControlStyle and other theme properties apply.
-			// We override only AnchorablePaneControlStyle in OnApplyTemplate.
+			DefaultStyleKeyProperty.OverrideMetadata(typeof(ToggleDockingManager), new FrameworkPropertyMetadata(typeof(ToggleDockingManager)));
 		}
 
 		public ToggleDockingManager()
 		{
 			Loaded += ToggleDockingManager_Loaded;
 			ActiveContentChanged += (s, e) => RefreshButtonStates();
-		}
-
-		/// <inheritdoc/>
-		public override void OnApplyTemplate()
-		{
-			base.OnApplyTemplate();
-
-			// Apply the toggle-specific anchorable pane style from our generic.xaml
-			var toggleStyle = TryFindResource("ToggleAnchorablePaneControlStyle") as System.Windows.Style;
-			if (toggleStyle != null)
-			{
-				AnchorablePaneControlStyle = toggleStyle;
-			}
 		}
 
 		/// <summary>

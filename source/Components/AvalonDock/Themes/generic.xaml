@@ -1515,8 +1515,8 @@
 								<Setter Property="Foreground" Value="#6B6B6B" />
 							</Trigger>
 							<Trigger Property="IsAnchorableFocused" Value="True">
-								<Setter TargetName="Bd" Property="Background" Value="#25007ACC" />
-								<Setter Property="Foreground" Value="#007ACC" />
+									<Setter TargetName="Bd" Property="Background" Value="#007ACC" />
+									<Setter Property="Foreground" Value="White" />
 							</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
@@ -1689,6 +1689,12 @@
 				</DataTemplate>
 			</Setter.Value>
 		</Setter>
+	</Style>
+
+	<!--  ToggleDockingManager: fallback style (theme override in Arc/VS2013 theme dictionaries)  -->
+	<Style x:Key="{x:Type avalonDock:ToggleDockingManager}" TargetType="{x:Type avalonDock:ToggleDockingManager}"
+		   BasedOn="{StaticResource {x:Type avalonDock:DockingManager}}">
+		<Setter Property="AnchorablePaneControlStyle" Value="{StaticResource ToggleAnchorablePaneControlStyle}" />
 	</Style>
 
 </ResourceDictionary>
