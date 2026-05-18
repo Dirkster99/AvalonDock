@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
     xmlns:avalonDockControls="clr-namespace:AvalonDock.Controls;assembly=AvalonDock"
+    xmlns:avalonDockThemes="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.Arc"
     xmlns:views="clr-namespace:ToggleTestApp.Views"
     xmlns:vm="clr-namespace:ToggleTestApp.ViewModels"
     Title="AvalonDock Code — Toggle Docking Demo"
@@ -113,8 +114,14 @@
         <!-- Dock Manager -->
         <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1"
                                          Background="#1E1E1E"
+                                         ButtonSize="32"
+                                         DefaultDockWidth="280"
+                                         DefaultDockHeight="220"
                                          DocumentsSource="{Binding OpenEditors}"
                                          ActiveContent="{Binding ActiveEditor, Mode=TwoWay}">
+            <avalonDock:ToggleDockingManager.Theme>
+                <avalonDockThemes:ArcDarkTheme />
+            </avalonDock:ToggleDockingManager.Theme>
             <avalonDock:LayoutRoot>
                 <avalonDock:LayoutPanel Orientation="Horizontal">
                     <avalonDock:LayoutDocumentPaneGroup>
@@ -156,23 +163,15 @@
                                 avalonDockControls:ToggleDock.Icon="{StaticResource SearchIcon}"
                                 avalonDockControls:ToggleDock.ToolTip="Search (Ctrl+Shift+F)">
                                 <Border Background="#252526" Padding="12">
-                                    <StackPanel>
-                                        <TextBlock Text="SEARCH" FontSize="11" FontWeight="SemiBold"
-                                                   Foreground="#BBBBBB" Margin="0,0,0,8" />
-                                        <TextBox Background="#3C3C3C" Foreground="#CCCCCC" BorderThickness="0"
-                                                 Padding="6,4" FontSize="12" />
-                                    </StackPanel>
+                                    <TextBox Background="#3C3C3C" Foreground="#CCCCCC" BorderThickness="0"
+                                             Padding="6,4" FontSize="12" VerticalAlignment="Top" />
                                 </Border>
                             </avalonDock:LayoutAnchorable>
                             <avalonDock:LayoutAnchorable Title="Source Control" ContentId="Git"
                                 avalonDockControls:ToggleDock.Icon="{StaticResource GitIcon}"
                                 avalonDockControls:ToggleDock.ToolTip="Source Control (Ctrl+Shift+G)">
                                 <Border Background="#252526" Padding="12">
-                                    <StackPanel>
-                                        <TextBlock Text="SOURCE CONTROL" FontSize="11" FontWeight="SemiBold"
-                                                   Foreground="#BBBBBB" Margin="0,0,0,8" />
-                                        <TextBlock Text="No changes detected" Foreground="#808080" FontSize="12" />
-                                    </StackPanel>
+                                    <TextBlock Text="No changes detected" Foreground="#808080" FontSize="12" />
                                 </Border>
                             </avalonDock:LayoutAnchorable>
                         </avalonDock:LayoutAnchorGroup>
@@ -183,17 +182,17 @@
                 <avalonDock:LayoutRoot.BottomSide>
                     <avalonDock:LayoutAnchorSide>
                         <avalonDock:LayoutAnchorGroup>
-                            <avalonDock:LayoutAnchorable Title="Terminal" ContentId="Terminal"
-                                avalonDockControls:ToggleDock.Icon="{StaticResource TerminalIcon}"
-                                avalonDockControls:ToggleDock.ToolTip="Terminal (Ctrl+`)">
-                                <views:TerminalView DataContext="{Binding Terminal}" />
-                            </avalonDock:LayoutAnchorable>
                             <avalonDock:LayoutAnchorable Title="Problems" ContentId="Problems"
                                 avalonDockControls:ToggleDock.Icon="{StaticResource ProblemsIcon}"
                                 avalonDockControls:ToggleDock.ToolTip="Problems (Ctrl+Shift+M)">
                                 <Border Background="#1E1E1E" Padding="12">
                                     <TextBlock Text="No problems detected" Foreground="#808080" FontSize="12" />
                                 </Border>
+                            </avalonDock:LayoutAnchorable>
+                            <avalonDock:LayoutAnchorable Title="Terminal" ContentId="Terminal"
+                                avalonDockControls:ToggleDock.Icon="{StaticResource TerminalIcon}"
+                                avalonDockControls:ToggleDock.ToolTip="Terminal (Ctrl+`)">
+                                <views:TerminalView DataContext="{Binding Terminal}" />
                             </avalonDock:LayoutAnchorable>
                         </avalonDock:LayoutAnchorGroup>
                     </avalonDock:LayoutAnchorSide>

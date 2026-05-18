@@ -19,6 +19,7 @@
         <ProjectReference Include="..\Components\AvalonDock.Core\AvalonDock.Core.csproj" />
         <ProjectReference Include="..\Components\AvalonDock.Mvvm\AvalonDock.Mvvm.csproj" />
         <ProjectReference Include="..\Components\AvalonDock.DependencyInjection\AvalonDock.DependencyInjection.csproj" />
+        <ProjectReference Include="..\Components\AvalonDock.Themes.Arc\AvalonDock.Themes.Arc.csproj" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="AvalonEdit" Version="6.3.1.120" />

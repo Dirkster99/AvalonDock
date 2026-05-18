@@ -22,15 +22,7 @@
         </HierarchicalDataTemplate>
     </UserControl.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <TextBlock Grid.Row="0" Text="EXPLORER" FontSize="11" FontWeight="SemiBold"
-                   Foreground="#BBBBBB" Margin="12,6,8,4" />
-
-        <TreeView Grid.Row="1" ItemsSource="{Binding RootItems}"
+        <TreeView ItemsSource="{Binding RootItems}"
                   Background="Transparent" BorderThickness="0"
                   VirtualizingPanel.IsVirtualizing="True">
             <TreeView.ItemContainerStyle>

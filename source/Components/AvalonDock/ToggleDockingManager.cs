@@ -84,6 +84,16 @@ namespace AvalonDock
 			DependencyProperty.Register(nameof(ShowHeaderOptionsButton), typeof(bool), typeof(ToggleDockingManager),
 				new PropertyMetadata(true));
 
+		/// <summary><see cref="DefaultDockWidth"/> dependency property.</summary>
+		public static readonly DependencyProperty DefaultDockWidthProperty =
+			DependencyProperty.Register(nameof(DefaultDockWidth), typeof(double), typeof(ToggleDockingManager),
+				new PropertyMetadata(250.0));
+
+		/// <summary><see cref="DefaultDockHeight"/> dependency property.</summary>
+		public static readonly DependencyProperty DefaultDockHeightProperty =
+			DependencyProperty.Register(nameof(DefaultDockHeight), typeof(double), typeof(ToggleDockingManager),
+				new PropertyMetadata(200.0));
+
 		/// <summary>
 		/// Gets or sets which docked panes get priority for full extent.
 		/// Default is <see cref="DockLayoutPriority.BottomFullWidth"/> (Rider-style).
@@ -123,6 +133,26 @@ namespace AvalonDock
 		{
 			get => (bool)GetValue(ShowHeaderOptionsButtonProperty);
 			set => SetValue(ShowHeaderOptionsButtonProperty, value);
+		}
+
+		/// <summary>
+		/// Gets or sets the default width for side-docked panes when no prior size is available.
+		/// Default is 250.
+		/// </summary>
+		public double DefaultDockWidth
+		{
+			get => (double)GetValue(DefaultDockWidthProperty);
+			set => SetValue(DefaultDockWidthProperty, value);
+		}
+
+		/// <summary>
+		/// Gets or sets the default height for bottom-docked panes when no prior size is available.
+		/// Default is 200.
+		/// </summary>
+		public double DefaultDockHeight
+		{
+			get => (double)GetValue(DefaultDockHeightProperty);
+			set => SetValue(DefaultDockHeightProperty, value);
 		}
 
 		static ToggleDockingManager()
@@ -729,6 +759,12 @@ namespace AvalonDock
 					DockMinWidth = anchorable.AutoHideMinWidth,
 					DockMinHeight = anchorable.AutoHideMinHeight
 				};
+
+				// Apply default dock dimensions from the manager
+				if (side == AnchorSide.Left || side == AnchorSide.Right)
+					previousContainer.DockWidth = new GridLength(DefaultDockWidth);
+				else
+					previousContainer.DockHeight = new GridLength(DefaultDockHeight);
 
 				var root = parentGroup.Root as LayoutRoot;
 				var rootPanel = root.RootPanel;
