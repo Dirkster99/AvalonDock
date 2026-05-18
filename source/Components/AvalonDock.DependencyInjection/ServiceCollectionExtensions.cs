@@ -57,5 +57,22 @@ namespace AvalonDock.DependencyInjection
 			services.AddSingleton<IDockState, TState>();
 			return services;
 		}
+
+		/// <summary>
+		/// Registers <see cref="ToggleDockOptions"/> with an optional configuration delegate.
+		/// Resolve the options in your window to call <see cref="ToggleDockOptions.ApplyTo"/>.
+		/// </summary>
+		/// <param name="services">The service collection.</param>
+		/// <param name="configure">Optional delegate to configure the options.</param>
+		/// <returns>The service collection for chaining.</returns>
+		public static IServiceCollection AddToggleDockOptions(
+			this IServiceCollection services,
+			Action<ToggleDockOptions>? configure = null)
+		{
+			var options = new ToggleDockOptions();
+			configure?.Invoke(options);
+			services.AddSingleton(options);
+			return services;
+		}
 	}
 }

@@ -1,5 +1,7 @@
 using System;
 using System.Windows;
+using AvalonDock;
+using AvalonDock.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using ToggleTestApp.ViewModels;
 
@@ -23,6 +25,15 @@ namespace ToggleTestApp
 
 		private static void ConfigureServices(IServiceCollection services)
 		{
+			// AvalonDock toggle options via DI
+			services.AddToggleDockOptions(opts =>
+			{
+				opts.ButtonSize = 28;
+				opts.DefaultDockWidth = 280;
+				opts.DefaultDockHeight = 220;
+				opts.LayoutPriority = nameof(DockLayoutPriority.BottomFullWidth);
+			});
+
 			// ViewModels
 			services.AddSingleton<TerminalViewModel>();
 			services.AddSingleton<FolderExplorerViewModel>(sp =>
@@ -36,7 +47,7 @@ namespace ToggleTestApp
 				return mainVm;
 			});
 
-			// Main window (receives MainViewModel via constructor)
+			// Main window (receives MainViewModel + ToggleDockOptions via constructor)
 			services.AddSingleton<MainWindow>();
 		}
 

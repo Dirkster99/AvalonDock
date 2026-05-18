@@ -114,9 +114,6 @@
         <!-- Dock Manager -->
         <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1"
                                          Background="#1E1E1E"
-                                         ButtonSize="32"
-                                         DefaultDockWidth="280"
-                                         DefaultDockHeight="220"
                                          DocumentsSource="{Binding OpenEditors}"
                                          ActiveContent="{Binding ActiveEditor, Mode=TwoWay}">
             <avalonDock:ToggleDockingManager.Theme>

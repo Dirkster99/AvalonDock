@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Windows;
 using AvalonDock;
+using AvalonDock.DependencyInjection;
 using AvalonDock.Layout;
 using ToggleTestApp.ViewModels;
 
@@ -8,8 +9,11 @@ namespace ToggleTestApp
 {
 	public partial class MainWindow : Window
 	{
-		public MainWindow(MainViewModel viewModel)
+		private readonly ToggleDockOptions? _dockOptions;
+
+		public MainWindow(MainViewModel viewModel, ToggleDockOptions? dockOptions = null)
 		{
+			_dockOptions = dockOptions;
 			DataContext = viewModel;
 			InitializeComponent();
 			Loaded += OnLoaded;
@@ -17,6 +21,21 @@ namespace ToggleTestApp
 
 		private void OnLoaded(object sender, RoutedEventArgs e)
 		{
+			// Apply DI-configured options
+			if (_dockOptions != null)
+			{
+				dockManager.ButtonSize = _dockOptions.ButtonSize;
+				dockManager.DefaultDockWidth = _dockOptions.DefaultDockWidth;
+				dockManager.DefaultDockHeight = _dockOptions.DefaultDockHeight;
+				dockManager.ShowHeaderMinimizeButton = _dockOptions.ShowHeaderMinimizeButton;
+				dockManager.ShowHeaderOptionsButton = _dockOptions.ShowHeaderOptionsButton;
+
+				if (System.Enum.TryParse<DockLayoutPriority>(_dockOptions.LayoutPriority, out var priority))
+				{
+					dockManager.LayoutPriority = priority;
+				}
+			}
+
 			// Open Terminal by default
 			var terminal = FindAnchorable("Terminal");
 			if (terminal != null)

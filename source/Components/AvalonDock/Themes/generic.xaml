@@ -1464,7 +1464,7 @@
 							<!-- Icon (ImageSource) -->
 							<Image x:Name="PART_Icon"
 								Source="{TemplateBinding IconSource}"
-								Width="16" Height="16"
+								Width="20" Height="20"
 								Margin="0,0,3,0"
 								Stretch="Uniform"
 								VerticalAlignment="Center"
@@ -1473,6 +1473,7 @@
 							<ContentPresenter x:Name="PART_IconContent"
 								Content="{TemplateBinding IconContent}"
 								ContentTemplate="{TemplateBinding IconTemplate}"
+								Width="20" Height="20"
 								Margin="0,0,3,0"
 								VerticalAlignment="Center"
 								Visibility="Collapsed" />
@@ -1507,14 +1508,16 @@
 							</Setter>
 						</DataTrigger>
 						<Trigger Property="IsMouseOver" Value="True">
-							<Setter TargetName="Bd" Property="Background" Value="#D8D8D8" />
+								<Setter TargetName="Bd" Property="Background" Value="#30808080" />
 						</Trigger>
 						<Trigger Property="IsChecked" Value="True">
-							<Setter TargetName="Bd" Property="Background" Value="#DCDCDC" />
-						</Trigger>
-						<Trigger Property="IsAnchorableFocused" Value="True">
-							<Setter TargetName="Bd" Property="Background" Value="#CCE4F7" />
-						</Trigger>
+								<Setter TargetName="Bd" Property="Background" Value="#25808080" />
+								<Setter Property="Foreground" Value="#6B6B6B" />
+							</Trigger>
+							<Trigger Property="IsAnchorableFocused" Value="True">
+								<Setter TargetName="Bd" Property="Background" Value="#25007ACC" />
+								<Setter Property="Foreground" Value="#007ACC" />
+							</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
@@ -1524,45 +1527,42 @@
 	<!--  ToggleDockingManager - modern rounded anchorable pane  -->
 	<Style x:Key="ToggleAnchorablePaneControlStyle" TargetType="{x:Type avalonDockControls:LayoutAnchorablePaneControl}">
 		<Setter Property="Foreground" Value="{Binding Model.Root.Manager.Foreground, RelativeSource={RelativeSource Self}}" />
-		<Setter Property="Background" Value="{Binding Model.Root.Manager.Background, RelativeSource={RelativeSource Self}}" />
+		<Setter Property="Background" Value="Transparent" />
 		<Setter Property="TabStripPlacement" Value="Bottom" />
+		<Setter Property="Padding" Value="0" />
+		<Setter Property="BorderThickness" Value="0" />
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type avalonDockControls:LayoutAnchorablePaneControl}">
-					<Border
-						CornerRadius="6"
-						Background="{TemplateBinding Background}"
-						BorderBrush="#D0D0D0"
-						BorderThickness="1"
+					<Grid
 						ClipToBounds="True"
+						KeyboardNavigation.TabNavigation="Local"
 						SnapsToDevicePixels="True">
-						<Grid KeyboardNavigation.TabNavigation="Local">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="*" />
-								<RowDefinition Height="Auto" />
-							</Grid.RowDefinitions>
-							<Border Grid.RowSpan="2" Background="Transparent" />
-							<Border
-								x:Name="ContentPanel"
-								Grid.Row="0"
-								KeyboardNavigation.DirectionalNavigation="Contained"
-								KeyboardNavigation.TabIndex="2"
-								KeyboardNavigation.TabNavigation="Cycle">
-								<ContentPresenter
-									x:Name="PART_SelectedContentHost"
-									Margin="{TemplateBinding Padding}"
-									ContentSource="SelectedContent"
-									SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-							</Border>
-							<avalonDockControls:AnchorablePaneTabPanel
-								x:Name="HeaderPanel"
-								Grid.Row="1"
-								Margin="4,0,4,4"
-								Panel.ZIndex="1"
-								IsItemsHost="true"
-								KeyboardNavigation.TabIndex="1" />
-						</Grid>
-					</Border>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="*" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+						<Border Grid.RowSpan="2" Background="Transparent" />
+						<Border
+							x:Name="ContentPanel"
+							Grid.Row="0"
+							KeyboardNavigation.DirectionalNavigation="Contained"
+							KeyboardNavigation.TabIndex="2"
+							KeyboardNavigation.TabNavigation="Cycle">
+							<ContentPresenter
+								x:Name="PART_SelectedContentHost"
+								Margin="{TemplateBinding Padding}"
+								ContentSource="SelectedContent"
+								SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+						</Border>
+						<avalonDockControls:AnchorablePaneTabPanel
+							x:Name="HeaderPanel"
+							Grid.Row="1"
+							Margin="0"
+							Panel.ZIndex="1"
+							IsItemsHost="true"
+							KeyboardNavigation.TabIndex="1" />
+					</Grid>
 					<ControlTemplate.Triggers>
 						<Trigger Property="IsEnabled" Value="false">
 							<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
@@ -1577,16 +1577,20 @@
 					<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
 					<Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
 					<Setter Property="ToolTip" Value="{Binding ToolTip}" />
+					<Setter Property="Background" Value="Transparent" />
+					<Setter Property="BorderBrush" Value="Transparent" />
 					<Setter Property="Template">
 						<Setter.Value>
 							<ControlTemplate TargetType="{x:Type TabItem}">
 								<Grid SnapsToDevicePixels="true">
 									<Border
 										x:Name="Bd"
-										Padding="{TemplateBinding Padding}"
+										Margin="0"
+										CornerRadius="0,0,4,4"
+										Padding="8,2,8,4"
 										Background="{TemplateBinding Background}"
-										BorderBrush="{TemplateBinding BorderBrush}"
-										BorderThickness="1,0,1,1">
+										BorderBrush="Transparent"
+										BorderThickness="0">
 										<ContentPresenter
 											x:Name="Content"
 											HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
@@ -1598,18 +1602,20 @@
 								</Grid>
 								<ControlTemplate.Triggers>
 									<Trigger Property="Selector.IsSelected" Value="true">
-										<Setter Property="Background" Value="White" />
+										<Setter TargetName="Bd" Property="Background">
+											<Setter.Value>
+												<SolidColorBrush Color="#007ACC" Opacity="0.3" />
+											</Setter.Value>
+										</Setter>
+										<Setter TargetName="Bd" Property="BorderBrush" Value="#007ACC" />
 										<Setter Property="Panel.ZIndex" Value="1" />
-										<Setter Property="Margin" Value="0,-1,-1,-2" />
 									</Trigger>
 									<MultiTrigger>
 										<MultiTrigger.Conditions>
 											<Condition Property="IsMouseOver" Value="true" />
 											<Condition Property="Selector.IsSelected" Value="false" />
 										</MultiTrigger.Conditions>
-										<Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" />
-										<Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-										<Setter Property="Panel.ZIndex" Value="0" />
+										<Setter TargetName="Bd" Property="Background" Value="#20808080" />
 									</MultiTrigger>
 									<Trigger Property="IsEnabled" Value="false">
 										<Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
@@ -1683,11 +1689,6 @@
 				</DataTemplate>
 			</Setter.Value>
 		</Setter>
-	</Style>
-
-	<Style x:Key="{x:Type avalonDock:ToggleDockingManager}" TargetType="{x:Type avalonDock:ToggleDockingManager}"
-		   BasedOn="{StaticResource {x:Type avalonDock:DockingManager}}">
-		<Setter Property="AnchorablePaneControlStyle" Value="{StaticResource ToggleAnchorablePaneControlStyle}" />
 	</Style>
 
 </ResourceDictionary>
