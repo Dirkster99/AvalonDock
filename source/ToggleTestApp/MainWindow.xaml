@@ -8,7 +8,7 @@
     xmlns:vm="clr-namespace:ToggleTestApp.ViewModels"
     Title="AvalonDock Code — Toggle Docking Demo"
     Width="1100" Height="750"
-    Background="{Binding Background, ElementName=dockManager}"
+    Background="#252729"
     UseLayoutRounding="True">
     <Window.Resources>
         <views:FileIconConverter x:Key="FileIconConverter" />
@@ -79,7 +79,7 @@
         </Grid.RowDefinitions>
 
         <!-- Title bar / Menu -->
-        <Grid Grid.Row="0" Background="{Binding Background, ElementName=dockManager}">
+        <Grid Grid.Row="0" Background="#252729">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -121,6 +121,7 @@
 
         <!-- Dock Manager -->
         <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1"
+                                         BorderThickness="0"
                                          DocumentsSource="{Binding OpenEditors}"
                                          ActiveContent="{Binding ActiveEditor, Mode=TwoWay}">
             <avalonDock:ToggleDockingManager.Theme>
@@ -205,7 +206,7 @@
         </avalonDock:ToggleDockingManager>
 
         <!-- Status bar -->
-        <Border Grid.Row="2" Background="{Binding Background, ElementName=dockManager}" Padding="8,4">
+        <Border Grid.Row="2" Background="#252729" Padding="8,4">
             <Grid>
                 <TextBlock Text="Ready" Foreground="#808080" FontSize="11" />
                 <TextBlock HorizontalAlignment="Right" Foreground="#808080" FontSize="11">

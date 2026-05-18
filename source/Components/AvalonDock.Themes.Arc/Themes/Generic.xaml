@@ -1346,6 +1346,7 @@
     <!--  DockingManager  -->
     <Style x:Key="{x:Type avalonDock:DockingManager}" TargetType="{x:Type avalonDock:DockingManager}">
         <Setter Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.Background}}" />
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="DocumentPaneControlStyle" Value="{StaticResource AvalonDockThemeArcDocumentPaneControlStyle}" />
         <Setter Property="AnchorablePaneControlStyle" Value="{StaticResource AvalonDockThemeArcAnchorablePaneControlStyle}" />
         <Setter Property="AnchorSideTemplate" Value="{StaticResource AvalonDockThemeArcAnchorSideTemplate}" />
