@@ -17,7 +17,7 @@ namespace AvalonDock.Layout
 	/// if and when their children collection or tree of children has changed.
 	/// </summary>
 	[Serializable]
-	public abstract class LayoutGroupBase : LayoutElement
+	public abstract class LayoutGroupBase : LayoutElement, Core.Serialization.ISerializableLayoutContainer
 	{
 		/// <summary>Raise an event to inform supscribers that the children collection down the tree of this object has changed.</summary>
 		[field: NonSerialized]

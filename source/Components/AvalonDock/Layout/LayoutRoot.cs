@@ -33,7 +33,7 @@ namespace AvalonDock.Layout
 	/// </summary>
 	[ContentProperty(nameof(RootPanel))]
 	[Serializable]
-	public class LayoutRoot : LayoutElement, ILayoutContainer, ILayoutRoot, IXmlSerializable
+	public class LayoutRoot : LayoutElement, ILayoutContainer, ILayoutRoot, IXmlSerializable, Core.Serialization.ISerializableLayoutRoot
 	{
 		private LayoutPanel _rootPanel;
 		private LayoutAnchorSide _topSide = null;
@@ -975,5 +975,7 @@ namespace AvalonDock.Layout
 
 #endif
 
+		IEnumerable<Core.Serialization.ISerializableLayoutElement> Core.Serialization.ISerializableLayoutRoot.Descendents()
+			=> ((ILayoutElement)this).Descendents().OfType<Core.Serialization.ISerializableLayoutElement>();
 	}
 }

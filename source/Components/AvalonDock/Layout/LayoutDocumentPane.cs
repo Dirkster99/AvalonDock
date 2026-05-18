@@ -21,7 +21,7 @@ namespace AvalonDock.Layout
 	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
-	public class LayoutDocumentPane : LayoutPositionableGroup<LayoutContent>, ILayoutDocumentPane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable
+	public class LayoutDocumentPane : LayoutPositionableGroup<LayoutContent>, ILayoutDocumentPane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable, Core.Serialization.ISerializableLayoutPane
 	{
 		private bool _showHeader = true;
 		private int _selectedIndex = -1;
@@ -80,6 +80,12 @@ namespace AvalonDock.Layout
 
 		/// <inheritdoc />
 		string ILayoutPaneSerializable.Id
+		{
+			get => _id;
+			set => _id = value;
+		}
+
+		string Core.Serialization.ISerializableLayoutPane.Id
 		{
 			get => _id;
 			set => _id = value;

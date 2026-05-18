@@ -23,7 +23,7 @@ namespace AvalonDock.Layout
 	/// class supports both
 	/// </summary>
 	[Serializable]
-	public abstract class LayoutElement : DependencyObject, ILayoutElement
+	public abstract class LayoutElement : DependencyObject, ILayoutElement, Core.Serialization.ISerializableLayoutElement
 	{
 		[NonSerialized]
 		private ILayoutContainer _parent = null;

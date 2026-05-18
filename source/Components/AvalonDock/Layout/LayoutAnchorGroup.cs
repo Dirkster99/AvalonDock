@@ -18,7 +18,7 @@ namespace AvalonDock.Layout
 	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
-	public class LayoutAnchorGroup : LayoutGroup<LayoutAnchorable>, ILayoutPreviousContainer, ILayoutPaneSerializable
+	public class LayoutAnchorGroup : LayoutGroup<LayoutAnchorable>, ILayoutPreviousContainer, ILayoutPaneSerializable, Core.Serialization.ISerializableLayoutPane
 	{
 		/// <inheritdoc />
 		protected override bool GetVisibility() => Children.Count > 0;
@@ -61,5 +61,7 @@ namespace AvalonDock.Layout
 
 		/// <inheritdoc />
 		string ILayoutPaneSerializable.Id { get => _id; set => _id = value; }
+
+		string Core.Serialization.ISerializableLayoutPane.Id { get => _id; set => _id = value; }
 	}
 }

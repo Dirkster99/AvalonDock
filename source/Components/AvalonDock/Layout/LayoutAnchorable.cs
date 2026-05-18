@@ -23,7 +23,7 @@ namespace AvalonDock.Layout
 	/// custom application content (WPF controls) and other children elements.
 	/// </summary>
 	[Serializable]
-	public class LayoutAnchorable : LayoutContent
+	public class LayoutAnchorable : LayoutContent, Core.Serialization.ISerializableLayoutAnchorable
 	{
 		private double _autohideWidth = 0.0;
 		private double _autohideMinWidth = 100.0;

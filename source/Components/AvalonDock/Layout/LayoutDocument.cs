@@ -16,7 +16,7 @@ namespace AvalonDock.Layout
 	/// Implements the layout model for the <see cref="Controls.LayoutDocumentControl"/>.
 	/// </summary>
 	[Serializable]
-	public class LayoutDocument : LayoutContent
+	public class LayoutDocument : LayoutContent, Core.Serialization.ISerializableLayoutDocument
 	{
 		private bool _canMove = true;
 		private bool _isVisible = true;

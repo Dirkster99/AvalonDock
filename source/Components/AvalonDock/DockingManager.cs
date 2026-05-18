@@ -41,7 +41,7 @@ namespace AvalonDock
 	[ContentProperty(nameof(Layout))]
 	[TemplatePart(Name = "PART_AutoHideArea")]
 	[SuppressMessage("Maintainability", "CA1506:Avoid excessive class coupling")]
-	public class DockingManager : Control, IOverlayWindowHost// , ILogicalChildrenContainer
+	public class DockingManager : Control, IOverlayWindowHost, Core.Serialization.ISerializableDockingManager// , ILogicalChildrenContainer
 	{
 		// ShortCut to current AvalonDock theme if OnThemeChanged() is invoked with DictionaryTheme instance
 		// in e.OldValue and e.NewValue of the passed event
@@ -73,6 +73,24 @@ namespace AvalonDock
 		public bool SuspendDocumentsSourceBinding = false;
 		/// <summary>When true, suspends automatic anchorable source binding during deserialization.</summary>
 		public bool SuspendAnchorablesSourceBinding = false;
+
+		Core.Serialization.ISerializableLayoutRoot Core.Serialization.ISerializableDockingManager.Layout
+		{
+			get => Layout;
+			set => Layout = (Layout.LayoutRoot)value;
+		}
+
+		bool Core.Serialization.ISerializableDockingManager.SuspendDocumentsSourceBinding
+		{
+			get => SuspendDocumentsSourceBinding;
+			set => SuspendDocumentsSourceBinding = value;
+		}
+
+		bool Core.Serialization.ISerializableDockingManager.SuspendAnchorablesSourceBinding
+		{
+			get => SuspendAnchorablesSourceBinding;
+			set => SuspendAnchorablesSourceBinding = value;
+		}
 
 		/// <summary>
 		/// Static class constructor to support WPF property control registration.

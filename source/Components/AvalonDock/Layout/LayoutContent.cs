@@ -25,7 +25,7 @@ namespace AvalonDock.Layout
 	/// </summary>
 	[ContentProperty(nameof(Content))]
 	[Serializable]
-	public abstract class LayoutContent : LayoutElement, IXmlSerializable, ILayoutElementForFloatingWindow, IComparable<LayoutContent>, ILayoutPreviousContainer
+	public abstract class LayoutContent : LayoutElement, IXmlSerializable, ILayoutElementForFloatingWindow, IComparable<LayoutContent>, ILayoutPreviousContainer, Core.Serialization.ISerializableLayoutContent, Core.Serialization.ISerializablePreviousContainer
 	{
 		/// <summary>
 		/// Class constructor
@@ -712,5 +712,23 @@ namespace AvalonDock.Layout
 		}
 
 		void ILayoutElementForFloatingWindow.RaiseFloatingPropertiesUpdated() => FloatingPropertiesUpdated?.Invoke(this, EventArgs.Empty);
+
+		object Core.Serialization.ISerializableLayoutContent.IconSource
+		{
+			get => IconSource;
+			set => IconSource = value as System.Windows.Media.ImageSource;
+		}
+
+		Core.Serialization.ISerializableLayoutContainer Core.Serialization.ISerializablePreviousContainer.PreviousContainer
+		{
+			get => _previousContainer as Core.Serialization.ISerializableLayoutContainer;
+			set => ((ILayoutPreviousContainer)this).PreviousContainer = value as ILayoutContainer;
+		}
+
+		string Core.Serialization.ISerializablePreviousContainer.PreviousContainerId
+		{
+			get => ((ILayoutPreviousContainer)this).PreviousContainerId;
+			set => ((ILayoutPreviousContainer)this).PreviousContainerId = value;
+		}
 	}
 }

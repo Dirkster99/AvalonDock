@@ -19,7 +19,7 @@ namespace AvalonDock.Layout
 	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
-	public class LayoutAnchorablePane : LayoutPositionableGroup<LayoutAnchorable>, ILayoutAnchorablePane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable
+	public class LayoutAnchorablePane : LayoutPositionableGroup<LayoutAnchorable>, ILayoutAnchorablePane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable, Core.Serialization.ISerializableLayoutPane
 	{
 		private int _selectedIndex = -1;
 
@@ -86,6 +86,12 @@ namespace AvalonDock.Layout
 
 		/// <summary>Gets/sets the unique id that is used for the serialization of this panel.</summary>
 		string ILayoutPaneSerializable.Id
+		{
+			get => _id;
+			set => _id = value;
+		}
+
+		string Core.Serialization.ISerializableLayoutPane.Id
 		{
 			get => _id;
 			set => _id = value;
