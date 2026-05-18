@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using AvalonDock.Core;
 using Microsoft.Extensions.DependencyInjection;
-
 namespace AvalonDock.DependencyInjection
 {
 	/// <summary>
@@ -72,6 +72,39 @@ namespace AvalonDock.DependencyInjection
 			var options = new ToggleDockOptions();
 			configure?.Invoke(options);
 			services.AddSingleton(options);
+			return services;
+		}
+
+		/// <summary>
+		/// Registers a toolbox ViewModel for use with the ToggleDockingManager.
+		/// The ViewModel must implement <see cref="IToolboxViewModel"/>.
+		/// All registered toolboxes are collected via <c>IEnumerable&lt;IToolboxViewModel&gt;</c>.
+		/// </summary>
+		/// <typeparam name="T">The concrete ViewModel type implementing <see cref="IToolboxViewModel"/>.</typeparam>
+		/// <param name="services">The service collection.</param>
+		/// <returns>The service collection for chaining.</returns>
+		public static IServiceCollection AddToolbox<T>(this IServiceCollection services)
+			where T : class, IToolboxViewModel
+		{
+			services.AddSingleton<T>();
+			services.AddSingleton<IToolboxViewModel>(sp => sp.GetRequiredService<T>());
+			return services;
+		}
+
+		/// <summary>
+		/// Registers a toolbox ViewModel with a factory for use with the ToggleDockingManager.
+		/// </summary>
+		/// <typeparam name="T">The concrete ViewModel type implementing <see cref="IToolboxViewModel"/>.</typeparam>
+		/// <param name="services">The service collection.</param>
+		/// <param name="factory">Factory to create the ViewModel instance.</param>
+		/// <returns>The service collection for chaining.</returns>
+		public static IServiceCollection AddToolbox<T>(
+			this IServiceCollection services,
+			Func<IServiceProvider, T> factory)
+			where T : class, IToolboxViewModel
+		{
+			services.AddSingleton<T>(factory);
+			services.AddSingleton<IToolboxViewModel>(sp => sp.GetRequiredService<T>());
 			return services;
 		}
 	}

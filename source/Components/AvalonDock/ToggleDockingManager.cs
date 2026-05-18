@@ -163,6 +163,7 @@ namespace AvalonDock
 
 		public ToggleDockingManager()
 		{
+			LayoutUpdateStrategy = new ToggleLayoutStrategy();
 			Loaded += ToggleDockingManager_Loaded;
 			ActiveContentChanged += (s, e) => RefreshButtonStates();
 		}
@@ -315,8 +316,28 @@ namespace AvalonDock
 		{
 			ApplyToggleAnchorableStyle();
 			SetupToggleDockButtonBars();
+			OpenDefaultToolboxes();
 			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
 				new System.Action(UpdatePinButtonsToMinimize));
+		}
+
+		private void OpenDefaultToolboxes()
+		{
+			if (Layout == null) return;
+
+			foreach (var anc in Layout.Descendents().OfType<LayoutAnchorable>().ToList())
+			{
+				if (anc.Content is Core.IToolboxViewModel toolbox && toolbox.IsOpenByDefault)
+				{
+					var zone = toolbox.Side switch
+					{
+						Core.ToolboxSide.Right => DockZone.RightTop,
+						Core.ToolboxSide.Bottom => DockZone.BottomLeft,
+						_ => DockZone.LeftTop
+					};
+					ToggleAnchorable(anc, zone);
+				}
+			}
 		}
 
 		private void UpdatePinButtonsToMinimize()

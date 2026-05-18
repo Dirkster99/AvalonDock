@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using AvalonDock;
+using AvalonDock.Core;
 using AvalonDock.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using ToggleTestApp.ViewModels;
@@ -34,20 +36,25 @@ namespace ToggleTestApp
 				opts.LayoutPriority = nameof(DockLayoutPriority.BottomFullWidth);
 			});
 
-			// ViewModels
-			services.AddSingleton<TerminalViewModel>();
-			services.AddSingleton<FolderExplorerViewModel>(sp =>
+			// Register toolboxes — order determines sidebar button order
+			services.AddToolbox<FolderExplorerViewModel>(sp =>
 				new FolderExplorerViewModel(_ => { }));
+			services.AddToolbox<SearchViewModel>();
+			services.AddToolbox<SourceControlViewModel>();
+			services.AddToolbox<ProblemsViewModel>();
+			services.AddToolbox<TerminalViewModel>();
+
+			// MainViewModel receives all registered toolboxes
 			services.AddSingleton<MainViewModel>(sp =>
 			{
+				var toolboxes = sp.GetRequiredService<IEnumerable<IToolboxViewModel>>();
 				var folderVm = sp.GetRequiredService<FolderExplorerViewModel>();
-				var termVm = sp.GetRequiredService<TerminalViewModel>();
-				var mainVm = new MainViewModel(folderVm, termVm);
+				var mainVm = new MainViewModel(toolboxes, folderVm);
 				folderVm.SetOpenFileCallback(mainVm.OpenFile);
 				return mainVm;
 			});
 
-			// Main window (receives MainViewModel + ToggleDockOptions via constructor)
+			// Main window
 			services.AddSingleton<MainWindow>();
 		}
 

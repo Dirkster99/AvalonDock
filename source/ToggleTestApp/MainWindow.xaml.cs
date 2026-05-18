@@ -1,8 +1,6 @@
-using System.Linq;
 using System.Windows;
 using AvalonDock;
 using AvalonDock.DependencyInjection;
-using AvalonDock.Layout;
 using ToggleTestApp.ViewModels;
 
 namespace ToggleTestApp
@@ -26,20 +24,6 @@ namespace ToggleTestApp
 				{
 					dockManager.LayoutPriority = priority;
 				}
-			}
-
-			Loaded += (_, _) => OpenDefaultLayout();
-		}
-
-		private void OpenDefaultLayout()
-		{
-			var terminal = dockManager.Layout.Descendents()
-				.OfType<LayoutAnchorable>()
-				.FirstOrDefault(a => a.ContentId == "Terminal");
-
-			if (terminal != null)
-			{
-				dockManager.ToggleAnchorable(terminal, DockZone.BottomLeft);
 			}
 		}
 

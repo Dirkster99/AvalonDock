@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -31,6 +32,20 @@ public class FileColorConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         return value is true ? FolderBrush : FileBrush;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
+/// <summary>
+/// Returns Collapsed when value is null, Visible otherwise.
+/// </summary>
+public class NullToCollapsedConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return value == null ? Visibility.Collapsed : Visibility.Visible;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

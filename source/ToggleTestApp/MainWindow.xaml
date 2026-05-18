@@ -13,62 +13,72 @@
     <Window.Resources>
         <views:FileIconConverter x:Key="FileIconConverter" />
         <views:FileColorConverter x:Key="FileColorConverter" />
+        <views:NullToCollapsedConverter x:Key="NullToCollapsedConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 
-        <!-- Explorer icon (folder tree) -->
-        <Viewbox x:Key="ExplorerIcon" x:Shared="False" Width="16" Height="16">
-            <Canvas Width="16" Height="16">
-                <Path Data="M1.5,1 L6,1 L7.5,3 L14.5,3 C15.3,3 15.5,3.5 15.5,4 L15.5,13 C15.5,13.5 15,14 14.5,14 L1.5,14 C1,14 0.5,13.5 0.5,13 L0.5,2 C0.5,1.5 1,1 1.5,1 Z"
-                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="0.8" Fill="Transparent" />
-                <Line X1="0.5" Y1="5.5" X2="15.5" Y2="5.5" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="0.6" />
-            </Canvas>
-        </Viewbox>
+        <!-- DataTemplate: how to render each toolbox VM's content -->
+        <DataTemplate DataType="{x:Type vm:FolderExplorerViewModel}">
+            <views:FolderExplorerView />
+        </DataTemplate>
 
-        <!-- Terminal icon -->
-        <Viewbox x:Key="TerminalIcon" x:Shared="False" Width="16" Height="16">
-            <Canvas Width="16" Height="16">
-                <Rectangle Canvas.Left="0.5" Canvas.Top="1.5" Width="15" Height="13"
-                           Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="0.8" RadiusX="1.5" RadiusY="1.5" Fill="Transparent" />
-                <Path Data="M4,6 L7,8.5 L4,11" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1.5" Fill="Transparent" />
-                <Rectangle Canvas.Left="8.5" Canvas.Top="10.5" Width="4" Height="1.2" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" />
-            </Canvas>
-        </Viewbox>
+        <DataTemplate DataType="{x:Type vm:TerminalViewModel}">
+            <views:TerminalView />
+        </DataTemplate>
 
-        <!-- Search icon (magnifier) -->
-        <Viewbox x:Key="SearchIcon" x:Shared="False" Width="16" Height="16">
-            <Canvas Width="16" Height="16">
-                <Ellipse Canvas.Left="2" Canvas.Top="2" Width="9" Height="9"
-                         Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1.2" Fill="Transparent" />
-                <Line X1="10" Y1="10" X2="14" Y2="14" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1.5" />
-            </Canvas>
-        </Viewbox>
+        <DataTemplate DataType="{x:Type vm:SearchViewModel}">
+            <Border Background="#252526" Padding="12">
+                <TextBox Background="#3C3C3C" Foreground="#CCCCCC" BorderThickness="0"
+                         Padding="6,4" FontSize="12" VerticalAlignment="Top"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+            </Border>
+        </DataTemplate>
 
-        <!-- Git branch icon -->
-        <Viewbox x:Key="GitIcon" x:Shared="False" Width="16" Height="16">
-            <Canvas Width="16" Height="16">
-                <Ellipse Canvas.Left="2.5" Canvas.Top="2" Width="3.5" Height="3.5"
-                         Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1" Fill="Transparent" />
-                <Ellipse Canvas.Left="9" Canvas.Top="2" Width="3.5" Height="3.5"
-                         Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1" Fill="Transparent" />
-                <Ellipse Canvas.Left="2.5" Canvas.Top="10.5" Width="3.5" Height="3.5"
-                         Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1" Fill="Transparent" />
-                <Line X1="4.25" Y1="5.5" X2="4.25" Y2="10.5" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1" />
-                <Path Data="M10.75,5.5 C10.75,8.5 4.25,8.5 4.25,10.5" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1" Fill="Transparent" />
-            </Canvas>
-        </Viewbox>
+        <DataTemplate DataType="{x:Type vm:SourceControlViewModel}">
+            <Border Background="#252526" Padding="12">
+                <TextBlock Text="{Binding Status}" Foreground="#808080" FontSize="12" />
+            </Border>
+        </DataTemplate>
 
-        <!-- Problems/Warnings icon -->
-        <Viewbox x:Key="ProblemsIcon" x:Shared="False" Width="16" Height="16">
-            <Canvas Width="16" Height="16">
-                <Path Data="M8,1.5 L15,13.5 L1,13.5 Z" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1" Fill="Transparent" />
-                <Line X1="8" Y1="6" X2="8" Y2="10" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1.2" />
-                <Ellipse Canvas.Left="7.2" Canvas.Top="11" Width="1.6" Height="1.6" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" />
-            </Canvas>
-        </Viewbox>
+        <DataTemplate DataType="{x:Type vm:ProblemsViewModel}">
+            <Border Background="#1E1E1E" Padding="12">
+                <TextBlock Text="{Binding Status}" Foreground="#808080" FontSize="12" />
+            </Border>
+        </DataTemplate>
 
-        <!-- Document tab template -->
+        <!-- DataTemplate: how to render document content -->
         <DataTemplate DataType="{x:Type vm:EditorTabViewModel}">
             <views:EditorView />
         </DataTemplate>
+
+        <!-- Document header template (tab header with icon + title) -->
+        <DataTemplate x:Key="DocumentTabHeaderTemplate">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{Binding Content.IconSource}" Width="14" Height="14"
+                       Margin="0,0,5,0" VerticalAlignment="Center"
+                       Visibility="{Binding Content.IconSource, Converter={StaticResource NullToCollapsedConverter}}" />
+                <TextBlock Text="{Binding Content.Title}" TextTrimming="CharacterEllipsis"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- LayoutItem style selector: different styles for toolboxes vs documents -->
+        <views:PanesStyleSelector x:Key="PanesStyleSelector">
+            <views:PanesStyleSelector.ToolboxStyle>
+                <Style TargetType="{x:Type avalonDockControls:LayoutAnchorableItem}">
+                    <Setter Property="Title" Value="{Binding Model.Title}" />
+                    <Setter Property="ContentId" Value="{Binding Model.ContentId}" />
+                    <Setter Property="ClipToBounds" Value="True" />
+                </Style>
+            </views:PanesStyleSelector.ToolboxStyle>
+            <views:PanesStyleSelector.DocumentStyle>
+                <Style TargetType="{x:Type avalonDockControls:LayoutDocumentItem}">
+                    <Setter Property="Title" Value="{Binding Model.Title}" />
+                    <Setter Property="ToolTip" Value="{Binding Model.ToolTip}" />
+                    <Setter Property="IconSource" Value="{Binding Model.IconSource}" />
+                    <Setter Property="ContentId" Value="{Binding Model.ContentId}" />
+                </Style>
+            </views:PanesStyleSelector.DocumentStyle>
+        </views:PanesStyleSelector>
     </Window.Resources>
 
     <Grid>
@@ -122,7 +132,10 @@
         <!-- Dock Manager -->
         <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1"
                                          BorderThickness="0"
-                                         DocumentsSource="{Binding OpenEditors}">
+                                         DocumentsSource="{Binding OpenEditors}"
+                                         AnchorablesSource="{Binding Toolboxes}"
+                                         DocumentHeaderTemplate="{StaticResource DocumentTabHeaderTemplate}"
+                                         LayoutItemContainerStyleSelector="{StaticResource PanesStyleSelector}">
             <avalonDock:ToggleDockingManager.Theme>
                 <avalonDockThemes:ArcDarkTheme />
             </avalonDock:ToggleDockingManager.Theme>
@@ -153,54 +166,6 @@
                         </avalonDock:LayoutDocumentPane>
                     </avalonDock:LayoutDocumentPaneGroup>
                 </avalonDock:LayoutPanel>
-
-                <!-- Explorer (left-top) -->
-                <avalonDock:LayoutRoot.LeftSide>
-                    <avalonDock:LayoutAnchorSide>
-                        <avalonDock:LayoutAnchorGroup>
-                            <avalonDock:LayoutAnchorable Title="Explorer" ContentId="Explorer"
-                                avalonDockControls:ToggleDock.Icon="{StaticResource ExplorerIcon}"
-                                avalonDockControls:ToggleDock.ToolTip="Explorer (Ctrl+Shift+E)">
-                                <views:FolderExplorerView DataContext="{Binding FolderExplorer}" />
-                            </avalonDock:LayoutAnchorable>
-                            <avalonDock:LayoutAnchorable Title="Search" ContentId="Search"
-                                avalonDockControls:ToggleDock.Icon="{StaticResource SearchIcon}"
-                                avalonDockControls:ToggleDock.ToolTip="Search (Ctrl+Shift+F)">
-                                <Border Background="#252526" Padding="12">
-                                    <TextBox Background="#3C3C3C" Foreground="#CCCCCC" BorderThickness="0"
-                                             Padding="6,4" FontSize="12" VerticalAlignment="Top" />
-                                </Border>
-                            </avalonDock:LayoutAnchorable>
-                            <avalonDock:LayoutAnchorable Title="Source Control" ContentId="Git"
-                                avalonDockControls:ToggleDock.Icon="{StaticResource GitIcon}"
-                                avalonDockControls:ToggleDock.ToolTip="Source Control (Ctrl+Shift+G)">
-                                <Border Background="#252526" Padding="12">
-                                    <TextBlock Text="No changes detected" Foreground="#808080" FontSize="12" />
-                                </Border>
-                            </avalonDock:LayoutAnchorable>
-                        </avalonDock:LayoutAnchorGroup>
-                    </avalonDock:LayoutAnchorSide>
-                </avalonDock:LayoutRoot.LeftSide>
-
-                <!-- Terminal + Problems (bottom) -->
-                <avalonDock:LayoutRoot.BottomSide>
-                    <avalonDock:LayoutAnchorSide>
-                        <avalonDock:LayoutAnchorGroup>
-                            <avalonDock:LayoutAnchorable Title="Problems" ContentId="Problems"
-                                avalonDockControls:ToggleDock.Icon="{StaticResource ProblemsIcon}"
-                                avalonDockControls:ToggleDock.ToolTip="Problems (Ctrl+Shift+M)">
-                                <Border Background="#1E1E1E" Padding="12">
-                                    <TextBlock Text="No problems detected" Foreground="#808080" FontSize="12" />
-                                </Border>
-                            </avalonDock:LayoutAnchorable>
-                            <avalonDock:LayoutAnchorable Title="Terminal" ContentId="Terminal"
-                                avalonDockControls:ToggleDock.Icon="{StaticResource TerminalIcon}"
-                                avalonDockControls:ToggleDock.ToolTip="Terminal (Ctrl+`)">
-                                <views:TerminalView DataContext="{Binding Terminal}" />
-                            </avalonDock:LayoutAnchorable>
-                        </avalonDock:LayoutAnchorGroup>
-                    </avalonDock:LayoutAnchorSide>
-                </avalonDock:LayoutRoot.BottomSide>
             </avalonDock:LayoutRoot>
         </avalonDock:ToggleDockingManager>
 

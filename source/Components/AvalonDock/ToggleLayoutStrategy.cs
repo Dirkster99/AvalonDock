@@ -1,0 +1,82 @@
+using System.Linq;
+using AvalonDock.Controls;
+using AvalonDock.Core;
+using AvalonDock.Layout;
+
+namespace AvalonDock
+{
+	/// <summary>
+	/// Layout strategy for the ToggleDockingManager that places anchorables
+	/// into left/right/bottom anchor sides based on <see cref="IToolboxViewModel.Side"/>.
+	/// Also sets <see cref="ToggleDock.Icon"/> and <see cref="ToggleDock.ToolTip"/> attached
+	/// properties from the ViewModel metadata.
+	/// </summary>
+	public class ToggleLayoutStrategy : ILayoutUpdateStrategy
+	{
+		/// <inheritdoc/>
+		public bool BeforeInsertAnchorable(LayoutRoot layout, LayoutAnchorable anchorableToShow, ILayoutContainer destinationContainer)
+		{
+			if (anchorableToShow.Content is not IToolboxViewModel toolbox)
+				return false;
+
+			// Set metadata on the LayoutAnchorable
+			anchorableToShow.Title = toolbox.Title;
+			anchorableToShow.ContentId = toolbox.ContentId;
+
+			if (toolbox.Icon != null)
+				ToggleDock.SetIcon(anchorableToShow, toolbox.Icon);
+
+			if (toolbox.ToolTipText != null)
+				ToggleDock.SetToolTip(anchorableToShow, toolbox.ToolTipText);
+
+			// Place into the correct anchor side
+			var side = GetAnchorSide(layout, toolbox.Side);
+			var group = side.Children.OfType<LayoutAnchorGroup>().FirstOrDefault();
+			if (group == null)
+			{
+				group = new LayoutAnchorGroup();
+				side.Children.Add(group);
+			}
+
+			group.Children.Add(anchorableToShow);
+			return true;
+		}
+
+		/// <inheritdoc/>
+		public void AfterInsertAnchorable(LayoutRoot layout, LayoutAnchorable anchorableShown)
+		{
+		}
+
+		/// <inheritdoc/>
+		public bool BeforeInsertDocument(LayoutRoot layout, LayoutDocument anchorableToShow, ILayoutContainer destinationContainer)
+		{
+			return false;
+		}
+
+		/// <inheritdoc/>
+		public void AfterInsertDocument(LayoutRoot layout, LayoutDocument anchorableShown)
+		{
+		}
+
+		private static LayoutAnchorSide GetAnchorSide(LayoutRoot layout, ToolboxSide side)
+		{
+			switch (side)
+			{
+				case ToolboxSide.Right:
+					if (layout.RightSide == null)
+						layout.RightSide = new LayoutAnchorSide();
+					return layout.RightSide;
+
+				case ToolboxSide.Bottom:
+					if (layout.BottomSide == null)
+						layout.BottomSide = new LayoutAnchorSide();
+					return layout.BottomSide;
+
+				default: // Left
+					if (layout.LeftSide == null)
+						layout.LeftSide = new LayoutAnchorSide();
+					return layout.LeftSide;
+			}
+		}
+	}
+}

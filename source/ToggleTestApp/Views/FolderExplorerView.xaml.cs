@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using ToggleTestApp.ViewModels;
 
 namespace ToggleTestApp.Views;
@@ -19,13 +20,17 @@ public partial class FolderExplorerView : UserControl
         }
     }
 
-    private void OnTreeViewItemDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void OnTreeViewItemDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (e.OriginalSource is FrameworkElement { DataContext: FileTreeItem { IsDirectory: false } item })
+        // Prevent event bubbling from child TreeViewItems
+        if (e.Handled) return;
+
+        if (sender is TreeView tree && tree.SelectedItem is FileTreeItem { IsDirectory: false } item)
         {
             if (DataContext is FolderExplorerViewModel vm)
             {
                 vm.OpenFileCommand.Execute(item);
+                e.Handled = true;
             }
         }
     }

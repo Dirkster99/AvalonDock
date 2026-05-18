@@ -24,13 +24,13 @@
     <Grid>
         <TreeView ItemsSource="{Binding RootItems}"
                   Background="Transparent" BorderThickness="0"
-                  VirtualizingPanel.IsVirtualizing="True">
+                  VirtualizingPanel.IsVirtualizing="True"
+                  MouseDoubleClick="OnTreeViewItemDoubleClick">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="TreeViewItem">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                     <Setter Property="Foreground" Value="#CCCCCC" />
                     <EventSetter Event="Expanded" Handler="OnTreeViewItemExpanded" />
-                    <EventSetter Event="MouseDoubleClick" Handler="OnTreeViewItemDoubleClick" />
                     <Style.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Background" Value="#094771" />

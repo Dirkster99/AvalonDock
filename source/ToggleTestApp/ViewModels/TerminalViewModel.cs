@@ -3,12 +3,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Threading;
+using AvalonDock.Core;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace ToggleTestApp.ViewModels;
 
-public partial class TerminalViewModel : ObservableObject, IDisposable
+public partial class TerminalViewModel : ObservableObject, IToolboxViewModel, IDisposable
 {
     private Process? _shellProcess;
     private readonly Dispatcher _dispatcher;
@@ -18,6 +19,14 @@ public partial class TerminalViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     private string _inputCommand = string.Empty;
+
+    // IToolboxViewModel implementation
+    public string Title => "Terminal";
+    public string ContentId => "Terminal";
+    public string? ToolTipText => "Terminal (Ctrl+`)";
+    public ToolboxSide Side => ToolboxSide.Bottom;
+    public bool IsOpenByDefault => true;
+    public object? Icon => ToolboxIcons.Terminal;
 
     public TerminalViewModel()
     {

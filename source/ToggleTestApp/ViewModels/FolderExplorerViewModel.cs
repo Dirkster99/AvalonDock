@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using AvalonDock.Core;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -56,7 +57,7 @@ public partial class FileTreeItem : ObservableObject
     }
 }
 
-public partial class FolderExplorerViewModel : ObservableObject
+public partial class FolderExplorerViewModel : ObservableObject, IToolboxViewModel
 {
     private Action<string> _openFileCallback;
 
@@ -68,6 +69,14 @@ public partial class FolderExplorerViewModel : ObservableObject
 
     [ObservableProperty]
     private FileTreeItem? _selectedItem;
+
+    // IToolboxViewModel implementation
+    public string Title => "Explorer";
+    public string ContentId => "Explorer";
+    public string? ToolTipText => "Explorer (Ctrl+Shift+E)";
+    public ToolboxSide Side => ToolboxSide.Left;
+    public bool IsOpenByDefault => false;
+    public object? Icon => ToolboxIcons.Explorer;
 
     public FolderExplorerViewModel(Action<string> openFileCallback)
     {

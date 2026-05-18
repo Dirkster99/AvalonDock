@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using AvalonDock.Core;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -10,21 +12,21 @@ namespace ToggleTestApp.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     [ObservableProperty]
-    private FolderExplorerViewModel _folderExplorer;
-
-    [ObservableProperty]
-    private TerminalViewModel _terminal;
-
-    [ObservableProperty]
     private ObservableCollection<EditorTabViewModel> _openEditors = new();
 
     [ObservableProperty]
     private EditorTabViewModel? _activeEditor;
 
-    public MainViewModel(FolderExplorerViewModel folderExplorer, TerminalViewModel terminal)
+    /// <summary>All registered toolbox ViewModels — bound to AnchorablesSource.</summary>
+    public ObservableCollection<IToolboxViewModel> Toolboxes { get; }
+
+    /// <summary>Provides typed access to the folder explorer VM.</summary>
+    public FolderExplorerViewModel FolderExplorer { get; }
+
+    public MainViewModel(IEnumerable<IToolboxViewModel> toolboxes, FolderExplorerViewModel folderExplorer)
     {
-        _folderExplorer = folderExplorer;
-        _terminal = terminal;
+        FolderExplorer = folderExplorer;
+        Toolboxes = new ObservableCollection<IToolboxViewModel>(toolboxes);
 
         // Default: open the AvalonDock source folder
         var defaultPath = Path.GetFullPath(
@@ -37,7 +39,6 @@ public partial class MainViewModel : ObservableObject
 
     public void OpenFile(string filePath)
     {
-        // Check if already open
         var existing = OpenEditors.FirstOrDefault(e => e.FilePath == filePath);
         if (existing != null)
         {
