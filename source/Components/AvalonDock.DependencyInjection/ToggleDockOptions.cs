@@ -19,10 +19,10 @@ namespace AvalonDock.DependencyInjection
 		/// <summary>Gets or sets the layout priority mode name. Default is "BottomFullWidth".</summary>
 		public string LayoutPriority { get; set; } = "BottomFullWidth";
 
-		/// <summary>Gets or sets whether the Minimize button appears in pane headers. Default is true.</summary>
+		/// <summary>Gets or sets a value indicating whether the Minimize button appears in pane headers. Default is true.</summary>
 		public bool ShowHeaderMinimizeButton { get; set; } = true;
 
-		/// <summary>Gets or sets whether the Options (three-dot) button appears in pane headers. Default is true.</summary>
+		/// <summary>Gets or sets a value indicating whether the Options (three-dot) button appears in pane headers. Default is true.</summary>
 		public bool ShowHeaderOptionsButton { get; set; } = true;
 	}
 }

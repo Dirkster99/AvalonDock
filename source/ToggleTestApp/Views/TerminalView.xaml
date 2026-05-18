@@ -1,36 +1,18 @@
 <UserControl x:Class="ToggleTestApp.Views.TerminalView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:easyWindowsTerminalControl="clr-namespace:EasyWindowsTerminalControl;assembly=EasyWindowsTerminalControl"
              Background="#1E1E1E">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-
-        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Auto"
-                      x:Name="OutputScroller">
-            <TextBlock Text="{Binding Output}" FontFamily="Cascadia Mono,Consolas,Courier New"
-                       FontSize="12" Foreground="#CCCCCC" Padding="8"
-                       TextWrapping="Wrap" />
-        </ScrollViewer>
-
-        <Grid Grid.Row="1" Background="#2D2D2D">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Grid.Column="0" Text="❯" Foreground="#007ACC"
-                       FontFamily="Cascadia Mono,Consolas" FontSize="13"
-                       Margin="8,4" VerticalAlignment="Center" />
-
-            <TextBox Grid.Column="1" Text="{Binding InputCommand, UpdateSourceTrigger=PropertyChanged}"
-                     FontFamily="Cascadia Mono,Consolas,Courier New" FontSize="12"
-                     Background="Transparent" Foreground="#CCCCCC" BorderThickness="0"
-                     CaretBrush="#CCCCCC" Padding="0,4"
-                     x:Name="InputBox" />
-        </Grid>
+	    <Grid>
+		    <easyWindowsTerminalControl:EasyTerminalControl StartupCommandLine="powershell" FontFamilyWhenSettingTheme="Consolas" LogConPTYOutput="True"  Win32InputMode="True" InputCapture="TabKey,DirectionKeys" >
+			    <easyWindowsTerminalControl:EasyTerminalControl.Resources>
+				    <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
+					    <!--Lazy Theming-->
+					    <Setter Property="Opacity" Value="0.7"/>
+				    </Style>
+			    </easyWindowsTerminalControl:EasyTerminalControl.Resources>
+		    </easyWindowsTerminalControl:EasyTerminalControl>
+	    </Grid>
     </Grid>
 </UserControl>
