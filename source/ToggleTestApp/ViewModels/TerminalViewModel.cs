@@ -4,12 +4,13 @@ using System.IO;
 using System.Text;
 using System.Windows.Threading;
 using AvalonDock.Core;
+using AvalonDock.Mvvm;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace ToggleTestApp.ViewModels;
 
-public partial class TerminalViewModel : ObservableObject, IToolboxViewModel, IDisposable
+public partial class TerminalViewModel : ToolboxBase, IDisposable
 {
     private Process? _shellProcess;
     private readonly Dispatcher _dispatcher;
@@ -20,16 +21,15 @@ public partial class TerminalViewModel : ObservableObject, IToolboxViewModel, ID
     [ObservableProperty]
     private string _inputCommand = string.Empty;
 
-    // IToolboxViewModel implementation
-    public string Title => "Terminal";
-    public string ContentId => "Terminal";
-    public string? ToolTipText => "Terminal (Ctrl+`)";
-    public ToolboxSide Side => ToolboxSide.Bottom;
-    public bool IsOpenByDefault => true;
-    public object? Icon => ToolboxIcons.Terminal;
-
     public TerminalViewModel()
     {
+        Id = "Terminal";
+        Title = "Terminal";
+        ToolTipText = "Terminal (Ctrl+`)";
+        Side = ToolboxSide.Bottom;
+        IsOpenByDefault = true;
+        Icon = ToolboxIcons.Terminal;
+
         _dispatcher = Dispatcher.CurrentDispatcher;
         StartShell();
     }

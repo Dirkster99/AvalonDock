@@ -327,14 +327,22 @@ namespace AvalonDock
 
 			foreach (var anc in Layout.Descendents().OfType<LayoutAnchorable>().ToList())
 			{
-				if (anc.Content is Core.IToolboxViewModel toolbox && toolbox.IsOpenByDefault)
+				if (anc.Content is Core.IToolbox toolbox && toolbox.IsOpenByDefault)
 				{
-					var zone = toolbox.Side switch
+					DockZone zone;
+					switch (toolbox.Side)
 					{
-						Core.ToolboxSide.Right => DockZone.RightTop,
-						Core.ToolboxSide.Bottom => DockZone.BottomLeft,
-						_ => DockZone.LeftTop
-					};
+						case Core.ToolboxSide.Right:
+							zone = DockZone.RightTop;
+							break;
+						case Core.ToolboxSide.Bottom:
+							zone = DockZone.BottomLeft;
+							break;
+						default:
+							zone = DockZone.LeftTop;
+							break;
+					}
+
 					ToggleAnchorable(anc, zone);
 				}
 			}

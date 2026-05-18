@@ -7,7 +7,7 @@ namespace AvalonDock
 {
 	/// <summary>
 	/// Layout strategy for the ToggleDockingManager that places anchorables
-	/// into left/right/bottom anchor sides based on <see cref="IToolboxViewModel.Side"/>.
+	/// into left/right/bottom anchor sides based on <see cref="IToolbox.Side"/>.
 	/// Also sets <see cref="ToggleDock.Icon"/> and <see cref="ToggleDock.ToolTip"/> attached
 	/// properties from the ViewModel metadata.
 	/// </summary>
@@ -16,12 +16,12 @@ namespace AvalonDock
 		/// <inheritdoc/>
 		public bool BeforeInsertAnchorable(LayoutRoot layout, LayoutAnchorable anchorableToShow, ILayoutContainer destinationContainer)
 		{
-			if (anchorableToShow.Content is not IToolboxViewModel toolbox)
+			if (!(anchorableToShow.Content is IToolbox toolbox))
 				return false;
 
 			// Set metadata on the LayoutAnchorable
 			anchorableToShow.Title = toolbox.Title;
-			anchorableToShow.ContentId = toolbox.ContentId;
+			anchorableToShow.ContentId = toolbox.Id;
 
 			if (toolbox.Icon != null)
 				ToggleDock.SetIcon(anchorableToShow, toolbox.Icon);

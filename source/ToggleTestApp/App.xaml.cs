@@ -44,10 +44,17 @@ namespace ToggleTestApp
 			services.AddToolbox<ProblemsViewModel>();
 			services.AddToolbox<TerminalViewModel>();
 
+			// Register each as IToolbox for collection injection
+			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<FolderExplorerViewModel>());
+			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SearchViewModel>());
+			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SourceControlViewModel>());
+			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<ProblemsViewModel>());
+			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<TerminalViewModel>());
+
 			// MainViewModel receives all registered toolboxes
 			services.AddSingleton<MainViewModel>(sp =>
 			{
-				var toolboxes = sp.GetRequiredService<IEnumerable<IToolboxViewModel>>();
+				var toolboxes = sp.GetRequiredService<IEnumerable<IToolbox>>();
 				var folderVm = sp.GetRequiredService<FolderExplorerViewModel>();
 				var mainVm = new MainViewModel(toolboxes, folderVm);
 				folderVm.SetOpenFileCallback(mainVm.OpenFile);

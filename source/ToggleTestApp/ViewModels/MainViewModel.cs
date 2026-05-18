@@ -18,15 +18,15 @@ public partial class MainViewModel : ObservableObject
     private EditorTabViewModel? _activeEditor;
 
     /// <summary>All registered toolbox ViewModels — bound to AnchorablesSource.</summary>
-    public ObservableCollection<IToolboxViewModel> Toolboxes { get; }
+    public ObservableCollection<IToolbox> Toolboxes { get; }
 
     /// <summary>Provides typed access to the folder explorer VM.</summary>
     public FolderExplorerViewModel FolderExplorer { get; }
 
-    public MainViewModel(IEnumerable<IToolboxViewModel> toolboxes, FolderExplorerViewModel folderExplorer)
+    public MainViewModel(IEnumerable<IToolbox> toolboxes, FolderExplorerViewModel folderExplorer)
     {
         FolderExplorer = folderExplorer;
-        Toolboxes = new ObservableCollection<IToolboxViewModel>(toolboxes);
+        Toolboxes = new ObservableCollection<IToolbox>(toolboxes);
 
         // Default: open the AvalonDock source folder
         var defaultPath = Path.GetFullPath(

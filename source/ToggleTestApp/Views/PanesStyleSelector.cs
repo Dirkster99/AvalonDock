@@ -7,7 +7,7 @@ namespace ToggleTestApp.Views;
 
 /// <summary>
 /// Selects the appropriate LayoutItem container style based on whether
-/// the content is a toolbox (IToolboxViewModel) or a document (EditorTabViewModel).
+/// the content is a toolbox (IToolbox) or a document (EditorTabViewModel).
 /// </summary>
 public class PanesStyleSelector : StyleSelector
 {
@@ -16,7 +16,7 @@ public class PanesStyleSelector : StyleSelector
 
     public override Style? SelectStyle(object item, DependencyObject container)
     {
-        if (item is IToolboxViewModel)
+        if (item is IToolbox)
             return ToolboxStyle;
 
         if (item is EditorTabViewModel)
