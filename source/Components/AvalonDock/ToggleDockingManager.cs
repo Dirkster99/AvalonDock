@@ -69,6 +69,21 @@ namespace AvalonDock
 			DependencyProperty.Register(nameof(LayoutPriority), typeof(DockLayoutPriority), typeof(ToggleDockingManager),
 				new PropertyMetadata(DockLayoutPriority.BottomFullWidth));
 
+		/// <summary><see cref="ButtonSize"/> dependency property.</summary>
+		public static readonly DependencyProperty ButtonSizeProperty =
+			DependencyProperty.Register(nameof(ButtonSize), typeof(double), typeof(ToggleDockingManager),
+				new PropertyMetadata(25.0));
+
+		/// <summary><see cref="ShowHeaderMinimizeButton"/> dependency property.</summary>
+		public static readonly DependencyProperty ShowHeaderMinimizeButtonProperty =
+			DependencyProperty.Register(nameof(ShowHeaderMinimizeButton), typeof(bool), typeof(ToggleDockingManager),
+				new PropertyMetadata(true));
+
+		/// <summary><see cref="ShowHeaderOptionsButton"/> dependency property.</summary>
+		public static readonly DependencyProperty ShowHeaderOptionsButtonProperty =
+			DependencyProperty.Register(nameof(ShowHeaderOptionsButton), typeof(bool), typeof(ToggleDockingManager),
+				new PropertyMetadata(true));
+
 		/// <summary>
 		/// Gets or sets which docked panes get priority for full extent.
 		/// Default is <see cref="DockLayoutPriority.BottomFullWidth"/> (Rider-style).
@@ -78,6 +93,36 @@ namespace AvalonDock
 		{
 			get => (DockLayoutPriority)GetValue(LayoutPriorityProperty);
 			set => SetValue(LayoutPriorityProperty, value);
+		}
+
+		/// <summary>
+		/// Gets or sets the size (width and height) of the sidebar toggle buttons.
+		/// Default is 25. Changing this adjusts all toggle buttons uniformly.
+		/// </summary>
+		public double ButtonSize
+		{
+			get => (double)GetValue(ButtonSizeProperty);
+			set => SetValue(ButtonSizeProperty, value);
+		}
+
+		/// <summary>
+		/// Gets or sets whether the Minimize button appears in the docked pane header.
+		/// Default is true.
+		/// </summary>
+		public bool ShowHeaderMinimizeButton
+		{
+			get => (bool)GetValue(ShowHeaderMinimizeButtonProperty);
+			set => SetValue(ShowHeaderMinimizeButtonProperty, value);
+		}
+
+		/// <summary>
+		/// Gets or sets whether the Options (three-dot) button appears in the docked pane header.
+		/// Default is true.
+		/// </summary>
+		public bool ShowHeaderOptionsButton
+		{
+			get => (bool)GetValue(ShowHeaderOptionsButtonProperty);
+			set => SetValue(ShowHeaderOptionsButtonProperty, value);
 		}
 
 		static ToggleDockingManager()

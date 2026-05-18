@@ -1,5 +1,7 @@
+using System.Linq;
 using System.Windows;
 using AvalonDock;
+using AvalonDock.Layout;
 using ToggleTestApp.ViewModels;
 
 namespace ToggleTestApp
@@ -10,6 +12,28 @@ namespace ToggleTestApp
 		{
 			DataContext = viewModel;
 			InitializeComponent();
+			Loaded += OnLoaded;
+		}
+
+		private void OnLoaded(object sender, RoutedEventArgs e)
+		{
+			// Open Terminal by default
+			var terminal = FindAnchorable("Terminal");
+			if (terminal != null)
+			{
+				dockManager.ToggleAnchorable(terminal, DockZone.BottomLeft);
+			}
+		}
+
+		private LayoutAnchorable? FindAnchorable(string contentId)
+		{
+			foreach (var anc in dockManager.Layout.Descendents().OfType<LayoutAnchorable>())
+			{
+				if (anc.ContentId == contentId)
+					return anc;
+			}
+
+			return null;
 		}
 
 		private void OnLayoutPriorityChanged(object sender, RoutedEventArgs e)

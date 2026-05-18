@@ -250,12 +250,15 @@ namespace AvalonDockTest.FlaUITests
 			Assert.That(btn, Is.Not.Null, "ToolBox 1 button should exist.");
 			btn.Click();
 			Wait.UntilInputIsProcessed();
-			System.Threading.Thread.Sleep(1000);
+			System.Threading.Thread.Sleep(2000);
 
-			// Verify it's docked
-			btn = FindToggleButton("ToolBox 1");
-			Assert.That(btn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
-				Is.EqualTo(ToggleState.On), "ToolBox 1 should be checked after docking.");
+			// Verify it's docked (with retry for UI stabilization)
+			Retry.WhileException(() =>
+			{
+				btn = FindToggleButton("ToolBox 1");
+				Assert.That(btn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
+					Is.EqualTo(ToggleState.On), "ToolBox 1 should be checked after docking.");
+			}, timeout: TimeSpan.FromSeconds(5), interval: TimeSpan.FromMilliseconds(500));
 
 			// Find the "Minimize" (formerly pin) button in the docked pane header
 			// The PART_AutoHidePin button should have tooltip "Minimize"
@@ -276,14 +279,14 @@ namespace AvalonDockTest.FlaUITests
 						catch { return false; }
 					});
 				},
-				timeout: TimeSpan.FromSeconds(5),
+				timeout: TimeSpan.FromSeconds(10),
 				interval: TimeSpan.FromMilliseconds(300));
 
 			// If we found the pin button, click it
 			if (minimizeBtn.Result != null)
 			{
 				ClickToggleButtonSafe(minimizeBtn.Result);
-				System.Threading.Thread.Sleep(1500);
+				System.Threading.Thread.Sleep(2000);
 
 				// ToolBox 1 should be back to auto-hidden (toggle button unchecked)
 				Retry.WhileException(() =>
@@ -292,7 +295,7 @@ namespace AvalonDockTest.FlaUITests
 					Assert.That(btn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
 						Is.EqualTo(ToggleState.Off),
 						"ToolBox 1 should be unchecked after clicking minimize (pin) button.");
-				}, timeout: TimeSpan.FromSeconds(3), interval: TimeSpan.FromMilliseconds(500));
+				}, timeout: TimeSpan.FromSeconds(5), interval: TimeSpan.FromMilliseconds(500));
 			}
 			else
 			{

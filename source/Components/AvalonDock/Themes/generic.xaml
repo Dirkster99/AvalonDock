@@ -377,6 +377,114 @@
 	</Style>
 
 	<Style TargetType="{x:Type avalonDockControls:AnchorablePaneTitle}" BasedOn="{StaticResource AnchorablePaneTitleStyle}"/>
+
+	<!-- Toggle-specific pane title with Minimize + Options (three-dot) buttons -->
+	<Style TargetType="{x:Type avalonDockControls:ToggleAnchorablePaneTitle}">
+		<Setter Property="Background" Value="Transparent" />
+		<Setter Property="BorderBrush" Value="Transparent" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type avalonDockControls:ToggleAnchorablePaneTitle}">
+					<Border
+						Background="{TemplateBinding Background}"
+						BorderBrush="{TemplateBinding BorderBrush}"
+						BorderThickness="{TemplateBinding BorderThickness}"
+						Padding="6,3">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+								<ColumnDefinition Width="Auto" />
+								<ColumnDefinition Width="Auto" />
+							</Grid.ColumnDefinitions>
+
+							<!-- Title content (supports custom template override) -->
+							<ContentPresenter
+								Grid.Column="0"
+								Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
+								ContentTemplate="{Binding Model.Root.Manager.AnchorableTitleTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+								VerticalAlignment="Center">
+								<ContentPresenter.Resources>
+									<DataTemplate DataType="{x:Type avalonDockLayout:LayoutAnchorable}">
+										<TextBlock Text="{Binding Title}" FontSize="11" FontWeight="SemiBold"
+											TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+									</DataTemplate>
+								</ContentPresenter.Resources>
+							</ContentPresenter>
+
+							<!-- Minimize button (dash icon) -->
+							<Button
+								x:Name="PART_MinimizeButton"
+								Grid.Column="1"
+								Command="{Binding Path=LayoutItem.AutoHideCommand, RelativeSource={RelativeSource TemplatedParent}}"
+								ToolTip="Minimize"
+								Focusable="False"
+								Width="20" Height="20"
+								Margin="2,0"
+								Background="Transparent"
+								BorderThickness="0"
+								Cursor="Hand"
+								Visibility="{Binding ShowHeaderMinimizeButton, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=Visible, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
+								<Button.Template>
+									<ControlTemplate TargetType="Button">
+										<Border x:Name="Bd" Background="Transparent" CornerRadius="3"
+											Width="20" Height="20">
+											<Path Data="M5,10 L15,10" Stroke="{TemplateBinding Foreground}"
+												StrokeThickness="1.5" HorizontalAlignment="Center" VerticalAlignment="Center" />
+										</Border>
+										<ControlTemplate.Triggers>
+											<Trigger Property="IsMouseOver" Value="True">
+												<Setter TargetName="Bd" Property="Background" Value="#40808080" />
+											</Trigger>
+										</ControlTemplate.Triggers>
+									</ControlTemplate>
+								</Button.Template>
+							</Button>
+
+							<!-- Options button (three-dot icon) -->
+							<avalonDockControls:DropDownButton
+								x:Name="PART_OptionsButton"
+								Grid.Column="2"
+								DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
+								DropDownContextMenuDataContext="{Binding Path=LayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
+								ToolTip="Options"
+								Focusable="False"
+								Visibility="{Binding ShowHeaderOptionsButton, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=Visible, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
+								<avalonDockControls:DropDownButton.Style>
+									<Style TargetType="avalonDockControls:DropDownButton">
+										<Setter Property="Width" Value="20" />
+										<Setter Property="Height" Value="20" />
+										<Setter Property="Background" Value="Transparent" />
+										<Setter Property="BorderThickness" Value="0" />
+										<Setter Property="Cursor" Value="Hand" />
+										<Setter Property="Template">
+											<Setter.Value>
+												<ControlTemplate TargetType="avalonDockControls:DropDownButton">
+													<Border x:Name="Bd" Background="Transparent" CornerRadius="3"
+														Width="20" Height="20">
+														<Canvas Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
+															<Ellipse Canvas.Left="2" Canvas.Top="7" Width="3" Height="3" Fill="{TemplateBinding Foreground}" />
+															<Ellipse Canvas.Left="6.5" Canvas.Top="7" Width="3" Height="3" Fill="{TemplateBinding Foreground}" />
+															<Ellipse Canvas.Left="11" Canvas.Top="7" Width="3" Height="3" Fill="{TemplateBinding Foreground}" />
+														</Canvas>
+													</Border>
+													<ControlTemplate.Triggers>
+														<Trigger Property="IsMouseOver" Value="True">
+															<Setter TargetName="Bd" Property="Background" Value="#40808080" />
+														</Trigger>
+													</ControlTemplate.Triggers>
+												</ControlTemplate>
+											</Setter.Value>
+										</Setter>
+									</Style>
+								</avalonDockControls:DropDownButton.Style>
+							</avalonDockControls:DropDownButton>
+						</Grid>
+					</Border>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 	
 	<ControlTemplate x:Key="AnchorSideTemplate" TargetType="{x:Type avalonDockControls:LayoutAnchorSideControl}">
 		<ItemsControl Background="{TemplateBinding Background}" ItemsSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Children}">
@@ -1330,8 +1438,8 @@
 		<Setter Property="Background" Value="Transparent" />
 		<Setter Property="BorderBrush" Value="Transparent" />
 		<Setter Property="BorderThickness" Value="0" />
-		<Setter Property="Width" Value="25" />
-		<Setter Property="Height" Value="25" />
+		<Setter Property="Width" Value="{Binding ButtonSize, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=25}" />
+		<Setter Property="Height" Value="{Binding ButtonSize, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=25}" />
 		<Setter Property="Padding" Value="0" />
 		<Setter Property="Margin" Value="2" />
 		<Setter Property="FontSize" Value="10.5" />
@@ -1530,7 +1638,48 @@
 		<Setter Property="ContentTemplate">
 			<Setter.Value>
 				<DataTemplate>
-					<avalonDockControls:LayoutAnchorableControl Model="{Binding}" />
+					<avalonDockControls:LayoutAnchorableControl Model="{Binding}">
+						<avalonDockControls:LayoutAnchorableControl.Template>
+							<ControlTemplate TargetType="{x:Type avalonDockControls:LayoutAnchorableControl}">
+								<Border
+									Background="{TemplateBinding Background}"
+									BorderBrush="{TemplateBinding BorderBrush}"
+									BorderThickness="{TemplateBinding BorderThickness}"
+									KeyboardNavigation.TabNavigation="Cycle">
+									<Grid>
+										<Grid.RowDefinitions>
+											<RowDefinition Height="Auto" />
+											<RowDefinition Height="*" />
+										</Grid.RowDefinitions>
+										<Border x:Name="Header">
+											<avalonDockControls:ToggleAnchorablePaneTitle Model="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}" />
+										</Border>
+										<ContentPresenter
+											Grid.Row="1"
+											Content="{Binding LayoutItem.View, RelativeSource={RelativeSource TemplatedParent}}"
+											ContentTemplate="{Binding LayoutItem.View.ContentTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+											ContentTemplateSelector="{Binding LayoutItem.View.ContentTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"
+											FlowDirection="{TemplateBinding FlowDirection}" />
+									</Grid>
+								</Border>
+								<ControlTemplate.Triggers>
+									<MultiDataTrigger>
+										<MultiDataTrigger.Conditions>
+											<Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.IsFloating}" Value="True" />
+											<Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.Parent.IsDirectlyHostedInFloatingWindow}" Value="True" />
+										</MultiDataTrigger.Conditions>
+										<Setter TargetName="Header" Property="Visibility" Value="Collapsed" />
+									</MultiDataTrigger>
+									<MultiDataTrigger>
+										<MultiDataTrigger.Conditions>
+											<Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model}" Value="{x:Null}" />
+										</MultiDataTrigger.Conditions>
+										<Setter TargetName="Header" Property="Visibility" Value="Collapsed" />
+									</MultiDataTrigger>
+								</ControlTemplate.Triggers>
+							</ControlTemplate>
+						</avalonDockControls:LayoutAnchorableControl.Template>
+					</avalonDockControls:LayoutAnchorableControl>
 				</DataTemplate>
 			</Setter.Value>
 		</Setter>

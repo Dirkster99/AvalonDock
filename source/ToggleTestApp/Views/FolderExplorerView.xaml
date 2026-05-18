@@ -2,8 +2,12 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:ToggleTestApp.ViewModels"
+             xmlns:views="clr-namespace:ToggleTestApp.Views"
              Background="#252526">
     <UserControl.Resources>
+        <views:FileIconConverter x:Key="FileIconConverter" />
+        <views:FileColorConverter x:Key="FileColorConverter" />
+
         <HierarchicalDataTemplate DataType="{x:Type vm:FileTreeItem}"
                                   ItemsSource="{Binding Children}">
             <StackPanel Orientation="Horizontal" Margin="2,1">
