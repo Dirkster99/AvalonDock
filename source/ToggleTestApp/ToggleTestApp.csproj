@@ -1,18 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
     <PropertyGroup>
         <RootNamespace>ToggleTestApp</RootNamespace>
-        <TargetFrameworks>net9.0-windows;net48</TargetFrameworks>
+        <TargetFrameworks>net9.0-windows</TargetFrameworks>
         <UseWPF>true</UseWPF>
         <ApplicationIcon />
         <OutputType>WinExe</OutputType>
         <StartupObject />
         <AssemblyName>ToggleTestApp</AssemblyName>
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>
     <ItemGroup>
-      <ProjectReference Include="..\Components\AvalonDock\AvalonDock.csproj" />
+        <ProjectReference Include="..\Components\AvalonDock\AvalonDock.csproj" />
+        <ProjectReference Include="..\Components\AvalonDock.Core\AvalonDock.Core.csproj" />
+        <ProjectReference Include="..\Components\AvalonDock.Mvvm\AvalonDock.Mvvm.csproj" />
+        <ProjectReference Include="..\Components\AvalonDock.DependencyInjection\AvalonDock.DependencyInjection.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
     </ItemGroup>
 </Project>

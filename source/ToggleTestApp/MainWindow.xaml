@@ -3,112 +3,216 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
     xmlns:avalonDockControls="clr-namespace:AvalonDock.Controls;assembly=AvalonDock"
-    Title="ToggleTestApp"
-    Width="800"
-    Height="600"
+    xmlns:views="clr-namespace:ToggleTestApp.Views"
+    xmlns:vm="clr-namespace:ToggleTestApp.ViewModels"
+    Title="AvalonDock Code — Toggle Docking Demo"
+    Width="1100" Height="750"
+    Background="#1E1E1E"
     UseLayoutRounding="True">
     <Window.Resources>
-        <!-- Wrench icon for tool boxes -->
-        <Path x:Key="WrenchIcon1" x:Shared="False"
-              Data="M14.7,6.3l-1.6-1.6c-0.2-0.2-0.5-0.2-0.7,0L8.3,8.8L7.2,7.7l4.1-4.1c0.2-0.2,0.2-0.5,0-0.7L9.7,1.3C9.1,0.7,8.3,0.5,7.5,0.7L5.9,2.3L7.5,3.9L6.1,5.3L4.5,3.7L2.3,5.9C2.1,6.5,2.3,7.3,2.9,7.9l0,0l-2.6,2.6c-0.4,0.4-0.4,1,0,1.4l1.8,1.8c0.4,0.4,1,0.4,1.4,0l2.6-2.6c0.6,0.6,1.4,0.8,2,0.6l1.6-1.6L8.1,8.5l1.4-1.4l1.6,1.6l4.1-4.1C15.3,4.5,14.7,6.3,14.7,6.3z"
-              Fill="#555555" Stretch="Uniform" Width="14" Height="14" />
-        <Path x:Key="WrenchIcon2" x:Shared="False"
-              Data="M14.7,6.3l-1.6-1.6c-0.2-0.2-0.5-0.2-0.7,0L8.3,8.8L7.2,7.7l4.1-4.1c0.2-0.2,0.2-0.5,0-0.7L9.7,1.3C9.1,0.7,8.3,0.5,7.5,0.7L5.9,2.3L7.5,3.9L6.1,5.3L4.5,3.7L2.3,5.9C2.1,6.5,2.3,7.3,2.9,7.9l0,0l-2.6,2.6c-0.4,0.4-0.4,1,0,1.4l1.8,1.8c0.4,0.4,1,0.4,1.4,0l2.6-2.6c0.6,0.6,1.4,0.8,2,0.6l1.6-1.6L8.1,8.5l1.4-1.4l1.6,1.6l4.1-4.1C15.3,4.5,14.7,6.3,14.7,6.3z"
-              Fill="#555555" Stretch="Uniform" Width="14" Height="14" />
-        <!-- Sliders icon for Properties -->
-        <Viewbox x:Key="SlidersIcon" x:Shared="False" Width="14" Height="14">
+        <views:FileIconConverter x:Key="FileIconConverter" />
+        <views:FileColorConverter x:Key="FileColorConverter" />
+
+        <!-- Explorer icon (folder tree) -->
+        <Viewbox x:Key="ExplorerIcon" x:Shared="False" Width="16" Height="16">
             <Canvas Width="16" Height="16">
-                <Rectangle Canvas.Left="1" Canvas.Top="2" Width="14" Height="2" RadiusX="1" RadiusY="1" Fill="#555555" />
-                <Ellipse Canvas.Left="9" Canvas.Top="1" Width="4" Height="4" Fill="#007ACC" />
-                <Rectangle Canvas.Left="1" Canvas.Top="7" Width="14" Height="2" RadiusX="1" RadiusY="1" Fill="#555555" />
-                <Ellipse Canvas.Left="3" Canvas.Top="6" Width="4" Height="4" Fill="#007ACC" />
-                <Rectangle Canvas.Left="1" Canvas.Top="12" Width="14" Height="2" RadiusX="1" RadiusY="1" Fill="#555555" />
-                <Ellipse Canvas.Left="7" Canvas.Top="11" Width="4" Height="4" Fill="#007ACC" />
+                <Path Data="M1.5,1 L6,1 L7.5,3 L14.5,3 C15.3,3 15.5,3.5 15.5,4 L15.5,13 C15.5,13.5 15,14 14.5,14 L1.5,14 C1,14 0.5,13.5 0.5,13 L0.5,2 C0.5,1.5 1,1 1.5,1 Z"
+                      Stroke="#C5C5C5" StrokeThickness="0.8" Fill="Transparent" />
+                <Line X1="0.5" Y1="5.5" X2="15.5" Y2="5.5" Stroke="#C5C5C5" StrokeThickness="0.6" />
             </Canvas>
         </Viewbox>
-        <!-- Terminal icon for Output -->
-        <Viewbox x:Key="TerminalIcon" x:Shared="False" Width="14" Height="14">
+
+        <!-- Terminal icon -->
+        <Viewbox x:Key="TerminalIcon" x:Shared="False" Width="16" Height="16">
             <Canvas Width="16" Height="16">
-                <Rectangle Canvas.Left="1" Canvas.Top="2" Width="14" Height="12"
-                           Stroke="#555555" StrokeThickness="1.2" RadiusX="1" RadiusY="1" Fill="Transparent" />
-                <Path Data="M4,7 L7,9.5 L4,12" Stroke="#007ACC" StrokeThickness="1.5" Fill="Transparent" />
-                <Rectangle Canvas.Left="8" Canvas.Top="11" Width="4" Height="1.2" Fill="#555555" />
+                <Rectangle Canvas.Left="0.5" Canvas.Top="1.5" Width="15" Height="13"
+                           Stroke="#C5C5C5" StrokeThickness="0.8" RadiusX="1.5" RadiusY="1.5" Fill="Transparent" />
+                <Path Data="M4,6 L7,8.5 L4,11" Stroke="#007ACC" StrokeThickness="1.5" Fill="Transparent" />
+                <Rectangle Canvas.Left="8.5" Canvas.Top="10.5" Width="4" Height="1.2" Fill="#C5C5C5" />
             </Canvas>
         </Viewbox>
+
+        <!-- Search icon (magnifier) -->
+        <Viewbox x:Key="SearchIcon" x:Shared="False" Width="16" Height="16">
+            <Canvas Width="16" Height="16">
+                <Ellipse Canvas.Left="2" Canvas.Top="2" Width="9" Height="9"
+                         Stroke="#C5C5C5" StrokeThickness="1.2" Fill="Transparent" />
+                <Line X1="10" Y1="10" X2="14" Y2="14" Stroke="#C5C5C5" StrokeThickness="1.5" />
+            </Canvas>
+        </Viewbox>
+
+        <!-- Git branch icon -->
+        <Viewbox x:Key="GitIcon" x:Shared="False" Width="16" Height="16">
+            <Canvas Width="16" Height="16">
+                <Ellipse Canvas.Left="2.5" Canvas.Top="2" Width="3.5" Height="3.5"
+                         Stroke="#C5C5C5" StrokeThickness="1" Fill="Transparent" />
+                <Ellipse Canvas.Left="9" Canvas.Top="2" Width="3.5" Height="3.5"
+                         Stroke="#C5C5C5" StrokeThickness="1" Fill="Transparent" />
+                <Ellipse Canvas.Left="2.5" Canvas.Top="10.5" Width="3.5" Height="3.5"
+                         Stroke="#C5C5C5" StrokeThickness="1" Fill="Transparent" />
+                <Line X1="4.25" Y1="5.5" X2="4.25" Y2="10.5" Stroke="#C5C5C5" StrokeThickness="1" />
+                <Path Data="M10.75,5.5 C10.75,8.5 4.25,8.5 4.25,10.5" Stroke="#C5C5C5" StrokeThickness="1" Fill="Transparent" />
+            </Canvas>
+        </Viewbox>
+
+        <!-- Problems/Warnings icon -->
+        <Viewbox x:Key="ProblemsIcon" x:Shared="False" Width="16" Height="16">
+            <Canvas Width="16" Height="16">
+                <Path Data="M8,1.5 L15,13.5 L1,13.5 Z" Stroke="#C5C5C5" StrokeThickness="1" Fill="Transparent" />
+                <Line X1="8" Y1="6" X2="8" Y2="10" Stroke="#C5C5C5" StrokeThickness="1.2" />
+                <Ellipse Canvas.Left="7.2" Canvas.Top="11" Width="1.6" Height="1.6" Fill="#C5C5C5" />
+            </Canvas>
+        </Viewbox>
+
+        <!-- Document tab template -->
+        <DataTemplate DataType="{x:Type vm:EditorTabViewModel}">
+            <views:EditorView />
+        </DataTemplate>
     </Window.Resources>
-    <Grid x:Name="layoutRoot">
+
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0">
-            <MenuItem Header="Layout">
-                <MenuItem Click="OnDumpToConsole" Header="Dump To Console" />
-                <Separator />
-                <MenuItem Header="Layout Priority">
-                    <MenuItem x:Name="menuBottomFullWidth" Header="Bottom Full Width (Rider)" IsCheckable="True" IsChecked="True" Click="OnLayoutPriorityChanged" />
-                    <MenuItem x:Name="menuSidesFullHeight" Header="Sides Full Height (VSCode)" IsCheckable="True" Click="OnLayoutPriorityChanged" />
-                    <MenuItem x:Name="menuDefaultPriority" Header="Default (No Restructuring)" IsCheckable="True" Click="OnLayoutPriorityChanged" />
-                </MenuItem>
-            </MenuItem>
-        </Menu>
 
-        <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1">
+        <!-- Title bar / Menu -->
+        <Grid Grid.Row="0" Background="#333333">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Menu Grid.Column="0" Background="Transparent" Foreground="#CCCCCC">
+                <Menu.Resources>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="Foreground" Value="#CCCCCC" />
+                    </Style>
+                </Menu.Resources>
+                <MenuItem Header="_File">
+                    <MenuItem Header="_Open Folder..." Command="{Binding OpenFolderCommand}" />
+                    <Separator />
+                    <MenuItem Header="E_xit" Click="OnExit" />
+                </MenuItem>
+                <MenuItem Header="_View">
+                    <MenuItem Header="Layout Priority">
+                        <MenuItem x:Name="menuBottomFullWidth" Header="Bottom Full Width (Rider)"
+                                  IsCheckable="True" IsChecked="True" Click="OnLayoutPriorityChanged" />
+                        <MenuItem x:Name="menuSidesFullHeight" Header="Sides Full Height (VSCode)"
+                                  IsCheckable="True" Click="OnLayoutPriorityChanged" />
+                        <MenuItem x:Name="menuDefaultPriority" Header="Default (No Restructuring)"
+                                  IsCheckable="True" Click="OnLayoutPriorityChanged" />
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+            <TextBlock Grid.Column="1" Text="AvalonDock Code — Toggle Docking Demo"
+                       Foreground="#999999" FontSize="12"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
+
+        <!-- Dock Manager -->
+        <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1"
+                                         Background="#1E1E1E"
+                                         DocumentsSource="{Binding OpenEditors}"
+                                         ActiveContent="{Binding ActiveEditor, Mode=TwoWay}">
             <avalonDock:LayoutRoot>
                 <avalonDock:LayoutPanel Orientation="Horizontal">
                     <avalonDock:LayoutDocumentPaneGroup>
                         <avalonDock:LayoutDocumentPane x:Name="LayoutDocumentPane">
-                            <avalonDock:LayoutDocument Title="Document 1" ContentId="document1">
-                                <TextBox Text="Document 1 Content" />
-                            </avalonDock:LayoutDocument>
-                            <avalonDock:LayoutDocument Title="Document 2" ContentId="document2">
-                                <TextBox Text="Document 2 Content" />
+                            <avalonDock:LayoutDocument Title="Welcome" ContentId="welcome">
+                                <Border Background="#1E1E1E" Padding="40">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <TextBlock Text="AvalonDock Code" FontSize="28" FontWeight="Light"
+                                                   Foreground="#CCCCCC" HorizontalAlignment="Center" />
+                                        <TextBlock Text="Toggle Docking Demo — v5.0.0" FontSize="14"
+                                                   Foreground="#808080" HorizontalAlignment="Center" Margin="0,8,0,24" />
+                                        <TextBlock Foreground="#808080" FontSize="13" TextAlignment="Center" LineHeight="24">
+                                            <Run Text="Click sidebar icons to toggle panels" /><LineBreak />
+                                            <Run Text="Drag buttons between zones to rearrange" /><LineBreak />
+                                            <Run Text="Double-click files in Explorer to open" /><LineBreak />
+                                            <Run Text="Right-click panel title for Move To / View Mode" />
+                                        </TextBlock>
+                                        <TextBlock Foreground="#555555" FontSize="11" TextAlignment="Center"
+                                                   Margin="0,24,0,0">
+                                            <Run Text="Powered by AvalonDock.Core + AvalonDock.Mvvm + DI" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
                             </avalonDock:LayoutDocument>
                         </avalonDock:LayoutDocumentPane>
                     </avalonDock:LayoutDocumentPaneGroup>
                 </avalonDock:LayoutPanel>
 
+                <!-- Explorer (left-top) -->
                 <avalonDock:LayoutRoot.LeftSide>
                     <avalonDock:LayoutAnchorSide>
                         <avalonDock:LayoutAnchorGroup>
-                            <avalonDock:LayoutAnchorable Title="ToolBox 1" ContentId="ToolBox1"
-                                avalonDockControls:ToggleDock.Icon="{StaticResource WrenchIcon1}"
-                                avalonDockControls:ToggleDock.ToolTip="Toggle ToolBox 1 panel">
-                                <TextBlock Text="ToolBox 1 Content" Margin="8" />
+                            <avalonDock:LayoutAnchorable Title="Explorer" ContentId="Explorer"
+                                avalonDockControls:ToggleDock.Icon="{StaticResource ExplorerIcon}"
+                                avalonDockControls:ToggleDock.ToolTip="Explorer (Ctrl+Shift+E)">
+                                <views:FolderExplorerView DataContext="{Binding FolderExplorer}" />
                             </avalonDock:LayoutAnchorable>
-                            <avalonDock:LayoutAnchorable Title="ToolBox 2" ContentId="ToolBox2"
-                                avalonDockControls:ToggleDock.Icon="{StaticResource WrenchIcon2}"
-                                avalonDockControls:ToggleDock.ToolTip="Toggle ToolBox 2 panel">
-                                <TextBlock Text="ToolBox 2 Content" Margin="8" />
+                            <avalonDock:LayoutAnchorable Title="Search" ContentId="Search"
+                                avalonDockControls:ToggleDock.Icon="{StaticResource SearchIcon}"
+                                avalonDockControls:ToggleDock.ToolTip="Search (Ctrl+Shift+F)">
+                                <Border Background="#252526" Padding="12">
+                                    <StackPanel>
+                                        <TextBlock Text="SEARCH" FontSize="11" FontWeight="SemiBold"
+                                                   Foreground="#BBBBBB" Margin="0,0,0,8" />
+                                        <TextBox Background="#3C3C3C" Foreground="#CCCCCC" BorderThickness="0"
+                                                 Padding="6,4" FontSize="12" />
+                                    </StackPanel>
+                                </Border>
+                            </avalonDock:LayoutAnchorable>
+                            <avalonDock:LayoutAnchorable Title="Source Control" ContentId="Git"
+                                avalonDockControls:ToggleDock.Icon="{StaticResource GitIcon}"
+                                avalonDockControls:ToggleDock.ToolTip="Source Control (Ctrl+Shift+G)">
+                                <Border Background="#252526" Padding="12">
+                                    <StackPanel>
+                                        <TextBlock Text="SOURCE CONTROL" FontSize="11" FontWeight="SemiBold"
+                                                   Foreground="#BBBBBB" Margin="0,0,0,8" />
+                                        <TextBlock Text="No changes detected" Foreground="#808080" FontSize="12" />
+                                    </StackPanel>
+                                </Border>
                             </avalonDock:LayoutAnchorable>
                         </avalonDock:LayoutAnchorGroup>
                     </avalonDock:LayoutAnchorSide>
                 </avalonDock:LayoutRoot.LeftSide>
 
-                <avalonDock:LayoutRoot.RightSide>
-                    <avalonDock:LayoutAnchorSide>
-                        <avalonDock:LayoutAnchorGroup>
-                            <avalonDock:LayoutAnchorable Title="Properties" ContentId="Properties"
-                                avalonDockControls:ToggleDock.Icon="{StaticResource SlidersIcon}"
-                                avalonDockControls:ToggleDock.ToolTip="Toggle Properties panel">
-                                <TextBlock Text="Properties Content" Margin="8" />
-                            </avalonDock:LayoutAnchorable>
-                        </avalonDock:LayoutAnchorGroup>
-                    </avalonDock:LayoutAnchorSide>
-                </avalonDock:LayoutRoot.RightSide>
-
+                <!-- Terminal + Problems (bottom) -->
                 <avalonDock:LayoutRoot.BottomSide>
                     <avalonDock:LayoutAnchorSide>
                         <avalonDock:LayoutAnchorGroup>
-                            <avalonDock:LayoutAnchorable Title="Output" ContentId="Output"
+                            <avalonDock:LayoutAnchorable Title="Terminal" ContentId="Terminal"
                                 avalonDockControls:ToggleDock.Icon="{StaticResource TerminalIcon}"
-                                avalonDockControls:ToggleDock.ToolTip="Toggle Output panel">
-                                <TextBlock Text="Output Content" Margin="8" />
+                                avalonDockControls:ToggleDock.ToolTip="Terminal (Ctrl+`)">
+                                <views:TerminalView DataContext="{Binding Terminal}" />
+                            </avalonDock:LayoutAnchorable>
+                            <avalonDock:LayoutAnchorable Title="Problems" ContentId="Problems"
+                                avalonDockControls:ToggleDock.Icon="{StaticResource ProblemsIcon}"
+                                avalonDockControls:ToggleDock.ToolTip="Problems (Ctrl+Shift+M)">
+                                <Border Background="#1E1E1E" Padding="12">
+                                    <TextBlock Text="No problems detected" Foreground="#808080" FontSize="12" />
+                                </Border>
                             </avalonDock:LayoutAnchorable>
                         </avalonDock:LayoutAnchorGroup>
                     </avalonDock:LayoutAnchorSide>
                 </avalonDock:LayoutRoot.BottomSide>
             </avalonDock:LayoutRoot>
         </avalonDock:ToggleDockingManager>
+
+        <!-- Status bar -->
+        <Border Grid.Row="2" Background="#007ACC" Padding="8,3">
+            <Grid>
+                <TextBlock Text="Ready" Foreground="White" FontSize="11" />
+                <TextBlock HorizontalAlignment="Right" Foreground="White" FontSize="11">
+                    <Run Text="AvalonDock v5.0.0" />
+                    <Run Text=" • " />
+                    <Run Text="ToggleDockingManager" />
+                    <Run Text=" • " />
+                    <Run Text="MVVM + DI" />
+                </TextBlock>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

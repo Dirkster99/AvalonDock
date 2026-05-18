@@ -1,20 +1,15 @@
 using System.Windows;
 using AvalonDock;
+using ToggleTestApp.ViewModels;
 
 namespace ToggleTestApp
 {
 	public partial class MainWindow : Window
 	{
-		public MainWindow()
+		public MainWindow(MainViewModel viewModel)
 		{
+			DataContext = viewModel;
 			InitializeComponent();
-		}
-
-		private void OnDumpToConsole(object sender, RoutedEventArgs e)
-		{
-#if DEBUG
-			dockManager.Layout.ConsoleDump(0);
-#endif
 		}
 
 		private void OnLayoutPriorityChanged(object sender, RoutedEventArgs e)
@@ -29,6 +24,11 @@ namespace ToggleTestApp
 				dockManager.LayoutPriority = DockLayoutPriority.SidesFullHeight;
 			else
 				dockManager.LayoutPriority = DockLayoutPriority.Default;
+		}
+
+		private void OnExit(object sender, RoutedEventArgs e)
+		{
+			Close();
 		}
 	}
 }
