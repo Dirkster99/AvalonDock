@@ -122,8 +122,7 @@
         <!-- Dock Manager -->
         <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1"
                                          BorderThickness="0"
-                                         DocumentsSource="{Binding OpenEditors}"
-                                         ActiveContent="{Binding ActiveEditor, Mode=TwoWay}">
+                                         DocumentsSource="{Binding OpenEditors}">
             <avalonDock:ToggleDockingManager.Theme>
                 <avalonDockThemes:ArcDarkTheme />
             </avalonDock:ToggleDockingManager.Theme>

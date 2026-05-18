@@ -775,6 +775,7 @@
 
 	<!--  DockingManager  -->
 	<Style x:Key="{x:Type avalonDock:DockingManager}" TargetType="{x:Type avalonDock:DockingManager}">
+		<Setter Property="BorderThickness" Value="0" />
 		<Setter Property="DocumentPaneControlStyle" Value="{StaticResource DocumentPaneControlStyle}" />
 		<Setter Property="AnchorablePaneControlStyle" Value="{StaticResource AnchorablePaneControlStyle}" />
 		<Setter Property="AnchorSideTemplate" Value="{StaticResource AnchorSideTemplate}" />
@@ -1695,7 +1696,7 @@
 	<!--  ToggleDockingManager: fallback style (theme override in Arc/VS2013 theme dictionaries)  -->
 	<Style x:Key="{x:Type avalonDock:ToggleDockingManager}" TargetType="{x:Type avalonDock:ToggleDockingManager}"
 		   BasedOn="{StaticResource {x:Type avalonDock:DockingManager}}">
-		<Setter Property="AnchorablePaneControlStyle" Value="{StaticResource ToggleAnchorablePaneControlStyle}" />
+		<Setter Property="BorderThickness" Value="0" />
 	</Style>
 
 </ResourceDictionary>

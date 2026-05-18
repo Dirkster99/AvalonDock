@@ -158,12 +158,30 @@ namespace AvalonDock
 		static ToggleDockingManager()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(ToggleDockingManager), new FrameworkPropertyMetadata(typeof(ToggleDockingManager)));
+			BorderThicknessProperty.OverrideMetadata(typeof(ToggleDockingManager), new FrameworkPropertyMetadata(new Thickness(0)));
 		}
 
 		public ToggleDockingManager()
 		{
 			Loaded += ToggleDockingManager_Loaded;
 			ActiveContentChanged += (s, e) => RefreshButtonStates();
+		}
+
+		/// <inheritdoc/>
+		protected override void OnThemeChanged(DependencyPropertyChangedEventArgs e)
+		{
+			base.OnThemeChanged(e);
+			// Re-apply toggle anchorable style after theme changes
+			ApplyToggleAnchorableStyle();
+		}
+
+		private void ApplyToggleAnchorableStyle()
+		{
+			var toggleStyle = TryFindResource("ToggleAnchorablePaneControlStyle") as System.Windows.Style;
+			if (toggleStyle != null)
+			{
+				AnchorablePaneControlStyle = toggleStyle;
+			}
 		}
 
 		/// <summary>
@@ -295,6 +313,7 @@ namespace AvalonDock
 
 		private void ToggleDockingManager_Loaded(object sender, RoutedEventArgs e)
 		{
+			ApplyToggleAnchorableStyle();
 			SetupToggleDockButtonBars();
 			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
 				new System.Action(UpdatePinButtonsToMinimize));

@@ -2661,10 +2661,10 @@
         </Setter>
     </Style>
 
-    <!--  ToggleDockingManager: inherits full Arc theme, overrides only AnchorablePaneControlStyle  -->
+    <!--  ToggleDockingManager: inherits full Arc theme  -->
     <Style x:Key="{x:Type avalonDock:ToggleDockingManager}" TargetType="{x:Type avalonDock:ToggleDockingManager}"
            BasedOn="{StaticResource {x:Type avalonDock:DockingManager}}">
-        <Setter Property="AnchorablePaneControlStyle" Value="{DynamicResource ToggleAnchorablePaneControlStyle}" />
+        <Setter Property="BorderThickness" Value="0" />
     </Style>
 
 </ResourceDictionary>
