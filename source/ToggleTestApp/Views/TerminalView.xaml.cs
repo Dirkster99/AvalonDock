@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -8,37 +7,103 @@ namespace ToggleTestApp.Views;
 
 public partial class TerminalView : UserControl
 {
+    private int _inputStartIndex;
+
     public TerminalView()
     {
         InitializeComponent();
         DataContextChanged += OnDataContextChanged;
+        TerminalBox.PreviewKeyDown += OnTerminalKeyDown;
+        TerminalBox.PreviewTextInput += OnPreviewTextInput;
+        DataObject.AddPastingHandler(TerminalBox, OnPaste);
     }
 
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
         if (e.OldValue is TerminalViewModel oldVm)
-            oldVm.PropertyChanged -= OnTerminalPropertyChanged;
+        {
+            oldVm.OutputReceived -= OnOutputReceived;
+            oldVm.PromptReady -= OnPromptReady;
+        }
 
         if (e.NewValue is TerminalViewModel newVm)
-            newVm.PropertyChanged += OnTerminalPropertyChanged;
-    }
-
-    private void OnTerminalPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(TerminalViewModel.Output))
         {
-            OutputScroller.ScrollToEnd();
+            newVm.OutputReceived += OnOutputReceived;
+            newVm.PromptReady += OnPromptReady;
+            TerminalBox.Text = "PowerShell\n";
+            ShowPrompt(newVm.CurrentDirectory);
         }
     }
 
-    protected override void OnPreviewKeyDown(KeyEventArgs e)
+    private void OnOutputReceived(object? sender, string text)
     {
-        if (e.Key == Key.Enter && DataContext is TerminalViewModel vm)
+        TerminalBox.Text += text;
+        OutputScroller.ScrollToEnd();
+    }
+
+    private void OnPromptReady(object? sender, string directory)
+    {
+        ShowPrompt(directory);
+    }
+
+    private void ShowPrompt(string directory)
+    {
+        var prompt = $"PS {directory}> ";
+        TerminalBox.Text += prompt;
+        _inputStartIndex = TerminalBox.Text.Length;
+        TerminalBox.CaretIndex = _inputStartIndex;
+        TerminalBox.Focus();
+        OutputScroller.ScrollToEnd();
+    }
+
+    private void OnTerminalKeyDown(object sender, KeyEventArgs e)
+    {
+        // Prevent editing before the input area
+        if (TerminalBox.CaretIndex < _inputStartIndex &&
+            e.Key != Key.Left && e.Key != Key.Right &&
+            e.Key != Key.Up && e.Key != Key.Down &&
+            e.Key != Key.Home && e.Key != Key.End)
         {
-            vm.SendCommandCommand.Execute(null);
+            TerminalBox.CaretIndex = TerminalBox.Text.Length;
+        }
+
+        if (e.Key == Key.Enter)
+        {
             e.Handled = true;
-        }
+            var command = TerminalBox.Text.Substring(_inputStartIndex);
+            TerminalBox.Text += "\n";
+            _inputStartIndex = TerminalBox.Text.Length;
 
-        base.OnPreviewKeyDown(e);
+            if (DataContext is TerminalViewModel vm)
+            {
+                vm.ExecuteCommand(command);
+            }
+        }
+        else if (e.Key == Key.Back)
+        {
+            if (TerminalBox.CaretIndex <= _inputStartIndex)
+                e.Handled = true;
+        }
+        else if (e.Key == Key.Home)
+        {
+            e.Handled = true;
+            TerminalBox.CaretIndex = _inputStartIndex;
+        }
+    }
+
+    private void OnPreviewTextInput(object sender, TextCompositionEventArgs e)
+    {
+        if (TerminalBox.CaretIndex < _inputStartIndex)
+        {
+            TerminalBox.CaretIndex = TerminalBox.Text.Length;
+        }
+    }
+
+    private void OnPaste(object sender, DataObjectPastingEventArgs e)
+    {
+        if (TerminalBox.CaretIndex < _inputStartIndex)
+        {
+            TerminalBox.CaretIndex = TerminalBox.Text.Length;
+        }
     }
 }

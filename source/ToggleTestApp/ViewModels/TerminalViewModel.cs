@@ -4,8 +4,6 @@ using System.Text;
 using System.Windows.Threading;
 using AvalonDock.Core;
 using AvalonDock.Mvvm;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 
 namespace ToggleTestApp.ViewModels;
 
@@ -13,12 +11,13 @@ public partial class TerminalViewModel : ToolboxBase, IDisposable
 {
     private Process? _shellProcess;
     private readonly Dispatcher _dispatcher;
+    private readonly StringBuilder _pendingOutput = new();
+    private bool _outputPending;
 
-    [ObservableProperty]
-    private string _output = string.Empty;
+    public event EventHandler<string>? OutputReceived;
+    public event EventHandler<string>? PromptReady;
 
-    [ObservableProperty]
-    private string _inputCommand = string.Empty;
+    public string CurrentDirectory { get; private set; }
 
     public TerminalViewModel()
     {
@@ -29,6 +28,7 @@ public partial class TerminalViewModel : ToolboxBase, IDisposable
         IsOpenByDefault = true;
         Icon = ToolboxIcons.Terminal;
 
+        CurrentDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         _dispatcher = Dispatcher.CurrentDispatcher;
         StartShell();
     }
@@ -41,7 +41,8 @@ public partial class TerminalViewModel : ToolboxBase, IDisposable
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "cmd.exe",
+                    FileName = "powershell.exe",
+                    Arguments = "-NoLogo -NoProfile -NoExit -Command \"function prompt { }\"",
                     UseShellExecute = false,
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
@@ -49,69 +50,96 @@ public partial class TerminalViewModel : ToolboxBase, IDisposable
                     CreateNoWindow = true,
                     StandardOutputEncoding = Encoding.UTF8,
                     StandardErrorEncoding = Encoding.UTF8,
-                    WorkingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+                    WorkingDirectory = CurrentDirectory
                 },
                 EnableRaisingEvents = true
             };
 
-            _shellProcess.OutputDataReceived += (_, e) =>
-            {
-                if (e.Data != null)
-                    AppendOutput(e.Data);
-            };
-
-            _shellProcess.ErrorDataReceived += (_, e) =>
-            {
-                if (e.Data != null)
-                    AppendOutput(e.Data);
-            };
-
+            _shellProcess.OutputDataReceived += OnDataReceived;
+            _shellProcess.ErrorDataReceived += OnDataReceived;
+            _shellProcess.Exited += OnProcessExited;
             _shellProcess.Start();
             _shellProcess.BeginOutputReadLine();
             _shellProcess.BeginErrorReadLine();
+
+            // Request initial working directory
+            RequestPromptUpdate();
         }
         catch (Exception ex)
         {
-            Output = $"Failed to start shell: {ex.Message}\n";
+            OutputReceived?.Invoke(this, $"Failed to start shell: {ex.Message}\n");
         }
     }
 
-    private void AppendOutput(string text)
+    public void ExecuteCommand(string command)
+    {
+        if (string.IsNullOrEmpty(command) || _shellProcess?.HasExited != false)
+            return;
+
+        _shellProcess.StandardInput.WriteLine(command);
+        RequestPromptUpdate();
+    }
+
+    private void RequestPromptUpdate()
+    {
+        if (_shellProcess?.HasExited != false) return;
+        _shellProcess.StandardInput.WriteLine("Write-Host \"::PWD::$((Get-Location).Path)\"");
+    }
+
+    private void OnDataReceived(object sender, DataReceivedEventArgs e)
+    {
+        if (e.Data == null) return;
+
+        // Intercept pwd marker
+        if (e.Data.StartsWith("::PWD::"))
+        {
+            var dir = e.Data.Substring(7);
+            CurrentDirectory = dir;
+            _dispatcher.BeginInvoke(() => PromptReady?.Invoke(this, dir));
+            return;
+        }
+
+        lock (_pendingOutput)
+        {
+            _pendingOutput.AppendLine(e.Data);
+            if (!_outputPending)
+            {
+                _outputPending = true;
+                _dispatcher.BeginInvoke(FlushOutput, DispatcherPriority.Background);
+            }
+        }
+    }
+
+    private void FlushOutput()
+    {
+        string text;
+        lock (_pendingOutput)
+        {
+            text = _pendingOutput.ToString();
+            _pendingOutput.Clear();
+            _outputPending = false;
+        }
+
+        if (!string.IsNullOrEmpty(text))
+        {
+            OutputReceived?.Invoke(this, text);
+        }
+    }
+
+    private void OnProcessExited(object? sender, EventArgs e)
     {
         _dispatcher.BeginInvoke(() =>
         {
-            Output += text + "\n";
+            OutputReceived?.Invoke(this, "\n[Process exited]\n");
         });
-    }
-
-    [RelayCommand]
-    private void SendCommand()
-    {
-        if (string.IsNullOrEmpty(InputCommand) || _shellProcess?.HasExited != false)
-            return;
-
-        AppendOutput($"> {InputCommand}");
-        _shellProcess.StandardInput.WriteLine(InputCommand);
-        InputCommand = string.Empty;
-    }
-
-    [RelayCommand]
-    private void Clear()
-    {
-        Output = string.Empty;
     }
 
     public void Dispose()
     {
         if (_shellProcess is { HasExited: false })
         {
-            try
-            {
-                _shellProcess.Kill();
-            }
-            catch { }
+            try { _shellProcess.Kill(); } catch { }
         }
-
         _shellProcess?.Dispose();
     }
 }
