@@ -8,7 +8,7 @@
     xmlns:vm="clr-namespace:ToggleTestApp.ViewModels"
     Title="AvalonDock Code — Toggle Docking Demo"
     Width="1100" Height="750"
-    Background="#1E1E1E"
+    Background="{Binding Background, ElementName=dockManager}"
     UseLayoutRounding="True">
     <Window.Resources>
         <views:FileIconConverter x:Key="FileIconConverter" />
@@ -18,8 +18,8 @@
         <Viewbox x:Key="ExplorerIcon" x:Shared="False" Width="16" Height="16">
             <Canvas Width="16" Height="16">
                 <Path Data="M1.5,1 L6,1 L7.5,3 L14.5,3 C15.3,3 15.5,3.5 15.5,4 L15.5,13 C15.5,13.5 15,14 14.5,14 L1.5,14 C1,14 0.5,13.5 0.5,13 L0.5,2 C0.5,1.5 1,1 1.5,1 Z"
-                      Stroke="#C5C5C5" StrokeThickness="0.8" Fill="Transparent" />
-                <Line X1="0.5" Y1="5.5" X2="15.5" Y2="5.5" Stroke="#C5C5C5" StrokeThickness="0.6" />
+                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="0.8" Fill="Transparent" />
+                <Line X1="0.5" Y1="5.5" X2="15.5" Y2="5.5" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="0.6" />
             </Canvas>
         </Viewbox>
 
@@ -27,9 +27,9 @@
         <Viewbox x:Key="TerminalIcon" x:Shared="False" Width="16" Height="16">
             <Canvas Width="16" Height="16">
                 <Rectangle Canvas.Left="0.5" Canvas.Top="1.5" Width="15" Height="13"
-                           Stroke="#C5C5C5" StrokeThickness="0.8" RadiusX="1.5" RadiusY="1.5" Fill="Transparent" />
-                <Path Data="M4,6 L7,8.5 L4,11" Stroke="#007ACC" StrokeThickness="1.5" Fill="Transparent" />
-                <Rectangle Canvas.Left="8.5" Canvas.Top="10.5" Width="4" Height="1.2" Fill="#C5C5C5" />
+                           Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="0.8" RadiusX="1.5" RadiusY="1.5" Fill="Transparent" />
+                <Path Data="M4,6 L7,8.5 L4,11" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1.5" Fill="Transparent" />
+                <Rectangle Canvas.Left="8.5" Canvas.Top="10.5" Width="4" Height="1.2" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" />
             </Canvas>
         </Viewbox>
 
@@ -37,8 +37,8 @@
         <Viewbox x:Key="SearchIcon" x:Shared="False" Width="16" Height="16">
             <Canvas Width="16" Height="16">
                 <Ellipse Canvas.Left="2" Canvas.Top="2" Width="9" Height="9"
-                         Stroke="#C5C5C5" StrokeThickness="1.2" Fill="Transparent" />
-                <Line X1="10" Y1="10" X2="14" Y2="14" Stroke="#C5C5C5" StrokeThickness="1.5" />
+                         Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1.2" Fill="Transparent" />
+                <Line X1="10" Y1="10" X2="14" Y2="14" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1.5" />
             </Canvas>
         </Viewbox>
 
@@ -46,22 +46,22 @@
         <Viewbox x:Key="GitIcon" x:Shared="False" Width="16" Height="16">
             <Canvas Width="16" Height="16">
                 <Ellipse Canvas.Left="2.5" Canvas.Top="2" Width="3.5" Height="3.5"
-                         Stroke="#C5C5C5" StrokeThickness="1" Fill="Transparent" />
+                         Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1" Fill="Transparent" />
                 <Ellipse Canvas.Left="9" Canvas.Top="2" Width="3.5" Height="3.5"
-                         Stroke="#C5C5C5" StrokeThickness="1" Fill="Transparent" />
+                         Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1" Fill="Transparent" />
                 <Ellipse Canvas.Left="2.5" Canvas.Top="10.5" Width="3.5" Height="3.5"
-                         Stroke="#C5C5C5" StrokeThickness="1" Fill="Transparent" />
-                <Line X1="4.25" Y1="5.5" X2="4.25" Y2="10.5" Stroke="#C5C5C5" StrokeThickness="1" />
-                <Path Data="M10.75,5.5 C10.75,8.5 4.25,8.5 4.25,10.5" Stroke="#C5C5C5" StrokeThickness="1" Fill="Transparent" />
+                         Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1" Fill="Transparent" />
+                <Line X1="4.25" Y1="5.5" X2="4.25" Y2="10.5" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1" />
+                <Path Data="M10.75,5.5 C10.75,8.5 4.25,8.5 4.25,10.5" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1" Fill="Transparent" />
             </Canvas>
         </Viewbox>
 
         <!-- Problems/Warnings icon -->
         <Viewbox x:Key="ProblemsIcon" x:Shared="False" Width="16" Height="16">
             <Canvas Width="16" Height="16">
-                <Path Data="M8,1.5 L15,13.5 L1,13.5 Z" Stroke="#C5C5C5" StrokeThickness="1" Fill="Transparent" />
-                <Line X1="8" Y1="6" X2="8" Y2="10" Stroke="#C5C5C5" StrokeThickness="1.2" />
-                <Ellipse Canvas.Left="7.2" Canvas.Top="11" Width="1.6" Height="1.6" Fill="#C5C5C5" />
+                <Path Data="M8,1.5 L15,13.5 L1,13.5 Z" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1" Fill="Transparent" />
+                <Line X1="8" Y1="6" X2="8" Y2="10" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" StrokeThickness="1.2" />
+                <Ellipse Canvas.Left="7.2" Canvas.Top="11" Width="1.6" Height="1.6" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ContentControl}}" />
             </Canvas>
         </Viewbox>
 
@@ -79,15 +79,23 @@
         </Grid.RowDefinitions>
 
         <!-- Title bar / Menu -->
-        <Grid Grid.Row="0" Background="#333333">
+        <Grid Grid.Row="0" Background="{Binding Background, ElementName=dockManager}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Menu Grid.Column="0" Background="Transparent" Foreground="#CCCCCC">
+            <Menu Grid.Column="0" Background="Transparent" Foreground="#CCCCCC" Padding="4,4">
                 <Menu.Resources>
                     <Style TargetType="MenuItem">
                         <Setter Property="Foreground" Value="#CCCCCC" />
+                        <Style.Triggers>
+                            <Trigger Property="Role" Value="SubmenuHeader">
+                                <Setter Property="Foreground" Value="Black" />
+                            </Trigger>
+                            <Trigger Property="Role" Value="SubmenuItem">
+                                <Setter Property="Foreground" Value="Black" />
+                            </Trigger>
+                        </Style.Triggers>
                     </Style>
                 </Menu.Resources>
                 <MenuItem Header="_File">
@@ -113,7 +121,6 @@
 
         <!-- Dock Manager -->
         <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1"
-                                         Background="#1E1E1E"
                                          DocumentsSource="{Binding OpenEditors}"
                                          ActiveContent="{Binding ActiveEditor, Mode=TwoWay}">
             <avalonDock:ToggleDockingManager.Theme>
@@ -198,10 +205,10 @@
         </avalonDock:ToggleDockingManager>
 
         <!-- Status bar -->
-        <Border Grid.Row="2" Background="#007ACC" Padding="8,3">
+        <Border Grid.Row="2" Background="{Binding Background, ElementName=dockManager}" Padding="8,4">
             <Grid>
-                <TextBlock Text="Ready" Foreground="White" FontSize="11" />
-                <TextBlock HorizontalAlignment="Right" Foreground="White" FontSize="11">
+                <TextBlock Text="Ready" Foreground="#808080" FontSize="11" />
+                <TextBlock HorizontalAlignment="Right" Foreground="#808080" FontSize="11">
                     <Run Text="AvalonDock v5.0.0" />
                     <Run Text=" • " />
                     <Run Text="ToggleDockingManager" />

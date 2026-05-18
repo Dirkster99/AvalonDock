@@ -1438,6 +1438,7 @@
 		<Setter Property="Background" Value="Transparent" />
 		<Setter Property="BorderBrush" Value="Transparent" />
 		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="Foreground" Value="#C5C5C5" />
 		<Setter Property="Width" Value="{Binding ButtonSize, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=25}" />
 		<Setter Property="Height" Value="{Binding ButtonSize, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=25}" />
 		<Setter Property="Padding" Value="0" />
