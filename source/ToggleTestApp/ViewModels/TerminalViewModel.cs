@@ -1,19 +1,24 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Threading;
-using System.Windows;
+using System.Text;
+using System.Windows.Threading;
 using AvalonDock.Core;
 using AvalonDock.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace ToggleTestApp.ViewModels;
 
-public partial class TerminalViewModel : ToolboxBase
+public partial class TerminalViewModel : ToolboxBase, IDisposable
 {
-    private Process? _process;
-    private bool _running;
+    private Process? _shellProcess;
+    private readonly Dispatcher _dispatcher;
 
-    public ObservableCollection<TerminalLine> OutputLines { get; } = new();
+    [ObservableProperty]
+    private string _output = string.Empty;
+
+    [ObservableProperty]
+    private string _inputCommand = string.Empty;
 
     public TerminalViewModel()
     {
@@ -23,62 +28,90 @@ public partial class TerminalViewModel : ToolboxBase
         Side = ToolboxSide.Bottom;
         IsOpenByDefault = true;
         Icon = ToolboxIcons.Terminal;
+
+        _dispatcher = Dispatcher.CurrentDispatcher;
+        StartShell();
     }
 
-    public void StartProcess()
+    private void StartShell()
     {
-        if (_running) return;
-
-        var psi = new ProcessStartInfo
+        try
         {
-            FileName = "powershell.exe",
-            Arguments = "-NoLogo -NoProfile",
-            UseShellExecute = false,
-            RedirectStandardInput = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true,
-            WorkingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
-        };
+            _shellProcess = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "cmd.exe",
+                    UseShellExecute = false,
+                    RedirectStandardInput = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    StandardOutputEncoding = Encoding.UTF8,
+                    StandardErrorEncoding = Encoding.UTF8,
+                    WorkingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+                },
+                EnableRaisingEvents = true
+            };
 
-        _process = new Process { StartInfo = psi };
-        _process.OutputDataReceived += OnOutputReceived;
-        _process.ErrorDataReceived += OnOutputReceived;
-        _process.Start();
-        _process.BeginOutputReadLine();
-        _process.BeginErrorReadLine();
-        _running = true;
-    }
+            _shellProcess.OutputDataReceived += (_, e) =>
+            {
+                if (e.Data != null)
+                    AppendOutput(e.Data);
+            };
 
-    public void StopProcess()
-    {
-        _running = false;
-        if (_process != null && !_process.HasExited)
-        {
-            try { _process.Kill(); } catch { }
+            _shellProcess.ErrorDataReceived += (_, e) =>
+            {
+                if (e.Data != null)
+                    AppendOutput(e.Data);
+            };
+
+            _shellProcess.Start();
+            _shellProcess.BeginOutputReadLine();
+            _shellProcess.BeginErrorReadLine();
         }
-        _process?.Dispose();
-        _process = null;
-    }
-
-    public void ExecuteLine(string line)
-    {
-        if (_process == null || _process.HasExited) return;
-        _process.StandardInput.WriteLine(line);
-    }
-
-    private void OnOutputReceived(object sender, DataReceivedEventArgs e)
-    {
-        if (e.Data == null) return;
-        Application.Current?.Dispatcher.BeginInvoke(() =>
+        catch (Exception ex)
         {
-            OutputLines.Add(new TerminalLine(e.Data));
+            Output = $"Failed to start shell: {ex.Message}\n";
+        }
+    }
+
+    private void AppendOutput(string text)
+    {
+        _dispatcher.BeginInvoke(() =>
+        {
+            Output += text + "\n";
         });
     }
-}
 
-public class TerminalLine
-{
-    public string Value { get; }
-    public TerminalLine(string value) => Value = value;
+    [RelayCommand]
+    private void SendCommand()
+    {
+        if (string.IsNullOrEmpty(InputCommand) || _shellProcess?.HasExited != false)
+            return;
+
+        AppendOutput($"> {InputCommand}");
+        _shellProcess.StandardInput.WriteLine(InputCommand);
+        InputCommand = string.Empty;
+    }
+
+    [RelayCommand]
+    private void Clear()
+    {
+        Output = string.Empty;
+    }
+
+    public void Dispose()
+    {
+        if (_shellProcess is { HasExited: false })
+        {
+            try
+            {
+                _shellProcess.Kill();
+            }
+            catch { }
+        }
+
+        _shellProcess?.Dispose();
+    }
 }

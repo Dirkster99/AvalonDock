@@ -1,6 +1,7 @@
-using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using ToggleTestApp.ViewModels;
 
 namespace ToggleTestApp.Views;
@@ -10,31 +11,34 @@ public partial class TerminalView : UserControl
     public TerminalView()
     {
         InitializeComponent();
+        DataContextChanged += OnDataContextChanged;
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e)
+    private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        Terminal.LineEntered += OnLineEntered;
-        if (DataContext is TerminalViewModel vm)
+        if (e.OldValue is TerminalViewModel oldVm)
+            oldVm.PropertyChanged -= OnTerminalPropertyChanged;
+
+        if (e.NewValue is TerminalViewModel newVm)
+            newVm.PropertyChanged += OnTerminalPropertyChanged;
+    }
+
+    private void OnTerminalPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(TerminalViewModel.Output))
         {
-            vm.StartProcess();
+            OutputScroller.ScrollToEnd();
         }
     }
 
-    private void OnUnloaded(object sender, RoutedEventArgs e)
+    protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
-        Terminal.LineEntered -= OnLineEntered;
-        if (DataContext is TerminalViewModel vm)
+        if (e.Key == Key.Enter && DataContext is TerminalViewModel vm)
         {
-            vm.StopProcess();
+            vm.SendCommandCommand.Execute(null);
+            e.Handled = true;
         }
-    }
 
-    private void OnLineEntered(object? sender, EventArgs e)
-    {
-        if (DataContext is TerminalViewModel vm && Terminal.Line != null)
-        {
-            vm.ExecuteLine(Terminal.Line);
-        }
+        base.OnPreviewKeyDown(e);
     }
 }

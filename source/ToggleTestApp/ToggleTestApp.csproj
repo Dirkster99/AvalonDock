@@ -25,6 +25,5 @@
         <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
-        <PackageReference Include="Simple.Wpf.Terminal" Version="2.3.57" />
     </ItemGroup>
 </Project>
