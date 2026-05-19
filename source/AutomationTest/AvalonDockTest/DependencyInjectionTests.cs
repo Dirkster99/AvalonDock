@@ -6,6 +6,7 @@ using AvalonDock.Core.Events;
 using AvalonDock.Core.Serialization;
 using AvalonDock.DependencyInjection;
 using AvalonDock.Mvvm;
+using AvalonDock.Serializer.Json;
 using AvalonDock.Serializer.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -169,6 +170,21 @@ namespace AvalonDockTest
 
 			Assert.That(serializer, Is.Not.Null);
 			Assert.That(serializer, Is.InstanceOf<XmlLayoutSerializer>());
+		}
+
+		[Test]
+		public void AddAvalonDockSerializer_JsonLayoutSerializer_Resolves()
+		{
+			var services = new ServiceCollection();
+			var fakeDm = new FakeDockingManager();
+			services.AddDockingManager(sp => fakeDm);
+			services.AddAvalonDockSerializer<JsonLayoutSerializer>();
+
+			var provider = services.BuildServiceProvider();
+			var serializer = provider.GetRequiredService<ILayoutSerializer>();
+
+			Assert.That(serializer, Is.Not.Null);
+			Assert.That(serializer, Is.InstanceOf<JsonLayoutSerializer>());
 		}
 
 		[Test]

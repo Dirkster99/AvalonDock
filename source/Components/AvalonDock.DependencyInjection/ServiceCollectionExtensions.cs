@@ -83,7 +83,7 @@ namespace AvalonDock.DependencyInjection
 		/// <param name="services">The service collection.</param>
 		/// <returns>The service collection for chaining.</returns>
 		public static IServiceCollection AddToolbox<T>(this IServiceCollection services)
-			where T : class
+			where T : class, IToolbox
 		{
 			services.AddSingleton<T>();
 			return services;
@@ -99,7 +99,7 @@ namespace AvalonDock.DependencyInjection
 		public static IServiceCollection AddToolbox<T>(
 			this IServiceCollection services,
 			Func<IServiceProvider, T> factory)
-			where T : class
+			where T : class, IToolbox
 		{
 			services.AddSingleton<T>(factory);
 			return services;

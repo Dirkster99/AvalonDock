@@ -43,6 +43,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvalonDock.DependencyInject
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvalonDock.Serializer.Xml", "Components\AvalonDock.Serializer.Xml\AvalonDock.Serializer.Xml.csproj", "{9771AE62-5315-42F0-8863-86CE3BC5D9C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvalonDock.Serializer.Json", "Components\AvalonDock.Serializer.Json\AvalonDock.Serializer.Json.csproj", "{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -245,6 +247,18 @@ Global
 		{9771AE62-5315-42F0-8863-86CE3BC5D9C1}.Release|x64.Build.0 = Release|Any CPU
 		{9771AE62-5315-42F0-8863-86CE3BC5D9C1}.Release|x86.ActiveCfg = Release|Any CPU
 		{9771AE62-5315-42F0-8863-86CE3BC5D9C1}.Release|x86.Build.0 = Release|Any CPU
+		{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C}.Debug|x64.Build.0 = Debug|Any CPU
+		{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C}.Debug|x86.Build.0 = Debug|Any CPU
+		{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C}.Release|x64.ActiveCfg = Release|Any CPU
+		{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C}.Release|x64.Build.0 = Release|Any CPU
+		{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C}.Release|x86.ActiveCfg = Release|Any CPU
+		{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -267,6 +281,7 @@ Global
 		{40516AAC-3298-4603-B759-EF232D4260C9} = {F30895DC-C3AC-FF44-FFF8-D51D98AE1B61}
 		{C292005B-6043-4B58-9BA1-2F0546FCDDC0} = {F30895DC-C3AC-FF44-FFF8-D51D98AE1B61}
 		{9771AE62-5315-42F0-8863-86CE3BC5D9C1} = {F30895DC-C3AC-FF44-FFF8-D51D98AE1B61}
+		{A195A8B3-0F5A-4699-BDE2-1A453BF71B5C} = {F30895DC-C3AC-FF44-FFF8-D51D98AE1B61}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {459B8289-CF04-4E70-AEC9-23DC3A6E66F6}
