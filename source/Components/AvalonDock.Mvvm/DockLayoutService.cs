@@ -109,5 +109,12 @@ namespace AvalonDock.Mvvm
 			OpenDocument(doc);
 			return doc;
 		}
+
+		/// <inheritdoc/>
+		public T? GetAnchorable<T>()
+			where T : class, IDockable
+		{
+			return _toolDock.VisibleDockables?.OfType<T>().FirstOrDefault();
+		}
 	}
 }

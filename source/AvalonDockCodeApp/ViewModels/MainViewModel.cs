@@ -8,58 +8,64 @@ namespace ToggleTestApp.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
-    private readonly IDockLayoutService _dockService;
+	private readonly IDockLayoutService _dockService;
 
-    /// <summary>The MVVM layout tree — bind to DockLayout on the DockingManager.</summary>
-    public IRootDock DockLayout => _dockService.Layout;
+	/// <summary>The MVVM layout tree — bind to DockLayout on the DockingManager.</summary>
+	public IRootDock DockLayout => _dockService.Layout;
 
-    /// <summary>Provides typed access to the folder explorer VM.</summary>
-    public FolderExplorerViewModel FolderExplorer { get; }
+	/// <summary>Provides typed access to the folder explorer VM via the layout service.</summary>
+	public FolderExplorerViewModel? FolderExplorer => _dockService.GetAnchorable<FolderExplorerViewModel>();
 
-    public MainViewModel(IDockLayoutService dockService, FolderExplorerViewModel folderExplorer)
-    {
-        _dockService = dockService;
-        FolderExplorer = folderExplorer;
+	public MainViewModel(IDockLayoutService dockService)
+	{
+		_dockService = dockService;
 
-        // Default: open the AvalonDock source folder
-        var defaultPath = Path.GetFullPath(
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\.."));
-        if (Directory.Exists(defaultPath))
-        {
-            folderExplorer.LoadFolder(defaultPath);
-        }
-    }
+		// Wire up the folder explorer's file-open callback
+		var folderExplorer = FolderExplorer;
+		if (folderExplorer != null)
+		{
+			folderExplorer.SetOpenFileCallback(OpenFile);
 
-    public void OpenFile(string filePath)
-    {
-        _dockService.OpenOrActivateDocument<EditorTabViewModel>(
-            e => e.FilePath == filePath,
-            () =>
-            {
-                var tab = new EditorTabViewModel();
-                tab.LoadFile(filePath);
-                return tab;
-            });
-    }
+			// Default: open the AvalonDock source folder
+			var defaultPath = Path.GetFullPath(
+				Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\.."));
+			if (Directory.Exists(defaultPath))
+			{
+				folderExplorer.LoadFolder(defaultPath);
+			}
+		}
+	}
 
-    [RelayCommand]
-    private void CloseEditor(EditorTabViewModel? tab)
-    {
-        if (tab != null)
-            _dockService.CloseDocument(tab);
-    }
+	public void OpenFile(string filePath)
+	{
+		_dockService.OpenOrActivateDocument(
+			e => e.FilePath == filePath,
+			() =>
+			{
+				var tab = new EditorTabViewModel();
+				tab.LoadFile(filePath);
+				return tab;
+			});
+	}
 
-    [RelayCommand]
-    private void OpenFolder()
-    {
-        var dialog = new Microsoft.Win32.OpenFolderDialog
-        {
-            Title = "Select a folder to open"
-        };
+	[RelayCommand]
+	private void CloseEditor(EditorTabViewModel? tab)
+	{
+		if (tab != null)
+			_dockService.CloseDocument(tab);
+	}
 
-        if (dialog.ShowDialog() == true)
-        {
-            FolderExplorer.LoadFolder(dialog.FolderName);
-        }
-    }
+	[RelayCommand]
+	private void OpenFolder()
+	{
+		var dialog = new Microsoft.Win32.OpenFolderDialog
+		{
+			Title = "Select a folder to open"
+		};
+
+		if (dialog.ShowDialog() == true)
+		{
+			FolderExplorer?.LoadFolder(dialog.FolderName);
+		}
+	}
 }

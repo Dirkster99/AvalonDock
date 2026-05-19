@@ -51,5 +51,11 @@ namespace AvalonDock.Core
 		/// <returns>The existing or newly created document.</returns>
 		T OpenOrActivateDocument<T>(Func<T, bool> predicate, Func<T> factory)
 			where T : class, IDockable;
+
+		/// <summary>Gets a registered anchorable/tool by type.</summary>
+		/// <typeparam name="T">The concrete anchorable type.</typeparam>
+		/// <returns>The anchorable instance, or null if not registered.</returns>
+		T? GetAnchorable<T>()
+			where T : class, IDockable;
 	}
 }

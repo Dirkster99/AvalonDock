@@ -53,15 +53,8 @@ namespace ToggleTestApp
 			// Dock layout service — auto-builds the MVVM dock tree from toolboxes
 			services.AddDockLayoutService();
 
-			// MainViewModel uses the layout service for all dock operations
-			services.AddSingleton<MainViewModel>(sp =>
-			{
-				var dockService = sp.GetRequiredService<IDockLayoutService>();
-				var folderVm = sp.GetRequiredService<FolderExplorerViewModel>();
-				var mainVm = new MainViewModel(dockService, folderVm);
-				folderVm.SetOpenFileCallback(mainVm.OpenFile);
-				return mainVm;
-			});
+			// MainViewModel uses only the layout service — all anchorables accessible via GetAnchorable<T>()
+			services.AddSingleton<MainViewModel>();
 
 			// Main window
 			services.AddSingleton<MainWindow>();
