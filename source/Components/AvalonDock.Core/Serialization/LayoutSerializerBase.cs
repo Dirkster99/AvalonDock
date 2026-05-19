@@ -34,8 +34,9 @@ namespace AvalonDock.Core
 
 	/// <summary>
 	/// UI-independent base class for layout serialization/deserialization.
-	/// Implements <see cref="ILayoutSerializer"/> for generic serialization
-	/// and provides layout-aware fixup when a docking manager is available.
+	/// Implements <see cref="ILayoutSerializer"/> with a template-method pattern:
+	/// subclasses provide format-specific <see cref="SerializeCore"/> and
+	/// <see cref="DeserializeCore"/>, while the base handles lifecycle and fixup.
 	/// </summary>
 	public abstract class LayoutSerializerBase : ILayoutSerializer
 	{
@@ -43,25 +44,12 @@ namespace AvalonDock.Core
 		private ISerializableLayoutDocument[] _previousDocuments;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="LayoutSerializerBase"/> class
-		/// for generic serialization (DI use). Layout-aware methods require a manager.
+		/// Initializes a new instance of the <see cref="LayoutSerializerBase"/> class.
 		/// </summary>
-		protected LayoutSerializerBase()
-		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="LayoutSerializerBase"/> class
-		/// with a docking manager for layout-aware serialization.
-		/// </summary>
-		/// <param name="manager">The docking manager to serialize.</param>
-		protected LayoutSerializerBase(ISerializableDockingManager manager)
+		/// <param name="manager">The docking manager whose layout is serialized.</param>
+		protected LayoutSerializerBase(IDockingManager manager)
 		{
 			Manager = manager ?? throw new ArgumentNullException(nameof(manager));
-			_previousAnchorables = Manager.Layout.Descendents()
-				.OfType<ISerializableLayoutAnchorable>().ToArray();
-			_previousDocuments = Manager.Layout.Descendents()
-				.OfType<ISerializableLayoutDocument>().ToArray();
 		}
 
 		/// <summary>
@@ -69,20 +57,55 @@ namespace AvalonDock.Core
 		/// </summary>
 		public event EventHandler<LayoutSerializationCallbackEventArgs> LayoutSerializationCallback;
 
-		/// <summary>Gets the docking manager being serialized, or null if created for generic use.</summary>
-		public ISerializableDockingManager Manager { get; }
+		/// <summary>Gets the docking manager whose layout is being serialized.</summary>
+		public IDockingManager Manager { get; }
 
 		/// <inheritdoc/>
-		public abstract string Serialize<T>(T value);
+		public void Serialize(Stream stream)
+		{
+			SerializeCore(stream, Manager.Layout);
+		}
 
 		/// <inheritdoc/>
-		public abstract T Deserialize<T>(string text);
+		public void Deserialize(Stream stream)
+		{
+			try
+			{
+				StartDeserialization();
+				CaptureCurrentState();
+				var layout = DeserializeCore(stream);
+				FixupLayout(layout);
+				Manager.Layout = layout;
+			}
+			finally
+			{
+				EndDeserialization();
+			}
+		}
 
 		/// <inheritdoc/>
-		public abstract T Load<T>(Stream stream);
+		public virtual void Serialize(string filepath)
+		{
+			using (var stream = File.Create(filepath))
+				Serialize(stream);
+		}
 
 		/// <inheritdoc/>
-		public abstract void Save<T>(Stream stream, T value);
+		public virtual void Deserialize(string filepath)
+		{
+			using (var stream = File.OpenRead(filepath))
+				Deserialize(stream);
+		}
+
+		/// <summary>Writes the layout to the stream in the concrete format (XML, JSON, etc.).</summary>
+		/// <param name="stream">The stream to write to.</param>
+		/// <param name="layout">The layout root to serialize.</param>
+		protected abstract void SerializeCore(Stream stream, ISerializableLayoutRoot layout);
+
+		/// <summary>Reads a layout from the stream in the concrete format.</summary>
+		/// <param name="stream">The stream to read from.</param>
+		/// <returns>The deserialized layout root.</returns>
+		protected abstract ISerializableLayoutRoot DeserializeCore(Stream stream);
 
 		/// <summary>
 		/// Fixes up a deserialized layout: reconnects previous containers,
@@ -176,15 +199,23 @@ namespace AvalonDock.Core
 			layout.CollectGarbage();
 		}
 
-		/// <summary>Suspends source bindings before deserialization.</summary>
-		protected void StartDeserialization()
+		private void CaptureCurrentState()
+		{
+			_previousAnchorables = Manager.Layout?.Descendents()
+				.OfType<ISerializableLayoutAnchorable>().ToArray()
+				?? Array.Empty<ISerializableLayoutAnchorable>();
+			_previousDocuments = Manager.Layout?.Descendents()
+				.OfType<ISerializableLayoutDocument>().ToArray()
+				?? Array.Empty<ISerializableLayoutDocument>();
+		}
+
+		private void StartDeserialization()
 		{
 			Manager.SuspendDocumentsSourceBinding = true;
 			Manager.SuspendAnchorablesSourceBinding = true;
 		}
 
-		/// <summary>Resumes source bindings after deserialization.</summary>
-		protected void EndDeserialization()
+		private void EndDeserialization()
 		{
 			Manager.SuspendDocumentsSourceBinding = false;
 			Manager.SuspendAnchorablesSourceBinding = false;

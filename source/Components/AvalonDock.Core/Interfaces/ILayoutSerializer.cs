@@ -1,34 +1,34 @@
+#nullable disable
+using System;
 using System.IO;
 
 namespace AvalonDock.Core
 {
 	/// <summary>
-	/// Abstraction for layout serialization, enabling pluggable serialization backends.
+	/// Abstraction for docking layout serialization, enabling pluggable
+	/// serialization formats (XML, JSON, etc.) via DI.
 	/// </summary>
 	public interface ILayoutSerializer
 	{
-		/// <summary>Serializes a value to a string.</summary>
-		/// <typeparam name="T">The type of value to serialize.</typeparam>
-		/// <param name="value">The value to serialize.</param>
-		/// <returns>The serialized string representation.</returns>
-		string Serialize<T>(T value);
+		/// <summary>
+		/// Raised during deserialization to let the client attach content to layout items.
+		/// </summary>
+		event EventHandler<LayoutSerializationCallbackEventArgs> LayoutSerializationCallback;
 
-		/// <summary>Deserializes a value from a string.</summary>
-		/// <typeparam name="T">The type to deserialize to.</typeparam>
-		/// <param name="text">The serialized string.</param>
-		/// <returns>The deserialized value.</returns>
-		T? Deserialize<T>(string text);
-
-		/// <summary>Loads a value from a stream.</summary>
-		/// <typeparam name="T">The type to deserialize to.</typeparam>
-		/// <param name="stream">The stream to read from.</param>
-		/// <returns>The deserialized value.</returns>
-		T? Load<T>(Stream stream);
-
-		/// <summary>Saves a value to a stream.</summary>
-		/// <typeparam name="T">The type of value to serialize.</typeparam>
+		/// <summary>Serializes the current docking layout to a stream.</summary>
 		/// <param name="stream">The stream to write to.</param>
-		/// <param name="value">The value to serialize.</param>
-		void Save<T>(Stream stream, T value);
+		void Serialize(Stream stream);
+
+		/// <summary>Deserializes a docking layout from a stream and applies fixup.</summary>
+		/// <param name="stream">The stream to read from.</param>
+		void Deserialize(Stream stream);
+
+		/// <summary>Serializes the current docking layout to a file.</summary>
+		/// <param name="filepath">The file path to write to.</param>
+		void Serialize(string filepath);
+
+		/// <summary>Deserializes a docking layout from a file and applies fixup.</summary>
+		/// <param name="filepath">The file path to read from.</param>
+		void Deserialize(string filepath);
 	}
 }
