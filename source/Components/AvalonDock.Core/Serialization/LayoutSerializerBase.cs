@@ -1,6 +1,7 @@
 #nullable disable
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using AvalonDock.Core.Serialization;
 
@@ -33,15 +34,25 @@ namespace AvalonDock.Core
 
 	/// <summary>
 	/// UI-independent base class for layout serialization/deserialization.
-	/// Works against <see cref="ISerializableDockingManager"/> and related interfaces.
+	/// Implements <see cref="ILayoutSerializer"/> for generic serialization
+	/// and provides layout-aware fixup when a docking manager is available.
 	/// </summary>
-	public abstract class LayoutSerializerBase
+	public abstract class LayoutSerializerBase : ILayoutSerializer
 	{
 		private ISerializableLayoutAnchorable[] _previousAnchorables;
 		private ISerializableLayoutDocument[] _previousDocuments;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="LayoutSerializerBase"/> class.
+		/// Initializes a new instance of the <see cref="LayoutSerializerBase"/> class
+		/// for generic serialization (DI use). Layout-aware methods require a manager.
+		/// </summary>
+		protected LayoutSerializerBase()
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutSerializerBase"/> class
+		/// with a docking manager for layout-aware serialization.
 		/// </summary>
 		/// <param name="manager">The docking manager to serialize.</param>
 		protected LayoutSerializerBase(ISerializableDockingManager manager)
@@ -58,8 +69,20 @@ namespace AvalonDock.Core
 		/// </summary>
 		public event EventHandler<LayoutSerializationCallbackEventArgs> LayoutSerializationCallback;
 
-		/// <summary>Gets the docking manager being serialized.</summary>
+		/// <summary>Gets the docking manager being serialized, or null if created for generic use.</summary>
 		public ISerializableDockingManager Manager { get; }
+
+		/// <inheritdoc/>
+		public abstract string Serialize<T>(T value);
+
+		/// <inheritdoc/>
+		public abstract T Deserialize<T>(string text);
+
+		/// <inheritdoc/>
+		public abstract T Load<T>(Stream stream);
+
+		/// <inheritdoc/>
+		public abstract void Save<T>(Stream stream, T value);
 
 		/// <summary>
 		/// Fixes up a deserialized layout: reconnects previous containers,

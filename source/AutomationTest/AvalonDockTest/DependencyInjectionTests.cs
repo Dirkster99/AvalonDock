@@ -171,16 +171,16 @@ namespace AvalonDockTest
 		}
 
 		[Test]
-		public void AddAvalonDockSerializer_XmlDockLayoutSerializer_Resolves()
+		public void AddAvalonDockSerializer_XmlLayoutSerializer_Resolves()
 		{
 			var services = new ServiceCollection();
-			services.AddAvalonDockSerializer<XmlDockLayoutSerializer>();
+			services.AddAvalonDockSerializer<XmlLayoutSerializer>();
 
 			var provider = services.BuildServiceProvider();
 			var serializer = provider.GetRequiredService<ILayoutSerializer>();
 
 			Assert.That(serializer, Is.Not.Null);
-			Assert.That(serializer, Is.InstanceOf<XmlDockLayoutSerializer>());
+			Assert.That(serializer, Is.InstanceOf<XmlLayoutSerializer>());
 		}
 
 		[Test]
@@ -219,9 +219,9 @@ namespace AvalonDockTest
 		}
 
 		[Test]
-		public void XmlDockLayoutSerializer_RoundTrips()
+		public void XmlLayoutSerializer_RoundTrips()
 		{
-			var serializer = new XmlDockLayoutSerializer();
+			var serializer = new XmlLayoutSerializer();
 			var data = new TestData { Name = "test", Value = 42 };
 
 			var xml = serializer.Serialize(data);
@@ -249,9 +249,9 @@ namespace AvalonDockTest
 		}
 
 		[Test]
-		public void XmlDockLayoutSerializer_StreamRoundTrips()
+		public void XmlLayoutSerializer_StreamRoundTrips()
 		{
-			var serializer = new XmlDockLayoutSerializer();
+			var serializer = new XmlLayoutSerializer();
 			var data = new TestData { Name = "stream", Value = 99 };
 
 			using var stream = new System.IO.MemoryStream();
