@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using AvalonDock.Core;
+using AvalonDock.Core.Events;
+using AvalonDock.Core.Serialization;
 using AvalonDock.DependencyInjection;
 using AvalonDock.Mvvm;
 using AvalonDock.Serializer.Json;
@@ -267,5 +269,327 @@ namespace AvalonDockTest
 	{
 		public string? Name { get; set; }
 		public int Value { get; set; }
+	}
+
+	internal class TestThemeManager : IThemeManager
+	{
+		private readonly List<IThemeInfo> _themes = new List<IThemeInfo>();
+		public string? CurrentThemeName { get; private set; }
+		public IReadOnlyList<IThemeInfo> AvailableThemes => _themes.AsReadOnly();
+		public event System.EventHandler? ThemeChanged;
+
+		public bool ApplyTheme(string themeName)
+		{
+			CurrentThemeName = themeName;
+			ThemeChanged?.Invoke(this, System.EventArgs.Empty);
+			return true;
+		}
+	}
+
+	internal class TestAutoHideManager : IAutoHideManager
+	{
+		public int AutoHideDelayMs { get; set; } = 1000;
+		public bool IsAutoHideVisible { get; private set; }
+		public string? CurrentAutoHideContentId { get; private set; }
+
+		public void ShowAutoHide(string contentId)
+		{
+			CurrentAutoHideContentId = contentId;
+			IsAutoHideVisible = true;
+		}
+
+		public void HideAutoHide()
+		{
+			CurrentAutoHideContentId = null;
+			IsAutoHideVisible = false;
+		}
+	}
+
+	internal class TestFloatingWindowService : IFloatingWindowService
+	{
+		public int FloatingWindowCount { get; private set; }
+		public event System.EventHandler? FloatingWindowCreated;
+		public event System.EventHandler? FloatingWindowClosed;
+
+		public bool Float(string contentId)
+		{
+			FloatingWindowCount++;
+			FloatingWindowCreated?.Invoke(this, System.EventArgs.Empty);
+			return true;
+		}
+
+		public void CloseAllFloatingWindows()
+		{
+			FloatingWindowCount = 0;
+			FloatingWindowClosed?.Invoke(this, System.EventArgs.Empty);
+		}
+	}
+
+	internal class TestDragDropHandler : IDragDropHandler
+	{
+		public bool IsDragDropEnabled { get; set; } = true;
+
+		public bool CanDrop(string contentId, string targetContentId, DockPosition position)
+		{
+			return IsDragDropEnabled && position != DockPosition.None;
+		}
+	}
+
+	[TestFixture]
+	public class CoreInterfaceTests
+	{
+		[Test]
+		[Category("Unit")]
+		public void AddThemeManager_RegistersSingleton()
+		{
+			var services = new ServiceCollection();
+			services.AddAvalonDockThemeManager<TestThemeManager>();
+
+			var provider = services.BuildServiceProvider();
+			var tm1 = provider.GetRequiredService<IThemeManager>();
+			var tm2 = provider.GetRequiredService<IThemeManager>();
+
+			Assert.That(tm1, Is.Not.Null);
+			Assert.That(tm1, Is.SameAs(tm2));
+			Assert.That(tm1, Is.InstanceOf<TestThemeManager>());
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void AddThemeManager_ApplyTheme_ChangesCurrentName()
+		{
+			var services = new ServiceCollection();
+			services.AddAvalonDockThemeManager<TestThemeManager>();
+
+			var provider = services.BuildServiceProvider();
+			var tm = provider.GetRequiredService<IThemeManager>();
+
+			Assert.That(tm.CurrentThemeName, Is.Null);
+			tm.ApplyTheme("ArcDark");
+			Assert.That(tm.CurrentThemeName, Is.EqualTo("ArcDark"));
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void AddThemeManager_RaisesThemeChanged()
+		{
+			var services = new ServiceCollection();
+			services.AddAvalonDockThemeManager<TestThemeManager>();
+
+			var provider = services.BuildServiceProvider();
+			var tm = provider.GetRequiredService<IThemeManager>();
+
+			bool raised = false;
+			tm.ThemeChanged += (s, e) => raised = true;
+			tm.ApplyTheme("Test");
+
+			Assert.That(raised, Is.True);
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void AddAutoHideManager_RegistersSingleton()
+		{
+			var services = new ServiceCollection();
+			services.AddAutoHideManager<TestAutoHideManager>();
+
+			var provider = services.BuildServiceProvider();
+			var ahm1 = provider.GetRequiredService<IAutoHideManager>();
+			var ahm2 = provider.GetRequiredService<IAutoHideManager>();
+
+			Assert.That(ahm1, Is.Not.Null);
+			Assert.That(ahm1, Is.SameAs(ahm2));
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void AutoHideManager_ShowAndHide()
+		{
+			var services = new ServiceCollection();
+			services.AddAutoHideManager<TestAutoHideManager>();
+
+			var provider = services.BuildServiceProvider();
+			var ahm = provider.GetRequiredService<IAutoHideManager>();
+
+			Assert.That(ahm.IsAutoHideVisible, Is.False);
+			ahm.ShowAutoHide("explorer");
+			Assert.That(ahm.IsAutoHideVisible, Is.True);
+			Assert.That(ahm.CurrentAutoHideContentId, Is.EqualTo("explorer"));
+
+			ahm.HideAutoHide();
+			Assert.That(ahm.IsAutoHideVisible, Is.False);
+			Assert.That(ahm.CurrentAutoHideContentId, Is.Null);
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void AddFloatingWindowService_RegistersSingleton()
+		{
+			var services = new ServiceCollection();
+			services.AddFloatingWindowService<TestFloatingWindowService>();
+
+			var provider = services.BuildServiceProvider();
+			var fws1 = provider.GetRequiredService<IFloatingWindowService>();
+			var fws2 = provider.GetRequiredService<IFloatingWindowService>();
+
+			Assert.That(fws1, Is.Not.Null);
+			Assert.That(fws1, Is.SameAs(fws2));
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void FloatingWindowService_FloatAndClose()
+		{
+			var services = new ServiceCollection();
+			services.AddFloatingWindowService<TestFloatingWindowService>();
+
+			var provider = services.BuildServiceProvider();
+			var fws = provider.GetRequiredService<IFloatingWindowService>();
+
+			Assert.That(fws.FloatingWindowCount, Is.EqualTo(0));
+			fws.Float("doc1");
+			Assert.That(fws.FloatingWindowCount, Is.EqualTo(1));
+			fws.Float("doc2");
+			Assert.That(fws.FloatingWindowCount, Is.EqualTo(2));
+
+			fws.CloseAllFloatingWindows();
+			Assert.That(fws.FloatingWindowCount, Is.EqualTo(0));
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void AddDragDropHandler_RegistersSingleton()
+		{
+			var services = new ServiceCollection();
+			services.AddDragDropHandler<TestDragDropHandler>();
+
+			var provider = services.BuildServiceProvider();
+			var ddh1 = provider.GetRequiredService<IDragDropHandler>();
+			var ddh2 = provider.GetRequiredService<IDragDropHandler>();
+
+			Assert.That(ddh1, Is.Not.Null);
+			Assert.That(ddh1, Is.SameAs(ddh2));
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void DragDropHandler_CanDrop_Rules()
+		{
+			var ddh = new TestDragDropHandler();
+
+			Assert.That(ddh.CanDrop("doc1", "target1", DockPosition.Left), Is.True);
+			Assert.That(ddh.CanDrop("doc1", "target1", DockPosition.None), Is.False);
+
+			ddh.IsDragDropEnabled = false;
+			Assert.That(ddh.CanDrop("doc1", "target1", DockPosition.Left), Is.False);
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void AddDockingManager_WithFactory_RegistersSingleton()
+		{
+			var services = new ServiceCollection();
+			var fakeDm = new FakeDockingManager();
+			services.AddDockingManager(sp => fakeDm);
+
+			var provider = services.BuildServiceProvider();
+			var dm1 = provider.GetRequiredService<IDockingManager>();
+			var dm2 = provider.GetRequiredService<IDockingManager>();
+
+			Assert.That(dm1, Is.Not.Null);
+			Assert.That(dm1, Is.SameAs(dm2));
+			Assert.That(dm1, Is.SameAs(fakeDm));
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void CoreEventArgs_CanBeCreated()
+		{
+			var args1 = new DocumentCancelEventArgs(new FakeDocument());
+			Assert.That(args1.Document, Is.Not.Null);
+			Assert.That(args1.Cancel, Is.False);
+
+			var args2 = new AnchorableCancelEventArgs(new FakeAnchorable());
+			Assert.That(args2.Anchorable, Is.Not.Null);
+			Assert.That(args2.CloseInsteadOfHide, Is.False);
+
+			var args3 = new ContentEventArgs(new FakeDocument());
+			Assert.That(args3.Content, Is.Not.Null);
+		}
+	}
+
+	internal class FakeDockingManager : IDockingManager
+	{
+		public object? ActiveContent { get; set; }
+		public System.Collections.IEnumerable? DocumentsSource { get; set; }
+		public System.Collections.IEnumerable? AnchorablesSource { get; set; }
+		public int AutoHideDelay { get; set; }
+		public bool AllowMixedOrientation { get; set; }
+		public ISerializableLayoutRoot? Layout
+		{
+			get => null;
+			set { }
+		}
+
+		ISerializableLayoutRoot ISerializableDockingManager.Layout
+		{
+			get => Layout!;
+			set => Layout = value;
+		}
+
+		public bool SuspendDocumentsSourceBinding { get; set; }
+		public bool SuspendAnchorablesSourceBinding { get; set; }
+		public event System.EventHandler? ActiveContentChanged;
+		public event System.EventHandler? LayoutChanged;
+		public event System.EventHandler? LayoutChanging;
+		public event System.EventHandler<DocumentCancelEventArgs>? DocumentClosing;
+		public event System.EventHandler<DocumentEventArgs>? DocumentClosed;
+		public event System.EventHandler<AnchorableCancelEventArgs>? AnchorableClosing;
+		public event System.EventHandler<AnchorableEventArgs>? AnchorableClosed;
+		public event System.EventHandler<AnchorableCancelEventArgs>? AnchorableHiding;
+		public event System.EventHandler<AnchorableEventArgs>? AnchorableHidden;
+		public event System.EventHandler<ContentCancelEventArgs>? ContentFloating;
+		public event System.EventHandler<ContentEventArgs>? ContentFloated;
+		public event System.EventHandler<ContentCancelEventArgs>? ContentDocking;
+		public event System.EventHandler<ContentEventArgs>? ContentDocked;
+
+		// Suppress unused event warnings
+		internal void SuppressWarnings()
+		{
+			ActiveContentChanged?.Invoke(this, System.EventArgs.Empty);
+			LayoutChanged?.Invoke(this, System.EventArgs.Empty);
+			LayoutChanging?.Invoke(this, System.EventArgs.Empty);
+			DocumentClosing?.Invoke(this, null!);
+			DocumentClosed?.Invoke(this, null!);
+			AnchorableClosing?.Invoke(this, null!);
+			AnchorableClosed?.Invoke(this, null!);
+			AnchorableHiding?.Invoke(this, null!);
+			AnchorableHidden?.Invoke(this, null!);
+			ContentFloating?.Invoke(this, null!);
+			ContentFloated?.Invoke(this, null!);
+			ContentDocking?.Invoke(this, null!);
+			ContentDocked?.Invoke(this, null!);
+		}
+	}
+
+	internal class FakeDocument : ISerializableLayoutDocument
+	{
+		public string ContentId { get; set; } = "fake-doc";
+		public string Title { get; set; } = "Fake Doc";
+		public object Content { get; set; } = new object();
+		public object IconSource { get; set; } = null!;
+		public void Close() { }
+		public void FixCachedRootOnDeserialize() { }
+	}
+
+	internal class FakeAnchorable : ISerializableLayoutAnchorable
+	{
+		public string ContentId { get; set; } = "fake-anc";
+		public string Title { get; set; } = "Fake Anchorable";
+		public object Content { get; set; } = new object();
+		public object IconSource { get; set; } = null!;
+		public void Close() { }
+		public void FixCachedRootOnDeserialize() { }
+		public bool HideAnchorable(bool cancelable) => false;
 	}
 }

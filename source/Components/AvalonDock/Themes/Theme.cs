@@ -13,12 +13,18 @@ using System.Windows;
 namespace AvalonDock.Themes
 {
 	/// <summary>Provides a base class for the implementation of a custom AvalonDock WPF theme.</summary>
-	public abstract class Theme : DependencyObject
+	public abstract class Theme : DependencyObject, Core.IThemeInfo
 	{
 		/// <summary>Class constructor</summary>
 		public Theme()
 		{
 		}
+
+		/// <summary>Gets the display name of this theme (defaults to the type name without "Theme" suffix).</summary>
+		public virtual string Name => GetType().Name.Replace("Theme", string.Empty);
+
+		/// <summary>Gets the <see cref="Uri"/> of the XAML resource dictionary for this theme.</summary>
+		Uri Core.IThemeInfo.ResourceUri => GetResourceUri();
 
 		/// <summary>Gets the <see cref="Uri"/> of the XAML that contains the definition for this AvalonDock theme.</summary>
 		/// <returns><see cref="Uri"/> of the XAML that contains the definition for this custom AvalonDock theme</returns>

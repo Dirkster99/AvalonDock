@@ -41,7 +41,7 @@ namespace AvalonDock
 	[ContentProperty(nameof(Layout))]
 	[TemplatePart(Name = "PART_AutoHideArea")]
 	[SuppressMessage("Maintainability", "CA1506:Avoid excessive class coupling")]
-	public class DockingManager : Control, IOverlayWindowHost, Core.Serialization.ISerializableDockingManager// , ILogicalChildrenContainer
+	public class DockingManager : Control, IOverlayWindowHost, Core.Serialization.ISerializableDockingManager, Core.IDockingManager// , ILogicalChildrenContainer
 	{
 		// ShortCut to current AvalonDock theme if OnThemeChanged() is invoked with DictionaryTheme instance
 		// in e.OldValue and e.NewValue of the passed event
@@ -90,6 +90,78 @@ namespace AvalonDock
 		{
 			get => SuspendAnchorablesSourceBinding;
 			set => SuspendAnchorablesSourceBinding = value;
+		}
+
+		// Core IDockingManager explicit event backing fields
+		private event EventHandler<Core.Events.DocumentCancelEventArgs> _coreDocumentClosing;
+		private event EventHandler<Core.Events.DocumentEventArgs> _coreDocumentClosed;
+		private event EventHandler<Core.Events.AnchorableCancelEventArgs> _coreAnchorableClosing;
+		private event EventHandler<Core.Events.AnchorableEventArgs> _coreAnchorableClosed;
+		private event EventHandler<Core.Events.AnchorableCancelEventArgs> _coreAnchorableHiding;
+		private event EventHandler<Core.Events.AnchorableEventArgs> _coreAnchorableHidden;
+		private event EventHandler<Core.Events.ContentCancelEventArgs> _coreContentFloating;
+		private event EventHandler<Core.Events.ContentEventArgs> _coreContentFloated;
+		private event EventHandler<Core.Events.ContentCancelEventArgs> _coreContentDocking;
+		private event EventHandler<Core.Events.ContentEventArgs> _coreContentDocked;
+
+		event EventHandler<Core.Events.DocumentCancelEventArgs> Core.IDockingManager.DocumentClosing
+		{
+			add => _coreDocumentClosing += value;
+			remove => _coreDocumentClosing -= value;
+		}
+
+		event EventHandler<Core.Events.DocumentEventArgs> Core.IDockingManager.DocumentClosed
+		{
+			add => _coreDocumentClosed += value;
+			remove => _coreDocumentClosed -= value;
+		}
+
+		event EventHandler<Core.Events.AnchorableCancelEventArgs> Core.IDockingManager.AnchorableClosing
+		{
+			add => _coreAnchorableClosing += value;
+			remove => _coreAnchorableClosing -= value;
+		}
+
+		event EventHandler<Core.Events.AnchorableEventArgs> Core.IDockingManager.AnchorableClosed
+		{
+			add => _coreAnchorableClosed += value;
+			remove => _coreAnchorableClosed -= value;
+		}
+
+		event EventHandler<Core.Events.AnchorableCancelEventArgs> Core.IDockingManager.AnchorableHiding
+		{
+			add => _coreAnchorableHiding += value;
+			remove => _coreAnchorableHiding -= value;
+		}
+
+		event EventHandler<Core.Events.AnchorableEventArgs> Core.IDockingManager.AnchorableHidden
+		{
+			add => _coreAnchorableHidden += value;
+			remove => _coreAnchorableHidden -= value;
+		}
+
+		event EventHandler<Core.Events.ContentCancelEventArgs> Core.IDockingManager.ContentFloating
+		{
+			add => _coreContentFloating += value;
+			remove => _coreContentFloating -= value;
+		}
+
+		event EventHandler<Core.Events.ContentEventArgs> Core.IDockingManager.ContentFloated
+		{
+			add => _coreContentFloated += value;
+			remove => _coreContentFloated -= value;
+		}
+
+		event EventHandler<Core.Events.ContentCancelEventArgs> Core.IDockingManager.ContentDocking
+		{
+			add => _coreContentDocking += value;
+			remove => _coreContentDocking -= value;
+		}
+
+		event EventHandler<Core.Events.ContentEventArgs> Core.IDockingManager.ContentDocked
+		{
+			add => _coreContentDocked += value;
+			remove => _coreContentDocked -= value;
 		}
 
 		/// <summary>
@@ -1733,9 +1805,12 @@ namespace AvalonDock
 			var floatingArgs = new ContentFloatingEventArgs(contentModel);
 			ContentFloating?.Invoke(this, floatingArgs);
 			if (floatingArgs.Cancel)
-			{
 				return;
-			}
+
+			var coreFloatArgs1 = new Core.Events.ContentCancelEventArgs(contentModel);
+			_coreContentFloating?.Invoke(this, coreFloatArgs1);
+			if (coreFloatArgs1.Cancel)
+				return;
 
 			LayoutFloatingWindowControl fwc = null;
 
@@ -1770,6 +1845,7 @@ namespace AvalonDock
 					if (startDrag) fwc.AttachDrag();
 					fwc.Show();
 					ContentFloated?.Invoke(this, new ContentFloatedEventArgs(content));
+					_coreContentFloated?.Invoke(this, new Core.Events.ContentEventArgs(content));
 				}), DispatcherPriority.Send);
 			}
 		}
@@ -1787,9 +1863,12 @@ namespace AvalonDock
 				var floatingArgs = new ContentFloatingEventArgs(firstContent);
 				ContentFloating?.Invoke(this, floatingArgs);
 				if (floatingArgs.Cancel)
-				{
 					return;
-				}
+
+				var coreFloatArgs2 = new Core.Events.ContentCancelEventArgs(firstContent);
+				_coreContentFloating?.Invoke(this, coreFloatArgs2);
+				if (coreFloatArgs2.Cancel)
+					return;
 			}
 
 			var fwc = CreateFloatingWindowForLayoutAnchorableWithoutParent(paneModel, false);
@@ -1803,6 +1882,7 @@ namespace AvalonDock
 			if (firstContent != null)
 			{
 				ContentFloated?.Invoke(this, new ContentFloatedEventArgs(firstContent));
+				_coreContentFloated?.Invoke(this, new Core.Events.ContentEventArgs(firstContent));
 			}
 		}
 
@@ -1887,10 +1967,16 @@ namespace AvalonDock
 			if (closingArgs?.Cancel == true)
 				return;
 
+			var coreClosingArgs = new Core.Events.AnchorableCancelEventArgs(model);
+			_coreAnchorableClosing?.Invoke(this, coreClosingArgs);
+			if (coreClosingArgs.Cancel)
+				return;
+
 			if (model.CloseAnchorable())
 			{
 				RemoveViewFromLogicalChild(model);
 				AnchorableClosed?.Invoke(this, new AnchorableClosedEventArgs(model));
+				_coreAnchorableClosed?.Invoke(this, new Core.Events.AnchorableEventArgs(model));
 			}
 		}
 
@@ -1903,6 +1989,10 @@ namespace AvalonDock
 				if (argsClosing.Cancel) return;
 			}
 
+			var coreClosingArgs = new Core.Events.DocumentCancelEventArgs(document);
+			_coreDocumentClosing?.Invoke(this, coreClosingArgs);
+			if (coreClosingArgs.Cancel) return;
+
 			// Get the document to activate after the close.
 			LayoutDocument documentToActivate = GetDocumentToActivate(document);
 
@@ -1912,6 +2002,7 @@ namespace AvalonDock
 			if (document.Content is UIElement uIElement)
 				RemoveLogicalChild(uIElement);
 			DocumentClosed?.Invoke(this, new DocumentClosedEventArgs(document));
+			_coreDocumentClosed?.Invoke(this, new Core.Events.DocumentEventArgs(document));
 
 			// get rid of the closed document content
 			document.Content = null;
@@ -1962,8 +2053,21 @@ namespace AvalonDock
 
 			if (hidingArgs?.Cancel == true) return;
 
+			var coreHidingArgs = new Core.Events.AnchorableCancelEventArgs(model);
+			_coreAnchorableHiding?.Invoke(this, coreHidingArgs);
+			if (coreHidingArgs.CloseInsteadOfHide)
+			{
+				ExecuteCloseCommand(model);
+				return;
+			}
+
+			if (coreHidingArgs.Cancel) return;
+
 			if (model.HideAnchorable(true))
+			{
 				AnchorableHidden?.Invoke(this, new AnchorableHiddenEventArgs(model));
+				_coreAnchorableHidden?.Invoke(this, new Core.Events.AnchorableEventArgs(model));
+			}
 		}
 
 		internal virtual void ExecuteAutoHideCommand(LayoutAnchorable _anchorable) => _anchorable.ToggleAutoHide();
@@ -1980,12 +2084,16 @@ namespace AvalonDock
 			var floatingArgs = new ContentFloatingEventArgs(contentToFloat);
 			ContentFloating?.Invoke(this, floatingArgs);
 			if (floatingArgs.Cancel)
-			{
 				return;
-			}
+
+			var coreFloatingArgs = new Core.Events.ContentCancelEventArgs(contentToFloat);
+			_coreContentFloating?.Invoke(this, coreFloatingArgs);
+			if (coreFloatingArgs.Cancel)
+				return;
 
 			contentToFloat.Float();
 			ContentFloated?.Invoke(this, new ContentFloatedEventArgs(contentToFloat));
+			_coreContentFloated?.Invoke(this, new Core.Events.ContentEventArgs(contentToFloat));
 		}
 
 		internal void ExecuteDockCommand(LayoutAnchorable anchorable)
@@ -1993,12 +2101,16 @@ namespace AvalonDock
 			var dockingArgs = new ContentDockingEventArgs(anchorable);
 			ContentDocking?.Invoke(this, dockingArgs);
 			if (dockingArgs.Cancel)
-			{
 				return;
-			}
+
+			var coreDockingArgs = new Core.Events.ContentCancelEventArgs(anchorable);
+			_coreContentDocking?.Invoke(this, coreDockingArgs);
+			if (coreDockingArgs.Cancel)
+				return;
 
 			anchorable.Dock();
 			ContentDocked?.Invoke(this, new ContentDockedEventArgs(anchorable));
+			_coreContentDocked?.Invoke(this, new Core.Events.ContentEventArgs(anchorable));
 		}
 
 		internal void ExecuteDockAsDocumentCommand(LayoutContent content)
@@ -2006,12 +2118,16 @@ namespace AvalonDock
 			var dockingArgs = new ContentDockingEventArgs(content);
 			ContentDocking?.Invoke(this, dockingArgs);
 			if (dockingArgs.Cancel)
-			{
 				return;
-			}
+
+			var coreDockingArgs = new Core.Events.ContentCancelEventArgs(content);
+			_coreContentDocking?.Invoke(this, coreDockingArgs);
+			if (coreDockingArgs.Cancel)
+				return;
 
 			content.DockAsDocument();
 			ContentDocked?.Invoke(this, new ContentDockedEventArgs(content));
+			_coreContentDocked?.Invoke(this, new Core.Events.ContentEventArgs(content));
 		}
 
 		internal void ExecuteContentActivateCommand(LayoutContent content) => content.IsActive = true;
