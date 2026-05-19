@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using AvalonDock.Core;
 using Microsoft.Extensions.DependencyInjection;
 namespace AvalonDock.DependencyInjection
@@ -174,6 +175,36 @@ namespace AvalonDock.DependencyInjection
 			where TDragDrop : class, IDragDropHandler
 		{
 			services.AddSingleton<IDragDropHandler, TDragDrop>();
+			return services;
+		}
+
+		/// <summary>
+		/// Registers the <see cref="IDockLayoutService"/> which auto-builds the MVVM layout tree
+		/// from all registered <see cref="IToolbox"/> instances.
+		/// </summary>
+		/// <param name="services">The service collection.</param>
+		/// <returns>The service collection for chaining.</returns>
+		public static IServiceCollection AddDockLayoutService(this IServiceCollection services)
+		{
+			services.AddSingleton<IDockLayoutService>(sp =>
+			{
+				var toolboxes = sp.GetService<IEnumerable<IToolbox>>()
+					?? System.Array.Empty<IToolbox>();
+				return new Mvvm.DockLayoutService(toolboxes);
+			});
+			return services;
+		}
+
+		/// <summary>
+		/// Registers the <see cref="IDockLayoutService"/> with a custom implementation.
+		/// </summary>
+		/// <typeparam name="TService">The concrete type implementing <see cref="IDockLayoutService"/>.</typeparam>
+		/// <param name="services">The service collection.</param>
+		/// <returns>The service collection for chaining.</returns>
+		public static IServiceCollection AddDockLayoutService<TService>(this IServiceCollection services)
+			where TService : class, IDockLayoutService
+		{
+			services.AddSingleton<IDockLayoutService, TService>();
 			return services;
 		}
 	}

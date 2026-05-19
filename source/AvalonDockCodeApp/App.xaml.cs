@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Windows;
 using AvalonDock;
 using AvalonDock.Core;
@@ -44,19 +43,22 @@ namespace ToggleTestApp
 			services.AddToolbox<ProblemsViewModel>();
 			services.AddToolbox<TerminalViewModel>();
 
-			// Register each as IToolbox for collection injection into MainViewModel
+			// Register each as IToolbox for collection injection into DockLayoutService
 			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<FolderExplorerViewModel>());
 			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SearchViewModel>());
 			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SourceControlViewModel>());
 			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<ProblemsViewModel>());
 			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<TerminalViewModel>());
 
-			// MainViewModel builds the MVVM dock tree from all registered toolboxes
+			// Dock layout service — auto-builds the MVVM dock tree from toolboxes
+			services.AddDockLayoutService();
+
+			// MainViewModel uses the layout service for all dock operations
 			services.AddSingleton<MainViewModel>(sp =>
 			{
-				var toolboxes = sp.GetRequiredService<IEnumerable<IToolbox>>();
+				var dockService = sp.GetRequiredService<IDockLayoutService>();
 				var folderVm = sp.GetRequiredService<FolderExplorerViewModel>();
-				var mainVm = new MainViewModel(toolboxes, folderVm);
+				var mainVm = new MainViewModel(dockService, folderVm);
 				folderVm.SetOpenFileCallback(mainVm.OpenFile);
 				return mainVm;
 			});

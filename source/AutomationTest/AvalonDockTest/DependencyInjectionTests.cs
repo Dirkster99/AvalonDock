@@ -456,6 +456,89 @@ namespace AvalonDockTest
 			var args3 = new ContentEventArgs(new FakeDocument());
 			Assert.That(args3.Content, Is.Not.Null);
 		}
+
+		[Test]
+		[Category("Unit")]
+		public void AddDockLayoutService_RegistersSingleton()
+		{
+			var services = new ServiceCollection();
+			services.AddToolbox<DiTestToolbox>();
+			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<DiTestToolbox>());
+			services.AddDockLayoutService();
+
+			var provider = services.BuildServiceProvider();
+			var svc1 = provider.GetRequiredService<IDockLayoutService>();
+			var svc2 = provider.GetRequiredService<IDockLayoutService>();
+
+			Assert.That(svc1, Is.SameAs(svc2));
+			Assert.That(svc1.Layout, Is.Not.Null);
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void DockLayoutService_CollectsToolboxes()
+		{
+			var services = new ServiceCollection();
+			services.AddToolbox<DiTestToolbox>();
+			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<DiTestToolbox>());
+			services.AddDockLayoutService();
+
+			var provider = services.BuildServiceProvider();
+			var svc = provider.GetRequiredService<IDockLayoutService>();
+
+			Assert.That(svc.Anchorables.Count(), Is.EqualTo(1));
+			Assert.That(svc.Anchorables.First().Title, Is.EqualTo("DI Test"));
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void DockLayoutService_OpenAndCloseDocument()
+		{
+			var svc = new DockLayoutService(System.Array.Empty<IToolbox>());
+			var doc = new Document { Id = "doc1", Title = "Test Doc" };
+
+			svc.OpenDocument(doc);
+			Assert.That(svc.Documents.Count(), Is.EqualTo(1));
+			Assert.That(svc.ActiveDockable, Is.SameAs(doc));
+
+			svc.CloseDocument(doc);
+			Assert.That(svc.Documents.Count(), Is.EqualTo(0));
+			Assert.That(svc.ActiveDockable, Is.Null);
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void DockLayoutService_OpenOrActivateDocument()
+		{
+			var svc = new DockLayoutService(System.Array.Empty<IToolbox>());
+			var doc1 = new Document { Id = "doc1", Title = "Doc 1" };
+
+			var result1 = svc.OpenOrActivateDocument<Document>(
+				d => d.Id == "doc1", () => doc1);
+			Assert.That(result1, Is.SameAs(doc1));
+			Assert.That(svc.Documents.Count(), Is.EqualTo(1));
+
+			// Call again — should return existing, not create new
+			var result2 = svc.OpenOrActivateDocument<Document>(
+				d => d.Id == "doc1", () => new Document { Id = "doc1b", Title = "Doc 1b" });
+			Assert.That(result2, Is.SameAs(doc1));
+			Assert.That(svc.Documents.Count(), Is.EqualTo(1));
+		}
+
+		[Test]
+		[Category("Unit")]
+		public void DockLayoutService_FindDocument()
+		{
+			var svc = new DockLayoutService(System.Array.Empty<IToolbox>());
+			var doc = new Document { Id = "findme", Title = "Find Me" };
+			svc.OpenDocument(doc);
+
+			var found = svc.FindDocument<Document>(d => d.Id == "findme");
+			Assert.That(found, Is.SameAs(doc));
+
+			var notFound = svc.FindDocument<Document>(d => d.Id == "missing");
+			Assert.That(notFound, Is.Null);
+		}
 	}
 
 	internal class FakeDockingManager : IDockingManager
