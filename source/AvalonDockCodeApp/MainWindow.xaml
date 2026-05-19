@@ -158,9 +158,7 @@
         <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1"
                                          BorderThickness="0"
                                          Background="#252729"
-                                         ActiveContent="{Binding ActiveEditor, Mode=TwoWay}"
-                                         DocumentsSource="{Binding OpenEditors}"
-                                         AnchorablesSource="{Binding Toolboxes}"
+                                         DockLayout="{Binding DockLayout}"
                                          DocumentHeaderTemplate="{StaticResource DocumentTabHeaderTemplate}"
                                          LayoutItemContainerStyleSelector="{StaticResource PanesStyleSelector}">
             <avalonDock:ToggleDockingManager.Theme>

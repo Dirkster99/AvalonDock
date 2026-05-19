@@ -1,16 +1,13 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Windows.Media;
+using AvalonDock.Mvvm;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ToggleTestApp.ViewModels;
 
-public partial class EditorTabViewModel : ObservableObject
+public partial class EditorTabViewModel : Document
 {
-    [ObservableProperty]
-    private string _title = "Untitled";
-
     [ObservableProperty]
     private string _toolTip = string.Empty;
 
@@ -21,20 +18,18 @@ public partial class EditorTabViewModel : ObservableObject
     private string _content = string.Empty;
 
     [ObservableProperty]
-    private bool _isModified;
-
-    [ObservableProperty]
     private string _syntaxHighlighting = "Text";
 
     [ObservableProperty]
     private ImageSource? _iconSource;
 
-    public string ContentId => FilePath;
+    public string ContentId => Id;
 
     public void LoadFile(string path)
     {
         FilePath = path;
         Title = Path.GetFileName(path);
+        Id = path;
         ToolTip = path;
         IconSource = FileIconHelper.GetIconForExtension(Path.GetExtension(path));
         SyntaxHighlighting = GetHighlightingForExtension(Path.GetExtension(path));

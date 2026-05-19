@@ -140,11 +140,13 @@ namespace AvalonDock
 		private void SubscribeToWpf()
 		{
 			_manager.ActiveContentChanged += OnWpfActiveContentChanged;
+			_manager.DocumentClosed += OnWpfDocumentClosed;
 		}
 
 		private void UnsubscribeFromWpf()
 		{
 			_manager.ActiveContentChanged -= OnWpfActiveContentChanged;
+			_manager.DocumentClosed -= OnWpfDocumentClosed;
 		}
 
 		private void OnDocumentCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -242,6 +244,50 @@ namespace AvalonDock
 			finally
 			{
 				_isSyncing = false;
+			}
+		}
+
+		private void OnWpfDocumentClosed(object sender, DocumentClosedEventArgs e)
+		{
+			if (_isSyncing)
+				return;
+
+			_isSyncing = true;
+			try
+			{
+				var content = e.Document.Content;
+				_documentModels?.Remove(content);
+
+				if (content is IDockable dockable)
+					RemoveDockableFromTree(_rootDock, dockable, isDocument: true);
+			}
+			finally
+			{
+				_isSyncing = false;
+			}
+		}
+
+		private void RemoveDockableFromTree(IDockable node, IDockable target, bool isDocument)
+		{
+			if (isDocument && node is IDocumentDock docDock)
+			{
+				docDock.VisibleDockables?.Remove(target);
+				return;
+			}
+
+			if (!isDocument && node is IToolDock toolDock)
+			{
+				toolDock.VisibleDockables?.Remove(target);
+				return;
+			}
+
+			if (node is IDock dock && dock.VisibleDockables != null)
+			{
+				foreach (var child in dock.VisibleDockables)
+				{
+					if (child is IDock)
+						RemoveDockableFromTree(child, target, isDocument);
+				}
 			}
 		}
 

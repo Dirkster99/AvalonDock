@@ -44,14 +44,14 @@ namespace ToggleTestApp
 			services.AddToolbox<ProblemsViewModel>();
 			services.AddToolbox<TerminalViewModel>();
 
-			// Register each as IToolbox for collection injection
+			// Register each as IToolbox for collection injection into MainViewModel
 			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<FolderExplorerViewModel>());
 			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SearchViewModel>());
 			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SourceControlViewModel>());
 			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<ProblemsViewModel>());
 			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<TerminalViewModel>());
 
-			// MainViewModel receives all registered toolboxes
+			// MainViewModel builds the MVVM dock tree from all registered toolboxes
 			services.AddSingleton<MainViewModel>(sp =>
 			{
 				var toolboxes = sp.GetRequiredService<IEnumerable<IToolbox>>();
