@@ -33,6 +33,10 @@ namespace AvalonDock.Controls
 			Control.IsHitTestVisibleProperty.AddOwner(typeof(LayoutAnchorControl), new FrameworkPropertyMetadata(true));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutAnchorControl"/> class.
+		/// </summary>
+		/// <param name="model"></param>
 		internal LayoutAnchorControl(LayoutAnchorable model)
 		{
 			_model = model;

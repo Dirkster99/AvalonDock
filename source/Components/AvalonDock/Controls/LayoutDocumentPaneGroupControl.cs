@@ -23,6 +23,10 @@ namespace AvalonDock.Controls
 	{
 		private readonly LayoutDocumentPaneGroup _model;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutDocumentPaneGroupControl"/> class.
+		/// </summary>
+		/// <param name="model"></param>
 		internal LayoutDocumentPaneGroupControl(LayoutDocumentPaneGroup model)
 			: base(model, model.Orientation)
 		{

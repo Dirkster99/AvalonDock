@@ -13,6 +13,10 @@ namespace AvalonDock.Controls
 {
 	internal class WindowActivateEventArgs : EventArgs
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="WindowActivateEventArgs"/> class.
+		/// </summary>
+		/// <param name="hwndActivating"></param>
 		public WindowActivateEventArgs(IntPtr hwndActivating)
 		{
 			HwndActivating = hwndActivating;

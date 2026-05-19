@@ -161,6 +161,9 @@ namespace AvalonDock
 			BorderThicknessProperty.OverrideMetadata(typeof(ToggleDockingManager), new FrameworkPropertyMetadata(new Thickness(0)));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ToggleDockingManager"/> class.
+		/// </summary>
 		public ToggleDockingManager()
 		{
 			LayoutUpdateStrategy = new ToggleLayoutStrategy();

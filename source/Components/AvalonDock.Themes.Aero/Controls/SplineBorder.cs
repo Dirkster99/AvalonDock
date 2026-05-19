@@ -15,6 +15,9 @@ namespace AvalonDock.Themes.Controls
 {
 	public class SplineBorder : Control
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SplineBorder"/> class.
+		/// </summary>
 		public SplineBorder()
 		{
 			// RenderOptions.SetEdgeMode(this, EdgeMode.Aliased);

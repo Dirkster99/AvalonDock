@@ -55,6 +55,9 @@ namespace AvalonDock.Controls
 			VisibilityProperty.OverrideMetadata(typeof(LayoutAutoHideWindowControl), new FrameworkPropertyMetadata(Visibility.Hidden));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutAutoHideWindowControl"/> class.
+		/// </summary>
 		internal LayoutAutoHideWindowControl()
 		{
 			_sizeChangedHandler = ViewboxZoomChanged;

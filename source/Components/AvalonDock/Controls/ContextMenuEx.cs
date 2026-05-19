@@ -21,6 +21,9 @@ namespace AvalonDock.Controls
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ContextMenuEx"/> class.
+		/// </summary>
 		public ContextMenuEx()
 		{
 		}

@@ -17,6 +17,9 @@ namespace AvalonDock.Mvvm
 		private IDockable? _defaultDockable;
 		private IDockable? _focusedDockable;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DockBase"/> class.
+		/// </summary>
 		protected DockBase()
 		{
 			CloseCommand = new RelayCommand(() => Factory?.CloseDockable(this));

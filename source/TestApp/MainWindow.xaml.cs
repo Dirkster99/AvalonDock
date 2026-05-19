@@ -20,7 +20,7 @@ using System.Windows.Threading;
 using AvalonDock.Layout;
 using System.Diagnostics;
 using System.IO;
-using AvalonDock.Layout.Serialization;
+using AvalonDock.Serializer.Xml;
 using AvalonDock;
 using AvalonDock.Themes;
 using System.Diagnostics.CodeAnalysis;

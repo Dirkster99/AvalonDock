@@ -21,6 +21,13 @@
 			public int Right;
 			public int Bottom;
 
+			/// <summary>
+			/// Initializes a new instance of the <see cref="RECT"/> struct.
+			/// </summary>
+			/// <param name="left"></param>
+			/// <param name="top"></param>
+			/// <param name="right"></param>
+			/// <param name="bottom"></param>
 			public RECT(int left, int top, int right, int bottom)
 			{
 				this.Left = left;

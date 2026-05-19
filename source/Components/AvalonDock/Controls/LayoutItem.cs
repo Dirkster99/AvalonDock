@@ -48,6 +48,9 @@ namespace AvalonDock.Controls
 			VisibilityProperty.OverrideMetadata(typeof(LayoutItem), new FrameworkPropertyMetadata(Visibility.Visible, OnVisibilityChanged));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutItem"/> class.
+		/// </summary>
 		internal LayoutItem()
 		{
 		}

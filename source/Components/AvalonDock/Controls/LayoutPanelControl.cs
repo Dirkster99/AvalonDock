@@ -22,6 +22,10 @@ namespace AvalonDock.Controls
 	{
 		private readonly LayoutPanel _model;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutPanelControl"/> class.
+		/// </summary>
+		/// <param name="model"></param>
 		internal LayoutPanelControl(LayoutPanel model)
 			: base(model, model.Orientation)
 		{

@@ -11,6 +11,10 @@ namespace AvalonDock.Core.Events
 	/// </summary>
 	public class DocumentEventArgs : EventArgs
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DocumentEventArgs"/> class.
+		/// </summary>
+		/// <param name="document"></param>
 		public DocumentEventArgs(ISerializableLayoutDocument document)
 		{
 			Document = document ?? throw new ArgumentNullException(nameof(document));
@@ -25,6 +29,10 @@ namespace AvalonDock.Core.Events
 	/// </summary>
 	public class DocumentCancelEventArgs : CancelEventArgs
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DocumentCancelEventArgs"/> class.
+		/// </summary>
+		/// <param name="document"></param>
 		public DocumentCancelEventArgs(ISerializableLayoutDocument document)
 		{
 			Document = document ?? throw new ArgumentNullException(nameof(document));
@@ -39,6 +47,10 @@ namespace AvalonDock.Core.Events
 	/// </summary>
 	public class AnchorableEventArgs : EventArgs
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AnchorableEventArgs"/> class.
+		/// </summary>
+		/// <param name="anchorable"></param>
 		public AnchorableEventArgs(ISerializableLayoutAnchorable anchorable)
 		{
 			Anchorable = anchorable ?? throw new ArgumentNullException(nameof(anchorable));
@@ -53,6 +65,10 @@ namespace AvalonDock.Core.Events
 	/// </summary>
 	public class AnchorableCancelEventArgs : CancelEventArgs
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AnchorableCancelEventArgs"/> class.
+		/// </summary>
+		/// <param name="anchorable"></param>
 		public AnchorableCancelEventArgs(ISerializableLayoutAnchorable anchorable)
 		{
 			Anchorable = anchorable ?? throw new ArgumentNullException(nameof(anchorable));
@@ -70,6 +86,10 @@ namespace AvalonDock.Core.Events
 	/// </summary>
 	public class ContentEventArgs : EventArgs
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ContentEventArgs"/> class.
+		/// </summary>
+		/// <param name="content"></param>
 		public ContentEventArgs(ISerializableLayoutContent content)
 		{
 			Content = content ?? throw new ArgumentNullException(nameof(content));
@@ -84,6 +104,10 @@ namespace AvalonDock.Core.Events
 	/// </summary>
 	public class ContentCancelEventArgs : CancelEventArgs
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ContentCancelEventArgs"/> class.
+		/// </summary>
+		/// <param name="content"></param>
 		public ContentCancelEventArgs(ISerializableLayoutContent content)
 		{
 			Content = content ?? throw new ArgumentNullException(nameof(content));

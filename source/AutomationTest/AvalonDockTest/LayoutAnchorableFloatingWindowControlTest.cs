@@ -9,7 +9,7 @@ namespace AvalonDockTest
 
 	using NUnit.Framework;
 
-	using AvalonDock.Layout.Serialization;
+	using AvalonDock.Serializer.Xml;
 	using TestHelpers;
 	using AvalonDockTest.Views;
 

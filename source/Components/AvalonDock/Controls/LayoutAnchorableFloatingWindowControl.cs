@@ -42,6 +42,11 @@ namespace AvalonDock.Controls
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutAnchorableFloatingWindowControl), new FrameworkPropertyMetadata(typeof(LayoutAnchorableFloatingWindowControl)));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutAnchorableFloatingWindowControl"/> class.
+		/// </summary>
+		/// <param name="model"></param>
+		/// <param name="isContentImmutable"></param>
 		internal LayoutAnchorableFloatingWindowControl(LayoutAnchorableFloatingWindow model, bool isContentImmutable)
 		   : base(model, isContentImmutable)
 		{
@@ -70,6 +75,10 @@ namespace AvalonDock.Controls
 			if (visibilityBinding == null && Visibility == Visibility.Visible) SetVisibilityBinding();
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutAnchorableFloatingWindowControl"/> class.
+		/// </summary>
+		/// <param name="model"></param>
 		internal LayoutAnchorableFloatingWindowControl(LayoutAnchorableFloatingWindow model)
 			: this(model, false)
 		{

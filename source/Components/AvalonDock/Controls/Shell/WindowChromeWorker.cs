@@ -63,6 +63,9 @@ namespace Microsoft.Windows.Shell
 		private WindowState _lastMenuState;
 		private bool _isGlassEnabled;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="WindowChromeWorker"/> class.
+		/// </summary>
 		public WindowChromeWorker()
 		{
 			_messageTable = new List<HANDLE_MESSAGE>

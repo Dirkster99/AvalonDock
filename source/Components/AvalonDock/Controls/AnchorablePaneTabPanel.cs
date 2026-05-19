@@ -20,6 +20,9 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public class AnchorablePaneTabPanel : Panel
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AnchorablePaneTabPanel"/> class.
+		/// </summary>
 		public AnchorablePaneTabPanel()
 		{
 			this.FlowDirection = System.Windows.FlowDirection.LeftToRight;

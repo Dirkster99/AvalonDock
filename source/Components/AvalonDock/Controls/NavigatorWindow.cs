@@ -50,6 +50,10 @@ namespace AvalonDock.Controls
 			ShowInTaskbarProperty.OverrideMetadata(typeof(NavigatorWindow), new FrameworkPropertyMetadata(false));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="NavigatorWindow"/> class.
+		/// </summary>
+		/// <param name="manager"></param>
 		internal NavigatorWindow(DockingManager manager)
 		{
 			_manager = manager;

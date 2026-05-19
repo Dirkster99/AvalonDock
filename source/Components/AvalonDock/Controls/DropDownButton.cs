@@ -24,6 +24,9 @@ namespace AvalonDock.Controls
 	/// <seealso cref="ToggleButton"/>
 	public class DropDownButton : ToggleButton
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DropDownButton"/> class.
+		/// </summary>
 		public DropDownButton()
 		{
 			Unloaded += DropDownButton_Unloaded;

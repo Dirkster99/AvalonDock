@@ -13,6 +13,11 @@ namespace AvalonDock.Controls
 {
 	internal class FocusChangeEventArgs : EventArgs
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="FocusChangeEventArgs"/> class.
+		/// </summary>
+		/// <param name="gotFocusWinHandle"></param>
+		/// <param name="lostFocusWinHandle"></param>
 		public FocusChangeEventArgs(IntPtr gotFocusWinHandle, IntPtr lostFocusWinHandle)
 		{
 			GotFocusWinHandle = gotFocusWinHandle;
@@ -30,6 +35,9 @@ namespace AvalonDock.Controls
 		private Win32Helper.HookProc _hookProc;
 		private ReentrantFlag _insideActivateEvent = new ReentrantFlag();
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="WindowHookHandler"/> class.
+		/// </summary>
 		public WindowHookHandler()
 		{
 		}

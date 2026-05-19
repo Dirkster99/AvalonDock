@@ -34,6 +34,10 @@ namespace AvalonDock.Controls
 		{
 			private ReentrantFlag _owner;
 
+			/// <summary>
+			/// Initializes a new instance of the <see cref="_ReentrantFlagHandler"/> class.
+			/// </summary>
+			/// <param name="owner"></param>
 			public _ReentrantFlagHandler(ReentrantFlag owner)
 			{
 				_owner = owner;

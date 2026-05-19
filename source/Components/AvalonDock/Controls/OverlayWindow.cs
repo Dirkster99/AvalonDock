@@ -76,6 +76,10 @@ namespace AvalonDock.Controls
 			OverlayWindow.VisibilityProperty.OverrideMetadata(typeof(OverlayWindow), new FrameworkPropertyMetadata(Visibility.Hidden));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="OverlayWindow"/> class.
+		/// </summary>
+		/// <param name="host"></param>
 		internal OverlayWindow(IOverlayWindowHost host)
 		{
 			_host = host;

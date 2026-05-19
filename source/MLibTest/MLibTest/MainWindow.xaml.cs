@@ -9,7 +9,7 @@ namespace MLibTest
 	using System.Linq;
 	using System.Windows;
 	using System.Windows.Input;
-	using AvalonDock.Layout.Serialization;
+	using AvalonDock.Serializer.Xml;
 	using MLibTest.Demos.ViewModels.AD;
 	using MLibTest.Demos.ViewModels;
 

@@ -62,6 +62,10 @@ namespace AvalonDock.Controls
 			ShowInTaskbarProperty.OverrideMetadata(typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(false));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutFloatingWindowControl"/> class.
+		/// </summary>
+		/// <param name="model"></param>
 		protected LayoutFloatingWindowControl(ILayoutElement model)
 		{
 			Loaded += OnLoaded;
@@ -71,6 +75,11 @@ namespace AvalonDock.Controls
 			_model = model;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutFloatingWindowControl"/> class.
+		/// </summary>
+		/// <param name="model"></param>
+		/// <param name="isContentImmutable"></param>
 		protected LayoutFloatingWindowControl(ILayoutElement model, bool isContentImmutable)
 		  : this(model)
 		{
@@ -812,6 +821,10 @@ namespace AvalonDock.Controls
 			private Border _rootPresenter = null;
 			private DockingManager _manager = null;
 
+			/// <summary>
+			/// Initializes a new instance of the <see cref="FloatingWindowContentHost"/> class.
+			/// </summary>
+			/// <param name="owner"></param>
 			public FloatingWindowContentHost(LayoutFloatingWindowControl owner)
 			{
 				_owner = owner;

@@ -22,6 +22,9 @@ namespace Microsoft.Windows.Shell
 
 	public class WindowChrome : Freezable
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="WindowChrome"/> class.
+		/// </summary>
 		public WindowChrome()
 		{
 			// Effective default values for some of these properties are set to be bindings

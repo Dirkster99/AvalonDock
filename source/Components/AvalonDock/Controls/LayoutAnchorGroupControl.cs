@@ -30,6 +30,10 @@ namespace AvalonDock.Controls
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutAnchorGroupControl), new FrameworkPropertyMetadata(typeof(LayoutAnchorGroupControl)));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutAnchorGroupControl"/> class.
+		/// </summary>
+		/// <param name="model"></param>
 		internal LayoutAnchorGroupControl(LayoutAnchorGroup model)
 		{
 			_model = model;

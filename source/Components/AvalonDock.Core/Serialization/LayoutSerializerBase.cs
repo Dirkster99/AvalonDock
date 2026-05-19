@@ -12,6 +12,11 @@ namespace AvalonDock.Core
 	/// </summary>
 	public class LayoutSerializationCallbackEventArgs : CancelEventArgs
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutSerializationCallbackEventArgs"/> class.
+		/// </summary>
+		/// <param name="model"></param>
+		/// <param name="previousContent"></param>
 		public LayoutSerializationCallbackEventArgs(ISerializableLayoutContent model, object previousContent)
 		{
 			Cancel = false;
@@ -35,6 +40,10 @@ namespace AvalonDock.Core
 		private ISerializableLayoutAnchorable[] _previousAnchorables;
 		private ISerializableLayoutDocument[] _previousDocuments;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutSerializerBase"/> class.
+		/// </summary>
+		/// <param name="manager"></param>
 		protected LayoutSerializerBase(ISerializableDockingManager manager)
 		{
 			Manager = manager ?? throw new ArgumentNullException(nameof(manager));

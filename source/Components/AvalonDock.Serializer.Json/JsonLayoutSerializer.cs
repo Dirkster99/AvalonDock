@@ -13,6 +13,9 @@ namespace AvalonDock.Serializer.Json
 	{
 		private readonly JsonSerializerOptions _options;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="JsonLayoutSerializer"/> class.
+		/// </summary>
 		public JsonLayoutSerializer()
 		{
 			_options = new JsonSerializerOptions
@@ -24,6 +27,10 @@ namespace AvalonDock.Serializer.Json
 			};
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="JsonLayoutSerializer"/> class.
+		/// </summary>
+		/// <param name="options"></param>
 		public JsonLayoutSerializer(JsonSerializerOptions options)
 		{
 			_options = options;

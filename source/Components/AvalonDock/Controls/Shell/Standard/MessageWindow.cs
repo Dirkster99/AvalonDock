@@ -36,6 +36,15 @@ namespace Standard
 			get; private set;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MessageWindow"/> class.
+		/// </summary>
+		/// <param name="classStyle"></param>
+		/// <param name="style"></param>
+		/// <param name="exStyle"></param>
+		/// <param name="location"></param>
+		/// <param name="name"></param>
+		/// <param name="callback"></param>
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public MessageWindow(CS classStyle, WS style, WS_EX exStyle, Rect location, string name, WndProc callback)
 		{
@@ -82,6 +91,9 @@ namespace Standard
 			}
 		}
 
+		/// <summary>
+		/// Finalizes an instance of the <see cref="MessageWindow"/> class.
+		/// </summary>
 		~MessageWindow()
 		{
 			_Dispose(false, false);

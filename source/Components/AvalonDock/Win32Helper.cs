@@ -247,6 +247,13 @@ WS_GROUP = 0x00020000;
 			public int Right;
 			public int Bottom;
 
+			/// <summary>
+			/// Initializes a new instance of the <see cref="RECT"/> struct.
+			/// </summary>
+			/// <param name="left_"></param>
+			/// <param name="top_"></param>
+			/// <param name="right_"></param>
+			/// <param name="bottom_"></param>
 			public RECT(int left_, int top_, int right_, int bottom_)
 			{
 				Left = left_;

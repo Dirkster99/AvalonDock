@@ -13,6 +13,9 @@ namespace AvalonDock.Serializer.Xml
 	{
 		private readonly XmlWriterSettings _writerSettings;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="XmlDockLayoutSerializer"/> class.
+		/// </summary>
 		public XmlDockLayoutSerializer()
 		{
 			_writerSettings = new XmlWriterSettings
@@ -22,6 +25,10 @@ namespace AvalonDock.Serializer.Xml
 			};
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="XmlDockLayoutSerializer"/> class.
+		/// </summary>
+		/// <param name="writerSettings"></param>
 		public XmlDockLayoutSerializer(XmlWriterSettings writerSettings)
 		{
 			_writerSettings = writerSettings;

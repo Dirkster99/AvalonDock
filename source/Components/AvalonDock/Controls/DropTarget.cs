@@ -29,6 +29,12 @@ namespace AvalonDock.Controls
 		private T _targetElement;
 		private DropTargetType _type;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DropTarget{T}"/> class.
+		/// </summary>
+		/// <param name="targetElement"></param>
+		/// <param name="detectionRect"></param>
+		/// <param name="type"></param>
 		protected DropTarget(T targetElement, Rect detectionRect, DropTargetType type)
 		{
 			_targetElement = targetElement;
@@ -36,6 +42,12 @@ namespace AvalonDock.Controls
 			_type = type;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DropTarget{T}"/> class.
+		/// </summary>
+		/// <param name="targetElement"></param>
+		/// <param name="detectionRects"></param>
+		/// <param name="type"></param>
 		protected DropTarget(T targetElement, IEnumerable<Rect> detectionRects, DropTargetType type)
 		{
 			_targetElement = targetElement;

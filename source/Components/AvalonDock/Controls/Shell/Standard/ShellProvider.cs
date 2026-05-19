@@ -384,6 +384,11 @@ namespace Standard
 		/// <summary>pid</summary>
 		private readonly uint _pid;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PKEY"/> struct.
+		/// </summary>
+		/// <param name="fmtid"></param>
+		/// <param name="pid"></param>
 		public PKEY(Guid fmtid, uint pid)
 		{
 			_fmtid = fmtid;

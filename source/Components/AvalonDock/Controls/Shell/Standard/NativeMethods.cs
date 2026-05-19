@@ -1539,6 +1539,12 @@ namespace Standard
 	{
 		private IConnectionPoint _cp;
 		// handle holds the cookie value.
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SafeConnectionPointCookie"/> class.
+		/// </summary>
+		/// <param name="target"></param>
+		/// <param name="sink"></param>
+		/// <param name="eventId"></param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "IConnectionPoint")]
 		public SafeConnectionPointCookie(IConnectionPointContainer target, object sink, Guid eventId) : base(true)
@@ -1848,6 +1854,9 @@ namespace Standard
 			GC.SuppressFinalize(this);
 		}
 
+		/// <summary>
+		/// Finalizes an instance of the <see cref="PROPVARIANT"/> class.
+		/// </summary>
 		~PROPVARIANT()
 		{
 			Dispose(false);
@@ -2125,6 +2134,13 @@ namespace Standard
 		private int _right;
 		private int _bottom;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="RefRECT"/> class.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="top"></param>
+		/// <param name="right"></param>
+		/// <param name="bottom"></param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public RefRECT(int left, int top, int right, int bottom)
 		{
