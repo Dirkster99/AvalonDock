@@ -14,8 +14,8 @@ using NUnit.Framework;
 namespace AvalonDockTest.FlaUITests
 {
 	/// <summary>
-	/// Base class for FlaUI tests that target the ToggleTestApp.
-	/// Launches ToggleTestApp.exe before each test fixture.
+	/// Base class for FlaUI tests that target the AvalonDockCodeApp.
+	/// Launches AvalonDockCodeApp.exe before each test fixture.
 	/// </summary>
 	[TestFixture]
 	[Category("FlaUI")]
@@ -221,7 +221,7 @@ namespace AvalonDockTest.FlaUITests
 			foreach (var tfm in tfms)
 			{
 				var candidate = Path.GetFullPath(Path.Combine(testDir,
-					"..", "..", "..", "..", "..", "ToggleTestApp", "bin", config, tfm, "ToggleTestApp.exe"));
+					"..", "..", "..", "..", "..", "AvalonDockCodeApp", "bin", config, tfm, "AvalonDockCodeApp.exe"));
 				if (File.Exists(candidate)) return candidate;
 			}
 
@@ -229,16 +229,16 @@ namespace AvalonDockTest.FlaUITests
 			var dir = new DirectoryInfo(testDir);
 			while (dir != null)
 			{
-				var matches = Directory.GetFiles(dir.FullName, "ToggleTestApp.exe", SearchOption.AllDirectories);
+				var matches = Directory.GetFiles(dir.FullName, "AvalonDockCodeApp.exe", SearchOption.AllDirectories);
 				var match = matches.FirstOrDefault(m =>
-					m.Contains(Path.DirectorySeparatorChar + "ToggleTestApp" + Path.DirectorySeparatorChar) &&
+					m.Contains(Path.DirectorySeparatorChar + "AvalonDockCodeApp" + Path.DirectorySeparatorChar) &&
 					!m.Contains("AvalonDockTest"));
 				if (match != null) return match;
 				dir = dir.Parent;
 				if (dir?.Name == "source" || dir?.Name == "AvalonDock") break;
 			}
 
-			Assert.Fail("ToggleTestApp.exe not found. Build the solution first.");
+			Assert.Fail("AvalonDockCodeApp.exe not found. Build the solution first.");
 			return null;
 		}
 

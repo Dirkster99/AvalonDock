@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVVMTestApp", "MVVMTestApp\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsTestApp", "WinFormsTestApp\WinFormsTestApp.csproj", "{2433B8AF-0788-4C86-8FDD-E3BCB62E2157}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToggleTestApp", "ToggleTestApp\ToggleTestApp.csproj", "{0D771B55-A51D-442F-983C-645D2E663025}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvalonDockCodeApp", "AvalonDockCodeApp\AvalonDockCodeApp.csproj", "{0D771B55-A51D-442F-983C-645D2E663025}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Components", "Components", "{F30895DC-C3AC-FF44-FFF8-D51D98AE1B61}"
 EndProject

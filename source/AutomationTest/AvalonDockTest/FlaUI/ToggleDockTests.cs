@@ -29,8 +29,8 @@ namespace AvalonDockTest.FlaUITests
 		[Test, Order(2)]
 		public void MainWindow_HasCorrectTitle()
 		{
-			Assert.That(MainWindow.Title, Does.Contain("ToggleTestApp"),
-				"Main window should have ToggleTestApp title.");
+			Assert.That(MainWindow.Title, Does.Contain("AvalonDockCodeApp"),
+				"Main window should have AvalonDockCodeApp title.");
 		}
 
 		[Test, Order(3)]

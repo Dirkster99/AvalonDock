@@ -6,10 +6,10 @@
         <ApplicationIcon />
         <OutputType>WinExe</OutputType>
         <StartupObject />
-        <AssemblyName>ToggleTestApp</AssemblyName>
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
+        <PackageId>AvalonDockCodeApp</PackageId>
     </PropertyGroup>
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
