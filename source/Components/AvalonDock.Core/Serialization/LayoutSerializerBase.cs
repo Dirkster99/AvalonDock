@@ -15,8 +15,8 @@ namespace AvalonDock.Core
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LayoutSerializationCallbackEventArgs"/> class.
 		/// </summary>
-		/// <param name="model"></param>
-		/// <param name="previousContent"></param>
+		/// <param name="model">The model of the view being deserialized.</param>
+		/// <param name="previousContent">The content from the previous layout, if available.</param>
 		public LayoutSerializationCallbackEventArgs(ISerializableLayoutContent model, object previousContent)
 		{
 			Cancel = false;
@@ -43,7 +43,7 @@ namespace AvalonDock.Core
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LayoutSerializerBase"/> class.
 		/// </summary>
-		/// <param name="manager"></param>
+		/// <param name="manager">The docking manager to serialize.</param>
 		protected LayoutSerializerBase(ISerializableDockingManager manager)
 		{
 			Manager = manager ?? throw new ArgumentNullException(nameof(manager));
@@ -65,6 +65,7 @@ namespace AvalonDock.Core
 		/// Fixes up a deserialized layout: reconnects previous containers,
 		/// restores anchorable/document content via callback or prior state.
 		/// </summary>
+		/// <param name="layout">The deserialized layout root to fix up.</param>
 		protected virtual void FixupLayout(ISerializableLayoutRoot layout)
 		{
 			// Fix cached root references
@@ -152,12 +153,14 @@ namespace AvalonDock.Core
 			layout.CollectGarbage();
 		}
 
+		/// <summary>Suspends source bindings before deserialization.</summary>
 		protected void StartDeserialization()
 		{
 			Manager.SuspendDocumentsSourceBinding = true;
 			Manager.SuspendAnchorablesSourceBinding = true;
 		}
 
+		/// <summary>Resumes source bindings after deserialization.</summary>
 		protected void EndDeserialization()
 		{
 			Manager.SuspendDocumentsSourceBinding = false;

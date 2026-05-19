@@ -23,7 +23,7 @@ namespace AvalonDock.Core
 		/// <summary>Hides the currently shown auto-hide window.</summary>
 		void HideAutoHide();
 
-		/// <summary>Gets whether an auto-hide window is currently visible.</summary>
+		/// <summary>Gets a value indicating whether an auto-hide window is currently visible.</summary>
 		bool IsAutoHideVisible { get; }
 
 		/// <summary>Gets the content ID of the currently shown auto-hide anchorable, or null.</summary>

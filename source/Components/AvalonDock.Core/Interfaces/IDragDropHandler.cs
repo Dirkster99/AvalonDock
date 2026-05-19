@@ -45,7 +45,7 @@ namespace AvalonDock.Core
 		/// <returns>True if the drop is allowed.</returns>
 		bool CanDrop(string contentId, string targetContentId, DockPosition position);
 
-		/// <summary>Gets or sets whether drag-and-drop operations are enabled.</summary>
+		/// <summary>Gets or sets a value indicating whether drag-and-drop operations are enabled.</summary>
 		bool IsDragDropEnabled { get; set; }
 	}
 }

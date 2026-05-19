@@ -35,7 +35,7 @@ namespace AvalonDock.Core
 		/// <summary>Gets or sets which side of the dock this toolbox belongs to.</summary>
 		ToolboxSide Side { get; set; }
 
-		/// <summary>Gets or sets whether this toolbox should be toggled open on startup.</summary>
+		/// <summary>Gets or sets a value indicating whether this toolbox should be toggled open on startup.</summary>
 		bool IsOpenByDefault { get; set; }
 
 		/// <summary>

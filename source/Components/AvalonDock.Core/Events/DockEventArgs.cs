@@ -14,7 +14,7 @@ namespace AvalonDock.Core.Events
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DocumentEventArgs"/> class.
 		/// </summary>
-		/// <param name="document"></param>
+		/// <param name="document">The document involved in the event.</param>
 		public DocumentEventArgs(ISerializableLayoutDocument document)
 		{
 			Document = document ?? throw new ArgumentNullException(nameof(document));
@@ -32,7 +32,7 @@ namespace AvalonDock.Core.Events
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DocumentCancelEventArgs"/> class.
 		/// </summary>
-		/// <param name="document"></param>
+		/// <param name="document">The document being closed.</param>
 		public DocumentCancelEventArgs(ISerializableLayoutDocument document)
 		{
 			Document = document ?? throw new ArgumentNullException(nameof(document));
@@ -50,7 +50,7 @@ namespace AvalonDock.Core.Events
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AnchorableEventArgs"/> class.
 		/// </summary>
-		/// <param name="anchorable"></param>
+		/// <param name="anchorable">The anchorable involved in the event.</param>
 		public AnchorableEventArgs(ISerializableLayoutAnchorable anchorable)
 		{
 			Anchorable = anchorable ?? throw new ArgumentNullException(nameof(anchorable));
@@ -68,7 +68,7 @@ namespace AvalonDock.Core.Events
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AnchorableCancelEventArgs"/> class.
 		/// </summary>
-		/// <param name="anchorable"></param>
+		/// <param name="anchorable">The anchorable being closed or hidden.</param>
 		public AnchorableCancelEventArgs(ISerializableLayoutAnchorable anchorable)
 		{
 			Anchorable = anchorable ?? throw new ArgumentNullException(nameof(anchorable));
@@ -77,7 +77,7 @@ namespace AvalonDock.Core.Events
 		/// <summary>Gets the anchorable being closed or hidden.</summary>
 		public ISerializableLayoutAnchorable Anchorable { get; }
 
-		/// <summary>Gets or sets whether to close (remove) instead of hide.</summary>
+		/// <summary>Gets or sets a value indicating whether to close (remove) instead of hide.</summary>
 		public bool CloseInsteadOfHide { get; set; }
 	}
 
@@ -89,7 +89,7 @@ namespace AvalonDock.Core.Events
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ContentEventArgs"/> class.
 		/// </summary>
-		/// <param name="content"></param>
+		/// <param name="content">The content involved in the event.</param>
 		public ContentEventArgs(ISerializableLayoutContent content)
 		{
 			Content = content ?? throw new ArgumentNullException(nameof(content));
@@ -107,7 +107,7 @@ namespace AvalonDock.Core.Events
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ContentCancelEventArgs"/> class.
 		/// </summary>
-		/// <param name="content"></param>
+		/// <param name="content">The content involved in the event.</param>
 		public ContentCancelEventArgs(ISerializableLayoutContent content)
 		{
 			Content = content ?? throw new ArgumentNullException(nameof(content));

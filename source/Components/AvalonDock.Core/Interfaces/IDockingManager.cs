@@ -30,7 +30,7 @@ namespace AvalonDock.Core
 		/// <summary>Gets or sets the delay in milliseconds before auto-hiding a tool window.</summary>
 		int AutoHideDelay { get; set; }
 
-		/// <summary>Gets or sets whether mixed orientation (horizontal + vertical splits) is allowed.</summary>
+		/// <summary>Gets or sets a value indicating whether mixed orientation (horizontal + vertical splits) is allowed.</summary>
 		bool AllowMixedOrientation { get; set; }
 
 		/// <summary>Raised when the active content changes.</summary>

@@ -9,6 +9,9 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<SignAssembly>true</SignAssembly>
+
+		<!-- Enable XML doc generation so StyleCop documentation rules (SA16xx) fire during build -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<AssemblyOriginatorKeyFile>..\AvalonDock\sn.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 

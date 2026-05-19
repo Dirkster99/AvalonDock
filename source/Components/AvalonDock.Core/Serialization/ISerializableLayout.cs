@@ -13,10 +13,10 @@ namespace AvalonDock.Core.Serialization
 		/// <summary>Gets or sets the layout root.</summary>
 		ISerializableLayoutRoot Layout { get; set; }
 
-		/// <summary>Suspends document source binding during deserialization.</summary>
+		/// <summary>Gets or sets a value indicating whether document source binding is suspended during deserialization.</summary>
 		bool SuspendDocumentsSourceBinding { get; set; }
 
-		/// <summary>Suspends anchorable source binding during deserialization.</summary>
+		/// <summary>Gets or sets a value indicating whether anchorable source binding is suspended during deserialization.</summary>
 		bool SuspendAnchorablesSourceBinding { get; set; }
 	}
 
@@ -26,6 +26,7 @@ namespace AvalonDock.Core.Serialization
 	public interface ISerializableLayoutRoot
 	{
 		/// <summary>Gets all descendant elements in the layout tree.</summary>
+		/// <returns>An enumerable of all descendant layout elements.</returns>
 		IEnumerable<ISerializableLayoutElement> Descendents();
 
 		/// <summary>Removes empty containers and collects garbage from the layout tree.</summary>
