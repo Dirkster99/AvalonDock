@@ -273,6 +273,43 @@ namespace AvalonDock
 		/// <summary>Handles changes to the <see cref="Layout"/> property.</summary>
 		private static void OnLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((DockingManager)d).OnLayoutChanged(e.OldValue as LayoutRoot, e.NewValue as LayoutRoot);
 
+		/// <summary><see cref="DockLayout"/> dependency property.</summary>
+		public static readonly DependencyProperty DockLayoutProperty = DependencyProperty.Register(
+			nameof(DockLayout),
+			typeof(Core.IRootDock),
+			typeof(DockingManager),
+			new FrameworkPropertyMetadata(null, OnDockLayoutChanged));
+
+		/// <summary>
+		/// Gets or sets the MVVM layout model. When set, the docking manager
+		/// syncs this ViewModel tree with the internal WPF layout automatically.
+		/// If null, the docking manager operates in classic (v4.x) mode.
+		/// </summary>
+		[Bindable(true)]
+		[Description("Gets/sets the MVVM layout model for ViewModel-driven docking.")]
+		[Category("Layout")]
+		[CLSCompliant(false)]
+		public Core.IRootDock DockLayout
+		{
+			get => (Core.IRootDock)GetValue(DockLayoutProperty);
+			set => SetValue(DockLayoutProperty, value);
+		}
+
+		private LayoutSyncBridge _syncBridge;
+
+		private static void OnDockLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			var dm = (DockingManager)d;
+			dm._syncBridge?.Detach();
+			dm._syncBridge = null;
+
+			if (e.NewValue is Core.IRootDock rootDock)
+			{
+				dm._syncBridge = new LayoutSyncBridge(dm, rootDock);
+				dm._syncBridge.Attach();
+			}
+		}
+
 		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Layout"/> property.</summary>
 		protected virtual void OnLayoutChanged(LayoutRoot oldLayout, LayoutRoot newLayout)
 		{

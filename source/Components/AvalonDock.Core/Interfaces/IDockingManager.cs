@@ -18,6 +18,13 @@ namespace AvalonDock.Core
 	/// </remarks>
 	public interface IDockingManager : ISerializableDockingManager
 	{
+		/// <summary>
+		/// Gets or sets the MVVM layout model. When set, the docking manager
+		/// syncs this ViewModel tree with the internal WPF layout automatically.
+		/// If null, the docking manager operates in classic (v4.x) mode.
+		/// </summary>
+		IRootDock DockLayout { get; set; }
+
 		/// <summary>Gets or sets the currently active content (selected document or anchorable).</summary>
 		object ActiveContent { get; set; }
 

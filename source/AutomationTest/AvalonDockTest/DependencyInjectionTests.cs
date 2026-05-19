@@ -460,6 +460,7 @@ namespace AvalonDockTest
 
 	internal class FakeDockingManager : IDockingManager
 	{
+		public IRootDock? DockLayout { get; set; }
 		public object? ActiveContent { get; set; }
 		public System.Collections.IEnumerable? DocumentsSource { get; set; }
 		public System.Collections.IEnumerable? AnchorablesSource { get; set; }
