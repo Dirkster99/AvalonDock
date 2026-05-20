@@ -99,6 +99,17 @@ namespace AvalonDock
 		private NavigatorWindow _navigatorWindow = null;
 
 		/// <summary>
+		/// The layout engine used for layout tree operations.
+		/// </summary>
+		private readonly ILayoutEngine _layoutEngine = new DefaultLayoutEngine();
+
+		/// <summary>
+		/// Gets the <see cref="ILayoutEngine"/> used by this manager for layout tree operations.
+		/// Override in subclasses to provide a specialized engine.
+		/// </summary>
+		public virtual ILayoutEngine LayoutEngine => _layoutEngine;
+
+		/// <summary>
 		/// Gets the extender providing factory interfaces for visual component creation.
 		/// Themes can set custom factories to override default visual behavior.
 		/// </summary>

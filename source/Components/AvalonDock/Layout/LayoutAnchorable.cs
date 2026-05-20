@@ -469,115 +469,22 @@ namespace AvalonDock.Layout
 				if (previousContainer == null)
 				{
 					var side = ((LayoutAnchorSide)parentGroup.Parent).Side;
-					switch (side)
+					previousContainer = new LayoutAnchorablePane
 					{
-						case AnchorSide.Right:
-							if (parentGroup.Root.RootPanel.Orientation == Orientation.Horizontal)
-							{
-								previousContainer = new LayoutAnchorablePane
-								{
-									DockMinWidth = AutoHideMinWidth,
-									DockMinHeight = AutoHideMinHeight
-								};
-								parentGroup.Root.RootPanel.Children.Add(previousContainer);
-							}
-							else
-							{
-								previousContainer = new LayoutAnchorablePane
-								{
-									DockMinHeight = AutoHideMinHeight,
-									DockMinWidth = AutoHideMinWidth
-								};
-								var panel = new LayoutPanel { Orientation = Orientation.Horizontal };
-								var root = parentGroup.Root as LayoutRoot;
-								var oldRootPanel = parentGroup.Root.RootPanel;
-								root.RootPanel = panel;
-								panel.Children.Add(oldRootPanel);
-								panel.Children.Add(previousContainer);
-							}
+						DockMinWidth = AutoHideMinWidth,
+						DockMinHeight = AutoHideMinHeight
+					};
 
-							break;
-
-						case AnchorSide.Left:
-							if (parentGroup.Root.RootPanel.Orientation == Orientation.Horizontal)
-							{
-								previousContainer = new LayoutAnchorablePane
-								{
-									DockMinWidth = AutoHideMinWidth,
-									DockMinHeight = AutoHideMinHeight
-								};
-								parentGroup.Root.RootPanel.Children.Insert(0, previousContainer);
-							}
-							else
-							{
-								previousContainer = new LayoutAnchorablePane
-								{
-									DockMinHeight = AutoHideMinHeight,
-									DockMinWidth = AutoHideMinWidth
-								};
-								var panel = new LayoutPanel { Orientation = Orientation.Horizontal };
-								var root = parentGroup.Root as LayoutRoot;
-								var oldRootPanel = parentGroup.Root.RootPanel;
-								root.RootPanel = panel;
-								panel.Children.Add(previousContainer);
-								panel.Children.Add(oldRootPanel);
-							}
-
-							break;
-
-						case AnchorSide.Top:
-							if (parentGroup.Root.RootPanel.Orientation == Orientation.Vertical)
-							{
-								previousContainer = new LayoutAnchorablePane
-								{
-									DockMinHeight = AutoHideMinHeight,
-									DockMinWidth = AutoHideMinWidth
-								};
-								parentGroup.Root.RootPanel.Children.Insert(0, previousContainer);
-							}
-							else
-							{
-								previousContainer = new LayoutAnchorablePane
-								{
-									DockMinWidth = AutoHideMinWidth,
-									DockMinHeight = AutoHideMinHeight
-								};
-								var panel = new LayoutPanel { Orientation = Orientation.Vertical };
-								var root = parentGroup.Root as LayoutRoot;
-								var oldRootPanel = parentGroup.Root.RootPanel;
-								root.RootPanel = panel;
-								panel.Children.Add(previousContainer);
-								panel.Children.Add(oldRootPanel);
-							}
-
-							break;
-
-						case AnchorSide.Bottom:
-							if (parentGroup.Root.RootPanel.Orientation == Orientation.Vertical)
-							{
-								previousContainer = new LayoutAnchorablePane
-								{
-									DockMinHeight = AutoHideMinHeight,
-									DockMinWidth = AutoHideMinWidth
-								};
-								parentGroup.Root.RootPanel.Children.Add(previousContainer);
-							}
-							else
-							{
-								previousContainer = new LayoutAnchorablePane
-								{
-									DockMinWidth = AutoHideMinWidth,
-									DockMinHeight = AutoHideMinHeight
-								};
-								var panel = new LayoutPanel { Orientation = Orientation.Vertical };
-								var root = parentGroup.Root as LayoutRoot;
-								var oldRootPanel = parentGroup.Root.RootPanel;
-								root.RootPanel = panel;
-								panel.Children.Add(oldRootPanel);
-								panel.Children.Add(previousContainer);
-							}
-
-							break;
+					var root = parentGroup.Root as LayoutRoot;
+					var engine = root?.Manager?.LayoutEngine;
+					if (engine != null)
+					{
+						engine.InsertPane(root, previousContainer, side);
+					}
+					else
+					{
+						// Fallback when no manager is available (e.g. in tests)
+						new DefaultLayoutEngine().InsertPane(root, previousContainer, side);
 					}
 				}
 				else

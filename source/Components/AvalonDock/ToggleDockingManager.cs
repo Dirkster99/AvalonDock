@@ -53,7 +53,7 @@ namespace AvalonDock
 		/// <summary>
 		/// Gets the <see cref="ILayoutEngine"/> used by this manager for layout tree operations.
 		/// </summary>
-		public ILayoutEngine LayoutEngine => _layoutEngine;
+		public override ILayoutEngine LayoutEngine => _layoutEngine;
 
 		/// <summary>
 		/// The left Top Bar field.
