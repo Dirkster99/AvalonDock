@@ -19,8 +19,7 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a control that is displayed when a <see cref="LayoutAnchorableControl"/>
-	/// is in AutoHide mode (which can be applied via context menu drop entry or click on the Pin symbol.
+	/// Represents the layout anchor control.
 	/// </summary>
 	public class LayoutAnchorControl : Control, ILayoutControl
 	{
@@ -36,7 +35,7 @@ namespace AvalonDock.Controls
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LayoutAnchorControl"/> class.
 		/// </summary>
-		/// <param name="model"></param>
+		/// <param name="model">The layout model.</param>
 		internal LayoutAnchorControl(LayoutAnchorable model)
 		{
 			_model = model;
@@ -46,6 +45,9 @@ namespace AvalonDock.Controls
 			SetSide(_model.FindParent<LayoutAnchorSide>().Side);
 		}
 
+		/// <summary>
+		/// Gets the model.
+		/// </summary>
 		public ILayoutElement Model
 		{
 			get
@@ -60,9 +62,14 @@ namespace AvalonDock.Controls
 		private static readonly DependencyPropertyKey SidePropertyKey = DependencyProperty.RegisterReadOnly("Side", typeof(AnchorSide), typeof(LayoutAnchorControl),
 				new FrameworkPropertyMetadata((AnchorSide)AnchorSide.Left));
 
+		/// <summary>
+		/// <see cref="Side"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty SideProperty = SidePropertyKey.DependencyProperty;
 
-		/// <summary>Gets the anchor side of the control.</summary>
+		/// <summary>
+		/// Gets the side.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets the anchor side of the control.")]
 		[Category("Anchor")]
@@ -75,43 +82,15 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Provides a secure method for setting the Side property.
-		/// This dependency property indicates the anchor side of the control.
+		/// Sets the side.
 		/// </summary>
-		/// <param name="value">The new value for the property.</param>
+		/// <param name="value">The value.</param>
 		protected void SetSide(AnchorSide value)
 		{
 			SetValue(SidePropertyKey, value);
 		}
 
-		// protected override void OnVisualParentChanged(DependencyObject oldParent)
-		// {
-		//    base.OnVisualParentChanged(oldParent);
-
-		// var contentModel = _model;
-
-		// if (oldParent != null && contentModel != null && contentModel.Content is UIElement)
-		//    {
-		//        var oldParentPaneControl = oldParent.FindVisualAncestor<LayoutAnchorablePaneControl>();
-		//        if (oldParentPaneControl != null)
-		//        {
-		//            ((ILogicalChildrenContainer)oldParentPaneControl).InternalRemoveLogicalChild(contentModel.Content);
-		//        }
-		//    }
-
-		// if (contentModel.Content != null && contentModel.Content is UIElement)
-		//    {
-		//        var oldLogicalParentPaneControl = LogicalTreeHelper.GetParent(contentModel.Content as UIElement)
-		//            as ILogicalChildrenContainer;
-		//        if (oldLogicalParentPaneControl != null)
-		//            oldLogicalParentPaneControl.InternalRemoveLogicalChild(contentModel.Content);
-		//    }
-
-		// if (contentModel != null && contentModel.Content != null && contentModel.Root != null && contentModel.Content is UIElement)
-		//    {
-		//        ((ILogicalChildrenContainer)contentModel.Root.Manager).InternalAddLogicalChild(contentModel.Content);
-		//    }
-		// }
+		/// <inheritdoc/>
 		protected override void OnMouseDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseDown(e);
@@ -123,9 +102,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <summary>
-		/// Handles double-click to toggle auto-hide (dock/pin the anchorable).
-		/// </summary>
+		/// <inheritdoc/>
 		protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
 		{
 			base.OnMouseDoubleClick(e);
@@ -138,9 +115,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <summary>
-		/// Handles right-click to show the anchorable context menu (Float, Dock, Auto Hide, etc.).
-		/// </summary>
+		/// <inheritdoc/>
 		protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
 		{
 			base.OnMouseRightButtonUp(e);
@@ -162,6 +137,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <inheritdoc/>
 		protected override void OnMouseEnter(System.Windows.Input.MouseEventArgs e)
 		{
 			base.OnMouseEnter(e);
@@ -176,6 +152,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <inheritdoc/>
 		protected override void OnMouseLeave(System.Windows.Input.MouseEventArgs e)
 		{
 			if (_openUpTimer != null)

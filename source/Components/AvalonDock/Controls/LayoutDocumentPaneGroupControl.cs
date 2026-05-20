@@ -14,10 +14,7 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a group control that hosts a <see cref="LayoutDocumentPaneGroup"/> model.
-	///
-	/// This Grid based control can host multiple other controls in its Children collection
-	/// (<see cref="LayoutAnchorableControl"/>, <see cref="LayoutDocumentControl"/> etc).
+	/// Represents the layout Document Pane Group Control.
 	/// </summary>
 	public class LayoutDocumentPaneGroupControl : LayoutGridControl<ILayoutDocumentPane>, ILayoutControl
 	{
@@ -26,13 +23,14 @@ namespace AvalonDock.Controls
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LayoutDocumentPaneGroupControl"/> class.
 		/// </summary>
-		/// <param name="model"></param>
+		/// <param name="model">The model.</param>
 		internal LayoutDocumentPaneGroupControl(LayoutDocumentPaneGroup model)
 			: base(model, model.Orientation)
 		{
 			_model = model;
 		}
 
+		/// <inheritdoc/>
 		protected override void OnFixChildrenDockLengths()
 		{
 			if (_model.Orientation == Orientation.Horizontal)

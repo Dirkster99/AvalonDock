@@ -13,27 +13,26 @@ using AvalonDock.Layout;
 namespace AvalonDock
 {
 	/// <summary>
-	/// Implements a Cancelable event that can be raised to ask the client application whether hiding this anchorable
-	/// is OK or not.
+	/// Provides data for the anchorable Hiding event.
 	/// </summary>
 	public class AnchorableHidingEventArgs : CancelEventArgs
 	{
 		/// <summary>
-		/// Class constructor from the anchorable layout model.
+		/// Initializes a new instance of the <see cref="AnchorableHidingEventArgs"/> class.
 		/// </summary>
-		/// <param name="document"></param>
+		/// <param name="anchorable">The anchorable.</param>
 		public AnchorableHidingEventArgs(LayoutAnchorable anchorable)
 		{
 			Anchorable = anchorable;
 		}
 
 		/// <summary>
-		/// Gets the model of the anchorable that is about to be hidden.
+		/// Gets the anchorable.
 		/// </summary>
 		public LayoutAnchorable Anchorable { get; private set; }
 
 		/// <summary>
-		/// Gets or sets a value indicating whether an anchorable should be closed instead of hidden
+		/// Gets or sets a value indicating whether close Instead Of Hide.
 		/// </summary>
 		public bool CloseInsteadOfHide { get; set; }
 	}

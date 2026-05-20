@@ -7,14 +7,8 @@ using AvalonDock.Themes;
 namespace AvalonDock
 {
 	/// <summary>
-	/// WPF implementation of <see cref="IThemeManager"/>.
-	/// Manages theme discovery, selection, and application to a <see cref="DockingManager"/>.
+	/// Represents the theme Manager.
 	/// </summary>
-	/// <remarks>
-	/// Register themes via <see cref="RegisterTheme"/> or pass them in the constructor.
-	/// Apply a theme by name via <see cref="ApplyTheme"/>; the manager sets
-	/// <see cref="DockingManager.Theme"/> internally.
-	/// </remarks>
 	public class ThemeManager : IThemeManager
 	{
 		private readonly List<Theme> _themes = new List<Theme>();
@@ -22,9 +16,9 @@ namespace AvalonDock
 		private string _currentThemeName;
 
 		/// <summary>
-		/// Initializes a new <see cref="ThemeManager"/>.
+		/// Initializes a new instance of the <see cref="ThemeManager"/> class.
 		/// </summary>
-		/// <param name="themes">Optional initial set of themes to register.</param>
+		/// <param name="themes">The themes.</param>
 		public ThemeManager(IEnumerable<Theme> themes = null)
 		{
 			if (themes != null)
@@ -34,27 +28,37 @@ namespace AvalonDock
 			}
 		}
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Gets the current Theme Name.
+		/// </summary>
 		public string CurrentThemeName => _currentThemeName;
 
-		/// <inheritdoc />
 #pragma warning disable CS3003 // Type not CLS-compliant
+
+		/// <summary>
+		/// Gets the available Themes.
+		/// </summary>
 		public IReadOnlyList<IThemeInfo> AvailableThemes => _themes.Cast<IThemeInfo>().ToList().AsReadOnly();
 #pragma warning restore CS3003
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Occurs when theme Changed.
+		/// </summary>
 		public event EventHandler ThemeChanged;
 
 		/// <summary>
-		/// Binds this manager to a <see cref="DockingManager"/> instance.
-		/// Must be called before <see cref="ApplyTheme"/>.
+		/// Executes the attach operation.
 		/// </summary>
+		/// <param name="dockingManager">The docking Manager.</param>
 		public void Attach(DockingManager dockingManager)
 		{
 			_dockingManager = dockingManager ?? throw new ArgumentNullException(nameof(dockingManager));
 		}
 
-		/// <summary>Registers an additional theme.</summary>
+		/// <summary>
+		/// Executes the register Theme operation.
+		/// </summary>
+		/// <param name="theme">The theme.</param>
 		public void RegisterTheme(Theme theme)
 		{
 			if (theme == null) throw new ArgumentNullException(nameof(theme));
@@ -62,7 +66,11 @@ namespace AvalonDock
 				_themes.Add(theme);
 		}
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Executes the apply Theme operation.
+		/// </summary>
+		/// <param name="themeName">The theme Name.</param>
+		/// <returns>true if the operation succeeds; otherwise, false.</returns>
 		public bool ApplyTheme(string themeName)
 		{
 			if (string.IsNullOrWhiteSpace(themeName)) return false;

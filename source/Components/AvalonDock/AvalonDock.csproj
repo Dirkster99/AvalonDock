@@ -6,6 +6,7 @@
 		<UseWPF>true</UseWPF>
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net.5.0-windows|AnyCPU'">
 		<DefineConstants/>

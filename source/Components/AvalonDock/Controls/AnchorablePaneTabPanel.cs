@@ -16,7 +16,7 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// provides a <see cref="Panel"/> that contains the TabItem Headers of the <see cref="LayoutAnchorablePaneControl"/>.
+	/// Represents the anchorable Pane Tab Panel.
 	/// </summary>
 	public class AnchorablePaneTabPanel : Panel
 	{
@@ -28,6 +28,7 @@ namespace AvalonDock.Controls
 			this.FlowDirection = System.Windows.FlowDirection.LeftToRight;
 		}
 
+		/// <inheritdoc/>
 		protected override Size MeasureOverride(Size availableSize)
 		{
 			double totWidth = 0;
@@ -52,6 +53,7 @@ namespace AvalonDock.Controls
 			return new Size(Math.Min(availableSize.Width, totWidth), maxHeight);
 		}
 
+		/// <inheritdoc/>
 		protected override Size ArrangeOverride(Size finalSize)
 		{
 			var visibleChildren = Children.Cast<UIElement>().Where(ch => ch.Visibility != System.Windows.Visibility.Collapsed);
@@ -84,6 +86,7 @@ namespace AvalonDock.Controls
 			return finalSize;
 		}
 
+		/// <inheritdoc/>
 		protected override void OnMouseLeave(System.Windows.Input.MouseEventArgs e)
 		{
 			if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed &&

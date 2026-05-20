@@ -25,18 +25,22 @@ namespace AvalonDock.Layout
 	}
 
 	/// <summary>
-	/// Defines an event to communicating a type of change if the tree of
-	/// has been changed due to an insert/remove operation.
+	/// Provides event data for children tree changed operations.
 	/// </summary>
 	public class ChildrenTreeChangedEventArgs : EventArgs
 	{
-		/// <summary>Class constructor</summary>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ChildrenTreeChangedEventArgs"/> class.
+		/// </summary>
+		/// <param name="change">The change.</param>
 		public ChildrenTreeChangedEventArgs(ChildrenTreeChange change)
 		{
 			Change = change;
 		}
 
-		/// <summary>Gets the type of <see cref="ChildrenTreeChange"/> for this event.</summary>
+		/// <summary>
+		/// Gets the change.
+		/// </summary>
 		public ChildrenTreeChange Change { get; private set; }
 	}
 }

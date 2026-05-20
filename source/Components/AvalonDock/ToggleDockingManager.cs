@@ -19,85 +19,161 @@ using AvalonDock.Layout;
 namespace AvalonDock
 {
 	/// <summary>
-	/// Identifies one of the 6 sidebar button positions / dock zones.
+	/// Defines the dock Zone values.
 	/// </summary>
 	public enum DockZone
 	{
+		/// <summary>
+		/// The left Top option.
+		/// </summary>
 		LeftTop,
+
+		/// <summary>
+		/// The left Bottom option.
+		/// </summary>
 		LeftBottom,
+
+		/// <summary>
+		/// The right Top option.
+		/// </summary>
 		RightTop,
+
+		/// <summary>
+		/// The right Bottom option.
+		/// </summary>
 		RightBottom,
+
+		/// <summary>
+		/// The bottom Left option.
+		/// </summary>
 		BottomLeft,
+
+		/// <summary>
+		/// The bottom Right option.
+		/// </summary>
 		BottomRight
 	}
 
 	/// <summary>
-	/// Controls which docked panes get priority for full extent.
+	/// Defines the dock Layout Priority values.
 	/// </summary>
 	public enum DockLayoutPriority
 	{
-		/// <summary>Bottom panes span full width; side panes share remaining height (Rider-style).</summary>
+		/// <summary>
+		/// The bottom Full Width option.
+		/// </summary>
 		BottomFullWidth,
-		/// <summary>Side panes span full height; bottom panes share remaining width (VSCode-style).</summary>
+
+		/// <summary>
+		/// The sides Full Height option.
+		/// </summary>
 		SidesFullHeight,
-		/// <summary>No restructuring — use AvalonDock's default nesting order.</summary>
+
+		/// <summary>
+		/// The default option.
+		/// </summary>
 		Default
 	}
 
 	/// <summary>
-	/// A docking manager with Rider-style toggle-dock behavior.
-	/// Two sidebars (left + right), each with 3 button sections separated by separators:
-	/// [SideTop] — separator — [SideBottom] — gap — [BottomSide].
-	/// Clicking a button toggles the corresponding anchorable. Exclusivity is per-bar.
-	/// Two tools from the same side (one top, one bottom) can coexist as a vertical split.
+	/// Represents the toggle Docking Manager.
 	/// </summary>
 	public class ToggleDockingManager : DockingManager
 	{
+		/// <summary>
+		/// The left Top Bar field.
+		/// </summary>
 		internal ToggleDockButtonBar _leftTopBar;
+
+		/// <summary>
+		/// The left Bottom Bar field.
+		/// </summary>
 		internal ToggleDockButtonBar _leftBottomBar;
+
+		/// <summary>
+		/// The right Top Bar field.
+		/// </summary>
 		internal ToggleDockButtonBar _rightTopBar;
+
+		/// <summary>
+		/// The right Bottom Bar field.
+		/// </summary>
 		internal ToggleDockButtonBar _rightBottomBar;
+
+		/// <summary>
+		/// The bottom Left Bar field.
+		/// </summary>
 		internal ToggleDockButtonBar _bottomLeftBar;
+
+		/// <summary>
+		/// The bottom Right Bar field.
+		/// </summary>
 		internal ToggleDockButtonBar _bottomRightBar;
+
+		/// <summary>
+		/// The injected Left Dock Panel field.
+		/// </summary>
 		internal DockPanel _injectedLeftDockPanel;
+
+		/// <summary>
+		/// The injected Right Dock Panel field.
+		/// </summary>
 		internal DockPanel _injectedRightDockPanel;
+
+		/// <summary>
+		/// The left Separator field.
+		/// </summary>
 		internal FrameworkElement _leftSeparator;
+
+		/// <summary>
+		/// The right Separator field.
+		/// </summary>
 		internal FrameworkElement _rightSeparator;
 
-		/// <summary><see cref="LayoutPriority"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="LayoutPriority"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty LayoutPriorityProperty =
 			DependencyProperty.Register(nameof(LayoutPriority), typeof(DockLayoutPriority), typeof(ToggleDockingManager),
 				new PropertyMetadata(DockLayoutPriority.BottomFullWidth));
 
-		/// <summary><see cref="ButtonSize"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="ButtonSize"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ButtonSizeProperty =
 			DependencyProperty.Register(nameof(ButtonSize), typeof(double), typeof(ToggleDockingManager),
 				new PropertyMetadata(25.0));
 
-		/// <summary><see cref="ShowHeaderMinimizeButton"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="ShowHeaderMinimizeButton"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ShowHeaderMinimizeButtonProperty =
 			DependencyProperty.Register(nameof(ShowHeaderMinimizeButton), typeof(bool), typeof(ToggleDockingManager),
 				new PropertyMetadata(true));
 
-		/// <summary><see cref="ShowHeaderOptionsButton"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="ShowHeaderOptionsButton"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ShowHeaderOptionsButtonProperty =
 			DependencyProperty.Register(nameof(ShowHeaderOptionsButton), typeof(bool), typeof(ToggleDockingManager),
 				new PropertyMetadata(true));
 
-		/// <summary><see cref="DefaultDockWidth"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="DefaultDockWidth"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty DefaultDockWidthProperty =
 			DependencyProperty.Register(nameof(DefaultDockWidth), typeof(double), typeof(ToggleDockingManager),
 				new PropertyMetadata(250.0));
 
-		/// <summary><see cref="DefaultDockHeight"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="DefaultDockHeight"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty DefaultDockHeightProperty =
 			DependencyProperty.Register(nameof(DefaultDockHeight), typeof(double), typeof(ToggleDockingManager),
 				new PropertyMetadata(200.0));
 
 		/// <summary>
-		/// Gets or sets which docked panes get priority for full extent.
-		/// Default is <see cref="DockLayoutPriority.BottomFullWidth"/> (Rider-style).
-		/// Set to <see cref="DockLayoutPriority.SidesFullHeight"/> for VSCode-style.
+		/// Gets or sets the layout Priority.
 		/// </summary>
 		public DockLayoutPriority LayoutPriority
 		{
@@ -106,8 +182,7 @@ namespace AvalonDock
 		}
 
 		/// <summary>
-		/// Gets or sets the size (width and height) of the sidebar toggle buttons.
-		/// Default is 25. Changing this adjusts all toggle buttons uniformly.
+		/// Gets or sets the button Size.
 		/// </summary>
 		public double ButtonSize
 		{
@@ -116,8 +191,7 @@ namespace AvalonDock
 		}
 
 		/// <summary>
-		/// Gets or sets whether the Minimize button appears in the docked pane header.
-		/// Default is true.
+		/// Gets or sets a value indicating whether show Header Minimize Button.
 		/// </summary>
 		public bool ShowHeaderMinimizeButton
 		{
@@ -126,8 +200,7 @@ namespace AvalonDock
 		}
 
 		/// <summary>
-		/// Gets or sets whether the Options (three-dot) button appears in the docked pane header.
-		/// Default is true.
+		/// Gets or sets a value indicating whether show Header Options Button.
 		/// </summary>
 		public bool ShowHeaderOptionsButton
 		{
@@ -136,8 +209,7 @@ namespace AvalonDock
 		}
 
 		/// <summary>
-		/// Gets or sets the default width for side-docked panes when no prior size is available.
-		/// Default is 250.
+		/// Gets or sets the default Dock Width.
 		/// </summary>
 		public double DefaultDockWidth
 		{
@@ -146,8 +218,7 @@ namespace AvalonDock
 		}
 
 		/// <summary>
-		/// Gets or sets the default height for bottom-docked panes when no prior size is available.
-		/// Default is 200.
+		/// Gets or sets the default Dock Height.
 		/// </summary>
 		public double DefaultDockHeight
 		{
@@ -155,6 +226,9 @@ namespace AvalonDock
 			set => SetValue(DefaultDockHeightProperty, value);
 		}
 
+		/// <summary>
+		/// Initializes static members of the <see cref="ToggleDockingManager"/> class.
+		/// </summary>
 		static ToggleDockingManager()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(ToggleDockingManager), new FrameworkPropertyMetadata(typeof(ToggleDockingManager)));
@@ -189,10 +263,10 @@ namespace AvalonDock
 		}
 
 		/// <summary>
-		/// Toggles an anchorable in the specified zone. Exclusivity is per button-bar:
-		/// only one anchorable per bar is docked at a time. But two bars on the same side
-		/// (e.g. LeftTop + LeftBottom) can both have an active dock — they split the space.
+		/// Executes the toggle Anchorable operation.
 		/// </summary>
+		/// <param name="anchorable">The anchorable.</param>
+		/// <param name="zone">The zone.</param>
 		public void ToggleAnchorable(LayoutAnchorable anchorable, DockZone zone)
 		{
 			if (anchorable.IsAutoHidden)
@@ -226,10 +300,10 @@ namespace AvalonDock
 		}
 
 		/// <summary>
-		/// Moves an anchorable to a different zone. Updates button bars and layout model.
-		/// If there's already a docked anchorable on the same side (different sub-zone),
-		/// both coexist as a vertical/horizontal split.
+		/// Executes the move Anchorable To Zone operation.
 		/// </summary>
+		/// <param name="anchorable">The anchorable.</param>
+		/// <param name="targetZone">The target Zone.</param>
 		public void MoveAnchorableToZone(LayoutAnchorable anchorable, DockZone targetZone)
 		{
 			if (anchorable == null) return;
@@ -274,10 +348,7 @@ namespace AvalonDock
 			ToggleAnchorable(anchorable, targetZone);
 		}
 
-		/// <summary>
-		/// Overrides the pin/auto-hide button behavior. The pin button
-		/// acts as a "minimize" button that sends the anchorable back to the sidebar.
-		/// </summary>
+		/// <inheritdoc/>
 		internal override void ExecuteAutoHideCommand(LayoutAnchorable anchorable)
 		{
 			if (anchorable == null) return;
@@ -285,9 +356,7 @@ namespace AvalonDock
 			ToggleAnchorable(anchorable, zone);
 		}
 
-		/// <summary>
-		/// Overrides pane title bar drag to use the toggle overlay instead of floating windows.
-		/// </summary>
+		/// <inheritdoc/>
 		internal override void StartDraggingFloatingWindowForPane(LayoutAnchorablePane paneModel)
 		{
 			if (paneModel == null) return;
@@ -301,9 +370,7 @@ namespace AvalonDock
 			base.StartDraggingFloatingWindowForPane(paneModel);
 		}
 
-		/// <summary>
-		/// Overrides content drag to use the toggle overlay for anchorables.
-		/// </summary>
+		/// <inheritdoc/>
 		internal override void StartDraggingFloatingWindowForContent(LayoutContent contentModel, bool startDrag = true)
 		{
 			if (contentModel is LayoutAnchorable anchorable)
@@ -520,10 +587,10 @@ namespace AvalonDock
 		}
 
 		/// <summary>
-		/// After docking an anchorable, ensures that if multiple panes share the same side,
-		/// they are split with the correct orientation:
-		/// Left/Right → Vertical (top/bottom), Bottom → Horizontal (left/right).
+		/// Executes the fix Split Orientation operation.
 		/// </summary>
+		/// <param name="anchorable">The anchorable.</param>
+		/// <param name="zone">The zone.</param>
 		private void FixSplitOrientation(LayoutAnchorable anchorable, DockZone zone)
 		{
 			var pane = anchorable.Parent as LayoutAnchorablePane;
@@ -617,12 +684,7 @@ namespace AvalonDock
 		}
 
 		/// <summary>
-		/// Ensures bottom panes are at the outermost vertical level for full width (Rider-style).
-		/// If a bottom pane ended up nested inside a horizontal panel (because it was docked
-		/// before side panes), this restructures the tree so bottom is a sibling of the
-		/// horizontal panel, not a child of it.
-		/// 
-		/// Target layout: Vertical[ Horizontal[Left?, Docs, Right?], Bottom? ]
+		/// Executes the ensure Bottom Full Width operation.
 		/// </summary>
 		private void EnsureBottomFullWidth()
 		{
@@ -697,12 +759,7 @@ namespace AvalonDock
 		}
 
 		/// <summary>
-		/// Ensures side panes are at the outermost horizontal level for full height (VSCode-style).
-		/// If a side pane ended up nested inside a vertical panel (because it was docked
-		/// after bottom panes), this restructures the tree so side panes are siblings of the
-		/// vertical panel, not children of it.
-		/// 
-		/// Target layout: Horizontal[ Left?, Vertical[Docs, Bottom?], Right? ]
+		/// Executes the ensure Sides Full Height operation.
 		/// </summary>
 		private void EnsureSidesFullHeight()
 		{
@@ -791,9 +848,10 @@ namespace AvalonDock
 		}
 
 		/// <summary>
-		/// Docks an auto-hidden anchorable into the layout, using the DockZone
-		/// to determine placement instead of relying on LayoutAnchorSide.Side.
+		/// Executes the dock From Auto Hide operation.
 		/// </summary>
+		/// <param name="anchorable">The anchorable.</param>
+		/// <param name="zone">The zone.</param>
 		private void DockFromAutoHide(LayoutAnchorable anchorable, DockZone zone)
 		{
 			var parentGroup = anchorable.Parent as LayoutAnchorGroup;
@@ -910,9 +968,10 @@ namespace AvalonDock
 		}
 
 		/// <summary>
-		/// Auto-hides a docked anchorable, using the DockZone to determine
-		/// the correct LayoutAnchorSide instead of relying on GetSide().
+		/// Executes the auto Hide From Dock operation.
 		/// </summary>
+		/// <param name="anchorable">The anchorable.</param>
+		/// <param name="zone">The zone.</param>
 		private void AutoHideFromDock(LayoutAnchorable anchorable, DockZone zone)
 		{
 			var parentPane = anchorable.Parent as LayoutAnchorablePane;
@@ -956,21 +1015,27 @@ namespace AvalonDock
 			var bottomLeft = bottomAnchorables.Take((bottomAnchorables.Count + 1) / 2).ToList();
 			var bottomRight = bottomAnchorables.Skip((bottomAnchorables.Count + 1) / 2).ToList();
 
-			// Create 6 button bars
+			// Create 6 button bars with automation IDs for UI test discoverability
 			_leftTopBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.LeftTop };
+			System.Windows.Automation.AutomationProperties.SetAutomationId(_leftTopBar, "ToggleDockBar_LeftTop");
 			_leftTopBar.SetAnchorables(leftAnchorables, DockZone.LeftTop);
 
 			_leftBottomBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.LeftBottom };
-			// LeftBottom starts empty — user drags buttons there
+			System.Windows.Automation.AutomationProperties.SetAutomationId(_leftBottomBar, "ToggleDockBar_LeftBottom");
+
 			_rightTopBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.RightTop };
+			System.Windows.Automation.AutomationProperties.SetAutomationId(_rightTopBar, "ToggleDockBar_RightTop");
 			_rightTopBar.SetAnchorables(rightAnchorables, DockZone.RightTop);
 
 			_rightBottomBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.RightBottom };
-			// RightBottom starts empty
+			System.Windows.Automation.AutomationProperties.SetAutomationId(_rightBottomBar, "ToggleDockBar_RightBottom");
+
 			_bottomLeftBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.BottomLeft };
+			System.Windows.Automation.AutomationProperties.SetAutomationId(_bottomLeftBar, "ToggleDockBar_BottomLeft");
 			_bottomLeftBar.SetAnchorables(bottomLeft, DockZone.BottomLeft);
 
 			_bottomRightBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.BottomRight };
+			System.Windows.Automation.AutomationProperties.SetAutomationId(_bottomRightBar, "ToggleDockBar_BottomRight");
 			_bottomRightBar.SetAnchorables(bottomRight, DockZone.BottomRight);
 
 			// Inject into the template grid
@@ -1103,7 +1168,10 @@ namespace AvalonDock
 				a.ToggleSingleAutoHide();
 		}
 
-		/// <summary>Hides any docked anchorable that belongs to the specified button bar.</summary>
+		/// <summary>
+		/// Executes the hide Docked In Bar operation.
+		/// </summary>
+		/// <param name="bar">The bar.</param>
 		private void HideDockedInBar(ToggleDockButtonBar bar)
 		{
 			if (bar == null) return;
@@ -1140,7 +1208,11 @@ namespace AvalonDock
 			}
 		}
 
-		/// <summary>Determines which zone an anchorable belongs to by checking all button bars.</summary>
+		/// <summary>
+		/// Gets the get Anchorable Zone.
+		/// </summary>
+		/// <param name="anchorable">The anchorable.</param>
+		/// <returns>The requested value.</returns>
 		private DockZone GetAnchorableZone(LayoutAnchorable anchorable)
 		{
 			if (_leftTopBar?.ContainsAnchorable(anchorable) == true) return DockZone.LeftTop;
@@ -1164,6 +1236,11 @@ namespace AvalonDock
 			return DockZone.LeftTop;
 		}
 
+		/// <summary>
+		/// Gets the get Bar For Zone.
+		/// </summary>
+		/// <param name="zone">The zone.</param>
+		/// <returns>The requested value.</returns>
 		internal ToggleDockButtonBar GetBarForZone(DockZone zone)
 		{
 			switch (zone)
@@ -1178,7 +1255,11 @@ namespace AvalonDock
 			}
 		}
 
-		/// <summary>Maps a DockZone to its LayoutAnchorSide in the layout model.</summary>
+		/// <summary>
+		/// Gets the get Layout Side For Zone.
+		/// </summary>
+		/// <param name="zone">The zone.</param>
+		/// <returns>The requested value.</returns>
 		private LayoutAnchorSide GetLayoutSideForZone(DockZone zone)
 		{
 			switch (zone)

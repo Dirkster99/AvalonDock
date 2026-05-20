@@ -11,10 +11,14 @@ using System.Windows.Controls;
 
 namespace AvalonDock.Layout
 {
-	/// <summary>Interface definition for a <see cref="ILayoutGroup"/> that supports a <see cref="System.Windows.Controls.Orientation"/> property.</summary>
+	/// <summary>
+	/// Interface for layout orientable group.
+	/// </summary>
 	public interface ILayoutOrientableGroup : ILayoutGroup
 	{
-		/// <summary>Gets/sets the <see cref="System.Windows.Controls.Orientation"/> of the <see cref="ILayoutGroup"/>.</summary>
+		/// <summary>
+		/// Gets or sets the orientation.
+		/// </summary>
 		Orientation Orientation { get; set; }
 	}
 }

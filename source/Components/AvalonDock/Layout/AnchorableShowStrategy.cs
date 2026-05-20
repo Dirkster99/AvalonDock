@@ -15,6 +15,9 @@ namespace AvalonDock.Layout
 	[Flags]
 	public enum AnchorableShowStrategy : byte
 	{
+		/// <summary>
+		/// Chooses the most suitable anchor side automatically.
+		/// </summary>
 		Most = 0x0001,
 
 		/// <summary>

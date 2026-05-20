@@ -24,12 +24,13 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a control that contains a <see cref="LayoutAnchorableControl"/>.
-	/// The <see cref="LayoutAutoHideWindowControl"/> pops out of a side panel
-	/// when the user clicks on a <see cref="LayoutAnchorControl"/> of a particular anchored item.
+	/// Represents the layout auto hide window control.
 	/// </summary>
 	public class LayoutAutoHideWindowControl : HwndHost, ILayoutControl
 	{
+		/// <summary>
+		/// The internal host.
+		/// </summary>
 		internal LayoutAnchorableControl _internalHost = null;
 
 		private LayoutAnchorControl _anchor;
@@ -63,11 +64,15 @@ namespace AvalonDock.Controls
 			_sizeChangedHandler = ViewboxZoomChanged;
 		}
 
-		/// <summary><see cref="AnchorableStyle"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="AnchorableStyle"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty AnchorableStyleProperty = DependencyProperty.Register(nameof(AnchorableStyle), typeof(Style), typeof(LayoutAutoHideWindowControl),
 				new FrameworkPropertyMetadata(null));
 
-		/// <summary>Gets/sets the style to apply to the <see cref="LayoutAnchorableControl"/> hosted in this auto hide window.</summary>
+		/// <summary>
+		/// Gets or sets the anchorable style.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the style to apply to the LayoutAnchorableControl hosted in this auto hide window.")]
 		[Category("Style")]
@@ -77,11 +82,15 @@ namespace AvalonDock.Controls
 			set => SetValue(AnchorableStyleProperty, value);
 		}
 
-		/// <summary><see cref="AnchorableGridStyle"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="AnchorableGridStyle"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty AnchorableGridStyleProperty = DependencyProperty.Register(nameof(AnchorableGridStyle), typeof(Style), typeof(LayoutAutoHideWindowControl),
 				new FrameworkPropertyMetadata(null));
 
-		/// <summary>Gets/sets the style to apply to the parent Grid of the <see cref="LayoutAnchorableControl"/> hosted in this auto hide window.</summary>
+		/// <summary>
+		/// Gets or sets the anchorable grid style.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the style to apply to the parent Grid of the LayoutAnchorableControl hosted in this auto hide window.")]
 		[Category("Style")]
@@ -91,11 +100,15 @@ namespace AvalonDock.Controls
 			set => SetValue(AnchorableGridStyleProperty, value);
 		}
 
-		/// <summary><see cref="Background"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="Background"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty BackgroundProperty = DependencyProperty.Register(nameof(Background), typeof(Brush), typeof(LayoutAutoHideWindowControl),
 				new FrameworkPropertyMetadata(null));
 
-		/// <summary>Gets/sets the background brush of the autohide childwindow.</summary>
+		/// <summary>
+		/// Gets or sets the background.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the background brush of the autohide childwindow.")]
 		[Category("Other")]
@@ -105,11 +118,20 @@ namespace AvalonDock.Controls
 			set => SetValue(BackgroundProperty, value);
 		}
 
+		/// <summary>
+		/// Gets the model.
+		/// </summary>
 		public ILayoutElement Model => _model;
 
-		/// <summary>Resizer</summary>
+		/// <summary>
+		/// Gets a value indicating whether this instance is resizing.
+		/// </summary>
 		internal bool IsResizing { get; private set; }
 
+		/// <summary>
+		/// Shows the control.
+		/// </summary>
+		/// <param name="anchor">The anchor.</param>
 		internal void Show(LayoutAnchorControl anchor)
 		{
 			if (_model != null) throw new InvalidOperationException();
@@ -128,6 +150,9 @@ namespace AvalonDock.Controls
 			Win32Helper.BringWindowToTop(_internalHwndSource.Handle);
 		}
 
+		/// <summary>
+		/// Hides the control.
+		/// </summary>
 		internal void Hide()
 		{
 			StopListeningToViewboxZoomChange();
@@ -141,6 +166,9 @@ namespace AvalonDock.Controls
 			Visibility = Visibility.Hidden;
 		}
 
+		/// <summary>
+		/// Gets a value indicating whether this instance is win32 mouse over.
+		/// </summary>
 		internal bool IsWin32MouseOver
 		{
 			get
@@ -159,7 +187,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override HandleRef BuildWindowCore(HandleRef hwndParent)
 		{
 			parentWindowHandle = hwndParent.Handle;
@@ -177,7 +205,7 @@ namespace AvalonDock.Controls
 			return new HandleRef(this, _internalHwndSource.Handle);
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void DestroyWindowCore(HandleRef hwnd)
 		{
 			if (_internalHwndSource == null) return;
@@ -185,13 +213,13 @@ namespace AvalonDock.Controls
 			_internalHwndSource = null;
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override bool HasFocusWithinCore() => false;
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override System.Collections.IEnumerator LogicalChildren => _internalHostPresenter == null ? new UIElement[] { }.GetEnumerator() : new UIElement[] { _internalHostPresenter }.GetEnumerator();
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override Size MeasureOverride(Size constraint)
 		{
 			if (_internalHostPresenter == null) return base.MeasureOverride(constraint);
@@ -200,7 +228,7 @@ namespace AvalonDock.Controls
 			return _internalHostPresenter.DesiredSize;
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override Size ArrangeOverride(Size finalSize)
 		{
 			if (_internalHostPresenter == null) return base.ArrangeOverride(finalSize);

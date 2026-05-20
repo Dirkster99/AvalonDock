@@ -4,12 +4,19 @@ using System.Xml.Serialization;
 
 namespace AvalonDock
 {
-	/// <summary>Thread-safe cache for XmlSerializer instances to avoid repeated reflection costs.</summary>
+	/// <summary>
+	/// Provides helper members for xml Serializers Cache.
+	/// </summary>
 	public static class XmlSerializersCache
 	{
 		private static readonly object s_lock = new object();
 		private static readonly ConcurrentDictionary<Type, XmlSerializer> s_cache = new ConcurrentDictionary<Type, XmlSerializer>();
 
+		/// <summary>
+		/// Gets the get Serializer.
+		/// </summary>
+		/// <param name="targetType">The target type.</param>
+		/// <returns>The requested value.</returns>
 		public static XmlSerializer GetSerializer(Type targetType)
 		{
 			if (s_cache.TryGetValue(targetType, out var serializer))
@@ -29,6 +36,11 @@ namespace AvalonDock
 			return serializer;
 		}
 
+		/// <summary>
+		/// Gets the get Serializer.
+		/// </summary>
+		/// <typeparam name="T">The t type.</typeparam>
+		/// <returns>The requested value.</returns>
 		public static XmlSerializer GetSerializer<T>() => GetSerializer(typeof(T));
 	}
 }

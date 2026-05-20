@@ -9,10 +9,14 @@
 
 namespace AvalonDock.Layout
 {
-	/// <summary>Interface definition for a layout pane that can be identified by a unique id.</summary>
+	/// <summary>
+	/// Interface for layout pane serializable.
+	/// </summary>
 	public interface ILayoutPaneSerializable
 	{
-		/// <summary>Gets/sets the unique id for this layout pane.</summary>
+		/// <summary>
+		/// Gets or sets the id.
+		/// </summary>
 		string Id { get; set; }
 	}
 }

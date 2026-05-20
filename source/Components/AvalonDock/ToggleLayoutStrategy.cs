@@ -8,7 +8,7 @@ namespace AvalonDock
 	/// <summary>
 	/// Layout strategy for the ToggleDockingManager that places anchorables
 	/// into left/right/bottom anchor sides based on <see cref="IToolbox.Side"/>.
-	/// Also sets <see cref="ToggleDock.Icon"/> and <see cref="ToggleDock.ToolTip"/> attached
+	/// Also sets <see cref="ToggleDock.IconProperty"/> and <see cref="ToggleDock.ToolTipProperty"/> attached
 	/// properties from the ViewModel metadata.
 	/// </summary>
 	public class ToggleLayoutStrategy : ILayoutUpdateStrategy

@@ -122,20 +122,36 @@ namespace AvalonDockTest.FlaUITests
 		}
 
 		/// <summary>
-		/// Finds all toggle buttons in the window (the sidebar buttons).
+		/// Finds all toggle buttons by searching within the ToggleDockButtonBar containers.
 		/// </summary>
 		protected AutomationElement[] FindAllToggleButtons()
 		{
-			return MainWindow.FindAllDescendants(CF.ByControlType(ControlType.Button))
-				.Where(b =>
+			var barIds = new[]
+			{
+				"ToggleDockBar_LeftTop", "ToggleDockBar_LeftBottom",
+				"ToggleDockBar_RightTop", "ToggleDockBar_RightBottom",
+				"ToggleDockBar_BottomLeft", "ToggleDockBar_BottomRight"
+			};
+
+			var buttons = new System.Collections.Generic.List<AutomationElement>();
+			foreach (var barId in barIds)
+			{
+				var bar = MainWindow.FindFirstDescendant(CF.ByAutomationId(barId));
+				if (bar == null) continue;
+
+				var descendants = bar.FindAllDescendants(CF.ByControlType(ControlType.Button));
+				foreach (var btn in descendants)
 				{
 					try
 					{
-						return b.Patterns.Toggle.IsSupported;
+						if (btn.Patterns.Toggle.IsSupported)
+							buttons.Add(btn);
 					}
-					catch { return false; }
-				})
-				.ToArray();
+					catch { }
+				}
+			}
+
+			return buttons.ToArray();
 		}
 
 		/// <summary>
@@ -257,9 +273,16 @@ namespace AvalonDockTest.FlaUITests
 
 		private void WaitForAppReady()
 		{
-			var result = Retry.WhileNull(
-				() => FindDocumentTab("Document 1") ?? FindByName("Layout"),
+			// Wait for the main document to appear
+			Retry.WhileNull(
+				() => FindDocumentTab("Welcome") ?? FindByName("Layout"),
 				timeout: TimeSpan.FromSeconds(15),
+				interval: TimeSpan.FromMilliseconds(500));
+
+			// Wait for toggle buttons to appear (they may arrive asynchronously via DockLayout binding)
+			Retry.WhileTrue(
+				() => FindAllToggleButtons().Length == 0,
+				timeout: TimeSpan.FromSeconds(10),
 				interval: TimeSpan.FromMilliseconds(500));
 
 			Wait.UntilInputIsProcessed();

@@ -16,29 +16,32 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
-	/// <inheritdoc />
 	/// <summary>
-	/// Implements the TabItem Header that is displayed when the <see cref="LayoutAnchorablePaneControl"/>
-	/// shows more than 1 <see cref="LayoutAnchorableControl"/>. This TabItem is displayed at the bottom
-	/// of a <see cref="LayoutAnchorablePaneControl"/>.
+	/// Represents the layout Anchorable Tab Item.
 	/// </summary>
-	/// <seealso cref="Control"/>
 	public class LayoutAnchorableTabItem : Control
 	{
 		private bool _isMouseDown = false;
 		private static LayoutAnchorableTabItem _draggingItem = null;
 		private static bool _cancelMouseLeave = false;
 
+		/// <summary>
+		/// Initializes static members of the <see cref="LayoutAnchorableTabItem"/> class.
+		/// </summary>
 		static LayoutAnchorableTabItem()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutAnchorableTabItem), new FrameworkPropertyMetadata(typeof(LayoutAnchorableTabItem)));
 		}
 
-		/// <summary><see cref="Model"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="Model"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(nameof(Model), typeof(LayoutContent), typeof(LayoutAnchorableTabItem),
 				new FrameworkPropertyMetadata(null, OnModelChanged));
 
-		/// <summary>Gets/sets the model attached to the anchorable tab item.</summary>
+		/// <summary>
+		/// Gets or sets the model.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the model attached to the anchorable tab item.")]
 		[Category("Other")]
@@ -48,44 +51,71 @@ namespace AvalonDock.Controls
 			set => SetValue(ModelProperty, value);
 		}
 
-		/// <summary>Handles changes to the <see cref="Model"/> property.</summary>
+		/// <summary>
+		/// Handles the on Model Changed.
+		/// </summary>
+		/// <param name="d">The d.</param>
+		/// <param name="e">The event arguments.</param>
 		private static void OnModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutAnchorableTabItem)d).OnModelChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Model"/> property.</summary>
+		/// <summary>
+		/// Handles the on Model Changed.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnModelChanged(DependencyPropertyChangedEventArgs e)
 		{
 			SetLayoutItem(Model?.Root.Manager.GetLayoutItemFromModel(Model));
 			// UpdateLogicalParent();
 		}
 
-		/// <summary><see cref="LayoutItem"/> Read-Only dependency property.</summary>
+		/// <summary>
+		/// The layout Item Property Key field.
+		/// </summary>
 		private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(LayoutItem), typeof(LayoutItem), typeof(LayoutAnchorableTabItem),
 				new FrameworkPropertyMetadata(null));
 
+		/// <summary>
+		/// <see cref="LayoutItem"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
-		/// <summary>Gets the the LayoutItem attached to this tag item.</summary>
+		/// <summary>
+		/// Gets the layout Item.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets the the LayoutItem attached to this tag item.")]
 		[Category("Other")]
 		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
 
 		/// <summary>
-		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.
-		/// This dependency property indicates the LayoutItem attached to this tag item.
+		/// Sets the set Layout Item.
 		/// </summary>
-		/// <param name="value">The new value for the property.</param>
+		/// <param name="value">The value.</param>
 		protected void SetLayoutItem(LayoutItem value) => SetValue(LayoutItemPropertyKey, value);
 
+		/// <summary>
+		/// Executes the is Dragging Item operation.
+		/// </summary>
+		/// <returns>true if the operation succeeds; otherwise, false.</returns>
 		internal static bool IsDraggingItem() => _draggingItem != null;
 
+		/// <summary>
+		/// Gets the get Dragging Item.
+		/// </summary>
+		/// <returns>The requested value.</returns>
 		internal static LayoutAnchorableTabItem GetDraggingItem() => _draggingItem;
 
+		/// <summary>
+		/// Executes the reset Dragging Item operation.
+		/// </summary>
 		internal static void ResetDraggingItem() => _draggingItem = null;
 
+		/// <summary>
+		/// Executes the cancel Mouse Leave operation.
+		/// </summary>
 		internal static void CancelMouseLeave() => _cancelMouseLeave = true;
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonDown(e);
@@ -101,7 +131,7 @@ namespace AvalonDock.Controls
 			_draggingItem = this;
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnMouseMove(System.Windows.Input.MouseEventArgs e)
 		{
 			base.OnMouseMove(e);
@@ -116,7 +146,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnMouseLeftButtonUp(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			_isMouseDown = false;
@@ -124,7 +154,7 @@ namespace AvalonDock.Controls
 			Model.IsActive = true;
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnMouseLeave(System.Windows.Input.MouseEventArgs e)
 		{
 			base.OnMouseLeave(e);
@@ -139,7 +169,7 @@ namespace AvalonDock.Controls
 			_cancelMouseLeave = false;
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnMouseEnter(MouseEventArgs e)
 		{
 			base.OnMouseEnter(e);

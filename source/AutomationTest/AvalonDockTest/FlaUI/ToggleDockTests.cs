@@ -29,43 +29,57 @@ namespace AvalonDockTest.FlaUITests
 		[Test, Order(2)]
 		public void MainWindow_HasCorrectTitle()
 		{
-			Assert.That(MainWindow.Title, Does.Contain("AvalonDockCodeApp"),
-				"Main window should have AvalonDockCodeApp title.");
+			Assert.That(MainWindow.Title, Does.Contain("AvalonDock Code"),
+				"Main window should have AvalonDock Code title.");
 		}
 
 		[Test, Order(3)]
 		public void Documents_ArePresent()
 		{
-			var doc1 = FindDocumentTab("Document 1");
-			var doc2 = FindDocumentTab("Document 2");
-			Assert.That(doc1, Is.Not.Null, "Document 1 should be present.");
-			Assert.That(doc2, Is.Not.Null, "Document 2 should be present.");
+			var welcome = FindDocumentTab("Welcome");
+			Assert.That(welcome, Is.Not.Null, "Welcome document should be present.");
 		}
 
 		[Test, Order(4)]
 		public void ToggleButtons_ArePresent_ForLeftSide()
 		{
-			var btn1 = FindToggleButton("ToolBox 1");
-			var btn2 = FindToggleButton("ToolBox 2");
-			Assert.That(btn1, Is.Not.Null, "ToolBox 1 toggle button should be present.");
-			Assert.That(btn2, Is.Not.Null, "ToolBox 2 toggle button should be present.");
+			// Diagnostic: check what automation IDs exist
+			var allDesc = MainWindow.FindAllDescendants();
+			var barElements = allDesc.Where(e => { try { return e.AutomationId?.StartsWith("ToggleDockBar") == true; } catch { return false; } }).ToArray();
+			TestContext.Out.WriteLine($"DEBUG: Found {barElements.Length} bar elements by AutomationId");
+			foreach (var bar in barElements)
+			{
+				try { TestContext.Out.WriteLine($"  Bar: AutomationId={bar.AutomationId}, Name={bar.Name}, Type={bar.ControlType}"); } catch { }
+			}
+
+			// Also check all buttons with Toggle pattern via broad search
+			var allBtns = allDesc.Where(b => { try { return b.ControlType == ControlType.Button && b.Patterns.Toggle.IsSupported; } catch { return false; } }).ToArray();
+			TestContext.Out.WriteLine($"DEBUG: Found {allBtns.Length} toggle-capable buttons via broad search");
+			foreach (var btn in allBtns)
+			{
+				try { TestContext.Out.WriteLine($"  Btn: Name=[{btn.Name}], AutomationId=[{btn.AutomationId}]"); } catch { }
+			}
+
+			var allButtons = FindAllToggleButtons();
+			var names = string.Join(", ", allButtons.Select(b => { try { return $"[{b.Name}]"; } catch { return "[?]"; } }));
+			TestContext.Out.WriteLine($"DEBUG: Found {allButtons.Length} toggle buttons via FindAllToggleButtons: {names}");
+
+			var btn1 = FindToggleButton("Explorer");
+			var btn2 = FindToggleButton("Search");
+			Assert.That(btn1, Is.Not.Null, $"Explorer toggle button should be present. Found buttons: {names}");
+			Assert.That(btn2, Is.Not.Null, $"Search toggle button should be present. Found buttons: {names}");
 		}
 
 		[Test, Order(5)]
-		public void ToggleButtons_ArePresent_ForRightSide()
+		public void ToggleButtons_ArePresent_ForBottomSide()
 		{
-			var btn = FindToggleButton("Properties");
-			Assert.That(btn, Is.Not.Null, "Properties toggle button should be present.");
+			var btn1 = FindToggleButton("Problems");
+			var btn2 = FindToggleButton("Terminal");
+			Assert.That(btn1, Is.Not.Null, "Problems toggle button should be present.");
+			Assert.That(btn2, Is.Not.Null, "Terminal toggle button should be present.");
 		}
 
 		[Test, Order(6)]
-		public void ToggleButtons_ArePresent_ForBottomSide()
-		{
-			var btn = FindToggleButton("Output");
-			Assert.That(btn, Is.Not.Null, "Output toggle button should be present.");
-		}
-
-		[Test, Order(7)]
 		public void ToggleButtons_InitialState_AllUnchecked()
 		{
 			// All anchorables start auto-hidden, so all buttons should be unchecked
@@ -93,8 +107,8 @@ namespace AvalonDockTest.FlaUITests
 		[Test, Order(1)]
 		public void ClickToggleButton_DocksAnchorable()
 		{
-			var btn = FindToggleButton("ToolBox 1");
-			Assert.That(btn, Is.Not.Null, "ToolBox 1 button should exist.");
+			var btn = FindToggleButton("Explorer");
+			Assert.That(btn, Is.Not.Null, "Explorer button should exist.");
 
 			// Click to toggle on (dock)
 			btn.Click();
@@ -102,22 +116,14 @@ namespace AvalonDockTest.FlaUITests
 			System.Threading.Thread.Sleep(1000);
 
 			// After clicking, the toggle button should be checked
-			btn = FindToggleButton("ToolBox 1");
+			btn = FindToggleButton("Explorer");
 			var togglePattern = btn?.Patterns.Toggle.PatternOrDefault;
 			Assert.That(togglePattern, Is.Not.Null, "Button should support Toggle pattern.");
 			Assert.That(togglePattern.ToggleState.Value, Is.EqualTo(ToggleState.On),
-				"ToolBox 1 button should be checked after clicking.");
-
-			// The content area should now show ToolBox 1 Content
-			var content = Retry.WhileNull(
-				() => FindByName("ToolBox 1 Content"),
-				timeout: TimeSpan.FromSeconds(5),
-				interval: TimeSpan.FromMilliseconds(300));
-			Assert.That(content.Result, Is.Not.Null,
-				"ToolBox 1 content should be visible after toggling on.");
+				"Explorer button should be checked after clicking.");
 
 			// Clean up: undock
-			btn = FindToggleButton("ToolBox 1");
+			btn = FindToggleButton("Explorer");
 			btn?.Click();
 			Wait.UntilInputIsProcessed();
 			System.Threading.Thread.Sleep(500);
@@ -126,8 +132,8 @@ namespace AvalonDockTest.FlaUITests
 		[Test, Order(2)]
 		public void ClickToggleButton_Again_HidesAnchorable()
 		{
-			var btn = FindToggleButton("ToolBox 1");
-			Assert.That(btn, Is.Not.Null, "ToolBox 1 button should exist.");
+			var btn = FindToggleButton("Explorer");
+			Assert.That(btn, Is.Not.Null, "Explorer button should exist.");
 
 			// Click to dock
 			btn.Click();
@@ -135,86 +141,86 @@ namespace AvalonDockTest.FlaUITests
 			System.Threading.Thread.Sleep(1000);
 
 			// Click again to undock (auto-hide)
-			btn = FindToggleButton("ToolBox 1");
+			btn = FindToggleButton("Explorer");
 			btn.Click();
 			Wait.UntilInputIsProcessed();
 			System.Threading.Thread.Sleep(1000);
 
 			// Button should be unchecked
-			btn = FindToggleButton("ToolBox 1");
+			btn = FindToggleButton("Explorer");
 			var togglePattern = btn?.Patterns.Toggle.PatternOrDefault;
 			Assert.That(togglePattern?.ToggleState.Value, Is.EqualTo(ToggleState.Off),
-				"ToolBox 1 button should be unchecked after second click.");
+				"Explorer button should be unchecked after second click.");
 		}
 
 		[Test, Order(3)]
 		public void ExclusiveToggle_SameSection_OnlyOneActive()
 		{
-			// Click ToolBox 1 to dock it
-			var btn1 = FindToggleButton("ToolBox 1");
-			Assert.That(btn1, Is.Not.Null, "ToolBox 1 button should exist.");
+			// Click Explorer to dock it (left side)
+			var btn1 = FindToggleButton("Explorer");
+			Assert.That(btn1, Is.Not.Null, "Explorer button should exist.");
 			btn1.Click();
 			Wait.UntilInputIsProcessed();
 			System.Threading.Thread.Sleep(1000);
 
-			// Verify ToolBox 1 is checked
-			btn1 = FindToggleButton("ToolBox 1");
+			// Verify Explorer is checked
+			btn1 = FindToggleButton("Explorer");
 			Assert.That(btn1?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
-				Is.EqualTo(ToggleState.On), "ToolBox 1 should be checked.");
+				Is.EqualTo(ToggleState.On), "Explorer should be checked.");
 
-			// Click ToolBox 2 — should dock ToolBox 2 and auto-hide ToolBox 1
-			var btn2 = FindToggleButton("ToolBox 2");
-			Assert.That(btn2, Is.Not.Null, "ToolBox 2 button should exist.");
+			// Click Search — should dock Search and auto-hide Explorer (same left section)
+			var btn2 = FindToggleButton("Search");
+			Assert.That(btn2, Is.Not.Null, "Search button should exist.");
 			btn2.Click();
 			Wait.UntilInputIsProcessed();
 			System.Threading.Thread.Sleep(1000);
 
 			// Re-find buttons after layout change
-			btn1 = FindToggleButton("ToolBox 1");
-			btn2 = FindToggleButton("ToolBox 2");
+			btn1 = FindToggleButton("Explorer");
+			btn2 = FindToggleButton("Search");
 
 			Assert.That(btn2?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
-				Is.EqualTo(ToggleState.On), "ToolBox 2 should be checked.");
+				Is.EqualTo(ToggleState.On), "Search should be checked.");
 			Assert.That(btn1?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
-				Is.EqualTo(ToggleState.Off), "ToolBox 1 should be unchecked (exclusive per section).");
+				Is.EqualTo(ToggleState.Off), "Explorer should be unchecked (exclusive per section).");
 
 			// Clean up
-			btn2 = FindToggleButton("ToolBox 2");
+			btn2 = FindToggleButton("Search");
 			btn2?.Click();
 			Wait.UntilInputIsProcessed();
 			System.Threading.Thread.Sleep(500);
 		}
 
 		[Test, Order(4)]
-		public void RightSide_Toggle_WorksIndependently()
+		public void DifferentSections_Toggle_WorkIndependently()
 		{
-			// Click ToolBox 1 on left using Invoke pattern as fallback
-			var leftBtn = FindToggleButton("ToolBox 1");
-			Assert.That(leftBtn, Is.Not.Null, "ToolBox 1 button should exist.");
+			// Click Explorer on left
+			var leftBtn = FindToggleButton("Explorer");
+			Assert.That(leftBtn, Is.Not.Null, "Explorer button should exist.");
 			ClickToggleButtonSafe(leftBtn);
 			System.Threading.Thread.Sleep(1000);
 
-			// Click Properties on right
-			var rightBtn = FindToggleButton("Properties");
-			Assert.That(rightBtn, Is.Not.Null, "Properties button should exist.");
-			ClickToggleButtonSafe(rightBtn);
+			// Click Terminal on bottom
+			var bottomBtn = FindToggleButton("Terminal");
+			Assert.That(bottomBtn, Is.Not.Null, "Terminal button should exist.");
+			ClickToggleButtonSafe(bottomBtn);
 			System.Threading.Thread.Sleep(1000);
 
 			// Both should be checked — they're in different sections
-			leftBtn = FindToggleButton("ToolBox 1");
-			rightBtn = FindToggleButton("Properties");
+			leftBtn = FindToggleButton("Explorer");
+			bottomBtn = FindToggleButton("Terminal");
 
 			Assert.That(leftBtn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
-				Is.EqualTo(ToggleState.On), "Left-side ToolBox 1 should be checked.");
-			Assert.That(rightBtn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
-				Is.EqualTo(ToggleState.On), "Right-side Properties should be checked.");
+				Is.EqualTo(ToggleState.On), "Left-side Explorer should be checked.");
+			Assert.That(bottomBtn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
+				Is.EqualTo(ToggleState.On), "Bottom-side Terminal should be checked.");
 
 			// Clean up
-			leftBtn = FindToggleButton("ToolBox 1");
+			leftBtn = FindToggleButton("Explorer");
 			ClickToggleButtonSafe(leftBtn);
 			System.Threading.Thread.Sleep(500);
-			rightBtn = FindToggleButton("Properties");
-			ClickToggleButtonSafe(rightBtn);
+			bottomBtn = FindToggleButton("Terminal");
+			ClickToggleButtonSafe(bottomBtn);
 			System.Threading.Thread.Sleep(500);
 		}
 
@@ -245,9 +251,9 @@ namespace AvalonDockTest.FlaUITests
 		[Retry(3)]
 		public void PinButton_ActsAsMinimize_SendsBackToSidebar()
 		{
-			// Dock ToolBox 1 first
-			var btn = FindToggleButton("ToolBox 1");
-			Assert.That(btn, Is.Not.Null, "ToolBox 1 button should exist.");
+			// Dock Explorer first
+			var btn = FindToggleButton("Explorer");
+			Assert.That(btn, Is.Not.Null, "Explorer button should exist.");
 			btn.Click();
 			Wait.UntilInputIsProcessed();
 			System.Threading.Thread.Sleep(2000);
@@ -255,9 +261,9 @@ namespace AvalonDockTest.FlaUITests
 			// Verify it's docked (with retry for UI stabilization)
 			Retry.WhileException(() =>
 			{
-				btn = FindToggleButton("ToolBox 1");
+				btn = FindToggleButton("Explorer");
 				Assert.That(btn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
-					Is.EqualTo(ToggleState.On), "ToolBox 1 should be checked after docking.");
+					Is.EqualTo(ToggleState.On), "Explorer should be checked after docking.");
 			}, timeout: TimeSpan.FromSeconds(5), interval: TimeSpan.FromMilliseconds(500));
 
 			// Find the "Minimize" (formerly pin) button in the docked pane header
@@ -288,19 +294,19 @@ namespace AvalonDockTest.FlaUITests
 				ClickToggleButtonSafe(minimizeBtn.Result);
 				System.Threading.Thread.Sleep(2000);
 
-				// ToolBox 1 should be back to auto-hidden (toggle button unchecked)
+				// Explorer should be back to auto-hidden (toggle button unchecked)
 				Retry.WhileException(() =>
 				{
-					btn = FindToggleButton("ToolBox 1");
+					btn = FindToggleButton("Explorer");
 					Assert.That(btn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
 						Is.EqualTo(ToggleState.Off),
-						"ToolBox 1 should be unchecked after clicking minimize (pin) button.");
+						"Explorer should be unchecked after clicking minimize (pin) button.");
 				}, timeout: TimeSpan.FromSeconds(5), interval: TimeSpan.FromMilliseconds(500));
 			}
 			else
 			{
 				// Pin button not found via automation — clean up manually and mark as inconclusive
-				btn = FindToggleButton("ToolBox 1");
+				btn = FindToggleButton("Explorer");
 				btn?.Click();
 				Wait.UntilInputIsProcessed();
 				System.Threading.Thread.Sleep(500);

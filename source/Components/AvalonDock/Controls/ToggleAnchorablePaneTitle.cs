@@ -12,24 +12,27 @@ using System.Windows;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// An enhanced pane title bar for use with <see cref="ToggleDockingManager"/>.
-	/// Provides a configurable header with Minimize and Options (three-dot) buttons.
-	/// Users can override the entire look via <see cref="ToggleDockingManager.AnchorableHeaderTemplate"/>.
+	/// Represents the toggle Anchorable Pane Title.
 	/// </summary>
 	public class ToggleAnchorablePaneTitle : AnchorablePaneTitle
 	{
+		/// <summary>
+		/// Initializes static members of the <see cref="ToggleAnchorablePaneTitle"/> class.
+		/// </summary>
 		static ToggleAnchorablePaneTitle()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(ToggleAnchorablePaneTitle), new FrameworkPropertyMetadata(typeof(ToggleAnchorablePaneTitle)));
 		}
 
-		/// <summary><see cref="ShowMinimizeButton"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="ShowMinimizeButton"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ShowMinimizeButtonProperty =
 			DependencyProperty.Register(nameof(ShowMinimizeButton), typeof(bool), typeof(ToggleAnchorablePaneTitle),
 				new PropertyMetadata(true));
 
 		/// <summary>
-		/// Gets or sets whether the Minimize button is shown. Default is true.
+		/// Gets or sets a value indicating whether show Minimize Button.
 		/// </summary>
 		public bool ShowMinimizeButton
 		{
@@ -37,13 +40,15 @@ namespace AvalonDock.Controls
 			set => SetValue(ShowMinimizeButtonProperty, value);
 		}
 
-		/// <summary><see cref="ShowOptionsButton"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="ShowOptionsButton"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ShowOptionsButtonProperty =
 			DependencyProperty.Register(nameof(ShowOptionsButton), typeof(bool), typeof(ToggleAnchorablePaneTitle),
 				new PropertyMetadata(true));
 
 		/// <summary>
-		/// Gets or sets whether the Options (three-dot) button is shown. Default is true.
+		/// Gets or sets a value indicating whether show Options Button.
 		/// </summary>
 		public bool ShowOptionsButton
 		{

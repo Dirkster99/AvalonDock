@@ -23,45 +23,78 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Returns true when the value is not null. Used in XAML triggers to show/hide icon elements.
+	/// Represents the null to false converter.
 	/// </summary>
 	public sealed class NullToFalseConverter : IValueConverter
 	{
+		/// <summary>
+		/// The shared instance.
+		/// </summary>
 		public static readonly NullToFalseConverter Instance = new NullToFalseConverter();
 
+		/// <summary>
+		/// Convert.
+		/// </summary>
+		/// <param name="value">The value.</param>
+		/// <param name="targetType">The target type.</param>
+		/// <param name="parameter">The parameter.</param>
+		/// <param name="culture">The culture.</param>
+		/// <returns>The convert.</returns>
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 			=> value != null;
 
+		/// <summary>
+		/// Convert back.
+		/// </summary>
+		/// <param name="value">The value.</param>
+		/// <param name="targetType">The target type.</param>
+		/// <param name="parameter">The parameter.</param>
+		/// <param name="culture">The culture.</param>
+		/// <returns>The convert back.</returns>
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 			=> throw new NotSupportedException();
 	}
 
 	/// <summary>
-	/// A vertical/horizontal bar of toggle buttons representing anchorable tool windows.
-	/// Used by <see cref="ToggleDockingManager"/> to provide VSCode/Rider-style sidebar buttons.
+	/// Represents the toggle dock button bar.
 	/// </summary>
 	public class ToggleDockButtonBar : ItemsControl
 	{
-		/// <summary>Gets/sets which dock zone this button bar represents.</summary>
+		/// <summary>
+		/// Gets or sets the zone.
+		/// </summary>
 		public DockZone Zone
 		{
 			get => (DockZone)GetValue(ZoneProperty);
 			set => SetValue(ZoneProperty, value);
 		}
 
+		/// <summary>
+		/// <see cref="Zone"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ZoneProperty =
 			DependencyProperty.Register(nameof(Zone), typeof(DockZone), typeof(ToggleDockButtonBar), new PropertyMetadata(DockZone.LeftTop));
 
+		/// <summary>
+		/// Gets or sets the orientation.
+		/// </summary>
 		public Orientation Orientation
 		{
 			get => (Orientation)GetValue(OrientationProperty);
 			set => SetValue(OrientationProperty, value);
 		}
 
+		/// <summary>
+		/// <see cref="Orientation"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty OrientationProperty =
 			DependencyProperty.Register(nameof(Orientation), typeof(Orientation), typeof(ToggleDockButtonBar), new PropertyMetadata(Orientation.Vertical));
 
-		/// <summary>Populates this bar with buttons for the given anchorables.</summary>
+		/// <summary>
+		/// Sets the anchorables.
+		/// </summary>
+		/// <param name="anchorables">The anchorables.</param>
+		/// <param name="zone">The zone.</param>
 		public void SetAnchorables(IEnumerable<LayoutAnchorable> anchorables, DockZone zone)
 		{
 			Items.Clear();
@@ -72,7 +105,11 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <summary>Checks whether any button in this bar references the given anchorable.</summary>
+		/// <summary>
+		/// Contains anchorable.
+		/// </summary>
+		/// <param name="anchorable">The anchorable.</param>
+		/// <returns>true if the collection contains the specified item; otherwise, false.</returns>
 		internal bool ContainsAnchorable(LayoutAnchorable anchorable)
 		{
 			foreach (var item in Items)
@@ -86,9 +123,7 @@ namespace AvalonDock.Controls
 	}
 
 	/// <summary>
-	/// A toggle button that represents a single anchorable tool window in the sidebar.
-	/// Clicking it toggles the anchorable between auto-hidden and docked states.
-	/// Supports drag to reorder or group with other buttons.
+	/// Represents the toggle dock button.
 	/// </summary>
 	public class ToggleDockButton : ToggleButton
 	{
@@ -101,64 +136,94 @@ namespace AvalonDock.Controls
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(ToggleDockButton), new FrameworkPropertyMetadata(typeof(ToggleDockButton)));
 		}
 
-		/// <summary>The anchorable model this button controls.</summary>
+		/// <summary>
+		/// Gets or sets the anchorable.
+		/// </summary>
 		public LayoutAnchorable Anchorable
 		{
 			get => (LayoutAnchorable)GetValue(AnchorableProperty);
 			set => SetValue(AnchorableProperty, value);
 		}
 
+		/// <summary>
+		/// <see cref="Anchorable"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty AnchorableProperty =
 			DependencyProperty.Register(nameof(Anchorable), typeof(LayoutAnchorable), typeof(ToggleDockButton),
 				new PropertyMetadata(null, OnAnchorableChanged));
 
-		/// <summary>Which dock zone this button belongs to.</summary>
+		/// <summary>
+		/// Gets or sets the zone.
+		/// </summary>
 		public DockZone Zone
 		{
 			get => (DockZone)GetValue(ZoneProperty);
 			set => SetValue(ZoneProperty, value);
 		}
 
+		/// <summary>
+		/// <see cref="Zone"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ZoneProperty =
 			DependencyProperty.Register(nameof(Zone), typeof(DockZone), typeof(ToggleDockButton), new PropertyMetadata(DockZone.LeftTop));
 
-		/// <summary>Icon source from the associated anchorable.</summary>
+		/// <summary>
+		/// Gets or sets the icon source.
+		/// </summary>
 		public ImageSource IconSource
 		{
 			get => (ImageSource)GetValue(IconSourceProperty);
 			set => SetValue(IconSourceProperty, value);
 		}
 
+		/// <summary>
+		/// <see cref="IconSource"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty IconSourceProperty =
 			DependencyProperty.Register(nameof(IconSource), typeof(ImageSource), typeof(ToggleDockButton), new PropertyMetadata(null));
 
-		/// <summary>Icon content (e.g. a Path or any UIElement) displayed before the title.</summary>
+		/// <summary>
+		/// Gets or sets the icon content.
+		/// </summary>
 		public object IconContent
 		{
 			get => GetValue(IconContentProperty);
 			set => SetValue(IconContentProperty, value);
 		}
 
+		/// <summary>
+		/// <see cref="IconContent"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty IconContentProperty =
 			DependencyProperty.Register(nameof(IconContent), typeof(object), typeof(ToggleDockButton), new PropertyMetadata(null));
 
-		/// <summary>DataTemplate for rendering the icon. When set, <see cref="IconContent"/> is used as the DataContext.</summary>
+		/// <summary>
+		/// Gets or sets the icon template.
+		/// </summary>
 		public DataTemplate IconTemplate
 		{
 			get => (DataTemplate)GetValue(IconTemplateProperty);
 			set => SetValue(IconTemplateProperty, value);
 		}
 
+		/// <summary>
+		/// <see cref="IconTemplate"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty IconTemplateProperty =
 			DependencyProperty.Register(nameof(IconTemplate), typeof(DataTemplate), typeof(ToggleDockButton), new PropertyMetadata(null));
 
-		/// <summary>True when this button's anchorable is the active (focused) content in the DockingManager.</summary>
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance is anchorable focused.
+		/// </summary>
 		public bool IsAnchorableFocused
 		{
 			get => (bool)GetValue(IsAnchorableFocusedProperty);
 			set => SetValue(IsAnchorableFocusedProperty, value);
 		}
 
+		/// <summary>
+		/// <see cref="IsAnchorableFocused"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty IsAnchorableFocusedProperty =
 			DependencyProperty.Register(nameof(IsAnchorableFocused), typeof(bool), typeof(ToggleDockButton), new PropertyMetadata(false));
 
@@ -190,6 +255,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <inheritdoc/>
 		protected override void OnClick()
 		{
 			// Don't fire toggle when a drag is in progress
@@ -206,6 +272,7 @@ namespace AvalonDock.Controls
 			manager?.ToggleAnchorable(Anchorable, Zone);
 		}
 
+		/// <inheritdoc/>
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonDown(e);
@@ -214,6 +281,7 @@ namespace AvalonDock.Controls
 			_isDragging = false;
 		}
 
+		/// <inheritdoc/>
 		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
 			_isMouseDown = false;
@@ -222,6 +290,7 @@ namespace AvalonDock.Controls
 			_isDragging = false;
 		}
 
+		/// <inheritdoc/>
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			base.OnMouseMove(e);
@@ -246,6 +315,12 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <summary>
+		/// Finds the parent.
+		/// </summary>
+		/// <typeparam name="T">The type of t.</typeparam>
+		/// <param name="child">The child.</param>
+		/// <returns>The find parent.</returns>
 		internal static T FindParent<T>(DependencyObject child)
 			where T : DependencyObject
 		{
@@ -261,8 +336,7 @@ namespace AvalonDock.Controls
 	}
 
 	/// <summary>
-	/// A transparent overlay window that shows 6 edge drop zones when dragging a toggle button.
-	/// Zones: LeftTop, LeftBottom, RightTop, RightBottom, BottomLeft, BottomRight.
+	/// Represents the toggle dock drag overlay.
 	/// </summary>
 	internal class ToggleDockDragOverlay : Window
 	{
@@ -275,13 +349,34 @@ namespace AvalonDock.Controls
 		private readonly VisualBrush _ghostBrush;
 		private readonly Size _ghostSize;
 
+		/// <summary>
+		/// Represents the drop zone.
+		/// </summary>
 		internal struct DropZone
 		{
+			/// <summary>
+			/// The rect.
+			/// </summary>
 			public Rect Rect;
+
+			/// <summary>
+			/// The zone.
+			/// </summary>
 			public DockZone Zone;
+
+			/// <summary>
+			/// The label.
+			/// </summary>
 			public string Label;
-			/// <summary>When set, draw a horizontal/vertical insertion line at this position instead of highlighting the whole zone.</summary>
+
+			/// <summary>
+			/// The insertion line start.
+			/// </summary>
 			public Point? InsertionLineStart;
+
+			/// <summary>
+			/// The insertion line end.
+			/// </summary>
 			public Point? InsertionLineEnd;
 		}
 
@@ -313,6 +408,11 @@ namespace AvalonDock.Controls
 			Cursor = Cursors.Hand;
 		}
 
+		/// <summary>
+		/// Start drag.
+		/// </summary>
+		/// <param name="source">The source.</param>
+		/// <param name="sourceBar">The source bar.</param>
 		internal static void StartDrag(ToggleDockButton source, ToggleDockButtonBar sourceBar)
 		{
 			var owner = Window.GetWindow(source);
@@ -327,7 +427,11 @@ namespace AvalonDock.Controls
 			overlay.CaptureMouse();
 		}
 
-		/// <summary>Starts drag from a docked anchorable pane (title bar drag).</summary>
+		/// <summary>
+		/// Start drag from pane.
+		/// </summary>
+		/// <param name="anchorable">The anchorable.</param>
+		/// <param name="manager">The manager.</param>
 		internal static void StartDragFromPane(LayoutAnchorable anchorable, ToggleDockingManager manager)
 		{
 			var owner = Window.GetWindow(manager);
@@ -551,12 +655,14 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <inheritdoc/>
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			base.OnMouseMove(e);
 			InvalidateVisual();
 		}
 
+		/// <inheritdoc/>
 		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonUp(e);
@@ -585,6 +691,7 @@ namespace AvalonDock.Controls
 
 		private bool _isClosing;
 
+		/// <inheritdoc/>
 		protected override void OnKeyDown(KeyEventArgs e)
 		{
 			if (e.Key == Key.Escape)
@@ -597,6 +704,7 @@ namespace AvalonDock.Controls
 			base.OnKeyDown(e);
 		}
 
+		/// <inheritdoc/>
 		protected override void OnLostMouseCapture(MouseEventArgs e)
 		{
 			base.OnLostMouseCapture(e);
@@ -604,6 +712,7 @@ namespace AvalonDock.Controls
 				Close();
 		}
 
+		/// <inheritdoc/>
 		protected override void OnRender(DrawingContext dc)
 		{
 			base.OnRender(dc);

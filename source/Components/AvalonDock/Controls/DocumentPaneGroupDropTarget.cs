@@ -15,19 +15,18 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a <see cref="LayoutDocumentPaneGroupControl"/> drop target
-	/// on which other items (<see cref="LayoutDocument"/>) can be dropped.
+	/// Represents the document pane group drop target.
 	/// </summary>
 	internal class DocumentPaneGroupDropTarget : DropTarget<LayoutDocumentPaneGroupControl>
 	{
 		private LayoutDocumentPaneGroupControl _targetPane;
 
 		/// <summary>
-		/// Class contructor
+		/// Initializes a new instance of the <see cref="DocumentPaneGroupDropTarget"/> class.
 		/// </summary>
-		/// <param name="paneControl"></param>
-		/// <param name="detectionRect"></param>
-		/// <param name="type"></param>
+		/// <param name="paneControl">The pane control.</param>
+		/// <param name="detectionRect">The detection rectangle.</param>
+		/// <param name="type">The drop target type.</param>
 		internal DocumentPaneGroupDropTarget(
 			LayoutDocumentPaneGroupControl paneControl,
 			Rect detectionRect,
@@ -37,11 +36,7 @@ namespace AvalonDock.Controls
 			_targetPane = paneControl;
 		}
 
-		/// <summary>
-		/// Method is invoked to complete a drag & drop operation with a (new) docking position
-		/// by docking of the LayoutDocument <paramref name="floatingWindow"/> into this drop target.
-		/// </summary>
-		/// <param name="floatingWindow"></param>
+		/// <inheritdoc/>
 		protected override void Drop(LayoutDocumentFloatingWindow floatingWindow)
 		{
 			ILayoutPane targetModel = _targetPane.Model as ILayoutPane;
@@ -63,11 +58,7 @@ namespace AvalonDock.Controls
 			base.Drop(floatingWindow);
 		}
 
-		/// <summary>
-		/// Method is invoked to complete a drag & drop operation with a (new) docking position
-		/// by docking of the LayoutAnchorable <paramref name="floatingWindow"/> into this drop target.
-		/// </summary>
-		/// <param name="floatingWindow"></param>
+		/// <inheritdoc/>
 		protected override void Drop(LayoutAnchorableFloatingWindow floatingWindow)
 		{
 			ILayoutPane targetModel = _targetPane.Model as ILayoutPane;
@@ -96,14 +87,7 @@ namespace AvalonDock.Controls
 			base.Drop(floatingWindow);
 		}
 
-		/// <summary>
-		/// Gets a <see cref="Geometry"/> that is used to highlight/preview the docking position
-		/// of this drop target for a <paramref name="floatingWindowModel"/> being docked inside an
-		/// <paramref name="overlayWindow"/>.
-		/// </summary>
-		/// <param name="overlayWindow"></param>
-		/// <param name="floatingWindowModel"></param>
-		/// <returns>The geometry of the preview/highlighting WPF figure path.</returns>
+		/// <inheritdoc/>
 		public override Geometry GetPreviewPath(
 			OverlayWindow overlayWindow,
 			LayoutFloatingWindow floatingWindowModel)

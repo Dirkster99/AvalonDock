@@ -14,25 +14,23 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a group control that hosts a <see cref="LayoutAnchorablePaneGroup"/> model.
-	///
-	/// This Grid based control can host multiple other controls in its Children collection
-	/// (<see cref="LayoutAnchorableControl"/>).
+	/// Represents the layout Anchorable Pane Group Control.
 	/// </summary>
 	public class LayoutAnchorablePaneGroupControl : LayoutGridControl<ILayoutAnchorablePane>, ILayoutControl
 	{
 		private LayoutAnchorablePaneGroup _model;
 
 		/// <summary>
-		/// Class constructor from layout model.
+		/// Initializes a new instance of the <see cref="LayoutAnchorablePaneGroupControl"/> class.
 		/// </summary>
-		/// <param name="model"></param>
+		/// <param name="model">The model.</param>
 		internal LayoutAnchorablePaneGroupControl(LayoutAnchorablePaneGroup model)
 			: base(model, model.Orientation)
 		{
 			_model = model;
 		}
 
+		/// <inheritdoc/>
 		protected override void OnFixChildrenDockLengths()
 		{
 			if (_model.Orientation == Orientation.Horizontal)

@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -15,26 +15,34 @@ using System.Windows.Markup;
 
 namespace AvalonDock.Layout
 {
-	/// <summary>Implements the layout model for the <see cref="Controls.LayoutPanelControl"/>.</summary>
+	/// <summary>
+	/// Represents a layout panel.
+	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
 	public class LayoutPanel : LayoutPositionableGroup<ILayoutPanelElement>, ILayoutPanelElement, ILayoutOrientableGroup
 	{
 		private Orientation _orientation;
 
-		/// <summary>Class constructor</summary>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutPanel"/> class.
+		/// </summary>
 		public LayoutPanel()
 		{
 		}
 
-		/// <summary>Class constructor</summary>
-		/// <param name="firstChild"></param>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutPanel"/> class.
+		/// </summary>
+		/// <param name="firstChild">The first child.</param>
 		public LayoutPanel(ILayoutPanelElement firstChild)
 		{
 			Children.Add(firstChild);
 		}
 
-		/// <summary>Gets/sets the orientation for this panel.</summary>
+		/// <summary>
+		/// Gets or sets the orientation.
+		/// </summary>
 		public Orientation Orientation
 		{
 			get => _orientation;
@@ -55,15 +63,7 @@ namespace AvalonDock.Layout
 				typeof(LayoutPanel), new PropertyMetadata(true));
 
 		/// <summary>
-		/// Gets/sets dependency property that determines whether docking of dragged items
-		/// is enabled or not. This property can be used disable/enable docking of
-		/// dragged FloatingWindowControls.
-		///
-		/// This property should only be set to false if:
-		/// <see cref="LayoutAnchorable.CanMove"/> and <see cref="LayoutDocument.CanMove"/>
-		/// are false since users will otherwise be able to:
-		/// 1) Drag an item away
-		/// 2) But won't be able to dock it agin.
+		/// Gets or sets a value indicating whether this instance can dock.
 		/// </summary>
 		public bool CanDock
 		{
@@ -71,10 +71,10 @@ namespace AvalonDock.Layout
 			set { SetValue(CanDockProperty, value); }
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override bool GetVisibility() => Children.Any(c => c.IsVisible);
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{
 			writer.WriteAttributeString(nameof(Orientation), Orientation.ToString());
@@ -85,11 +85,7 @@ namespace AvalonDock.Layout
 			base.WriteXml(writer);
 		}
 
-		/// <inheritdoc />
-		/// <summary>
-		/// This method is never invoked - <see cref="LayoutRoot"/>.ReadRootPanel()
-		/// for implementation of this reader.
-		/// </summary>
+		/// <inheritdoc/>
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
 			if (reader.MoveToAttribute(nameof(Orientation)))

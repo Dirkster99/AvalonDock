@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -15,12 +15,7 @@ using System.Xml.Serialization;
 namespace AvalonDock.Layout
 {
 	/// <summary>
-	/// Implements an abstract base class for almost all layout models in the AvalonDock.Layout namespace.
-	///
-	/// This base inherites from <see cref="DependencyObject"/> and implements <see cref="PropertyChanged"/>
-	/// and <see cref="PropertyChanging"/> events. Deriving classes can, therefore, implement
-	/// depedency object and/or viewmodel specific functionalities.
-	/// class supports both
+	/// Provides a base class for layout element.
 	/// </summary>
 	[Serializable]
 	public abstract class LayoutElement : DependencyObject, ILayoutElement, Core.Serialization.ISerializableLayoutElement
@@ -32,23 +27,29 @@ namespace AvalonDock.Layout
 		private ILayoutRoot _root = null;
 
 		/// <summary>
-		/// Class constructor
+		/// Initializes a new instance of the <see cref="LayoutElement"/> class.
 		/// </summary>
 		internal LayoutElement()
 		{
 		}
 
-		/// <summary>Raised when a property has changed (after the change has taken place).</summary>
+		/// <summary>
+		/// Occurs when the property changed event is raised.
+		/// </summary>
 		[field: NonSerialized]
 		[field: XmlIgnore]
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		/// <summary>Raised when a property is about to change (raised before the actual change).</summary>
+		/// <summary>
+		/// Occurs when the property changing event is raised.
+		/// </summary>
 		[field: NonSerialized]
 		[field: XmlIgnore]
 		public event PropertyChangingEventHandler PropertyChanging;
 
-		/// <summary>Gets or sets the parent container of the element</summary>
+		/// <summary>
+		/// Gets or sets the parent.
+		/// </summary>
 		[XmlIgnore]
 		public ILayoutContainer Parent
 		{
@@ -70,7 +71,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		/// <summary>Gets or sets the layout root of the element.</summary>
+		/// <summary>
+		/// Gets the root.
+		/// </summary>
 		public ILayoutRoot Root
 		{
 			get
@@ -80,8 +83,11 @@ namespace AvalonDock.Layout
 				return parent as ILayoutRoot;
 			}
 		}
-
 #if TRACE
+		/// <summary>
+		/// Dumps this layout element to the trace output.
+		/// </summary>
+		/// <param name="tab">The indentation level.</param>
 		public virtual void ConsoleDump(int tab)
 		{
 			System.Diagnostics.Trace.Write(new string(' ', tab * 4));
@@ -90,8 +96,7 @@ namespace AvalonDock.Layout
 #endif
 
 		/// <summary>
-		/// When deserializing layout enclosing element parent is set later than this parent
-		/// We need to update it, otherwise when deleting this element <see cref="LayoutRoot.ElementRemoved" /> will no be called
+		/// Executes the fix cached root on deserialize operation.
 		/// </summary>
 		public void FixCachedRootOnDeserialize()
 		{
@@ -99,31 +104,45 @@ namespace AvalonDock.Layout
 				_root = Root;
 		}
 
-		/// <summary>Provides derived classes an opportunity to handle execute code before to the <see cref="Parent"/> property changes.</summary>
+		/// <summary>
+		/// Executes the on parent changing operation.
+		/// </summary>
+		/// <param name="oldValue">The previous value.</param>
+		/// <param name="newValue">The new value.</param>
 		protected virtual void OnParentChanging(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
 		}
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Parent"/> property.</summary>
+		/// <summary>
+		/// Executes the on parent changed operation.
+		/// </summary>
+		/// <param name="oldValue">The previous value.</param>
+		/// <param name="newValue">The new value.</param>
 		protected virtual void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
 		}
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Root"/> property.</summary>
+		/// <summary>
+		/// Executes the on root changed operation.
+		/// </summary>
+		/// <param name="oldRoot">The old root.</param>
+		/// <param name="newRoot">The new root.</param>
 		protected virtual void OnRootChanged(ILayoutRoot oldRoot, ILayoutRoot newRoot)
 		{
 			((LayoutRoot)oldRoot)?.OnLayoutElementRemoved(this);
 			((LayoutRoot)newRoot)?.OnLayoutElementAdded(this);
 		}
 
-		/// <summary>Should be invoked to raise the <see cref="PropertyChanged"/> event for the property named in <paramref name="propertyName"/>.
-		/// This event should be fired AFTER changing properties with viewmodel binding support.
+		/// <summary>
+		/// Raises the property changed.
 		/// </summary>
+		/// <param name="propertyName">The property name.</param>
 		protected virtual void RaisePropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-		/// <summary>Should be invoked to raise the <see cref="RaisePropertyChanging"/> event for the property named in <paramref name="propertyName"/>.
-		/// This event should be fired BEFORE changing properties with viewmodel binding support.
+		/// <summary>
+		/// Raises the property changing.
 		/// </summary>
+		/// <param name="propertyName">The property name.</param>
 		protected virtual void RaisePropertyChanging(string propertyName) => PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
 	}
 }

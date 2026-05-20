@@ -13,22 +13,21 @@ using AvalonDock.Layout;
 namespace AvalonDock
 {
 	/// <summary>
-	/// Implements a Cancelable event that can be raised to ask the client application whether closing this anchorable
-	/// and removing its content (viewmodel) is OK or not.
+	/// Provides data for the anchorable Closing event.
 	/// </summary>
 	public class AnchorableClosingEventArgs : CancelEventArgs
 	{
 		/// <summary>
-		/// Class constructor from the anchorable layout model.
+		/// Initializes a new instance of the <see cref="AnchorableClosingEventArgs"/> class.
 		/// </summary>
-		/// <param name="document"></param>
+		/// <param name="anchorable">The anchorable.</param>
 		public AnchorableClosingEventArgs(LayoutAnchorable anchorable)
 		{
 			Anchorable = anchorable;
 		}
 
 		/// <summary>
-		/// Gets the model of the anchorable that is about to be closed.
+		/// Gets the anchorable.
 		/// </summary>
 		public LayoutAnchorable Anchorable { get; private set; }
 	}

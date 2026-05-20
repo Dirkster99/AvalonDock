@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -14,8 +14,7 @@ using System.Windows.Markup;
 namespace AvalonDock.Layout
 {
 	/// <summary>
-	/// Implements an element in the layout model that can contain and organize multiple
-	/// <see cref="LayoutDocumentPane"/> elements, which in turn contain <see cref="LayoutDocument"/> elements.
+	/// Represents a layout document pane group.
 	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
@@ -23,18 +22,25 @@ namespace AvalonDock.Layout
 	{
 		private Orientation _orientation;
 
-		/// <summary>Class constructor</summary>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutDocumentPaneGroup"/> class.
+		/// </summary>
 		public LayoutDocumentPaneGroup()
 		{
 		}
 
-		/// <summary>Class constructor from <paramref name="documentPane"/> that is added into the children collection of this object.</summary>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutDocumentPaneGroup"/> class.
+		/// </summary>
+		/// <param name="documentPane">The document pane.</param>
 		public LayoutDocumentPaneGroup(LayoutDocumentPane documentPane)
 		{
 			Children.Add(documentPane);
 		}
 
-		/// <summary>Gets/sets the (Horizontal, Vertical) <see cref="System.Windows.Controls.Orientation"/> of this group.</summary>
+		/// <summary>
+		/// Gets or sets the orientation.
+		/// </summary>
 		public Orientation Orientation
 		{
 			get => _orientation;
@@ -47,17 +53,17 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override bool GetVisibility() => true;
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{
 			writer.WriteAttributeString(nameof(Orientation), Orientation.ToString());
 			base.WriteXml(writer);
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
 			if (reader.MoveToAttribute(nameof(Orientation))) Orientation = (Orientation)Enum.Parse(typeof(Orientation), reader.Value, true);

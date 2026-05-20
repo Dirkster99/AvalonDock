@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -13,9 +13,16 @@ using System.Runtime.InteropServices;
 
 namespace AvalonDock.Layout
 {
-	/// <summary>Provides extension methods for WPF specific (Visual Tree) capabilities.</summary>
+	/// <summary>
+	/// Represents a extensions.
+	/// </summary>
 	public static class Extensions
 	{
+		/// <summary>
+		/// Executes the descendents operation.
+		/// </summary>
+		/// <param name="element">The layout element.</param>
+		/// <returns>The resulting value.</returns>
 		public static IEnumerable<ILayoutElement> Descendents(this ILayoutElement element)
 		{
 			if (!(element is ILayoutContainer container)) yield break;
@@ -27,6 +34,12 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Finds the parent.
+		/// </summary>
+		/// <typeparam name="T">The type of the related value.</typeparam>
+		/// <param name="element">The layout element.</param>
+		/// <returns>The resulting value.</returns>
 		public static T FindParent<T>(this ILayoutElement element) // where T : ILayoutContainer
 		{
 			var parent = element.Parent;
@@ -35,6 +48,11 @@ namespace AvalonDock.Layout
 			return (T)parent;
 		}
 
+		/// <summary>
+		/// Gets the root.
+		/// </summary>
+		/// <param name="element">The layout element.</param>
+		/// <returns>The resulting value.</returns>
 		public static ILayoutRoot GetRoot(this ILayoutElement element) // where T : ILayoutContainer
 		{
 			if (element is ILayoutRoot layoutRoot) return layoutRoot;
@@ -44,6 +62,12 @@ namespace AvalonDock.Layout
 			return (ILayoutRoot)parent;
 		}
 
+		/// <summary>
+		/// Executes the contains child of type operation.
+		/// </summary>
+		/// <typeparam name="T">The type of the related value.</typeparam>
+		/// <param name="element">The layout element.</param>
+		/// <returns><see langword="true"/> if the operation succeeds; otherwise, <see langword="false"/>.</returns>
 		public static bool ContainsChildOfType<T>(this ILayoutContainer element)
 		{
 			foreach (var childElement in element.Descendents())
@@ -51,6 +75,13 @@ namespace AvalonDock.Layout
 			return false;
 		}
 
+		/// <summary>
+		/// Determines whether the container contains a child of either specified type.
+		/// </summary>
+		/// <typeparam name="T">The first child type to look for.</typeparam>
+		/// <typeparam name="S">The second child type to look for.</typeparam>
+		/// <param name="container">The container.</param>
+		/// <returns><see langword="true"/> if the operation succeeds; otherwise, <see langword="false"/>.</returns>
 		public static bool ContainsChildOfType<T, S>(this ILayoutContainer container)
 		{
 			foreach (var childElement in container.Descendents())
@@ -58,8 +89,20 @@ namespace AvalonDock.Layout
 			return false;
 		}
 
+		/// <summary>
+		/// Determines whether the container matches either specified type.
+		/// </summary>
+		/// <typeparam name="T">The first type to compare against.</typeparam>
+		/// <typeparam name="S">The second type to compare against.</typeparam>
+		/// <param name="container">The container.</param>
+		/// <returns><see langword="true"/> if the operation succeeds; otherwise, <see langword="false"/>.</returns>
 		public static bool IsOfType<T, S>(this ILayoutContainer container) => container is T || container is S;
 
+		/// <summary>
+		/// Gets the side.
+		/// </summary>
+		/// <param name="element">The layout element.</param>
+		/// <returns>The resulting value.</returns>
 		public static AnchorSide GetSide(this ILayoutElement element)
 		{
 			if (element.Parent is ILayoutOrientableGroup parentContainer)
@@ -78,12 +121,9 @@ namespace AvalonDock.Layout
 		}
 
 		/// <summary>
-		/// Removed with Issue 20 since Win32 definition seems to be buggy here
-		/// (GetMonitorInfo always returns false on rectangle returned from <see cref="Win32Helper.MonitorFromRect"/>)
-		///
-		/// <see cref="ILayoutElementForFloatingWindowExtension"/> for replacement candidate.
+		/// Executes the keep inside nearest monitor issue20 operation.
 		/// </summary>
-		/// <param name="paneInsideFloatingWindow"></param>
+		/// <param name="paneInsideFloatingWindow">The pane inside floating window.</param>
 		internal static void KeepInsideNearestMonitor_Issue20(this ILayoutElementForFloatingWindow paneInsideFloatingWindow)
 		{
 			var r = new Win32Helper.RECT { Left = (int)paneInsideFloatingWindow.FloatingLeft, Top = (int)paneInsideFloatingWindow.FloatingTop };
@@ -111,6 +151,12 @@ namespace AvalonDock.Layout
 				paneInsideFloatingWindow.FloatingTop = monitorInfo.Work.Bottom - (paneInsideFloatingWindow.FloatingHeight + 10);
 		}
 
+		/// <summary>
+		/// Executes the is in anchorable pane at start of panel operation.
+		/// </summary>
+		/// <param name="element">The layout element.</param>
+		/// <param name="layoutPanel">The layout panel.</param>
+		/// <returns><see langword="true"/> if the operation succeeds; otherwise, <see langword="false"/>.</returns>
 		private static bool IsInAnchorablePaneAtStartOfPanel(this ILayoutElement element, LayoutPanel layoutPanel)
 		{
 			foreach (var child in layoutPanel.Children)

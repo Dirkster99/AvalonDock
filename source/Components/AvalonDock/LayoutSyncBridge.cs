@@ -9,14 +9,8 @@ using AvalonDock.Core;
 namespace AvalonDock
 {
 	/// <summary>
-	/// Bidirectional sync bridge between an <see cref="IRootDock"/> MVVM layout model
-	/// and the WPF <see cref="DockingManager"/>.
+	/// Represents the layout Sync Bridge.
 	/// </summary>
-	/// <remarks>
-	/// <para>Phase 3a: syncs documents, anchorables, and active content.
-	/// The bridge uses the existing DocumentsSource/AnchorablesSource mechanism
-	/// internally, so no breaking changes are introduced.</para>
-	/// </remarks>
 	internal sealed class LayoutSyncBridge
 	{
 		private readonly DockingManager _manager;
@@ -25,13 +19,20 @@ namespace AvalonDock
 		private ObservableCollection<object> _anchorableModels;
 		private bool _isSyncing;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutSyncBridge"/> class.
+		/// </summary>
+		/// <param name="manager">The manager.</param>
+		/// <param name="rootDock">The root Dock.</param>
 		public LayoutSyncBridge(DockingManager manager, IRootDock rootDock)
 		{
 			_manager = manager ?? throw new ArgumentNullException(nameof(manager));
 			_rootDock = rootDock ?? throw new ArgumentNullException(nameof(rootDock));
 		}
 
-		/// <summary>Attaches the bridge: reads the MVVM tree and wires up sync handlers.</summary>
+		/// <summary>
+		/// Executes the attach operation.
+		/// </summary>
 		public void Attach()
 		{
 			_documentModels = new ObservableCollection<object>();
@@ -48,7 +49,9 @@ namespace AvalonDock
 			SubscribeToWpf();
 		}
 
-		/// <summary>Detaches the bridge: removes all handlers and clears sources.</summary>
+		/// <summary>
+		/// Executes the detach operation.
+		/// </summary>
 		public void Detach()
 		{
 			UnsubscribeFromWpf();

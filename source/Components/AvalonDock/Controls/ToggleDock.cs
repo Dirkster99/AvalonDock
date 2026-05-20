@@ -12,26 +12,12 @@ using System.Windows;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Provides attached properties for configuring toggle dock button appearance
-	/// on <see cref="Layout.LayoutAnchorable"/> elements.
-	/// <para>
-	/// These properties allow developers to declaratively set icons and tooltips
-	/// in XAML without modifying the serializable layout model.
-	/// </para>
-	/// <example>
-	/// <code>
-	/// &lt;avalonDock:LayoutAnchorable Title="ToolBox"
-	///     avalonDock:ToggleDock.Icon="{StaticResource WrenchIcon}"
-	///     avalonDock:ToggleDock.ToolTip="Toggle ToolBox panel" /&gt;
-	/// </code>
-	/// </example>
+	/// Provides helper members for toggle Dock.
 	/// </summary>
 	public static class ToggleDock
 	{
 		/// <summary>
-		/// Gets or sets the icon content displayed on the toggle dock button.
-		/// Accepts any object: <see cref="System.Windows.Media.ImageSource"/>,
-		/// <see cref="UIElement"/> (e.g. Path, Viewbox), or a <see cref="DataTemplate"/>.
+		/// Icon attached dependency property.
 		/// </summary>
 		public static readonly DependencyProperty IconProperty =
 			DependencyProperty.RegisterAttached(
@@ -40,13 +26,22 @@ namespace AvalonDock.Controls
 				typeof(ToggleDock),
 				new FrameworkPropertyMetadata(null));
 
+		/// <summary>
+		/// Gets the get Icon.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		/// <returns>The requested value.</returns>
 		public static object GetIcon(DependencyObject element) => element.GetValue(IconProperty);
 
+		/// <summary>
+		/// Sets the set Icon.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		/// <param name="value">The value.</param>
 		public static void SetIcon(DependencyObject element, object value) => element.SetValue(IconProperty, value);
 
 		/// <summary>
-		/// Gets or sets a custom tooltip for the toggle dock button.
-		/// When not set, the anchorable's <see cref="Layout.LayoutAnchorable.Title"/> is used.
+		/// ToolTip attached dependency property.
 		/// </summary>
 		public static readonly DependencyProperty ToolTipProperty =
 			DependencyProperty.RegisterAttached(
@@ -55,14 +50,22 @@ namespace AvalonDock.Controls
 				typeof(ToggleDock),
 				new FrameworkPropertyMetadata(null));
 
+		/// <summary>
+		/// Gets the get Tool Tip.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		/// <returns>The requested value.</returns>
 		public static object GetToolTip(DependencyObject element) => element.GetValue(ToolTipProperty);
 
+		/// <summary>
+		/// Sets the set Tool Tip.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		/// <param name="value">The value.</param>
 		public static void SetToolTip(DependencyObject element, object value) => element.SetValue(ToolTipProperty, value);
 
 		/// <summary>
-		/// Gets or sets a <see cref="DataTemplate"/> used to render the icon.
-		/// When set, this takes precedence over <see cref="IconProperty"/> for rendering.
-		/// The <see cref="IconProperty"/> value is passed as the DataContext.
+		/// IconTemplate attached dependency property.
 		/// </summary>
 		public static readonly DependencyProperty IconTemplateProperty =
 			DependencyProperty.RegisterAttached(
@@ -71,8 +74,18 @@ namespace AvalonDock.Controls
 				typeof(ToggleDock),
 				new FrameworkPropertyMetadata(null));
 
+		/// <summary>
+		/// Gets the get Icon Template.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		/// <returns>The requested value.</returns>
 		public static DataTemplate GetIconTemplate(DependencyObject element) => (DataTemplate)element.GetValue(IconTemplateProperty);
 
+		/// <summary>
+		/// Sets the set Icon Template.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		/// <param name="value">The value.</param>
 		public static void SetIconTemplate(DependencyObject element, DataTemplate value) => element.SetValue(IconTemplateProperty, value);
 	}
 }

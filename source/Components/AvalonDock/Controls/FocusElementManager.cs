@@ -21,6 +21,9 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Provides helper members for focus Element Manager.
+	/// </summary>
 	internal static class FocusElementManager
 	{
 		private static List<DockingManager> _managers = new List<DockingManager>();
@@ -31,6 +34,10 @@ namespace AvalonDock.Controls
 		private static DispatcherOperation _setFocusAsyncOperation;
 		private static WeakReference _lastFocusedElementBeforeEnterMenuMode = null;
 
+		/// <summary>
+		/// Sets the setup Focus Management.
+		/// </summary>
+		/// <param name="manager">The manager.</param>
 		internal static void SetupFocusManagement(DockingManager manager)
 		{
 			if (_managers.Count == 0)
@@ -69,6 +76,10 @@ namespace AvalonDock.Controls
 			_managers.Add(manager);
 		}
 
+		/// <summary>
+		/// Executes the finalize Focus Management operation.
+		/// </summary>
+		/// <param name="manager">The manager.</param>
 		internal static void FinalizeFocusManagement(DockingManager manager)
 		{
 			manager.PreviewGotKeyboardFocus -= new KeyboardFocusChangedEventHandler(manager_PreviewGotKeyboardFocus);
@@ -89,10 +100,10 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Get the input element that was focused before user left the layout element
+		/// Gets the get Last Focused Element.
 		/// </summary>
-		/// <param name="model">Element to look for</param>
-		/// <returns>Input element </returns>
+		/// <param name="model">The model.</param>
+		/// <returns>The requested value.</returns>
 		internal static IInputElement GetLastFocusedElement(ILayoutElement model)
 		{
 			IInputElement objectWithFocus;
@@ -103,10 +114,10 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Get the last window handle focused before user left the element passed as argument
+		/// Gets the get Last Window Handle.
 		/// </summary>
-		/// <param name="model"></param>
-		/// <returns></returns>
+		/// <param name="model">The model.</param>
+		/// <returns>The requested value.</returns>
 		internal static IntPtr GetLastWindowHandle(ILayoutElement model)
 		{
 			IntPtr handleWithFocus;
@@ -117,9 +128,9 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Given a layout element tries to set the focus of the keyword where it was before user moved to another element
+		/// Sets the set Focus On Last Element.
 		/// </summary>
-		/// <param name="model"></param>
+		/// <param name="model">The model.</param>
 		internal static void SetFocusOnLastElement(ILayoutElement model)
 		{
 			bool focused = false;

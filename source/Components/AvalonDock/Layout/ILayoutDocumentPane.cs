@@ -9,8 +9,10 @@
 
 namespace AvalonDock.Layout
 {
-	/// <summary>Defines an interface for that identifies a <see cref="LayoutDocumentPane"/>
-	/// or an equivalent class (<see cref="LayoutDocumentPaneGroup"/>, <see cref="LayoutDocumentPaneGroupControl"/> etc.)</summary>
+	/// <summary>
+	/// Interface for layout elements that behave like a <see cref="LayoutDocumentPane"/>
+	/// or an equivalent pane container such as <see cref="LayoutDocumentPaneGroup"/>.
+	/// </summary>
 	public interface ILayoutDocumentPane : ILayoutPanelElement, ILayoutPane
 	{
 	}

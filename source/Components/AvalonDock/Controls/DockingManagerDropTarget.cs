@@ -16,23 +16,18 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a <see cref="DockingManager"/> drop target
-	/// on which other items (<see cref="LayoutDocument"/> or <see cref="LayoutAnchorable"/>) can be dropped.
-	///
-	/// The resulting drop targets are usually the 4 outer drop target buttons
-	/// re-presenting a <see cref="LayoutAnchorSideControl"/> shown as overlay
-	/// on the <see cref="DockingManager"/> when the user drags an item over it.
+	/// Represents the docking manager drop target.
 	/// </summary>
 	internal class DockingManagerDropTarget : DropTarget<DockingManager>
 	{
 		private DockingManager _manager;
 
 		/// <summary>
-		/// Class constructor
+		/// Initializes a new instance of the <see cref="DockingManagerDropTarget"/> class.
 		/// </summary>
-		/// <param name="manager"></param>
-		/// <param name="detectionRect"></param>
-		/// <param name="type"></param>
+		/// <param name="manager">The manager.</param>
+		/// <param name="detectionRect">The detection rectangle.</param>
+		/// <param name="type">The drop target type.</param>
 		internal DockingManagerDropTarget(
 			DockingManager manager,
 			Rect detectionRect,
@@ -42,11 +37,7 @@ namespace AvalonDock.Controls
 			_manager = manager;
 		}
 
-		/// <summary>
-		/// Method is invoked to complete a drag & drop operation with a (new) docking position
-		/// by docking of the LayoutAnchorable <paramref name="floatingWindow"/> into this drop target.
-		/// </summary>
-		/// <param name="floatingWindow"></param>
+		/// <inheritdoc/>
 		protected override void Drop(LayoutAnchorableFloatingWindow floatingWindow)
 		{
 			switch (Type)
@@ -203,14 +194,7 @@ namespace AvalonDock.Controls
 			base.Drop(floatingWindow);
 		}
 
-		/// <summary>
-		/// Gets a <see cref="Geometry"/> that is used to highlight/preview the docking position
-		/// of this drop target for a <paramref name="floatingWindowModel"/> being docked inside an
-		/// <paramref name="overlayWindow"/>.
-		/// </summary>
-		/// <param name="overlayWindow"></param>
-		/// <param name="floatingWindowModel"></param>
-		/// <returns>The geometry of the preview/highlighting WPF figure path.</returns>
+		/// <inheritdoc/>
 		public override Geometry GetPreviewPath(
 			OverlayWindow overlayWindow,
 			LayoutFloatingWindow floatingWindowModel)

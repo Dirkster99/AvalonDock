@@ -13,22 +13,21 @@ using AvalonDock.Layout;
 namespace AvalonDock
 {
 	/// <summary>
-	/// Implements a Cancelable event that can be raised to ask the client application whether closing this document
-	/// and removing its content (viewmodel) is OK or not.
+	/// Provides data for the document Closing event.
 	/// </summary>
 	public class DocumentClosingEventArgs : CancelEventArgs
 	{
 		/// <summary>
-		/// Class constructor from the documents layout model.
+		/// Initializes a new instance of the <see cref="DocumentClosingEventArgs"/> class.
 		/// </summary>
-		/// <param name="document"></param>
+		/// <param name="document">The document.</param>
 		public DocumentClosingEventArgs(LayoutDocument document)
 		{
 			Document = document;
 		}
 
 		/// <summary>
-		/// Gets the model of the document that is about to be closed.
+		/// Gets the document.
 		/// </summary>
 		public LayoutDocument Document { get; private set; }
 	}

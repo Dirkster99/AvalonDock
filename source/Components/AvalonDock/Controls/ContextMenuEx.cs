@@ -13,10 +13,13 @@ using System.Windows.Data;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements an extended <see cref="ContextMenu"/> for the <see cref="LayoutDocumentPaneControl"/>.
+	/// Represents the context Menu Ex.
 	/// </summary>
 	public class ContextMenuEx : ContextMenu
 	{
+		/// <summary>
+		/// Initializes static members of the <see cref="ContextMenuEx"/> class.
+		/// </summary>
 		static ContextMenuEx()
 		{
 		}
@@ -28,11 +31,13 @@ namespace AvalonDock.Controls
 		{
 		}
 
+		/// <inheritdoc/>
 		protected override System.Windows.DependencyObject GetContainerForItemOverride()
 		{
 			return new MenuItemEx();
 		}
 
+		/// <inheritdoc/>
 		protected override void OnOpened(System.Windows.RoutedEventArgs e)
 		{
 			BindingOperations.GetBindingExpression(this, ItemsSourceProperty).UpdateTarget();
