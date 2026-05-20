@@ -43,31 +43,10 @@ namespace AvalonDockTest.FlaUITests
 		[Test, Order(4)]
 		public void ToggleButtons_ArePresent_ForLeftSide()
 		{
-			// Diagnostic: check what automation IDs exist
-			var allDesc = MainWindow.FindAllDescendants();
-			var barElements = allDesc.Where(e => { try { return e.AutomationId?.StartsWith("ToggleDockBar") == true; } catch { return false; } }).ToArray();
-			TestContext.Out.WriteLine($"DEBUG: Found {barElements.Length} bar elements by AutomationId");
-			foreach (var bar in barElements)
-			{
-				try { TestContext.Out.WriteLine($"  Bar: AutomationId={bar.AutomationId}, Name={bar.Name}, Type={bar.ControlType}"); } catch { }
-			}
-
-			// Also check all buttons with Toggle pattern via broad search
-			var allBtns = allDesc.Where(b => { try { return b.ControlType == ControlType.Button && b.Patterns.Toggle.IsSupported; } catch { return false; } }).ToArray();
-			TestContext.Out.WriteLine($"DEBUG: Found {allBtns.Length} toggle-capable buttons via broad search");
-			foreach (var btn in allBtns)
-			{
-				try { TestContext.Out.WriteLine($"  Btn: Name=[{btn.Name}], AutomationId=[{btn.AutomationId}]"); } catch { }
-			}
-
-			var allButtons = FindAllToggleButtons();
-			var names = string.Join(", ", allButtons.Select(b => { try { return $"[{b.Name}]"; } catch { return "[?]"; } }));
-			TestContext.Out.WriteLine($"DEBUG: Found {allButtons.Length} toggle buttons via FindAllToggleButtons: {names}");
-
 			var btn1 = FindToggleButton("Explorer");
 			var btn2 = FindToggleButton("Search");
-			Assert.That(btn1, Is.Not.Null, $"Explorer toggle button should be present. Found buttons: {names}");
-			Assert.That(btn2, Is.Not.Null, $"Search toggle button should be present. Found buttons: {names}");
+			Assert.That(btn1, Is.Not.Null, "Explorer toggle button should be present.");
+			Assert.That(btn2, Is.Not.Null, "Search toggle button should be present.");
 		}
 
 		[Test, Order(5)]
@@ -86,12 +65,9 @@ namespace AvalonDockTest.FlaUITests
 			var buttons = FindAllToggleButtons();
 			foreach (var btn in buttons)
 			{
-				var togglePattern = btn.Patterns.Toggle.PatternOrDefault;
-				if (togglePattern != null)
-				{
-					Assert.That(togglePattern.ToggleState.Value, Is.EqualTo(ToggleState.Off),
-						$"Button '{btn.Name}' should be unchecked initially.");
-				}
+				var state = GetToggleState(btn);
+				Assert.That(state, Is.EqualTo(ToggleState.Off),
+					$"Button '{btn.Name}' should be unchecked initially.");
 			}
 		}
 	}
@@ -117,9 +93,7 @@ namespace AvalonDockTest.FlaUITests
 
 			// After clicking, the toggle button should be checked
 			btn = FindToggleButton("Explorer");
-			var togglePattern = btn?.Patterns.Toggle.PatternOrDefault;
-			Assert.That(togglePattern, Is.Not.Null, "Button should support Toggle pattern.");
-			Assert.That(togglePattern.ToggleState.Value, Is.EqualTo(ToggleState.On),
+			Assert.That(GetToggleState(btn), Is.EqualTo(ToggleState.On),
 				"Explorer button should be checked after clicking.");
 
 			// Clean up: undock
@@ -148,8 +122,7 @@ namespace AvalonDockTest.FlaUITests
 
 			// Button should be unchecked
 			btn = FindToggleButton("Explorer");
-			var togglePattern = btn?.Patterns.Toggle.PatternOrDefault;
-			Assert.That(togglePattern?.ToggleState.Value, Is.EqualTo(ToggleState.Off),
+			Assert.That(GetToggleState(btn), Is.EqualTo(ToggleState.Off),
 				"Explorer button should be unchecked after second click.");
 		}
 
@@ -165,7 +138,7 @@ namespace AvalonDockTest.FlaUITests
 
 			// Verify Explorer is checked
 			btn1 = FindToggleButton("Explorer");
-			Assert.That(btn1?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
+			Assert.That(GetToggleState(btn1),
 				Is.EqualTo(ToggleState.On), "Explorer should be checked.");
 
 			// Click Search — should dock Search and auto-hide Explorer (same left section)
@@ -179,9 +152,9 @@ namespace AvalonDockTest.FlaUITests
 			btn1 = FindToggleButton("Explorer");
 			btn2 = FindToggleButton("Search");
 
-			Assert.That(btn2?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
+			Assert.That(GetToggleState(btn2),
 				Is.EqualTo(ToggleState.On), "Search should be checked.");
-			Assert.That(btn1?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
+			Assert.That(GetToggleState(btn1),
 				Is.EqualTo(ToggleState.Off), "Explorer should be unchecked (exclusive per section).");
 
 			// Clean up
@@ -210,9 +183,9 @@ namespace AvalonDockTest.FlaUITests
 			leftBtn = FindToggleButton("Explorer");
 			bottomBtn = FindToggleButton("Terminal");
 
-			Assert.That(leftBtn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
+			Assert.That(GetToggleState(leftBtn),
 				Is.EqualTo(ToggleState.On), "Left-side Explorer should be checked.");
-			Assert.That(bottomBtn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
+			Assert.That(GetToggleState(bottomBtn),
 				Is.EqualTo(ToggleState.On), "Bottom-side Terminal should be checked.");
 
 			// Clean up
@@ -262,7 +235,7 @@ namespace AvalonDockTest.FlaUITests
 			Retry.WhileException(() =>
 			{
 				btn = FindToggleButton("Explorer");
-				Assert.That(btn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
+				Assert.That(GetToggleState(btn),
 					Is.EqualTo(ToggleState.On), "Explorer should be checked after docking.");
 			}, timeout: TimeSpan.FromSeconds(5), interval: TimeSpan.FromMilliseconds(500));
 
@@ -298,7 +271,7 @@ namespace AvalonDockTest.FlaUITests
 				Retry.WhileException(() =>
 				{
 					btn = FindToggleButton("Explorer");
-					Assert.That(btn?.Patterns.Toggle.PatternOrDefault?.ToggleState.Value,
+					Assert.That(GetToggleState(btn),
 						Is.EqualTo(ToggleState.Off),
 						"Explorer should be unchecked after clicking minimize (pin) button.");
 				}, timeout: TimeSpan.FromSeconds(5), interval: TimeSpan.FromMilliseconds(500));

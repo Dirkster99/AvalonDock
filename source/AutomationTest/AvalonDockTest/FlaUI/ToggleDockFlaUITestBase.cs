@@ -123,6 +123,8 @@ namespace AvalonDockTest.FlaUITests
 
 		/// <summary>
 		/// Finds all toggle buttons by searching within the ToggleDockButtonBar containers.
+		/// UIA wraps ToggleDockButton items as DataItem elements; the actual
+		/// ToggleButton with Toggle pattern is a descendant of each DataItem.
 		/// </summary>
 		protected AutomationElement[] FindAllToggleButtons()
 		{
@@ -139,15 +141,28 @@ namespace AvalonDockTest.FlaUITests
 				var bar = MainWindow.FindFirstDescendant(CF.ByAutomationId(barId));
 				if (bar == null) continue;
 
-				var descendants = bar.FindAllDescendants(CF.ByControlType(ControlType.Button));
-				foreach (var btn in descendants)
+				var dataItems = bar.FindAllDescendants()
+					.Where(e => { try { return e.ControlType == ControlType.DataItem && !string.IsNullOrEmpty(e.Name); } catch { return false; } });
+
+				foreach (var dataItem in dataItems)
 				{
+					// Look for the actual ToggleButton inside the DataItem
+					AutomationElement toggleBtn = null;
 					try
 					{
-						if (btn.Patterns.Toggle.IsSupported)
-							buttons.Add(btn);
+						foreach (var child in dataItem.FindAllDescendants())
+						{
+							if (child.Patterns.Toggle.IsSupported)
+							{
+								toggleBtn = child;
+								break;
+							}
+						}
 					}
 					catch { }
+
+					// Use the ToggleButton if found, otherwise fall back to the DataItem
+					buttons.Add(toggleBtn ?? dataItem);
 				}
 			}
 
@@ -156,15 +171,68 @@ namespace AvalonDockTest.FlaUITests
 
 		/// <summary>
 		/// Finds a toggle button by its name (matching the anchorable title).
+		/// Searches DataItem elements by name, returns the inner ToggleButton if available.
 		/// </summary>
 		protected AutomationElement FindToggleButton(string name)
 		{
-			var buttons = FindAllToggleButtons();
-			return buttons.FirstOrDefault(b =>
+			var barIds = new[]
 			{
-				try { return b.Name == name; }
-				catch { return false; }
-			});
+				"ToggleDockBar_LeftTop", "ToggleDockBar_LeftBottom",
+				"ToggleDockBar_RightTop", "ToggleDockBar_RightBottom",
+				"ToggleDockBar_BottomLeft", "ToggleDockBar_BottomRight"
+			};
+
+			foreach (var barId in barIds)
+			{
+				var bar = MainWindow.FindFirstDescendant(CF.ByAutomationId(barId));
+				if (bar == null) continue;
+
+				foreach (var item in bar.FindAllDescendants())
+				{
+					try
+					{
+						if (item.ControlType == ControlType.DataItem && item.Name == name)
+						{
+							// Return the inner ToggleButton if it exists
+							foreach (var child in item.FindAllDescendants())
+							{
+								try { if (child.Patterns.Toggle.IsSupported) return child; }
+								catch { }
+							}
+
+							return item;
+						}
+					}
+					catch { }
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Gets the toggle state of a toggle button element.
+		/// Checks the element and its children for Toggle pattern,
+		/// falls back to checking whether the tool window is docked.
+		/// </summary>
+		protected ToggleState GetToggleState(AutomationElement toggleBtn)
+		{
+			if (toggleBtn == null) return ToggleState.Off;
+
+			var toggle = toggleBtn.Patterns.Toggle.PatternOrDefault;
+			if (toggle != null) return toggle.ToggleState.Value;
+
+			foreach (var child in toggleBtn.FindAllDescendants())
+			{
+				try
+				{
+					var childToggle = child.Patterns.Toggle.PatternOrDefault;
+					if (childToggle != null) return childToggle.ToggleState.Value;
+				}
+				catch { }
+			}
+
+			return IsToolWindowDocked(toggleBtn.Name) ? ToggleState.On : ToggleState.Off;
 		}
 
 		/// <summary>

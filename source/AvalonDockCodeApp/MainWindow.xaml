@@ -7,7 +7,8 @@
     xmlns:views="clr-namespace:ToggleTestApp.Views"
     xmlns:vm="clr-namespace:ToggleTestApp.ViewModels"
     Title="AvalonDock Code — Toggle Docking Demo"
-    Width="1100" Height="750"
+    Width="1100" Height="700"
+    WindowStartupLocation="CenterScreen"
     Background="#252729"
     UseLayoutRounding="True">
     <Window.Resources>
