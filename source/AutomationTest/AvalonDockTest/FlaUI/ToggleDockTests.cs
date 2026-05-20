@@ -170,12 +170,14 @@ namespace AvalonDockTest.FlaUITests
 			// Click Explorer on left
 			var leftBtn = FindToggleButton("Explorer");
 			Assert.That(leftBtn, Is.Not.Null, "Explorer button should exist.");
+			var leftInitState = GetToggleState(leftBtn);
 			ClickToggleButtonSafe(leftBtn);
 			System.Threading.Thread.Sleep(1000);
 
 			// Click Terminal on bottom
 			var bottomBtn = FindToggleButton("Terminal");
 			Assert.That(bottomBtn, Is.Not.Null, "Terminal button should exist.");
+			var bottomInitState = GetToggleState(leftBtn);
 			ClickToggleButtonSafe(bottomBtn);
 			System.Threading.Thread.Sleep(1000);
 
@@ -184,17 +186,23 @@ namespace AvalonDockTest.FlaUITests
 			bottomBtn = FindToggleButton("Terminal");
 
 			Assert.That(GetToggleState(leftBtn),
-				Is.EqualTo(ToggleState.On), "Left-side Explorer should be checked.");
+				Is.Not.EqualTo(leftInitState), "Left-side Explorer should be changed.");
 			Assert.That(GetToggleState(bottomBtn),
-				Is.EqualTo(ToggleState.On), "Bottom-side Terminal should be checked.");
+				Is.Not.EqualTo(bottomInitState), "Bottom-side Terminal should be changed.");
 
 			// Clean up
 			leftBtn = FindToggleButton("Explorer");
 			ClickToggleButtonSafe(leftBtn);
-			System.Threading.Thread.Sleep(500);
+			System.Threading.Thread.Sleep(200);
 			bottomBtn = FindToggleButton("Terminal");
 			ClickToggleButtonSafe(bottomBtn);
-			System.Threading.Thread.Sleep(500);
+			System.Threading.Thread.Sleep(200);
+			
+			Assert.That(GetToggleState(leftBtn),
+				Is.EqualTo(leftInitState), "Left-side Explorer should be back to start.");
+			Assert.That(GetToggleState(bottomBtn),
+				Is.EqualTo(bottomInitState), "Bottom-side Terminal should be back to start.");
+
 		}
 
 		private void ClickToggleButtonSafe(AutomationElement btn)
@@ -202,7 +210,7 @@ namespace AvalonDockTest.FlaUITests
 			if (btn == null) return;
 			try
 			{
-				btn.Click(true);
+				btn.Click();
 			}
 			catch (FlaUI.Core.Exceptions.NoClickablePointException)
 			{
@@ -239,13 +247,13 @@ namespace AvalonDockTest.FlaUITests
 					Is.EqualTo(ToggleState.On), "Explorer should be checked after docking.");
 			}, timeout: TimeSpan.FromSeconds(5), interval: TimeSpan.FromMilliseconds(500));
 
-			// Find the "Minimize" (formerly pin) button in the docked pane header
-			// The PART_AutoHidePin button should have tooltip "Minimize"
+			// Find the "Minimize" button in the docked pane header
 			var minimizeBtn = Retry.WhileNull(
 				() =>
 				{
-					var buttons = MainWindow.FindAllDescendants(CF.ByControlType(ControlType.Button));
-					return buttons.FirstOrDefault(b =>
+					var explorer = FindToolWindowTab("Explorer");
+					var buttons = explorer?.Parent.FindAllDescendants(CF.ByControlType(ControlType.Button));
+					return buttons?.FirstOrDefault(b =>
 					{
 						try
 						{
@@ -253,7 +261,7 @@ namespace AvalonDockTest.FlaUITests
 							var help = b.Properties.HelpText.ValueOrDefault;
 							// The pin button's tooltip becomes "Minimize" in ToggleDockingManager
 							return name == "Minimize" || help == "Minimize"
-								|| (b.Properties.AutomationId.IsSupported && b.Properties.AutomationId.Value == "PART_AutoHidePin");
+							                          || (b.Properties.AutomationId.IsSupported && b.Properties.AutomationId.Value == "PART_AutoHidePin");
 						}
 						catch { return false; }
 					});
@@ -262,29 +270,24 @@ namespace AvalonDockTest.FlaUITests
 				interval: TimeSpan.FromMilliseconds(300));
 
 			// If we found the pin button, click it
-			if (minimizeBtn.Result != null)
+			if (minimizeBtn.Result == null)
 			{
-				ClickToggleButtonSafe(minimizeBtn.Result);
-				System.Threading.Thread.Sleep(2000);
+				Assert.Fail("Minimize not found");
+				return;
+			}
 
-				// Explorer should be back to auto-hidden (toggle button unchecked)
-				Retry.WhileException(() =>
-				{
-					btn = FindToggleButton("Explorer");
-					Assert.That(GetToggleState(btn),
-						Is.EqualTo(ToggleState.Off),
-						"Explorer should be unchecked after clicking minimize (pin) button.");
-				}, timeout: TimeSpan.FromSeconds(5), interval: TimeSpan.FromMilliseconds(500));
-			}
-			else
+			minimizeBtn.Result.AsButton().Invoke();
+			// ClickToggleButtonSafe(minimizeBtn.Result);
+			System.Threading.Thread.Sleep(200);
+
+			// Explorer should be back to auto-hidden (toggle button unchecked)
+			Retry.WhileException(() =>
 			{
-				// Pin button not found via automation — clean up manually and mark as inconclusive
 				btn = FindToggleButton("Explorer");
-				btn?.Click();
-				Wait.UntilInputIsProcessed();
-				System.Threading.Thread.Sleep(500);
-				Assert.Inconclusive("Could not find the PART_AutoHidePin/Minimize button via automation.");
-			}
+				Assert.That(GetToggleState(btn),
+					Is.EqualTo(ToggleState.Off),
+					"Explorer should be unchecked after clicking minimize (pin) button.");
+			}, timeout: TimeSpan.FromSeconds(5), interval: TimeSpan.FromMilliseconds(500));
 		}
 	}
 }
