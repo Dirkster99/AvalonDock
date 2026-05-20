@@ -9,7 +9,7 @@ namespace AvalonDock.Mvvm
 	/// Inherits from <see cref="DockableBase"/> and implements <see cref="IToolbox"/>.
 	/// </summary>
 	/// <remarks>
-	/// <para>Inherit from this class for your toolbox ViewModels. Set <see cref="Side"/>
+	/// <para>Inherit from this class for your toolbox ViewModels. Set <see cref="Zone"/>
 	/// in the constructor to control placement. Override <see cref="DockableBase.Title"/>
 	/// and <see cref="DockableBase.Id"/> for display and serialization.</para>
 	/// <para>Register with DI using <c>services.AddToolbox&lt;T&gt;()</c> and they will
@@ -19,7 +19,7 @@ namespace AvalonDock.Mvvm
 	public abstract class ToolboxBase : DockableBase, IToolbox
 	{
 		private string? _toolTipText;
-		private ToolboxSide _side = ToolboxSide.Left;
+		private DockZone _zone = DockZone.LeftTop;
 		private bool _isOpenByDefault;
 		private object? _icon;
 
@@ -33,10 +33,10 @@ namespace AvalonDock.Mvvm
 
 		/// <inheritdoc/>
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
-		public ToolboxSide Side
+		public DockZone Zone
 		{
-			get => _side;
-			set => SetProperty(ref _side, value);
+			get => _zone;
+			set => SetProperty(ref _zone, value);
 		}
 
 		/// <inheritdoc/>

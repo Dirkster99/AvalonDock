@@ -1,8 +1,38 @@
+using System;
+
+[assembly: CLSCompliant(true)]
+
 namespace AvalonDock.Core
 {
 	/// <summary>
+	/// Defines the specific dock zone where a toolbox should be placed.
+	/// Each side (left, right, bottom) is split into two zones for finer-grained control.
+	/// </summary>
+	public enum DockZone
+	{
+		/// <summary>Left sidebar, top section.</summary>
+		LeftTop,
+
+		/// <summary>Left sidebar, bottom section.</summary>
+		LeftBottom,
+
+		/// <summary>Right sidebar, top section.</summary>
+		RightTop,
+
+		/// <summary>Right sidebar, bottom section.</summary>
+		RightBottom,
+
+		/// <summary>Bottom panel, left section.</summary>
+		BottomLeft,
+
+		/// <summary>Bottom panel, right section.</summary>
+		BottomRight
+	}
+
+	/// <summary>
 	/// Defines the side of the dock where a toolbox should be placed.
 	/// </summary>
+	[Obsolete("Use DockZone instead for finer-grained placement control.")]
 	public enum ToolboxSide
 	{
 		/// <summary>Docked to the left sidebar.</summary>
@@ -32,8 +62,8 @@ namespace AvalonDock.Core
 		/// <summary>Gets or sets the tooltip text shown on the sidebar toggle button.</summary>
 		string? ToolTipText { get; set; }
 
-		/// <summary>Gets or sets which side of the dock this toolbox belongs to.</summary>
-		ToolboxSide Side { get; set; }
+		/// <summary>Gets or sets the dock zone where this toolbox is placed.</summary>
+		DockZone Zone { get; set; }
 
 		/// <summary>Gets or sets a value indicating whether this toolbox should be toggled open on startup.</summary>
 		bool IsOpenByDefault { get; set; }

@@ -14,46 +14,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using AvalonDock.Controls;
+using AvalonDock.Core;
 using AvalonDock.Layout;
 
 namespace AvalonDock
 {
-	/// <summary>
-	/// Defines the dock Zone values.
-	/// </summary>
-	public enum DockZone
-	{
-		/// <summary>
-		/// The left Top option.
-		/// </summary>
-		LeftTop,
-
-		/// <summary>
-		/// The left Bottom option.
-		/// </summary>
-		LeftBottom,
-
-		/// <summary>
-		/// The right Top option.
-		/// </summary>
-		RightTop,
-
-		/// <summary>
-		/// The right Bottom option.
-		/// </summary>
-		RightBottom,
-
-		/// <summary>
-		/// The bottom Left option.
-		/// </summary>
-		BottomLeft,
-
-		/// <summary>
-		/// The bottom Right option.
-		/// </summary>
-		BottomRight
-	}
-
 	/// <summary>
 	/// Defines the dock Layout Priority values.
 	/// </summary>
@@ -397,23 +362,9 @@ namespace AvalonDock
 
 			foreach (var anc in Layout.Descendents().OfType<LayoutAnchorable>().ToList())
 			{
-				if (anc.Content is Core.IToolbox toolbox && toolbox.IsOpenByDefault)
+				if (anc.Content is IToolbox toolbox && toolbox.IsOpenByDefault)
 				{
-					DockZone zone;
-					switch (toolbox.Side)
-					{
-						case Core.ToolboxSide.Right:
-							zone = DockZone.RightTop;
-							break;
-						case Core.ToolboxSide.Bottom:
-							zone = DockZone.BottomLeft;
-							break;
-						default:
-							zone = DockZone.LeftTop;
-							break;
-					}
-
-					ToggleAnchorable(anc, zone);
+					ToggleAnchorable(anc, toolbox.Zone);
 				}
 			}
 		}
@@ -1006,29 +957,58 @@ namespace AvalonDock
 
 			AutoHideAllDockedAnchorables();
 
-			// Collect anchorables
+			// Collect all anchorables from each side
 			var leftAnchorables = CollectAnchorables(Layout.LeftSide);
 			var rightAnchorables = CollectAnchorables(Layout.RightSide);
 			var bottomAnchorables = CollectAnchorables(Layout.BottomSide);
 
-			// Split bottom anchorables: first half → BottomLeft, second half → BottomRight
-			var bottomLeft = bottomAnchorables.Take((bottomAnchorables.Count + 1) / 2).ToList();
-			var bottomRight = bottomAnchorables.Skip((bottomAnchorables.Count + 1) / 2).ToList();
+			// Distribute anchorables to zones based on IToolbox.Zone
+			var leftTop = new List<LayoutAnchorable>();
+			var leftBottom = new List<LayoutAnchorable>();
+			foreach (var anc in leftAnchorables)
+			{
+				if (anc.Content is IToolbox t && t.Zone == DockZone.LeftBottom)
+					leftBottom.Add(anc);
+				else
+					leftTop.Add(anc);
+			}
+
+			var rightTop = new List<LayoutAnchorable>();
+			var rightBottom = new List<LayoutAnchorable>();
+			foreach (var anc in rightAnchorables)
+			{
+				if (anc.Content is IToolbox t && t.Zone == DockZone.RightBottom)
+					rightBottom.Add(anc);
+				else
+					rightTop.Add(anc);
+			}
+
+			var bottomLeft = new List<LayoutAnchorable>();
+			var bottomRight = new List<LayoutAnchorable>();
+			foreach (var anc in bottomAnchorables)
+			{
+				if (anc.Content is IToolbox t && t.Zone == DockZone.BottomRight)
+					bottomRight.Add(anc);
+				else
+					bottomLeft.Add(anc);
+			}
 
 			// Create 6 button bars with automation IDs for UI test discoverability
 			_leftTopBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.LeftTop };
 			System.Windows.Automation.AutomationProperties.SetAutomationId(_leftTopBar, "ToggleDockBar_LeftTop");
-			_leftTopBar.SetAnchorables(leftAnchorables, DockZone.LeftTop);
+			_leftTopBar.SetAnchorables(leftTop, DockZone.LeftTop);
 
 			_leftBottomBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.LeftBottom };
 			System.Windows.Automation.AutomationProperties.SetAutomationId(_leftBottomBar, "ToggleDockBar_LeftBottom");
+			_leftBottomBar.SetAnchorables(leftBottom, DockZone.LeftBottom);
 
 			_rightTopBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.RightTop };
 			System.Windows.Automation.AutomationProperties.SetAutomationId(_rightTopBar, "ToggleDockBar_RightTop");
-			_rightTopBar.SetAnchorables(rightAnchorables, DockZone.RightTop);
+			_rightTopBar.SetAnchorables(rightTop, DockZone.RightTop);
 
 			_rightBottomBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.RightBottom };
 			System.Windows.Automation.AutomationProperties.SetAutomationId(_rightBottomBar, "ToggleDockBar_RightBottom");
+			_rightBottomBar.SetAnchorables(rightBottom, DockZone.RightBottom);
 
 			_bottomLeftBar = new ToggleDockButtonBar { Orientation = Orientation.Vertical, Zone = DockZone.BottomLeft };
 			System.Windows.Automation.AutomationProperties.SetAutomationId(_bottomLeftBar, "ToggleDockBar_BottomLeft");
@@ -1095,7 +1075,7 @@ namespace AvalonDock
 			{
 				Height = 1,
 				Margin = new Thickness(4, 6, 4, 6),
-				Background = new SolidColorBrush(Color.FromRgb(0xCC, 0xCC, 0xCC))
+				Background = new SolidColorBrush(Color.FromRgb(0x99, 0x99, 0x99))
 			};
 		}
 

@@ -19,7 +19,7 @@ namespace AvalonDockTest
 		{
 			Id = "di-test";
 			Title = "DI Test";
-			Side = ToolboxSide.Left;
+			Zone = DockZone.LeftTop;
 		}
 	}
 

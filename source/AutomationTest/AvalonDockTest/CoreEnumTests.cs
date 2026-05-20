@@ -5,21 +5,24 @@ using NUnit.Framework;
 namespace AvalonDockTest
 {
 	[TestFixture]
-	public class ToolboxSideTests
+	public class DockZoneTests
 	{
 		[Test]
-		public void ToolboxSide_HasExpectedValues()
+		public void DockZone_HasExpectedValues()
 		{
-			Assert.That((int)ToolboxSide.Left, Is.EqualTo(0));
-			Assert.That((int)ToolboxSide.Right, Is.EqualTo(1));
-			Assert.That((int)ToolboxSide.Bottom, Is.EqualTo(2));
+			Assert.That((int)DockZone.LeftTop, Is.EqualTo(0));
+			Assert.That((int)DockZone.LeftBottom, Is.EqualTo(1));
+			Assert.That((int)DockZone.RightTop, Is.EqualTo(2));
+			Assert.That((int)DockZone.RightBottom, Is.EqualTo(3));
+			Assert.That((int)DockZone.BottomLeft, Is.EqualTo(4));
+			Assert.That((int)DockZone.BottomRight, Is.EqualTo(5));
 		}
 
 		[Test]
-		public void ToolboxSide_HasExactlyThreeValues()
+		public void DockZone_HasExactlySixValues()
 		{
-			var values = Enum.GetValues(typeof(ToolboxSide));
-			Assert.That(values.Length, Is.EqualTo(3));
+			var values = Enum.GetValues(typeof(DockZone));
+			Assert.That(values.Length, Is.EqualTo(6));
 		}
 	}
 

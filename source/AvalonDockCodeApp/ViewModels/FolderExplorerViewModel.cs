@@ -77,7 +77,7 @@ public partial class FolderExplorerViewModel : ToolboxBase
         Id = "Explorer";
         Title = "Explorer";
         ToolTipText = "Explorer (Ctrl+Shift+E)";
-        Side = ToolboxSide.Left;
+        Zone = DockZone.LeftTop;
         Icon = ToolboxIcons.Explorer;
     }
 

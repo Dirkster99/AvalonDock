@@ -13,7 +13,7 @@ namespace AvalonDockTest
 			Id = "test-toolbox";
 			Title = "Test Toolbox";
 			ToolTipText = "A test toolbox";
-			Side = ToolboxSide.Left;
+			Zone = DockZone.LeftTop;
 			Icon = "icon-placeholder";
 		}
 	}
@@ -50,7 +50,7 @@ namespace AvalonDockTest
 			Assert.That(toolbox.Id, Is.EqualTo("test-toolbox"));
 			Assert.That(toolbox.Title, Is.EqualTo("Test Toolbox"));
 			Assert.That(toolbox.ToolTipText, Is.EqualTo("A test toolbox"));
-			Assert.That(toolbox.Side, Is.EqualTo(ToolboxSide.Left));
+			Assert.That(toolbox.Zone, Is.EqualTo(DockZone.LeftTop));
 			Assert.That(toolbox.Icon, Is.EqualTo("icon-placeholder"));
 		}
 
@@ -71,20 +71,20 @@ namespace AvalonDockTest
 		}
 
 		[Test]
-		public void ToolboxBase_Side_RaisesPropertyChanged()
+		public void ToolboxBase_Zone_RaisesPropertyChanged()
 		{
 			var toolbox = new ConcreteToolbox();
 			var changed = false;
 			toolbox.PropertyChanged += (_, e) =>
 			{
-				if (e.PropertyName == nameof(ToolboxBase.Side))
+				if (e.PropertyName == nameof(ToolboxBase.Zone))
 					changed = true;
 			};
 
-			toolbox.Side = ToolboxSide.Right;
+			toolbox.Zone = DockZone.RightTop;
 
 			Assert.That(changed, Is.True);
-			Assert.That(toolbox.Side, Is.EqualTo(ToolboxSide.Right));
+			Assert.That(toolbox.Zone, Is.EqualTo(DockZone.RightTop));
 		}
 
 		[Test]

@@ -7,7 +7,7 @@ namespace AvalonDock
 {
 	/// <summary>
 	/// Layout strategy for the ToggleDockingManager that places anchorables
-	/// into left/right/bottom anchor sides based on <see cref="IToolbox.Side"/>.
+	/// into left/right/bottom anchor sides based on <see cref="IToolbox.Zone"/>.
 	/// Also sets <see cref="ToggleDock.IconProperty"/> and <see cref="ToggleDock.ToolTipProperty"/> attached
 	/// properties from the ViewModel metadata.
 	/// </summary>
@@ -29,8 +29,8 @@ namespace AvalonDock
 			if (toolbox.ToolTipText != null)
 				ToggleDock.SetToolTip(anchorableToShow, toolbox.ToolTipText);
 
-			// Place into the correct anchor side
-			var side = GetAnchorSide(layout, toolbox.Side);
+			// Place into the correct anchor side based on zone
+			var side = GetAnchorSide(layout, toolbox.Zone);
 			var group = side.Children.OfType<LayoutAnchorGroup>().FirstOrDefault();
 			if (group == null)
 			{
@@ -58,21 +58,23 @@ namespace AvalonDock
 		{
 		}
 
-		private static LayoutAnchorSide GetAnchorSide(LayoutRoot layout, ToolboxSide side)
+		private static LayoutAnchorSide GetAnchorSide(LayoutRoot layout, DockZone zone)
 		{
-			switch (side)
+			switch (zone)
 			{
-				case ToolboxSide.Right:
+				case DockZone.RightTop:
+				case DockZone.RightBottom:
 					if (layout.RightSide == null)
 						layout.RightSide = new LayoutAnchorSide();
 					return layout.RightSide;
 
-				case ToolboxSide.Bottom:
+				case DockZone.BottomLeft:
+				case DockZone.BottomRight:
 					if (layout.BottomSide == null)
 						layout.BottomSide = new LayoutAnchorSide();
 					return layout.BottomSide;
 
-				default: // Left
+				default: // LeftTop, LeftBottom
 					if (layout.LeftSide == null)
 						layout.LeftSide = new LayoutAnchorSide();
 					return layout.LeftSide;

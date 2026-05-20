@@ -23,11 +23,11 @@ namespace AvalonDockTest
 		}
 
 		[Test]
-		public void IToolbox_HasSideProperty()
+		public void IToolbox_HasZoneProperty()
 		{
-			var prop = typeof(IToolbox).GetProperty("Side");
+			var prop = typeof(IToolbox).GetProperty("Zone");
 			Assert.That(prop, Is.Not.Null);
-			Assert.That(prop!.PropertyType, Is.EqualTo(typeof(ToolboxSide)));
+			Assert.That(prop!.PropertyType, Is.EqualTo(typeof(DockZone)));
 			Assert.That(prop.GetMethod, Is.Not.Null);
 			Assert.That(prop.SetMethod, Is.Not.Null);
 		}

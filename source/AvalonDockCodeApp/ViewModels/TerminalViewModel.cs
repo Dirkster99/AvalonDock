@@ -23,7 +23,7 @@ public partial class TerminalViewModel : ToolboxBase, IDisposable
 		Id = "Terminal";
 		Title = "Terminal";
 		ToolTipText = "Terminal (Ctrl+`)";
-		Side = ToolboxSide.Bottom;
+		Zone = DockZone.BottomLeft;
 		IsOpenByDefault = true;
 		Icon = ToolboxIcons.Terminal;
 
