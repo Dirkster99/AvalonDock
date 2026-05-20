@@ -11,7 +11,7 @@ public partial class SourceControlViewModel : ToolboxBase
 		Id = "Git";
 		Title = "Source Control";
 		ToolTipText = "Source Control (Ctrl+Shift+G)";
-		Zone = DockZone.LeftTop;
+		Zone = DockZone.LeftBottom;
 		Icon = ToolboxIcons.Git;
 	}
 

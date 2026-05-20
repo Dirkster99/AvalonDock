@@ -184,7 +184,7 @@
                                         </TextBlock>
                                         <TextBlock Foreground="#555555" FontSize="11" TextAlignment="Center"
                                                    Margin="0,24,0,0">
-                                            <Run Text="Powered by AvalonDock.Core + AvalonDock.Mvvm + DI" />
+                                            <Run Text="Powered by AvalonDock + AvalonDock.Mvvm + AvalonDock-DependencyInjection" />
                                         </TextBlock>
                                     </StackPanel>
                                 </Border>
