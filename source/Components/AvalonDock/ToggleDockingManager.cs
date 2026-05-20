@@ -46,6 +46,16 @@ namespace AvalonDock
 	public class ToggleDockingManager : DockingManager
 	{
 		/// <summary>
+		/// The layout engine used for all layout tree operations.
+		/// </summary>
+		private readonly ToggleLayoutEngine _layoutEngine = new ToggleLayoutEngine();
+
+		/// <summary>
+		/// Gets the <see cref="ILayoutEngine"/> used by this manager for layout tree operations.
+		/// </summary>
+		public ILayoutEngine LayoutEngine => _layoutEngine;
+
+		/// <summary>
 		/// The left Top Bar field.
 		/// </summary>
 		internal ToggleDockButtonBar _leftTopBar;
@@ -544,94 +554,7 @@ namespace AvalonDock
 		/// <param name="zone">The zone.</param>
 		private void FixSplitOrientation(LayoutAnchorable anchorable, DockZone zone)
 		{
-			var pane = anchorable.Parent as LayoutAnchorablePane;
-			if (pane == null) return;
-
-			var parentPanel = pane.Parent as LayoutPanel;
-			if (parentPanel == null) return;
-
-			var desiredOrientation = IsBottomZone(zone) ? Orientation.Horizontal : Orientation.Vertical;
-
-			// Case 1: There's an adjacent LayoutAnchorablePaneGroup sibling — insert into it.
-			// Only join a group that is contiguous with this pane (same side of the document).
-			var paneIdx = parentPanel.Children.IndexOf(pane);
-			LayoutAnchorablePaneGroup existingGroup = null;
-			if (paneIdx > 0 && parentPanel.Children[paneIdx - 1] is LayoutAnchorablePaneGroup leftNeighbor
-				&& leftNeighbor.Orientation == desiredOrientation)
-				existingGroup = leftNeighbor;
-			else if (paneIdx < parentPanel.Children.Count - 1 && parentPanel.Children[paneIdx + 1] is LayoutAnchorablePaneGroup rightNeighbor
-				&& rightNeighbor.Orientation == desiredOrientation)
-				existingGroup = rightNeighbor;
-
-			if (existingGroup != null)
-			{
-				parentPanel.Children.Remove(pane);
-				// "Top" sub-zones (LeftTop, RightTop) go first; "Bottom" sub-zones append
-				if (zone == DockZone.LeftTop || zone == DockZone.RightTop)
-					existingGroup.Children.Insert(0, pane);
-				else
-					existingGroup.Children.Add(pane);
-				return;
-			}
-
-			// Case 2: Multiple contiguous LayoutAnchorablePane siblings on the same side —
-			// wrap them in a group. Only group panes that are adjacent (no document pane
-			// or other element between them), so left-side and right-side panes aren't
-			// accidentally merged.
-			paneIdx = parentPanel.Children.IndexOf(pane);
-			var contiguousPanes = new List<LayoutAnchorablePane> { pane };
-
-			// Scan backward from the pane
-			for (int i = paneIdx - 1; i >= 0; i--)
-			{
-				if (parentPanel.Children[i] is LayoutAnchorablePane adjPane)
-					contiguousPanes.Insert(0, adjPane);
-				else break;
-			}
-
-			// Scan forward from the pane
-			for (int i = paneIdx + 1; i < parentPanel.Children.Count; i++)
-			{
-				if (parentPanel.Children[i] is LayoutAnchorablePane adjPane)
-					contiguousPanes.Add(adjPane);
-				else break;
-			}
-
-			if (contiguousPanes.Count < 2) return;
-			if (parentPanel.Orientation == desiredOrientation) return;
-
-			var group = new LayoutAnchorablePaneGroup { Orientation = desiredOrientation };
-			int firstIdx = parentPanel.Children.IndexOf(contiguousPanes[0]);
-
-			for (int i = contiguousPanes.Count - 1; i >= 0; i--)
-				parentPanel.Children.Remove(contiguousPanes[i]);
-
-			foreach (var sp in contiguousPanes)
-				group.Children.Add(sp);
-
-			parentPanel.Children.Insert(Math.Min(firstIdx, parentPanel.Children.Count), group);
-		}
-
-		private static bool IsBottomZone(DockZone zone)
-		{
-			return zone == DockZone.BottomLeft || zone == DockZone.BottomRight;
-		}
-
-		private static bool IsLeftZone(DockZone zone)
-		{
-			return zone == DockZone.LeftTop || zone == DockZone.LeftBottom;
-		}
-
-		private static bool IsRightZone(DockZone zone)
-		{
-			return zone == DockZone.RightTop || zone == DockZone.RightBottom;
-		}
-
-		private static AnchorSide ZoneToAnchorSide(DockZone zone)
-		{
-			if (IsLeftZone(zone)) return AnchorSide.Left;
-			if (IsRightZone(zone)) return AnchorSide.Right;
-			return AnchorSide.Bottom;
+			_layoutEngine.FixSplitOrientationForZone(anchorable, zone);
 		}
 
 		/// <summary>
@@ -639,74 +562,7 @@ namespace AvalonDock
 		/// </summary>
 		private void EnsureBottomFullWidth()
 		{
-			var root = Layout as LayoutRoot;
-			if (root == null) return;
-			var rootPanel = root.RootPanel;
-			if (rootPanel == null) return;
-
-			// If root is horizontal, check if any bottom panes are nested inside it
-			if (rootPanel.Orientation == Orientation.Horizontal)
-			{
-				// Look for bottom anchorable panes that are children of sub-vertical panels
-				// within this horizontal root. If found, we need to lift them out.
-				var bottomPanes = new List<LayoutAnchorablePane>();
-				foreach (var child in rootPanel.Children.OfType<LayoutPanel>().ToList())
-				{
-					if (child.Orientation == Orientation.Vertical)
-					{
-						foreach (var pane in child.Children.OfType<LayoutAnchorablePane>().ToList())
-						{
-							// Check if this pane is at the end of a vertical sub-panel → it's a bottom pane
-							if (child.Children.IndexOf(pane) == child.Children.Count - 1 && child.Children.Count > 1)
-								bottomPanes.Add(pane);
-						}
-					}
-				}
-
-				if (bottomPanes.Count > 0)
-				{
-					// Wrap root in vertical, move bottom panes to outermost level
-					var vPanel = new LayoutPanel { Orientation = Orientation.Vertical };
-					root.RootPanel = vPanel;
-
-					// Clean bottom panes from their current parents
-					foreach (var bp in bottomPanes)
-						((ILayoutContainer)bp.Parent).RemoveChild(bp);
-
-					vPanel.Children.Add(rootPanel);
-					foreach (var bp in bottomPanes)
-						vPanel.Children.Add(bp);
-				}
-			}
-			else if (rootPanel.Orientation == Orientation.Vertical)
-			{
-				// Root is already vertical. Check if bottom panes are in the right place.
-				// Bottom panes should be direct children at the end, not nested in horizontal sub-panels.
-				var bottomPanesToLift = new List<LayoutAnchorablePane>();
-				foreach (var child in rootPanel.Children.OfType<LayoutPanel>().ToList())
-				{
-					if (child.Orientation == Orientation.Horizontal)
-					{
-						foreach (var subChild in child.Children.OfType<LayoutPanel>().ToList())
-						{
-							if (subChild.Orientation == Orientation.Vertical)
-							{
-								foreach (var pane in subChild.Children.OfType<LayoutAnchorablePane>().ToList())
-								{
-									if (subChild.Children.IndexOf(pane) == subChild.Children.Count - 1 && subChild.Children.Count > 1)
-										bottomPanesToLift.Add(pane);
-								}
-							}
-						}
-					}
-				}
-
-				foreach (var bp in bottomPanesToLift)
-				{
-					((ILayoutContainer)bp.Parent).RemoveChild(bp);
-					rootPanel.Children.Add(bp);
-				}
-			}
+			_layoutEngine.EnsureBottomFullWidth(Layout as LayoutRoot);
 		}
 
 		/// <summary>
@@ -714,88 +570,7 @@ namespace AvalonDock
 		/// </summary>
 		private void EnsureSidesFullHeight()
 		{
-			var root = Layout as LayoutRoot;
-			if (root == null) return;
-			var rootPanel = root.RootPanel;
-			if (rootPanel == null) return;
-
-			if (rootPanel.Orientation == Orientation.Vertical)
-			{
-				// Root is vertical. Side panes may be nested in horizontal sub-panels.
-				var leftPanes = new List<LayoutAnchorablePane>();
-				var rightPanes = new List<LayoutAnchorablePane>();
-
-				foreach (var child in rootPanel.Children.OfType<LayoutPanel>().ToList())
-				{
-					if (child.Orientation == Orientation.Horizontal)
-					{
-						foreach (var pane in child.Children.OfType<LayoutAnchorablePane>().ToList())
-						{
-							int idx = child.Children.IndexOf(pane);
-							if (idx == 0 && child.Children.Count > 1)
-								leftPanes.Add(pane);
-							else if (idx == child.Children.Count - 1 && child.Children.Count > 1)
-								rightPanes.Add(pane);
-						}
-					}
-				}
-
-				if (leftPanes.Count > 0 || rightPanes.Count > 0)
-				{
-					var hPanel = new LayoutPanel { Orientation = Orientation.Horizontal };
-					root.RootPanel = hPanel;
-
-					foreach (var lp in leftPanes)
-						((ILayoutContainer)lp.Parent).RemoveChild(lp);
-					foreach (var rp in rightPanes)
-						((ILayoutContainer)rp.Parent).RemoveChild(rp);
-
-					foreach (var lp in leftPanes)
-						hPanel.Children.Add(lp);
-					hPanel.Children.Add(rootPanel);
-					foreach (var rp in rightPanes)
-						hPanel.Children.Add(rp);
-				}
-			}
-			else if (rootPanel.Orientation == Orientation.Horizontal)
-			{
-				// Root is already horizontal. Check if side panes are nested in vertical sub-panels.
-				var leftPanesToLift = new List<LayoutAnchorablePane>();
-				var rightPanesToLift = new List<LayoutAnchorablePane>();
-
-				foreach (var child in rootPanel.Children.OfType<LayoutPanel>().ToList())
-				{
-					if (child.Orientation == Orientation.Vertical)
-					{
-						foreach (var subChild in child.Children.OfType<LayoutPanel>().ToList())
-						{
-							if (subChild.Orientation == Orientation.Horizontal)
-							{
-								foreach (var pane in subChild.Children.OfType<LayoutAnchorablePane>().ToList())
-								{
-									int idx = subChild.Children.IndexOf(pane);
-									if (idx == 0 && subChild.Children.Count > 1)
-										leftPanesToLift.Add(pane);
-									else if (idx == subChild.Children.Count - 1 && subChild.Children.Count > 1)
-										rightPanesToLift.Add(pane);
-								}
-							}
-						}
-					}
-				}
-
-				foreach (var lp in leftPanesToLift)
-				{
-					((ILayoutContainer)lp.Parent).RemoveChild(lp);
-					rootPanel.Children.Insert(0, lp);
-				}
-
-				foreach (var rp in rightPanesToLift)
-				{
-					((ILayoutContainer)rp.Parent).RemoveChild(rp);
-					rootPanel.Children.Add(rp);
-				}
-			}
+			_layoutEngine.EnsureSidesFullHeight(Layout as LayoutRoot);
 		}
 
 		/// <summary>
@@ -816,7 +591,7 @@ namespace AvalonDock
 
 			if (previousContainer == null)
 			{
-				var side = ZoneToAnchorSide(zone);
+				var side = ToggleLayoutEngine.ZoneToAnchorSide(zone);
 				previousContainer = new LayoutAnchorablePane
 				{
 					DockMinWidth = anchorable.AutoHideMinWidth,
@@ -830,85 +605,7 @@ namespace AvalonDock
 					previousContainer.DockHeight = new GridLength(DefaultDockHeight);
 
 				var root = parentGroup.Root as LayoutRoot;
-				var rootPanel = root.RootPanel;
-
-				switch (side)
-				{
-					case AnchorSide.Right:
-						if (rootPanel.Orientation == Orientation.Horizontal)
-						{
-							if (zone == DockZone.RightTop)
-							{
-								// Insert before existing right-side panes/groups (after the document content)
-								int insertIdx = rootPanel.Children.Count;
-								while (insertIdx > 0 &&
-									   (rootPanel.Children[insertIdx - 1] is LayoutAnchorablePane ||
-										rootPanel.Children[insertIdx - 1] is LayoutAnchorablePaneGroup))
-								{
-									insertIdx--;
-								}
-
-								rootPanel.Children.Insert(insertIdx, previousContainer);
-							}
-							else
-							{
-								rootPanel.Children.Add(previousContainer);
-							}
-						}
-						else
-						{
-							var panel = new LayoutPanel { Orientation = Orientation.Horizontal };
-							root.RootPanel = panel;
-							panel.Children.Add(rootPanel);
-							panel.Children.Add(previousContainer);
-						}
-
-						break;
-					case AnchorSide.Left:
-						if (rootPanel.Orientation == Orientation.Horizontal)
-						{
-							if (zone == DockZone.LeftBottom)
-							{
-								// Insert after existing left-side panes/groups (before the document content)
-								int insertIdx = 0;
-								while (insertIdx < rootPanel.Children.Count &&
-									   (rootPanel.Children[insertIdx] is LayoutAnchorablePane ||
-										rootPanel.Children[insertIdx] is LayoutAnchorablePaneGroup))
-								{
-									insertIdx++;
-								}
-
-								rootPanel.Children.Insert(insertIdx, previousContainer);
-							}
-							else
-							{
-								rootPanel.Children.Insert(0, previousContainer);
-							}
-						}
-						else
-						{
-							var panel = new LayoutPanel { Orientation = Orientation.Horizontal };
-							root.RootPanel = panel;
-							panel.Children.Add(previousContainer);
-							panel.Children.Add(rootPanel);
-						}
-
-						break;
-					case AnchorSide.Bottom:
-						if (rootPanel.Orientation == Orientation.Vertical)
-						{
-							rootPanel.Children.Add(previousContainer);
-						}
-						else
-						{
-							var panel = new LayoutPanel { Orientation = Orientation.Vertical };
-							root.RootPanel = panel;
-							panel.Children.Add(rootPanel);
-							panel.Children.Add(previousContainer);
-						}
-
-						break;
-				}
+				_layoutEngine.InsertPaneForZone(root, previousContainer, zone);
 			}
 
 			parentGroup.Children.Remove(anchorable);
@@ -930,7 +627,7 @@ namespace AvalonDock
 			var root = anchorable.Root;
 			if (root == null) return;
 
-			var side = ZoneToAnchorSide(zone);
+			var side = ToggleLayoutEngine.ZoneToAnchorSide(zone);
 			var newAnchorGroup = new LayoutAnchorGroup();
 			((ILayoutPreviousContainer)newAnchorGroup).PreviousContainer = parentPane;
 
