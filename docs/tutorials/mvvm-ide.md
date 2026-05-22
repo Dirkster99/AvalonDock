@@ -3,416 +3,437 @@ title: "Tutorial: MVVM IDE Application"
 layout: default
 parent: Tutorials
 nav_order: 1
-description: "Build a multi-document IDE with MVVM, template selectors, and commands."
+description: "Build a multi-document IDE with the v5 MVVM + DI architecture using ToolboxBase, Document, IDockLayoutService, and ToggleDockingManager."
 ---
 
-# Tutorial: Build an MVVM IDE Application
+# Tutorial: Build an MVVM IDE Application (v5)
 
-In this tutorial you will build a Visual Studio-like IDE application using the MVVM pattern. By the end, you'll have an app with tabbed documents, a file explorer panel, a properties panel, and an output panel — all driven by view models.
+In this tutorial you will build a Visual Studio Code-style IDE application using AvalonDock v5's first-class MVVM and Dependency Injection architecture. Everything is controlled via view models — no code-behind layout manipulation, no singletons.
 
 {: .tip }
-This tutorial is inspired by the `MVVMTestApp` and `VS2013Test` sample projects in the repository.
+This tutorial follows the exact patterns used in the `AvalonDockCodeApp` sample project, which is the reference implementation for AvalonDock v5.
 
 ---
 
 ## What You'll Build
 
 A docking IDE with:
-- **Document tabs** that can be opened, closed, and floated
-- **Explorer panel** (anchorable) docked to the left
-- **Properties panel** (anchorable) docked to the right
-- **Output panel** (anchorable) auto-hidden at the bottom
-- **Active document tracking** bound to the view model
-- **Commands** for File → New, File → Open, and closing documents
+- **Sidebar toggle buttons** for tool panels (like VS Code)
+- **Explorer panel** — a file tree browser (toolbox, docked left)
+- **Search panel** — a search input (toolbox, docked left)
+- **Output panel** — log output (toolbox, docked bottom)
+- **Document tabs** — file editor tabs, opened from the explorer
+- **Everything via DI** — `IDockLayoutService` manages the layout tree, view models are injected
+- **Zero code-behind** for layout logic
 
 ---
 
 ## Prerequisites
 
 - .NET 9 or later SDK
-- A WPF project with `Dirkster.AvalonDock` and `Dirkster.AvalonDock.Themes.VS2013` installed
+- Windows (WPF is Windows-only)
 
 ```bash
 dotnet new wpf -n MvvmIdeApp
 cd MvvmIdeApp
 dotnet add package Dirkster.AvalonDock
-dotnet add package Dirkster.AvalonDock.Themes.VS2013
+dotnet add package Dirkster.AvalonDock.Mvvm
+dotnet add package Dirkster.AvalonDock.DependencyInjection
+dotnet add package Dirkster.AvalonDock.Themes.Arc
+dotnet add package CommunityToolkit.Mvvm
 ```
 
 ---
 
-## Step 1: Create the Base View Model
+## The v5 Architecture
 
-Every dockable panel needs a `Title`, `ContentId`, and property-change notification. Create a base class that all your panel view models will inherit from.
+Before diving in, here is how the pieces fit together:
 
-**File: `ViewModels/PaneViewModel.cs`**
-
-```csharp
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Media;
-
-namespace MvvmIdeApp.ViewModels;
-
-public abstract class PaneViewModel : INotifyPropertyChanged
-{
-    private string _title;
-    private string _contentId;
-    private bool _isSelected;
-    private bool _isActive;
-
-    public string Title
-    {
-        get => _title;
-        set => SetProperty(ref _title, value);
-    }
-
-    public string ContentId
-    {
-        get => _contentId;
-        set => SetProperty(ref _contentId, value);
-    }
-
-    public bool IsSelected
-    {
-        get => _isSelected;
-        set => SetProperty(ref _isSelected, value);
-    }
-
-    public bool IsActive
-    {
-        get => _isActive;
-        set => SetProperty(ref _isActive, value);
-    }
-
-    public virtual ImageSource IconSource => null;
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string name = null)
-    {
-        if (Equals(field, value)) return false;
-        field = value;
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        return true;
-    }
-}
 ```
+App.xaml.cs  (Composition Root)
+├── AddToolbox<ExplorerToolbox>()       ← registers tool VMs
+├── AddToolbox<SearchToolbox>()
+├── AddToolbox<OutputToolbox>()
+├── AddDockLayoutService()              ← auto-builds layout tree from toolboxes
+├── AddToggleDockOptions(...)           ← configures sidebar button size, dock sizes
+└── AddSingleton<MainViewModel>()       ← receives IDockLayoutService via DI
+
+MainViewModel
+├── DockLayout (IRootDock)              ← bound to ToggleDockingManager.DockLayout
+├── OpenFile() → _dockService.OpenOrActivateDocument(...)
+└── CloseDocument() → _dockService.CloseDocument(...)
+
+ToggleDockingManager (XAML)
+├── DockLayout="{Binding DockLayout}"   ← drives the entire layout from the VM
+├── DataTemplates per VM type           ← renders each toolbox/document
+└── PanesStyleSelector                  ← binds Title, ContentId, IconSource
+```
+
+### Key Base Classes
+
+| Class | Package | Purpose |
+|:------|:--------|:--------|
+| `ToolboxBase` | `AvalonDock.Mvvm` | Base for tool panel VMs. Has `Zone`, `Icon`, `IsOpenByDefault`. |
+| `Document` | `AvalonDock.Mvvm` | Base for document tab VMs. Has `Title`, `Id`, `IsModified`. |
+| `DockableBase` | `AvalonDock.Mvvm` | Abstract base for both. Uses `CommunityToolkit.Mvvm.ObservableObject`. |
+| `IDockLayoutService` | `AvalonDock.Core` | Manages the layout tree. Open/close documents, get anchorables by type. |
+| `IToolbox` | `AvalonDock.Core` | Interface for toolbox VMs. `DockZone` controls placement. |
 
 ---
 
-## Step 2: Create Document and Tool View Models
+## Step 1: Create Toolbox View Models
 
-Documents are closable content items (like file editors). Tools are persistent panels (like Explorer or Output).
+Each tool panel inherits from `ToolboxBase` and declares its placement via `DockZone`.
 
-**File: `ViewModels/DocumentViewModel.cs`**
-
-```csharp
-namespace MvvmIdeApp.ViewModels;
-
-public class DocumentViewModel : PaneViewModel
-{
-    private string _text;
-    private string _filePath;
-    private bool _isDirty;
-
-    public DocumentViewModel(string title)
-    {
-        Title = title;
-        ContentId = System.Guid.NewGuid().ToString();
-    }
-
-    public string Text
-    {
-        get => _text;
-        set
-        {
-            if (SetProperty(ref _text, value))
-                IsDirty = true;
-        }
-    }
-
-    public string FilePath
-    {
-        get => _filePath;
-        set => SetProperty(ref _filePath, value);
-    }
-
-    public bool IsDirty
-    {
-        get => _isDirty;
-        set => SetProperty(ref _isDirty, value);
-    }
-}
-```
-
-**File: `ViewModels/ToolViewModel.cs`**
-
-```csharp
-namespace MvvmIdeApp.ViewModels;
-
-public class ToolViewModel : PaneViewModel
-{
-    public ToolViewModel(string title)
-    {
-        Title = title;
-        ContentId = title.ToLowerInvariant().Replace(" ", "-");
-    }
-}
-
-// Specialized tool view models
-public class ExplorerViewModel : ToolViewModel
-{
-    public ExplorerViewModel() : base("Explorer") { }
-}
-
-public class PropertiesViewModel : ToolViewModel
-{
-    public PropertiesViewModel() : base("Properties") { }
-}
-
-public class OutputViewModel : ToolViewModel
-{
-    private string _outputText = string.Empty;
-
-    public OutputViewModel() : base("Output") { }
-
-    public string OutputText
-    {
-        get => _outputText;
-        set => SetProperty(ref _outputText, value);
-    }
-
-    public void AppendLine(string line)
-    {
-        OutputText += line + Environment.NewLine;
-    }
-}
-```
-
----
-
-## Step 3: Create a RelayCommand
-
-You'll need a simple `ICommand` implementation for menu commands.
-
-**File: `RelayCommand.cs`**
-
-```csharp
-using System.Windows.Input;
-
-namespace MvvmIdeApp;
-
-public class RelayCommand : ICommand
-{
-    private readonly Action<object> _execute;
-    private readonly Predicate<object> _canExecute;
-
-    public RelayCommand(Action<object> execute, Predicate<object> canExecute = null)
-    {
-        _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-        _canExecute = canExecute;
-    }
-
-    public event EventHandler CanExecuteChanged
-    {
-        add => CommandManager.RequerySuggested += value;
-        remove => CommandManager.RequerySuggested -= value;
-    }
-
-    public bool CanExecute(object parameter) => _canExecute?.Invoke(parameter) ?? true;
-    public void Execute(object parameter) => _execute(parameter);
-}
-```
-
----
-
-## Step 4: Create the Main (Workspace) View Model
-
-This is the heart of the application. It manages the collections of documents and tools, and exposes commands.
-
-**File: `ViewModels/WorkspaceViewModel.cs`**
+**File: `ViewModels/ExplorerToolbox.cs`**
 
 ```csharp
 using System.Collections.ObjectModel;
-using System.Windows.Input;
+using AvalonDock.Core;
+using AvalonDock.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MvvmIdeApp.ViewModels;
 
-public class WorkspaceViewModel : PaneViewModel
+public partial class ExplorerToolbox : ToolboxBase
 {
-    private DocumentViewModel _activeDocument;
-    private int _documentCounter;
+    private Action<string> _openFileCallback = _ => { };
 
-    public WorkspaceViewModel()
+    [ObservableProperty]
+    private ObservableCollection<string> _files = new()
     {
-        // Initialize tool panels
-        Explorer = new ExplorerViewModel();
-        Properties = new PropertiesViewModel();
-        Output = new OutputViewModel();
+        "Program.cs", "MainWindow.xaml", "App.xaml", "README.md"
+    };
 
-        Tools = new ObservableCollection<ToolViewModel>
+    public ExplorerToolbox()
+    {
+        Id = "Explorer";
+        Title = "Explorer";
+        ToolTipText = "Explorer (Ctrl+Shift+E)";
+        Zone = DockZone.LeftTop;     // Docked left, top section
+    }
+
+    public void SetOpenFileCallback(Action<string> callback)
+        => _openFileCallback = callback;
+
+    public void OpenSelectedFile(string fileName)
+        => _openFileCallback(fileName);
+}
+```
+
+**File: `ViewModels/SearchToolbox.cs`**
+
+```csharp
+using AvalonDock.Core;
+using AvalonDock.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace MvvmIdeApp.ViewModels;
+
+public partial class SearchToolbox : ToolboxBase
+{
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    public SearchToolbox()
+    {
+        Id = "Search";
+        Title = "Search";
+        ToolTipText = "Search (Ctrl+Shift+F)";
+        Zone = DockZone.LeftTop;     // Same side as Explorer
+    }
+}
+```
+
+**File: `ViewModels/OutputToolbox.cs`**
+
+```csharp
+using AvalonDock.Core;
+using AvalonDock.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace MvvmIdeApp.ViewModels;
+
+public partial class OutputToolbox : ToolboxBase
+{
+    [ObservableProperty]
+    private string _outputText = "Ready.\n";
+
+    public OutputToolbox()
+    {
+        Id = "Output";
+        Title = "Output";
+        ToolTipText = "Output (Ctrl+Shift+U)";
+        Zone = DockZone.BottomLeft;  // Docked at bottom
+        IsOpenByDefault = true;      // Open when app starts
+    }
+
+    public void AppendLine(string text) => OutputText += text + "\n";
+}
+```
+
+### DockZone Options
+
+The `DockZone` enum controls where each toolbox appears:
+
+| Zone | Position |
+|:-----|:---------|
+| `LeftTop` | Left sidebar, upper section |
+| `LeftBottom` | Left sidebar, lower section |
+| `RightTop` | Right sidebar, upper section |
+| `RightBottom` | Right sidebar, lower section |
+| `BottomLeft` | Bottom panel, left section |
+| `BottomRight` | Bottom panel, right section |
+
+---
+
+## Step 2: Create the Document View Model
+
+Documents inherit from `Document` (which extends `DockableBase`). Each open file gets its own tab.
+
+**File: `ViewModels/EditorTabViewModel.cs`**
+
+```csharp
+using System.IO;
+using AvalonDock.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace MvvmIdeApp.ViewModels;
+
+public partial class EditorTabViewModel : Document
+{
+    [ObservableProperty]
+    private string _filePath = string.Empty;
+
+    [ObservableProperty]
+    private string _content = string.Empty;
+
+    [ObservableProperty]
+    private string _toolTip = string.Empty;
+
+    public void LoadFile(string path)
+    {
+        FilePath = path;
+        Title = Path.GetFileName(path);
+        Id = path;           // Unique ID for this document
+        ToolTip = path;
+
+        try
         {
-            Explorer, Properties, Output
-        };
-
-        Documents = new ObservableCollection<DocumentViewModel>();
-
-        // Create an initial welcome document
-        NewDocument();
-
-        Output.AppendLine("Application started.");
-    }
-
-    // --- Collections ---
-
-    public ObservableCollection<DocumentViewModel> Documents { get; }
-    public ObservableCollection<ToolViewModel> Tools { get; }
-
-    // --- Tool Accessors ---
-
-    public ExplorerViewModel Explorer { get; }
-    public PropertiesViewModel Properties { get; }
-    public OutputViewModel Output { get; }
-
-    // --- Active Document ---
-
-    public DocumentViewModel ActiveDocument
-    {
-        get => _activeDocument;
-        set => SetProperty(ref _activeDocument, value);
-    }
-
-    // --- Commands ---
-
-    public ICommand NewDocumentCommand => new RelayCommand(_ => NewDocument());
-
-    public ICommand CloseDocumentCommand => new RelayCommand(
-        _ => CloseDocument(ActiveDocument),
-        _ => ActiveDocument != null
-    );
-
-    // --- Methods ---
-
-    public void NewDocument()
-    {
-        _documentCounter++;
-        var doc = new DocumentViewModel($"Untitled {_documentCounter}")
+            Content = File.ReadAllText(path);
+            IsModified = false;
+        }
+        catch (Exception ex)
         {
-            Text = $"// New document {_documentCounter}\n"
-        };
-        Documents.Add(doc);
-        ActiveDocument = doc;
-        Output.AppendLine($"Created: {doc.Title}");
-    }
-
-    public void CloseDocument(DocumentViewModel doc)
-    {
-        if (doc == null) return;
-        Documents.Remove(doc);
-        Output.AppendLine($"Closed: {doc.Title}");
-        ActiveDocument = Documents.LastOrDefault();
+            Content = $"Error: {ex.Message}";
+        }
     }
 }
 ```
 
 ---
 
-## Step 5: Create Template Selectors
+## Step 3: Create the Main View Model
 
-AvalonDock uses `DataTemplateSelector` to pick the right visual template for each type of content, and a `StyleSelector` to bind layout properties.
+The `MainViewModel` receives `IDockLayoutService` via constructor injection. It uses the service to open/close documents and access tool panels — no direct layout manipulation needed.
 
-**File: `PanesTemplateSelector.cs`**
+**File: `ViewModels/MainViewModel.cs`**
+
+```csharp
+using AvalonDock.Core;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
+namespace MvvmIdeApp.ViewModels;
+
+public partial class MainViewModel : ObservableObject
+{
+    private readonly IDockLayoutService _dockService;
+
+    /// <summary>The MVVM layout tree — bind to DockLayout on the DockingManager.</summary>
+    public IRootDock DockLayout => _dockService.Layout;
+
+    /// <summary>Typed access to the Explorer toolbox via the layout service.</summary>
+    public ExplorerToolbox? Explorer => _dockService.GetAnchorable<ExplorerToolbox>();
+
+    /// <summary>Typed access to the Output toolbox.</summary>
+    public OutputToolbox? Output => _dockService.GetAnchorable<OutputToolbox>();
+
+    public MainViewModel(IDockLayoutService dockService)
+    {
+        _dockService = dockService;
+
+        // Wire up file-open callback from Explorer
+        Explorer?.SetOpenFileCallback(OpenFile);
+        Output?.AppendLine("Application initialized via DI.");
+    }
+
+    /// <summary>Opens a file as a document tab, or activates it if already open.</summary>
+    public void OpenFile(string filePath)
+    {
+        _dockService.OpenOrActivateDocument(
+            existing => existing.FilePath == filePath,  // find existing
+            () =>                                        // or create new
+            {
+                var tab = new EditorTabViewModel();
+                tab.LoadFile(filePath);
+                return tab;
+            });
+
+        Output?.AppendLine($"Opened: {filePath}");
+    }
+
+    [RelayCommand]
+    private void CloseDocument(EditorTabViewModel? tab)
+    {
+        if (tab != null)
+        {
+            _dockService.CloseDocument(tab);
+            Output?.AppendLine($"Closed: {tab.Title}");
+        }
+    }
+}
+```
+
+### IDockLayoutService API
+
+The service manages all layout operations from your view model:
+
+| Method | Description |
+|:-------|:------------|
+| `Layout` | The `IRootDock` tree — bind to `DockLayout` in XAML |
+| `OpenDocument(doc)` | Add a document and make it active |
+| `CloseDocument(doc)` | Remove a document from the layout |
+| `OpenOrActivateDocument(predicate, factory)` | Find existing or create new document |
+| `FindDocument<T>(predicate)` | Find an open document by predicate |
+| `GetAnchorable<T>()` | Get a registered toolbox by type |
+| `Documents` | All currently open documents |
+| `Anchorables` | All registered toolboxes |
+
+---
+
+## Step 4: Configure the DI Composition Root
+
+The `App.xaml.cs` is the composition root. This is where toolboxes are registered, the layout service is configured, and everything is wired together.
+
+**File: `App.xaml.cs`**
 
 ```csharp
 using System.Windows;
-using System.Windows.Controls;
+using AvalonDock.Core;
+using AvalonDock.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using MvvmIdeApp.ViewModels;
 
 namespace MvvmIdeApp;
 
-public class PanesTemplateSelector : DataTemplateSelector
+public partial class App : Application
 {
-    public DataTemplate DocumentTemplate { get; set; }
-    public DataTemplate ExplorerTemplate { get; set; }
-    public DataTemplate PropertiesTemplate { get; set; }
-    public DataTemplate OutputTemplate { get; set; }
+    private IServiceProvider? _serviceProvider;
 
-    public override DataTemplate SelectTemplate(object item, DependencyObject container)
+    protected override void OnStartup(StartupEventArgs e)
     {
-        return item switch
+        base.OnStartup(e);
+
+        var services = new ServiceCollection();
+        ConfigureServices(services);
+        _serviceProvider = services.BuildServiceProvider();
+
+        var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+        mainWindow.Show();
+    }
+
+    private static void ConfigureServices(IServiceCollection services)
+    {
+        // Configure sidebar and docking options
+        services.AddToggleDockOptions(opts =>
         {
-            DocumentViewModel => DocumentTemplate,
-            ExplorerViewModel => ExplorerTemplate,
-            PropertiesViewModel => PropertiesTemplate,
-            OutputViewModel => OutputTemplate,
-            _ => base.SelectTemplate(item, container)
-        };
+            opts.ButtonSize = 28;
+            opts.DefaultDockWidth = 280;
+            opts.DefaultDockHeight = 220;
+        });
+
+        // Register toolbox VMs — order determines sidebar button order
+        services.AddToolbox<ExplorerToolbox>();
+        services.AddToolbox<SearchToolbox>();
+        services.AddToolbox<OutputToolbox>();
+
+        // Register each as IToolbox so DockLayoutService can discover them
+        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<ExplorerToolbox>());
+        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SearchToolbox>());
+        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<OutputToolbox>());
+
+        // DockLayoutService auto-builds the MVVM layout tree from registered IToolbox instances
+        services.AddDockLayoutService();
+
+        // Main view model — receives IDockLayoutService
+        services.AddSingleton<MainViewModel>();
+
+        // Main window — receives MainViewModel + ToggleDockOptions
+        services.AddSingleton<MainWindow>();
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        (_serviceProvider as IDisposable)?.Dispose();
+        base.OnExit(e);
     }
 }
 ```
+
+{: .important }
+Remove `StartupUri="MainWindow.xaml"` from `App.xaml` — the window is now created via DI.
+
+**File: `App.xaml`**
+
+```xml
+<Application x:Class="MvvmIdeApp.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources />
+</Application>
+```
+
+---
+
+## Step 5: Create the Style Selector
+
+The style selector binds layout properties (`Title`, `ContentId`, `IconSource`) from view models to layout items. It differentiates between toolboxes and documents.
 
 **File: `PanesStyleSelector.cs`**
 
 ```csharp
 using System.Windows;
 using System.Windows.Controls;
+using AvalonDock.Core;
 using MvvmIdeApp.ViewModels;
 
 namespace MvvmIdeApp;
 
 public class PanesStyleSelector : StyleSelector
 {
-    public Style DocumentStyle { get; set; }
-    public Style ToolStyle { get; set; }
+    public Style? ToolboxStyle { get; set; }
+    public Style? DocumentStyle { get; set; }
 
-    public override Style SelectStyle(object item, DependencyObject container)
+    public override Style? SelectStyle(object item, DependencyObject container)
     {
-        return item switch
-        {
-            DocumentViewModel => DocumentStyle,
-            ToolViewModel => ToolStyle,
-            _ => base.SelectStyle(item, container)
-        };
+        if (item is IToolbox)
+            return ToolboxStyle;
+
+        if (item is EditorTabViewModel)
+            return DocumentStyle;
+
+        return base.SelectStyle(item, container);
     }
 }
 ```
 
 ---
 
-## Step 6: Create an ActiveDocument Converter
+## Step 6: Build the XAML Layout
 
-The `DockingManager.ActiveContent` property is of type `object`, but your view model tracks a `DocumentViewModel`. A converter bridges this gap.
-
-**File: `ActiveDocumentConverter.cs`**
-
-```csharp
-using System.Globalization;
-using System.Windows.Data;
-using MvvmIdeApp.ViewModels;
-
-namespace MvvmIdeApp;
-
-public class ActiveDocumentConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return value; // VM → DockingManager: pass through
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        // DockingManager → VM: only accept DocumentViewModel
-        return value is DocumentViewModel ? value : Binding.DoNothing;
-    }
-}
-```
-
----
-
-## Step 7: Build the XAML Layout
-
-This is where everything comes together. The XAML wires the `DockingManager` to your view model collections.
+The XAML uses `ToggleDockingManager` (the v5 sidebar-based docking control) and binds its `DockLayout` property to the view model.
 
 **File: `MainWindow.xaml`**
 
@@ -421,156 +442,152 @@ This is where everything comes together. The XAML wires the `DockingManager` to 
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
-        xmlns:avalonDockThemes="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.VS2013"
+        xmlns:avalonDockControls="clr-namespace:AvalonDock.Controls;assembly=AvalonDock"
+        xmlns:themes="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.Arc"
         xmlns:local="clr-namespace:MvvmIdeApp"
         xmlns:vm="clr-namespace:MvvmIdeApp.ViewModels"
-        Title="MVVM IDE — AvalonDock Tutorial" Height="600" Width="900">
-
-    <Window.DataContext>
-        <vm:WorkspaceViewModel />
-    </Window.DataContext>
+        Title="MVVM IDE — AvalonDock v5 Tutorial"
+        Width="1000" Height="700"
+        Background="#252729">
 
     <Window.Resources>
-        <local:ActiveDocumentConverter x:Key="ActiveDocumentConverter" />
+        <!-- DataTemplate: how to render each toolbox VM's content area -->
+        <DataTemplate DataType="{x:Type vm:ExplorerToolbox}">
+            <ListBox ItemsSource="{Binding Files}" Background="#252526"
+                     Foreground="#CCCCCC" BorderThickness="0" Margin="4" />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:SearchToolbox}">
+            <Border Background="#252526" Padding="12">
+                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Background="#3C3C3C" Foreground="#CCCCCC"
+                         BorderThickness="0" Padding="6,4" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:OutputToolbox}">
+            <TextBox Text="{Binding OutputText, Mode=OneWay}"
+                     IsReadOnly="True" AcceptsReturn="True"
+                     FontFamily="Consolas" FontSize="12"
+                     VerticalScrollBarVisibility="Auto"
+                     Background="#1E1E1E" Foreground="#DCDCDC" />
+        </DataTemplate>
+
+        <!-- DataTemplate: how to render document content -->
+        <DataTemplate DataType="{x:Type vm:EditorTabViewModel}">
+            <TextBox Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}"
+                     AcceptsReturn="True" AcceptsTab="True"
+                     FontFamily="Consolas" FontSize="13"
+                     VerticalScrollBarVisibility="Auto"
+                     Background="#1E1E1E" Foreground="#DCDCDC" />
+        </DataTemplate>
+
+        <!-- LayoutItem style selector -->
+        <local:PanesStyleSelector x:Key="PanesStyleSelector">
+            <local:PanesStyleSelector.ToolboxStyle>
+                <Style TargetType="{x:Type avalonDockControls:LayoutAnchorableItem}">
+                    <Setter Property="Title" Value="{Binding Model.Title}" />
+                    <Setter Property="ContentId" Value="{Binding Model.ContentId}" />
+                </Style>
+            </local:PanesStyleSelector.ToolboxStyle>
+            <local:PanesStyleSelector.DocumentStyle>
+                <Style TargetType="{x:Type avalonDockControls:LayoutDocumentItem}">
+                    <Setter Property="Title" Value="{Binding Model.Title}" />
+                    <Setter Property="ToolTip" Value="{Binding Model.ToolTip}" />
+                    <Setter Property="ContentId" Value="{Binding Model.ContentId}" />
+                </Style>
+            </local:PanesStyleSelector.DocumentStyle>
+        </local:PanesStyleSelector>
     </Window.Resources>
 
-    <DockPanel>
-        <!-- Menu Bar -->
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem Header="_New" Command="{Binding NewDocumentCommand}" />
-                <MenuItem Header="_Close" Command="{Binding CloseDocumentCommand}" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Menu -->
+        <Menu Grid.Row="0" Background="#252729" Foreground="#CCCCCC" Padding="4">
+            <MenuItem Header="_File" Foreground="#CCCCCC">
+                <MenuItem Header="E_xit" Click="OnExit" />
             </MenuItem>
         </Menu>
 
-        <!-- Docking Manager -->
-        <avalonDock:DockingManager
-            DocumentsSource="{Binding Documents}"
-            AnchorablesSource="{Binding Tools}"
-            ActiveContent="{Binding ActiveDocument, Mode=TwoWay,
-                            Converter={StaticResource ActiveDocumentConverter}}">
+        <!-- ToggleDockingManager — the v5 sidebar-based docking control -->
+        <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1"
+            Background="#252729" BorderThickness="0"
+            DockLayout="{Binding DockLayout}"
+            LayoutItemContainerStyleSelector="{StaticResource PanesStyleSelector}">
 
-            <!-- Theme -->
-            <avalonDock:DockingManager.Theme>
-                <avalonDockThemes:Vs2013LightTheme />
-            </avalonDock:DockingManager.Theme>
+            <avalonDock:ToggleDockingManager.Theme>
+                <themes:ArcDarkTheme />
+            </avalonDock:ToggleDockingManager.Theme>
 
-            <!-- Template Selector: picks the right DataTemplate per content type -->
-            <avalonDock:DockingManager.LayoutItemTemplateSelector>
-                <local:PanesTemplateSelector>
-                    <local:PanesTemplateSelector.DocumentTemplate>
-                        <DataTemplate DataType="{x:Type vm:DocumentViewModel}">
-                            <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
-                                     AcceptsReturn="True" AcceptsTab="True"
-                                     FontFamily="Consolas" FontSize="13"
-                                     VerticalScrollBarVisibility="Auto"
-                                     HorizontalScrollBarVisibility="Auto" />
-                        </DataTemplate>
-                    </local:PanesTemplateSelector.DocumentTemplate>
-
-                    <local:PanesTemplateSelector.ExplorerTemplate>
-                        <DataTemplate DataType="{x:Type vm:ExplorerViewModel}">
-                            <TreeView Margin="4">
-                                <TreeViewItem Header="Solution 'MyApp'" IsExpanded="True">
-                                    <TreeViewItem Header="MyApp">
-                                        <TreeViewItem Header="MainWindow.xaml" />
-                                        <TreeViewItem Header="App.xaml" />
-                                    </TreeViewItem>
-                                </TreeViewItem>
-                            </TreeView>
-                        </DataTemplate>
-                    </local:PanesTemplateSelector.ExplorerTemplate>
-
-                    <local:PanesTemplateSelector.PropertiesTemplate>
-                        <DataTemplate DataType="{x:Type vm:PropertiesViewModel}">
-                            <StackPanel Margin="8">
-                                <TextBlock Text="Properties" FontWeight="Bold" Margin="0,0,0,8" />
-                                <TextBlock Text="Select an item to view its properties." 
-                                           Foreground="Gray" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </local:PanesTemplateSelector.PropertiesTemplate>
-
-                    <local:PanesTemplateSelector.OutputTemplate>
-                        <DataTemplate DataType="{x:Type vm:OutputViewModel}">
-                            <TextBox Text="{Binding OutputText, Mode=OneWay}"
-                                     IsReadOnly="True" AcceptsReturn="True"
-                                     FontFamily="Consolas" FontSize="12"
-                                     VerticalScrollBarVisibility="Auto"
-                                     Background="#1E1E1E" Foreground="#DCDCDC" />
-                        </DataTemplate>
-                    </local:PanesTemplateSelector.OutputTemplate>
-                </local:PanesTemplateSelector>
-            </avalonDock:DockingManager.LayoutItemTemplateSelector>
-
-            <!-- Style Selector: binds layout properties (Title, CanClose, etc.) -->
-            <avalonDock:DockingManager.LayoutItemContainerStyleSelector>
-                <local:PanesStyleSelector>
-                    <local:PanesStyleSelector.DocumentStyle>
-                        <Style TargetType="{x:Type avalonDock:LayoutItem}">
-                            <Setter Property="Title" Value="{Binding Model.Title}" />
-                            <Setter Property="ContentId" Value="{Binding Model.ContentId}" />
-                            <Setter Property="CanClose" Value="True" />
-                        </Style>
-                    </local:PanesStyleSelector.DocumentStyle>
-
-                    <local:PanesStyleSelector.ToolStyle>
-                        <Style TargetType="{x:Type avalonDock:LayoutItem}">
-                            <Setter Property="Title" Value="{Binding Model.Title}" />
-                            <Setter Property="ContentId" Value="{Binding Model.ContentId}" />
-                            <Setter Property="CanClose" Value="False" />
-                        </Style>
-                    </local:PanesStyleSelector.ToolStyle>
-                </local:PanesStyleSelector>
-            </avalonDock:DockingManager.LayoutItemContainerStyleSelector>
-
-            <!-- Layout Structure -->
+            <!-- Initial document area (toolboxes are auto-placed by DockLayoutService) -->
             <avalonDock:LayoutRoot>
                 <avalonDock:LayoutPanel Orientation="Horizontal">
-                    <!-- Left: Explorer -->
-                    <avalonDock:LayoutAnchorablePane DockWidth="220" />
-
-                    <!-- Center: Documents -->
-                    <avalonDock:LayoutDocumentPane />
-
-                    <!-- Right: Properties -->
-                    <avalonDock:LayoutAnchorablePane DockWidth="220" />
+                    <avalonDock:LayoutDocumentPaneGroup>
+                        <avalonDock:LayoutDocumentPane>
+                            <avalonDock:LayoutDocument Title="Welcome" ContentId="welcome">
+                                <Border Background="#1E1E1E" Padding="40">
+                                    <StackPanel VerticalAlignment="Center"
+                                                HorizontalAlignment="Center">
+                                        <TextBlock Text="MVVM IDE" FontSize="28"
+                                                   FontWeight="Light" Foreground="#CCCCCC"
+                                                   HorizontalAlignment="Center" />
+                                        <TextBlock Text="AvalonDock v5 Tutorial" FontSize="14"
+                                                   Foreground="#808080"
+                                                   HorizontalAlignment="Center" Margin="0,8,0,24" />
+                                        <TextBlock Foreground="#808080" FontSize="13"
+                                                   TextAlignment="Center" LineHeight="24">
+                                            <Run Text="Click sidebar icons to toggle panels" />
+                                            <LineBreak />
+                                            <Run Text="Powered by AvalonDock.Mvvm + DependencyInjection" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </avalonDock:LayoutDocument>
+                        </avalonDock:LayoutDocumentPane>
+                    </avalonDock:LayoutDocumentPaneGroup>
                 </avalonDock:LayoutPanel>
-
-                <!-- Bottom: auto-hidden Output -->
-                <avalonDock:LayoutRoot.BottomSide>
-                    <avalonDock:LayoutAnchorSide>
-                        <avalonDock:LayoutAnchorGroup>
-                            <avalonDock:LayoutAnchorable Title="Output"
-                                                          ContentId="output" />
-                        </avalonDock:LayoutAnchorGroup>
-                    </avalonDock:LayoutAnchorSide>
-                </avalonDock:LayoutRoot.BottomSide>
             </avalonDock:LayoutRoot>
-        </avalonDock:DockingManager>
-    </DockPanel>
+        </avalonDock:ToggleDockingManager>
+    </Grid>
 </Window>
 ```
 
 ---
 
-## Step 8: Wire Up the Code-Behind
+## Step 7: Wire Up the Code-Behind
 
-The code-behind is minimal — just default initialization.
+The code-behind receives the view model and dock options via constructor injection. Layout options are applied here — the only code-behind needed.
 
 **File: `MainWindow.xaml.cs`**
 
 ```csharp
 using System.Windows;
+using AvalonDock.DependencyInjection;
+using MvvmIdeApp.ViewModels;
 
 namespace MvvmIdeApp;
 
 public partial class MainWindow : Window
 {
-    public MainWindow()
+    public MainWindow(MainViewModel viewModel, ToggleDockOptions? dockOptions = null)
     {
+        DataContext = viewModel;
         InitializeComponent();
+
+        // Apply DI-configured dock options
+        if (dockOptions != null)
+        {
+            dockManager.ButtonSize = dockOptions.ButtonSize;
+            dockManager.DefaultDockWidth = dockOptions.DefaultDockWidth;
+            dockManager.DefaultDockHeight = dockOptions.DefaultDockHeight;
+        }
     }
+
+    private void OnExit(object sender, RoutedEventArgs e) => Close();
 }
 ```
 
@@ -578,102 +595,82 @@ public partial class MainWindow : Window
 
 ## How It Works
 
-### The MVVM Data Flow
+### The v5 Data Flow
 
 ```
-WorkspaceViewModel
-├── Documents (ObservableCollection<DocumentViewModel>)
-│   └── bound to → DockingManager.DocumentsSource
-├── Tools (ObservableCollection<ToolViewModel>)
-│   └── bound to → DockingManager.AnchorablesSource
-└── ActiveDocument
-    └── bound to → DockingManager.ActiveContent (via converter)
+DI Container
+├── ExplorerToolbox (IToolbox, Zone=LeftTop)
+├── SearchToolbox   (IToolbox, Zone=LeftTop)
+├── OutputToolbox   (IToolbox, Zone=BottomLeft)
+│
+└── DockLayoutService
+    ├── Collects all IToolbox instances
+    ├── Auto-builds IRootDock layout tree
+    └── Exposes: Layout, OpenDocument(), CloseDocument(), GetAnchorable<T>()
+
+MainViewModel
+├── DockLayout → bound to ToggleDockingManager.DockLayout
+├── OpenFile() → _dockService.OpenOrActivateDocument(...)
+└── Explorer  → _dockService.GetAnchorable<ExplorerToolbox>()
+
+ToggleDockingManager (XAML)
+├── Reads DockLayout to know what panels exist and where
+├── Creates sidebar toggle buttons from toolbox icons
+├── Uses DataTemplates to render each VM's content
+└── Uses PanesStyleSelector to bind Title/ContentId
 ```
 
-### Key Concepts
+### What Makes v5 Different
 
-1. **`DocumentsSource` and `AnchorablesSource`** — These are the two main binding points. AvalonDock creates layout items automatically for each view model in these collections.
-
-2. **`LayoutItemTemplateSelector`** — Chooses the visual template (the content area) based on the view model type. Each type of panel gets its own `DataTemplate`.
-
-3. **`LayoutItemContainerStyleSelector`** — Binds layout-level properties like `Title`, `ContentId`, and `CanClose` from the view model to the layout container. This controls the tab header and docking behavior.
-
-4. **`ActiveDocumentConverter`** — The `ActiveContent` property accepts any object, but your view model only wants to track documents. The converter filters out non-document activations (e.g., when a tool window is focused).
-
-5. **Layout structure** — The `LayoutRoot` in XAML defines the *initial* layout. Once the user rearranges panels, the runtime layout takes over. Empty `LayoutAnchorablePane` elements are filled by AvalonDock based on the order of items in `AnchorablesSource`.
+| v4 / Legacy Pattern | v5 Pattern |
+|:---------------------|:-----------|
+| Static `Workspace.This` singleton | `IDockLayoutService` via constructor injection |
+| Manual `DocumentsSource` / `AnchorablesSource` binding | `DockLayout` property binds the entire layout tree |
+| `ILayoutUpdateStrategy` to control placement | `DockZone` enum on each `ToolboxBase` |
+| `ActiveDocumentConverter` for active tracking | `IDockLayoutService.ActiveDockable` |
+| Manual `ObservableCollection` management | `OpenOrActivateDocument()` / `CloseDocument()` |
+| `DockingManager` with manual layout | `ToggleDockingManager` with sidebar toggles |
 
 ---
 
-## Common Patterns
+## Adding a New Toolbox
 
-### Controlling Where Tools Appear
+To add a new tool panel in the v5 architecture:
 
-By default, AvalonDock places anchorables in the first available `LayoutAnchorablePane`. To control placement, implement `ILayoutUpdateStrategy`:
+1. **Create the VM** — inherit from `ToolboxBase`, set `Zone`:
+   ```csharp
+   public class ProblemsToolbox : ToolboxBase
+   {
+       public ProblemsToolbox()
+       {
+           Id = "Problems";
+           Title = "Problems";
+           Zone = DockZone.BottomLeft;
+       }
+   }
+   ```
 
-```csharp
-public class LayoutInitializer : ILayoutUpdateStrategy
-{
-    public bool BeforeInsertAnchorable(
-        LayoutRoot layout, LayoutAnchorable anchorableToShow,
-        ILayoutContainer destinationContainer)
-    {
-        var pane = anchorableToShow.Content switch
-        {
-            ExplorerViewModel => layout.Descendents()
-                .OfType<LayoutAnchorablePane>().FirstOrDefault(),
-            PropertiesViewModel => layout.Descendents()
-                .OfType<LayoutAnchorablePane>().LastOrDefault(),
-            _ => null
-        };
+2. **Register in DI** — add two lines to `ConfigureServices`:
+   ```csharp
+   services.AddToolbox<ProblemsToolbox>();
+   services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<ProblemsToolbox>());
+   ```
 
-        if (pane != null)
-        {
-            pane.Children.Add(anchorableToShow);
-            return true;
-        }
-        return false;
-    }
+3. **Add a DataTemplate** in XAML:
+   ```xml
+   <DataTemplate DataType="{x:Type vm:ProblemsToolbox}">
+       <TextBlock Text="No problems detected" Foreground="#808080" Margin="12" />
+   </DataTemplate>
+   ```
 
-    public void AfterInsertAnchorable(LayoutRoot layout, LayoutAnchorable anchorable) { }
-    public bool BeforeInsertDocument(LayoutRoot layout, LayoutDocument doc,
-        ILayoutContainer container) => false;
-    public void AfterInsertDocument(LayoutRoot layout, LayoutDocument doc) { }
-}
-```
-
-Then set it in XAML:
-
-```xml
-<avalonDock:DockingManager.LayoutUpdateStrategy>
-    <local:LayoutInitializer />
-</avalonDock:DockingManager.LayoutUpdateStrategy>
-```
-
-### Handling Document Close
-
-To react when the user closes a document via the tab's X button, handle the `DocumentClosing` event or use `LayoutItemContainerStyle` with a close command:
-
-```xml
-<Style TargetType="{x:Type avalonDock:LayoutItem}">
-    <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
-</Style>
-```
-
-### Dirty Indicator in Tab Title
-
-Show an asterisk when a document has unsaved changes:
-
-```csharp
-public string DisplayTitle => IsDirty ? $"{Title} *" : Title;
-```
-
-Bind the layout title to `DisplayTitle` instead of `Title`, and raise `PropertyChanged` for `DisplayTitle` whenever `IsDirty` changes.
+That's it — `DockLayoutService` automatically places it in the layout based on its `DockZone`.
 
 ---
 
 ## Next Steps
 
-- Add [Layout Serialization]({% link tutorials/layout-persistence.md %}) to save and restore the user's panel arrangement
-- Add [Dependency Injection]({% link tutorials/dependency-injection-app.md %}) to replace the singleton pattern with constructor injection
+- Add [Layout Persistence]({% link tutorials/layout-persistence.md %}) to save and restore the user's panel arrangement
 - Apply a [Custom Theme]({% link tutorials/styling-and-theming.md %}) to match your application's branding
-- See the `MVVMTestApp` and `VS2013Test` projects in the repository for production-ready examples
+- See the `AvalonDockCodeApp` project in the repository for the full reference implementation with a terminal, file icons, and syntax highlighting
+- Review the [MVVM Guide]({% link guides/mvvm.md %}) for additional patterns (template selectors, style selectors)
+- Review the [DI Guide]({% link guides/dependency-injection.md %}) for all available DI extension methods

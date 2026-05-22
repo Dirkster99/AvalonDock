@@ -8,7 +8,10 @@ description: "Register AvalonDock services with dependency injection."
 
 # Dependency Injection
 
-AvalonDock v5.0.0 provides built-in support for `Microsoft.Extensions.DependencyInjection` through the `AvalonDock.DependencyInjection` package.
+AvalonDock v5 provides built-in support for `Microsoft.Extensions.DependencyInjection` through the `AvalonDock.DependencyInjection` package.
+
+{: .tip }
+For a full walkthrough, see [Tutorial: Dependency Injection Deep Dive]({% link tutorials/dependency-injection-app.md %}). The `AvalonDockCodeApp` sample project demonstrates all DI patterns.
 
 ---
 
@@ -20,104 +23,185 @@ dotnet add package Dirkster.AvalonDock.DependencyInjection
 
 ---
 
-## Register Services
+## Extension Methods Reference
 
-Use the `AddAvalonDock()` extension method on `IServiceCollection`:
+### Core Registration
+
+| Method | Purpose |
+|:-------|:--------|
+| `AddToolbox<T>()` | Register a toolbox VM as singleton |
+| `AddToolbox<T>(factory)` | Register a toolbox VM with a custom factory |
+| `AddDockLayoutService()` | Register `IDockLayoutService` — auto-builds layout tree from `IToolbox` instances |
+| `AddToggleDockOptions(configure)` | Configure sidebar button size, dock dimensions, layout priority |
+
+### Additional Services
+
+| Method | Purpose |
+|:-------|:--------|
+| `AddAvalonDock<TFactory>()` | Register a custom `IFactory` |
+| `AddAvalonDockSerializer<T>()` | Register a layout serializer |
+| `AddAvalonDockThemeManager<T>()` | Register a theme manager |
+| `AddDockingManager(factory)` | Register an `IDockingManager` wrapper |
+| `AddAutoHideManager<T>()` | Register an auto-hide manager |
+| `AddFloatingWindowService<T>()` | Register a floating window service |
+| `AddDragDropHandler<T>()` | Register a drag-and-drop handler |
+| `AddDockLayoutService<T>()` | Register a custom `IDockLayoutService` implementation |
+
+---
+
+## Recommended Setup (v5 Pattern)
+
+This matches the pattern used in the `AvalonDockCodeApp` sample:
 
 ```csharp
+using AvalonDock.Core;
 using AvalonDock.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
-services.AddAvalonDock(options =>
+// 1. Configure toggle dock options
+services.AddToggleDockOptions(opts =>
 {
-    // Configure options
+    opts.ButtonSize = 28;
+    opts.DefaultDockWidth = 280;
+    opts.DefaultDockHeight = 220;
+    opts.LayoutPriority = nameof(DockLayoutPriority.BottomFullWidth);
 });
 
-// Register your view models
-services.AddTransient<MainViewModel>();
-services.AddTransient<DocumentViewModel>();
-services.AddTransient<ExplorerViewModel>();
+// 2. Register toolboxes — order determines sidebar button order
+services.AddToolbox<ExplorerToolbox>();
+services.AddToolbox<SearchToolbox>();
+services.AddToolbox<OutputToolbox>();
+
+// 3. Register each as IToolbox for collection injection
+services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<ExplorerToolbox>());
+services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SearchToolbox>());
+services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<OutputToolbox>());
+
+// 4. DockLayoutService auto-builds the MVVM layout tree
+services.AddDockLayoutService();
+
+// 5. Application view models and windows
+services.AddSingleton<MainViewModel>();
+services.AddSingleton<MainWindow>();
 
 var provider = services.BuildServiceProvider();
 ```
 
 ---
 
-## Usage with WPF Host
+## ToggleDockOptions
 
-If you're using `Microsoft.Extensions.Hosting` with WPF:
+Configure the sidebar and docking behavior:
+
+```csharp
+services.AddToggleDockOptions(opts =>
+{
+    opts.ButtonSize = 28;                // Sidebar button size (px)
+    opts.DefaultDockWidth = 280;         // Default width for side panes
+    opts.DefaultDockHeight = 220;        // Default height for bottom panes
+    opts.LayoutPriority = "BottomFullWidth";  // Layout restructuring mode
+    opts.ShowHeaderMinimizeButton = true; // Show minimize in pane headers
+    opts.ShowHeaderOptionsButton = true;  // Show options (⋯) in pane headers
+});
+```
+
+### Layout Priority Modes
+
+| Mode | Behavior | Similar To |
+|:-----|:---------|:-----------|
+| `BottomFullWidth` | Bottom panel spans full width | JetBrains Rider |
+| `SidesFullHeight` | Side panels span full height | VS Code |
+| `Default` | No automatic restructuring | Classic AvalonDock |
+
+---
+
+## Factory Registration
+
+For toolboxes that need constructor parameters:
+
+```csharp
+services.AddToolbox<FolderExplorerToolbox>(sp =>
+    new FolderExplorerToolbox(filePath => { /* callback */ }));
+```
+
+---
+
+## WPF App Integration
 
 ```csharp
 public partial class App : Application
 {
-    private readonly IHost _host;
+    private IServiceProvider? _serviceProvider;
 
-    public App()
+    protected override void OnStartup(StartupEventArgs e)
     {
-        _host = Host.CreateDefaultBuilder()
-            .ConfigureServices((context, services) =>
-            {
-                services.AddAvalonDock();
-                services.AddSingleton<MainWindow>();
-                services.AddSingleton<MainViewModel>();
-            })
-            .Build();
-    }
-
-    protected override async void OnStartup(StartupEventArgs e)
-    {
-        await _host.StartAsync();
-
-        var mainWindow = _host.Services.GetRequiredService<MainWindow>();
-        mainWindow.DataContext = _host.Services.GetRequiredService<MainViewModel>();
-        mainWindow.Show();
-
         base.OnStartup(e);
+
+        var services = new ServiceCollection();
+        ConfigureServices(services);
+        _serviceProvider = services.BuildServiceProvider();
+
+        var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+        mainWindow.Show();
     }
 
-    protected override async void OnExit(ExitEventArgs e)
+    protected override void OnExit(ExitEventArgs e)
     {
-        await _host.StopAsync();
-        _host.Dispose();
+        (_serviceProvider as IDisposable)?.Dispose();
         base.OnExit(e);
+    }
+}
+```
+
+{: .important }
+Remove `StartupUri="MainWindow.xaml"` from `App.xaml` when using DI — the window is created via `GetRequiredService<MainWindow>()`.
+
+---
+
+## Applying Options in MainWindow
+
+The `MainWindow` receives the view model and dock options via constructor injection:
+
+```csharp
+public partial class MainWindow : Window
+{
+    public MainWindow(MainViewModel viewModel, ToggleDockOptions? dockOptions = null)
+    {
+        DataContext = viewModel;
+        InitializeComponent();
+
+        if (dockOptions != null)
+        {
+            dockManager.ButtonSize = dockOptions.ButtonSize;
+            dockManager.DefaultDockWidth = dockOptions.DefaultDockWidth;
+            dockManager.DefaultDockHeight = dockOptions.DefaultDockHeight;
+            dockManager.ShowHeaderMinimizeButton = dockOptions.ShowHeaderMinimizeButton;
+            dockManager.ShowHeaderOptionsButton = dockOptions.ShowHeaderOptionsButton;
+
+            if (Enum.TryParse<DockLayoutPriority>(dockOptions.LayoutPriority, out var priority))
+                dockManager.LayoutPriority = priority;
+        }
     }
 }
 ```
 
 ---
 
-## ToggleDockOptions
-
-Configure docking behavior through `ToggleDockOptions`:
-
-```csharp
-services.AddAvalonDock(options =>
-{
-    options.AllowFloatingWindows = true;
-    options.AllowAutoHide = true;
-});
-```
-
----
-
 ## Resolving Services in View Models
-
-With DI configured, your view models can receive AvalonDock services through constructor injection:
 
 ```csharp
 public class MainViewModel
 {
-    private readonly IDockLayoutService _layoutService;
-    private readonly IThemeManager _themeManager;
+    private readonly IDockLayoutService _dockService;
 
-    public MainViewModel(
-        IDockLayoutService layoutService,
-        IThemeManager themeManager)
+    public MainViewModel(IDockLayoutService dockService)
     {
-        _layoutService = layoutService;
-        _themeManager = themeManager;
+        _dockService = dockService;
     }
+
+    // Typed access to any registered toolbox
+    public ExplorerToolbox? Explorer => _dockService.GetAnchorable<ExplorerToolbox>();
 }
 ```
