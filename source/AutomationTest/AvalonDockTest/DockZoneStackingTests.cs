@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using AvalonDock;
 using AvalonDock.Core;
@@ -221,6 +223,41 @@ namespace AvalonDockTest
 		}
 
 		/// <summary>
+		/// When BottomLeft pane is inserted into an existing BottomRight group,
+		/// the BottomLeft pane must be first (at the start) of the horizontal group.
+		/// This is the Case 1 (existing group neighbor) scenario.
+		/// </summary>
+		[Test]
+		public void BottomLeft_IntoExistingBottomRightGroup_ShouldInsertAtStart()
+		{
+			var rootPanel = new LayoutPanel { Orientation = Orientation.Vertical };
+			var root = new LayoutRoot { RootPanel = rootPanel };
+			var docPane = new LayoutDocumentPane(new LayoutDocument { Title = "Doc" });
+			rootPanel.Children.Add(docPane);
+
+			// Create existing horizontal group with two BottomRight panes
+			var rightPane1 = new LayoutAnchorablePane(new LayoutAnchorable { Title = "Output" });
+			var rightPane2 = new LayoutAnchorablePane(new LayoutAnchorable { Title = "Debug" });
+			var existingGroup = new LayoutAnchorablePaneGroup { Orientation = Orientation.Horizontal };
+			existingGroup.Children.Add(rightPane1);
+			existingGroup.Children.Add(rightPane2);
+			rootPanel.Children.Add(existingGroup);
+
+			// Insert BottomLeft pane next to the group
+			var leftPane = new LayoutAnchorablePane(new LayoutAnchorable { Title = "Terminal" });
+			rootPanel.Children.Insert(rootPanel.Children.IndexOf(existingGroup), leftPane);
+
+			// FixSplitOrientation should insert Terminal at the START of the group
+			var terminalAnchorable = leftPane.Children.OfType<LayoutAnchorable>().First();
+			_engine.FixSplitOrientationForZone(terminalAnchorable, DockZone.BottomLeft);
+
+			// Terminal (BottomLeft) should be first in the group
+			Assert.That(existingGroup.Children.Count, Is.EqualTo(3));
+			Assert.That(existingGroup.Children[0], Is.SameAs(leftPane),
+				"BottomLeft pane must be first in the horizontal group");
+		}
+
+		/// <summary>
 		/// After grouping, the group should be at the same position as the first pane was.
 		/// </summary>
 		[Test]
@@ -282,6 +319,155 @@ namespace AvalonDockTest
 			var group = rootPanel.Children.OfType<LayoutAnchorablePaneGroup>().FirstOrDefault();
 			Assert.That(group, Is.Not.Null);
 			Assert.That(group.Orientation, Is.EqualTo(Orientation.Vertical));
+		}
+
+		/// <summary>
+		/// Reproduces the user scenario: open BottomRight first (full width),
+		/// then open BottomLeft. Verify BottomLeft appears BEFORE BottomRight
+		/// in the resulting horizontal group.
+		/// </summary>
+		[Test]
+		public void BottomRight_ThenBottomLeft_ShouldPreserveOrder()
+		{
+			// Step 1: Start with document-only layout
+			var root = CreateDocumentOnlyLayout();
+
+			// Step 2: Insert Problems at BottomRight (like ToggleAnchorable)
+			var problemsPane = new LayoutAnchorablePane(new LayoutAnchorable { Title = "Problems" });
+			_engine.InsertPaneForZone(root, problemsPane, DockZone.BottomRight);
+
+			// After step 2: V:[H:[Doc], ProblemsPane]
+			Assert.That(root.RootPanel.Orientation, Is.EqualTo(Orientation.Vertical),
+				"After inserting bottom pane, root should be Vertical");
+			Assert.That(root.RootPanel.Children[root.RootPanel.Children.Count - 1], Is.SameAs(problemsPane),
+				"Problems should be at the end");
+
+			// Step 3: Insert Terminal at BottomLeft
+			var terminalPane = new LayoutAnchorablePane(new LayoutAnchorable { Title = "Terminal" });
+			_engine.InsertPaneForZone(root, terminalPane, DockZone.BottomLeft);
+
+			// After step 3: V:[H:[Doc], TerminalPane, ProblemsPane]
+			var rootPanel = root.RootPanel;
+			int termIdx = rootPanel.Children.IndexOf(terminalPane);
+			int probIdx = rootPanel.Children.IndexOf(problemsPane);
+			Assert.That(termIdx, Is.LessThan(probIdx),
+				$"Terminal (BottomLeft) at index {termIdx} should be before Problems (BottomRight) at index {probIdx}");
+
+			// Step 4: FixSplitOrientation for Terminal (the last inserted)
+			var terminalAnchorable = terminalPane.Children.OfType<LayoutAnchorable>().First();
+			_engine.FixSplitOrientationForZone(terminalAnchorable, DockZone.BottomLeft);
+
+			// After grouping: V:[H:[Doc], H:[TerminalPane, ProblemsPane]]
+			var group = rootPanel.Children.OfType<LayoutAnchorablePaneGroup>().FirstOrDefault();
+			Assert.That(group, Is.Not.Null, "Panes should be grouped");
+			Assert.That(group.Orientation, Is.EqualTo(Orientation.Horizontal));
+			Assert.That(group.Children.Count, Is.EqualTo(2));
+
+			// The KEY assertion: BottomLeft (Terminal) must be first, BottomRight (Problems) second
+			Assert.That(group.Children[0], Is.SameAs(terminalPane),
+				"Terminal (BottomLeft) must be first in the horizontal group");
+			Assert.That(group.Children[1], Is.SameAs(problemsPane),
+				"Problems (BottomRight) must be second in the horizontal group");
+		}
+
+		/// <summary>
+		/// Full integration test simulating the DockFromAutoHide flow:
+		/// Problems dragged to BottomRight then Terminal dragged to BottomLeft.
+		/// Verifies that BottomLeft appears before BottomRight in the final group.
+		/// </summary>
+		[Test]
+		public void FullDockFlow_BottomRight_ThenBottomLeft_ShouldPreserveOrder()
+		{
+			// Setup: doc-only layout with auto-hidden anchorables
+			var root = new LayoutRoot();
+			var rootPanel = new LayoutPanel { Orientation = Orientation.Horizontal };
+			rootPanel.Children.Add(new LayoutDocumentPane(new LayoutDocument { Title = "Welcome" }));
+			root.RootPanel = rootPanel;
+
+			var problems = new LayoutAnchorable { Title = "Problems", AutoHideMinHeight = 100 };
+			var terminal = new LayoutAnchorable { Title = "Terminal", AutoHideMinHeight = 100 };
+
+			// Put both in BottomSide auto-hide (simulating app startup)
+			var problemsGroup = new LayoutAnchorGroup();
+			problemsGroup.Children.Add(problems);
+			root.BottomSide.Children.Add(problemsGroup);
+
+			var terminalGroup = new LayoutAnchorGroup();
+			terminalGroup.Children.Add(terminal);
+			root.BottomSide.Children.Add(terminalGroup);
+
+			Assert.That(problems.IsAutoHidden, Is.True, "Problems should start auto-hidden");
+			Assert.That(terminal.IsAutoHidden, Is.True, "Terminal should start auto-hidden");
+
+			// ── Step 1: Simulate DockFromAutoHide(Problems, BottomRight) ──
+			var problemsPane = new LayoutAnchorablePane
+			{
+				DockMinHeight = problems.AutoHideMinHeight,
+				DockHeight = new GridLength(200)
+			};
+			_engine.InsertPaneForZone(root, problemsPane, DockZone.BottomRight);
+			problemsGroup.Children.Remove(problems);
+			problemsPane.Children.Add(problems);
+			root.BottomSide.Children.Remove(problemsGroup);
+
+			// After step 1: V:[H:[DocPane], ProblemsPane]
+			Assert.That(root.RootPanel.Orientation, Is.EqualTo(Orientation.Vertical));
+			Assert.That(problems.IsAutoHidden, Is.False, "Problems should be docked now");
+
+			// FixSplitOrientation (should be no-op with single pane)
+			_engine.FixSplitOrientationForZone(problems, DockZone.BottomRight);
+			_engine.EnsureBottomFullWidth(root);
+
+			// ── Step 2: Simulate MoveAnchorableToZone(Terminal, BottomLeft) ──
+			// MoveAnchorableToZone creates a fresh group
+			terminalGroup.Children.Remove(terminal);
+			root.BottomSide.Children.Remove(terminalGroup);
+			var freshGroup = new LayoutAnchorGroup();
+			root.BottomSide.Children.Add(freshGroup);
+			freshGroup.Children.Add(terminal);
+
+			Assert.That(terminal.IsAutoHidden, Is.True, "Terminal should still be auto-hidden");
+
+			// Simulate DockFromAutoHide(Terminal, BottomLeft)
+			var terminalParentGroup = terminal.Parent as LayoutAnchorGroup;
+			Assert.That(terminalParentGroup, Is.Not.Null);
+			var prevContainer = ((ILayoutPreviousContainer)terminalParentGroup).PreviousContainer as LayoutAnchorablePane;
+			Assert.That(prevContainer, Is.Null, "Fresh group should have no PreviousContainer");
+
+			var terminalPane = new LayoutAnchorablePane
+			{
+				DockMinHeight = terminal.AutoHideMinHeight,
+				DockHeight = new GridLength(200)
+			};
+			_engine.InsertPaneForZone(root, terminalPane, DockZone.BottomLeft);
+			freshGroup.Children.Remove(terminal);
+			terminalPane.Children.Add(terminal);
+			root.BottomSide.Children.Remove(freshGroup);
+
+			// Verify intermediate tree: V:[H:[DocPane], TerminalPane, ProblemsPane]
+			var rp = root.RootPanel;
+			int termIdx = rp.Children.IndexOf(terminalPane);
+			int probIdx = rp.Children.IndexOf(problemsPane);
+			Assert.That(termIdx, Is.GreaterThan(-1), "TerminalPane should be in root panel");
+			Assert.That(probIdx, Is.GreaterThan(-1), "ProblemsPane should be in root panel");
+			Assert.That(termIdx, Is.LessThan(probIdx),
+				$"Before grouping: Terminal at {termIdx} should be before Problems at {probIdx}");
+
+			// FixSplitOrientation for Terminal (BottomLeft)
+			_engine.FixSplitOrientationForZone(terminal, DockZone.BottomLeft);
+
+			// EnsureBottomFullWidth
+			_engine.EnsureBottomFullWidth(root);
+
+			// Final verification: should be H:[TerminalPane, ProblemsPane] in a group
+			var group = root.RootPanel.Children.OfType<LayoutAnchorablePaneGroup>().FirstOrDefault();
+			Assert.That(group, Is.Not.Null, "Bottom panes should be grouped");
+			Assert.That(group.Orientation, Is.EqualTo(Orientation.Horizontal));
+			Assert.That(group.Children.Count, Is.EqualTo(2));
+			Assert.That(group.Children[0], Is.SameAs(terminalPane),
+				"Terminal (BottomLeft) must be the FIRST child in the horizontal group");
+			Assert.That(group.Children[1], Is.SameAs(problemsPane),
+				"Problems (BottomRight) must be the SECOND child in the horizontal group");
 		}
 
 		// ────────────────────────────────────────────────────────────

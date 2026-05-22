@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using AvalonDock.Layout;
 
@@ -173,6 +174,8 @@ namespace AvalonDock
 					existingGroup.Children.Insert(0, pane);
 				else
 					existingGroup.Children.Add(pane);
+
+				UpdateGroupDimensions(existingGroup);
 				return;
 			}
 
@@ -199,6 +202,26 @@ namespace AvalonDock
 
 			var group = new LayoutAnchorablePaneGroup { Orientation = desiredOrientation };
 			int firstIdx = parentPanel.Children.IndexOf(contiguousPanes[0]);
+
+			// Set the group's cross-axis dimension to the max of all panes
+			if (desiredOrientation == Orientation.Vertical)
+			{
+				double maxWidth = contiguousPanes.Max(p => p.DockWidth.IsAbsolute ? p.DockWidth.Value : 0);
+				double maxMinWidth = contiguousPanes.Max(p => p.DockMinWidth);
+				if (maxWidth > 0)
+					group.DockWidth = new GridLength(maxWidth);
+				if (maxMinWidth > 0)
+					group.DockMinWidth = maxMinWidth;
+			}
+			else
+			{
+				double maxHeight = contiguousPanes.Max(p => p.DockHeight.IsAbsolute ? p.DockHeight.Value : 0);
+				double maxMinHeight = contiguousPanes.Max(p => p.DockMinHeight);
+				if (maxHeight > 0)
+					group.DockHeight = new GridLength(maxHeight);
+				if (maxMinHeight > 0)
+					group.DockMinHeight = maxMinHeight;
+			}
 
 			for (int i = contiguousPanes.Count - 1; i >= 0; i--)
 				parentPanel.Children.Remove(contiguousPanes[i]);
@@ -363,6 +386,36 @@ namespace AvalonDock
 			return side == AnchorSide.Bottom || side == AnchorSide.Top
 				? Orientation.Horizontal
 				: Orientation.Vertical;
+		}
+
+		/// <summary>
+		/// Updates the group's cross-axis dimension (DockWidth for Vertical groups,
+		/// DockHeight for Horizontal groups) to the maximum of its children.
+		/// </summary>
+		/// <param name="group">The pane group to update.</param>
+		private static void UpdateGroupDimensions(LayoutAnchorablePaneGroup group)
+		{
+			var panes = group.Children.OfType<LayoutAnchorablePane>().ToList();
+			if (panes.Count == 0) return;
+
+			if (group.Orientation == Orientation.Vertical)
+			{
+				double maxWidth = panes.Max(p => p.DockWidth.IsAbsolute ? p.DockWidth.Value : 0);
+				double maxMinWidth = panes.Max(p => p.DockMinWidth);
+				if (maxWidth > 0)
+					group.DockWidth = new GridLength(maxWidth);
+				if (maxMinWidth > 0)
+					group.DockMinWidth = maxMinWidth;
+			}
+			else
+			{
+				double maxHeight = panes.Max(p => p.DockHeight.IsAbsolute ? p.DockHeight.Value : 0);
+				double maxMinHeight = panes.Max(p => p.DockMinHeight);
+				if (maxHeight > 0)
+					group.DockHeight = new GridLength(maxHeight);
+				if (maxMinHeight > 0)
+					group.DockMinHeight = maxMinHeight;
+			}
 		}
 	}
 }

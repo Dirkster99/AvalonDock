@@ -251,6 +251,10 @@ namespace AvalonDock
 				DockFromAutoHide(anchorable, zone);
 				FixSplitOrientation(anchorable, zone);
 
+				// After grouping, ensure bottom zone order is correct
+				if (ToggleLayoutEngine.IsBottomZone(zone))
+					EnsureBottomZoneOrder();
+
 				switch (LayoutPriority)
 				{
 					case DockLayoutPriority.BottomFullWidth:
@@ -558,6 +562,83 @@ namespace AvalonDock
 		}
 
 		/// <summary>
+		/// Ensures that panes within a bottom horizontal group are ordered
+		/// correctly: BottomLeft panes before BottomRight panes.
+		/// Uses the button bars to determine each anchorable's zone.
+		/// </summary>
+		private void EnsureBottomZoneOrder()
+		{
+			var root = Layout as LayoutRoot;
+			if (root?.RootPanel == null) return;
+
+			// Find the horizontal group of bottom anchorable panes
+			LayoutAnchorablePaneGroup group = null;
+			foreach (var child in root.RootPanel.Children)
+			{
+				if (child is LayoutAnchorablePaneGroup g && g.Orientation == Orientation.Horizontal)
+				{
+					group = g;
+					break;
+				}
+			}
+
+			if (group == null || group.Children.Count < 2) return;
+
+			// Check if any BottomRight pane appears before a BottomLeft pane
+			bool needsReorder = false;
+			bool seenRight = false;
+			foreach (var child in group.Children.OfType<LayoutAnchorablePane>())
+			{
+				var anc = child.Children.OfType<LayoutAnchorable>().FirstOrDefault();
+				if (anc == null) continue;
+				var zone = GetAnchorableZone(anc);
+				if (zone == DockZone.BottomRight)
+				{
+					seenRight = true;
+				}
+				else if (zone == DockZone.BottomLeft && seenRight)
+				{
+					needsReorder = true;
+					break;
+				}
+			}
+
+			if (!needsReorder) return;
+
+			// Partition into left and right panes, preserving relative order within each group
+			var leftPanes = new List<ILayoutAnchorablePane>();
+			var rightPanes = new List<ILayoutAnchorablePane>();
+			foreach (var child in group.Children.ToList())
+			{
+				if (child is LayoutAnchorablePane pane)
+				{
+					var anc = pane.Children.OfType<LayoutAnchorable>().FirstOrDefault();
+					if (anc != null && GetAnchorableZone(anc) == DockZone.BottomRight)
+					{
+						rightPanes.Add(pane);
+					}
+					else
+					{
+						leftPanes.Add(pane);
+					}
+				}
+				else
+				{
+					leftPanes.Add(child);
+				}
+			}
+
+			// Rebuild group: all left panes first, then right panes
+			while (group.Children.Count > 0)
+				group.Children.RemoveAt(group.Children.Count - 1);
+
+			foreach (var p in leftPanes)
+				group.Children.Add(p);
+			foreach (var p in rightPanes)
+				group.Children.Add(p);
+		}
+
+		/// <summary>
 		/// Executes the ensure Bottom Full Width operation.
 		/// </summary>
 		private void EnsureBottomFullWidth()
@@ -589,6 +670,8 @@ namespace AvalonDock
 			if (previousContainer != null && previousContainer.Root == null)
 				previousContainer = null;
 
+			var root = parentGroup.Root as LayoutRoot;
+
 			if (previousContainer == null)
 			{
 				var side = ToggleLayoutEngine.ZoneToAnchorSide(zone);
@@ -604,7 +687,12 @@ namespace AvalonDock
 				else
 					previousContainer.DockHeight = new GridLength(DefaultDockHeight);
 
-				var root = parentGroup.Root as LayoutRoot;
+				_layoutEngine.InsertPaneForZone(root, previousContainer, zone);
+			}
+			else
+			{
+				// Re-insert at the correct zone position to maintain zone ordering
+				((ILayoutContainer)previousContainer.Parent)?.RemoveChild(previousContainer);
 				_layoutEngine.InsertPaneForZone(root, previousContainer, zone);
 			}
 
