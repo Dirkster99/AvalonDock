@@ -263,7 +263,8 @@ namespace AvalonDock
 
 		private void ApplyToggleAnchorableStyle()
 		{
-			AnchorablePaneControlStyle = LoadToggleStyle();
+			var style = TryFindResource("ToggleAnchorablePaneControlStyle") as Style;
+			AnchorablePaneControlStyle = style ?? LoadToggleStyle();
 		}
 
 		/// <summary>

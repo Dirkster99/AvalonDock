@@ -251,11 +251,11 @@
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedBackground}"
 		options:Freeze="true"
-		Color="#2B60CC" />
+		Color="#3574F0" />
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedBorder}"
 		options:Freeze="true"
-		Color="#2B60CC" />
+		Color="#3574F0" />
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedGlyph}"
 		options:Freeze="true"
@@ -279,11 +279,11 @@
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactivePressedBackground}"
 		options:Freeze="true"
-		Color="#2B60CC" />
+		Color="#3574F0" />
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactivePressedBorder}"
 		options:Freeze="true"
-		Color="#2B60CC" />
+		Color="#3574F0" />
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactivePressedGlyph}"
 		options:Freeze="true"
