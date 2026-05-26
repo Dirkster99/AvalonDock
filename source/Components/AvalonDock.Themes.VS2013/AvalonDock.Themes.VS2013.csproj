@@ -6,6 +6,8 @@
 		<UseWPF>true</UseWPF>
         <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
         <SignAssembly>true</SignAssembly>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		
 	</PropertyGroup>
 
 	<ItemGroup>

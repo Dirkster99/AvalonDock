@@ -11,6 +11,7 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\AvalonDock\sn.snk</AssemblyOriginatorKeyFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
