@@ -20,17 +20,17 @@ Be sure to check out the [Wiki](https://github.com/Dirkster99/AvalonDock/wiki) a
 
 ### Core
 
-| Package | Downloads |
-|:--------|:----------|
-| [Dirkster.AvalonDock](http://nuget.org/packages/Dirkster.AvalonDock) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.svg)](http://nuget.org/packages/Dirkster.AvalonDock) |
+| Package | Description |
+|:--------|:------------|
+| [Dirkster.AvalonDock](http://nuget.org/packages/Dirkster.AvalonDock) | Main WPF docking framework package |
 | [Dirkster.AvalonDock.Core](http://nuget.org/packages/Dirkster.AvalonDock.Core) | UI-agnostic interfaces and models |
 | [Dirkster.AvalonDock.Mvvm](http://nuget.org/packages/Dirkster.AvalonDock.Mvvm) | MVVM base classes (`DockableBase`, `ToolboxBase`, `DockLayoutService`) |
 | [Dirkster.AvalonDock.DependencyInjection](http://nuget.org/packages/Dirkster.AvalonDock.DependencyInjection) | `IServiceCollection` extensions for DI registration |
 
 ### Serializers
 
-| Package | Downloads |
-|:--------|:----------|
+| Package | Description |
+|:--------|:------------|
 | [Dirkster.AvalonDock.Serializer.Xml](http://nuget.org/packages/Dirkster.AvalonDock.Serializer.Xml) | XML layout serialization |
 | [Dirkster.AvalonDock.Serializer.Json](http://nuget.org/packages/Dirkster.AvalonDock.Serializer.Json) | JSON layout serialization (**new in v5**) |
 
