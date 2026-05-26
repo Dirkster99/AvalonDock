@@ -403,6 +403,10 @@ namespace AvalonDock
 		{
 			foreach (var title in FindVisualChildren<AnchorablePaneTitle>(this))
 			{
+				// ToggleAnchorablePaneTitle has self-contained buttons wired in its OnApplyTemplate
+				if (title is ToggleAnchorablePaneTitle)
+					continue;
+
 				foreach (var btn in FindVisualChildren<System.Windows.Controls.Button>(title))
 				{
 					if (btn.Name == "PART_AutoHidePin")
@@ -483,7 +487,12 @@ namespace AvalonDock
 			return btn;
 		}
 
-		private ContextMenu BuildToggleContextMenu(LayoutAnchorable anchorable)
+		/// <summary>
+		/// Builds the toggle context menu for an anchorable.
+		/// </summary>
+		/// <param name="anchorable">The anchorable to build the menu for.</param>
+		/// <returns>The context menu.</returns>
+		internal ContextMenu BuildToggleContextMenu(LayoutAnchorable anchorable)
 		{
 			var menu = new ContextMenu();
 

@@ -8,6 +8,9 @@
  ************************************************************************/
 
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 
 namespace AvalonDock.Controls
 {
@@ -54,6 +57,42 @@ namespace AvalonDock.Controls
 		{
 			get => (bool)GetValue(ShowOptionsButtonProperty);
 			set => SetValue(ShowOptionsButtonProperty, value);
+		}
+
+		/// <inheritdoc/>
+		public override void OnApplyTemplate()
+		{
+			base.OnApplyTemplate();
+
+			if (GetTemplateChild("PART_OptionsButton") is Button optionsBtn)
+			{
+				optionsBtn.Click += OnOptionsButtonClick;
+			}
+		}
+
+		private void OnOptionsButtonClick(object sender, RoutedEventArgs e)
+		{
+			var manager = FindToggleDockingManager();
+			if (manager == null || Model == null)
+				return;
+
+			var menu = manager.BuildToggleContextMenu(Model);
+			menu.PlacementTarget = sender as Button;
+			menu.Placement = PlacementMode.Bottom;
+			menu.IsOpen = true;
+		}
+
+		private ToggleDockingManager FindToggleDockingManager()
+		{
+			DependencyObject current = this;
+			while (current != null)
+			{
+				if (current is ToggleDockingManager mgr)
+					return mgr;
+				current = VisualTreeHelper.GetParent(current);
+			}
+
+			return null;
 		}
 	}
 }
