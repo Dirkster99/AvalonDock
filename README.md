@@ -103,7 +103,7 @@ public partial class App : Application
             opts.ButtonSize = 28;
             opts.DefaultDockWidth = 280;
             opts.DefaultDockHeight = 220;
-            opts.LayoutPriority = nameof(DockLayoutPriority.BottomFullWidth);
+            opts.LayoutPriority = nameof(AvalonDock.DockLayoutPriority.BottomFullWidth);
         });
 
         // Register toolbox view models
