@@ -105,6 +105,8 @@ namespace AvalonDock
 		/// </summary>
 		internal FrameworkElement _rightSeparator;
 
+		private System.Windows.Style _cachedToggleStyle;
+
 		/// <summary>
 		/// <see cref="LayoutPriority"/> dependency property.
 		/// </summary>
@@ -224,16 +226,28 @@ namespace AvalonDock
 		protected override void OnThemeChanged(DependencyPropertyChangedEventArgs e)
 		{
 			base.OnThemeChanged(e);
-			// Re-apply toggle anchorable style after theme changes
-			ApplyToggleAnchorableStyle();
+			// Style will be re-applied in OnApplyTemplate after the new template is loaded
+		}
+
+		/// <inheritdoc/>
+		public override void OnApplyTemplate()
+		{
+			base.OnApplyTemplate();
+
+			// After theme change, re-inject the sidebar buttons into the new template
+			if (IsLoaded)
+			{
+				ApplyToggleAnchorableStyle();
+				SetupToggleDockButtonBars();
+			}
 		}
 
 		private void ApplyToggleAnchorableStyle()
 		{
-			var toggleStyle = TryFindResource("ToggleAnchorablePaneControlStyle") as System.Windows.Style;
-			if (toggleStyle != null)
+			_cachedToggleStyle ??= TryFindResource("ToggleAnchorablePaneControlStyle") as System.Windows.Style;
+			if (_cachedToggleStyle != null)
 			{
-				AnchorablePaneControlStyle = toggleStyle;
+				AnchorablePaneControlStyle = _cachedToggleStyle;
 			}
 		}
 

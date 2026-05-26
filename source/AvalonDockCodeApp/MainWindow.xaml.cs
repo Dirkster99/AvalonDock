@@ -54,18 +54,6 @@ namespace ToggleTestApp
 
 			dockManager.Theme = isDark ? (Theme)new ArcDarkTheme() : new ArcLightTheme();
 
-			// Switch App-level merged dictionaries so all DynamicResource lookups update
-			var appDicts = Application.Current.Resources.MergedDictionaries;
-			appDicts.Clear();
-			appDicts.Add(new ResourceDictionary
-			{
-				Source = new Uri(
-					isDark
-						? "/AvalonDock.Themes.Arc;component/DarkTheme.xaml"
-						: "/AvalonDock.Themes.Arc;component/LightTheme.xaml",
-					UriKind.Relative),
-			});
-
 			SetAppThemeResources(isDark);
 			UpdateThemeColors();
 		}
