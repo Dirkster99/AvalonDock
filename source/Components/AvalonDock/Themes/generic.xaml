@@ -383,6 +383,7 @@
 		<Setter Property="Background" Value="Transparent" />
 		<Setter Property="BorderBrush" Value="Transparent" />
 		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="Foreground" Value="#808080" />
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type avalonDockControls:ToggleAnchorablePaneTitle}">
@@ -463,9 +464,9 @@
 													<Border x:Name="Bd" Background="Transparent" CornerRadius="3"
 														Width="20" Height="20">
 														<Canvas Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
-															<Ellipse Canvas.Left="2" Canvas.Top="7" Width="3" Height="3" Fill="{TemplateBinding Foreground}" />
-															<Ellipse Canvas.Left="6.5" Canvas.Top="7" Width="3" Height="3" Fill="{TemplateBinding Foreground}" />
-															<Ellipse Canvas.Left="11" Canvas.Top="7" Width="3" Height="3" Fill="{TemplateBinding Foreground}" />
+															<Ellipse Canvas.Left="7" Canvas.Top="2" Width="3" Height="3" Fill="{TemplateBinding Foreground}" />
+															<Ellipse Canvas.Left="7" Canvas.Top="6.5" Width="3" Height="3" Fill="{TemplateBinding Foreground}" />
+															<Ellipse Canvas.Left="7" Canvas.Top="11" Width="3" Height="3" Fill="{TemplateBinding Foreground}" />
 														</Canvas>
 													</Border>
 													<ControlTemplate.Triggers>
@@ -481,6 +482,11 @@
 							</avalonDockControls:DropDownButton>
 						</Grid>
 					</Border>
+					<ControlTemplate.Triggers>
+						<DataTrigger Binding="{Binding Model.IsActive, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+							<Setter Property="Foreground" Value="White" />
+						</DataTrigger>
+					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>

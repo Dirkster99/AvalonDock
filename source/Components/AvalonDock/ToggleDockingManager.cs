@@ -239,6 +239,8 @@ namespace AvalonDock
 			{
 				ApplyToggleAnchorableStyle();
 				SetupToggleDockButtonBars();
+				Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
+					new System.Action(UpdatePinButtonsToMinimize));
 			}
 		}
 
@@ -452,13 +454,11 @@ namespace AvalonDock
 				Name = "PART_ToggleMenu",
 				Content = new System.Windows.Controls.TextBlock
 				{
-					Text = "⋯",
+					Text = "⋮",
 					FontSize = 14,
 					FontWeight = FontWeights.Bold,
-					Foreground = new SolidColorBrush(Color.FromRgb(0x55, 0x55, 0x55)),
 					VerticalAlignment = VerticalAlignment.Center,
 					HorizontalAlignment = HorizontalAlignment.Center,
-					Margin = new Thickness(0, -2, 0, 0)
 				},
 				Width = 20,
 				Height = 20,
