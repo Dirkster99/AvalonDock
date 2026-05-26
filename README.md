@@ -258,6 +258,7 @@ AvalonDock.DependencyInjection  IServiceCollection extensions
 
 AvalonDock                 WPF docking library (DockingManager, ToggleDockingManager)
   ├── net9.0-windows
+  ├── net10.0-windows
   └── net48
 
 AvalonDock.Serializer.Xml  XML layout persistence (extracted from core in v5)
