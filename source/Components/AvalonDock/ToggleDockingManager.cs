@@ -43,6 +43,7 @@ namespace AvalonDock
 	/// <summary>
 	/// Represents the toggle Docking Manager.
 	/// </summary>
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "DockingManager subclass is inherently highly coupled to WPF and layout types.")]
 	public class ToggleDockingManager : DockingManager
 	{
 		/// <summary>
@@ -105,7 +106,22 @@ namespace AvalonDock
 		/// </summary>
 		internal FrameworkElement _rightSeparator;
 
-		private System.Windows.Style _cachedToggleStyle;
+		private static Style _staticToggleStyle;
+
+		private static Style LoadToggleStyle()
+		{
+			if (_staticToggleStyle == null)
+			{
+				var dict = new ResourceDictionary
+				{
+					Source = new Uri("/AvalonDock;component/Themes/generic.xaml", UriKind.Relative)
+				};
+
+				_staticToggleStyle = dict["ToggleAnchorablePaneControlStyle"] as Style;
+			}
+
+			return _staticToggleStyle;
+		}
 
 		/// <summary>
 		/// <see cref="LayoutPriority"/> dependency property.
@@ -218,6 +234,7 @@ namespace AvalonDock
 		public ToggleDockingManager()
 		{
 			LayoutUpdateStrategy = new ToggleLayoutStrategy();
+			AnchorablePaneControlStyle = LoadToggleStyle();
 			Loaded += ToggleDockingManager_Loaded;
 			ActiveContentChanged += (s, e) => RefreshButtonStates();
 		}
@@ -246,11 +263,7 @@ namespace AvalonDock
 
 		private void ApplyToggleAnchorableStyle()
 		{
-			_cachedToggleStyle ??= TryFindResource("ToggleAnchorablePaneControlStyle") as System.Windows.Style;
-			if (_cachedToggleStyle != null)
-			{
-				AnchorablePaneControlStyle = _cachedToggleStyle;
-			}
+			AnchorablePaneControlStyle = LoadToggleStyle();
 		}
 
 		/// <summary>
