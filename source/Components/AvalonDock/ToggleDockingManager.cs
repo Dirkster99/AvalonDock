@@ -243,7 +243,15 @@ namespace AvalonDock
 		protected override void OnThemeChanged(DependencyPropertyChangedEventArgs e)
 		{
 			base.OnThemeChanged(e);
-			// Style will be re-applied in OnApplyTemplate after the new template is loaded
+
+			if (IsLoaded)
+			{
+				// Schedule re-setup after the new theme resources are fully available.
+				// OnApplyTemplate may not fire when switching between themes that share
+				// the same template structure (e.g. Arc Dark ↔ Arc Light).
+				Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
+					new System.Action(ReapplyThemeStyles));
+			}
 		}
 
 		/// <inheritdoc/>
@@ -254,11 +262,17 @@ namespace AvalonDock
 			// After theme change, re-inject the sidebar buttons into the new template
 			if (IsLoaded)
 			{
-				ApplyToggleAnchorableStyle();
-				SetupToggleDockButtonBars();
-				Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
-					new System.Action(UpdatePinButtonsToMinimize));
+				ReapplyThemeStyles();
 			}
+		}
+
+		private void ReapplyThemeStyles()
+		{
+			ApplyToggleAnchorableStyle();
+			SetupToggleDockButtonBars();
+			RefreshButtonStates();
+			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
+				new System.Action(UpdatePinButtonsToMinimize));
 		}
 
 		private void ApplyToggleAnchorableStyle()
@@ -903,6 +917,19 @@ namespace AvalonDock
 
 		private void RemoveToggleDockButtonBars()
 		{
+			// Clear icon content on all buttons before removing them from the visual tree.
+			// Icon Viewbox instances use RelativeSource.FindAncestor bindings to the button's
+			// Foreground. If the Viewbox is re-parented directly to a new button, WPF may not
+			// re-resolve those bindings, causing stale colors (e.g. white icon stuck after
+			// the focused state is cleared). Clearing IconContent first ensures the Viewbox is
+			// properly disconnected so bindings refresh when re-attached.
+			ClearBarIconContent(_leftTopBar);
+			ClearBarIconContent(_leftBottomBar);
+			ClearBarIconContent(_rightTopBar);
+			ClearBarIconContent(_rightBottomBar);
+			ClearBarIconContent(_bottomLeftBar);
+			ClearBarIconContent(_bottomRightBar);
+
 			if (_injectedLeftDockPanel != null)
 			{
 				(VisualTreeHelper.GetParent(_injectedLeftDockPanel) as Grid)?.Children.Remove(_injectedLeftDockPanel);
@@ -921,6 +948,19 @@ namespace AvalonDock
 			_rightBottomBar = null;
 			_bottomLeftBar = null;
 			_bottomRightBar = null;
+		}
+
+		private static void ClearBarIconContent(ToggleDockButtonBar bar)
+		{
+			if (bar == null) return;
+			foreach (var item in bar.Items)
+			{
+				if (item is ToggleDockButton btn)
+				{
+					btn.IconContent = null;
+					btn.IconSource = null;
+				}
+			}
 		}
 
 		private Grid FindTemplateRootGrid()
