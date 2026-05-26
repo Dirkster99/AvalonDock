@@ -2661,6 +2661,175 @@
         </Setter>
     </Style>
 
+    <!--  ToggleDockingManager: Arc theme ToggleAnchorablePaneTitle style  -->
+    <Style TargetType="{x:Type avalonDockControls:ToggleAnchorablePaneTitle}">
+        <Setter Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionInactiveBackground}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionInactiveText}}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type avalonDockControls:ToggleAnchorablePaneTitle}">
+                    <Border
+                        x:Name="TitleBorder"
+                        CornerRadius="6,6,0,0"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid Margin="6,6,4,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Title content -->
+                            <Border
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Background="Transparent">
+                                <avalonDockControls:DropDownControlArea
+                                    DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
+                                    DropDownContextMenuDataContext="{Binding Path=LayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
+                                    Style="{DynamicResource DropDownControlArea}">
+                                    <ContentPresenter
+                                        x:Name="Header"
+                                        Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
+                                        ContentTemplate="{Binding Model.Root.Manager.AnchorableTitleTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                        ContentTemplateSelector="{Binding Model.Root.Manager.AnchorableTitleTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"
+                                        TextElement.Foreground="{TemplateBinding Foreground}" />
+                                </avalonDockControls:DropDownControlArea>
+                            </Border>
+
+                            <!-- Options button (vertical three-dot icon) -->
+                            <Button
+                                x:Name="PART_OptionsButton"
+                                Grid.Column="1"
+                                Margin="1,1,1,0"
+                                Width="15"
+                                Height="15"
+                                VerticalAlignment="Center"
+                                Focusable="False"
+                                Style="{StaticResource AvalonDockThemeArcButtonStyle}"
+                                ToolTip="Options"
+                                Visibility="{Binding ShowHeaderOptionsButton, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=Visible, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
+                                <Canvas Width="10" Height="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Ellipse x:Name="Dot1" Canvas.Left="3.5" Canvas.Top="0" Width="3" Height="3"
+                                             Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}" />
+                                    <Ellipse x:Name="Dot2" Canvas.Left="3.5" Canvas.Top="3.5" Width="3" Height="3"
+                                             Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}" />
+                                    <Ellipse x:Name="Dot3" Canvas.Left="3.5" Canvas.Top="7" Width="3" Height="3"
+                                             Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}" />
+                                </Canvas>
+                            </Button>
+
+                            <!-- Minimize button (dash icon) -->
+                            <Button
+                                x:Name="PART_MinimizeButton"
+                                Grid.Column="2"
+                                Margin="0,1,1,0"
+                                Width="15"
+                                Height="15"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Command="{Binding Path=LayoutItem.AutoHideCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                Focusable="False"
+                                Style="{StaticResource AvalonDockThemeArcButtonStyle}"
+                                ToolTip="Minimize"
+                                Visibility="{Binding ShowHeaderMinimizeButton, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=Visible, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
+                                <Path
+                                    x:Name="PART_ImgMinimize"
+                                    Width="8"
+                                    Height="8"
+                                    Data="M0,4 L8,4"
+                                    Stroke="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
+                                    StrokeThickness="1.5"
+                                    Stretch="Uniform" />
+                            </Button>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <!--  Tool Window : Caption / Active  -->
+                        <DataTrigger Binding="{Binding Model.IsActive, RelativeSource={RelativeSource Mode=Self}}" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionActiveBackground}}" />
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionActiveText}}" />
+                        </DataTrigger>
+
+                        <!--  Tool Window : Caption : Button / Active  -->
+                        <DataTrigger Binding="{Binding Model.IsActive, RelativeSource={RelativeSource Mode=Self}}" Value="True">
+                            <Setter TargetName="Dot1" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveGlyph}}" />
+                            <Setter TargetName="Dot2" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveGlyph}}" />
+                            <Setter TargetName="Dot3" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveGlyph}}" />
+                            <Setter TargetName="PART_ImgMinimize" Property="Stroke" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveGlyph}}" />
+                        </DataTrigger>
+
+                        <!--  Tool Window : Caption : Options Button / Active, hovered  -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=PART_OptionsButton}" Value="True" />
+                                <Condition Binding="{Binding Model.IsActive, RelativeSource={RelativeSource Mode=Self}}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="PART_OptionsButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredBackground}}" />
+                            <Setter TargetName="PART_OptionsButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredBorder}}" />
+                            <Setter TargetName="Dot1" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredGlyph}}" />
+                            <Setter TargetName="Dot2" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredGlyph}}" />
+                            <Setter TargetName="Dot3" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredGlyph}}" />
+                        </MultiDataTrigger>
+
+                        <!--  Tool Window : Caption : Minimize Button / Active, hovered  -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=PART_MinimizeButton}" Value="True" />
+                                <Condition Binding="{Binding Model.IsActive, RelativeSource={RelativeSource Mode=Self}}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="PART_MinimizeButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredBackground}}" />
+                            <Setter TargetName="PART_MinimizeButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredBorder}}" />
+                            <Setter TargetName="PART_ImgMinimize" Property="Stroke" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredGlyph}}" />
+                        </MultiDataTrigger>
+
+                        <!--  Tool Window : Caption : Options Button / Inactive, hovered  -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=PART_OptionsButton}" Value="True" />
+                                <Condition Binding="{Binding Model.IsActive, RelativeSource={RelativeSource Mode=Self}}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="PART_OptionsButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredBackground}}" />
+                            <Setter TargetName="PART_OptionsButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredBorder}}" />
+                            <Setter TargetName="Dot1" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredGlyph}}" />
+                            <Setter TargetName="Dot2" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredGlyph}}" />
+                            <Setter TargetName="Dot3" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredGlyph}}" />
+                        </MultiDataTrigger>
+
+                        <!--  Tool Window : Caption : Minimize Button / Inactive, hovered  -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=PART_MinimizeButton}" Value="True" />
+                                <Condition Binding="{Binding Model.IsActive, RelativeSource={RelativeSource Mode=Self}}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="PART_MinimizeButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredBackground}}" />
+                            <Setter TargetName="PART_MinimizeButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredBorder}}" />
+                            <Setter TargetName="PART_ImgMinimize" Property="Stroke" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredGlyph}}" />
+                        </MultiDataTrigger>
+
+                        <!--  Tool Window : Caption : Button / Pressed  -->
+                        <Trigger SourceName="PART_OptionsButton" Property="IsMouseCaptured" Value="True">
+                            <Setter TargetName="PART_OptionsButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedBackground}}" />
+                            <Setter TargetName="PART_OptionsButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedBorder}}" />
+                            <Setter TargetName="Dot1" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedGlyph}}" />
+                            <Setter TargetName="Dot2" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedGlyph}}" />
+                            <Setter TargetName="Dot3" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedGlyph}}" />
+                        </Trigger>
+                        <Trigger SourceName="PART_MinimizeButton" Property="IsMouseCaptured" Value="True">
+                            <Setter TargetName="PART_MinimizeButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedBackground}}" />
+                            <Setter TargetName="PART_MinimizeButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedBorder}}" />
+                            <Setter TargetName="PART_ImgMinimize" Property="Stroke" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActivePressedGlyph}}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!--  ToggleDockingManager: Arc theme toggle anchorable pane style  -->
     <Style x:Key="ToggleAnchorablePaneControlStyle" TargetType="{x:Type avalonDockControls:LayoutAnchorablePaneControl}">
         <Setter Property="TabStripPlacement" Value="Bottom" />
@@ -2799,13 +2968,16 @@
         <Setter Property="ContentTemplate">
             <Setter.Value>
                 <DataTemplate>
-                    <avalonDockControls:LayoutAnchorableControl Model="{Binding}">
+                    <avalonDockControls:LayoutAnchorableControl Model="{Binding}"
+                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.TabBackground}}">
                         <avalonDockControls:LayoutAnchorableControl.Template>
                             <ControlTemplate TargetType="{x:Type avalonDockControls:LayoutAnchorableControl}">
                                 <Border
+                                    x:Name="Bd"
+                                    CornerRadius="6"
                                     Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.PanelBorderBrush}}"
+                                    BorderThickness="1"
                                     KeyboardNavigation.TabNavigation="Cycle">
                                     <Grid>
                                         <Grid.RowDefinitions>
