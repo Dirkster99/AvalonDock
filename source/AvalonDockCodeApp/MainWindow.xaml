@@ -9,7 +9,7 @@
     Title="AvalonDock Code — Toggle Docking Demo"
     Width="1100" Height="700"
     WindowStartupLocation="CenterScreen"
-    Background="#252729"
+    Background="{Binding Background, ElementName=dockManager}"
     UseLayoutRounding="True">
     <Window.Resources>
         <views:FileIconConverter x:Key="FileIconConverter" />
@@ -17,9 +17,22 @@
         <views:NullToCollapsedConverter x:Key="NullToCollapsedConverter" />
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 
-        <!-- Global dark scrollbar style -->
+        <!-- Theme-adaptive app colors (updated in code-behind on theme switch) -->
+        <SolidColorBrush x:Key="AppPanelBg" Color="#252526" />
+        <SolidColorBrush x:Key="AppEditorBg" Color="#1E1E1E" />
+        <SolidColorBrush x:Key="AppInputBg" Color="#3C3C3C" />
+        <SolidColorBrush x:Key="AppInputBarBg" Color="#2D2D2D" />
+        <SolidColorBrush x:Key="AppText" Color="#CCCCCC" />
+        <SolidColorBrush x:Key="AppSubText" Color="#808080" />
+        <SolidColorBrush x:Key="AppDimText" Color="#555555" />
+        <SolidColorBrush x:Key="AppEditorText" Color="#D4D4D4" />
+        <SolidColorBrush x:Key="AppLineNumbers" Color="#858585" />
+        <SolidColorBrush x:Key="AppScrollbarBg" Color="#2B2B2B" />
+        <SolidColorBrush x:Key="AppSelection" Color="#094771" />
+
+        <!-- Compact scrollbar style -->
         <Style TargetType="ScrollBar">
-            <Setter Property="Background" Value="#2B2B2B" />
+            <Setter Property="Background" Value="{DynamicResource AppScrollbarBg}" />
             <Setter Property="Width" Value="10" />
             <Setter Property="MinWidth" Value="10" />
             <Style.Triggers>
@@ -45,22 +58,25 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:SearchViewModel}">
-            <Border Background="#252526" Padding="12">
-                <TextBox Background="#3C3C3C" Foreground="#CCCCCC" BorderThickness="0"
+            <Border Background="{DynamicResource AppPanelBg}" Padding="12">
+                <TextBox Background="{DynamicResource AppInputBg}"
+                         Foreground="{DynamicResource AppText}" BorderThickness="0"
                          Padding="6,4" FontSize="12" VerticalAlignment="Top"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
             </Border>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:SourceControlViewModel}">
-            <Border Background="#252526" Padding="12">
-                <TextBlock Text="{Binding Status}" Foreground="#808080" FontSize="12" />
+            <Border Background="{DynamicResource AppPanelBg}" Padding="12">
+                <TextBlock Text="{Binding Status}"
+                           Foreground="{DynamicResource AppSubText}" FontSize="12" />
             </Border>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:ProblemsViewModel}">
-            <Border Background="#1E1E1E" Padding="12">
-                <TextBlock Text="{Binding Status}" Foreground="#808080" FontSize="12" />
+            <Border Background="{DynamicResource AppEditorBg}" Padding="12">
+                <TextBlock Text="{Binding Status}"
+                           Foreground="{DynamicResource AppSubText}" FontSize="12" />
             </Border>
         </DataTemplate>
 
@@ -108,15 +124,16 @@
         </Grid.RowDefinitions>
 
         <!-- Title bar / Menu -->
-        <Grid Grid.Row="0" Background="#252729">
+        <Grid Grid.Row="0" Background="{Binding Background, ElementName=dockManager}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Menu Grid.Column="0" Background="Transparent" Foreground="#CCCCCC" Padding="4,4">
+            <Menu Grid.Column="0" Background="Transparent"
+                  Foreground="{DynamicResource AppText}" Padding="4,4">
                 <Menu.Resources>
                     <Style TargetType="MenuItem">
-                        <Setter Property="Foreground" Value="#CCCCCC" />
+                        <Setter Property="Foreground" Value="{DynamicResource AppText}" />
                         <Style.Triggers>
                             <Trigger Property="Role" Value="SubmenuHeader">
                                 <Setter Property="Foreground" Value="Black" />
@@ -151,14 +168,13 @@
                 </MenuItem>
             </Menu>
             <TextBlock Grid.Column="1" Text="AvalonDock Code — Toggle Docking Demo"
-                       Foreground="#999999" FontSize="12"
+                       Foreground="{DynamicResource AppSubText}" FontSize="12"
                        HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Grid>
 
         <!-- Dock Manager -->
         <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1"
                                          BorderThickness="0"
-                                         Background="#252729"
                                          DockLayout="{Binding DockLayout}"
                                          DocumentHeaderTemplate="{StaticResource DocumentTabHeaderTemplate}"
                                          LayoutItemContainerStyleSelector="{StaticResource PanesStyleSelector}">
@@ -170,19 +186,19 @@
                     <avalonDock:LayoutDocumentPaneGroup>
                         <avalonDock:LayoutDocumentPane x:Name="LayoutDocumentPane">
                             <avalonDock:LayoutDocument Title="Welcome" ContentId="welcome">
-                                <Border Background="#1E1E1E" Padding="40">
+                                <Border Background="{DynamicResource AppEditorBg}" Padding="40">
                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                         <TextBlock Text="AvalonDock Code" FontSize="28" FontWeight="Light"
-                                                   Foreground="#CCCCCC" HorizontalAlignment="Center" />
+                                                   Foreground="{DynamicResource AppText}" HorizontalAlignment="Center" />
                                         <TextBlock Text="Toggle Docking Demo — v5.0.0" FontSize="14"
-                                                   Foreground="#808080" HorizontalAlignment="Center" Margin="0,8,0,24" />
-                                        <TextBlock Foreground="#808080" FontSize="13" TextAlignment="Center" LineHeight="24">
+                                                   Foreground="{DynamicResource AppSubText}" HorizontalAlignment="Center" Margin="0,8,0,24" />
+                                        <TextBlock Foreground="{DynamicResource AppSubText}" FontSize="13" TextAlignment="Center" LineHeight="24">
                                             <Run Text="Click sidebar icons to toggle panels" /><LineBreak />
                                             <Run Text="Drag buttons between zones to rearrange" /><LineBreak />
                                             <Run Text="Double-click files in Explorer to open" /><LineBreak />
                                             <Run Text="Right-click panel title for Move To / View Mode" />
                                         </TextBlock>
-                                        <TextBlock Foreground="#555555" FontSize="11" TextAlignment="Center"
+                                        <TextBlock Foreground="{DynamicResource AppDimText}" FontSize="11" TextAlignment="Center"
                                                    Margin="0,24,0,0">
                                             <Run Text="Powered by AvalonDock + AvalonDock.Mvvm + AvalonDock-DependencyInjection" />
                                         </TextBlock>
@@ -196,10 +212,10 @@
         </avalonDock:ToggleDockingManager>
 
         <!-- Status bar -->
-        <Border Grid.Row="2" Background="#252729" Padding="8,4">
+        <Border Grid.Row="2" Background="{Binding Background, ElementName=dockManager}" Padding="8,4">
             <Grid>
-                <TextBlock Text="Ready" Foreground="#808080" FontSize="11" />
-                <TextBlock HorizontalAlignment="Right" Foreground="#808080" FontSize="11">
+                <TextBlock Text="Ready" Foreground="{DynamicResource AppSubText}" FontSize="11" />
+                <TextBlock HorizontalAlignment="Right" Foreground="{DynamicResource AppSubText}" FontSize="11">
                     <Run Text="AvalonDock v5.0.0" />
                     <Run Text=" • " />
                     <Run Text="ToggleDockingManager" />

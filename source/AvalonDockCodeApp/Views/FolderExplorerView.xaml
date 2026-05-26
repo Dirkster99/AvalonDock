@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:ToggleTestApp.ViewModels"
              xmlns:views="clr-namespace:ToggleTestApp.Views"
-             Background="#252526">
+             Background="{DynamicResource AppPanelBg}">
     <UserControl.Resources>
         <views:FileIconConverter x:Key="FileIconConverter" />
         <views:FileColorConverter x:Key="FileColorConverter" />
@@ -16,7 +16,7 @@
                            FontFamily="Segoe MDL2 Assets" FontSize="12"
                            Foreground="{Binding IsDirectory, Converter={StaticResource FileColorConverter}}"
                            Margin="0,0,6,0" VerticalAlignment="Center" />
-                <TextBlock Text="{Binding Name}" Foreground="#CCCCCC" FontSize="12"
+                <TextBlock Text="{Binding Name}" Foreground="{DynamicResource AppText}" FontSize="12"
                            VerticalAlignment="Center" />
             </StackPanel>
         </HierarchicalDataTemplate>
@@ -29,11 +29,11 @@
             <TreeView.ItemContainerStyle>
                 <Style TargetType="TreeViewItem">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
-                    <Setter Property="Foreground" Value="#CCCCCC" />
+                    <Setter Property="Foreground" Value="{DynamicResource AppText}" />
                     <EventSetter Event="Expanded" Handler="OnTreeViewItemExpanded" />
                     <Style.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="#094771" />
+                            <Setter Property="Background" Value="{DynamicResource AppSelection}" />
                         </Trigger>
                     </Style.Triggers>
                 </Style>

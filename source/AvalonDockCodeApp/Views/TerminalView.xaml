@@ -1,7 +1,7 @@
 <UserControl x:Class="ToggleTestApp.Views.TerminalView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Background="#1E1E1E">
+             Background="{DynamicResource AppEditorBg}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -12,11 +12,11 @@
                       HorizontalScrollBarVisibility="Auto"
                       x:Name="OutputScroller">
             <TextBlock Text="{Binding Output}" FontFamily="Cascadia Mono,Consolas,Courier New"
-                       FontSize="12" Foreground="#CCCCCC" Padding="8"
+                       FontSize="12" Foreground="{DynamicResource AppText}" Padding="8"
                        TextWrapping="Wrap" />
         </ScrollViewer>
 
-        <Grid Grid.Row="1" Background="#2D2D2D">
+        <Grid Grid.Row="1" Background="{DynamicResource AppInputBarBg}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -28,8 +28,8 @@
 
             <TextBox Grid.Column="1" Text="{Binding InputCommand, UpdateSourceTrigger=PropertyChanged}"
                      FontFamily="Cascadia Mono,Consolas,Courier New" FontSize="12"
-                     Background="Transparent" Foreground="#CCCCCC" BorderThickness="0"
-                     CaretBrush="#CCCCCC" Padding="0,4"
+                     Background="Transparent" Foreground="{DynamicResource AppText}" BorderThickness="0"
+                     CaretBrush="{DynamicResource AppText}" Padding="0,4"
                      x:Name="InputBox" />
         </Grid>
     </Grid>
