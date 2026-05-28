@@ -61,13 +61,21 @@ namespace AvalonDockTest.FlaUITests
 		[Test, Order(6)]
 		public void ToggleButtons_InitialState_AllUnchecked()
 		{
-			// All anchorables start auto-hidden, so all buttons should be unchecked
+			// All anchorables start auto-hidden, so all buttons should be unchecked except terminal
 			var buttons = FindAllToggleButtons();
 			foreach (var btn in buttons)
 			{
 				var state = GetToggleState(btn);
-				Assert.That(state, Is.EqualTo(ToggleState.Off),
+    if (btn.Name != "Terminal)
+    {
+				 Assert.That(state, Is.EqualTo(ToggleState.Off),
 					$"Button '{btn.Name}' should be unchecked initially.");
+    }
+    else 
+    {
+     Assert.That(state, Is.EqualTo(ToggleState.On),
+					$"Button '{btn.Name}' should be checked initially.");
+    }
 			}
 		}
 	}
