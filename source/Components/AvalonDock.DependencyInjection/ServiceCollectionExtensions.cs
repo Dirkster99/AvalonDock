@@ -60,7 +60,6 @@ namespace AvalonDock.DependencyInjection
 
 		/// <summary>
 		/// Registers <see cref="ToggleDockOptions"/> with an optional configuration delegate.
-		/// Resolve the options in your window to call <see cref="ToggleDockOptions.ApplyTo"/>.
 		/// </summary>
 		/// <param name="services">The service collection.</param>
 		/// <param name="configure">Optional delegate to configure the options.</param>

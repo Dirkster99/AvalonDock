@@ -15,6 +15,9 @@ namespace AvalonDock.Mvvm
 		private IList<IDockable>? _pinnedDockables;
 		private IDockable? _defaultLayout;
 
+		/// <summary>
+		/// Gets or sets the floating dockables owned by the root dock.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = false)]
 		public IList<IDockable>? FloatingDockables
 		{
@@ -22,6 +25,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _floatingDockables, value);
 		}
 
+		/// <summary>
+		/// Gets or sets the pinned dockables owned by the root dock.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = false)]
 		public IList<IDockable>? PinnedDockables
 		{
@@ -29,6 +35,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _pinnedDockables, value);
 		}
 
+		/// <summary>
+		/// Gets or sets the default layout shown by the root dock.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = false)]
 		public IDockable? DefaultLayout
 		{
@@ -36,10 +45,16 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _defaultLayout, value);
 		}
 
+		/// <summary>
+		/// Shows the floating windows associated with the root dock.
+		/// </summary>
 		public virtual void ShowWindows()
 		{
 		}
 
+		/// <summary>
+		/// Hides the floating windows associated with the root dock.
+		/// </summary>
 		public virtual void HideWindows()
 		{
 		}
@@ -53,6 +68,9 @@ namespace AvalonDock.Mvvm
 	{
 		private bool _canCreateDocument = true;
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the dock can create new documents.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool CanCreateDocument
 		{
@@ -71,6 +89,9 @@ namespace AvalonDock.Mvvm
 		private bool _isExpanded;
 		private bool _autoHide;
 
+		/// <summary>
+		/// Gets or sets the alignment of the tool dock.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public DockAlignment Alignment
 		{
@@ -78,6 +99,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _alignment, value);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the tool dock is expanded.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = false)]
 		public bool IsExpanded
 		{
@@ -85,6 +109,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _isExpanded, value);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the tool dock automatically hides.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = false)]
 		public bool AutoHide
 		{

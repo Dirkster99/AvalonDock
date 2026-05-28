@@ -13,6 +13,9 @@ using System.Windows.Media;
 
 namespace AvalonDock.Themes.Controls
 {
+	/// <summary>
+	/// Represents a control that renders a spline-shaped border with fill and stroke brushes.
+	/// </summary>
 	public class SplineBorder : Control
 	{
 		/// <summary>
@@ -90,6 +93,10 @@ namespace AvalonDock.Themes.Controls
 			set => SetValue(BottomBorderMarginProperty, value);
 		}
 
+		/// <summary>
+		/// Renders the spline border using the current fill, stroke, and thickness settings.
+		/// </summary>
+		/// <param name="drawingContext">The drawing context used to render the spline border.</param>
 		protected override void OnRender(DrawingContext drawingContext)
 		{
 			var pgFill = new PathGeometry();

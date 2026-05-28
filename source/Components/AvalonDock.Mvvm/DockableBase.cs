@@ -26,6 +26,9 @@ namespace AvalonDock.Mvvm
 		private bool _isActive;
 		private DockState _dockState = DockState.Docked;
 
+		/// <summary>
+		/// Gets or sets the unique identifier of the dockable.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string Id
 		{
@@ -33,6 +36,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _id, value);
 		}
 
+		/// <summary>
+		/// Gets or sets the display title of the dockable.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public string Title
 		{
@@ -40,6 +46,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _title, value);
 		}
 
+		/// <summary>
+		/// Gets or sets the runtime context associated with the dockable.
+		/// </summary>
 		[IgnoreDataMember]
 		public object? Context
 		{
@@ -47,6 +56,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _context, value);
 		}
 
+		/// <summary>
+		/// Gets or sets the parent dockable that owns this instance.
+		/// </summary>
 		[IgnoreDataMember]
 		public IDockable? Owner
 		{
@@ -54,6 +66,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _owner, value);
 		}
 
+		/// <summary>
+		/// Gets or sets the factory that manages this dockable.
+		/// </summary>
 		[IgnoreDataMember]
 		public IFactory? Factory
 		{
@@ -61,6 +76,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _factory, value);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the dockable can be closed.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool CanClose
 		{
@@ -68,6 +86,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _canClose, value);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the dockable can be pinned.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool CanPin
 		{
@@ -75,6 +96,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _canPin, value);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the dockable can float.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool CanFloat
 		{
@@ -82,6 +106,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _canFloat, value);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the dockable can be dragged.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool CanDrag
 		{
@@ -89,6 +116,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _canDrag, value);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the dockable can accept dropped items.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public bool CanDrop
 		{
@@ -96,6 +126,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _canDrop, value);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the dockable has unsaved changes.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = false)]
 		public bool IsModified
 		{
@@ -103,6 +136,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _isModified, value);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the dockable is currently active.
+		/// </summary>
 		[IgnoreDataMember]
 		public bool IsActive
 		{
@@ -110,6 +146,9 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _isActive, value);
 		}
 
+		/// <summary>
+		/// Gets or sets the current docking state of the dockable.
+		/// </summary>
 		[DataMember(IsRequired = false, EmitDefaultValue = true)]
 		public DockState DockState
 		{
@@ -117,8 +156,15 @@ namespace AvalonDock.Mvvm
 			set => SetProperty(ref _dockState, value);
 		}
 
+		/// <summary>
+		/// Determines whether the dockable can be closed.
+		/// </summary>
+		/// <returns><see langword="true"/> when closing is allowed; otherwise, <see langword="false"/>.</returns>
 		public virtual bool OnClose() => true;
 
+		/// <summary>
+		/// Handles selection of the dockable.
+		/// </summary>
 		public virtual void OnSelected()
 		{
 		}
