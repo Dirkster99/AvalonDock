@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -8,8 +9,8 @@ namespace ToggleTestApp.ViewModels;
 
 /// <summary>
 /// Provides sidebar toggle button icons as Viewbox instances.
-/// Each icon binds its strokes/fills to the ancestor ContentControl's Foreground
-/// so icons inherit the active/inactive color from the button state.
+/// Each icon binds its strokes/fills to the inherited TextElement.Foreground
+/// so icons automatically reflect the active/inactive color from the button's triggers.
 /// </summary>
 public static class ToolboxIcons
 {
@@ -19,9 +20,10 @@ public static class ToolboxIcons
 	public static object Git => CreateGitIcon();
 	public static object Problems => CreateProblemsIcon();
 
-	private static Binding ForegroundBinding() => new Binding("Foreground")
+	private static Binding ForegroundBinding() => new Binding
 	{
-		RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(ContentControl), 1)
+		Path = new PropertyPath(TextElement.ForegroundProperty),
+		RelativeSource = new RelativeSource(RelativeSourceMode.Self)
 	};
 
 	private static Viewbox CreateExplorerIcon()
