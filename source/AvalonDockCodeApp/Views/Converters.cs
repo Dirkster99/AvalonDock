@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Windows;
@@ -12,13 +12,13 @@ namespace ToggleTestApp.Views;
 /// </summary>
 public class FileIconConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return value is true ? "\uE8B7" : "\uE8A5"; // Folder : Page
-    }
+	public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+	{
+		return value is true ? "\uE8B7" : "\uE8A5"; // Folder : Page
+	}
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        => throw new NotSupportedException();
+	public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		=> throw new NotSupportedException();
 }
 
 /// <summary>
@@ -26,16 +26,16 @@ public class FileIconConverter : IValueConverter
 /// </summary>
 public class FileColorConverter : IValueConverter
 {
-    private static readonly SolidColorBrush FolderBrush = new(Color.FromRgb(0xDC, 0xB6, 0x7A));
-    private static readonly SolidColorBrush FileBrush = new(Color.FromRgb(0xCC, 0xCC, 0xCC));
+	private static readonly SolidColorBrush FolderBrush = new(Color.FromRgb(0xDC, 0xB6, 0x7A));
+	private static readonly SolidColorBrush FileBrush = new(Color.FromRgb(0xCC, 0xCC, 0xCC));
 
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return value is true ? FolderBrush : FileBrush;
-    }
+	public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+	{
+		return value is true ? FolderBrush : FileBrush;
+	}
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        => throw new NotSupportedException();
+	public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		=> throw new NotSupportedException();
 }
 
 /// <summary>
@@ -43,11 +43,11 @@ public class FileColorConverter : IValueConverter
 /// </summary>
 public class NullToCollapsedConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        return value == null ? Visibility.Collapsed : Visibility.Visible;
-    }
+	public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+	{
+		return value == null ? Visibility.Collapsed : Visibility.Visible;
+	}
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        => throw new NotSupportedException();
+	public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		=> throw new NotSupportedException();
 }
