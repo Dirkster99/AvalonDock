@@ -29,7 +29,9 @@ namespace AvalonDockTest.FlaUITests
 		[Test, Order(2)]
 		public void MainWindow_HasCorrectTitle()
 		{
-			Assert.That(MainWindow.Title, Does.Contain("AvalonDock Code"),
+			Assert.That(
+				MainWindow.Title,
+				Does.Contain("AvalonDock Code"),
 				"Main window should have AvalonDock Code title.");
 		}
 
@@ -66,16 +68,20 @@ namespace AvalonDockTest.FlaUITests
 			foreach (var btn in buttons)
 			{
 				var state = GetToggleState(btn);
-    if (btn.Name != "Terminal)
-    {
-				 Assert.That(state, Is.EqualTo(ToggleState.Off),
-					$"Button '{btn.Name}' should be unchecked initially.");
-    }
-    else 
-    {
-     Assert.That(state, Is.EqualTo(ToggleState.On),
-					$"Button '{btn.Name}' should be checked initially.");
-    }
+				if (btn.Name != "Terminal")
+				{
+					Assert.That(
+						state,
+						Is.EqualTo(ToggleState.Off),
+						$"Button '{btn.Name}' should be unchecked initially.");
+				}
+				else
+				{
+					Assert.That(
+						state,
+						Is.EqualTo(ToggleState.On),
+						$"Button '{btn.Name}' should be checked initially.");
+				}
 			}
 		}
 	}
@@ -101,7 +107,9 @@ namespace AvalonDockTest.FlaUITests
 
 			// After clicking, the toggle button should be checked
 			btn = FindToggleButton("Explorer");
-			Assert.That(GetToggleState(btn), Is.EqualTo(ToggleState.On),
+			Assert.That(
+				GetToggleState(btn),
+				Is.EqualTo(ToggleState.On),
 				"Explorer button should be checked after clicking.");
 
 			// Clean up: undock
@@ -130,7 +138,9 @@ namespace AvalonDockTest.FlaUITests
 
 			// Button should be unchecked
 			btn = FindToggleButton("Explorer");
-			Assert.That(GetToggleState(btn), Is.EqualTo(ToggleState.Off),
+			Assert.That(
+				GetToggleState(btn),
+				Is.EqualTo(ToggleState.Off),
 				"Explorer button should be unchecked after second click.");
 		}
 
@@ -146,8 +156,10 @@ namespace AvalonDockTest.FlaUITests
 
 			// Verify Explorer is checked
 			btn1 = FindToggleButton("Explorer");
-			Assert.That(GetToggleState(btn1),
-				Is.EqualTo(ToggleState.On), "Explorer should be checked.");
+			Assert.That(
+				GetToggleState(btn1),
+				Is.EqualTo(ToggleState.On),
+				"Explorer should be checked.");
 
 			// Click Search — should dock Search and auto-hide Explorer (same left section)
 			var btn2 = FindToggleButton("Search");
@@ -160,10 +172,14 @@ namespace AvalonDockTest.FlaUITests
 			btn1 = FindToggleButton("Explorer");
 			btn2 = FindToggleButton("Search");
 
-			Assert.That(GetToggleState(btn2),
-				Is.EqualTo(ToggleState.On), "Search should be checked.");
-			Assert.That(GetToggleState(btn1),
-				Is.EqualTo(ToggleState.Off), "Explorer should be unchecked (exclusive per section).");
+			Assert.That(
+				GetToggleState(btn2),
+				Is.EqualTo(ToggleState.On),
+				"Search should be checked.");
+			Assert.That(
+				GetToggleState(btn1),
+				Is.EqualTo(ToggleState.Off),
+				"Explorer should be unchecked (exclusive per section).");
 
 			// Clean up
 			btn2 = FindToggleButton("Search");
@@ -193,10 +209,14 @@ namespace AvalonDockTest.FlaUITests
 			leftBtn = FindToggleButton("Explorer");
 			bottomBtn = FindToggleButton("Terminal");
 
-			Assert.That(GetToggleState(leftBtn),
-				Is.Not.EqualTo(leftInitState), "Left-side Explorer should be changed.");
-			Assert.That(GetToggleState(bottomBtn),
-				Is.Not.EqualTo(bottomInitState), "Bottom-side Terminal should be changed.");
+			Assert.That(
+				GetToggleState(leftBtn),
+				Is.Not.EqualTo(leftInitState),
+				"Left-side Explorer should be changed.");
+			Assert.That(
+				GetToggleState(bottomBtn),
+				Is.Not.EqualTo(bottomInitState),
+				"Bottom-side Terminal should be changed.");
 
 			// Clean up
 			leftBtn = FindToggleButton("Explorer");
@@ -205,12 +225,15 @@ namespace AvalonDockTest.FlaUITests
 			bottomBtn = FindToggleButton("Terminal");
 			ClickToggleButtonSafe(bottomBtn);
 			System.Threading.Thread.Sleep(200);
-			
-			Assert.That(GetToggleState(leftBtn),
-				Is.EqualTo(leftInitState), "Left-side Explorer should be back to start.");
-			Assert.That(GetToggleState(bottomBtn),
-				Is.EqualTo(bottomInitState), "Bottom-side Terminal should be back to start.");
 
+			Assert.That(
+				GetToggleState(leftBtn),
+				Is.EqualTo(leftInitState),
+				"Left-side Explorer should be back to start.");
+			Assert.That(
+				GetToggleState(bottomBtn),
+				Is.EqualTo(bottomInitState),
+				"Bottom-side Terminal should be back to start.");
 		}
 
 		private void ClickToggleButtonSafe(AutomationElement btn)
@@ -233,6 +256,7 @@ namespace AvalonDockTest.FlaUITests
 					toggle?.Toggle();
 				}
 			}
+
 			Wait.UntilInputIsProcessed();
 		}
 
@@ -248,12 +272,17 @@ namespace AvalonDockTest.FlaUITests
 			System.Threading.Thread.Sleep(2000);
 
 			// Verify it's docked (with retry for UI stabilization)
-			Retry.WhileException(() =>
-			{
-				btn = FindToggleButton("Explorer");
-				Assert.That(GetToggleState(btn),
-					Is.EqualTo(ToggleState.On), "Explorer should be checked after docking.");
-			}, timeout: TimeSpan.FromSeconds(5), interval: TimeSpan.FromMilliseconds(500));
+			Retry.WhileException(
+				() =>
+				{
+					btn = FindToggleButton("Explorer");
+					Assert.That(
+						GetToggleState(btn),
+						Is.EqualTo(ToggleState.On),
+						"Explorer should be checked after docking.");
+				},
+				timeout: TimeSpan.FromSeconds(5),
+				interval: TimeSpan.FromMilliseconds(500));
 
 			// Find the "Minimize" button in the docked pane header
 			var minimizeBtn = Retry.WhileNull(
@@ -269,9 +298,13 @@ namespace AvalonDockTest.FlaUITests
 							var help = b.Properties.HelpText.ValueOrDefault;
 							// The pin button's tooltip becomes "Minimize" in ToggleDockingManager
 							return name == "Minimize" || help == "Minimize"
-							                          || (b.Properties.AutomationId.IsSupported && b.Properties.AutomationId.Value == "PART_AutoHidePin");
+							                          || (b.Properties.AutomationId.IsSupported &&
+							                              b.Properties.AutomationId.Value == "PART_AutoHidePin");
 						}
-						catch { return false; }
+						catch
+						{
+							return false;
+						}
 					});
 				},
 				timeout: TimeSpan.FromSeconds(10),
@@ -289,13 +322,17 @@ namespace AvalonDockTest.FlaUITests
 			System.Threading.Thread.Sleep(200);
 
 			// Explorer should be back to auto-hidden (toggle button unchecked)
-			Retry.WhileException(() =>
-			{
-				btn = FindToggleButton("Explorer");
-				Assert.That(GetToggleState(btn),
-					Is.EqualTo(ToggleState.Off),
-					"Explorer should be unchecked after clicking minimize (pin) button.");
-			}, timeout: TimeSpan.FromSeconds(5), interval: TimeSpan.FromMilliseconds(500));
+			Retry.WhileException(
+				() =>
+				{
+					btn = FindToggleButton("Explorer");
+					Assert.That(
+						GetToggleState(btn),
+						Is.EqualTo(ToggleState.Off),
+						"Explorer should be unchecked after clicking minimize (pin) button.");
+				},
+				timeout: TimeSpan.FromSeconds(5),
+				interval: TimeSpan.FromMilliseconds(500));
 		}
 	}
 }
