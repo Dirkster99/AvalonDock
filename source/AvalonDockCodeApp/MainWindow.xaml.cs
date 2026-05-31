@@ -1,5 +1,7 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using AvalonDock;
@@ -29,6 +31,8 @@ namespace ToggleTestApp
 					dockManager.LayoutPriority = priority;
 				}
 			}
+
+			ContentRendered += (_, _) => UpdateTitleBarColor();
 		}
 
 		private void OnLayoutPriorityChanged(object sender, RoutedEventArgs e)
@@ -97,7 +101,33 @@ namespace ToggleTestApp
 				bool isDark = IsDarkBrush(dockManager.Background);
 				var foreground = isDark ? Brushes.White : Brushes.Black;
 				Foreground = foreground;
+
+				UpdateTitleBarColor();
 			}));
+		}
+
+		[DllImport("dwmapi.dll", PreserveSig = true)]
+		private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
+
+		private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+		private const int DWMWA_CAPTION_COLOR = 35;
+
+		private void UpdateTitleBarColor()
+		{
+			var hwnd = new WindowInteropHelper(this).Handle;
+			if (hwnd == IntPtr.Zero)
+				return;
+
+			bool isDark = IsDarkBrush(dockManager.Background);
+			int darkMode = isDark ? 1 : 0;
+			DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref darkMode, sizeof(int));
+
+			if (dockManager.Background is SolidColorBrush scb)
+			{
+				var c = scb.Color;
+				int colorRef = c.R | (c.G << 8) | (c.B << 16);
+				DwmSetWindowAttribute(hwnd, DWMWA_CAPTION_COLOR, ref colorRef, sizeof(int));
+			}
 		}
 
 		private static bool IsDarkBrush(Brush brush)
