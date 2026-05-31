@@ -5,9 +5,9 @@ namespace AvalonDock.Core
 {
 	/// <summary>
 	/// High-level service for managing the dock layout tree.
-	/// Provides a clean API for common operations (opening documents,
-	/// managing anchorables, tracking active content) so that ViewModels
-	/// don't need to interact with low-level layout nodes directly.
+	/// Provides the core primitives (layout, documents, anchorables, events)
+	/// while higher-level operations are available as extension methods
+	/// in <see cref="DockLayoutServiceExtensions"/>.
 	/// </summary>
 	/// <remarks>
 	/// <para>Register via DI with <c>AddDockLayoutService()</c>.
@@ -37,48 +37,12 @@ namespace AvalonDock.Core
 		/// <param name="document">The document dockable to close.</param>
 		void CloseDocument(IDockable document);
 
-		/// <summary>Finds the first open document matching the predicate.</summary>
-		/// <typeparam name="T">The concrete document type.</typeparam>
-		/// <param name="predicate">A predicate to match against.</param>
-		/// <returns>The matching document, or null if not found.</returns>
-		T? FindDocument<T>(Func<T, bool> predicate)
-			where T : class, IDockable;
-
-		/// <summary>Opens a document if not already open, otherwise activates it.</summary>
-		/// <typeparam name="T">The concrete document type.</typeparam>
-		/// <param name="predicate">Predicate to find an existing instance.</param>
-		/// <param name="factory">Factory to create a new instance if not found.</param>
-		/// <returns>The existing or newly created document.</returns>
-		T OpenOrActivateDocument<T>(Func<T, bool> predicate, Func<T> factory)
-			where T : class, IDockable;
-
-		/// <summary>Gets a registered anchorable/tool by type.</summary>
-		/// <typeparam name="T">The concrete anchorable type.</typeparam>
-		/// <returns>The anchorable instance, or null if not registered.</returns>
-		T? GetAnchorable<T>()
-			where T : class, IToolbox;
-
-		/// <summary>Docks (shows) the specified anchorable if it is currently auto-hidden.</summary>
-		/// <param name="anchorable">The anchorable to show.</param>
-		void ShowAnchorable(IDockable anchorable);
-
-		/// <summary>Auto-hides (minimizes) the specified anchorable if it is currently docked.</summary>
-		/// <param name="anchorable">The anchorable to hide.</param>
-		void HideAnchorable(IDockable anchorable);
-
-		/// <summary>Gets a value indicating whether the specified anchorable is currently docked (not auto-hidden).</summary>
-		/// <param name="anchorable">The anchorable to query.</param>
-		/// <returns><c>true</c> if the anchorable is docked; <c>false</c> if auto-hidden or not found.</returns>
-		bool IsAnchorableOpen(IDockable anchorable);
-
-		/// <summary>Gets a value indicating whether any anchorable on the specified side is docked.</summary>
-		/// <param name="side">The side to query.</param>
-		/// <returns><c>true</c> if any anchorable on the side is docked; otherwise <c>false</c>.</returns>
-		bool IsSideOpen(ToolboxSide side);
-
 		/// <summary>
-		/// Raised when the docked/auto-hidden state of any anchorable changes.
-		/// Subscribers should re-read <see cref="IsSideOpen"/> and <see cref="IsAnchorableOpen"/> values.
+		/// Raised when the docked/auto-hidden state of any anchorable changes
+		/// (i.e. when any <see cref="IToolbox.IsOpen"/> value changes).
+		/// Subscribers should re-query visibility via the extension methods
+		/// <see cref="DockLayoutServiceExtensions.IsSideOpen"/> and
+		/// <see cref="DockLayoutServiceExtensions.IsAnchorableOpen"/>.
 		/// </summary>
 		event EventHandler? AnchorableStateChanged;
 	}

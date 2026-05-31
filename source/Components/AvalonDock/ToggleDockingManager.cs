@@ -1466,17 +1466,5 @@ namespace AvalonDock
 				_suppressServiceSync = false;
 			}
 		}
-
-		private static bool HasDockedAnchorable(ToggleDockButtonBar bar)
-		{
-			if (bar == null) return false;
-			foreach (var item in bar.Items)
-			{
-				if (item is ToggleDockButton btn && btn.Anchorable != null && !btn.Anchorable.IsAutoHidden)
-					return true;
-			}
-
-			return false;
-		}
 	}
 }

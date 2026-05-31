@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using AvalonDock.Core;
 
@@ -8,7 +9,9 @@ namespace AvalonDock.Mvvm
 {
 	/// <summary>
 	/// Default implementation of <see cref="IDockLayoutService"/>.
-	/// Builds the layout tree automatically from registered <see cref="IToolbox"/> instances.
+	/// Builds the layout tree automatically from registered <see cref="IToolbox"/> instances
+	/// and raises <see cref="AnchorableStateChanged"/> whenever any toolbox's
+	/// <see cref="IToolbox.IsOpen"/> property changes.
 	/// </summary>
 	public class DockLayoutService : IDockLayoutService
 	{
@@ -29,12 +32,13 @@ namespace AvalonDock.Mvvm
 				VisibleDockables = new ObservableCollection<IDockable>()
 			};
 
+			var toolboxList = toolboxes?.Cast<IDockable>() ?? Enumerable.Empty<IDockable>();
+
 			_toolDock = new ToolDock
 			{
 				Id = "Tools",
 				Title = "Tools",
-				VisibleDockables = new ObservableCollection<IDockable>(
-					toolboxes?.Cast<IDockable>() ?? Enumerable.Empty<IDockable>())
+				VisibleDockables = new ObservableCollection<IDockable>(toolboxList)
 			};
 
 			_rootDock = new RootDock
@@ -43,6 +47,14 @@ namespace AvalonDock.Mvvm
 				Title = "Root",
 				VisibleDockables = new ObservableCollection<IDockable> { _documentDock, _toolDock }
 			};
+
+			foreach (var dockable in _toolDock.VisibleDockables)
+			{
+				if (dockable is INotifyPropertyChanged npc)
+				{
+					npc.PropertyChanged += OnToolboxPropertyChanged;
+				}
+			}
 		}
 
 		/// <inheritdoc/>
@@ -90,67 +102,12 @@ namespace AvalonDock.Mvvm
 			}
 		}
 
-		/// <inheritdoc/>
-		public T? FindDocument<T>(Func<T, bool> predicate)
-			where T : class, IDockable
+		private void OnToolboxPropertyChanged(object? sender, PropertyChangedEventArgs e)
 		{
-			return _documentDock.VisibleDockables?.OfType<T>().FirstOrDefault(predicate);
-		}
-
-		/// <inheritdoc/>
-		public T OpenOrActivateDocument<T>(Func<T, bool> predicate, Func<T> factory)
-			where T : class, IDockable
-		{
-			var existing = FindDocument(predicate);
-			if (existing != null)
+			if (e.PropertyName == nameof(IToolbox.IsOpen))
 			{
-				_rootDock.ActiveDockable = existing;
-				return existing;
-			}
-
-			var doc = factory();
-			OpenDocument(doc);
-			return doc;
-		}
-
-		/// <inheritdoc/>
-		public T? GetAnchorable<T>()
-			where T : class, IToolbox
-		{
-			return _toolDock.VisibleDockables?.OfType<T>().FirstOrDefault();
-		}
-
-		/// <inheritdoc/>
-		public void ShowAnchorable(IDockable anchorable)
-		{
-			if (anchorable is IToolbox toolbox && !toolbox.IsOpen)
-			{
-				toolbox.IsOpen = true;
 				AnchorableStateChanged?.Invoke(this, EventArgs.Empty);
 			}
-		}
-
-		/// <inheritdoc/>
-		public void HideAnchorable(IDockable anchorable)
-		{
-			if (anchorable is IToolbox toolbox && toolbox.IsOpen)
-			{
-				toolbox.IsOpen = false;
-				AnchorableStateChanged?.Invoke(this, EventArgs.Empty);
-			}
-		}
-
-		/// <inheritdoc/>
-		public bool IsAnchorableOpen(IDockable anchorable)
-		{
-			return anchorable is IToolbox toolbox && toolbox.IsOpen;
-		}
-
-		/// <inheritdoc/>
-		public bool IsSideOpen(ToolboxSide side)
-		{
-			return Anchorables.OfType<IToolbox>()
-				.Any(t => t.Zone.ToSide() == side && t.IsOpen);
 		}
 	}
 }
