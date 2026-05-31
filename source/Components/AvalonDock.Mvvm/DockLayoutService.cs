@@ -16,6 +16,11 @@ namespace AvalonDock.Mvvm
 		private readonly ToolDock _toolDock;
 		private readonly RootDock _rootDock;
 
+		private Action<IDockable>? _showHandler;
+		private Action<IDockable>? _hideHandler;
+		private Func<IDockable, bool>? _isOpenQuery;
+		private Func<ToolboxSide, bool>? _isSideOpenQuery;
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DockLayoutService"/> class.
 		/// </summary>
@@ -62,6 +67,9 @@ namespace AvalonDock.Mvvm
 		/// <inheritdoc/>
 		public IEnumerable<IDockable> Anchorables =>
 			_toolDock.VisibleDockables ?? Enumerable.Empty<IDockable>();
+
+		/// <inheritdoc/>
+		public event EventHandler? AnchorableStateChanged;
 
 		/// <inheritdoc/>
 		public void OpenDocument(IDockable document)
@@ -115,6 +123,49 @@ namespace AvalonDock.Mvvm
 			where T : class, IDockable
 		{
 			return _toolDock.VisibleDockables?.OfType<T>().FirstOrDefault();
+		}
+
+		/// <inheritdoc/>
+		public void ShowAnchorable(IDockable anchorable)
+		{
+			_showHandler?.Invoke(anchorable);
+		}
+
+		/// <inheritdoc/>
+		public void HideAnchorable(IDockable anchorable)
+		{
+			_hideHandler?.Invoke(anchorable);
+		}
+
+		/// <inheritdoc/>
+		public bool IsAnchorableOpen(IDockable anchorable)
+		{
+			return _isOpenQuery?.Invoke(anchorable) ?? false;
+		}
+
+		/// <inheritdoc/>
+		public bool IsSideOpen(ToolboxSide side)
+		{
+			return _isSideOpenQuery?.Invoke(side) ?? false;
+		}
+
+		/// <inheritdoc/>
+		public void RegisterAnchorableVisibilityHandler(
+			Action<IDockable> show,
+			Action<IDockable> hide,
+			Func<IDockable, bool> isOpen,
+			Func<ToolboxSide, bool> isSideOpen)
+		{
+			_showHandler = show;
+			_hideHandler = hide;
+			_isOpenQuery = isOpen;
+			_isSideOpenQuery = isSideOpen;
+		}
+
+		/// <inheritdoc/>
+		public void NotifyAnchorableStateChanged()
+		{
+			AnchorableStateChanged?.Invoke(this, EventArgs.Empty);
 		}
 	}
 }

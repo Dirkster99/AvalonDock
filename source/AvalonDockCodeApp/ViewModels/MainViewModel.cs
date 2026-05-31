@@ -13,12 +13,25 @@ public partial class MainViewModel : ObservableObject
 	/// <summary>The MVVM layout tree — bind to DockLayout on the DockingManager.</summary>
 	public IRootDock DockLayout => _dockService.Layout;
 
+	/// <summary>Exposes the layout service for binding to ToggleDockingManager.LayoutService.</summary>
+	public IDockLayoutService LayoutService => _dockService;
+
 	/// <summary>Provides typed access to the folder explorer VM via the layout service.</summary>
 	public FolderExplorerViewModel? FolderExplorer => _dockService.GetAnchorable<FolderExplorerViewModel>();
+
+	[ObservableProperty]
+	private bool _isPrimarySideBarOpen;
+
+	[ObservableProperty]
+	private bool _isBottomPanelOpen;
+
+	[ObservableProperty]
+	private bool _isSecondarySideBarOpen;
 
 	public MainViewModel(IDockLayoutService dockService)
 	{
 		_dockService = dockService;
+		_dockService.AnchorableStateChanged += OnAnchorableStateChanged;
 
 		// Wire up the folder explorer's file-open callback
 		var folderExplorer = FolderExplorer;
@@ -91,5 +104,21 @@ public partial class MainViewModel : ObservableObject
 			var sourceControl = _dockService.GetAnchorable<SourceControlViewModel>();
 			sourceControl?.SetRootPath(dialog.FolderName);
 		}
+	}
+
+	[RelayCommand]
+	private void TogglePrimarySideBar() => _dockService.ToggleSide(ToolboxSide.Left);
+
+	[RelayCommand]
+	private void ToggleBottomPanel() => _dockService.ToggleSide(ToolboxSide.Bottom);
+
+	[RelayCommand]
+	private void ToggleSecondarySideBar() => _dockService.ToggleSide(ToolboxSide.Right);
+
+	private void OnAnchorableStateChanged(object? sender, EventArgs e)
+	{
+		IsPrimarySideBarOpen = _dockService.IsSideOpen(ToolboxSide.Left);
+		IsBottomPanelOpen = _dockService.IsSideOpen(ToolboxSide.Bottom);
+		IsSecondarySideBarOpen = _dockService.IsSideOpen(ToolboxSide.Right);
 	}
 }

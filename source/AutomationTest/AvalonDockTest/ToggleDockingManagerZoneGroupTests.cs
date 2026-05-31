@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Windows;
-using System.Windows.Input;
 using AvalonDock;
 using AvalonDock.Core;
 using AvalonDock.Layout;
@@ -14,69 +13,39 @@ using NUnit.Framework;
 namespace AvalonDockTest
 {
 	/// <summary>
-	/// Tests for ToggleDockingManager zone group toggle DependencyProperties and commands.
-	/// Static tests verify DP registration without requiring a WPF Application context.
+	/// Tests for ToggleDockingManager LayoutService dependency property registration.
 	/// </summary>
 	[TestFixture]
-	public class ToggleDockingManagerZoneGroupStaticTests
+	public class ToggleDockingManagerLayoutServiceTests
 	{
 		/// <summary>
-		/// Verifies that the IsPrimarySideBarOpen DP is registered correctly.
+		/// Verifies that the LayoutService DP is registered correctly.
 		/// </summary>
 		[Test]
-		public void IsPrimarySideBarOpenProperty_IsRegistered()
+		public void LayoutServiceProperty_IsRegistered()
 		{
-			Assert.That(ToggleDockingManager.IsPrimarySideBarOpenProperty, Is.Not.Null);
-			Assert.That(ToggleDockingManager.IsPrimarySideBarOpenProperty.Name, Is.EqualTo("IsPrimarySideBarOpen"));
-			Assert.That(ToggleDockingManager.IsPrimarySideBarOpenProperty.PropertyType, Is.EqualTo(typeof(bool)));
-			Assert.That(ToggleDockingManager.IsPrimarySideBarOpenProperty.OwnerType, Is.EqualTo(typeof(ToggleDockingManager)));
+			Assert.That(ToggleDockingManager.LayoutServiceProperty, Is.Not.Null);
+			Assert.That(ToggleDockingManager.LayoutServiceProperty.Name, Is.EqualTo("LayoutService"));
+			Assert.That(ToggleDockingManager.LayoutServiceProperty.PropertyType, Is.EqualTo(typeof(IDockLayoutService)));
+			Assert.That(ToggleDockingManager.LayoutServiceProperty.OwnerType, Is.EqualTo(typeof(ToggleDockingManager)));
 		}
 
 		/// <summary>
-		/// Verifies that the IsBottomPanelOpen DP is registered correctly.
+		/// LayoutService DP defaults to null.
 		/// </summary>
 		[Test]
-		public void IsBottomPanelOpenProperty_IsRegistered()
+		public void LayoutServiceProperty_DefaultsToNull()
 		{
-			Assert.That(ToggleDockingManager.IsBottomPanelOpenProperty, Is.Not.Null);
-			Assert.That(ToggleDockingManager.IsBottomPanelOpenProperty.Name, Is.EqualTo("IsBottomPanelOpen"));
-			Assert.That(ToggleDockingManager.IsBottomPanelOpenProperty.PropertyType, Is.EqualTo(typeof(bool)));
-			Assert.That(ToggleDockingManager.IsBottomPanelOpenProperty.OwnerType, Is.EqualTo(typeof(ToggleDockingManager)));
-		}
-
-		/// <summary>
-		/// Verifies that the IsSecondarySideBarOpen DP is registered correctly.
-		/// </summary>
-		[Test]
-		public void IsSecondarySideBarOpenProperty_IsRegistered()
-		{
-			Assert.That(ToggleDockingManager.IsSecondarySideBarOpenProperty, Is.Not.Null);
-			Assert.That(ToggleDockingManager.IsSecondarySideBarOpenProperty.Name, Is.EqualTo("IsSecondarySideBarOpen"));
-			Assert.That(ToggleDockingManager.IsSecondarySideBarOpenProperty.PropertyType, Is.EqualTo(typeof(bool)));
-			Assert.That(ToggleDockingManager.IsSecondarySideBarOpenProperty.OwnerType, Is.EqualTo(typeof(ToggleDockingManager)));
-		}
-
-		/// <summary>
-		/// All three state DPs should default to false.
-		/// </summary>
-		[Test]
-		public void StateDPs_DefaultToFalse()
-		{
-			var defaultPrimary = ToggleDockingManager.IsPrimarySideBarOpenProperty.DefaultMetadata.DefaultValue;
-			var defaultBottom = ToggleDockingManager.IsBottomPanelOpenProperty.DefaultMetadata.DefaultValue;
-			var defaultSecondary = ToggleDockingManager.IsSecondarySideBarOpenProperty.DefaultMetadata.DefaultValue;
-
-			Assert.That(defaultPrimary, Is.EqualTo(false));
-			Assert.That(defaultBottom, Is.EqualTo(false));
-			Assert.That(defaultSecondary, Is.EqualTo(false));
+			var defaultValue = ToggleDockingManager.LayoutServiceProperty.DefaultMetadata.DefaultValue;
+			Assert.That(defaultValue, Is.Null);
 		}
 	}
 
 	/// <summary>
-	/// Extended DockLayoutService tests covering multi-zone toolbox scenarios.
+	/// Tests for DockLayoutService anchorable visibility and zone group functionality.
 	/// </summary>
 	[TestFixture]
-	public class DockLayoutServiceZoneTests
+	public class DockLayoutServiceAnchorableVisibilityTests
 	{
 		private class LeftTopToolbox : ToolboxBase
 		{
@@ -126,6 +95,165 @@ namespace AvalonDockTest
 				Title = "Bottom Right";
 				Zone = DockZone.BottomRight;
 			}
+		}
+
+		/// <summary>
+		/// ShowAnchorable delegates to registered show handler.
+		/// </summary>
+		[Test]
+		public void ShowAnchorable_DelegatesToRegisteredHandler()
+		{
+			IDockable? shown = null;
+			var service = new DockLayoutService(new IToolbox[] { new LeftTopToolbox() });
+			service.RegisterAnchorableVisibilityHandler(
+				show: d => shown = d,
+				hide: _ => { },
+				isOpen: _ => false,
+				isSideOpen: _ => false);
+
+			var toolbox = service.GetAnchorable<LeftTopToolbox>()!;
+			service.ShowAnchorable(toolbox);
+			Assert.That(shown, Is.SameAs(toolbox));
+		}
+
+		/// <summary>
+		/// HideAnchorable delegates to registered hide handler.
+		/// </summary>
+		[Test]
+		public void HideAnchorable_DelegatesToRegisteredHandler()
+		{
+			IDockable? hidden = null;
+			var service = new DockLayoutService(new IToolbox[] { new LeftTopToolbox() });
+			service.RegisterAnchorableVisibilityHandler(
+				show: _ => { },
+				hide: d => hidden = d,
+				isOpen: _ => true,
+				isSideOpen: _ => true);
+
+			var toolbox = service.GetAnchorable<LeftTopToolbox>()!;
+			service.HideAnchorable(toolbox);
+			Assert.That(hidden, Is.SameAs(toolbox));
+		}
+
+		/// <summary>
+		/// IsAnchorableOpen delegates to registered query handler.
+		/// </summary>
+		[Test]
+		public void IsAnchorableOpen_DelegatesToRegisteredQuery()
+		{
+			var service = new DockLayoutService(new IToolbox[] { new LeftTopToolbox() });
+			service.RegisterAnchorableVisibilityHandler(
+				show: _ => { },
+				hide: _ => { },
+				isOpen: d => d is LeftTopToolbox,
+				isSideOpen: _ => false);
+
+			var toolbox = service.GetAnchorable<LeftTopToolbox>()!;
+			Assert.That(service.IsAnchorableOpen(toolbox), Is.True);
+		}
+
+		/// <summary>
+		/// IsAnchorableOpen returns false when no handler is registered.
+		/// </summary>
+		[Test]
+		public void IsAnchorableOpen_ReturnsFalse_WhenNoHandler()
+		{
+			var service = new DockLayoutService(new IToolbox[] { new LeftTopToolbox() });
+			var toolbox = service.GetAnchorable<LeftTopToolbox>()!;
+			Assert.That(service.IsAnchorableOpen(toolbox), Is.False);
+		}
+
+		/// <summary>
+		/// IsSideOpen delegates to registered handler.
+		/// </summary>
+		[Test]
+		public void IsSideOpen_DelegatesToRegisteredHandler()
+		{
+			var service = new DockLayoutService(Array.Empty<IToolbox>());
+			service.RegisterAnchorableVisibilityHandler(
+				show: _ => { },
+				hide: _ => { },
+				isOpen: _ => false,
+				isSideOpen: side => side == ToolboxSide.Left);
+
+			Assert.That(service.IsSideOpen(ToolboxSide.Left), Is.True);
+			Assert.That(service.IsSideOpen(ToolboxSide.Right), Is.False);
+			Assert.That(service.IsSideOpen(ToolboxSide.Bottom), Is.False);
+		}
+
+		/// <summary>
+		/// NotifyAnchorableStateChanged raises the event.
+		/// </summary>
+		[Test]
+		public void NotifyAnchorableStateChanged_RaisesEvent()
+		{
+			var service = new DockLayoutService(Array.Empty<IToolbox>());
+			bool raised = false;
+			service.AnchorableStateChanged += (_, _) => raised = true;
+
+			service.NotifyAnchorableStateChanged();
+			Assert.That(raised, Is.True);
+		}
+
+		/// <summary>
+		/// ToggleSide extension hides all open toolboxes on the side.
+		/// </summary>
+		[Test]
+		public void ToggleSide_HidesAllOpen_WhenAnyAreOpen()
+		{
+			var lt = new LeftTopToolbox();
+			var lb = new LeftBottomToolbox();
+			var hidden = new List<IDockable>();
+			var service = new DockLayoutService(new IToolbox[] { lt, lb });
+			service.RegisterAnchorableVisibilityHandler(
+				show: _ => { },
+				hide: d => hidden.Add(d),
+				isOpen: d => true,
+				isSideOpen: _ => true);
+
+			service.ToggleSide(ToolboxSide.Left);
+			Assert.That(hidden, Has.Count.EqualTo(2));
+			Assert.That(hidden, Contains.Item(lt));
+			Assert.That(hidden, Contains.Item(lb));
+		}
+
+		/// <summary>
+		/// ToggleSide extension shows first available when none are open.
+		/// </summary>
+		[Test]
+		public void ToggleSide_ShowsFirst_WhenNoneAreOpen()
+		{
+			var lt = new LeftTopToolbox();
+			var lb = new LeftBottomToolbox();
+			IDockable? shown = null;
+			var service = new DockLayoutService(new IToolbox[] { lt, lb });
+			service.RegisterAnchorableVisibilityHandler(
+				show: d => shown = d,
+				hide: _ => { },
+				isOpen: _ => false,
+				isSideOpen: _ => false);
+
+			service.ToggleSide(ToolboxSide.Left);
+			Assert.That(shown, Is.SameAs(lt));
+		}
+
+		/// <summary>
+		/// ToggleSide does nothing when no toolboxes exist on the side.
+		/// </summary>
+		[Test]
+		public void ToggleSide_DoesNothing_WhenNoToolboxesOnSide()
+		{
+			var lt = new LeftTopToolbox();
+			bool anyCalled = false;
+			var service = new DockLayoutService(new IToolbox[] { lt });
+			service.RegisterAnchorableVisibilityHandler(
+				show: _ => anyCalled = true,
+				hide: _ => anyCalled = true,
+				isOpen: _ => false,
+				isSideOpen: _ => false);
+
+			service.ToggleSide(ToolboxSide.Right);
+			Assert.That(anyCalled, Is.False);
 		}
 
 		/// <summary>
@@ -299,16 +427,46 @@ namespace AvalonDockTest
 	}
 
 	/// <summary>
-	/// Tests for ToggleLayoutEngine zone-to-side mapping used by zone group toggle.
+	/// Tests for DockZone extension methods and ToggleLayoutEngine zone-to-side mapping.
 	/// </summary>
 	[TestFixture]
-	public class ZoneToSideMapTests
+	public class DockZoneExtensionTests
 	{
 		/// <summary>
-		/// Left zones map to Left AnchorSide.
+		/// Left zones map to Left ToolboxSide.
 		/// </summary>
 		[Test]
 		public void LeftZones_MapToLeftSide()
+		{
+			Assert.That(DockZone.LeftTop.ToSide(), Is.EqualTo(ToolboxSide.Left));
+			Assert.That(DockZone.LeftBottom.ToSide(), Is.EqualTo(ToolboxSide.Left));
+		}
+
+		/// <summary>
+		/// Right zones map to Right ToolboxSide.
+		/// </summary>
+		[Test]
+		public void RightZones_MapToRightSide()
+		{
+			Assert.That(DockZone.RightTop.ToSide(), Is.EqualTo(ToolboxSide.Right));
+			Assert.That(DockZone.RightBottom.ToSide(), Is.EqualTo(ToolboxSide.Right));
+		}
+
+		/// <summary>
+		/// Bottom zones map to Bottom ToolboxSide.
+		/// </summary>
+		[Test]
+		public void BottomZones_MapToBottomSide()
+		{
+			Assert.That(DockZone.BottomLeft.ToSide(), Is.EqualTo(ToolboxSide.Bottom));
+			Assert.That(DockZone.BottomRight.ToSide(), Is.EqualTo(ToolboxSide.Bottom));
+		}
+
+		/// <summary>
+		/// Left zones map to Left AnchorSide (existing ToggleLayoutEngine mapping).
+		/// </summary>
+		[Test]
+		public void LeftZones_MapToLeftAnchorSide()
 		{
 			Assert.That(ToggleLayoutEngine.ZoneToAnchorSide(DockZone.LeftTop), Is.EqualTo(AnchorSide.Left));
 			Assert.That(ToggleLayoutEngine.ZoneToAnchorSide(DockZone.LeftBottom), Is.EqualTo(AnchorSide.Left));
@@ -318,7 +476,7 @@ namespace AvalonDockTest
 		/// Right zones map to Right AnchorSide.
 		/// </summary>
 		[Test]
-		public void RightZones_MapToRightSide()
+		public void RightZones_MapToRightAnchorSide()
 		{
 			Assert.That(ToggleLayoutEngine.ZoneToAnchorSide(DockZone.RightTop), Is.EqualTo(AnchorSide.Right));
 			Assert.That(ToggleLayoutEngine.ZoneToAnchorSide(DockZone.RightBottom), Is.EqualTo(AnchorSide.Right));
@@ -328,7 +486,7 @@ namespace AvalonDockTest
 		/// Bottom zones map to Bottom AnchorSide.
 		/// </summary>
 		[Test]
-		public void BottomZones_MapToBottomSide()
+		public void BottomZones_MapToBottomAnchorSide()
 		{
 			Assert.That(ToggleLayoutEngine.ZoneToAnchorSide(DockZone.BottomLeft), Is.EqualTo(AnchorSide.Bottom));
 			Assert.That(ToggleLayoutEngine.ZoneToAnchorSide(DockZone.BottomRight), Is.EqualTo(AnchorSide.Bottom));

@@ -30,18 +30,19 @@ namespace AvalonDock.Core
 	}
 
 	/// <summary>
-	/// Defines the side of the dock where a toolbox should be placed.
+	/// Identifies a side of the dock layout. Used both for coarse-grained placement
+	/// and for bulk show/hide operations (e.g. VS Code-style layout toggle buttons).
+	/// For finer-grained placement, see <see cref="DockZone"/>.
 	/// </summary>
-	[Obsolete("Use DockZone instead for finer-grained placement control.")]
 	public enum ToolboxSide
 	{
-		/// <summary>Docked to the left sidebar.</summary>
+		/// <summary>Docked to the left sidebar (<see cref="DockZone.LeftTop"/> + <see cref="DockZone.LeftBottom"/>).</summary>
 		Left,
 
-		/// <summary>Docked to the right sidebar.</summary>
+		/// <summary>Docked to the right sidebar (<see cref="DockZone.RightTop"/> + <see cref="DockZone.RightBottom"/>).</summary>
 		Right,
 
-		/// <summary>Docked to the bottom panel.</summary>
+		/// <summary>Docked to the bottom panel (<see cref="DockZone.BottomLeft"/> + <see cref="DockZone.BottomRight"/>).</summary>
 		Bottom
 	}
 

@@ -204,8 +204,8 @@
                 <!-- Toggle Primary Side Bar (Left) -->
                 <ToggleButton Style="{StaticResource LayoutToggleButton}"
                               ToolTip="Toggle Primary Side Bar"
-                              IsChecked="{Binding IsPrimarySideBarOpen, ElementName=dockManager, Mode=OneWay}"
-                              Command="{Binding TogglePrimarySideBarCommand, ElementName=dockManager}">
+                              IsChecked="{Binding IsPrimarySideBarOpen, Mode=OneWay}"
+                              Command="{Binding TogglePrimarySideBarCommand}">
                     <Viewbox Width="14" Height="14">
                         <Canvas Width="16" Height="16">
                             <Rectangle Width="15" Height="13" RadiusX="1" RadiusY="1"
@@ -221,8 +221,8 @@
                 <!-- Toggle Panel (Bottom) -->
                 <ToggleButton Style="{StaticResource LayoutToggleButton}"
                               ToolTip="Toggle Panel"
-                              IsChecked="{Binding IsBottomPanelOpen, ElementName=dockManager, Mode=OneWay}"
-                              Command="{Binding ToggleBottomPanelCommand, ElementName=dockManager}">
+                              IsChecked="{Binding IsBottomPanelOpen, Mode=OneWay}"
+                              Command="{Binding ToggleBottomPanelCommand}">
                     <Viewbox Width="14" Height="14">
                         <Canvas Width="16" Height="16">
                             <Rectangle Width="15" Height="13" RadiusX="1" RadiusY="1"
@@ -238,8 +238,8 @@
                 <!-- Toggle Secondary Side Bar (Right) -->
                 <ToggleButton Style="{StaticResource LayoutToggleButton}"
                               ToolTip="Toggle Secondary Side Bar"
-                              IsChecked="{Binding IsSecondarySideBarOpen, ElementName=dockManager, Mode=OneWay}"
-                              Command="{Binding ToggleSecondarySideBarCommand, ElementName=dockManager}">
+                              IsChecked="{Binding IsSecondarySideBarOpen, Mode=OneWay}"
+                              Command="{Binding ToggleSecondarySideBarCommand}">
                     <Viewbox Width="14" Height="14">
                         <Canvas Width="16" Height="16">
                             <Rectangle Width="15" Height="13" RadiusX="1" RadiusY="1"
@@ -258,6 +258,7 @@
         <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1"
                                          BorderThickness="0"
                                          DockLayout="{Binding DockLayout}"
+                                         LayoutService="{Binding LayoutService}"
                                          DocumentHeaderTemplate="{StaticResource DocumentTabHeaderTemplate}"
                                          LayoutItemContainerStyleSelector="{StaticResource PanesStyleSelector}">
             <avalonDock:ToggleDockingManager.Theme>

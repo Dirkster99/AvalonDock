@@ -57,5 +57,49 @@ namespace AvalonDock.Core
 		/// <returns>The anchorable instance, or null if not registered.</returns>
 		T? GetAnchorable<T>()
 			where T : class, IDockable;
+
+		/// <summary>Docks (shows) the specified anchorable if it is currently auto-hidden.</summary>
+		/// <param name="anchorable">The anchorable to show.</param>
+		void ShowAnchorable(IDockable anchorable);
+
+		/// <summary>Auto-hides (minimizes) the specified anchorable if it is currently docked.</summary>
+		/// <param name="anchorable">The anchorable to hide.</param>
+		void HideAnchorable(IDockable anchorable);
+
+		/// <summary>Gets a value indicating whether the specified anchorable is currently docked (not auto-hidden).</summary>
+		/// <param name="anchorable">The anchorable to query.</param>
+		/// <returns><c>true</c> if the anchorable is docked; <c>false</c> if auto-hidden or not found.</returns>
+		bool IsAnchorableOpen(IDockable anchorable);
+
+		/// <summary>Gets a value indicating whether any anchorable on the specified side is docked.</summary>
+		/// <param name="side">The side to query.</param>
+		/// <returns><c>true</c> if any anchorable on the side is docked; otherwise <c>false</c>.</returns>
+		bool IsSideOpen(ToolboxSide side);
+
+		/// <summary>
+		/// Raised when the docked/auto-hidden state of any anchorable changes.
+		/// Subscribers should re-read <see cref="IsSideOpen"/> values.
+		/// </summary>
+		event EventHandler? AnchorableStateChanged;
+
+		/// <summary>
+		/// Registers the view-layer handlers that perform actual dock/auto-hide operations.
+		/// Called by the docking manager control during initialization.
+		/// </summary>
+		/// <param name="show">Docks an anchorable from auto-hidden state.</param>
+		/// <param name="hide">Auto-hides a docked anchorable.</param>
+		/// <param name="isOpen">Returns whether an anchorable is currently docked.</param>
+		/// <param name="isSideOpen">Returns whether any anchorable on the given side is docked.</param>
+		void RegisterAnchorableVisibilityHandler(
+			Action<IDockable> show,
+			Action<IDockable> hide,
+			Func<IDockable, bool> isOpen,
+			Func<ToolboxSide, bool> isSideOpen);
+
+		/// <summary>
+		/// Notifies the service that anchorable state has changed.
+		/// Called by the view layer after any dock/auto-hide operation.
+		/// </summary>
+		void NotifyAnchorableStateChanged();
 	}
 }
