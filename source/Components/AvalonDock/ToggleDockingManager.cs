@@ -1274,6 +1274,9 @@ namespace AvalonDock
 			}
 
 			RefreshButtonStates();
+
+			// Immediately open the restored anchorable
+			ToggleAnchorable(anchorable, zone);
 		}
 
 		/// <summary>
