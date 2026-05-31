@@ -496,11 +496,12 @@ namespace AvalonDock
 				VerticalAlignment = VerticalAlignment.Center,
 			};
 
+			// Bind Fill to the button's inherited Foreground via TextElement property inheritance
 			ellipsisPath.SetBinding(System.Windows.Shapes.Shape.FillProperty,
-				new System.Windows.Data.Binding("Foreground")
+				new System.Windows.Data.Binding
 				{
-					RelativeSource = new System.Windows.Data.RelativeSource(
-						System.Windows.Data.RelativeSourceMode.FindAncestor, typeof(System.Windows.Controls.Button), 1)
+					Path = new PropertyPath(System.Windows.Documents.TextElement.ForegroundProperty),
+					RelativeSource = System.Windows.Data.RelativeSource.Self,
 				});
 
 			var btn = new System.Windows.Controls.Button
