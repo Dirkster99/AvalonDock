@@ -486,17 +486,27 @@ namespace AvalonDock
 
 		private System.Windows.Controls.Button CreateThreeDotMenuButton(AnchorablePaneTitle title)
 		{
+			var ellipsisPath = new System.Windows.Shapes.Path
+			{
+				Data = Geometry.Parse("M64 360a56 56 0 1 0 0 112 56 56 0 1 0 0-112zm0-160a56 56 0 1 0 0 112 56 56 0 1 0 0-112zM120 96A56 56 0 1 0 8 96a56 56 0 1 0 112 0z"),
+				Stretch = Stretch.Uniform,
+				Width = 4,
+				Height = 14,
+				HorizontalAlignment = HorizontalAlignment.Center,
+				VerticalAlignment = VerticalAlignment.Center,
+			};
+
+			ellipsisPath.SetBinding(System.Windows.Shapes.Shape.FillProperty,
+				new System.Windows.Data.Binding("Foreground")
+				{
+					RelativeSource = new System.Windows.Data.RelativeSource(
+						System.Windows.Data.RelativeSourceMode.FindAncestor, typeof(System.Windows.Controls.Button), 1)
+				});
+
 			var btn = new System.Windows.Controls.Button
 			{
 				Name = "PART_ToggleMenu",
-				Content = new System.Windows.Controls.TextBlock
-				{
-					Text = "⋮",
-					FontSize = 14,
-					FontWeight = FontWeights.Bold,
-					VerticalAlignment = VerticalAlignment.Center,
-					HorizontalAlignment = HorizontalAlignment.Center,
-				},
+				Content = ellipsisPath,
 				Width = 20,
 				Height = 20,
 				Padding = new Thickness(0),
@@ -1167,14 +1177,18 @@ namespace AvalonDock
 			borderFactory.SetValue(Border.CornerRadiusProperty, new CornerRadius(4));
 			borderFactory.SetValue(UIElement.SnapsToDevicePixelsProperty, true);
 
-			var textFactory = new FrameworkElementFactory(typeof(TextBlock));
-			textFactory.SetValue(TextBlock.TextProperty, "⋯");
-			textFactory.SetValue(TextBlock.FontSizeProperty, 12.0);
-			textFactory.SetValue(TextBlock.FontWeightProperty, FontWeights.Bold);
-			textFactory.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
-			textFactory.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
+			var pathFactory = new FrameworkElementFactory(typeof(System.Windows.Shapes.Path));
+			pathFactory.SetValue(System.Windows.Shapes.Path.DataProperty,
+				Geometry.Parse("M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"));
+			pathFactory.SetValue(System.Windows.Shapes.Path.StretchProperty, Stretch.Uniform);
+			pathFactory.SetValue(FrameworkElement.WidthProperty, 12.0);
+			pathFactory.SetValue(FrameworkElement.HeightProperty, 12.0);
+			pathFactory.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+			pathFactory.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
+			pathFactory.SetBinding(System.Windows.Shapes.Path.FillProperty,
+				new System.Windows.Data.Binding("Foreground") { RelativeSource = new System.Windows.Data.RelativeSource(System.Windows.Data.RelativeSourceMode.TemplatedParent) });
 
-			borderFactory.AppendChild(textFactory);
+			borderFactory.AppendChild(pathFactory);
 			template.VisualTree = borderFactory;
 
 			var hoverTrigger = new Trigger { Property = UIElement.IsMouseOverProperty, Value = true };

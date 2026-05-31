@@ -432,9 +432,9 @@
 													<Border x:Name="Bd" Background="Transparent" CornerRadius="3"
 														Width="20" Height="20">
 														<Canvas Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
-															<Ellipse Canvas.Left="7" Canvas.Top="2" Width="3" Height="3" Fill="{TemplateBinding Foreground}" />
-															<Ellipse Canvas.Left="7" Canvas.Top="6.5" Width="3" Height="3" Fill="{TemplateBinding Foreground}" />
-															<Ellipse Canvas.Left="7" Canvas.Top="11" Width="3" Height="3" Fill="{TemplateBinding Foreground}" />
+															<Ellipse Canvas.Left="7" Canvas.Top="2" Width="2" Height="2" Fill="{TemplateBinding Foreground}" />
+															<Ellipse Canvas.Left="7" Canvas.Top="6.5" Width="2" Height="2" Fill="{TemplateBinding Foreground}" />
+															<Ellipse Canvas.Left="7" Canvas.Top="11" Width="2" Height="2" Fill="{TemplateBinding Foreground}" />
 														</Canvas>
 													</Border>
 													<ControlTemplate.Triggers>
