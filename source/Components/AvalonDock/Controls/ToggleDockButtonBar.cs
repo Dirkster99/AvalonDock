@@ -137,6 +137,35 @@ namespace AvalonDock.Controls
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(ToggleDockButton), new FrameworkPropertyMetadata(typeof(ToggleDockButton)));
 		}
 
+		/// <inheritdoc/>
+		protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
+		{
+			base.OnMouseRightButtonUp(e);
+			if (Anchorable == null) return;
+
+			var manager = Anchorable.Root?.Manager as ToggleDockingManager;
+			if (manager == null) return;
+
+			var menu = manager.BuildToggleContextMenu(Anchorable);
+
+			// Insert "Hide" at the top, followed by a separator
+			var hideItem = new MenuItem { Header = "Hide" };
+			hideItem.Click += (s, ev) =>
+			{
+				var layoutItem = manager.GetLayoutItemFromModel(Anchorable) as LayoutAnchorableItem;
+				layoutItem?.HideCommand?.Execute(null);
+				manager.RemoveButtonFromAllBars(Anchorable);
+			};
+
+			menu.Items.Insert(0, hideItem);
+			menu.Items.Insert(1, new Separator());
+
+			menu.PlacementTarget = this;
+			menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+			menu.IsOpen = true;
+			e.Handled = true;
+		}
+
 		/// <summary>
 		/// Gets or sets the anchorable.
 		/// </summary>

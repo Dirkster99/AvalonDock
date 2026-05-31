@@ -106,6 +106,11 @@ namespace AvalonDock
 		/// </summary>
 		internal FrameworkElement _rightSeparator;
 
+		/// <summary>
+		/// The button that opens the hidden anchorables menu.
+		/// </summary>
+		private Button _showHiddenButton;
+
 		private static Style _staticToggleStyle;
 
 		private static Style LoadToggleStyle()
@@ -869,6 +874,7 @@ namespace AvalonDock
 			DockPanel.SetDock(_leftBottomBar, Dock.Top);
 
 			leftPanel.Children.Add(_leftTopBar);
+			leftPanel.Children.Add(CreateShowHiddenButton());
 			leftPanel.Children.Add(leftSep);
 			leftPanel.Children.Add(_leftBottomBar);
 			leftPanel.Children.Add(_bottomLeftBar);
@@ -1118,6 +1124,133 @@ namespace AvalonDock
 				default:
 					return Layout.LeftSide;
 			}
+		}
+
+		/// <summary>
+		/// Creates the button that opens the hidden anchorables menu.
+		/// </summary>
+		/// <returns>The show-hidden button, docked to Top.</returns>
+		private Button CreateShowHiddenButton()
+		{
+			_showHiddenButton = new Button
+			{
+				Content = new TextBlock
+				{
+					Text = "⋯",
+					FontSize = 12,
+					FontWeight = FontWeights.Bold,
+					HorizontalAlignment = HorizontalAlignment.Center,
+					VerticalAlignment = VerticalAlignment.Center,
+				},
+				Width = ButtonSize,
+				Height = ButtonSize,
+				Padding = new Thickness(0),
+				Margin = new Thickness(2),
+				Focusable = false,
+				Background = Brushes.Transparent,
+				BorderBrush = Brushes.Transparent,
+				BorderThickness = new Thickness(0),
+				Style = (Style)FindResource(ToolBar.ButtonStyleKey),
+				ToolTip = "Hidden Panels",
+			};
+
+			_showHiddenButton.Click += (s, e) =>
+			{
+				var menu = BuildShowHiddenContextMenu();
+				if (menu == null) return;
+				menu.PlacementTarget = _showHiddenButton;
+				menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Right;
+				menu.IsOpen = true;
+			};
+
+			DockPanel.SetDock(_showHiddenButton, Dock.Top);
+			return _showHiddenButton;
+		}
+
+		/// <summary>
+		/// Builds a context menu listing all hidden anchorables.
+		/// </summary>
+		/// <returns>The context menu, or null if no anchorables are hidden.</returns>
+		private ContextMenu BuildShowHiddenContextMenu()
+		{
+			if (Layout?.Hidden == null || Layout.Hidden.Count == 0)
+				return null;
+
+			var menu = new ContextMenu();
+			foreach (var anchorable in Layout.Hidden.ToList())
+			{
+				var mi = new MenuItem { Header = anchorable.Title };
+
+				// Try to show the icon
+				var attachedIcon = ToggleDock.GetIcon(anchorable);
+				if (attachedIcon is FrameworkElement iconElement)
+				{
+					var rect = new System.Windows.Shapes.Rectangle
+					{
+						Width = 16,
+						Height = 16,
+						Fill = new VisualBrush(iconElement) { Stretch = Stretch.Uniform },
+					};
+					mi.Icon = rect;
+				}
+				else if (anchorable.IconSource != null)
+				{
+					mi.Icon = new System.Windows.Controls.Image
+					{
+						Source = anchorable.IconSource,
+						Width = 16,
+						Height = 16,
+					};
+				}
+
+				var anc = anchorable;
+				mi.Click += (s, ev) => RestoreHiddenAnchorable(anc);
+				menu.Items.Add(mi);
+			}
+
+			return menu;
+		}
+
+		/// <summary>
+		/// Restores a hidden anchorable back to the toggle button bars.
+		/// </summary>
+		/// <param name="anchorable">The hidden anchorable to restore.</param>
+		internal void RestoreHiddenAnchorable(LayoutAnchorable anchorable)
+		{
+			if (anchorable == null) return;
+
+			var zone = DockZone.LeftTop;
+			if (anchorable.Content is IToolbox toolbox)
+				zone = toolbox.Zone;
+
+			// Remove from Hidden collection
+			if (Layout.Hidden.Contains(anchorable))
+				Layout.Hidden.Remove(anchorable);
+
+			// Add to the correct layout side as auto-hidden
+			var targetSide = GetLayoutSideForZone(zone);
+			var group = new LayoutAnchorGroup();
+			targetSide.Children.Add(group);
+			group.Children.Add(anchorable);
+
+			// Add button to the appropriate bar
+			var bar = GetBarForZone(zone);
+			if (bar != null)
+			{
+				var btn = new ToggleDockButton { Anchorable = anchorable, Zone = zone };
+				bar.Items.Add(btn);
+			}
+
+			RefreshButtonStates();
+		}
+
+		/// <summary>
+		/// Removes the button for the specified anchorable from all button bars.
+		/// </summary>
+		/// <param name="anchorable">The anchorable whose button to remove.</param>
+		internal void RemoveButtonFromAllBars(LayoutAnchorable anchorable)
+		{
+			RemoveFromAllBars(anchorable);
 		}
 
 		private void RemoveFromAllBars(LayoutAnchorable anchorable)
