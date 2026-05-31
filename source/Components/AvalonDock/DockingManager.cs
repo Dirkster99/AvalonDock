@@ -1992,6 +1992,15 @@ namespace AvalonDock
 		internal FrameworkElement GetAutoHideAreaElement() => _autohideArea;
 
 		/// <summary>
+		/// Float a content item into a floating window, optionally starting an attached drag.
+		/// Exposed as a small public helper for parity harnesses and sample apps.
+		/// </summary>
+		/// <param name="contentModel">The document or anchorable to float.</param>
+		/// <param name="startDrag">Whether to attach drag behavior immediately after floating.</param>
+		public void FloatContent(LayoutContent contentModel, bool startDrag = false)
+			=> StartDraggingFloatingWindowForContent(contentModel, startDrag);
+
+		/// <summary>
 		/// Executes when the user starts to drag a <see cref="LayoutDocument"/> or
 		/// <see cref="LayoutAnchorable"/> by dragging its TabItem Header.
 		/// </summary>

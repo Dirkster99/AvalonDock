@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using AvalonDock.Layout;
 #if HAS_UNO
 using Microsoft.UI.Dispatching;
@@ -46,7 +47,7 @@ namespace AvalonDock.Controls
 #endif
 		where T : class, ILayoutPanelElement
 	{
-		protected readonly LayoutPositionableGroup<T> _model;
+		private readonly LayoutPositionableGroup<T> _model;
 		private readonly Orientation _orientation;
 		private bool _initialized;
 		private ChildrenTreeChange? _asyncRefreshCalled;

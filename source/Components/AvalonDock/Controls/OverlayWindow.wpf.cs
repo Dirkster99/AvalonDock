@@ -516,7 +516,7 @@ namespace AvalonDock.Controls
 						var group = dropAreaDocumentPaneGroup.AreaElement.Model as LayoutDocumentPaneGroup;
 						var groupVisibility = OverlayIndicatorContextRules.ForDocumentPaneGroup(
 							group,
-							_floatingWindow?.Model,
+							_floatingWindow?.Model as LayoutFloatingWindow,
 							out var layoutDocumentPane);
 						if (layoutDocumentPane == null)
 						{
@@ -563,7 +563,7 @@ namespace AvalonDock.Controls
 								layoutDocumentPane,
 								isAnchorableDrag: true,
 								allowMixedOrientation: parentDocumentPaneGroup?.Root?.Manager?.AllowMixedOrientation ?? false,
-								floatingModel: _floatingWindow?.Model);
+								floatingModel: _floatingWindow?.Model as LayoutFloatingWindow);
 
 							ApplyDirectionalVisibility(visibility,
 								_documentPaneFullDropTargetLeft,
@@ -605,7 +605,7 @@ namespace AvalonDock.Controls
 								layoutDocumentPane,
 								isAnchorableDrag: false,
 								allowMixedOrientation: parentDocumentPaneGroup?.Root?.Manager?.AllowMixedOrientation ?? false,
-								floatingModel: _floatingWindow?.Model);
+								floatingModel: _floatingWindow?.Model as LayoutFloatingWindow);
 
 							ApplyDirectionalVisibility(visibility,
 								_documentPaneDropTargetLeft,
