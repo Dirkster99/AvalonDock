@@ -237,10 +237,10 @@ namespace AvalonDockTest
 		}
 
 		/// <summary>
-		/// ToggleSide extension shows first available when none are open.
+		/// ToggleSide extension shows first available when none are open and no history exists.
 		/// </summary>
 		[Test]
-		public void ToggleSide_ShowsFirst_WhenNoneAreOpen()
+		public void ToggleSide_ShowsFirst_WhenNoneAreOpenAndNoHistory()
 		{
 			var lt = new LeftTopToolbox();
 			var lb = new LeftBottomToolbox();
@@ -248,6 +248,56 @@ namespace AvalonDockTest
 
 			service.ToggleSide(ToolboxSide.Left);
 			Assert.That(service.IsAnchorableOpen(lt), Is.True);
+		}
+
+		/// <summary>
+		/// ToggleSide restores previously open toolboxes after toggling off and on again.
+		/// </summary>
+		[Test]
+		public void ToggleSide_RestoresLastOpened_WhenToggledBackOn()
+		{
+			var lt = new LeftTopToolbox();
+			var lb = new LeftBottomToolbox();
+			var service = new DockLayoutService(new IToolbox[] { lt, lb });
+
+			// Open only lb (the second one)
+			service.ShowAnchorable(lb);
+			Assert.That(service.IsAnchorableOpen(lb), Is.True);
+			Assert.That(service.IsAnchorableOpen(lt), Is.False);
+
+			// Toggle off — should remember lb was open
+			service.ToggleSide(ToolboxSide.Left);
+			Assert.That(service.IsAnchorableOpen(lb), Is.False);
+
+			// Toggle back on — should restore lb, not lt
+			service.ToggleSide(ToolboxSide.Left);
+			Assert.That(service.IsAnchorableOpen(lb), Is.True, "Last opened toolbox should be restored");
+			Assert.That(service.IsAnchorableOpen(lt), Is.False, "Toolbox that was not previously open should stay closed");
+		}
+
+		/// <summary>
+		/// ToggleSide restores all previously open toolboxes, not just one.
+		/// </summary>
+		[Test]
+		public void ToggleSide_RestoresAllPreviouslyOpen_WhenMultipleWereOpen()
+		{
+			var lt = new LeftTopToolbox();
+			var lb = new LeftBottomToolbox();
+			var service = new DockLayoutService(new IToolbox[] { lt, lb });
+
+			// Open both
+			service.ShowAnchorable(lt);
+			service.ShowAnchorable(lb);
+
+			// Toggle off
+			service.ToggleSide(ToolboxSide.Left);
+			Assert.That(service.IsAnchorableOpen(lt), Is.False);
+			Assert.That(service.IsAnchorableOpen(lb), Is.False);
+
+			// Toggle back on — both should restore
+			service.ToggleSide(ToolboxSide.Left);
+			Assert.That(service.IsAnchorableOpen(lt), Is.True);
+			Assert.That(service.IsAnchorableOpen(lb), Is.True);
 		}
 
 		/// <summary>
