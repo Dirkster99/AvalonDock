@@ -17,7 +17,7 @@
 
         <avalonedit:TextEditor Grid.Row="1"
                                x:Name="Editor"
-                               FontFamily="Cascadia Mono,Consolas,Courier New"
+                               FontFamily="Consolas, Courier New, monospace"
                                FontSize="13"
                                Background="{DynamicResource AppEditorBg}"
                                Foreground="{DynamicResource AppEditorText}"

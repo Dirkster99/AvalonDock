@@ -195,8 +195,7 @@
                                         <TextBlock Foreground="{DynamicResource AppSubText}" FontSize="13" TextAlignment="Center" LineHeight="24">
                                             <Run Text="Click sidebar icons to toggle panels" /><LineBreak />
                                             <Run Text="Drag buttons between zones to rearrange" /><LineBreak />
-                                            <Run Text="Double-click files in Explorer to open" /><LineBreak />
-                                            <Run Text="Right-click panel title for Move To / View Mode" />
+                                            <Run Text="Double-click files in Explorer to open" />
                                         </TextBlock>
                                         <TextBlock Foreground="{DynamicResource AppDimText}" FontSize="11" TextAlignment="Center"
                                                    Margin="0,24,0,0">

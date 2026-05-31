@@ -2714,11 +2714,11 @@
                                 ToolTip="Options"
                                 Visibility="{Binding ShowHeaderOptionsButton, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=Visible, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
                                 <Canvas Width="10" Height="10" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Ellipse x:Name="Dot1" Canvas.Left="3.5" Canvas.Top="0" Width="3" Height="3"
+                                    <Ellipse x:Name="Dot1" Canvas.Left="3.5" Canvas.Top="0" Width="2" Height="2"
                                              Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}" />
-                                    <Ellipse x:Name="Dot2" Canvas.Left="3.5" Canvas.Top="3.5" Width="3" Height="3"
+                                    <Ellipse x:Name="Dot2" Canvas.Left="3.5" Canvas.Top="3.5" Width="2" Height="2"
                                              Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}" />
-                                    <Ellipse x:Name="Dot3" Canvas.Left="3.5" Canvas.Top="7" Width="3" Height="3"
+                                    <Ellipse x:Name="Dot3" Canvas.Left="3.5" Canvas.Top="7" Width="2" Height="2"
                                              Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}" />
                                 </Canvas>
                             </Button>
@@ -3023,7 +3023,7 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Foreground" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionInactiveText}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static avalonDockControls:ToggleDockButton.ForegroundBrushKey}}" />
         <Setter Property="Width" Value="{Binding ButtonSize, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=25}" />
         <Setter Property="Height" Value="{Binding ButtonSize, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=25}" />
         <Setter Property="Padding" Value="0" />

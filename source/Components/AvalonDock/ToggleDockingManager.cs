@@ -874,9 +874,9 @@ namespace AvalonDock
 			DockPanel.SetDock(_leftBottomBar, Dock.Top);
 
 			leftPanel.Children.Add(_leftTopBar);
-			leftPanel.Children.Add(CreateShowHiddenButton());
 			leftPanel.Children.Add(leftSep);
 			leftPanel.Children.Add(_leftBottomBar);
+			leftPanel.Children.Add(CreateShowHiddenButton());
 			leftPanel.Children.Add(_bottomLeftBar);
 			leftPanel.Children.Add(new Border()); // fill gap
 
@@ -1142,6 +1142,8 @@ namespace AvalonDock
 				ToolTip = "Hidden Panels",
 				Template = CreateShowHiddenButtonTemplate(),
 			};
+
+			_showHiddenButton.SetResourceReference(Control.ForegroundProperty, ToggleDockButton.ForegroundBrushKey);
 
 			_showHiddenButton.Click += (s, e) =>
 			{

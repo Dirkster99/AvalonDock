@@ -128,6 +128,12 @@ namespace AvalonDock.Controls
 	/// </summary>
 	public class ToggleDockButton : ToggleButton
 	{
+		/// <summary>
+		/// Resource key for the sidebar button foreground brush, shared by all sidebar buttons.
+		/// </summary>
+		public static readonly ComponentResourceKey ForegroundBrushKey =
+			new ComponentResourceKey(typeof(ToggleDockButton), "ForegroundBrush");
+
 		private Point _dragStartPoint;
 		private bool _isMouseDown;
 		private bool _isDragging;

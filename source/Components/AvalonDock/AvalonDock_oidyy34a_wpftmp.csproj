@@ -1,0 +1,85 @@
+<Project>
+  <PropertyGroup>
+    <AssemblyName>AvalonDock</AssemblyName>
+    <IntermediateOutputPath>obj\Debug\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>C:\Users\aleu1c014278\git\AvalonDockAI\source\Components\AvalonDock\obj\</MSBuildProjectExtensionsPath>
+    <_TargetAssemblyProjectName>AvalonDock</_TargetAssemblyProjectName>
+    <RootNamespace>AvalonDock</RootNamespace>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk.WindowsDesktop" />
+  <PropertyGroup>
+    <RootNamespace>AvalonDock</RootNamespace>
+    <PackageId>Dirkster.AvalonDock</PackageId>
+    <TargetFrameworks>$(ComponentTargetFrameworks)</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net.5.0-windows|AnyCPU'">
+    <DefineConstants />
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <!-- NuGet Packaging -->
+  <ItemGroup>
+    <None Include="LICENSE" Pack="true" PackagePath="" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AvalonDock.Core\AvalonDock.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.ca-ES.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <!--PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <DefineConstants>TRACE;DEBUG</DefineConstants>
+	</PropertyGroup>-->
+  <ItemGroup>
+    <ReferencePath Include="C:\Users\aleu1c014278\git\AvalonDockAI\source\Components\AvalonDock.Core\bin\Debug\netstandard2.0\AvalonDock.Core.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\mscorlib.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\PresentationCore.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\PresentationFramework.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\System.Core.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\System.Data.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\System.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\System.Drawing.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\System.IO.Compression.FileSystem.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\System.Numerics.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\System.Runtime.Serialization.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\System.Windows.Controls.Ribbon.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\System.Xaml.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\System.Xml.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\System.Xml.Linq.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\UIAutomationClient.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\UIAutomationClientsideProviders.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\UIAutomationProvider.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\UIAutomationTypes.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\WindowsBase.dll" />
+    <ReferencePath Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.netframework.referenceassemblies.net48\1.0.3\build\.NETFramework\v4.8\Facades\netstandard.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="C:\Users\aleu1c014278\git\AvalonDockAI\source\Components\AvalonDock\obj\Debug\net48\GeneratedInternalTypeHelper.g.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.codeanalysis.netanalyzers\10.0.300\analyzers\dotnet\Microsoft.CodeAnalysis.NetAnalyzers.dll" />
+    <Analyzer Include="C:\Users\aleu1c014278\.nuget\packages\microsoft.codeanalysis.netanalyzers\10.0.300\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll" />
+    <Analyzer Include="C:\Users\aleu1c014278\.nuget\packages\sonaranalyzer.csharp\10.26.0.140279\analyzers\SonarAnalyzer.CSharp.dll" />
+    <Analyzer Include="C:\Users\aleu1c014278\.nuget\packages\stylecop.analyzers.unstable\1.2.0.556\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="C:\Users\aleu1c014278\.nuget\packages\stylecop.analyzers.unstable\1.2.0.556\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.WindowsDesktop" />
+</Project>
