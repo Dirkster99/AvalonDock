@@ -9,6 +9,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -95,6 +96,9 @@ namespace AvalonDock
 		/// The injected Right Dock Panel field.
 		/// </summary>
 		internal DockPanel _injectedRightDockPanel;
+
+		private readonly Dictionary<IToolbox, LayoutAnchorable> _toolboxToAnchorable = new Dictionary<IToolbox, LayoutAnchorable>();
+		private int _syncDepth;
 
 		/// <summary>
 		/// The left Separator field.
@@ -342,7 +346,7 @@ namespace AvalonDock
 			RefreshButtonStates();
 			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
 				new System.Action(UpdatePinButtonsToMinimize));
-			PushStateToService();
+			SetToolboxIsOpen(anchorable);
 		}
 
 		/// <summary>
@@ -388,6 +392,9 @@ namespace AvalonDock
 			{
 				var btn = new ToggleDockButton { Anchorable = anchorable, Zone = targetZone };
 				targetBar.Items.Add(btn);
+
+				if (anchorable.Content is IToolbox movedToolbox)
+					RegisterToolbox(movedToolbox, anchorable);
 			}
 
 			// Toggle it on
@@ -888,6 +895,8 @@ namespace AvalonDock
 			System.Windows.Automation.AutomationProperties.SetAutomationId(_bottomRightBar, "ToggleDockBar_BottomRight");
 			_bottomRightBar.SetAnchorables(bottomRight, DockZone.BottomRight);
 
+			RegisterToolboxesFromBars();
+
 			// Inject into the template grid
 			var rootGrid = FindTemplateRootGrid();
 			if (rootGrid == null) return;
@@ -952,6 +961,12 @@ namespace AvalonDock
 
 		private void RemoveToggleDockButtonBars()
 		{
+			// Unsubscribe from all toolbox PropertyChanged events
+			foreach (var toolbox in _toolboxToAnchorable.Keys.ToList())
+			{
+				UnregisterToolbox(toolbox);
+			}
+
 			// Clear icon content on all buttons before removing them from the visual tree.
 			// Icon Viewbox instances use RelativeSource.FindAncestor bindings to the button's
 			// Foreground. If the Viewbox is re-parented directly to a new button, WPF may not
@@ -1289,6 +1304,9 @@ namespace AvalonDock
 			{
 				var btn = new ToggleDockButton { Anchorable = anchorable, Zone = zone };
 				bar.Items.Add(btn);
+
+				if (anchorable.Content is IToolbox restoredToolbox)
+					RegisterToolbox(restoredToolbox, anchorable);
 			}
 
 			RefreshButtonStates();
@@ -1332,93 +1350,109 @@ namespace AvalonDock
 		private void OnActiveContentChangedForAnchorableState(object sender, EventArgs e)
 		{
 			RefreshButtonStates();
-			PushStateToService();
 		}
 
 		private static void OnLayoutServiceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
-			if (d is ToggleDockingManager manager)
-			{
-				if (e.OldValue is IDockLayoutService oldService)
-				{
-					oldService.AnchorableStateChanged -= manager.OnServiceAnchorableStateChanged;
-				}
+			// LayoutService DP is kept for XAML binding but TDM no longer subscribes
+			// to AnchorableStateChanged — it reacts per-toolbox via PropertyChanged.
+		}
 
-				if (e.NewValue is IDockLayoutService newService)
+		private void RegisterToolboxesFromBars()
+		{
+			ToggleDockButtonBar[] allBars = { _leftTopBar, _leftBottomBar, _rightTopBar, _rightBottomBar, _bottomLeftBar, _bottomRightBar };
+			foreach (var bar in allBars)
+			{
+				if (bar == null) continue;
+				foreach (var item in bar.Items)
 				{
-					newService.AnchorableStateChanged += manager.OnServiceAnchorableStateChanged;
+					if (item is ToggleDockButton btn && btn.Anchorable?.Content is IToolbox toolbox)
+					{
+						RegisterToolbox(toolbox, btn.Anchorable);
+					}
 				}
 			}
 		}
 
-		private bool _suppressServiceSync;
-
-		private void OnServiceAnchorableStateChanged(object sender, EventArgs e)
+		/// <summary>
+		/// Registers a toolbox↔anchorable link: subscribes to the toolbox's PropertyChanged
+		/// so the TDM can react when <see cref="IToolbox.IsOpen"/> changes from the MVVM layer.
+		/// </summary>
+		/// <param name="toolbox">The toolbox to register.</param>
+		/// <param name="anchorable">The layout anchorable linked to the toolbox.</param>
+		internal void RegisterToolbox(IToolbox toolbox, LayoutAnchorable anchorable)
 		{
-			if (_suppressServiceSync || LayoutService == null)
+			if (_toolboxToAnchorable.ContainsKey(toolbox))
+			{
+				_toolboxToAnchorable[toolbox] = anchorable;
 				return;
+			}
 
-			SyncLayoutFromService();
+			_toolboxToAnchorable[toolbox] = anchorable;
+
+			if (toolbox is INotifyPropertyChanged npc)
+			{
+				npc.PropertyChanged += OnToolboxPropertyChanged;
+			}
 		}
 
 		/// <summary>
-		/// Reads each toolbox's <see cref="IToolbox.IsOpen"/> state and
-		/// docks or auto-hides to match. Called when the service raises
-		/// <see cref="IDockLayoutService.AnchorableStateChanged"/>.
+		/// Unregisters a toolbox↔anchorable link and unsubscribes from PropertyChanged.
 		/// </summary>
-		private void SyncLayoutFromService()
+		/// <param name="toolbox">The toolbox to unregister.</param>
+		internal void UnregisterToolbox(IToolbox toolbox)
 		{
-			var service = LayoutService;
-			if (service == null)
+			_toolboxToAnchorable.Remove(toolbox);
+
+			if (toolbox is INotifyPropertyChanged npc)
+			{
+				npc.PropertyChanged -= OnToolboxPropertyChanged;
+			}
+		}
+
+		private void OnToolboxPropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			if (e.PropertyName != nameof(IToolbox.IsOpen) || _syncDepth > 0)
 				return;
 
-			_suppressServiceSync = true;
+			if (!(sender is IToolbox toolbox) || !_toolboxToAnchorable.TryGetValue(toolbox, out var anchorable))
+				return;
+
+			bool wantOpen = toolbox.IsOpen;
+			bool isOpen = !anchorable.IsAutoHidden;
+
+			if (wantOpen == isOpen)
+				return;
+
+			_syncDepth++;
 			try
 			{
-				ToggleDockButtonBar[] allBars = { _leftTopBar, _leftBottomBar, _rightTopBar, _rightBottomBar, _bottomLeftBar, _bottomRightBar };
-				foreach (var bar in allBars)
+				if (wantOpen)
 				{
-					if (bar == null) continue;
-					foreach (var item in bar.Items)
+					var zone = GetAnchorableZone(anchorable);
+					HideDockedInBar(GetBarForZone(zone));
+					DockFromAutoHide(anchorable, zone);
+					FixSplitOrientation(anchorable, zone);
+
+					if (ToggleLayoutEngine.IsBottomZone(zone))
+						EnsureBottomZoneOrder();
+
+					switch (LayoutPriority)
 					{
-						if (!(item is ToggleDockButton btn) || btn.Anchorable == null)
-							continue;
-
-						var anchorable = btn.Anchorable;
-						if (!(anchorable.Content is IToolbox toolbox))
-							continue;
-
-						bool wantOpen = toolbox.IsOpen;
-						bool isOpen = !anchorable.IsAutoHidden;
-
-						if (wantOpen && !isOpen)
-						{
-							var zone = GetAnchorableZone(anchorable);
-							HideDockedInBar(GetBarForZone(zone));
-							DockFromAutoHide(anchorable, zone);
-							FixSplitOrientation(anchorable, zone);
-
-							if (ToggleLayoutEngine.IsBottomZone(zone))
-								EnsureBottomZoneOrder();
-
-							switch (LayoutPriority)
-							{
-								case DockLayoutPriority.BottomFullWidth:
-									EnsureBottomFullWidth();
-									break;
-								case DockLayoutPriority.SidesFullHeight:
-									EnsureSidesFullHeight();
-									break;
-							}
-
-							ActiveContent = anchorable.Content;
-						}
-						else if (!wantOpen && isOpen)
-						{
-							var zone = GetAnchorableZone(anchorable);
-							AutoHideFromDock(anchorable, zone);
-						}
+						case DockLayoutPriority.BottomFullWidth:
+							EnsureBottomFullWidth();
+							break;
+						case DockLayoutPriority.SidesFullHeight:
+							EnsureSidesFullHeight();
+							break;
 					}
+
+					ActiveContent = anchorable.Content;
+				}
+				else
+				{
+					var zone = GetAnchorableZone(anchorable);
+					AutoHideFromDock(anchorable, zone);
 				}
 
 				RefreshButtonStates();
@@ -1427,43 +1461,27 @@ namespace AvalonDock
 			}
 			finally
 			{
-				_suppressServiceSync = false;
+				_syncDepth--;
 			}
 		}
 
 		/// <summary>
-		/// Pushes the current WPF layout state (docked vs auto-hidden) for every
-		/// anchorable into the toolbox <see cref="IToolbox.IsOpen"/> property.
-		/// Called after <see cref="ToggleAnchorable"/> or any view-initiated state change.
+		/// Sets <see cref="IToolbox.IsOpen"/> on the single toolbox that was just toggled
+		/// in the view layer. Uses <see cref="_syncDepth"/> to prevent re-entrancy.
 		/// </summary>
-		private void PushStateToService()
+		private void SetToolboxIsOpen(LayoutAnchorable anchorable)
 		{
-			var service = LayoutService;
-			if (service == null)
+			if (!(anchorable.Content is IToolbox toolbox))
 				return;
 
-			_suppressServiceSync = true;
+			_syncDepth++;
 			try
 			{
-				ToggleDockButtonBar[] allBars = { _leftTopBar, _leftBottomBar, _rightTopBar, _rightBottomBar, _bottomLeftBar, _bottomRightBar };
-				foreach (var bar in allBars)
-				{
-					if (bar == null) continue;
-					foreach (var item in bar.Items)
-					{
-						if (!(item is ToggleDockButton btn) || btn.Anchorable == null)
-							continue;
-
-						if (btn.Anchorable.Content is IToolbox toolbox)
-						{
-							toolbox.IsOpen = !btn.Anchorable.IsAutoHidden;
-						}
-					}
-				}
+				toolbox.IsOpen = !anchorable.IsAutoHidden;
 			}
 			finally
 			{
-				_suppressServiceSync = false;
+				_syncDepth--;
 			}
 		}
 	}
