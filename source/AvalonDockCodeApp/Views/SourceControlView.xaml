@@ -4,6 +4,8 @@
              xmlns:vm="clr-namespace:ToggleTestApp.ViewModels"
              Background="{DynamicResource AppPanelBg}">
     <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
         <DataTemplate x:Key="ChangeItemTemplate" DataType="{x:Type vm:ChangeItem}">
             <Grid Margin="4,1" ToolTip="{Binding FilePath}">
                 <Grid.ColumnDefinitions>

@@ -183,59 +183,70 @@ public partial class SearchViewModel : ToolboxBase
 	private static string[] GetSearchableFiles(
 		string rootPath, string includeFilter, string excludeFilter)
 	{
-		var extensions = new[]
+		var extensions = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase)
 		{
-			"*.cs", "*.xaml", "*.xml", "*.json", "*.csproj", "*.sln",
-			"*.props", "*.targets", "*.md", "*.txt", "*.js", "*.ts",
-			"*.css", "*.html", "*.htm", "*.py", "*.config", "*.yml", "*.yaml"
+			".cs", ".xaml", ".xml", ".json", ".csproj", ".sln",
+			".props", ".targets", ".md", ".txt", ".js", ".ts",
+			".css", ".html", ".htm", ".py", ".config", ".yml", ".yaml"
 		};
 
 		var includePatterns = string.IsNullOrWhiteSpace(includeFilter)
 			? Array.Empty<string>()
 			: includeFilter.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-		var excludePatterns = string.IsNullOrWhiteSpace(excludeFilter)
-			? new[] { "bin", "obj", ".git", ".vs", "node_modules", "packages" }
-			: excludeFilter.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+		var excludeDirs = string.IsNullOrWhiteSpace(excludeFilter)
+			? new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase)
+				{ "bin", "obj", ".git", ".vs", "node_modules", "packages" }
+			: new System.Collections.Generic.HashSet<string>(
+				excludeFilter.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+				StringComparer.OrdinalIgnoreCase);
 
 		var files = new System.Collections.Generic.List<string>();
+		CollectFiles(rootPath, extensions, excludeDirs, includePatterns, files);
+		return files.ToArray();
+	}
 
+	private static void CollectFiles(
+		string directory,
+		System.Collections.Generic.HashSet<string> extensions,
+		System.Collections.Generic.HashSet<string> excludeDirs,
+		string[] includePatterns,
+		System.Collections.Generic.List<string> result)
+	{
 		try
 		{
-			foreach (var ext in extensions)
+			foreach (var file in Directory.EnumerateFiles(directory))
 			{
-				foreach (var file in Directory.EnumerateFiles(rootPath, ext, SearchOption.AllDirectories))
+				var ext = Path.GetExtension(file);
+				if (!extensions.Contains(ext))
+					continue;
+
+				if (includePatterns.Length > 0)
 				{
-					var skip = false;
-					foreach (var excl in excludePatterns)
+					var matched = false;
+					foreach (var incl in includePatterns)
 					{
-						if (file.Contains(Path.DirectorySeparatorChar + excl + Path.DirectorySeparatorChar,
-							StringComparison.OrdinalIgnoreCase))
+						if (file.EndsWith(incl.TrimStart('*'), StringComparison.OrdinalIgnoreCase))
 						{
-							skip = true;
+							matched = true;
 							break;
 						}
 					}
 
-					if (skip) continue;
-
-					if (includePatterns.Length > 0)
-					{
-						var matched = false;
-						foreach (var incl in includePatterns)
-						{
-							if (file.EndsWith(incl.TrimStart('*'), StringComparison.OrdinalIgnoreCase))
-							{
-								matched = true;
-								break;
-							}
-						}
-
-						if (!matched) continue;
-					}
-
-					files.Add(file);
+					if (!matched)
+						continue;
 				}
+
+				result.Add(file);
+			}
+
+			foreach (var subDir in Directory.EnumerateDirectories(directory))
+			{
+				var dirName = Path.GetFileName(subDir);
+				if (excludeDirs.Contains(dirName))
+					continue;
+
+				CollectFiles(subDir, extensions, excludeDirs, includePatterns, result);
 			}
 		}
 		catch (UnauthorizedAccessException)
@@ -244,8 +255,6 @@ public partial class SearchViewModel : ToolboxBase
 		catch (IOException)
 		{
 		}
-
-		return files.ToArray();
 	}
 
 	private static System.Collections.Generic.List<SearchMatch> SearchFile(

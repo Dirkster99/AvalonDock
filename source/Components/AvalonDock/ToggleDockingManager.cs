@@ -323,7 +323,9 @@ namespace AvalonDock
 
 				// After grouping, ensure bottom zone order is correct
 				if (ToggleLayoutEngine.IsBottomZone(zone))
+				{
 					EnsureBottomZoneOrder();
+				}
 
 				switch (LayoutPriority)
 				{
@@ -356,7 +358,10 @@ namespace AvalonDock
 		/// <param name="targetZone">The target Zone.</param>
 		public void MoveAnchorableToZone(LayoutAnchorable anchorable, DockZone targetZone)
 		{
-			if (anchorable == null) return;
+			if (anchorable == null)
+			{
+				return;
+			}
 
 			var currentZone = GetAnchorableZone(anchorable);
 
@@ -364,17 +369,24 @@ namespace AvalonDock
 			if (currentZone == targetZone)
 			{
 				if (anchorable.IsAutoHidden)
+				{
 					ToggleAnchorable(anchorable, targetZone);
+				}
+
 				return;
 			}
 
 			// Ensure auto-hidden first
 			if (!anchorable.IsAutoHidden)
+			{
 				AutoHideFromDock(anchorable, currentZone);
+			}
 
 			// Remove from current layout parent
 			if (anchorable.Parent is LayoutAnchorGroup oldGroup)
+			{
 				oldGroup.RemoveChild(anchorable);
+			}
 
 			// Add to the target side in the layout model (always create a fresh group
 			// so DockFromAutoHide won't reuse a stale PreviousContainer from another zone)
@@ -394,7 +406,9 @@ namespace AvalonDock
 				targetBar.Items.Add(btn);
 
 				if (anchorable.Content is IToolbox movedToolbox)
+				{
 					RegisterToolbox(movedToolbox, anchorable);
+				}
 			}
 
 			// Toggle it on
@@ -404,7 +418,11 @@ namespace AvalonDock
 		/// <inheritdoc/>
 		internal override void ExecuteAutoHideCommand(LayoutAnchorable anchorable)
 		{
-			if (anchorable == null) return;
+			if (anchorable == null)
+			{
+				return;
+			}
+
 			var zone = GetAnchorableZone(anchorable);
 			ToggleAnchorable(anchorable, zone);
 		}
@@ -412,7 +430,11 @@ namespace AvalonDock
 		/// <inheritdoc/>
 		internal override void StartDraggingFloatingWindowForPane(LayoutAnchorablePane paneModel)
 		{
-			if (paneModel == null) return;
+			if (paneModel == null)
+			{
+				return;
+			}
+
 			var anchorable = paneModel.Children.OfType<LayoutAnchorable>().FirstOrDefault();
 			if (anchorable != null)
 			{
@@ -446,7 +468,10 @@ namespace AvalonDock
 
 		private void OpenDefaultToolboxes()
 		{
-			if (Layout == null) return;
+			if (Layout == null)
+			{
+				return;
+			}
 
 			foreach (var anc in Layout.Descendents().OfType<LayoutAnchorable>().ToList())
 			{
@@ -463,7 +488,9 @@ namespace AvalonDock
 			{
 				// ToggleAnchorablePaneTitle has self-contained buttons wired in its OnApplyTemplate
 				if (title is ToggleAnchorablePaneTitle)
+				{
 					continue;
+				}
 
 				foreach (var btn in FindVisualChildren<System.Windows.Controls.Button>(title))
 				{
@@ -487,7 +514,9 @@ namespace AvalonDock
 
 				// Hide the old DropDownButton (pin menu)
 				foreach (var dd in FindVisualChildren<DropDownButton>(title))
+				{
 					dd.Visibility = Visibility.Collapsed;
+				}
 
 				// Inject three-dot menu button if not already present
 				var grid = FindVisualChildren<Grid>(title).FirstOrDefault();
@@ -499,7 +528,9 @@ namespace AvalonDock
 					// Move minimize button (PART_AutoHidePin) to the last column
 					var autoHideBtn = grid.Children.OfType<System.Windows.Controls.Button>().FirstOrDefault(b => b.Name == "PART_AutoHidePin");
 					if (autoHideBtn != null)
+					{
 						Grid.SetColumn(autoHideBtn, newCol);
+					}
 
 					// Put three-dot menu in the old auto-hide column (2)
 					var menuBtn = CreateThreeDotMenuButton(title);
@@ -545,7 +576,10 @@ namespace AvalonDock
 			btn.Click += (s, e) =>
 			{
 				var anchorable = title.Model;
-				if (anchorable == null) return;
+				if (anchorable == null)
+				{
+					return;
+				}
 
 				var menu = BuildToggleContextMenu(anchorable);
 				menu.PlacementTarget = btn;
@@ -587,7 +621,10 @@ namespace AvalonDock
 			floatItem.Click += (s, e) =>
 			{
 				if (anchorable.IsAutoHidden)
+				{
 					anchorable.ToggleSingleAutoHide();
+				}
+
 				var layoutItem = GetLayoutItemFromModel(anchorable) as LayoutAnchorableItem;
 				layoutItem?.FloatCommand?.Execute(null);
 			};
@@ -633,13 +670,23 @@ namespace AvalonDock
 		private static IEnumerable<T> FindVisualChildren<T>(DependencyObject parent)
 			where T : DependencyObject
 		{
-			if (parent == null) yield break;
+			if (parent == null)
+			{
+				yield break;
+			}
+
 			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
 			{
 				var child = VisualTreeHelper.GetChild(parent, i);
-				if (child is T t) yield return t;
+				if (child is T t)
+				{
+					yield return t;
+				}
+
 				foreach (var c in FindVisualChildren<T>(child))
+				{
 					yield return c;
+				}
 			}
 		}
 
@@ -661,7 +708,10 @@ namespace AvalonDock
 		private void EnsureBottomZoneOrder()
 		{
 			var root = Layout as LayoutRoot;
-			if (root?.RootPanel == null) return;
+			if (root?.RootPanel == null)
+			{
+				return;
+			}
 
 			// Find the horizontal group of bottom anchorable panes
 			LayoutAnchorablePaneGroup group = null;
@@ -674,7 +724,10 @@ namespace AvalonDock
 				}
 			}
 
-			if (group == null || group.Children.Count < 2) return;
+			if (group == null || group.Children.Count < 2)
+			{
+				return;
+			}
 
 			// Check if any BottomRight pane appears before a BottomLeft pane
 			bool needsReorder = false;
@@ -682,7 +735,11 @@ namespace AvalonDock
 			foreach (var child in group.Children.OfType<LayoutAnchorablePane>())
 			{
 				var anc = child.Children.OfType<LayoutAnchorable>().FirstOrDefault();
-				if (anc == null) continue;
+				if (anc == null)
+				{
+					continue;
+				}
+
 				var zone = GetAnchorableZone(anc);
 				if (zone == DockZone.BottomRight)
 				{
@@ -695,7 +752,10 @@ namespace AvalonDock
 				}
 			}
 
-			if (!needsReorder) return;
+			if (!needsReorder)
+			{
+				return;
+			}
 
 			// Partition into left and right panes, preserving relative order within each group
 			var leftPanes = new List<ILayoutAnchorablePane>();
@@ -722,12 +782,19 @@ namespace AvalonDock
 
 			// Rebuild group: all left panes first, then right panes
 			while (group.Children.Count > 0)
+			{
 				group.Children.RemoveAt(group.Children.Count - 1);
+			}
 
 			foreach (var p in leftPanes)
+			{
 				group.Children.Add(p);
+			}
+
 			foreach (var p in rightPanes)
+			{
 				group.Children.Add(p);
+			}
 		}
 
 		/// <summary>
@@ -754,13 +821,22 @@ namespace AvalonDock
 		private void DockFromAutoHide(LayoutAnchorable anchorable, DockZone zone)
 		{
 			var parentGroup = anchorable.Parent as LayoutAnchorGroup;
-			if (parentGroup == null) return;
+			if (parentGroup == null)
+			{
+				return;
+			}
+
 			var parentSide = parentGroup.Parent as LayoutAnchorSide;
-			if (parentSide == null) return;
+			if (parentSide == null)
+			{
+				return;
+			}
 
 			var previousContainer = ((ILayoutPreviousContainer)parentGroup).PreviousContainer as LayoutAnchorablePane;
 			if (previousContainer != null && previousContainer.Root == null)
+			{
 				previousContainer = null;
+			}
 
 			var root = parentGroup.Root as LayoutRoot;
 
@@ -775,9 +851,13 @@ namespace AvalonDock
 
 				// Apply default dock dimensions from the manager
 				if (side == AnchorSide.Left || side == AnchorSide.Right)
+				{
 					previousContainer.DockWidth = new GridLength(DefaultDockWidth);
+				}
 				else
+				{
 					previousContainer.DockHeight = new GridLength(DefaultDockHeight);
+				}
 
 				_layoutEngine.InsertPaneForZone(root, previousContainer, zone);
 			}
@@ -792,7 +872,9 @@ namespace AvalonDock
 			previousContainer.Children.Add(anchorable);
 
 			if (parentGroup.Children.Count == 0)
+			{
 				parentSide.Children.Remove(parentGroup);
+			}
 		}
 
 		/// <summary>
@@ -803,9 +885,16 @@ namespace AvalonDock
 		private void AutoHideFromDock(LayoutAnchorable anchorable, DockZone zone)
 		{
 			var parentPane = anchorable.Parent as LayoutAnchorablePane;
-			if (parentPane == null) return;
+			if (parentPane == null)
+			{
+				return;
+			}
+
 			var root = anchorable.Root;
-			if (root == null) return;
+			if (root == null)
+			{
+				return;
+			}
 
 			var side = ToggleLayoutEngine.ZoneToAnchorSide(zone);
 			var newAnchorGroup = new LayoutAnchorGroup();
@@ -827,10 +916,25 @@ namespace AvalonDock
 			RemoveToggleDockButtonBars();
 
 			// Hide the standard auto-hide side panels
-			if (LeftSidePanel != null) LeftSidePanel.Visibility = Visibility.Collapsed;
-			if (RightSidePanel != null) RightSidePanel.Visibility = Visibility.Collapsed;
-			if (TopSidePanel != null) TopSidePanel.Visibility = Visibility.Collapsed;
-			if (BottomSidePanel != null) BottomSidePanel.Visibility = Visibility.Collapsed;
+			if (LeftSidePanel != null)
+			{
+				LeftSidePanel.Visibility = Visibility.Collapsed;
+			}
+
+			if (RightSidePanel != null)
+			{
+				RightSidePanel.Visibility = Visibility.Collapsed;
+			}
+
+			if (TopSidePanel != null)
+			{
+				TopSidePanel.Visibility = Visibility.Collapsed;
+			}
+
+			if (BottomSidePanel != null)
+			{
+				BottomSidePanel.Visibility = Visibility.Collapsed;
+			}
 
 			AutoHideAllDockedAnchorables();
 
@@ -845,9 +949,13 @@ namespace AvalonDock
 			foreach (var anc in leftAnchorables)
 			{
 				if (anc.Content is IToolbox t && t.Zone == DockZone.LeftBottom)
+				{
 					leftBottom.Add(anc);
+				}
 				else
+				{
 					leftTop.Add(anc);
+				}
 			}
 
 			var rightTop = new List<LayoutAnchorable>();
@@ -855,9 +963,13 @@ namespace AvalonDock
 			foreach (var anc in rightAnchorables)
 			{
 				if (anc.Content is IToolbox t && t.Zone == DockZone.RightBottom)
+				{
 					rightBottom.Add(anc);
+				}
 				else
+				{
 					rightTop.Add(anc);
+				}
 			}
 
 			var bottomLeft = new List<LayoutAnchorable>();
@@ -865,9 +977,13 @@ namespace AvalonDock
 			foreach (var anc in bottomAnchorables)
 			{
 				if (anc.Content is IToolbox t && t.Zone == DockZone.BottomRight)
+				{
 					bottomRight.Add(anc);
+				}
 				else
+				{
 					bottomLeft.Add(anc);
+				}
 			}
 
 			// Create 6 button bars with automation IDs for UI test discoverability
@@ -899,7 +1015,10 @@ namespace AvalonDock
 
 			// Inject into the template grid
 			var rootGrid = FindTemplateRootGrid();
-			if (rootGrid == null) return;
+			if (rootGrid == null)
+			{
+				return;
+			}
 
 			// Left sidebar: [LeftTop] — separator — [LeftBottom] — gap — [BottomLeft]
 			var leftPanel = new DockPanel();
@@ -1002,7 +1121,11 @@ namespace AvalonDock
 
 		private static void ClearBarIconContent(ToggleDockButtonBar bar)
 		{
-			if (bar == null) return;
+			if (bar == null)
+			{
+				return;
+			}
+
 			foreach (var item in bar.Items)
 			{
 				if (item is ToggleDockButton btn)
@@ -1023,12 +1146,16 @@ namespace AvalonDock
 					for (int j = 0; j < VisualTreeHelper.GetChildrenCount(border); j++)
 					{
 						if (VisualTreeHelper.GetChild(border, j) is Grid grid)
+						{
 							return grid;
+						}
 					}
 				}
 
 				if (child is Grid g)
+				{
 					return g;
+				}
 			}
 
 			return null;
@@ -1037,7 +1164,10 @@ namespace AvalonDock
 		private static List<LayoutAnchorable> CollectAnchorables(LayoutAnchorSide side)
 		{
 			var result = new List<LayoutAnchorable>();
-			if (side == null) return result;
+			if (side == null)
+			{
+				return result;
+			}
 
 			foreach (var group in side.Children)
 			{
@@ -1057,7 +1187,9 @@ namespace AvalonDock
 				.Where(a => a.Parent is LayoutAnchorablePane && !a.IsFloating)
 				.ToList();
 			foreach (var a in docked)
+			{
 				a.ToggleSingleAutoHide();
+			}
 		}
 
 		/// <summary>
@@ -1066,11 +1198,17 @@ namespace AvalonDock
 		/// <param name="bar">The bar.</param>
 		private void HideDockedInBar(ToggleDockButtonBar bar)
 		{
-			if (bar == null) return;
+			if (bar == null)
+			{
+				return;
+			}
+
 			foreach (var item in bar.Items)
 			{
 				if (item is ToggleDockButton btn && btn.Anchorable != null && !btn.Anchorable.IsAutoHidden)
+				{
 					AutoHideFromDock(btn.Anchorable, bar.Zone);
+				}
 			}
 		}
 
@@ -1087,7 +1225,11 @@ namespace AvalonDock
 
 		private static void RefreshBarStates(ToggleDockButtonBar bar, object activeContent)
 		{
-			if (bar == null) return;
+			if (bar == null)
+			{
+				return;
+			}
+
 			foreach (var item in bar.Items)
 			{
 				if (item is ToggleDockButton btn && btn.Anchorable != null)
@@ -1107,12 +1249,35 @@ namespace AvalonDock
 		/// <returns>The requested value.</returns>
 		private DockZone GetAnchorableZone(LayoutAnchorable anchorable)
 		{
-			if (_leftTopBar?.ContainsAnchorable(anchorable) == true) return DockZone.LeftTop;
-			if (_leftBottomBar?.ContainsAnchorable(anchorable) == true) return DockZone.LeftBottom;
-			if (_rightTopBar?.ContainsAnchorable(anchorable) == true) return DockZone.RightTop;
-			if (_rightBottomBar?.ContainsAnchorable(anchorable) == true) return DockZone.RightBottom;
-			if (_bottomLeftBar?.ContainsAnchorable(anchorable) == true) return DockZone.BottomLeft;
-			if (_bottomRightBar?.ContainsAnchorable(anchorable) == true) return DockZone.BottomRight;
+			if (_leftTopBar?.ContainsAnchorable(anchorable) == true)
+			{
+				return DockZone.LeftTop;
+			}
+
+			if (_leftBottomBar?.ContainsAnchorable(anchorable) == true)
+			{
+				return DockZone.LeftBottom;
+			}
+
+			if (_rightTopBar?.ContainsAnchorable(anchorable) == true)
+			{
+				return DockZone.RightTop;
+			}
+
+			if (_rightBottomBar?.ContainsAnchorable(anchorable) == true)
+			{
+				return DockZone.RightBottom;
+			}
+
+			if (_bottomLeftBar?.ContainsAnchorable(anchorable) == true)
+			{
+				return DockZone.BottomLeft;
+			}
+
+			if (_bottomRightBar?.ContainsAnchorable(anchorable) == true)
+			{
+				return DockZone.BottomRight;
+			}
 
 			// Fallback
 			if (anchorable.Parent is LayoutAnchorGroup group && group.Parent is LayoutAnchorSide side)
@@ -1192,7 +1357,11 @@ namespace AvalonDock
 			_showHiddenButton.Click += (s, e) =>
 			{
 				var menu = BuildShowHiddenContextMenu();
-				if (menu == null) return;
+				if (menu == null)
+				{
+					return;
+				}
+
 				menu.PlacementTarget = _showHiddenButton;
 				menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Right;
 				menu.IsOpen = true;
@@ -1239,7 +1408,9 @@ namespace AvalonDock
 		private ContextMenu BuildShowHiddenContextMenu()
 		{
 			if (Layout?.Hidden == null || Layout.Hidden.Count == 0)
+			{
 				return null;
+			}
 
 			var menu = new ContextMenu();
 			foreach (var anchorable in Layout.Hidden.ToList())
@@ -1282,15 +1453,22 @@ namespace AvalonDock
 		/// <param name="anchorable">The hidden anchorable to restore.</param>
 		internal void RestoreHiddenAnchorable(LayoutAnchorable anchorable)
 		{
-			if (anchorable == null) return;
+			if (anchorable == null)
+			{
+				return;
+			}
 
 			var zone = DockZone.LeftTop;
 			if (anchorable.Content is IToolbox toolbox)
+			{
 				zone = toolbox.Zone;
+			}
 
 			// Remove from Hidden collection
 			if (Layout.Hidden.Contains(anchorable))
+			{
 				Layout.Hidden.Remove(anchorable);
+			}
 
 			// Add to the correct layout side as auto-hidden
 			var targetSide = GetLayoutSideForZone(zone);
@@ -1306,7 +1484,9 @@ namespace AvalonDock
 				bar.Items.Add(btn);
 
 				if (anchorable.Content is IToolbox restoredToolbox)
+				{
 					RegisterToolbox(restoredToolbox, anchorable);
+				}
 			}
 
 			RefreshButtonStates();
@@ -1336,7 +1516,11 @@ namespace AvalonDock
 
 		private static void RemoveFromBar(ToggleDockButtonBar bar, LayoutAnchorable anchorable)
 		{
-			if (bar == null) return;
+			if (bar == null)
+			{
+				return;
+			}
+
 			for (int i = bar.Items.Count - 1; i >= 0; i--)
 			{
 				if (bar.Items[i] is ToggleDockButton btn && btn.Anchorable == anchorable)
@@ -1363,7 +1547,11 @@ namespace AvalonDock
 			ToggleDockButtonBar[] allBars = { _leftTopBar, _leftBottomBar, _rightTopBar, _rightBottomBar, _bottomLeftBar, _bottomRightBar };
 			foreach (var bar in allBars)
 			{
-				if (bar == null) continue;
+				if (bar == null)
+				{
+					continue;
+				}
+
 				foreach (var item in bar.Items)
 				{
 					if (item is ToggleDockButton btn && btn.Anchorable?.Content is IToolbox toolbox)
@@ -1413,16 +1601,22 @@ namespace AvalonDock
 		private void OnToolboxPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName != nameof(IToolbox.IsOpen) || _syncDepth > 0)
+			{
 				return;
+			}
 
 			if (!(sender is IToolbox toolbox) || !_toolboxToAnchorable.TryGetValue(toolbox, out var anchorable))
+			{
 				return;
+			}
 
 			bool wantOpen = toolbox.IsOpen;
 			bool isOpen = !anchorable.IsAutoHidden;
 
 			if (wantOpen == isOpen)
+			{
 				return;
+			}
 
 			_syncDepth++;
 			try
@@ -1435,7 +1629,9 @@ namespace AvalonDock
 					FixSplitOrientation(anchorable, zone);
 
 					if (ToggleLayoutEngine.IsBottomZone(zone))
+					{
 						EnsureBottomZoneOrder();
+					}
 
 					switch (LayoutPriority)
 					{
@@ -1472,7 +1668,9 @@ namespace AvalonDock
 		private void SetToolboxIsOpen(LayoutAnchorable anchorable)
 		{
 			if (!(anchorable.Content is IToolbox toolbox))
+			{
 				return;
+			}
 
 			_syncDepth++;
 			try
