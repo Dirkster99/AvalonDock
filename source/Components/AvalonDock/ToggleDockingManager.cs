@@ -1171,8 +1171,6 @@ namespace AvalonDock
 			textFactory.SetValue(TextBlock.FontWeightProperty, FontWeights.Bold);
 			textFactory.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
 			textFactory.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
-			textFactory.SetBinding(TextBlock.ForegroundProperty,
-				new System.Windows.Data.Binding("Foreground") { RelativeSource = new System.Windows.Data.RelativeSource(System.Windows.Data.RelativeSourceMode.TemplatedParent) });
 
 			borderFactory.AppendChild(textFactory);
 			template.VisualTree = borderFactory;
