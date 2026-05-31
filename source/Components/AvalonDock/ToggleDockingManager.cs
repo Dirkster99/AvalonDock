@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using AvalonDock.Controls;
 using AvalonDock.Core;
@@ -110,6 +111,11 @@ namespace AvalonDock
 		/// The button that opens the hidden anchorables menu.
 		/// </summary>
 		private Button _showHiddenButton;
+
+		/// <summary>Last active anchorable per zone group, used by layout toggle commands.</summary>
+		private LayoutAnchorable _lastActiveLeft;
+		private LayoutAnchorable _lastActiveBottom;
+		private LayoutAnchorable _lastActiveRight;
 
 		private static Style _staticToggleStyle;
 
@@ -225,6 +231,69 @@ namespace AvalonDock
 		}
 
 		/// <summary>
+		/// <see cref="IsPrimarySideBarOpen"/> dependency property.
+		/// </summary>
+		public static readonly DependencyProperty IsPrimarySideBarOpenProperty =
+			DependencyProperty.Register(nameof(IsPrimarySideBarOpen), typeof(bool), typeof(ToggleDockingManager),
+				new PropertyMetadata(false));
+
+		/// <summary>
+		/// <see cref="IsBottomPanelOpen"/> dependency property.
+		/// </summary>
+		public static readonly DependencyProperty IsBottomPanelOpenProperty =
+			DependencyProperty.Register(nameof(IsBottomPanelOpen), typeof(bool), typeof(ToggleDockingManager),
+				new PropertyMetadata(false));
+
+		/// <summary>
+		/// <see cref="IsSecondarySideBarOpen"/> dependency property.
+		/// </summary>
+		public static readonly DependencyProperty IsSecondarySideBarOpenProperty =
+			DependencyProperty.Register(nameof(IsSecondarySideBarOpen), typeof(bool), typeof(ToggleDockingManager),
+				new PropertyMetadata(false));
+
+		/// <summary>
+		/// Gets a value indicating whether any left-side anchorable is docked (not auto-hidden).
+		/// </summary>
+		public bool IsPrimarySideBarOpen
+		{
+			get => (bool)GetValue(IsPrimarySideBarOpenProperty);
+			private set => SetValue(IsPrimarySideBarOpenProperty, value);
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether any bottom-side anchorable is docked (not auto-hidden).
+		/// </summary>
+		public bool IsBottomPanelOpen
+		{
+			get => (bool)GetValue(IsBottomPanelOpenProperty);
+			private set => SetValue(IsBottomPanelOpenProperty, value);
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether any right-side anchorable is docked (not auto-hidden).
+		/// </summary>
+		public bool IsSecondarySideBarOpen
+		{
+			get => (bool)GetValue(IsSecondarySideBarOpenProperty);
+			private set => SetValue(IsSecondarySideBarOpenProperty, value);
+		}
+
+		/// <summary>
+		/// Gets the command that toggles the primary (left) side bar.
+		/// </summary>
+		public ICommand TogglePrimarySideBarCommand { get; private set; }
+
+		/// <summary>
+		/// Gets the command that toggles the bottom panel.
+		/// </summary>
+		public ICommand ToggleBottomPanelCommand { get; private set; }
+
+		/// <summary>
+		/// Gets the command that toggles the secondary (right) side bar.
+		/// </summary>
+		public ICommand ToggleSecondarySideBarCommand { get; private set; }
+
+		/// <summary>
 		/// Initializes static members of the <see cref="ToggleDockingManager"/> class.
 		/// </summary>
 		static ToggleDockingManager()
@@ -241,7 +310,11 @@ namespace AvalonDock
 			LayoutUpdateStrategy = new ToggleLayoutStrategy();
 			AnchorablePaneControlStyle = LoadToggleStyle();
 			Loaded += ToggleDockingManager_Loaded;
-			ActiveContentChanged += (s, e) => RefreshButtonStates();
+			ActiveContentChanged += OnActiveContentChangedForZoneTracking;
+
+			TogglePrimarySideBarCommand = new SimpleRelayCommand(() => ToggleZoneGroup(ZoneGroupKind.Left));
+			ToggleBottomPanelCommand = new SimpleRelayCommand(() => ToggleZoneGroup(ZoneGroupKind.Bottom));
+			ToggleSecondarySideBarCommand = new SimpleRelayCommand(() => ToggleZoneGroup(ZoneGroupKind.Right));
 		}
 
 		/// <inheritdoc/>
@@ -1309,6 +1382,206 @@ namespace AvalonDock
 					return;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Identifies the three zone groups for layout toggle buttons.
+		/// </summary>
+		private enum ZoneGroupKind
+		{
+			/// <summary>Left side: LeftTop + LeftBottom.</summary>
+			Left,
+
+			/// <summary>Bottom: BottomLeft + BottomRight.</summary>
+			Bottom,
+
+			/// <summary>Right side: RightTop + RightBottom.</summary>
+			Right
+		}
+
+		private void OnActiveContentChangedForZoneTracking(object sender, EventArgs e)
+		{
+			RefreshButtonStates();
+			TrackLastActiveAnchorable();
+			UpdateZoneGroupStates();
+		}
+
+		private void TrackLastActiveAnchorable()
+		{
+			if (ActiveContent == null) return;
+
+			// Find the LayoutAnchorable for the active content
+			var anchorable = FindAnchorableByContent(ActiveContent);
+			if (anchorable == null || anchorable.IsAutoHidden) return;
+
+			var zone = GetAnchorableZone(anchorable);
+			switch (GetZoneGroup(zone))
+			{
+				case ZoneGroupKind.Left:
+					_lastActiveLeft = anchorable;
+					break;
+				case ZoneGroupKind.Bottom:
+					_lastActiveBottom = anchorable;
+					break;
+				case ZoneGroupKind.Right:
+					_lastActiveRight = anchorable;
+					break;
+			}
+		}
+
+		private void UpdateZoneGroupStates()
+		{
+			IsPrimarySideBarOpen = HasDockedAnchorable(_leftTopBar) || HasDockedAnchorable(_leftBottomBar);
+			IsBottomPanelOpen = HasDockedAnchorable(_bottomLeftBar) || HasDockedAnchorable(_bottomRightBar);
+			IsSecondarySideBarOpen = HasDockedAnchorable(_rightTopBar) || HasDockedAnchorable(_rightBottomBar);
+		}
+
+		private static bool HasDockedAnchorable(ToggleDockButtonBar bar)
+		{
+			if (bar == null) return false;
+			foreach (var item in bar.Items)
+			{
+				if (item is ToggleDockButton btn && btn.Anchorable != null && !btn.Anchorable.IsAutoHidden)
+					return true;
+			}
+
+			return false;
+		}
+
+		private void ToggleZoneGroup(ZoneGroupKind group)
+		{
+			var bars = GetBarsForGroup(group);
+			bool anyOpen = false;
+			foreach (var bar in bars)
+			{
+				if (HasDockedAnchorable(bar))
+				{
+					anyOpen = true;
+					break;
+				}
+			}
+
+			if (anyOpen)
+			{
+				// Close all in this group
+				foreach (var bar in bars)
+					HideDockedInBar(bar);
+			}
+			else
+			{
+				// Open last active, or first available
+				var lastActive = GetLastActiveForGroup(group);
+				if (lastActive != null)
+				{
+					var zone = GetAnchorableZone(lastActive);
+					ToggleAnchorable(lastActive, zone);
+				}
+				else
+				{
+					OpenFirstAvailableInGroup(bars);
+				}
+			}
+
+			RefreshButtonStates();
+			UpdateZoneGroupStates();
+			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
+				new System.Action(UpdatePinButtonsToMinimize));
+		}
+
+		private ToggleDockButtonBar[] GetBarsForGroup(ZoneGroupKind group)
+		{
+			switch (group)
+			{
+				case ZoneGroupKind.Left: return new[] { _leftTopBar, _leftBottomBar };
+				case ZoneGroupKind.Bottom: return new[] { _bottomLeftBar, _bottomRightBar };
+				case ZoneGroupKind.Right: return new[] { _rightTopBar, _rightBottomBar };
+				default: return Array.Empty<ToggleDockButtonBar>();
+			}
+		}
+
+		private LayoutAnchorable GetLastActiveForGroup(ZoneGroupKind group)
+		{
+			switch (group)
+			{
+				case ZoneGroupKind.Left: return _lastActiveLeft;
+				case ZoneGroupKind.Bottom: return _lastActiveBottom;
+				case ZoneGroupKind.Right: return _lastActiveRight;
+				default: return null;
+			}
+		}
+
+		private static ZoneGroupKind GetZoneGroup(DockZone zone)
+		{
+			switch (zone)
+			{
+				case DockZone.LeftTop:
+				case DockZone.LeftBottom:
+					return ZoneGroupKind.Left;
+				case DockZone.BottomLeft:
+				case DockZone.BottomRight:
+					return ZoneGroupKind.Bottom;
+				case DockZone.RightTop:
+				case DockZone.RightBottom:
+					return ZoneGroupKind.Right;
+				default:
+					return ZoneGroupKind.Left;
+			}
+		}
+
+		private LayoutAnchorable FindAnchorableByContent(object content)
+		{
+			if (content == null) return null;
+
+			ToggleDockButtonBar[] allBars = { _leftTopBar, _leftBottomBar, _rightTopBar, _rightBottomBar, _bottomLeftBar, _bottomRightBar };
+			foreach (var bar in allBars)
+			{
+				if (bar == null) continue;
+				foreach (var item in bar.Items)
+				{
+					if (item is ToggleDockButton btn && btn.Anchorable?.Content == content)
+						return btn.Anchorable;
+				}
+			}
+
+			return null;
+		}
+
+		private void OpenFirstAvailableInGroup(ToggleDockButtonBar[] bars)
+		{
+			foreach (var bar in bars)
+			{
+				foreach (var item in bar.Items)
+				{
+					if (item is ToggleDockButton btn && btn.Anchorable != null)
+					{
+						ToggleAnchorable(btn.Anchorable, bar.Zone);
+						return;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Simple ICommand implementation for zone group toggle commands.
+		/// </summary>
+		private sealed class SimpleRelayCommand : ICommand
+		{
+			private readonly Action _execute;
+
+			public SimpleRelayCommand(Action execute)
+			{
+				_execute = execute;
+			}
+
+			public event EventHandler CanExecuteChanged
+			{
+				add { }
+				remove { }
+			}
+
+			public bool CanExecute(object parameter) => true;
+
+			public void Execute(object parameter) => _execute();
 		}
 	}
 }

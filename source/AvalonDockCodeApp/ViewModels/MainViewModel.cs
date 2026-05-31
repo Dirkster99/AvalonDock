@@ -34,6 +34,24 @@ public partial class MainViewModel : ObservableObject
 				folderExplorer.LoadFolder(defaultPath);
 			}
 		}
+
+		// Wire up search VM with root path and file-open callback
+		var search = _dockService.GetAnchorable<SearchViewModel>();
+		if (search != null)
+		{
+			search.SetOpenFileCallback(OpenFile);
+			if (folderExplorer != null)
+				search.SetRootPath(folderExplorer.RootPath);
+		}
+
+		// Wire up source control VM
+		var sourceControl = _dockService.GetAnchorable<SourceControlViewModel>();
+		if (sourceControl != null)
+		{
+			sourceControl.SetOpenFileCallback(OpenFile);
+			if (folderExplorer != null)
+				sourceControl.SetRootPath(folderExplorer.RootPath);
+		}
 	}
 
 	public void OpenFile(string filePath)
@@ -66,6 +84,12 @@ public partial class MainViewModel : ObservableObject
 		if (dialog.ShowDialog() == true)
 		{
 			FolderExplorer?.LoadFolder(dialog.FolderName);
+
+			var search = _dockService.GetAnchorable<SearchViewModel>();
+			search?.SetRootPath(dialog.FolderName);
+
+			var sourceControl = _dockService.GetAnchorable<SourceControlViewModel>();
+			sourceControl?.SetRootPath(dialog.FolderName);
 		}
 	}
 }
