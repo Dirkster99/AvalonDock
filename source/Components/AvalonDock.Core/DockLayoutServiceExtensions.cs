@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace AvalonDock.Core
 {
@@ -11,8 +9,6 @@ namespace AvalonDock.Core
 	/// </summary>
 	public static class DockLayoutServiceExtensions
 	{
-		private static readonly ConditionalWeakTable<IDockLayoutService, SideToggleState> ToggleState = new ConditionalWeakTable<IDockLayoutService, SideToggleState>();
-
 		/// <summary>Finds the first open document matching the predicate.</summary>
 		/// <typeparam name="T">The concrete document type.</typeparam>
 		/// <param name="service">The layout service.</param>
@@ -94,63 +90,6 @@ namespace AvalonDock.Core
 		{
 			return service.Anchorables.OfType<IToolbox>()
 				.Any(t => t.Zone.ToSide() == side && t.IsOpen);
-		}
-
-		/// <summary>
-		/// Toggles all anchorables on the specified side.
-		/// If any are open, all are hidden (and their identities are remembered).
-		/// If none are open, the previously open toolboxes are restored; if no
-		/// history exists, the first available toolbox is shown.
-		/// </summary>
-		/// <param name="service">The layout service.</param>
-		/// <param name="side">The side to toggle.</param>
-		public static void ToggleSide(this IDockLayoutService service, ToolboxSide side)
-		{
-			var toolboxes = service.Anchorables
-				.OfType<IToolbox>()
-				.Where(t => t.Zone.ToSide() == side)
-				.ToList();
-
-			if (toolboxes.Count == 0)
-			{
-				return;
-			}
-
-#if NETSTANDARD2_0
-			var state = ToggleState.GetValue(service, _ => new SideToggleState());
-#else
-			var state = ToggleState.GetOrCreateValue(service);
-#endif
-			bool anyOpen = toolboxes.Any(t => t.IsOpen);
-
-			if (anyOpen)
-			{
-				state.LastOpen[side] = toolboxes.Where(t => t.IsOpen).ToList();
-
-				foreach (var t in toolboxes)
-				{
-					t.IsOpen = false;
-				}
-			}
-			else
-			{
-				if (state.LastOpen.TryGetValue(side, out var lastOpen) && lastOpen.Count > 0)
-				{
-					foreach (var t in lastOpen)
-					{
-						t.IsOpen = true;
-					}
-				}
-				else
-				{
-					toolboxes[0].IsOpen = true;
-				}
-			}
-		}
-
-		private sealed class SideToggleState
-		{
-			public Dictionary<ToolboxSide, List<IToolbox>> LastOpen { get; } = new Dictionary<ToolboxSide, List<IToolbox>>();
 		}
 	}
 }

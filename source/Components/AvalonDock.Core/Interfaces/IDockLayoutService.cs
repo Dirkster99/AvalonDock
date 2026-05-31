@@ -45,5 +45,14 @@ namespace AvalonDock.Core
 		/// <see cref="DockLayoutServiceExtensions.IsAnchorableOpen"/>.
 		/// </summary>
 		event EventHandler? AnchorableStateChanged;
+
+		/// <summary>
+		/// Toggles all anchorables on the specified side.
+		/// If any are open, all are hidden (and their identities are remembered).
+		/// If none are open, the previously open toolboxes are restored; if no
+		/// history exists, the first available toolbox is shown.
+		/// </summary>
+		/// <param name="side">The side to toggle.</param>
+		void ToggleSide(ToolboxSide side);
 	}
 }
