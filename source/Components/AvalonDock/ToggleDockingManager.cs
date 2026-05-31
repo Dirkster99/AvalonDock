@@ -1134,24 +1134,13 @@ namespace AvalonDock
 		{
 			_showHiddenButton = new Button
 			{
-				Content = new TextBlock
-				{
-					Text = "⋯",
-					FontSize = 12,
-					FontWeight = FontWeights.Bold,
-					HorizontalAlignment = HorizontalAlignment.Center,
-					VerticalAlignment = VerticalAlignment.Center,
-				},
 				Width = ButtonSize,
 				Height = ButtonSize,
 				Padding = new Thickness(0),
 				Margin = new Thickness(2),
 				Focusable = false,
-				Background = Brushes.Transparent,
-				BorderBrush = Brushes.Transparent,
-				BorderThickness = new Thickness(0),
-				Style = (Style)FindResource(ToolBar.ButtonStyleKey),
 				ToolTip = "Hidden Panels",
+				Template = CreateShowHiddenButtonTemplate(),
 			};
 
 			_showHiddenButton.Click += (s, e) =>
@@ -1165,6 +1154,34 @@ namespace AvalonDock
 
 			DockPanel.SetDock(_showHiddenButton, Dock.Top);
 			return _showHiddenButton;
+		}
+
+		private static ControlTemplate CreateShowHiddenButtonTemplate()
+		{
+			var template = new ControlTemplate(typeof(Button));
+
+			var borderFactory = new FrameworkElementFactory(typeof(Border), "Bd");
+			borderFactory.SetValue(Border.BackgroundProperty, Brushes.Transparent);
+			borderFactory.SetValue(Border.CornerRadiusProperty, new CornerRadius(4));
+			borderFactory.SetValue(UIElement.SnapsToDevicePixelsProperty, true);
+
+			var textFactory = new FrameworkElementFactory(typeof(TextBlock));
+			textFactory.SetValue(TextBlock.TextProperty, "⋯");
+			textFactory.SetValue(TextBlock.FontSizeProperty, 12.0);
+			textFactory.SetValue(TextBlock.FontWeightProperty, FontWeights.Bold);
+			textFactory.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+			textFactory.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
+			textFactory.SetBinding(TextBlock.ForegroundProperty,
+				new System.Windows.Data.Binding("Foreground") { RelativeSource = new System.Windows.Data.RelativeSource(System.Windows.Data.RelativeSourceMode.TemplatedParent) });
+
+			borderFactory.AppendChild(textFactory);
+			template.VisualTree = borderFactory;
+
+			var hoverTrigger = new Trigger { Property = UIElement.IsMouseOverProperty, Value = true };
+			hoverTrigger.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(Color.FromArgb(0x30, 0x80, 0x80, 0x80)), "Bd"));
+			template.Triggers.Add(hoverTrigger);
+
+			return template;
 		}
 
 		/// <summary>
