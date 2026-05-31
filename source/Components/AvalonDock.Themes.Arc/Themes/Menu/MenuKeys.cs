@@ -29,16 +29,6 @@ namespace AvalonDock.Themes.Arc.Themes.Menu
 		public static readonly ComponentResourceKey SubmenuItemBackgroundHighlightedKey = new ComponentResourceKey(typeof(ResourceKeys), "SubmenuItemBackgroundHighlightedKey");
 
 		/// <summary>
-		/// Gets the resource key for the focus scroll button brush.
-		/// </summary>
-		public static readonly ComponentResourceKey FocusScrollButtonBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "FocusScrollButtonBrushKey");
-
-		/// <summary>
-		/// Gets the resource key for the scroll button brush.
-		/// </summary>
-		public static readonly ComponentResourceKey ScrollButtonBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "ScrollButtonBrushKey");
-
-		/// <summary>
 		/// Gets the resource key for the check mark background brush.
 		/// </summary>
 		public static readonly ComponentResourceKey CheckMarkBackgroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "CheckMarkBackgroundBrushKey");
@@ -64,21 +54,6 @@ namespace AvalonDock.Themes.Arc.Themes.Menu
 		public static readonly ComponentResourceKey DisabledSubMenuItemBorderBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "DisabledSubMenuItemBorderBrushKey");
 
 		/// <summary>
-		/// Gets the resource key for the menu border brush.
-		/// </summary>
-		public static readonly ComponentResourceKey MenuBorderBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "MenuBorderBrushKey");
-
-		/// <summary>
-		/// Gets the resource key for the menu background.
-		/// </summary>
-		public static readonly ComponentResourceKey MenuBackgroundKey = new ComponentResourceKey(typeof(ResourceKeys), "MenuBackgroundKey");
-
-		/// <summary>
-		/// Gets the resource key for the top level header menu background.
-		/// </summary>
-		public static readonly ComponentResourceKey TopLevelHeaderMenuBackgroundKey = new ComponentResourceKey(typeof(ResourceKeys), "TopLevelHeaderMenuBackgroundKey");
-
-		/// <summary>
 		/// Gets the resource key for the text brush.
 		/// </summary>
 		public static readonly ComponentResourceKey TextBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "TextBrushKey");
@@ -92,11 +67,6 @@ namespace AvalonDock.Themes.Arc.Themes.Menu
 		/// Gets the resource key for the item text disabled.
 		/// </summary>
 		public static readonly ComponentResourceKey ItemTextDisabledKey = new ComponentResourceKey(typeof(ResourceKeys), "ItemTextDisabledKey");
-
-		/// <summary>
-		/// Gets the resource key for the normal background brush.
-		/// </summary>
-		public static readonly ComponentResourceKey NormalBackgroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "NormalBackgroundBrushKey");
 
 		/// <summary>
 		/// Gets the resource key for the item background hover.

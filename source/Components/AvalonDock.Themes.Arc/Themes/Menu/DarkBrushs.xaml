@@ -31,18 +31,6 @@
 
 	<SolidColorBrush
 		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
-									 ResourceId=FocusScrollButtonBrushKey}"
-		PresentationOptions:Freeze="True"
-		Color="#FF3574F0" />
-
-	<SolidColorBrush
-		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
-									 ResourceId=ScrollButtonBrushKey}"
-		PresentationOptions:Freeze="True"
-		Color="#FFFFFFFF" />
-
-	<SolidColorBrush
-		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
 									 ResourceId=CheckMarkBackgroundBrushKey}"
 		PresentationOptions:Freeze="True"
 		Color="Transparent" />
@@ -70,26 +58,6 @@
 
 	<SolidColorBrush
 		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
-									 ResourceId=MenuBorderBrushKey}"
-		PresentationOptions:Freeze="True"
-		Color="#515151" />
-
-	<LinearGradientBrush
-		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys}, ResourceId=MenuBackgroundKey}"
-		PresentationOptions:Freeze="True"
-		StartPoint="0,0"
-		EndPoint="0,1">
-		<GradientStop Offset="1" Color="#2B2B2B" />
-	</LinearGradientBrush>
-
-	<SolidColorBrush
-		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
-									 ResourceId=TopLevelHeaderMenuBackgroundKey}"
-		PresentationOptions:Freeze="True"
-		Color="#3C3F41" />
-
-	<SolidColorBrush
-		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
 									 ResourceId=TextBrushKey}"
 		PresentationOptions:Freeze="True"
 		Color="#BBBBBB" />
@@ -105,12 +73,6 @@
 									 ResourceId=ItemTextDisabledKey}"
 		PresentationOptions:Freeze="True"
 		Color="#787878" />
-
-	<SolidColorBrush
-		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
-									 ResourceId=NormalBackgroundBrushKey}"
-		PresentationOptions:Freeze="True"
-		Color="#FF2B2B2B" />
 
 	<SolidColorBrush
 		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},

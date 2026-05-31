@@ -344,21 +344,6 @@ namespace AvalonDock.Themes.Arc.Themes
 		/// </summary>
 		public static readonly ComponentResourceKey ToolWindowCaptionButtonInactiveHoveredGlyph = new ComponentResourceKey(typeof(ResourceKeys), "ToolWindowCaptionButtonInactiveHoveredGlyph");
 
-		/// <summary>
-		/// Gets the resource key for the tool window caption button inactive pressed background.
-		/// </summary>
-		public static readonly ComponentResourceKey ToolWindowCaptionButtonInactivePressedBackground = new ComponentResourceKey(typeof(ResourceKeys), "ToolWindowCaptionButtonInactivePressedBackground");
-
-		/// <summary>
-		/// Gets the resource key for the tool window caption button inactive pressed border.
-		/// </summary>
-		public static readonly ComponentResourceKey ToolWindowCaptionButtonInactivePressedBorder = new ComponentResourceKey(typeof(ResourceKeys), "ToolWindowCaptionButtonInactivePressedBorder");
-
-		/// <summary>
-		/// Gets the resource key for the tool window caption button inactive pressed glyph.
-		/// </summary>
-		public static readonly ComponentResourceKey ToolWindowCaptionButtonInactivePressedGlyph = new ComponentResourceKey(typeof(ResourceKeys), "ToolWindowCaptionButtonInactivePressedGlyph");
-
 		// Tool Window : Tab
 
 		/// <summary>
@@ -458,11 +443,6 @@ namespace AvalonDock.Themes.Arc.Themes
 		/// Gets the resource key for the docking button height.
 		/// </summary>
 		public static readonly ComponentResourceKey DockingButtonHeightKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonHeightKey");
-
-		/// <summary>
-		/// Gets the resource key for the docking button background brush.
-		/// </summary>
-		public static readonly ComponentResourceKey DockingButtonBackgroundBrushKey = new ComponentResourceKey(typeof(ResourceKeys), "DockingButtonBackgroundBrushKey");
 
 		/// <summary>
 		/// Gets the resource key for the docking button foreground brush.

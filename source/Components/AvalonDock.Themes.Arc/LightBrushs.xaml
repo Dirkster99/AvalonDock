@@ -96,10 +96,6 @@
 		options:Freeze="true"
 		Color="#000000" />
 	<SolidColorBrush
-		x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabSelectedInactiveBackground}"
-		options:Freeze="true"
-		Color="#E8E8E8" />
-	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabSelectedInactiveText}"
 		options:Freeze="true"
 		Color="#616161" />
@@ -182,25 +178,9 @@
 		options:Freeze="true"
 		Color="#616161" />
 	<SolidColorBrush
-		x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonHoveredBackground}"
-		options:Freeze="true"
-		Color="#C75450" />
-	<SolidColorBrush
-		x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonHoveredBorder}"
-		options:Freeze="true"
-		Color="#C75450" />
-	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonHoveredGlyph}"
 		options:Freeze="true"
 		Color="#FFFFFF" />
-	<SolidColorBrush
-		x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonPressedBackground}"
-		options:Freeze="true"
-		Color="#A5423F" />
-	<SolidColorBrush
-		x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonPressedBorder}"
-		options:Freeze="true"
-		Color="#A5423F" />
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonPressedGlyph}"
 		options:Freeze="true"
@@ -281,18 +261,6 @@
 		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredGlyph}"
 		options:Freeze="true"
 		Color="#616161" />
-	<SolidColorBrush
-		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactivePressedBackground}"
-		options:Freeze="true"
-		Color="#3574F0" />
-	<SolidColorBrush
-		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactivePressedBorder}"
-		options:Freeze="true"
-		Color="#3574F0" />
-	<SolidColorBrush
-		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactivePressedGlyph}"
-		options:Freeze="true"
-		Color="#FFFFFF" />
 
 	<!--  Tool Window : Tab  -->
 	<SolidColorBrush
@@ -367,10 +335,6 @@
 		Color="#FFFFFF" />
 
 	<!--  Docking Buttons  -->
-	<SolidColorBrush
-		x:Key="{x:Static reskeys:ResourceKeys.DockingButtonBackgroundBrushKey}"
-		options:Freeze="true"
-		Color="#20000000" />
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.DockingButtonForegroundBrushKey}"
 		options:Freeze="true"

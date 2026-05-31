@@ -300,19 +300,6 @@
 		options:Freeze="true"
 		Color="#000000" />
 
-	<SolidColorBrush
-		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactivePressedBackground}"
-		options:Freeze="true"
-		Color="#FFE8A6" />
-	<SolidColorBrush
-		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactivePressedBorder}"
-		options:Freeze="true"
-		Color="#E5C365" />
-	<SolidColorBrush
-		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactivePressedGlyph}"
-		options:Freeze="true"
-		Color="#000000" />
-
 	<!--  Tool Window : Tab  -->
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.ToolWindowTabSelectedActiveBackground}"
@@ -392,10 +379,6 @@
 
 
 	<!--  DockingBrushKeys  -->
-	<SolidColorBrush
-		x:Key="{x:Static reskeys:ResourceKeys.DockingButtonBackgroundBrushKey}"
-		options:Freeze="true"
-		Color="#20000000" />
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.DockingButtonForegroundBrushKey}"
 		options:Freeze="true"
