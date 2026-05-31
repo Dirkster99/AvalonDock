@@ -21,6 +21,7 @@ namespace AvalonDock.Mvvm
 		private string? _toolTipText;
 		private DockZone _zone = DockZone.LeftTop;
 		private bool _isOpenByDefault;
+		private bool _isOpen;
 		private object? _icon;
 
 		/// <inheritdoc/>
@@ -45,6 +46,14 @@ namespace AvalonDock.Mvvm
 		{
 			get => _isOpenByDefault;
 			set => SetProperty(ref _isOpenByDefault, value);
+		}
+
+		/// <inheritdoc/>
+		[IgnoreDataMember]
+		public bool IsOpen
+		{
+			get => _isOpen;
+			set => SetProperty(ref _isOpen, value);
 		}
 
 		/// <inheritdoc/>

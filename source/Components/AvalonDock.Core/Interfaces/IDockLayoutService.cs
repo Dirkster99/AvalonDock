@@ -56,7 +56,7 @@ namespace AvalonDock.Core
 		/// <typeparam name="T">The concrete anchorable type.</typeparam>
 		/// <returns>The anchorable instance, or null if not registered.</returns>
 		T? GetAnchorable<T>()
-			where T : class, IDockable;
+			where T : class, IToolbox;
 
 		/// <summary>Docks (shows) the specified anchorable if it is currently auto-hidden.</summary>
 		/// <param name="anchorable">The anchorable to show.</param>
@@ -78,28 +78,8 @@ namespace AvalonDock.Core
 
 		/// <summary>
 		/// Raised when the docked/auto-hidden state of any anchorable changes.
-		/// Subscribers should re-read <see cref="IsSideOpen"/> values.
+		/// Subscribers should re-read <see cref="IsSideOpen"/> and <see cref="IsAnchorableOpen"/> values.
 		/// </summary>
 		event EventHandler? AnchorableStateChanged;
-
-		/// <summary>
-		/// Registers the view-layer handlers that perform actual dock/auto-hide operations.
-		/// Called by the docking manager control during initialization.
-		/// </summary>
-		/// <param name="show">Docks an anchorable from auto-hidden state.</param>
-		/// <param name="hide">Auto-hides a docked anchorable.</param>
-		/// <param name="isOpen">Returns whether an anchorable is currently docked.</param>
-		/// <param name="isSideOpen">Returns whether any anchorable on the given side is docked.</param>
-		void RegisterAnchorableVisibilityHandler(
-			Action<IDockable> show,
-			Action<IDockable> hide,
-			Func<IDockable, bool> isOpen,
-			Func<ToolboxSide, bool> isSideOpen);
-
-		/// <summary>
-		/// Notifies the service that anchorable state has changed.
-		/// Called by the view layer after any dock/auto-hide operation.
-		/// </summary>
-		void NotifyAnchorableStateChanged();
 	}
 }

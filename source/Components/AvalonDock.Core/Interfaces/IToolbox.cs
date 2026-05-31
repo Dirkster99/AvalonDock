@@ -69,6 +69,9 @@ namespace AvalonDock.Core
 		/// <summary>Gets or sets a value indicating whether this toolbox should be toggled open on startup.</summary>
 		bool IsOpenByDefault { get; set; }
 
+		/// <summary>Gets or sets a value indicating whether this toolbox is currently docked (visible). When <c>false</c> the toolbox is auto-hidden.</summary>
+		bool IsOpen { get; set; }
+
 		/// <summary>
 		/// Gets or sets the icon content for the sidebar toggle button.
 		/// Accepts any WPF-renderable object: ImageSource, UIElement (Viewbox, Path), DrawingImage, or null.

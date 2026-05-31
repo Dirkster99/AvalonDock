@@ -98,65 +98,40 @@ namespace AvalonDockTest
 		}
 
 		/// <summary>
-		/// ShowAnchorable delegates to registered show handler.
+		/// ShowAnchorable marks the anchorable as open in the service.
 		/// </summary>
 		[Test]
-		public void ShowAnchorable_DelegatesToRegisteredHandler()
+		public void ShowAnchorable_MarksAsOpen()
 		{
-			IDockable? shown = null;
 			var service = new DockLayoutService(new IToolbox[] { new LeftTopToolbox() });
-			service.RegisterAnchorableVisibilityHandler(
-				show: d => shown = d,
-				hide: _ => { },
-				isOpen: _ => false,
-				isSideOpen: _ => false);
-
 			var toolbox = service.GetAnchorable<LeftTopToolbox>()!;
+
+			Assert.That(service.IsAnchorableOpen(toolbox), Is.False);
 			service.ShowAnchorable(toolbox);
-			Assert.That(shown, Is.SameAs(toolbox));
-		}
-
-		/// <summary>
-		/// HideAnchorable delegates to registered hide handler.
-		/// </summary>
-		[Test]
-		public void HideAnchorable_DelegatesToRegisteredHandler()
-		{
-			IDockable? hidden = null;
-			var service = new DockLayoutService(new IToolbox[] { new LeftTopToolbox() });
-			service.RegisterAnchorableVisibilityHandler(
-				show: _ => { },
-				hide: d => hidden = d,
-				isOpen: _ => true,
-				isSideOpen: _ => true);
-
-			var toolbox = service.GetAnchorable<LeftTopToolbox>()!;
-			service.HideAnchorable(toolbox);
-			Assert.That(hidden, Is.SameAs(toolbox));
-		}
-
-		/// <summary>
-		/// IsAnchorableOpen delegates to registered query handler.
-		/// </summary>
-		[Test]
-		public void IsAnchorableOpen_DelegatesToRegisteredQuery()
-		{
-			var service = new DockLayoutService(new IToolbox[] { new LeftTopToolbox() });
-			service.RegisterAnchorableVisibilityHandler(
-				show: _ => { },
-				hide: _ => { },
-				isOpen: d => d is LeftTopToolbox,
-				isSideOpen: _ => false);
-
-			var toolbox = service.GetAnchorable<LeftTopToolbox>()!;
 			Assert.That(service.IsAnchorableOpen(toolbox), Is.True);
 		}
 
 		/// <summary>
-		/// IsAnchorableOpen returns false when no handler is registered.
+		/// HideAnchorable marks the anchorable as closed in the service.
 		/// </summary>
 		[Test]
-		public void IsAnchorableOpen_ReturnsFalse_WhenNoHandler()
+		public void HideAnchorable_MarksAsClosed()
+		{
+			var service = new DockLayoutService(new IToolbox[] { new LeftTopToolbox() });
+			var toolbox = service.GetAnchorable<LeftTopToolbox>()!;
+
+			service.ShowAnchorable(toolbox);
+			Assert.That(service.IsAnchorableOpen(toolbox), Is.True);
+
+			service.HideAnchorable(toolbox);
+			Assert.That(service.IsAnchorableOpen(toolbox), Is.False);
+		}
+
+		/// <summary>
+		/// IsAnchorableOpen returns false for anchorables never shown.
+		/// </summary>
+		[Test]
+		public void IsAnchorableOpen_ReturnsFalse_WhenNeverShown()
 		{
 			var service = new DockLayoutService(new IToolbox[] { new LeftTopToolbox() });
 			var toolbox = service.GetAnchorable<LeftTopToolbox>()!;
@@ -164,35 +139,84 @@ namespace AvalonDockTest
 		}
 
 		/// <summary>
-		/// IsSideOpen delegates to registered handler.
+		/// IsSideOpen returns true when any toolbox on that side is open.
 		/// </summary>
 		[Test]
-		public void IsSideOpen_DelegatesToRegisteredHandler()
+		public void IsSideOpen_ReturnsTrue_WhenAnyToolboxOnSideIsOpen()
 		{
-			var service = new DockLayoutService(Array.Empty<IToolbox>());
-			service.RegisterAnchorableVisibilityHandler(
-				show: _ => { },
-				hide: _ => { },
-				isOpen: _ => false,
-				isSideOpen: side => side == ToolboxSide.Left);
+			var lt = new LeftTopToolbox();
+			var lb = new LeftBottomToolbox();
+			var service = new DockLayoutService(new IToolbox[] { lt, lb });
 
+			Assert.That(service.IsSideOpen(ToolboxSide.Left), Is.False);
+
+			service.ShowAnchorable(lt);
 			Assert.That(service.IsSideOpen(ToolboxSide.Left), Is.True);
 			Assert.That(service.IsSideOpen(ToolboxSide.Right), Is.False);
-			Assert.That(service.IsSideOpen(ToolboxSide.Bottom), Is.False);
 		}
 
 		/// <summary>
-		/// NotifyAnchorableStateChanged raises the event.
+		/// ShowAnchorable raises AnchorableStateChanged event.
 		/// </summary>
 		[Test]
-		public void NotifyAnchorableStateChanged_RaisesEvent()
+		public void ShowAnchorable_RaisesStateChangedEvent()
 		{
-			var service = new DockLayoutService(Array.Empty<IToolbox>());
+			var service = new DockLayoutService(new IToolbox[] { new LeftTopToolbox() });
 			bool raised = false;
 			service.AnchorableStateChanged += (_, _) => raised = true;
 
-			service.NotifyAnchorableStateChanged();
+			service.ShowAnchorable(service.GetAnchorable<LeftTopToolbox>()!);
 			Assert.That(raised, Is.True);
+		}
+
+		/// <summary>
+		/// HideAnchorable raises AnchorableStateChanged event.
+		/// </summary>
+		[Test]
+		public void HideAnchorable_RaisesStateChangedEvent()
+		{
+			var service = new DockLayoutService(new IToolbox[] { new LeftTopToolbox() });
+			var toolbox = service.GetAnchorable<LeftTopToolbox>()!;
+			service.ShowAnchorable(toolbox);
+
+			bool raised = false;
+			service.AnchorableStateChanged += (_, _) => raised = true;
+
+			service.HideAnchorable(toolbox);
+			Assert.That(raised, Is.True);
+		}
+
+		/// <summary>
+		/// ShowAnchorable does not raise event when already open (idempotent).
+		/// </summary>
+		[Test]
+		public void ShowAnchorable_DoesNotRaiseEvent_WhenAlreadyOpen()
+		{
+			var service = new DockLayoutService(new IToolbox[] { new LeftTopToolbox() });
+			var toolbox = service.GetAnchorable<LeftTopToolbox>()!;
+			service.ShowAnchorable(toolbox);
+
+			bool raised = false;
+			service.AnchorableStateChanged += (_, _) => raised = true;
+
+			service.ShowAnchorable(toolbox);
+			Assert.That(raised, Is.False);
+		}
+
+		/// <summary>
+		/// HideAnchorable does not raise event when already hidden (idempotent).
+		/// </summary>
+		[Test]
+		public void HideAnchorable_DoesNotRaiseEvent_WhenAlreadyHidden()
+		{
+			var service = new DockLayoutService(new IToolbox[] { new LeftTopToolbox() });
+			var toolbox = service.GetAnchorable<LeftTopToolbox>()!;
+
+			bool raised = false;
+			service.AnchorableStateChanged += (_, _) => raised = true;
+
+			service.HideAnchorable(toolbox);
+			Assert.That(raised, Is.False);
 		}
 
 		/// <summary>
@@ -203,18 +227,13 @@ namespace AvalonDockTest
 		{
 			var lt = new LeftTopToolbox();
 			var lb = new LeftBottomToolbox();
-			var hidden = new List<IDockable>();
 			var service = new DockLayoutService(new IToolbox[] { lt, lb });
-			service.RegisterAnchorableVisibilityHandler(
-				show: _ => { },
-				hide: d => hidden.Add(d),
-				isOpen: d => true,
-				isSideOpen: _ => true);
+			service.ShowAnchorable(lt);
+			service.ShowAnchorable(lb);
 
 			service.ToggleSide(ToolboxSide.Left);
-			Assert.That(hidden, Has.Count.EqualTo(2));
-			Assert.That(hidden, Contains.Item(lt));
-			Assert.That(hidden, Contains.Item(lb));
+			Assert.That(service.IsAnchorableOpen(lt), Is.False);
+			Assert.That(service.IsAnchorableOpen(lb), Is.False);
 		}
 
 		/// <summary>
@@ -225,16 +244,10 @@ namespace AvalonDockTest
 		{
 			var lt = new LeftTopToolbox();
 			var lb = new LeftBottomToolbox();
-			IDockable? shown = null;
 			var service = new DockLayoutService(new IToolbox[] { lt, lb });
-			service.RegisterAnchorableVisibilityHandler(
-				show: d => shown = d,
-				hide: _ => { },
-				isOpen: _ => false,
-				isSideOpen: _ => false);
 
 			service.ToggleSide(ToolboxSide.Left);
-			Assert.That(shown, Is.SameAs(lt));
+			Assert.That(service.IsAnchorableOpen(lt), Is.True);
 		}
 
 		/// <summary>
@@ -244,16 +257,13 @@ namespace AvalonDockTest
 		public void ToggleSide_DoesNothing_WhenNoToolboxesOnSide()
 		{
 			var lt = new LeftTopToolbox();
-			bool anyCalled = false;
 			var service = new DockLayoutService(new IToolbox[] { lt });
-			service.RegisterAnchorableVisibilityHandler(
-				show: _ => anyCalled = true,
-				hide: _ => anyCalled = true,
-				isOpen: _ => false,
-				isSideOpen: _ => false);
+
+			int eventCount = 0;
+			service.AnchorableStateChanged += (_, _) => eventCount++;
 
 			service.ToggleSide(ToolboxSide.Right);
-			Assert.That(anyCalled, Is.False);
+			Assert.That(eventCount, Is.EqualTo(0));
 		}
 
 		/// <summary>

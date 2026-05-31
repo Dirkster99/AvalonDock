@@ -342,6 +342,7 @@ namespace AvalonDock
 			RefreshButtonStates();
 			Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
 				new System.Action(UpdatePinButtonsToMinimize));
+			PushStateToService();
 		}
 
 		/// <summary>
@@ -1331,72 +1332,138 @@ namespace AvalonDock
 		private void OnActiveContentChangedForAnchorableState(object sender, EventArgs e)
 		{
 			RefreshButtonStates();
-			NotifyServiceStateChanged();
-		}
-
-		private void NotifyServiceStateChanged()
-		{
-			LayoutService?.NotifyAnchorableStateChanged();
+			PushStateToService();
 		}
 
 		private static void OnLayoutServiceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
-			if (d is ToggleDockingManager manager && e.NewValue is IDockLayoutService service)
+			if (d is ToggleDockingManager manager)
 			{
-				manager.RegisterWithService(service);
+				if (e.OldValue is IDockLayoutService oldService)
+				{
+					oldService.AnchorableStateChanged -= manager.OnServiceAnchorableStateChanged;
+				}
+
+				if (e.NewValue is IDockLayoutService newService)
+				{
+					newService.AnchorableStateChanged += manager.OnServiceAnchorableStateChanged;
+				}
 			}
 		}
 
-		private void RegisterWithService(IDockLayoutService service)
+		private bool _suppressServiceSync;
+
+		private void OnServiceAnchorableStateChanged(object sender, EventArgs e)
 		{
-			service.RegisterAnchorableVisibilityHandler(
-				show: ShowAnchorableFromService,
-				hide: HideAnchorableFromService,
-				isOpen: IsAnchorableOpenFromService,
-				isSideOpen: IsSideOpenFromService);
+			if (_suppressServiceSync || LayoutService == null)
+				return;
+
+			SyncLayoutFromService();
 		}
 
-		private void ShowAnchorableFromService(IDockable dockable)
+		/// <summary>
+		/// Reads each toolbox's <see cref="IToolbox.IsOpen"/> state and
+		/// docks or auto-hides to match. Called when the service raises
+		/// <see cref="IDockLayoutService.AnchorableStateChanged"/>.
+		/// </summary>
+		private void SyncLayoutFromService()
 		{
-			var anchorable = FindAnchorableByContent(dockable);
-			if (anchorable != null && anchorable.IsAutoHidden)
-			{
-				var zone = GetAnchorableZone(anchorable);
-				ToggleAnchorable(anchorable, zone);
-			}
-		}
+			var service = LayoutService;
+			if (service == null)
+				return;
 
-		private void HideAnchorableFromService(IDockable dockable)
-		{
-			var anchorable = FindAnchorableByContent(dockable);
-			if (anchorable != null && !anchorable.IsAutoHidden)
+			_suppressServiceSync = true;
+			try
 			{
-				var zone = GetAnchorableZone(anchorable);
-				AutoHideFromDock(anchorable, zone);
+				ToggleDockButtonBar[] allBars = { _leftTopBar, _leftBottomBar, _rightTopBar, _rightBottomBar, _bottomLeftBar, _bottomRightBar };
+				foreach (var bar in allBars)
+				{
+					if (bar == null) continue;
+					foreach (var item in bar.Items)
+					{
+						if (!(item is ToggleDockButton btn) || btn.Anchorable == null)
+							continue;
+
+						var anchorable = btn.Anchorable;
+						if (!(anchorable.Content is IToolbox toolbox))
+							continue;
+
+						bool wantOpen = toolbox.IsOpen;
+						bool isOpen = !anchorable.IsAutoHidden;
+
+						if (wantOpen && !isOpen)
+						{
+							var zone = GetAnchorableZone(anchorable);
+							HideDockedInBar(GetBarForZone(zone));
+							DockFromAutoHide(anchorable, zone);
+							FixSplitOrientation(anchorable, zone);
+
+							if (ToggleLayoutEngine.IsBottomZone(zone))
+								EnsureBottomZoneOrder();
+
+							switch (LayoutPriority)
+							{
+								case DockLayoutPriority.BottomFullWidth:
+									EnsureBottomFullWidth();
+									break;
+								case DockLayoutPriority.SidesFullHeight:
+									EnsureSidesFullHeight();
+									break;
+							}
+
+							ActiveContent = anchorable.Content;
+						}
+						else if (!wantOpen && isOpen)
+						{
+							var zone = GetAnchorableZone(anchorable);
+							AutoHideFromDock(anchorable, zone);
+						}
+					}
+				}
+
 				RefreshButtonStates();
 				Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded,
 					new System.Action(UpdatePinButtonsToMinimize));
 			}
-		}
-
-		private bool IsAnchorableOpenFromService(IDockable dockable)
-		{
-			var anchorable = FindAnchorableByContent(dockable);
-			return anchorable != null && !anchorable.IsAutoHidden;
-		}
-
-		private bool IsSideOpenFromService(ToolboxSide side)
-		{
-			switch (side)
+			finally
 			{
-				case ToolboxSide.Left:
-					return HasDockedAnchorable(_leftTopBar) || HasDockedAnchorable(_leftBottomBar);
-				case ToolboxSide.Bottom:
-					return HasDockedAnchorable(_bottomLeftBar) || HasDockedAnchorable(_bottomRightBar);
-				case ToolboxSide.Right:
-					return HasDockedAnchorable(_rightTopBar) || HasDockedAnchorable(_rightBottomBar);
-				default:
-					return false;
+				_suppressServiceSync = false;
+			}
+		}
+
+		/// <summary>
+		/// Pushes the current WPF layout state (docked vs auto-hidden) for every
+		/// anchorable into the toolbox <see cref="IToolbox.IsOpen"/> property.
+		/// Called after <see cref="ToggleAnchorable"/> or any view-initiated state change.
+		/// </summary>
+		private void PushStateToService()
+		{
+			var service = LayoutService;
+			if (service == null)
+				return;
+
+			_suppressServiceSync = true;
+			try
+			{
+				ToggleDockButtonBar[] allBars = { _leftTopBar, _leftBottomBar, _rightTopBar, _rightBottomBar, _bottomLeftBar, _bottomRightBar };
+				foreach (var bar in allBars)
+				{
+					if (bar == null) continue;
+					foreach (var item in bar.Items)
+					{
+						if (!(item is ToggleDockButton btn) || btn.Anchorable == null)
+							continue;
+
+						if (btn.Anchorable.Content is IToolbox toolbox)
+						{
+							toolbox.IsOpen = !btn.Anchorable.IsAutoHidden;
+						}
+					}
+				}
+			}
+			finally
+			{
+				_suppressServiceSync = false;
 			}
 		}
 
@@ -1410,24 +1477,6 @@ namespace AvalonDock
 			}
 
 			return false;
-		}
-
-		private LayoutAnchorable FindAnchorableByContent(object content)
-		{
-			if (content == null) return null;
-
-			ToggleDockButtonBar[] allBars = { _leftTopBar, _leftBottomBar, _rightTopBar, _rightBottomBar, _bottomLeftBar, _bottomRightBar };
-			foreach (var bar in allBars)
-			{
-				if (bar == null) continue;
-				foreach (var item in bar.Items)
-				{
-					if (item is ToggleDockButton btn && btn.Anchorable?.Content == content)
-						return btn.Anchorable;
-				}
-			}
-
-			return null;
 		}
 	}
 }
