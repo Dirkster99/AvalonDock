@@ -7,7 +7,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -37,49 +36,9 @@
                           Background="Transparent" Foreground="{DynamicResource AppSubText}"
                           BorderBrush="{DynamicResource AppDimText}" BorderThickness="1" />
         </StackPanel>
-
-        <!-- Include/Exclude filters -->
-        <Grid Grid.Row="2" Margin="8,0,8,6">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <TextBox Grid.Row="0" Background="{DynamicResource AppInputBg}"
-                     Foreground="{DynamicResource AppText}" BorderThickness="1"
-                     BorderBrush="{DynamicResource AppDimText}"
-                     Padding="4,2" FontSize="11" Margin="0,0,0,2"
-                     Text="{Binding IncludeFilter, UpdateSourceTrigger=PropertyChanged}"
-                     CaretBrush="{DynamicResource AppText}">
-                <TextBox.Style>
-                    <Style TargetType="TextBox">
-                        <Style.Triggers>
-                            <Trigger Property="Text" Value="">
-                                <Setter Property="ToolTip" Value="Files to include (e.g. *.cs, *.xaml)" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBox.Style>
-            </TextBox>
-            <TextBox Grid.Row="1" Background="{DynamicResource AppInputBg}"
-                     Foreground="{DynamicResource AppText}" BorderThickness="1"
-                     BorderBrush="{DynamicResource AppDimText}"
-                     Padding="4,2" FontSize="11"
-                     Text="{Binding ExcludeFilter, UpdateSourceTrigger=PropertyChanged}"
-                     CaretBrush="{DynamicResource AppText}">
-                <TextBox.Style>
-                    <Style TargetType="TextBox">
-                        <Style.Triggers>
-                            <Trigger Property="Text" Value="">
-                                <Setter Property="ToolTip" Value="Files to exclude (e.g. bin, obj)" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBox.Style>
-            </TextBox>
-        </Grid>
-
+        
         <!-- Results tree -->
-        <TreeView Grid.Row="3" ItemsSource="{Binding Results}"
+        <TreeView Grid.Row="2" ItemsSource="{Binding Results}"
                   Background="Transparent" BorderThickness="0"
                   VirtualizingPanel.IsVirtualizing="True"
                   Margin="0">
@@ -120,7 +79,7 @@
         </TreeView>
 
         <!-- Status bar -->
-        <Border Grid.Row="4" Background="{DynamicResource AppInputBarBg}" Padding="8,4">
+        <Border Grid.Row="3" Background="{DynamicResource AppInputBarBg}" Padding="8,4">
             <TextBlock Text="{Binding StatusText}" Foreground="{DynamicResource AppSubText}"
                        FontSize="11" />
         </Border>
