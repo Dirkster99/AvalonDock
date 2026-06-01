@@ -191,6 +191,7 @@ namespace AvalonDock.DependencyInjection
 					?? System.Array.Empty<IToolbox>();
 				return new Mvvm.DockLayoutService(toolboxes);
 			});
+			services.AddSingleton<Mvvm.SideToggleManager>();
 			return services;
 		}
 

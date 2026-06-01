@@ -18,7 +18,6 @@ namespace AvalonDock.Mvvm
 		private readonly DocumentDock _documentDock;
 		private readonly ToolDock _toolDock;
 		private readonly RootDock _rootDock;
-		private readonly Dictionary<ToolboxSide, List<IToolbox>> _lastOpenBySide = new Dictionary<ToolboxSide, List<IToolbox>>();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DockLayoutService"/> class.
@@ -100,46 +99,6 @@ namespace AvalonDock.Mvvm
 			if (_rootDock.ActiveDockable == document)
 			{
 				_rootDock.ActiveDockable = _documentDock.VisibleDockables?.LastOrDefault();
-			}
-		}
-
-		/// <inheritdoc/>
-		public void ToggleSide(ToolboxSide side)
-		{
-			var toolboxes = Anchorables
-				.OfType<IToolbox>()
-				.Where(t => t.Zone.ToSide() == side)
-				.ToList();
-
-			if (toolboxes.Count == 0)
-			{
-				return;
-			}
-
-			bool anyOpen = toolboxes.Any(t => t.IsOpen);
-
-			if (anyOpen)
-			{
-				_lastOpenBySide[side] = toolboxes.Where(t => t.IsOpen).ToList();
-
-				foreach (var t in toolboxes)
-				{
-					t.IsOpen = false;
-				}
-			}
-			else
-			{
-				if (_lastOpenBySide.TryGetValue(side, out var lastOpen) && lastOpen.Count > 0)
-				{
-					foreach (var t in lastOpen)
-					{
-						t.IsOpen = true;
-					}
-				}
-				else
-				{
-					toolboxes[0].IsOpen = true;
-				}
 			}
 		}
 

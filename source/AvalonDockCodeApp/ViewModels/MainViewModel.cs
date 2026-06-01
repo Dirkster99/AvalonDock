@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using AvalonDock.Core;
+using AvalonDock.Mvvm;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -9,6 +10,7 @@ namespace ToggleTestApp.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
 	private readonly IDockLayoutService _dockService;
+	private readonly SideToggleManager _sideToggle;
 
 	/// <summary>The MVVM layout tree — bind to DockLayout on the DockingManager.</summary>
 	public IRootDock DockLayout => _dockService.Layout;
@@ -28,9 +30,10 @@ public partial class MainViewModel : ObservableObject
 	[ObservableProperty]
 	private bool _isSecondarySideBarOpen;
 
-	public MainViewModel(IDockLayoutService dockService)
+	public MainViewModel(IDockLayoutService dockService, SideToggleManager sideToggle)
 	{
 		_dockService = dockService;
+		_sideToggle = sideToggle;
 		_dockService.AnchorableStateChanged += OnAnchorableStateChanged;
 
 		// Wire up the folder explorer's file-open callback
@@ -107,13 +110,13 @@ public partial class MainViewModel : ObservableObject
 	}
 
 	[RelayCommand]
-	private void TogglePrimarySideBar() => _dockService.ToggleSide(ToolboxSide.Left);
+	private void TogglePrimarySideBar() => _sideToggle.Toggle(ToolboxSide.Left);
 
 	[RelayCommand]
-	private void ToggleBottomPanel() => _dockService.ToggleSide(ToolboxSide.Bottom);
+	private void ToggleBottomPanel() => _sideToggle.Toggle(ToolboxSide.Bottom);
 
 	[RelayCommand]
-	private void ToggleSecondarySideBar() => _dockService.ToggleSide(ToolboxSide.Right);
+	private void ToggleSecondarySideBar() => _sideToggle.Toggle(ToolboxSide.Right);
 
 	private void OnAnchorableStateChanged(object? sender, EventArgs e)
 	{

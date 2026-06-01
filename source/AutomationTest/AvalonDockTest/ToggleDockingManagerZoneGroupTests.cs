@@ -220,7 +220,7 @@ namespace AvalonDockTest
 		}
 
 		/// <summary>
-		/// ToggleSide extension hides all open toolboxes on the side.
+		/// SideToggleManager hides all open toolboxes on the side.
 		/// </summary>
 		[Test]
 		public void ToggleSide_HidesAllOpen_WhenAnyAreOpen()
@@ -228,16 +228,17 @@ namespace AvalonDockTest
 			var lt = new LeftTopToolbox();
 			var lb = new LeftBottomToolbox();
 			var service = new DockLayoutService(new IToolbox[] { lt, lb });
+			var toggle = new SideToggleManager(service);
 			service.ShowAnchorable(lt);
 			service.ShowAnchorable(lb);
 
-			service.ToggleSide(ToolboxSide.Left);
+			toggle.Toggle(ToolboxSide.Left);
 			Assert.That(service.IsAnchorableOpen(lt), Is.False);
 			Assert.That(service.IsAnchorableOpen(lb), Is.False);
 		}
 
 		/// <summary>
-		/// ToggleSide extension shows first available when none are open and no history exists.
+		/// SideToggleManager shows first available when none are open and no history exists.
 		/// </summary>
 		[Test]
 		public void ToggleSide_ShowsFirst_WhenNoneAreOpenAndNoHistory()
@@ -245,13 +246,14 @@ namespace AvalonDockTest
 			var lt = new LeftTopToolbox();
 			var lb = new LeftBottomToolbox();
 			var service = new DockLayoutService(new IToolbox[] { lt, lb });
+			var toggle = new SideToggleManager(service);
 
-			service.ToggleSide(ToolboxSide.Left);
+			toggle.Toggle(ToolboxSide.Left);
 			Assert.That(service.IsAnchorableOpen(lt), Is.True);
 		}
 
 		/// <summary>
-		/// ToggleSide restores previously open toolboxes after toggling off and on again.
+		/// SideToggleManager restores previously open toolboxes after toggling off and on again.
 		/// </summary>
 		[Test]
 		public void ToggleSide_RestoresLastOpened_WhenToggledBackOn()
@@ -259,6 +261,7 @@ namespace AvalonDockTest
 			var lt = new LeftTopToolbox();
 			var lb = new LeftBottomToolbox();
 			var service = new DockLayoutService(new IToolbox[] { lt, lb });
+			var toggle = new SideToggleManager(service);
 
 			// Open only lb (the second one)
 			service.ShowAnchorable(lb);
@@ -266,17 +269,17 @@ namespace AvalonDockTest
 			Assert.That(service.IsAnchorableOpen(lt), Is.False);
 
 			// Toggle off — should remember lb was open
-			service.ToggleSide(ToolboxSide.Left);
+			toggle.Toggle(ToolboxSide.Left);
 			Assert.That(service.IsAnchorableOpen(lb), Is.False);
 
 			// Toggle back on — should restore lb, not lt
-			service.ToggleSide(ToolboxSide.Left);
+			toggle.Toggle(ToolboxSide.Left);
 			Assert.That(service.IsAnchorableOpen(lb), Is.True, "Last opened toolbox should be restored");
 			Assert.That(service.IsAnchorableOpen(lt), Is.False, "Toolbox that was not previously open should stay closed");
 		}
 
 		/// <summary>
-		/// ToggleSide restores all previously open toolboxes, not just one.
+		/// SideToggleManager restores all previously open toolboxes, not just one.
 		/// </summary>
 		[Test]
 		public void ToggleSide_RestoresAllPreviouslyOpen_WhenMultipleWereOpen()
@@ -284,35 +287,37 @@ namespace AvalonDockTest
 			var lt = new LeftTopToolbox();
 			var lb = new LeftBottomToolbox();
 			var service = new DockLayoutService(new IToolbox[] { lt, lb });
+			var toggle = new SideToggleManager(service);
 
 			// Open both
 			service.ShowAnchorable(lt);
 			service.ShowAnchorable(lb);
 
 			// Toggle off
-			service.ToggleSide(ToolboxSide.Left);
+			toggle.Toggle(ToolboxSide.Left);
 			Assert.That(service.IsAnchorableOpen(lt), Is.False);
 			Assert.That(service.IsAnchorableOpen(lb), Is.False);
 
 			// Toggle back on — both should restore
-			service.ToggleSide(ToolboxSide.Left);
+			toggle.Toggle(ToolboxSide.Left);
 			Assert.That(service.IsAnchorableOpen(lt), Is.True);
 			Assert.That(service.IsAnchorableOpen(lb), Is.True);
 		}
 
 		/// <summary>
-		/// ToggleSide does nothing when no toolboxes exist on the side.
+		/// SideToggleManager does nothing when no toolboxes exist on the side.
 		/// </summary>
 		[Test]
 		public void ToggleSide_DoesNothing_WhenNoToolboxesOnSide()
 		{
 			var lt = new LeftTopToolbox();
 			var service = new DockLayoutService(new IToolbox[] { lt });
+			var toggle = new SideToggleManager(service);
 
 			int eventCount = 0;
 			service.AnchorableStateChanged += (_, _) => eventCount++;
 
-			service.ToggleSide(ToolboxSide.Right);
+			toggle.Toggle(ToolboxSide.Right);
 			Assert.That(eventCount, Is.EqualTo(0));
 		}
 
