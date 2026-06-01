@@ -1571,11 +1571,10 @@
                             </MultiDataTrigger.Conditions>
 							<Setter TargetName="Header" Property="BorderThickness" Value="0" />
 							<Setter TargetName="Header" Property="Padding" Value="0" />
-							<!-- Use inactive-hover colors for close button even on active tab,
-							     matching VS2013 design intent (no bright-blue hover on blue tab). -->
-							<Setter TargetName="DocumentCloseButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveHoveredBackground}}" />
-                            <Setter TargetName="DocumentCloseButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveHoveredBorder}}" />
-                            <Setter TargetName="PART_ImgPinClose" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveHoveredGlyph}}" />
+							<!-- Active tab close button hover uses Color B (#1C97EA) — same as inactive tab hover bg. -->
+							<Setter TargetName="DocumentCloseButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveHoveredBackground}}" />
+                            <Setter TargetName="DocumentCloseButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveHoveredBorder}}" />
+                            <Setter TargetName="PART_ImgPinClose" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveHoveredGlyph}}" />
                         </MultiDataTrigger>
 
                         <!--  Document Well : Tab : Button / Selected, active, pressed  -->
