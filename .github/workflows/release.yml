@@ -93,6 +93,7 @@ jobs:
             "source/Components/AvalonDock.Themes.Expression/AvalonDock.Themes.Expression.csproj"
             "source/Components/AvalonDock.Themes.VS2010/AvalonDock.Themes.VS2010.csproj"
             "source/Components/AvalonDock.Themes.VS2013/AvalonDock.Themes.VS2013.csproj"
+            "source/Components/AvalonDock.Themes.VS/AvalonDock.Themes.VS.csproj"
           )
           
           for project in "${projects[@]}"; do
