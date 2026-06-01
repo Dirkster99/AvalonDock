@@ -1,28 +1,18 @@
-/************************************************************************
-   AvalonDock
+using System;
 
-   Copyright (C) 2007-2013 Xceed Software Inc.
+namespace AvalonDock.Themes;
 
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-namespace AvalonDock.Themes
+/// <summary>
+/// Implements the Arc Dark theme for AvalonDock.
+/// Modern theme with compact tabs, rounded corners, and semi-transparent design.
+/// </summary>
+public class ArcDarkTheme : Theme
 {
-	using System;
-
-	/// <summary>
-	/// Implements the Arc Dark theme for AvalonDock.
-	/// Modern theme with compact tabs, rounded corners, and semi-transparent design.
-	/// </summary>
-	public class ArcDarkTheme : Theme
+	/// <inheritdoc/>
+	public override Uri GetResourceUri()
 	{
-		/// <inheritdoc/>
-		public override Uri GetResourceUri()
-		{
-			return new Uri(
-				"/AvalonDock.Themes.Arc;component/DarkTheme.xaml",
-				UriKind.Relative);
-		}
+		return new Uri(
+			"/AvalonDock.Themes.Arc;component/DarkTheme.xaml",
+			UriKind.Relative);
 	}
 }
