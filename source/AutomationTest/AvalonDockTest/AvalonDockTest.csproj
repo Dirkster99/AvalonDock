@@ -28,6 +28,7 @@
 		<ProjectReference Include="..\..\Components\AvalonDock.DependencyInjection\AvalonDock.DependencyInjection.csproj"/>
 		<ProjectReference Include="..\..\Components\AvalonDock.Serializer.Xml\AvalonDock.Serializer.Xml.csproj"/>
 		<ProjectReference Include="..\..\Components\AvalonDock.Serializer.Json\AvalonDock.Serializer.Json.csproj"/>
+		<ProjectReference Include="..\..\Components\AvalonDock.Themes.VS\AvalonDock.Themes.VS.csproj"/>
 	</ItemGroup>
 
 </Project>

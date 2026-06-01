@@ -157,6 +157,13 @@
                                   IsCheckable="True" IsChecked="True" Click="OnThemeChanged" />
                         <MenuItem x:Name="menuArcLight" Header="Arc Light"
                                   IsCheckable="True" Click="OnThemeChanged" />
+                        <Separator />
+                        <MenuItem x:Name="menuVs2015Dark" Header="VS2015 Dark"
+                                  IsCheckable="True" Click="OnThemeChanged" />
+                        <MenuItem x:Name="menuVs2015Light" Header="VS2015 Light"
+                                  IsCheckable="True" Click="OnThemeChanged" />
+                        <MenuItem x:Name="menuVs2015Blue" Header="VS2015 Blue"
+                                  IsCheckable="True" Click="OnThemeChanged" />
                     </MenuItem>
                 </MenuItem>
             </Menu>

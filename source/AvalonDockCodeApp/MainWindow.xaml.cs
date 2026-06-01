@@ -7,6 +7,7 @@ using System.Windows.Threading;
 using AvalonDock;
 using AvalonDock.DependencyInjection;
 using AvalonDock.Themes;
+using AvalonDock.Themes.VS;
 using ToggleTestApp.ViewModels;
 
 namespace ToggleTestApp
@@ -53,11 +54,40 @@ namespace ToggleTestApp
 		{
 			menuArcDark.IsChecked = sender == menuArcDark;
 			menuArcLight.IsChecked = sender == menuArcLight;
+			menuVs2015Dark.IsChecked = sender == menuVs2015Dark;
+			menuVs2015Light.IsChecked = sender == menuVs2015Light;
+			menuVs2015Blue.IsChecked = sender == menuVs2015Blue;
 
-			bool isDark = menuArcDark.IsChecked;
+			Theme theme;
+			bool isDark;
 
-			dockManager.Theme = isDark ? (Theme)new ArcDarkTheme() : new ArcLightTheme();
+			if (sender == menuVs2015Dark)
+			{
+				theme = new VS2015DarkTheme();
+				isDark = true;
+			}
+			else if (sender == menuVs2015Light)
+			{
+				theme = new VS2015LightTheme();
+				isDark = false;
+			}
+			else if (sender == menuVs2015Blue)
+			{
+				theme = new VS2015BlueTheme();
+				isDark = true;
+			}
+			else if (sender == menuArcLight)
+			{
+				theme = new ArcLightTheme();
+				isDark = false;
+			}
+			else
+			{
+				theme = new ArcDarkTheme();
+				isDark = true;
+			}
 
+			dockManager.Theme = theme;
 			SetAppThemeResources(isDark);
 			UpdateThemeColors();
 		}
