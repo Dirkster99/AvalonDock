@@ -236,6 +236,16 @@ public static class DockDiagnostics
         return $"ActiveContent={active?.GetType().Name ?? "null"} LayoutActive={layoutActive?.Title ?? "null"}";
     });
 
+    [DevFlowAction("dock-show-compass",
+        Description = "Show overlay compass for parity screenshots (mirrors Uno ShowOverlayForDiagnostics).")]
+    public static string ShowCompass() => RunOnUi(() =>
+    {
+        var dm = GetDockManager();
+        if (dm == null) return "no DockingManager";
+        dm.ShowOverlayForDiagnostics();
+        return "compass shown";
+    });
+
     private static IEnumerable<T> FindVisualDescendants<T>(DependencyObject root)
         where T : DependencyObject
     {

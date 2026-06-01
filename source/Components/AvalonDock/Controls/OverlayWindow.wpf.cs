@@ -193,6 +193,43 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
+		/// Show one drop-area compass without requiring a real floating window drag.
+		/// Mirrors Uno's OverlayWindow.ShowForDiagnostics(). Positions and makes
+		/// visible the appropriate target grid for the given area type.
+		/// </summary>
+		internal void ShowForDiagnostics(IDropArea area)
+		{
+			if (_mainCanvasPanel != null)
+				_mainCanvasPanel.Visibility = System.Windows.Visibility.Visible;
+
+			FrameworkElement areaElement;
+			switch (area.Type)
+			{
+				case DropAreaType.DockingManager:
+					areaElement = _gridDockingManagerDropTargets;
+					break;
+				case DropAreaType.DocumentPane:
+					areaElement = _gridDocumentPaneDropTargets;
+					// Make all directional targets and center visible for diagnostics.
+					if (_documentPaneDropTargetInto  != null) _documentPaneDropTargetInto.Visibility  = System.Windows.Visibility.Visible;
+					if (_documentPaneDropTargetLeft   != null) _documentPaneDropTargetLeft.Visibility   = System.Windows.Visibility.Visible;
+					if (_documentPaneDropTargetRight  != null) _documentPaneDropTargetRight.Visibility  = System.Windows.Visibility.Visible;
+					if (_documentPaneDropTargetTop    != null) _documentPaneDropTargetTop.Visibility    = System.Windows.Visibility.Visible;
+					if (_documentPaneDropTargetBottom != null) _documentPaneDropTargetBottom.Visibility = System.Windows.Visibility.Visible;
+					break;
+				default:
+					return;
+			}
+			if (areaElement == null) return;
+
+			Canvas.SetLeft(areaElement, area.DetectionRect.Left - Left);
+			Canvas.SetTop(areaElement,  area.DetectionRect.Top  - Top);
+			areaElement.Width      = area.DetectionRect.Width;
+			areaElement.Height     = area.DetectionRect.Height;
+			areaElement.Visibility = System.Windows.Visibility.Visible;
+		}
+
+		/// <summary>
 		/// This method controls the DropTargetInto button of the overlay window.
 		/// It checks that only 1 of the defined ContentLayouts can be present on the LayoutDocumentPane or LayoutAnchorablePane.
 		/// The combination between the ContentLayout Title and the ContentId is the search key, and has to be unique.

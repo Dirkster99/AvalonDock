@@ -1716,6 +1716,26 @@ namespace AvalonDock
 			return _overlayWindow;
 		}
 
+		/// <summary>
+		/// Show the drop-zone compass for visual inspection and parity testing without
+		/// requiring a real drag operation. Mirrors Uno's ShowOverlayForDiagnostics().
+		/// </summary>
+		public void ShowOverlayForDiagnostics()
+		{
+			CreateOverlayWindow();
+			_overlayWindow.EnableDropTargets();
+			_overlayWindow.Show();
+
+			// Outer compass: DockingManager drop targets (4 edge arrows).
+			_overlayWindow.ShowForDiagnostics(new DropArea<DockingManager>(this, DropAreaType.DockingManager));
+
+			// Inner compass: DocumentPane drop targets (5-button cross).
+			var docPane = this.FindVisualChildren<LayoutDocumentPaneControl>()
+				.FirstOrDefault(c => c.Visibility == System.Windows.Visibility.Visible && c.ActualWidth > 0);
+			if (docPane != null)
+				_overlayWindow.ShowForDiagnostics(new DropArea<LayoutDocumentPaneControl>(docPane, DropAreaType.DocumentPane));
+		}
+
 		/// <inheritdoc/>
 		void IOverlayWindowHost.HideOverlayWindow()
 		{

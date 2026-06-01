@@ -34,11 +34,5 @@ public partial class MainWindow : Window
     }
 
     private void OnShowCompassClick(object sender, RoutedEventArgs e)
-    {
-        MessageBox.Show(this,
-            "Overlay compass diagnostics are not wired for this WPF parity sample yet.",
-            "AvalonDock Sample",
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
-    }
+        => DockDiagnostics.ShowCompass();
 }
