@@ -265,7 +265,6 @@
         <avalonDock:ToggleDockingManager x:Name="dockManager" Grid.Row="1"
                                          BorderThickness="0"
                                          DockLayout="{Binding DockLayout}"
-                                         LayoutService="{Binding LayoutService}"
                                          DocumentHeaderTemplate="{StaticResource DocumentTabHeaderTemplate}"
                                          LayoutItemContainerStyleSelector="{StaticResource PanesStyleSelector}">
             <avalonDock:ToggleDockingManager.Theme>
