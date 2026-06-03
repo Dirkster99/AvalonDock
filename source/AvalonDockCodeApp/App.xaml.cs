@@ -43,13 +43,6 @@ public partial class App : Application
 		services.AddToolbox<ProblemsViewModel>();
 		services.AddToolbox<TerminalViewModel>();
 
-		// Register each as IToolbox for collection injection into DockLayoutService
-		services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<FolderExplorerViewModel>());
-		services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SearchViewModel>());
-		services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SourceControlViewModel>());
-		services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<ProblemsViewModel>());
-		services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<TerminalViewModel>());
-
 		// Dock layout service — auto-builds the MVVM dock tree from toolboxes
 		services.AddDockLayoutService();
 
