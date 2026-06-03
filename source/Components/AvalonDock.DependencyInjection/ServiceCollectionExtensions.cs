@@ -86,6 +86,7 @@ namespace AvalonDock.DependencyInjection
 			where T : class, IToolbox
 		{
 			services.AddSingleton<T>();
+			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<T>());
 			return services;
 		}
 
@@ -102,6 +103,7 @@ namespace AvalonDock.DependencyInjection
 			where T : class, IToolbox
 		{
 			services.AddSingleton<T>(factory);
+			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<T>());
 			return services;
 		}
 
