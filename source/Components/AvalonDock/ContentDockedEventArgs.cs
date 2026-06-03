@@ -4,35 +4,42 @@ using AvalonDock.Layout;
 namespace AvalonDock
 {
 	/// <summary>
-	/// Cancelable event raised before a layout content is docked (re-docked from floating).
-	/// Set <see cref="CancelEventArgs.Cancel"/> to true to prevent docking.
+	/// Provides data for the content Docking event.
 	/// </summary>
 	public class ContentDockingEventArgs : CancelEventArgs
 	{
-		/// <summary>Class constructor.</summary>
-		/// <param name="content">The content that is about to be docked.</param>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ContentDockingEventArgs"/> class.
+		/// </summary>
+		/// <param name="content">The content.</param>
 		public ContentDockingEventArgs(LayoutContent content)
 		{
 			Content = content;
 		}
 
-		/// <summary>Gets the layout content that is about to be docked.</summary>
+		/// <summary>
+		/// Gets the content.
+		/// </summary>
 		public LayoutContent Content { get; }
 	}
 
 	/// <summary>
-	/// Event raised after a layout content has been docked.
+	/// Provides data for the content Docked event.
 	/// </summary>
 	public class ContentDockedEventArgs : System.EventArgs
 	{
-		/// <summary>Class constructor.</summary>
-		/// <param name="content">The content that was docked.</param>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ContentDockedEventArgs"/> class.
+		/// </summary>
+		/// <param name="content">The content.</param>
 		public ContentDockedEventArgs(LayoutContent content)
 		{
 			Content = content;
 		}
 
-		/// <summary>Gets the layout content that was docked.</summary>
+		/// <summary>
+		/// Gets the content.
+		/// </summary>
 		public LayoutContent Content { get; }
 	}
 }

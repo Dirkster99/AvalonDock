@@ -4,35 +4,42 @@ using AvalonDock.Layout;
 namespace AvalonDock
 {
 	/// <summary>
-	/// Cancelable event raised before a layout content is floated.
-	/// Set <see cref="CancelEventArgs.Cancel"/> to true to prevent floating.
+	/// Provides data for the content Floating event.
 	/// </summary>
 	public class ContentFloatingEventArgs : CancelEventArgs
 	{
-		/// <summary>Class constructor.</summary>
-		/// <param name="content">The content that is about to be floated.</param>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ContentFloatingEventArgs"/> class.
+		/// </summary>
+		/// <param name="content">The content.</param>
 		public ContentFloatingEventArgs(LayoutContent content)
 		{
 			Content = content;
 		}
 
-		/// <summary>Gets the layout content that is about to be floated.</summary>
+		/// <summary>
+		/// Gets the content.
+		/// </summary>
 		public LayoutContent Content { get; }
 	}
 
 	/// <summary>
-	/// Event raised after a layout content has been floated.
+	/// Provides data for the content Floated event.
 	/// </summary>
 	public class ContentFloatedEventArgs : System.EventArgs
 	{
-		/// <summary>Class constructor.</summary>
-		/// <param name="content">The content that was floated.</param>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ContentFloatedEventArgs"/> class.
+		/// </summary>
+		/// <param name="content">The content.</param>
 		public ContentFloatedEventArgs(LayoutContent content)
 		{
 			Content = content;
 		}
 
-		/// <summary>Gets the layout content that was floated.</summary>
+		/// <summary>
+		/// Gets the content.
+		/// </summary>
 		public LayoutContent Content { get; }
 	}
 }

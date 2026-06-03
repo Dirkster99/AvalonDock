@@ -1,0 +1,87 @@
+<UserControl x:Class="ToggleTestApp.Views.SearchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ToggleTestApp.ViewModels"
+             Background="{DynamicResource AppPanelBg}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Search input -->
+        <Grid Grid.Row="0" Margin="8,8,8,4">
+            <TextBox Background="{DynamicResource AppInputBg}"
+                     Foreground="{DynamicResource AppText}" BorderThickness="1"
+                     BorderBrush="{DynamicResource AppDimText}"
+                     Padding="6,4" FontSize="12"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     CaretBrush="{DynamicResource AppText}" />
+        </Grid>
+
+        <!-- Options row -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="8,0,8,4">
+            <ToggleButton Content="Aa" IsChecked="{Binding MatchCase}" ToolTip="Match Case"
+                          FontSize="10" Padding="4,2" Margin="0,0,4,0"
+                          Background="Transparent" Foreground="{DynamicResource AppSubText}"
+                          BorderBrush="{DynamicResource AppDimText}" BorderThickness="1" />
+            <ToggleButton Content="W" IsChecked="{Binding WholeWord}" ToolTip="Whole Word"
+                          FontSize="10" Padding="4,2" Margin="0,0,4,0"
+                          Background="Transparent" Foreground="{DynamicResource AppSubText}"
+                          BorderBrush="{DynamicResource AppDimText}" BorderThickness="1" />
+            <ToggleButton Content=".*" IsChecked="{Binding UseRegex}" ToolTip="Use Regex"
+                          FontSize="10" Padding="4,2" Margin="0,0,4,0"
+                          Background="Transparent" Foreground="{DynamicResource AppSubText}"
+                          BorderBrush="{DynamicResource AppDimText}" BorderThickness="1" />
+        </StackPanel>
+        
+        <!-- Results tree -->
+        <TreeView Grid.Row="2" ItemsSource="{Binding Results}"
+                  Background="Transparent" BorderThickness="0"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  Margin="0">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type vm:SearchFileGroup}"
+                                          ItemsSource="{Binding Matches}">
+                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                        <TextBlock Text="{Binding FileName}" Foreground="{DynamicResource AppText}"
+                                   FontSize="12" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding MatchCount, StringFormat=' ({0})'}"
+                                   Foreground="{DynamicResource AppSubText}" FontSize="11"
+                                   Margin="4,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+
+                <DataTemplate DataType="{x:Type vm:SearchMatch}">
+                    <TextBlock Margin="0,1" FontSize="11" FontFamily="Cascadia Mono,Consolas,Courier New"
+                               ToolTip="{Binding FilePath}" Cursor="Hand"
+                               MouseLeftButtonUp="OnMatchClick">
+                        <Run Text="{Binding LineNumber, StringFormat='{}{0}: ', Mode=OneWay}"
+                             Foreground="{DynamicResource AppDimText}" />
+                        <Run Text="{Binding Prefix, Mode=OneWay}"
+                             Foreground="{DynamicResource AppSubText}" />
+                        <Run Text="{Binding MatchText, Mode=OneWay}"
+                             Foreground="#E8AB53" FontWeight="Bold" />
+                        <Run Text="{Binding Suffix, Mode=OneWay}"
+                             Foreground="{DynamicResource AppSubText}" />
+                    </TextBlock>
+                </DataTemplate>
+            </TreeView.Resources>
+
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="TreeViewItem">
+                    <Setter Property="IsExpanded" Value="True" />
+                    <Setter Property="Foreground" Value="{DynamicResource AppText}" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+        </TreeView>
+
+        <!-- Status bar -->
+        <Border Grid.Row="3" Background="{DynamicResource AppInputBarBg}" Padding="8,4">
+            <TextBlock Text="{Binding StatusText}" Foreground="{DynamicResource AppSubText}"
+                       FontSize="11" />
+        </Border>
+    </Grid>
+</UserControl>

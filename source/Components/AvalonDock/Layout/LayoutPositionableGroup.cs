@@ -1,13 +1,4 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using System;
+﻿using System;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
@@ -15,8 +6,10 @@ using System.Windows.Controls;
 
 namespace AvalonDock.Layout
 {
-	/// <summary>Provides a base class for other layout panel models that support a specific class of panel.</summary>
-	/// <typeparam name="T"></typeparam>
+	/// <summary>
+	/// Provides a base class for layout positionable group.
+	/// </summary>
+	/// <typeparam name="T">The type of the related layout element.</typeparam>
 	[Serializable]
 	public abstract class LayoutPositionableGroup<T> : LayoutGroup<T>, ILayoutPositionableElementWithActualSize
 		where T : class, ILayoutElement
@@ -52,10 +45,13 @@ namespace AvalonDock.Layout
 		private double _actualHeight;
 
 		/// <summary>
-		/// Event fired when floating properties were updated.
+		/// Occurs when the floating properties updated event is raised.
 		/// </summary>
 		public event EventHandler FloatingPropertiesUpdated;
 
+		/// <summary>
+		/// Gets or sets the dock width.
+		/// </summary>
 		public GridLength DockWidth
 		{
 			get => _dockWidth.IsAbsolute && _resizableAbsoluteDockWidth < _dockWidth.Value && _resizableAbsoluteDockWidth.HasValue ?
@@ -71,8 +67,14 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets the fixed dock width.
+		/// </summary>
 		public double FixedDockWidth => _dockWidth.IsAbsolute && _dockWidth.Value >= _dockMinWidth ? _dockWidth.Value : _dockMinWidth;
 
+		/// <summary>
+		/// Gets or sets the resizable absolute dock width.
+		/// </summary>
 		public double ResizableAbsoluteDockWidth
 		{
 			get => _resizableAbsoluteDockWidth ?? 0;
@@ -93,6 +95,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the dock height.
+		/// </summary>
 		public GridLength DockHeight
 		{
 			get => _dockHeight.IsAbsolute && _resizableAbsoluteDockHeight < _dockHeight.Value && _resizableAbsoluteDockHeight.HasValue ?
@@ -108,8 +113,14 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets the fixed dock height.
+		/// </summary>
 		public double FixedDockHeight => _dockHeight.IsAbsolute && _dockHeight.Value >= _dockMinHeight ? _dockHeight.Value : _dockMinHeight;
 
+		/// <summary>
+		/// Gets or sets the resizable absolute dock height.
+		/// </summary>
 		public double ResizableAbsoluteDockHeight
 		{
 			get => _resizableAbsoluteDockHeight ?? 0;
@@ -135,10 +146,7 @@ namespace AvalonDock.Layout
 		}
 
 		/// <summary>
-		/// Gets or sets the AllowDuplicateContent property.
-		/// When this property is true, then the LayoutDocumentPane or LayoutAnchorablePane allows dropping
-		/// duplicate content (according to its Title and ContentId). When this dependency property is false,
-		/// then the LayoutDocumentPane or LayoutAnchorablePane hides the OverlayWindow.DropInto button to prevent dropping of duplicate content.
+		/// Gets or sets a value indicating whether duplicate content is allowed.
 		/// </summary>
 		public bool AllowDuplicateContent
 		{
@@ -152,6 +160,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance can reposition items.
+		/// </summary>
 		public bool CanRepositionItems
 		{
 			get => _canRepositionItems;
@@ -164,6 +175,10 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Executes the calculated dock min width operation.
+		/// </summary>
+		/// <returns>The resulting value.</returns>
 		public double CalculatedDockMinWidth()
 		{
 			var childrenDockMinWidth = 0.0;
@@ -179,10 +194,7 @@ namespace AvalonDock.Layout
 		}
 
 		/// <summary>
-		/// Defines the smallest available width that can be applied to a deriving element.
-		///
-		/// The system ensures the minimum width by blocking/limiting <see cref="GridSplitter"/>
-		/// movement when the user resizes a deriving element or resizes the main window.
+		/// Gets or sets the dock min width.
 		/// </summary>
 		public double DockMinWidth
 		{
@@ -197,6 +209,10 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Executes the calculated dock min height operation.
+		/// </summary>
+		/// <returns>The resulting value.</returns>
 		public double CalculatedDockMinHeight()
 		{
 			var childrenDockMinHeight = 0.0;
@@ -212,10 +228,7 @@ namespace AvalonDock.Layout
 		}
 
 		/// <summary>
-		/// Defines the smallest available height that can be applied to a deriving element.
-		///
-		/// The system ensures the minimum height by blocking/limiting <see cref="GridSplitter"/>
-		/// movement when the user resizes a deriving element or resizes the main window.
+		/// Gets or sets the dock min height.
 		/// </summary>
 		public double DockMinHeight
 		{
@@ -230,6 +243,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the floating width.
+		/// </summary>
 		public double FloatingWidth
 		{
 			get => _floatingWidth;
@@ -242,6 +258,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the floating height.
+		/// </summary>
 		public double FloatingHeight
 		{
 			get => _floatingHeight;
@@ -254,6 +273,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the floating left.
+		/// </summary>
 		public double FloatingLeft
 		{
 			get => _floatingLeft;
@@ -266,6 +288,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the floating top.
+		/// </summary>
 		public double FloatingTop
 		{
 			get => _floatingTop;
@@ -278,6 +303,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance is maximized.
+		/// </summary>
 		public bool IsMaximized
 		{
 			get => _isMaximized;
@@ -289,20 +317,24 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <inheritdoc/>
 		double ILayoutPositionableElementWithActualSize.ActualWidth
 		{
 			get => _actualWidth;
 			set => _actualWidth = value;
 		}
 
+		/// <inheritdoc/>
 		double ILayoutPositionableElementWithActualSize.ActualHeight
 		{
 			get => _actualHeight;
 			set => _actualHeight = value;
 		}
 
+		/// <inheritdoc/>
 		void ILayoutElementForFloatingWindow.RaiseFloatingPropertiesUpdated() => FloatingPropertiesUpdated?.Invoke(this, EventArgs.Empty);
 
+		/// <inheritdoc/>
 		public override void WriteXml(System.Xml.XmlWriter writer)
 		{
 			if (DockWidth.Value != 1.0 || !DockWidth.IsStar)
@@ -319,6 +351,7 @@ namespace AvalonDock.Layout
 			base.WriteXml(writer);
 		}
 
+		/// <inheritdoc/>
 		public override void ReadXml(System.Xml.XmlReader reader)
 		{
 			if (reader.MoveToAttribute(nameof(DockWidth))) _dockWidth = (GridLength)_gridLengthConverter.ConvertFromInvariantString(reader.Value);
@@ -333,10 +366,16 @@ namespace AvalonDock.Layout
 			base.ReadXml(reader);
 		}
 
+		/// <summary>
+		/// Executes the on dock width changed operation.
+		/// </summary>
 		protected virtual void OnDockWidthChanged()
 		{
 		}
 
+		/// <summary>
+		/// Executes the on dock height changed operation.
+		/// </summary>
 		protected virtual void OnDockHeightChanged()
 		{
 		}

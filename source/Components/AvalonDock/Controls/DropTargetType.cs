@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 namespace AvalonDock.Controls
 {
 	/// <summary>
@@ -63,9 +54,16 @@ namespace AvalonDock.Controls
 		/// and the drop target will be part of a tabbed display).</summary>
 		AnchorablePaneDockInside,
 
+		/// <summary>The specific drop area docks a document pane as an anchorable to the left.</summary>
 		DocumentPaneDockAsAnchorableLeft,
+
+		/// <summary>The specific drop area docks a document pane as an anchorable to the top.</summary>
 		DocumentPaneDockAsAnchorableTop,
+
+		/// <summary>The specific drop area docks a document pane as an anchorable to the right.</summary>
 		DocumentPaneDockAsAnchorableRight,
+
+		/// <summary>The specific drop area docks a document pane as an anchorable to the bottom.</summary>
 		DocumentPaneDockAsAnchorableBottom,
 	}
 }

@@ -1,0 +1,219 @@
+<UserControl x:Class="ToggleTestApp.Views.SourceControlView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ToggleTestApp.ViewModels"
+             Background="{DynamicResource AppPanelBg}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
+        <!-- Arc-like flat Expander style -->
+        <Style x:Key="ArcExpander" TargetType="Expander">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource AppText}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Expander">
+                        <DockPanel>
+                            <Border x:Name="HeaderBorder" DockPanel.Dock="Top"
+                                    Background="Transparent" Padding="6,4" Cursor="Hand">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Path x:Name="Arrow" Grid.Column="0"
+                                          Data="M 0,0 L 4,4 L 0,8"
+                                          Stroke="{DynamicResource AppSubText}" StrokeThickness="1.5"
+                                          Fill="Transparent"
+                                          VerticalAlignment="Center" Margin="0,0,6,0"
+                                          RenderTransformOrigin="0.5,0.5">
+                                        <Path.RenderTransform>
+                                            <RotateTransform Angle="0" />
+                                        </Path.RenderTransform>
+                                    </Path>
+                                    <ContentPresenter Grid.Column="1"
+                                                      ContentSource="Header"
+                                                      VerticalAlignment="Center" />
+                                </Grid>
+                                <Border.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{x:Static ApplicationCommands.NotACommand}" />
+                                </Border.InputBindings>
+                            </Border>
+                            <ContentPresenter x:Name="ExpandContent" DockPanel.Dock="Bottom"
+                                              Visibility="Collapsed" />
+                        </DockPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="True">
+                                <Setter TargetName="Arrow" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="90" />
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource AppSubText}" />
+                                <Setter TargetName="ExpandContent" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <Trigger SourceName="HeaderBorder" Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HeaderBorder" Property="Background"
+                                        Value="{DynamicResource AppInputBg}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Clickable change item template -->
+        <DataTemplate x:Key="ChangeItemTemplate" DataType="{x:Type vm:ChangeItem}">
+            <Border x:Name="ItemBorder" Background="Transparent" Cursor="Hand"
+                    Margin="0" Padding="4,2"
+                    MouseLeftButtonUp="OnChangeItemClick">
+                <Grid ToolTip="{Binding FilePath}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding FileName}"
+                               Foreground="{DynamicResource AppText}" FontSize="12"
+                               TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding KindLabel}" FontWeight="Bold"
+                               FontSize="11" Margin="6,0,4,0" VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{DynamicResource AppSubText}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Kind}" Value="Modified">
+                                        <Setter Property="Foreground" Value="#E2C08D" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Kind}" Value="Added">
+                                        <Setter Property="Foreground" Value="#73C991" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Kind}" Value="Deleted">
+                                        <Setter Property="Foreground" Value="#C74E39" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Kind}" Value="Untracked">
+                                        <Setter Property="Foreground" Value="#73C991" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+            </Border>
+            <DataTemplate.Triggers>
+                <Trigger SourceName="ItemBorder" Property="IsMouseOver" Value="True">
+                    <Setter TargetName="ItemBorder" Property="Background"
+                            Value="{DynamicResource AppInputBg}" />
+                </Trigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Branch info -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="8,8,8,4"
+                    Visibility="{Binding IsGitRepo, Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBlock Text="⎇" FontSize="13" Foreground="{DynamicResource AppSubText}"
+                       VerticalAlignment="Center" Margin="0,0,4,0" />
+            <TextBlock Text="{Binding BranchName}" Foreground="{DynamicResource AppText}"
+                       FontSize="12" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Commit message -->
+        <Grid Grid.Row="1" Margin="8,4"
+              Visibility="{Binding IsGitRepo, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Background="{DynamicResource AppInputBg}"
+                     Foreground="{DynamicResource AppText}" BorderThickness="1"
+                     BorderBrush="{DynamicResource AppDimText}"
+                     Padding="6,4" FontSize="12"
+                     Text="{Binding CommitMessage, UpdateSourceTrigger=PropertyChanged}"
+                     CaretBrush="{DynamicResource AppText}"
+                     AcceptsReturn="False" MaxLines="1" />
+            <Button Grid.Column="1" Content="✓" ToolTip="Commit"
+                    Command="{Binding CommitCommand}"
+                    Background="Transparent" Foreground="{DynamicResource AppText}"
+                    BorderThickness="0" Padding="8,4" Margin="4,0,0,0"
+                    FontSize="14" FontWeight="Bold" Cursor="Hand" />
+        </Grid>
+
+        <!-- Staged changes -->
+        <Expander Grid.Row="2" IsExpanded="True" Margin="0,4,0,0"
+                  Style="{StaticResource ArcExpander}"
+                  Visibility="{Binding IsGitRepo, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Expander.Header>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="STAGED CHANGES" Foreground="{DynamicResource AppSubText}"
+                               FontSize="10" FontWeight="Bold" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding StagedChanges.Count, StringFormat=' ({0})'}"
+                               Foreground="{DynamicResource AppDimText}" FontSize="10"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Expander.Header>
+            <ItemsControl ItemsSource="{Binding StagedChanges}"
+                          ItemTemplate="{StaticResource ChangeItemTemplate}"
+                          Margin="16,0,0,0" />
+        </Expander>
+
+        <!-- Unstaged changes -->
+        <Expander Grid.Row="3" IsExpanded="True" Margin="0,4,0,0"
+                  Style="{StaticResource ArcExpander}"
+                  Visibility="{Binding IsGitRepo, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Expander.Header>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="CHANGES" Foreground="{DynamicResource AppSubText}"
+                               FontSize="10" FontWeight="Bold" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding UnstagedChanges.Count, StringFormat=' ({0})'}"
+                               Foreground="{DynamicResource AppDimText}" FontSize="10"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+            </Expander.Header>
+            <ItemsControl ItemsSource="{Binding UnstagedChanges}"
+                          ItemTemplate="{StaticResource ChangeItemTemplate}"
+                          Margin="16,0,0,0" />
+        </Expander>
+
+        <!-- No git message -->
+        <TextBlock Grid.Row="4" Text="{Binding Status}"
+                   Foreground="{DynamicResource AppSubText}" FontSize="12"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Margin="12">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsGitRepo}" Value="False">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <!-- Refresh button -->
+        <Border Grid.Row="5" Background="{DynamicResource AppInputBarBg}" Padding="8,4">
+            <Grid>
+                <TextBlock Text="{Binding Status}" Foreground="{DynamicResource AppSubText}"
+                           FontSize="11" VerticalAlignment="Center" />
+                <Button Content="↻" ToolTip="Refresh" Command="{Binding RefreshCommand}"
+                        HorizontalAlignment="Right" Background="Transparent"
+                        Foreground="{DynamicResource AppSubText}" BorderThickness="0"
+                        Padding="6,2" FontSize="13" Cursor="Hand" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

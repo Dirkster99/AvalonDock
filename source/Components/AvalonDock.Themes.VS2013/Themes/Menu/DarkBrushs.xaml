@@ -33,18 +33,6 @@
 	<!--  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  -->
 	<SolidColorBrush
 		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
-									 ResourceId=FocusScrollButtonBrushKey}"
-		PresentationOptions:Freeze="True"
-		Color="#FF042271" />
-
-	<SolidColorBrush
-		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
-									 ResourceId=ScrollButtonBrushKey}"
-		PresentationOptions:Freeze="True"
-		Color="#FFFFFFFF" />
-
-	<SolidColorBrush
-		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
 									 ResourceId=CheckMarkBackgroundBrushKey}"
 		PresentationOptions:Freeze="True"
 		Color="Transparent" />
@@ -74,22 +62,7 @@
 		Color="#DBD6D6" />
 
 	<!--  SolidColorBrush x:Key="MenuBarBackgroundBorderBrush" Color="#F0000000"/  -->
-	<SolidColorBrush
-		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
-									 ResourceId=MenuBorderBrushKey}"
-		PresentationOptions:Freeze="True"
-		Color="#333337" />
-
-	<LinearGradientBrush x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys}, ResourceId=MenuBackgroundKey}" PresentationOptions:Freeze="True" StartPoint="0,0" EndPoint="0,1">
-		<GradientStop Offset="1" Color="#1B1B1C" />
-	</LinearGradientBrush>
-
 	<!--  Styles the background of the top level item in a menu (Files, Edit, ...)  -->
-	<SolidColorBrush
-		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
-									 ResourceId=TopLevelHeaderMenuBackgroundKey}"
-		PresentationOptions:Freeze="True"
-		Color="#333337" />
 	<!--  Control Keys XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  -->
 
 	<SolidColorBrush
@@ -109,12 +82,6 @@
 									 ResourceId=ItemTextDisabledKey}"
 		PresentationOptions:Freeze="True"
 		Color="#717171" />
-
-	<SolidColorBrush
-		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},
-									 ResourceId=NormalBackgroundBrushKey}"
-		PresentationOptions:Freeze="True"
-		Color="#FF2D2D30" />
 
 	<SolidColorBrush
 		x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type reskeys:ResourceKeys},

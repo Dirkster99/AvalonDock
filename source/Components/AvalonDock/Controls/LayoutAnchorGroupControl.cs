@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -17,19 +8,25 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// This control displays multiple <see cref="LayoutAnchorControl"/>s along the
-	/// top, bottom, left, or right side of the <see cref="DockingManager"/>.
+	/// Represents the layout Anchor Group Control.
 	/// </summary>
 	public class LayoutAnchorGroupControl : Control, ILayoutControl
 	{
 		private ObservableCollection<LayoutAnchorControl> _childViews = new ObservableCollection<LayoutAnchorControl>();
 		private LayoutAnchorGroup _model;
 
+		/// <summary>
+		/// Initializes static members of the <see cref="LayoutAnchorGroupControl"/> class.
+		/// </summary>
 		static LayoutAnchorGroupControl()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutAnchorGroupControl), new FrameworkPropertyMetadata(typeof(LayoutAnchorGroupControl)));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutAnchorGroupControl"/> class.
+		/// </summary>
+		/// <param name="model">The model.</param>
 		internal LayoutAnchorGroupControl(LayoutAnchorGroup model)
 		{
 			_model = model;
@@ -38,6 +35,9 @@ namespace AvalonDock.Controls
 			_model.Children.CollectionChanged += (s, e) => OnModelChildrenCollectionChanged(e);
 		}
 
+		/// <summary>
+		/// Gets the children.
+		/// </summary>
 		public ObservableCollection<LayoutAnchorControl> Children
 		{
 			get
@@ -46,6 +46,9 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <summary>
+		/// Gets the model.
+		/// </summary>
 		public ILayoutElement Model
 		{
 			get

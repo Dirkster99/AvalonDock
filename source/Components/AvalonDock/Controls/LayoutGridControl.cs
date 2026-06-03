@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,18 +10,10 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
-	/// <inheritdoc cref="Grid"/>
-	/// <inheritdoc cref="ILayoutControl"/>
-	/// <inheritdoc cref="IAdjustableSizeLayout"/>
 	/// <summary>
-	/// The abstract LayoutGridControl<T> class (and its inheriting classes) are used to layout non-floating
-	/// windows and documents in AvalonDock. This contains a definition of size proportion per item and
-	/// includes user interactions with Grid Splitter elements to resize UI items in an interactive way.
+	/// Represents the layout grid control.
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <seealso cref="Grid"/>
-	/// <seealso cref="ILayoutControl"/>
-	/// <seealso cref="IAdjustableSizeLayout"/>
+	/// <typeparam name="T">The type of t.</typeparam>
 	public abstract class LayoutGridControl<T> : Grid, ILayoutControl, IAdjustableSizeLayout
 		where T : class, ILayoutPanelElement
 	{
@@ -44,10 +27,10 @@ namespace AvalonDock.Controls
 		private Vector _initialStartPoint;
 
 		/// <summary>
-		/// Class constructor
+		/// Initializes a new instance of the <see cref="LayoutGridControl{T}"/> class.
 		/// </summary>
-		/// <param name="model"></param>
-		/// <param name="orientation"></param>
+		/// <param name="model">The layout model.</param>
+		/// <param name="orientation">The orientation.</param>
 		internal LayoutGridControl(LayoutPositionableGroup<T> model, Orientation orientation)
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));
@@ -56,8 +39,14 @@ namespace AvalonDock.Controls
 			Unloaded += OnUnloaded;
 		}
 
+		/// <summary>
+		/// Gets the model.
+		/// </summary>
 		public ILayoutElement Model => _model;
 
+		/// <summary>
+		/// Gets the orientation.
+		/// </summary>
 		public Orientation Orientation => (_model as ILayoutOrientableGroup).Orientation;
 
 		private bool AsyncRefreshCalled => _asyncRefreshCalled != null;
@@ -81,12 +70,18 @@ namespace AvalonDock.Controls
 			this.SizeChanged += OnSizeChanged;
 		}
 
+		/// <summary>
+		/// Fix children dock lengths.
+		/// </summary>
 		protected void FixChildrenDockLengths()
 		{
 			using (_fixingChildrenDockLengths.Enter())
 				OnFixChildrenDockLengths();
 		}
 
+		/// <summary>
+		/// Raises the fix children dock lengths event.
+		/// </summary>
 		protected abstract void OnFixChildrenDockLengths();
 
 		private void OnSizeChanged(object sender, SizeChangedEventArgs e)
@@ -104,10 +99,10 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Method executes when the element is removed from within an element tree of loaded elements.
+		/// Handles the unloaded event.
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
+		/// <param name="sender">The event sender.</param>
+		/// <param name="e">The event arguments.</param>
 		private void OnUnloaded(object sender, RoutedEventArgs e)
 		{
 			// In order to prevent resource leaks, unsubscribe from SizeChanged events.
@@ -400,6 +395,10 @@ namespace AvalonDock.Controls
 			HideResizerOverlayWindow();
 		}
 
+		/// <summary>
+		/// Adjust fixed children panel sizes.
+		/// </summary>
+		/// <param name="parentSize">The parent size.</param>
 		public virtual void AdjustFixedChildrenPanelSizes(Size? parentSize = null)
 		{
 			var visibleChildren = GetVisibleChildren();

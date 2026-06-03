@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System;
 using System.Linq;
 using System.Windows;
@@ -16,18 +7,19 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Provides a panel that contains the TabItem Headers of the <see cref="LayoutDocumentPaneControl"/>.
+	/// Represents the document Pane Tab Panel.
 	/// </summary>
 	public class DocumentPaneTabPanel : Panel
 	{
 		/// <summary>
-		/// Static constructor
+		/// Initializes a new instance of the <see cref="DocumentPaneTabPanel"/> class.
 		/// </summary>
 		public DocumentPaneTabPanel()
 		{
 			this.FlowDirection = System.Windows.FlowDirection.LeftToRight;
 		}
 
+		/// <inheritdoc/>
 		protected override Size MeasureOverride(Size availableSize)
 		{
 			Size desideredSize = new Size();
@@ -42,6 +34,7 @@ namespace AvalonDock.Controls
 			return new Size(Math.Min(desideredSize.Width, availableSize.Width), desideredSize.Height);
 		}
 
+		/// <inheritdoc/>
 		protected override Size ArrangeOverride(Size finalSize)
 		{
 			var visibleChildren = Children.Cast<UIElement>().Where(ch => ch.Visibility != System.Windows.Visibility.Collapsed);
@@ -86,6 +79,7 @@ namespace AvalonDock.Controls
 			return finalSize;
 		}
 
+		/// <inheritdoc/>
 		protected override void OnMouseLeave(System.Windows.Input.MouseEventArgs e)
 		{
 			// if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed &&

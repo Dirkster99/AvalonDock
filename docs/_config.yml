@@ -1,0 +1,59 @@
+title: AvalonDock
+description: >-
+  A WPF Document and Tool Window layout container for building
+  Visual Studio-like docking interfaces.
+url: "https://dirkster99.github.io"
+baseurl: "/AvalonDock"
+
+remote_theme: just-the-docs/just-the-docs@v0.10.0
+
+permalink: pretty
+
+aux_links:
+  "GitHub":
+    - "https://github.com/Dirkster99/AvalonDock"
+  "NuGet":
+    - "https://www.nuget.org/packages/Dirkster.AvalonDock"
+
+aux_links_new_tab: true
+
+nav_sort: order
+
+heading_anchors: true
+
+search_enabled: true
+search:
+  heading_level: 3
+  previews: 3
+  preview_words_before: 5
+  preview_words_after: 10
+
+back_to_top: true
+back_to_top_text: "Back to top"
+
+footer_content: >-
+  AvalonDock is licensed under the <a href="https://github.com/Dirkster99/AvalonDock/blob/master/LICENSE">MS-PL / Apache 2.0</a> license.
+  &copy; 2017&ndash;2026 Open Source Contributors.
+
+color_scheme: dark
+
+callouts:
+  note:
+    title: Note
+    color: blue
+  warning:
+    title: Warning
+    color: red
+  tip:
+    title: Tip
+    color: green
+  important:
+    title: Important
+    color: yellow
+
+plugins:
+  - jekyll-seo-tag
+
+exclude:
+  - node_modules/
+  - vendor/

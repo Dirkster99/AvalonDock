@@ -7,7 +7,7 @@
     using System.Windows.Forms;
     using AvalonDock;
     using AvalonDock.Layout;
-    using AvalonDock.Layout.Serialization;
+    using AvalonDock.Serializer.Xml;
     using AvalonDock.Themes;
 
     public partial class FormMain : Form

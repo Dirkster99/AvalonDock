@@ -1,13 +1,4 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -20,45 +11,54 @@ using AvalonDock.Controls;
 namespace AvalonDock.Layout
 {
 	/// <summary>
-	/// Provides an abstract base class for common properties and methods of
-	/// the <see cref="LayoutAnchorable"/> and <see cref="LayoutDocument"/> classes.
+	/// Provides a base class for layout content.
 	/// </summary>
 	[ContentProperty(nameof(Content))]
 	[Serializable]
-	public abstract class LayoutContent : LayoutElement, IXmlSerializable, ILayoutElementForFloatingWindow, IComparable<LayoutContent>, ILayoutPreviousContainer
+	public abstract class LayoutContent : LayoutElement, IXmlSerializable, ILayoutElementForFloatingWindow, IComparable<LayoutContent>, ILayoutPreviousContainer, Core.Serialization.ISerializableLayoutContent, Core.Serialization.ISerializablePreviousContainer
 	{
 		/// <summary>
-		/// Class constructor
+		/// Initializes a new instance of the <see cref="LayoutContent"/> class.
 		/// </summary>
 		internal LayoutContent()
 		{
 		}
 
-		/// <summary>Event fired when the content is closed (i.e. removed definitely from the layout).</summary>
+		/// <summary>
+		/// Occurs when the closed event is raised.
+		/// </summary>
 		public event EventHandler Closed;
 
 		/// <summary>
-		/// Event fired when the content is about to be closed (i.e. removed definitely from the layout)
+		/// Occurs when the closing event is raised.
 		/// </summary>
-		/// <remarks>Please note that <see cref="LayoutAnchorable"/> also can be hidden. Usually user hide anchorables when click the 'X' button. To completely close
-		/// an anchorable the user should click the 'Close' menu item from the context menu. When an <see cref="LayoutAnchorable"/> is hidden its visibility changes to false and
-		/// <see cref="LayoutAnchorable.IsHidden"/> property is set to true.
-		/// Handle the Hiding event for the <see cref="LayoutAnchorable"/> to cancel the hide operation.</remarks>
 		public event EventHandler<CancelEventArgs> Closing;
 
 		/// <summary>
-		/// Event fired when floating properties were updated.
+		/// Occurs when the floating properties updated event is raised.
 		/// </summary>
 		public event EventHandler FloatingPropertiesUpdated;
 
+		/// <summary>
+		/// Identifies the <see cref="Title"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title), typeof(string), typeof(LayoutContent), new UIPropertyMetadata(null, OnTitlePropertyChanged, CoerceTitleValue));
 
+		/// <summary>
+		/// Gets or sets the title.
+		/// </summary>
 		public string Title
 		{
 			get => (string)GetValue(TitleProperty);
 			set => SetValue(TitleProperty, value);
 		}
 
+		/// <summary>
+		/// Executes the coerce title value operation.
+		/// </summary>
+		/// <param name="obj">The object instance.</param>
+		/// <param name="value">The value.</param>
+		/// <returns>The resulting value.</returns>
 		private static object CoerceTitleValue(DependencyObject obj, object value)
 		{
 			var lc = (LayoutContent)obj;
@@ -66,11 +66,19 @@ namespace AvalonDock.Layout
 			return value;
 		}
 
+		/// <summary>
+		/// Executes the on title property changed operation.
+		/// </summary>
+		/// <param name="obj">The object instance.</param>
+		/// <param name="args">The event arguments.</param>
 		private static void OnTitlePropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args) => ((LayoutContent)obj).RaisePropertyChanged(TitleProperty.Name);
 
 		[NonSerialized]
 		private object _content = null;
 
+		/// <summary>
+		/// Gets or sets the content.
+		/// </summary>
 		[XmlIgnore]
 		public object Content
 		{
@@ -85,8 +93,14 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Identifies the <see cref="ContentId"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ContentIdProperty = DependencyProperty.Register(nameof(ContentId), typeof(string), typeof(LayoutContent), new UIPropertyMetadata(null, OnContentIdPropertyChanged));
 
+		/// <summary>
+		/// Gets or sets the content id.
+		/// </summary>
 		public string ContentId
 		{
 			get
@@ -100,16 +114,29 @@ namespace AvalonDock.Layout
 			set => SetValue(ContentIdProperty, value);
 		}
 
+		/// <summary>
+		/// Executes the on content id property changed operation.
+		/// </summary>
+		/// <param name="obj">The object instance.</param>
+		/// <param name="args">The event arguments.</param>
 		private static void OnContentIdPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
 		{
 			if (obj is LayoutContent layoutContent) layoutContent.OnContentIdPropertyChanged((string)args.OldValue, (string)args.NewValue);
 		}
 
+		/// <summary>
+		/// Executes the on content id property changed operation.
+		/// </summary>
+		/// <param name="oldValue">The previous value.</param>
+		/// <param name="newValue">The new value.</param>
 		private void OnContentIdPropertyChanged(string oldValue, string newValue)
 		{
 			if (oldValue != newValue) RaisePropertyChanged(nameof(ContentId));
 		}
 
+		/// <summary>
+		/// Sets the content id from content.
+		/// </summary>
 		private void SetContentIdFromContent()
 		{
 			var contentAsControl = _content as FrameworkElement;
@@ -118,6 +145,9 @@ namespace AvalonDock.Layout
 
 		private bool _isSelected = false;
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance is selected.
+		/// </summary>
 		public bool IsSelected
 		{
 			get => _isSelected;
@@ -135,15 +165,23 @@ namespace AvalonDock.Layout
 		}
 
 		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the <see cref="IsSelected"/> property.
+		/// Executes the on is selected changed operation.
 		/// </summary>
+		/// <param name="oldValue">The previous value.</param>
+		/// <param name="newValue">The new value.</param>
 		protected virtual void OnIsSelectedChanged(bool oldValue, bool newValue) => IsSelectedChanged?.Invoke(this, EventArgs.Empty);
 
+		/// <summary>
+		/// Occurs when the is selected changed event is raised.
+		/// </summary>
 		public event EventHandler IsSelectedChanged;
 
 		[field: NonSerialized]
 		private bool _isActive = false;
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance is active.
+		/// </summary>
 		[XmlIgnore]
 		public bool IsActive
 		{
@@ -168,18 +206,26 @@ namespace AvalonDock.Layout
 		}
 
 		/// <summary>
-		/// Provides derived classes an opportunity to handle changes to the <see cref="IsActive"/> property.
+		/// Executes the on is active changed operation.
 		/// </summary>
+		/// <param name="oldValue">The previous value.</param>
+		/// <param name="newValue">The new value.</param>
 		protected virtual void OnIsActiveChanged(bool oldValue, bool newValue)
 		{
 			if (newValue) LastActivationTimeStamp = DateTime.Now;
 			IsActiveChanged?.Invoke(this, EventArgs.Empty);
 		}
 
+		/// <summary>
+		/// Occurs when the is active changed event is raised.
+		/// </summary>
 		public event EventHandler IsActiveChanged;
 
 		private bool _isLastFocusedDocument = false;
 
+		/// <summary>
+		/// Gets a value indicating whether this instance is the last focused document.
+		/// </summary>
 		public bool IsLastFocusedDocument
 		{
 			get => _isLastFocusedDocument;
@@ -195,6 +241,7 @@ namespace AvalonDock.Layout
 		[field: NonSerialized]
 		private ILayoutContainer _previousContainer = null;
 
+		/// <inheritdoc/>
 		[XmlIgnore]
 		ILayoutContainer ILayoutPreviousContainer.PreviousContainer
 		{
@@ -209,15 +256,22 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the previous container.
+		/// </summary>
 		protected ILayoutContainer PreviousContainer
 		{
 			get => ((ILayoutPreviousContainer)this).PreviousContainer;
 			set => ((ILayoutPreviousContainer)this).PreviousContainer = value;
 		}
 
+		/// <inheritdoc/>
 		[XmlIgnore]
 		string ILayoutPreviousContainer.PreviousContainerId { get; set; }
 
+		/// <summary>
+		/// Gets or sets the previous container id.
+		/// </summary>
 		protected string PreviousContainerId
 		{
 			get => ((ILayoutPreviousContainer)this).PreviousContainerId;
@@ -227,6 +281,9 @@ namespace AvalonDock.Layout
 		[field: NonSerialized]
 		private int _previousContainerIndex = -1;
 
+		/// <summary>
+		/// Gets or sets the previous container index.
+		/// </summary>
 		[XmlIgnore]
 		public int PreviousContainerIndex
 		{
@@ -241,6 +298,9 @@ namespace AvalonDock.Layout
 
 		private DateTime? _lastActivationTimeStamp = null;
 
+		/// <summary>
+		/// Gets or sets the last activation time stamp.
+		/// </summary>
 		public DateTime? LastActivationTimeStamp
 		{
 			get => _lastActivationTimeStamp;
@@ -254,6 +314,9 @@ namespace AvalonDock.Layout
 
 		private double _floatingWidth = 0.0;
 
+		/// <summary>
+		/// Gets or sets the floating width.
+		/// </summary>
 		public double FloatingWidth
 		{
 			get => _floatingWidth;
@@ -268,6 +331,9 @@ namespace AvalonDock.Layout
 
 		private double _floatingHeight = 0.0;
 
+		/// <summary>
+		/// Gets or sets the floating height.
+		/// </summary>
 		public double FloatingHeight
 		{
 			get => _floatingHeight;
@@ -282,6 +348,9 @@ namespace AvalonDock.Layout
 
 		private double _floatingLeft = 0.0;
 
+		/// <summary>
+		/// Gets or sets the floating left.
+		/// </summary>
 		public double FloatingLeft
 		{
 			get => _floatingLeft;
@@ -296,6 +365,9 @@ namespace AvalonDock.Layout
 
 		private double _floatingTop = 0.0;
 
+		/// <summary>
+		/// Gets or sets the floating top.
+		/// </summary>
 		public double FloatingTop
 		{
 			get => _floatingTop;
@@ -310,6 +382,9 @@ namespace AvalonDock.Layout
 
 		private bool _isMaximized = false;
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance is maximized.
+		/// </summary>
 		public bool IsMaximized
 		{
 			get => _isMaximized;
@@ -324,6 +399,9 @@ namespace AvalonDock.Layout
 
 		private object _toolTip = null;
 
+		/// <summary>
+		/// Gets or sets the tool tip.
+		/// </summary>
 		public object ToolTip
 		{
 			get => _toolTip;
@@ -335,7 +413,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		/// <summary>Gets whether the content is currently floating or not.</summary>
+		/// <summary>
+		/// Gets a value indicating whether this instance is floating.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets whether the content is currently floating or not.")]
 		[Category("Other")]
@@ -343,6 +423,9 @@ namespace AvalonDock.Layout
 
 		private ImageSource _iconSource = null;
 
+		/// <summary>
+		/// Gets or sets the icon source.
+		/// </summary>
 		public ImageSource IconSource
 		{
 			get => _iconSource;
@@ -357,13 +440,24 @@ namespace AvalonDock.Layout
 		// BD: 14.08.2020 added _canCloseDefault to properly implement inverting _canClose default value in inheritors (e.g. LayoutAnchorable)
 		//     Thus CanClose property will be serialized only when not equal to its default for given class
 		//     With previous code it was not possible to serialize CanClose if set to true for LayoutAnchorable instance
+
+		/// <summary>
+		/// Stores the current close capability value.
+		/// </summary>
 		internal bool _canClose = true;
 
 		// BD: 14.08.2020 added _canCloseDefault to properly implement inverting _canClose default value in inheritors (e.g. LayoutAnchorable)
 		//     Thus CanClose property will be serialized only when not equal to its default for given class
 		//     With previous code it was not possible to serialize CanClose if set to true for LayoutAnchorable instance
+
+		/// <summary>
+		/// Stores the default close capability value for serialization comparisons.
+		/// </summary>
 		internal bool _canCloseDefault = true;
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance can close.
+		/// </summary>
 		public bool CanClose
 		{
 			get => _canClose;
@@ -377,6 +471,9 @@ namespace AvalonDock.Layout
 
 		private bool _canFloat = true;
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance can float.
+		/// </summary>
 		public bool CanFloat
 		{
 			get => _canFloat;
@@ -391,12 +488,8 @@ namespace AvalonDock.Layout
 		private bool _canShowOnHover = true;
 
 		/// <summary>
-		/// Set to false to disable the behavior of auto-showing
-		/// a <see cref="LayoutAnchorableControl"/> on mouse over.
-		/// When true, hovering the mouse over an anchorable tab 
-		/// will cause the anchorable to show itself.
+		/// Gets or sets a value indicating whether this instance can show on hover.
 		/// </summary>
-		/// <remarks>Defaults to true</remarks>
 		public bool CanShowOnHover
 		{
 			get => _canShowOnHover;
@@ -410,6 +503,9 @@ namespace AvalonDock.Layout
 
 		private bool _isEnabled = true;
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance is enabled.
+		/// </summary>
 		public bool IsEnabled
 		{
 			get => _isEnabled;
@@ -421,16 +517,26 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets the tab item.
+		/// </summary>
 		public LayoutDocumentTabItem TabItem { get; internal set; }
 
-		/// <summary>Close the content</summary>
-		/// <remarks>Note that the anchorable is only hidden (not closed). By default when user click the X button it only hides the content.</remarks>
+		/// <summary>
+		/// Executes the close operation.
+		/// </summary>
 		public abstract void Close();
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Gets the schema.
+		/// </summary>
+		/// <returns>The resulting value.</returns>
 		public System.Xml.Schema.XmlSchema GetSchema() => null;
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Reads the xml.
+		/// </summary>
+		/// <param name="reader">The XML reader to read from.</param>
 		public virtual void ReadXml(System.Xml.XmlReader reader)
 		{
 			if (reader.MoveToAttribute(nameof(Title)))
@@ -470,7 +576,10 @@ namespace AvalonDock.Layout
 			reader.Read();
 		}
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Writes the xml.
+		/// </summary>
+		/// <param name="writer">The XML writer to write to.</param>
 		public virtual void WriteXml(System.Xml.XmlWriter writer)
 		{
 			if (!string.IsNullOrWhiteSpace(Title))
@@ -513,6 +622,11 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Executes the compare to operation.
+		/// </summary>
+		/// <param name="other">The other.</param>
+		/// <returns>The resulting value.</returns>
 		public int CompareTo(LayoutContent other)
 		{
 			if (Content is IComparable contentAsComparable)
@@ -520,7 +634,9 @@ namespace AvalonDock.Layout
 			return string.Compare(Title, other.Title);
 		}
 
-		/// <summary>Float the content in a popup window</summary>
+		/// <summary>
+		/// Executes the float operation.
+		/// </summary>
 		public void Float()
 		{
 			if (PreviousContainer != null && PreviousContainer.FindParent<LayoutFloatingWindow>() != null)
@@ -551,7 +667,9 @@ namespace AvalonDock.Layout
 			RaisePropertyChanged(nameof(IsFloating));
 		}
 
-		/// <summary>Dock the content as document.</summary>
+		/// <summary>
+		/// Executes the dock as document operation.
+		/// </summary>
 		public void DockAsDocument()
 		{
 			if (!(Root is LayoutRoot root)) throw new InvalidOperationException();
@@ -594,7 +712,9 @@ namespace AvalonDock.Layout
 			RaisePropertyChanged(nameof(IsFloating));
 		}
 
-		/// <summary>Re-dock the content to its previous container</summary>
+		/// <summary>
+		/// Executes the dock operation.
+		/// </summary>
 		public void Dock()
 		{
 			if (PreviousContainer != null)
@@ -633,7 +753,7 @@ namespace AvalonDock.Layout
 			RaisePropertyChanged(nameof(IsFloating));
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnParentChanging(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
 			if (oldValue != null) IsSelected = false;
@@ -641,7 +761,7 @@ namespace AvalonDock.Layout
 			base.OnParentChanging(oldValue, newValue);
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnParentChanged(ILayoutContainer oldValue, ILayoutContainer newValue)
 		{
 			if (IsSelected && Parent is ILayoutContentSelector)
@@ -653,8 +773,10 @@ namespace AvalonDock.Layout
 			base.OnParentChanged(oldValue, newValue);
 		}
 
-		/// <summary>Test if the content can be closed. </summary>
-		/// <returns></returns>
+		/// <summary>
+		/// Executes the test can close operation.
+		/// </summary>
+		/// <returns><see langword="true"/> if the operation succeeds; otherwise, <see langword="false"/>.</returns>
 		internal bool TestCanClose()
 		{
 			var args = new CancelEventArgs();
@@ -662,6 +784,9 @@ namespace AvalonDock.Layout
 			return !args.Cancel;
 		}
 
+		/// <summary>
+		/// Executes the close internal operation.
+		/// </summary>
 		internal void CloseInternal()
 		{
 			var root = Root;
@@ -703,14 +828,46 @@ namespace AvalonDock.Layout
 			OnClosed();
 		}
 
+		/// <summary>
+		/// Executes the on closed operation.
+		/// </summary>
 		protected virtual void OnClosed() => Closed?.Invoke(this, EventArgs.Empty);
 
+		/// <summary>
+		/// Executes the on closing operation.
+		/// </summary>
+		/// <param name="args">The event arguments.</param>
 		protected virtual void OnClosing(CancelEventArgs args) => Closing?.Invoke(this, args);
 
+		/// <summary>
+		/// Executes the internal dock operation.
+		/// </summary>
 		protected virtual void InternalDock()
 		{
 		}
 
+		/// <inheritdoc/>
 		void ILayoutElementForFloatingWindow.RaiseFloatingPropertiesUpdated() => FloatingPropertiesUpdated?.Invoke(this, EventArgs.Empty);
+
+		/// <inheritdoc/>
+		object Core.Serialization.ISerializableLayoutContent.IconSource
+		{
+			get => IconSource;
+			set => IconSource = value as System.Windows.Media.ImageSource;
+		}
+
+		/// <inheritdoc/>
+		Core.Serialization.ISerializableLayoutContainer Core.Serialization.ISerializablePreviousContainer.PreviousContainer
+		{
+			get => _previousContainer as Core.Serialization.ISerializableLayoutContainer;
+			set => ((ILayoutPreviousContainer)this).PreviousContainer = value as ILayoutContainer;
+		}
+
+		/// <inheritdoc/>
+		string Core.Serialization.ISerializablePreviousContainer.PreviousContainerId
+		{
+			get => ((ILayoutPreviousContainer)this).PreviousContainerId;
+			set => ((ILayoutPreviousContainer)this).PreviousContainerId = value;
+		}
 	}
 }

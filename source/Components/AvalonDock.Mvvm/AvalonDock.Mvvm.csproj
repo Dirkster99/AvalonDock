@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net9.0</TargetFrameworks>
+		<RootNamespace>AvalonDock.Mvvm</RootNamespace>
+		<AssemblyName>AvalonDock.Mvvm</AssemblyName>
+		<Description>MVVM support for AvalonDock using CommunityToolkit.Mvvm.</Description>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\AvalonDock\sn.snk</AssemblyOriginatorKeyFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AvalonDock.Core\AvalonDock.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+	</ItemGroup>
+
+</Project>

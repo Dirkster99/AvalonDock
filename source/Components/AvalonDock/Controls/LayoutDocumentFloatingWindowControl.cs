@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,26 +13,26 @@ using Microsoft.Windows.Shell;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a floating window control that can host other controls
-	/// (<see cref="LayoutAnchorableControl"/>, <see cref="LayoutDocumentControl"/>)
-	/// and be dragged (independently of the <see cref="DockingManager"/>) around the screen.
+	/// Represents the layout document floating window control.
 	/// </summary>
 	public class LayoutDocumentFloatingWindowControl : LayoutFloatingWindowControl, IOverlayWindowHost
 	{
 		private readonly LayoutDocumentFloatingWindow _model;
 		private List<IDropArea> _dropAreas = null;
 
-		/// <summary>Static class constructor</summary>
+		/// <summary>
+		/// Initializes static members of the <see cref="LayoutDocumentFloatingWindowControl"/> class.
+		/// </summary>
 		static LayoutDocumentFloatingWindowControl()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutDocumentFloatingWindowControl), new FrameworkPropertyMetadata(typeof(LayoutDocumentFloatingWindowControl)));
 		}
 
 		/// <summary>
-		/// Class constructor
+		/// Initializes a new instance of the <see cref="LayoutDocumentFloatingWindowControl"/> class.
 		/// </summary>
-		/// <param name="model"></param>
-		/// <param name="isContentImmutable"></param>
+		/// <param name="model">The layout model.</param>
+		/// <param name="isContentImmutable">The is content immutable.</param>
 		internal LayoutDocumentFloatingWindowControl(LayoutDocumentFloatingWindow model, bool isContentImmutable)
 			: base(model, isContentImmutable)
 		{
@@ -53,24 +44,25 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Class constructor
+		/// Initializes a new instance of the <see cref="LayoutDocumentFloatingWindowControl"/> class.
 		/// </summary>
-		/// <param name="model"></param>
+		/// <param name="model">The layout model.</param>
 		internal LayoutDocumentFloatingWindowControl(LayoutDocumentFloatingWindow model)
 			: this(model, false)
 		{
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		public override ILayoutElement Model => _model;
 
-		/// <summary><see cref="SingleContentLayoutItem"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="SingleContentLayoutItem"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty SingleContentLayoutItemProperty = DependencyProperty.Register(nameof(SingleContentLayoutItem), typeof(LayoutItem), typeof(LayoutDocumentFloatingWindowControl),
 				new FrameworkPropertyMetadata(null, OnSingleContentLayoutItemChanged));
 
 		/// <summary>
-		/// Gets or sets the <see cref="SingleContentLayoutItem"/> property.  This dependency property
-		/// indicates the layout item of the selected content when is shown a single document pane.
+		/// Gets or sets the single content layout item.
 		/// </summary>
 		public LayoutItem SingleContentLayoutItem
 		{
@@ -81,11 +73,15 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="SingleContentLayoutItem"/> property.</summary>
 		private static void OnSingleContentLayoutItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutDocumentFloatingWindowControl)d).OnSingleContentLayoutItemChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="SingleContentLayoutItem"/> property.</summary>
+		/// <summary>
+		/// Raises the single content layout item changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnSingleContentLayoutItemChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
 
+		/// <inheritdoc/>
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
@@ -101,7 +97,7 @@ namespace AvalonDock.Controls
 			if (e.PropertyName == nameof(LayoutDocumentFloatingWindow.RootPanel) && _model.RootPanel == null) InternalClose();
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override IntPtr FilterMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
 		{
 			switch (msg)
@@ -154,7 +150,7 @@ namespace AvalonDock.Controls
 			return base.FilterMessage(hwnd, msg, wParam, lParam, ref handled);
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnClosed(EventArgs e)
 		{
 			var root = Model.Root;
@@ -192,7 +188,7 @@ namespace AvalonDock.Controls
 			return true;
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
 		{
 			// TODO
@@ -205,6 +201,7 @@ namespace AvalonDock.Controls
 			base.OnClosing(e);
 		}
 
+		/// <inheritdoc/>
 		bool IOverlayWindowHost.HitTestScreen(Point dragPoint)
 		{
 			return HitTest(this.TransformToDeviceDPI(dragPoint));
@@ -218,6 +215,7 @@ namespace AvalonDock.Controls
 			return detectionRect.Contains(dragPoint);
 		}
 
+		/// <inheritdoc/>
 		DockingManager IOverlayWindowHost.Manager => _model.Root.Manager;
 
 		private OverlayWindow _overlayWindow = null;
@@ -241,6 +239,7 @@ namespace AvalonDock.Controls
 			_overlayWindow.Height = rectWindow.Height;
 		}
 
+		/// <inheritdoc/>
 		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
 		{
 			CreateOverlayWindow(draggingWindow);
@@ -249,6 +248,9 @@ namespace AvalonDock.Controls
 			return _overlayWindow;
 		}
 
+		/// <summary>
+		/// Hides the overlay window.
+		/// </summary>
 		public void HideOverlayWindow()
 		{
 			_dropAreas = null;
@@ -258,6 +260,11 @@ namespace AvalonDock.Controls
 			_overlayWindow = null;
 		}
 
+		/// <summary>
+		/// Gets the drop areas.
+		/// </summary>
+		/// <param name="draggingWindow">The floating window being dragged.</param>
+		/// <returns>The drop areas.</returns>
 		public IEnumerable<IDropArea> GetDropAreas(LayoutFloatingWindowControl draggingWindow)
 		{
 			if (_dropAreas != null) return _dropAreas;
@@ -298,10 +305,10 @@ namespace AvalonDock.Controls
 
 		/// <summary>
 		/// Finds all <see cref="LayoutAnchorable"/> objects (tool windows) within a
-		/// <see cref="LayoutFloatingWindow"/> (if any) and return them.
+		/// <see cref="LayoutFloatingWindow"/> (if any) and returns them.
 		/// </summary>
-		/// <param name="draggingWindow"></param>
-		/// <returns></returns>
+		/// <param name="draggingWindow">The floating window being dragged.</param>
+		/// <returns>The anchorables contained in the floating window.</returns>
 		private IEnumerable<LayoutAnchorable> GetAnchorableInFloatingWindow(LayoutFloatingWindowControl draggingWindow)
 		{
 			if (!(draggingWindow.Model is LayoutAnchorableFloatingWindow layoutAnchorableFloatingWindow)) yield break;
@@ -319,13 +326,10 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Finds all <see cref="LayoutAnchorable"/> objects (toolwindows) within a
-		/// <see cref="LayoutAnchorablePaneGroup"/> (if any) and return them.
+		/// Gets the layout anchorable.
 		/// </summary>
-		/// <param name="layoutAnchPaneGroup"></param>
-		/// <returns>All the anchorable items found.</returns>
-		/// <seealso cref="LayoutAnchorable"/>
-		/// <seealso cref="LayoutAnchorablePaneGroup"/>
+		/// <param name="layoutAnchPaneGroup">The layout anch pane group.</param>
+		/// <returns>The layout anchorable.</returns>
 		internal IEnumerable<LayoutAnchorable> GetLayoutAnchorable(LayoutAnchorablePaneGroup layoutAnchPaneGroup)
 		{
 			if (layoutAnchPaneGroup == null) yield break;
@@ -333,6 +337,9 @@ namespace AvalonDock.Controls
 				yield return anchorable;
 		}
 
+		/// <summary>
+		/// Gets the hide window command.
+		/// </summary>
 		public ICommand HideWindowCommand { get; }
 
 		private bool CanExecuteHideWindowCommand(object parameter)
@@ -381,6 +388,9 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <summary>
+		/// Gets the close window command.
+		/// </summary>
 		public ICommand CloseWindowCommand { get; }
 
 		private bool CanExecuteCloseWindowCommand(object parameter)
