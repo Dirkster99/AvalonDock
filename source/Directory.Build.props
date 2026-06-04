@@ -19,9 +19,16 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageTags>WPF avalondock docking layout MVVM</PackageTags>
 
+		<!-- Single source of truth for the license shipped in every NuGet package -->
+		<PackageLicenseSourceFile>$(MSBuildThisFileDirectory)..\LICENSE</PackageLicenseSourceFile>
+
 		<!-- Enforce zero warnings policy -->
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 	</PropertyGroup>
+	<ItemGroup>
+		<!-- Pack the shared root LICENSE into every package without copying it per project -->
+		<None Include="$(PackageLicenseSourceFile)" Pack="true" PackagePath="" Visible="false" />
+	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers"
 			Version="10.*">
