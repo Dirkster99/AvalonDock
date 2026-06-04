@@ -4,6 +4,7 @@
 		<TargetFrameworks>netstandard2.0;net9.0</TargetFrameworks>
 		<RootNamespace>AvalonDock.Core</RootNamespace>
 		<AssemblyName>AvalonDock.Core</AssemblyName>
+		<PackageId>Dirkster.AvalonDock.Core</PackageId>
 		<Description>UI-agnostic core interfaces and base classes for AvalonDock docking layout engine.</Description>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
