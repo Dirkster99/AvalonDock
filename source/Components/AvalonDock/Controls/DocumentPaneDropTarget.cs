@@ -453,36 +453,29 @@ namespace AvalonDock.Controls
 					}
 
 				case DropTargetType.DocumentPaneDockBottom:
-					{
-						var targetScreenRect = TargetElement.GetScreenArea();
-						targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
-						targetScreenRect.Offset(0.0, targetScreenRect.Height / 2.0);
-						targetScreenRect.Height /= 2.0;
-						return new RectangleGeometry(targetScreenRect);
-					}
-
 				case DropTargetType.DocumentPaneDockTop:
-					{
-						var targetScreenRect = TargetElement.GetScreenArea();
-						targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
-						targetScreenRect.Height /= 2.0;
-						return new RectangleGeometry(targetScreenRect);
-					}
-
 				case DropTargetType.DocumentPaneDockLeft:
-					{
-						var targetScreenRect = TargetElement.GetScreenArea();
-						targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
-						targetScreenRect.Width /= 2.0;
-						return new RectangleGeometry(targetScreenRect);
-					}
-
 				case DropTargetType.DocumentPaneDockRight:
 					{
 						var targetScreenRect = TargetElement.GetScreenArea();
 						targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
-						targetScreenRect.Offset(targetScreenRect.Width / 2.0, 0.0);
-						targetScreenRect.Width /= 2.0;
+
+						if (OverlayPreviewRules.TryComputePanePreviewRect(
+							Type,
+							targetScreenRect.Width,
+							targetScreenRect.Height,
+							out var left,
+							out var top,
+							out var width,
+							out var height))
+						{
+							targetScreenRect = new Rect(
+								targetScreenRect.Left + left,
+								targetScreenRect.Top + top,
+								width,
+								height);
+						}
+
 						return new RectangleGeometry(targetScreenRect);
 					}
 			}
