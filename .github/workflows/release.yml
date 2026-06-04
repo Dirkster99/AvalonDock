@@ -87,6 +87,11 @@ jobs:
           
           projects=(
             "source/Components/AvalonDock/AvalonDock.csproj"
+            "source/Components/AvalonDock.Core/AvalonDock.Core.csproj"
+            "source/Components/AvalonDock.DependencyInjection/AvalonDock.DependencyInjection.csproj"
+            "source/Components/AvalonDock.Mvvm/AvalonDock.Mvvm.csproj"
+            "source/Components/AvalonDock.Serializer.Json/AvalonDock.Serializer.Json.csproj"
+            "source/Components/AvalonDock.Serializer.Xml/AvalonDock.Serializer.Xml.csproj"
             "source/Components/AvalonDock.Themes.Aero/AvalonDock.Themes.Aero.csproj"
             "source/Components/AvalonDock.Themes.Arc/AvalonDock.Themes.Arc.csproj"
             "source/Components/AvalonDock.Themes.Metro/AvalonDock.Themes.Metro.csproj"
