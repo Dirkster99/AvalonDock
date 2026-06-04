@@ -476,7 +476,6 @@ namespace AvalonDockTest
 		{
 			var services = new ServiceCollection();
 			services.AddToolbox<DiTestToolbox>();
-			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<DiTestToolbox>());
 			services.AddDockLayoutService();
 
 			var provider = services.BuildServiceProvider();
