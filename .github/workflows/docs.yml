@@ -1,40 +1,40 @@
-#name: Deploy Documentation
-#
-#on:
-#  push:
-#    branches: ["master"]
-#    paths:
-#      - "docs/**"
-#  workflow_dispatch:
-#
-#permissions:
-#  contents: read
-#  pages: write
-#  id-token: write
-#
-#concurrency:
-#  group: "pages"
-#  cancel-in-progress: false
-#
-#jobs:
-#  build:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#
+name: Deploy Documentation
+
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - "docs/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
 #      - name: Setup Pages
 #        uses: actions/configure-pages@v5
-#
-#      - name: Build with Jekyll
-#        uses: actions/jekyll-build-pages@v1
-#        with:
-#          source: ./docs
-#          destination: ./_site
-#
-#      - name: Upload artifact
-#        uses: actions/upload-pages-artifact@v3
-#
+
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./docs
+          destination: ./_site
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+
 #  deploy:
 #    environment:
 #      name: github-pages
