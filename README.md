@@ -20,30 +20,30 @@ Be sure to check out the [Wiki](https://github.com/Dirkster99/AvalonDock/wiki) a
 
 ### Core
 
-| Package | Description |
-|:--------|:------------|
-| [Dirkster.AvalonDock](http://nuget.org/packages/Dirkster.AvalonDock) | Main WPF docking framework package |
-| [Dirkster.AvalonDock.Core](http://nuget.org/packages/Dirkster.AvalonDock.Core) | UI-agnostic interfaces and models |
-| [Dirkster.AvalonDock.Mvvm](http://nuget.org/packages/Dirkster.AvalonDock.Mvvm) | MVVM base classes (`DockableBase`, `ToolboxBase`, `DockLayoutService`) |
-| [Dirkster.AvalonDock.DependencyInjection](http://nuget.org/packages/Dirkster.AvalonDock.DependencyInjection) | `IServiceCollection` extensions for DI registration |
+| Package | Downloads | Description |
+|:--------|:----------|:------------|
+| [Dirkster.AvalonDock](http://nuget.org/packages/Dirkster.AvalonDock) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.svg)](http://nuget.org/packages/Dirkster.AvalonDock) | Main WPF docking framework package |
+| [Dirkster.AvalonDock.Core](http://nuget.org/packages/Dirkster.AvalonDock.Core) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Core.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Core) | UI-agnostic interfaces and models |
+| [Dirkster.AvalonDock.Mvvm](http://nuget.org/packages/Dirkster.AvalonDock.Mvvm) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Mvvm.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Mvvm) | MVVM base classes (`DockableBase`, `ToolboxBase`, `DockLayoutService`) |
+| [Dirkster.AvalonDock.DependencyInjection](http://nuget.org/packages/Dirkster.AvalonDock.DependencyInjection) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.DependencyInjection.svg)](http://nuget.org/packages/Dirkster.AvalonDock.DependencyInjection) | `IServiceCollection` extensions for DI registration |
 
 ### Serializers
 
-| Package | Description |
-|:--------|:------------|
-| [Dirkster.AvalonDock.Serializer.Xml](http://nuget.org/packages/Dirkster.AvalonDock.Serializer.Xml) | XML layout serialization |
-| [Dirkster.AvalonDock.Serializer.Json](http://nuget.org/packages/Dirkster.AvalonDock.Serializer.Json) | JSON layout serialization (**new in v5**) |
+| Package | Downloads | Description |
+|:--------|:----------|:------------|
+| [Dirkster.AvalonDock.Serializer.Xml](http://nuget.org/packages/Dirkster.AvalonDock.Serializer.Xml) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Serializer.Xml.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Serializer.Xml) | XML layout serialization |
+| [Dirkster.AvalonDock.Serializer.Json](http://nuget.org/packages/Dirkster.AvalonDock.Serializer.Json) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Serializer.Json.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Serializer.Json) | JSON layout serialization (**new in v5**) |
 
 ### Themes
 
-| Package | Downloads |
-|:--------|:----------|
-| [Dirkster.AvalonDock.Themes.Arc](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Arc) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Arc.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Arc) **NEW!** |
-| [Dirkster.AvalonDock.Themes.Aero](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Aero) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Aero.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Aero) |
-| [Dirkster.AvalonDock.Themes.Expression](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Expression) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Expression.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Expression) |
-| [Dirkster.AvalonDock.Themes.Metro](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Metro) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Metro.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Metro) |
-| [Dirkster.AvalonDock.Themes.VS2010](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2010.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010) |
-| [Dirkster.AvalonDock.Themes.VS2013](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2013.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013) |
+| Package | Downloads | Description |
+|:--------|:----------|:------------|
+| [Dirkster.AvalonDock.Themes.Arc](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Arc) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Arc.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Arc) | Arc theme **NEW!** |
+| [Dirkster.AvalonDock.Themes.Aero](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Aero) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Aero.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Aero) | Aero theme |
+| [Dirkster.AvalonDock.Themes.Expression](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Expression) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Expression.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Expression) | Expression theme |
+| [Dirkster.AvalonDock.Themes.Metro](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Metro) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Metro.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Metro) | Metro theme |
+| [Dirkster.AvalonDock.Themes.VS2010](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2010.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010) | Visual Studio 2010 theme |
+| [Dirkster.AvalonDock.Themes.VS2013](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2013.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013) | Visual Studio 2013 theme |
 
 ---
 
