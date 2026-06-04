@@ -196,55 +196,28 @@ namespace AvalonDock.Controls
 
 			var targetScreenRect = TargetElement.GetScreenArea();
 
-			switch (Type)
+			// Preferred dock size used by the outer-edge rules: width for Left/Right, height for Top/Bottom.
+			var preferredSize = Type == DropTargetType.DockingManagerDockTop || Type == DropTargetType.DockingManagerDockBottom
+				? (layoutAnchorablePane.DockHeight.IsAbsolute ? layoutAnchorablePane.DockHeight.Value : layoutAnchorablePaneWithActualSize.ActualHeight)
+				: (layoutAnchorablePane.DockWidth.IsAbsolute ? layoutAnchorablePane.DockWidth.Value : layoutAnchorablePaneWithActualSize.ActualWidth);
+
+			if (OverlayPreviewRules.TryComputeManagerPreviewRect(
+				Type,
+				targetScreenRect.Width,
+				targetScreenRect.Height,
+				preferredSize,
+				out var left,
+				out var top,
+				out var width,
+				out var height))
 			{
-				case DropTargetType.DockingManagerDockLeft:
-					{
-						var desideredWidth = layoutAnchorablePane.DockWidth.IsAbsolute ? layoutAnchorablePane.DockWidth.Value : layoutAnchorablePaneWithActualSize.ActualWidth;
-						var previewBoxRect = new Rect(
-							targetScreenRect.Left - overlayWindow.Left,
-							targetScreenRect.Top - overlayWindow.Top,
-							Math.Min(desideredWidth, targetScreenRect.Width / 2.0),
-							targetScreenRect.Height);
+				var previewBoxRect = new Rect(
+					targetScreenRect.Left - overlayWindow.Left + left,
+					targetScreenRect.Top - overlayWindow.Top + top,
+					width,
+					height);
 
-						return new RectangleGeometry(previewBoxRect);
-					}
-
-				case DropTargetType.DockingManagerDockTop:
-					{
-						var desideredHeight = layoutAnchorablePane.DockHeight.IsAbsolute ? layoutAnchorablePane.DockHeight.Value : layoutAnchorablePaneWithActualSize.ActualHeight;
-						var previewBoxRect = new Rect(
-							targetScreenRect.Left - overlayWindow.Left,
-							targetScreenRect.Top - overlayWindow.Top,
-							targetScreenRect.Width,
-							Math.Min(desideredHeight, targetScreenRect.Height / 2.0));
-
-						return new RectangleGeometry(previewBoxRect);
-					}
-
-				case DropTargetType.DockingManagerDockRight:
-					{
-						var desideredWidth = layoutAnchorablePane.DockWidth.IsAbsolute ? layoutAnchorablePane.DockWidth.Value : layoutAnchorablePaneWithActualSize.ActualWidth;
-						var previewBoxRect = new Rect(
-							targetScreenRect.Right - overlayWindow.Left - Math.Min(desideredWidth, targetScreenRect.Width / 2.0),
-							targetScreenRect.Top - overlayWindow.Top,
-							Math.Min(desideredWidth, targetScreenRect.Width / 2.0),
-							targetScreenRect.Height);
-
-						return new RectangleGeometry(previewBoxRect);
-					}
-
-				case DropTargetType.DockingManagerDockBottom:
-					{
-						var desideredHeight = layoutAnchorablePane.DockHeight.IsAbsolute ? layoutAnchorablePane.DockHeight.Value : layoutAnchorablePaneWithActualSize.ActualHeight;
-						var previewBoxRect = new Rect(
-							targetScreenRect.Left - overlayWindow.Left,
-							targetScreenRect.Bottom - overlayWindow.Top - Math.Min(desideredHeight, targetScreenRect.Height / 2.0),
-							targetScreenRect.Width,
-							Math.Min(desideredHeight, targetScreenRect.Height / 2.0));
-
-						return new RectangleGeometry(previewBoxRect);
-					}
+				return new RectangleGeometry(previewBoxRect);
 			}
 
 			throw new InvalidOperationException();
