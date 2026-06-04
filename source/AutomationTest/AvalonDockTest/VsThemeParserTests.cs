@@ -1,4 +1,5 @@
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Windows.Media;
 using AvalonDock.Themes.VS;
@@ -107,6 +108,40 @@ namespace AvalonDockTest
 
 			Assert.That(palette.Contains("EnvironmentBackground"), Is.True);
 			Assert.That(palette.Contains("NonExistent"), Is.False);
+		}
+
+		[Test]
+		public void ParseGZip_ProducesSamePaletteAsPlainText()
+		{
+			var plain = ParseString(MinimalDarkTheme);
+			var gz = VsThemeParser.ParseGZip(GZip(MinimalDarkTheme));
+
+			Assert.That(gz.Count, Is.EqualTo(plain.Count));
+			Assert.That(gz.GetBackground("EnvironmentBackground"), Is.EqualTo(plain.GetBackground("EnvironmentBackground")));
+			Assert.That(gz.GetBackground("FileTabSelectedBorder"), Is.EqualTo(plain.GetBackground("FileTabSelectedBorder")));
+			Assert.That(gz.GetForeground("TitleBarActiveText"), Is.EqualTo(plain.GetForeground("TitleBarActiveText")));
+		}
+
+		[Test]
+		public void Parse_AutoDetectsGZipStream()
+		{
+			using var stream = new MemoryStream(GZip(MinimalDarkTheme));
+
+			var palette = VsThemeParser.Parse(stream);
+
+			Assert.That(palette.GetBackground("EnvironmentBackground"), Is.EqualTo(Color.FromArgb(0xFF, 0x2D, 0x2D, 0x30)));
+		}
+
+		private static byte[] GZip(string xml)
+		{
+			using var ms = new MemoryStream();
+			using (var gz = new GZipStream(ms, CompressionMode.Compress))
+			{
+				var bytes = Encoding.UTF8.GetBytes(xml);
+				gz.Write(bytes, 0, bytes.Length);
+			}
+
+			return ms.ToArray();
 		}
 
 		private static VsThemeColorPalette ParseString(string xml)
