@@ -5,6 +5,7 @@
 		<UseWPF>true</UseWPF>
 		<RootNamespace>AvalonDock</RootNamespace>
 		<AssemblyName>AvalonDock.Serializer.Xml</AssemblyName>
+		<PackageId>Dirkster.AvalonDock.Serializer.Xml</PackageId>
 		<Description>XML layout serializer for AvalonDock layout persistence.</Description>
 		<LangVersion>latest</LangVersion>
 		<Nullable>disable</Nullable>

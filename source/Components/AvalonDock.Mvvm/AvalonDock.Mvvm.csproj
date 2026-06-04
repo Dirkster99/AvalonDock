@@ -4,6 +4,7 @@
 		<TargetFrameworks>netstandard2.0;net9.0</TargetFrameworks>
 		<RootNamespace>AvalonDock.Mvvm</RootNamespace>
 		<AssemblyName>AvalonDock.Mvvm</AssemblyName>
+		<PackageId>Dirkster.AvalonDock.Mvvm</PackageId>
 		<Description>MVVM support for AvalonDock using CommunityToolkit.Mvvm.</Description>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
