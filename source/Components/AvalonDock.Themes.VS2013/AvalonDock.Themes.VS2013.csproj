@@ -20,11 +20,6 @@
 		<EmbeddedResource Include="Resources\vs2013light.vstheme.gz"/>
 	</ItemGroup>
 
-	<!-- NuGet Packaging -->
-	<ItemGroup>
-		<None Include="LICENSE" Pack="true" PackagePath=""/>
-	</ItemGroup>
-
 	<ItemGroup>
 		<ProjectReference Include="..\AvalonDock\AvalonDock.csproj"/>
 		<ProjectReference Include="..\AvalonDock.Themes.VS\AvalonDock.Themes.VS.csproj"/>

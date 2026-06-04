@@ -17,11 +17,6 @@
 		<EmbeddedResource Include="Resources\*.vstheme" />
 	</ItemGroup>
 
-	<!-- NuGet Packaging -->
-	<ItemGroup>
-		<None Include="LICENSE" Pack="true" PackagePath=""/>
-	</ItemGroup>
-
 	<ItemGroup>
 		<ProjectReference Include="..\AvalonDock\AvalonDock.csproj"/>
 	</ItemGroup>
