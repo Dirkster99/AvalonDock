@@ -111,11 +111,6 @@ public partial class App : Application
         services.AddToolbox<SearchToolbox>();
         services.AddToolbox<TerminalToolbox>();
 
-        // Register each as IToolbox for auto-discovery
-        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<ExplorerToolbox>());
-        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SearchToolbox>());
-        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<TerminalToolbox>());
-
         // Auto-build layout tree from registered toolboxes
         services.AddDockLayoutService();
 
@@ -245,16 +240,13 @@ AvalonDock v5 is organized into modular packages with clear separation of concer
 
 ```
 AvalonDock.Core            UI-agnostic interfaces (IDockable, IDock, IFactory, IToolbox, etc.)
-  ├── netstandard2.0       Cross-platform abstractions
-  └── net9.0
+  └── netstandard2.0       Cross-platform abstractions
 
 AvalonDock.Mvvm            CommunityToolkit.Mvvm view models (DockableBase, ToolboxBase, etc.)
-  ├── netstandard2.0
-  └── net9.0
+  └── netstandard2.0
 
 AvalonDock.DependencyInjection  IServiceCollection extensions
-  ├── netstandard2.0
-  └── net9.0
+  └── netstandard2.0
 
 AvalonDock                 WPF docking library (DockingManager, ToggleDockingManager)
   ├── net9.0-windows
@@ -265,22 +257,6 @@ AvalonDock.Serializer.Xml  XML layout persistence (extracted from core in v5)
 AvalonDock.Serializer.Json JSON layout persistence (new in v5)
 AvalonDock.Themes.*        Theme packages (Arc, Aero, Expression, Metro, VS2010, VS2013)
 ```
-
-### Key Interfaces (AvalonDock.Core)
-
-| Interface | Purpose |
-|:----------|:--------|
-| `IDockable` | Fundamental dockable content unit — title, state, close/pin/float capability |
-| `IDock` | Container holding multiple `IDockable` children |
-| `IRootDock` | Root of the layout tree — floating and pinned dockables |
-| `IDocumentDock` | Document area container |
-| `IToolDock` | Tool window container with alignment and auto-hide |
-| `IToolbox` | Toolbox with zone-based sidebar placement |
-| `IFactory` | Abstract factory for creating and managing layout elements |
-| `IDockLayoutService` | High-level document/toolbox management |
-| `ILayoutSerializer` | Pluggable layout serialization (XML or JSON) |
-
----
 
 ## Theming
 
