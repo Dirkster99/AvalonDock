@@ -33,6 +33,16 @@ namespace AvalonDock.Themes.VS
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="VsTheme"/> class
+		/// from GZIP-compressed .vstheme bytes (for example, an embedded .vstheme.gz resource).
+		/// </summary>
+		/// <param name="gzipBytes">The GZIP-compressed .vstheme XML content.</param>
+		public VsTheme(byte[] gzipBytes)
+			: base(VsThemeResourceBuilder.Build(VsThemeParser.ParseGZip(gzipBytes)))
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="VsTheme"/> class
 		/// from a pre-built <see cref="VsThemeColorPalette"/>.
 		/// </summary>
 		/// <param name="palette">The parsed color palette.</param>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Windows.Media;
 using System.Xml.Linq;
@@ -18,8 +19,10 @@ namespace AvalonDock.Themes.VS
 
 		/// <summary>
 		/// Parses a .vstheme file from a stream and returns the color palette.
+		/// The stream may contain either plain .vstheme XML or GZIP-compressed
+		/// .vstheme XML; the compression is detected automatically.
 		/// </summary>
-		/// <param name="stream">The stream containing the .vstheme XML content.</param>
+		/// <param name="stream">The stream containing the (optionally GZIP-compressed) .vstheme XML content.</param>
 		/// <returns>A dictionary mapping color token names to their resolved colors.</returns>
 		public static VsThemeColorPalette Parse(Stream stream)
 		{
@@ -28,8 +31,35 @@ namespace AvalonDock.Themes.VS
 				throw new ArgumentNullException(nameof(stream));
 			}
 
-			var doc = XDocument.Load(stream);
-			return ParseDocument(doc);
+			byte[] bytes;
+			using (var buffer = new MemoryStream())
+			{
+				stream.CopyTo(buffer);
+				bytes = buffer.ToArray();
+			}
+
+			return ParseBytes(bytes);
+		}
+
+		/// <summary>
+		/// Parses a GZIP-compressed .vstheme file from its raw compressed bytes
+		/// and returns the color palette.
+		/// </summary>
+		/// <param name="gzipBytes">The GZIP-compressed .vstheme XML content.</param>
+		/// <returns>A dictionary mapping color token names to their resolved colors.</returns>
+		public static VsThemeColorPalette ParseGZip(byte[] gzipBytes)
+		{
+			if (gzipBytes == null)
+			{
+				throw new ArgumentNullException(nameof(gzipBytes));
+			}
+
+			using (var ms = new MemoryStream(gzipBytes))
+			using (var gz = new GZipStream(ms, CompressionMode.Decompress))
+			{
+				var doc = XDocument.Load(gz);
+				return ParseDocument(doc);
+			}
 		}
 
 		/// <summary>
@@ -47,6 +77,21 @@ namespace AvalonDock.Themes.VS
 			using (var stream = File.OpenRead(filePath))
 			{
 				return Parse(stream);
+			}
+		}
+
+		private static VsThemeColorPalette ParseBytes(byte[] bytes)
+		{
+			// GZIP streams start with the magic bytes 0x1F 0x8B.
+			if (bytes.Length >= 2 && bytes[0] == 0x1F && bytes[1] == 0x8B)
+			{
+				return ParseGZip(bytes);
+			}
+
+			using (var ms = new MemoryStream(bytes))
+			{
+				var doc = XDocument.Load(ms);
+				return ParseDocument(doc);
 			}
 		}
 
