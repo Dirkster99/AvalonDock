@@ -85,7 +85,6 @@ namespace AvalonDockTest
 		{
 			var services = new ServiceCollection();
 			services.AddToolbox<DiTestToolbox>();
-			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<DiTestToolbox>());
 
 			var provider = services.BuildServiceProvider();
 			var toolboxes = provider.GetServices<IToolbox>().ToList();
@@ -100,10 +99,7 @@ namespace AvalonDockTest
 			var services = new ServiceCollection();
 			services.AddToolbox<DiTestToolbox>();
 			services.AddToolbox<DiTestToolboxWithDeps>(sp => new DiTestToolboxWithDeps("v"));
-
-			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<DiTestToolbox>());
-			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<DiTestToolboxWithDeps>());
-
+			
 			var provider = services.BuildServiceProvider();
 			var toolboxes = provider.GetServices<IToolbox>().ToList();
 
