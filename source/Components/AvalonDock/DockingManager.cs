@@ -99,13 +99,7 @@ namespace AvalonDock
 		/// Override in subclasses to provide a specialized engine.
 		/// </summary>
 		public virtual ILayoutEngine LayoutEngine => _layoutEngine;
-
-		/// <summary>
-		/// Gets the extender providing factory interfaces for visual component creation.
-		/// Themes can set custom factories to override default visual behavior.
-		/// </summary>
-		public DockingManagerExtender Extender { get; } = new DockingManagerExtender();
-
+		
 		/// <summary>
 		/// Indicates whether document source binding is suspended during deserialization.
 		/// </summary>
