@@ -9,7 +9,7 @@ namespace AvalonDock
 	/// into the correct anchor side based on the content-to-side map built by
 	/// <see cref="LayoutSyncBridge"/> from the MVVM <see cref="Core.IToolDock.Alignment"/>.
 	/// </summary>
-	internal sealed class DockAlignmentStrategy : ILayoutUpdateStrategy
+	public sealed class DockAlignmentStrategy : ILayoutUpdateStrategy
 	{
 		private readonly IReadOnlyDictionary<object, AnchorSide> _contentToSide;
 
