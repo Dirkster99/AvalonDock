@@ -207,10 +207,13 @@ namespace AvalonDock
 				switch (e.Action)
 				{
 					case NotifyCollectionChangedAction.Add:
+						var addSide = FindSideForSender(sender);
 						foreach (var item in e.NewItems)
 						{
 							if (!_anchorableModels.Contains(item))
 								_anchorableModels.Add(item);
+							if (addSide.HasValue)
+								_contentToSide[item] = addSide.Value;
 						}
 
 						break;
@@ -391,6 +394,34 @@ namespace AvalonDock
 						RebuildAnchorablesFromTree(child);
 				}
 			}
+		}
+
+		private AnchorSide? FindSideForSender(object sender)
+		{
+			return FindToolDockForCollection(_rootDock, sender) is IToolDock td
+				? (AnchorSide?)AlignmentToAnchorSide(td.Alignment)
+				: null;
+		}
+
+		private static IToolDock FindToolDockForCollection(IDockable node, object sender)
+		{
+			if (node is IToolDock toolDock && toolDock.VisibleDockables == sender)
+				return toolDock;
+
+			if (node is IDock dock && dock.VisibleDockables != null)
+			{
+				foreach (var child in dock.VisibleDockables)
+				{
+					if (child is IDock)
+					{
+						var found = FindToolDockForCollection(child, sender);
+						if (found != null)
+							return found;
+					}
+				}
+			}
+
+			return null;
 		}
 
 		private static AnchorSide AlignmentToAnchorSide(DockAlignment alignment)

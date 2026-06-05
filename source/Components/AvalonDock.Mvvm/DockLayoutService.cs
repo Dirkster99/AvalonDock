@@ -16,7 +16,7 @@ namespace AvalonDock.Mvvm
 	public class DockLayoutService : IDockLayoutService
 	{
 		private readonly DocumentDock _documentDock;
-		private readonly ToolDock _toolDock;
+		private readonly List<ToolDock> _toolDocks = new List<ToolDock>();
 		private readonly RootDock _rootDock;
 
 		/// <summary>
@@ -32,27 +32,39 @@ namespace AvalonDock.Mvvm
 				VisibleDockables = new ObservableCollection<IDockable>()
 			};
 
-			var toolboxList = toolboxes?.Cast<IDockable>() ?? Enumerable.Empty<IDockable>();
+			var rootChildren = new ObservableCollection<IDockable> { _documentDock };
 
-			_toolDock = new ToolDock
+			// Group toolboxes by alignment so LayoutSyncBridge places them on the correct side
+			var toolboxList = toolboxes?.ToList() ?? new List<IToolbox>();
+			var groups = toolboxList.GroupBy(t => ZoneToAlignment(t.Zone));
+			foreach (var group in groups)
 			{
-				Id = "Tools",
-				Title = "Tools",
-				VisibleDockables = new ObservableCollection<IDockable>(toolboxList)
-			};
+				var toolDock = new ToolDock
+				{
+					Id = $"Tools_{group.Key}",
+					Title = $"Tools ({group.Key})",
+					Alignment = group.Key,
+					VisibleDockables = new ObservableCollection<IDockable>(group.Cast<IDockable>())
+				};
+				_toolDocks.Add(toolDock);
+				rootChildren.Add(toolDock);
+			}
 
 			_rootDock = new RootDock
 			{
 				Id = "Root",
 				Title = "Root",
-				VisibleDockables = new ObservableCollection<IDockable> { _documentDock, _toolDock }
+				VisibleDockables = rootChildren
 			};
 
-			foreach (var dockable in _toolDock.VisibleDockables)
+			foreach (var toolDock in _toolDocks)
 			{
-				if (dockable is INotifyPropertyChanged npc)
+				foreach (var dockable in toolDock.VisibleDockables!)
 				{
-					npc.PropertyChanged += OnToolboxPropertyChanged;
+					if (dockable is INotifyPropertyChanged npc)
+					{
+						npc.PropertyChanged += OnToolboxPropertyChanged;
+					}
 				}
 			}
 		}
@@ -73,7 +85,7 @@ namespace AvalonDock.Mvvm
 
 		/// <inheritdoc/>
 		public IEnumerable<IDockable> Anchorables =>
-			_toolDock.VisibleDockables ?? Enumerable.Empty<IDockable>();
+			_toolDocks.SelectMany(td => td.VisibleDockables ?? Enumerable.Empty<IDockable>());
 
 		/// <inheritdoc/>
 		public event EventHandler? AnchorableStateChanged;
@@ -99,6 +111,24 @@ namespace AvalonDock.Mvvm
 			if (_rootDock.ActiveDockable == document)
 			{
 				_rootDock.ActiveDockable = _documentDock.VisibleDockables?.LastOrDefault();
+			}
+		}
+
+		private static DockAlignment ZoneToAlignment(DockZone zone)
+		{
+			switch (zone)
+			{
+				case DockZone.LeftTop:
+				case DockZone.LeftBottom:
+					return DockAlignment.Left;
+				case DockZone.RightTop:
+				case DockZone.RightBottom:
+					return DockAlignment.Right;
+				case DockZone.BottomLeft:
+				case DockZone.BottomRight:
+					return DockAlignment.Bottom;
+				default:
+					return DockAlignment.Left;
 			}
 		}
 

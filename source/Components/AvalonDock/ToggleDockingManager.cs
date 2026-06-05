@@ -271,7 +271,9 @@ public class ToggleDockingManager : DockingManager
 	{
 		base.OnDockLayoutChanged(oldValue, newValue);
 		if (IsLoaded)
+		{
 			SetupToggleDockButtonBars();
+		}
 	}
 
 	/// <inheritdoc/>
