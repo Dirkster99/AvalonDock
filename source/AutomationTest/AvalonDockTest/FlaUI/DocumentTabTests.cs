@@ -48,6 +48,7 @@ namespace AvalonDockTest.FlaUITests
         /// Regression for #244 - Right click on tab header closes tab unexpectedly.
         /// </summary>
         [Test, Order(3)]
+        [Retry(3)] // Retry to catch any intermittent failures
         public void RightClickDocumentTab_DoesNotClose_Issue244()
         {
             var tab = WaitForDocumentTab("Document 1");

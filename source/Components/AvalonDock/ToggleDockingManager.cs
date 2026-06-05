@@ -267,6 +267,14 @@ public class ToggleDockingManager : DockingManager
 	}
 
 	/// <inheritdoc/>
+	protected override void OnDockLayoutChanged(Core.IRootDock oldValue, Core.IRootDock newValue)
+	{
+		base.OnDockLayoutChanged(oldValue, newValue);
+		if (IsLoaded)
+			SetupToggleDockButtonBars();
+	}
+
+	/// <inheritdoc/>
 	protected override void OnThemeChanged(DependencyPropertyChangedEventArgs e)
 	{
 		base.OnThemeChanged(e);

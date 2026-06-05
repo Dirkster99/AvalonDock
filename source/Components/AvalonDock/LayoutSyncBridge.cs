@@ -4,7 +4,9 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 using AvalonDock.Core;
+using AvalonDock.Layout;
 
 namespace AvalonDock
 {
@@ -18,6 +20,12 @@ namespace AvalonDock
 		private ObservableCollection<object> _documentModels;
 		private ObservableCollection<object> _anchorableModels;
 		private bool _isSyncing;
+		private readonly Dictionary<object, AnchorSide> _contentToSide = new Dictionary<object, AnchorSide>();
+
+		/// <summary>
+		/// Gets a read-only view of the content-to-side mapping populated during tree walk.
+		/// </summary>
+		internal IReadOnlyDictionary<object, AnchorSide> ContentToSideMap => _contentToSide;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LayoutSyncBridge"/> class.
@@ -60,6 +68,7 @@ namespace AvalonDock
 			_manager.DocumentsSource = null;
 			_manager.AnchorablesSource = null;
 
+			_contentToSide.Clear();
 			_documentModels = null;
 			_anchorableModels = null;
 		}
@@ -78,10 +87,12 @@ namespace AvalonDock
 			}
 			else if (node is IToolDock toolDock && toolDock.VisibleDockables != null)
 			{
+				var side = AlignmentToAnchorSide(toolDock.Alignment);
 				foreach (var child in toolDock.VisibleDockables)
 				{
 					if (!_anchorableModels.Contains(child))
 						_anchorableModels.Add(child);
+					_contentToSide[child] = side;
 				}
 
 				SubscribeCollection(toolDock.VisibleDockables, OnAnchorableCollectionChanged);
@@ -363,10 +374,12 @@ namespace AvalonDock
 		{
 			if (node is IToolDock toolDock && toolDock.VisibleDockables != null)
 			{
+				var side = AlignmentToAnchorSide(toolDock.Alignment);
 				foreach (var child in toolDock.VisibleDockables)
 				{
 					if (!_anchorableModels.Contains(child))
 						_anchorableModels.Add(child);
+					_contentToSide[child] = side;
 				}
 			}
 
@@ -377,6 +390,18 @@ namespace AvalonDock
 					if (child is IDock)
 						RebuildAnchorablesFromTree(child);
 				}
+			}
+		}
+
+		private static AnchorSide AlignmentToAnchorSide(DockAlignment alignment)
+		{
+			switch (alignment)
+			{
+				case DockAlignment.Left: return AnchorSide.Left;
+				case DockAlignment.Right: return AnchorSide.Right;
+				case DockAlignment.Top: return AnchorSide.Top;
+				case DockAlignment.Bottom: return AnchorSide.Bottom;
+				default: return AnchorSide.Right;
 			}
 		}
 	}
