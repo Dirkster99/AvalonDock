@@ -2,8 +2,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using AvalonDock.Core;
-using AvalonDock.Core.Serialization;
-using AvalonDock.Layout;
+using AvalonDock.Core.Serialization.Dto;
 
 namespace AvalonDock.Serializer.Xml
 {
@@ -14,7 +13,7 @@ namespace AvalonDock.Serializer.Xml
 	/// </summary>
 	public class XmlLayoutSerializer : LayoutSerializerBase
 	{
-		private readonly XmlSerializer _layoutSerializer = XmlSerializersCache.GetSerializer<LayoutRoot>();
+		private static readonly XmlSerializer DtoSerializer = new XmlSerializer(typeof(LayoutRootDto));
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="XmlLayoutSerializer"/> class.
@@ -26,29 +25,37 @@ namespace AvalonDock.Serializer.Xml
 		}
 
 		/// <inheritdoc/>
-		protected override void SerializeCore(Stream stream, ISerializableLayoutRoot layout)
+		protected override void SerializeCore(Stream stream, LayoutRootDto dto)
 		{
-			_layoutSerializer.Serialize(stream, (LayoutRoot)layout);
+			var ns = new XmlSerializerNamespaces();
+			ns.Add(string.Empty, string.Empty);
+			DtoSerializer.Serialize(stream, dto, ns);
 		}
 
 		/// <inheritdoc/>
-		protected override ISerializableLayoutRoot DeserializeCore(Stream stream)
+		protected override LayoutRootDto DeserializeCore(Stream stream)
 		{
-			return (ISerializableLayoutRoot)_layoutSerializer.Deserialize(stream);
+			return (LayoutRootDto)DtoSerializer.Deserialize(stream);
 		}
 
 		/// <summary>Serialize the layout into a <see cref="XmlWriter"/>.</summary>
 		/// <param name="writer">The XML writer to write to.</param>
 		public void Serialize(XmlWriter writer)
 		{
-			_layoutSerializer.Serialize(writer, (LayoutRoot)Manager.Layout);
+			var dto = Manager.DtoMapper.ToDto(Manager.Layout);
+			var ns = new XmlSerializerNamespaces();
+			ns.Add(string.Empty, string.Empty);
+			DtoSerializer.Serialize(writer, dto, ns);
 		}
 
 		/// <summary>Serialize the layout into a <see cref="TextWriter"/>.</summary>
 		/// <param name="writer">The text writer to write to.</param>
 		public void Serialize(TextWriter writer)
 		{
-			_layoutSerializer.Serialize(writer, (LayoutRoot)Manager.Layout);
+			var dto = Manager.DtoMapper.ToDto(Manager.Layout);
+			var ns = new XmlSerializerNamespaces();
+			ns.Add(string.Empty, string.Empty);
+			DtoSerializer.Serialize(writer, dto, ns);
 		}
 
 		/// <summary>Deserialize the layout from a <see cref="TextReader"/>.</summary>

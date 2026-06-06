@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,8 +13,6 @@ namespace AvalonDock.Layout
 	public abstract class LayoutPositionableGroup<T> : LayoutGroup<T>, ILayoutPositionableElementWithActualSize
 		where T : class, ILayoutElement
 	{
-		private static GridLengthConverter _gridLengthConverter = new GridLengthConverter();
-
 		// DockWidth fields
 		private GridLength _dockWidth = new GridLength(1.0, GridUnitType.Star);
 
@@ -333,38 +330,6 @@ namespace AvalonDock.Layout
 
 		/// <inheritdoc/>
 		void ILayoutElementForFloatingWindow.RaiseFloatingPropertiesUpdated() => FloatingPropertiesUpdated?.Invoke(this, EventArgs.Empty);
-
-		/// <inheritdoc/>
-		public override void WriteXml(System.Xml.XmlWriter writer)
-		{
-			if (DockWidth.Value != 1.0 || !DockWidth.IsStar)
-				writer.WriteAttributeString(nameof(DockWidth), _gridLengthConverter.ConvertToInvariantString(DockWidth.IsAbsolute ? new GridLength(FixedDockWidth) : DockWidth));
-			if (DockHeight.Value != 1.0 || !DockHeight.IsStar)
-				writer.WriteAttributeString(nameof(DockHeight), _gridLengthConverter.ConvertToInvariantString(DockHeight.IsAbsolute ? new GridLength(FixedDockHeight) : DockHeight));
-			if (DockMinWidth != 25.0) writer.WriteAttributeString(nameof(DockMinWidth), DockMinWidth.ToString(CultureInfo.InvariantCulture));
-			if (DockMinHeight != 25.0) writer.WriteAttributeString(nameof(DockMinHeight), DockMinHeight.ToString(CultureInfo.InvariantCulture));
-			if (FloatingWidth != 0.0) writer.WriteAttributeString(nameof(FloatingWidth), FloatingWidth.ToString(CultureInfo.InvariantCulture));
-			if (FloatingHeight != 0.0) writer.WriteAttributeString(nameof(FloatingHeight), FloatingHeight.ToString(CultureInfo.InvariantCulture));
-			if (FloatingLeft != 0.0) writer.WriteAttributeString(nameof(FloatingLeft), FloatingLeft.ToString(CultureInfo.InvariantCulture));
-			if (FloatingTop != 0.0) writer.WriteAttributeString(nameof(FloatingTop), FloatingTop.ToString(CultureInfo.InvariantCulture));
-			if (IsMaximized) writer.WriteAttributeString(nameof(IsMaximized), IsMaximized.ToString());
-			base.WriteXml(writer);
-		}
-
-		/// <inheritdoc/>
-		public override void ReadXml(System.Xml.XmlReader reader)
-		{
-			if (reader.MoveToAttribute(nameof(DockWidth))) _dockWidth = (GridLength)_gridLengthConverter.ConvertFromInvariantString(reader.Value);
-			if (reader.MoveToAttribute(nameof(DockHeight))) _dockHeight = (GridLength)_gridLengthConverter.ConvertFromInvariantString(reader.Value);
-			if (reader.MoveToAttribute(nameof(DockMinWidth))) _dockMinWidth = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(DockMinHeight))) _dockMinHeight = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(FloatingWidth))) _floatingWidth = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(FloatingHeight))) _floatingHeight = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(FloatingLeft))) _floatingLeft = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(FloatingTop))) _floatingTop = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(IsMaximized))) _isMaximized = bool.Parse(reader.Value);
-			base.ReadXml(reader);
-		}
 
 		/// <summary>
 		/// Executes the on dock width changed operation.

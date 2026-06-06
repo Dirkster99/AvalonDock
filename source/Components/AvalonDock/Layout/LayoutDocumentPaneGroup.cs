@@ -47,20 +47,6 @@ namespace AvalonDock.Layout
 		/// <inheritdoc/>
 		protected override bool GetVisibility() => true;
 
-		/// <inheritdoc/>
-		public override void WriteXml(System.Xml.XmlWriter writer)
-		{
-			writer.WriteAttributeString(nameof(Orientation), Orientation.ToString());
-			base.WriteXml(writer);
-		}
-
-		/// <inheritdoc/>
-		public override void ReadXml(System.Xml.XmlReader reader)
-		{
-			if (reader.MoveToAttribute(nameof(Orientation))) Orientation = (Orientation)Enum.Parse(typeof(Orientation), reader.Value, true);
-			base.ReadXml(reader);
-		}
-
 #if TRACE
 		/// <inheritdoc />
 		public override void ConsoleDump(int tab)

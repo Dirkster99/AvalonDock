@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using AvalonDock.Core.Serialization;
+using AvalonDock.Core.Serialization.Dto;
 
 namespace AvalonDock.Core
 {
@@ -63,7 +64,8 @@ namespace AvalonDock.Core
 		/// <inheritdoc/>
 		public void Serialize(Stream stream)
 		{
-			SerializeCore(stream, Manager.Layout);
+			var dto = Manager.DtoMapper.ToDto(Manager.Layout);
+			SerializeCore(stream, dto);
 		}
 
 		/// <inheritdoc/>
@@ -73,7 +75,8 @@ namespace AvalonDock.Core
 			{
 				StartDeserialization();
 				CaptureCurrentState();
-				var layout = DeserializeCore(stream);
+				var dto = DeserializeCore(stream);
+				var layout = Manager.DtoMapper.FromDto(dto);
 				FixupLayout(layout);
 				Manager.Layout = layout;
 			}
@@ -97,15 +100,15 @@ namespace AvalonDock.Core
 				Deserialize(stream);
 		}
 
-		/// <summary>Writes the layout to the stream in the concrete format (XML, JSON, etc.).</summary>
+		/// <summary>Writes the layout DTO to the stream in the concrete format (XML, JSON, etc.).</summary>
 		/// <param name="stream">The stream to write to.</param>
-		/// <param name="layout">The layout root to serialize.</param>
-		protected abstract void SerializeCore(Stream stream, ISerializableLayoutRoot layout);
+		/// <param name="dto">The layout root DTO to serialize.</param>
+		protected abstract void SerializeCore(Stream stream, LayoutRootDto dto);
 
-		/// <summary>Reads a layout from the stream in the concrete format.</summary>
+		/// <summary>Reads a layout DTO from the stream in the concrete format.</summary>
 		/// <param name="stream">The stream to read from.</param>
-		/// <returns>The deserialized layout root.</returns>
-		protected abstract ISerializableLayoutRoot DeserializeCore(Stream stream);
+		/// <returns>The deserialized layout root DTO.</returns>
+		protected abstract LayoutRootDto DeserializeCore(Stream stream);
 
 		/// <summary>
 		/// Fixes up a deserialized layout: reconnects previous containers,
