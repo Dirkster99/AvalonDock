@@ -12,15 +12,12 @@ AvalonDock is a WPF Document and Tool Window layout container that is used to ar
 
 AvalonDock is used by [many open source and commercial projects](https://github.com/search?p=4&q=%22dirkster.avalondock%22&type=Code), including:
 
-- [Stride](https://github.com/stride3d/stride) — Free and open-source cross-platform C# game engine (7.6K stars)
-- [Optick](https://github.com/bombomby/optick) — C++ Profiler for Games (3.1K stars)
-- [RoslynPad](https://github.com/roslynpad/roslynpad) — A cross-platform C# editor based on Roslyn and AvalonEdit (2.8K stars)
-- [Squalr](https://github.com/Squalr/Squalr-Sharp) — Memory Editor and Game Hacking Tool (1.6K stars)
-- [WpfDesigner](https://github.com/icsharpcode/WpfDesigner) — The WPF Designer from SharpDevelop (1.1K stars)
-- [DaxStudio](https://github.com/DaxStudio/DaxStudio) — DAX query tool for Power BI and Analysis Services (820 stars)
-- [Macad3D](https://github.com/Macad3D/Macad3D) — Free and open-source 3D Construction Tool (557 stars)
-- [LiveSPICE](https://github.com/dsharlet/LiveSPICE) — Real-time SPICE simulation for audio signals (524 stars)
-- [grzyClothTool](https://github.com/grzybeek/grzyClothTool) — GTA5 addon clothing pack tool (475 stars)
+- [Stride](https://github.com/stride3d/stride) — Free and open-source cross-platform C# game engine
+- [Optick](https://github.com/bombomby/optick) — C++ Profiler for Games
+- [RoslynPad](https://github.com/roslynpad/roslynpad) — A cross-platform C# editor based on Roslyn and AvalonEdit
+- [WpfDesigner](https://github.com/icsharpcode/WpfDesigner) — The WPF Designer from SharpDevelop
+- [DaxStudio](https://github.com/DaxStudio/DaxStudio) — DAX query tool for Power BI and Analysis Services
+- [Macad3D](https://github.com/Macad3D/Macad3D) — Free and open-source 3D Construction Tool
 - [Edi](https://dirkster99.github.io/Edi/) — Open source text editor IDE based on AvalonDock and AvalonEdit (330 stars)
 - [Profile Explorer](https://github.com/microsoft/profile-explorer) — Microsoft CPU profiling trace viewer (273 stars)
 
