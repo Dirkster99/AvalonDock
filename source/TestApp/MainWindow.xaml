@@ -152,7 +152,7 @@
                                 <TextBox x:Name="tbDocument2Timer"
                                     Background="Transparent"
                                     BorderThickness="0"
-                                    Text="{Binding TestTimer, Mode=OneWay, StringFormat='Document 2 Attached to Timer ->\{0\}'}" />
+                                    Text="{Binding TestTimer, RelativeSource={RelativeSource AncestorType=Window}, Mode=OneWay, StringFormat='Document 2 Attached to Timer ->\{0\}'}" />
                             </LayoutDocument>
                         </LayoutDocumentPane>
                     </LayoutDocumentPaneGroup>
@@ -164,7 +164,7 @@
                                 Hiding="OnToolWindow1Hiding">
                                 <StackPanel MinHeight="450" Background="Transparent">
                                     <local:TestUserControl />
-                                <TextBox x:Name="tbToolWindow1Timer" Background="Transparent" Text="{Binding TestTimer, Mode=OneWay, StringFormat='Tool Window 1 Attached to Timer ->\{0\}'}" />
+                                <TextBox x:Name="tbToolWindow1Timer" Background="Transparent" Text="{Binding TestTimer, RelativeSource={RelativeSource AncestorType=Window}, Mode=OneWay, StringFormat='Tool Window 1 Attached to Timer ->\{0\}'}" />
                                 </StackPanel>
                             </LayoutAnchorable>
                             <LayoutAnchorable Title="Tool Window 2" ContentId="toolWindow2">
@@ -181,7 +181,7 @@
                                 Title="AutoHide1 Content"
                                 ContentId="AutoHide1Content"
                                 IconSource="/TestApp;component/Images/address-book--pencil.png">
-                                <TextBox x:Name="tbAutoHide1Timer" Background="Transparent" Text="{Binding TestTimer, Mode=OneWay, StringFormat='AutoHide Attached to Timer ->\{0\}'}" />
+                                <TextBox x:Name="tbAutoHide1Timer" Background="Transparent" Text="{Binding TestTimer, RelativeSource={RelativeSource AncestorType=Window}, Mode=OneWay, StringFormat='AutoHide Attached to Timer ->\{0\}'}" />
                             </LayoutAnchorable>
                             <LayoutAnchorable Title="AutoHide2 Content" ContentId="AutoHide2Content">
                                 <StackPanel x:Name="spAutoHide2" Orientation="Vertical" Background="Transparent">

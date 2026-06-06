@@ -8,7 +8,7 @@ using System.Windows.Markup;
 
 [assembly: ThemeInfo(
 	ResourceDictionaryLocation.None,
-	ResourceDictionaryLocation.SourceAssembly)]
+	ResourceDictionaryLocation.None)]
 
 [assembly: XmlnsDefinition("https://github.com/Dirkster99/AvalonDock", "AvalonDock.Themes")]
 [assembly: XmlnsPrefix("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "AvalonDock.Themes")]
