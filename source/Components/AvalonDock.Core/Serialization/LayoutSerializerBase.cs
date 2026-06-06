@@ -89,15 +89,15 @@ namespace AvalonDock.Core
 		/// <inheritdoc/>
 		public virtual void Serialize(string filepath)
 		{
-			using (var stream = File.Create(filepath))
-				Serialize(stream);
+			using var stream = File.Create(filepath);
+			Serialize(stream);
 		}
 
 		/// <inheritdoc/>
 		public virtual void Deserialize(string filepath)
 		{
-			using (var stream = File.OpenRead(filepath))
-				Deserialize(stream);
+			using var stream = File.OpenRead(filepath);
+			Deserialize(stream);
 		}
 
 		/// <summary>Writes the layout DTO to the stream in the concrete format (XML, JSON, etc.).</summary>

@@ -17,7 +17,7 @@ namespace AvalonDock.Serializer.Json
 	{
 		private readonly Formatting _formatting;
 
-		private static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
+		private readonly JsonSerializerSettings _settings = new JsonSerializerSettings
 		{
 			NullValueHandling = NullValueHandling.Ignore,
 			DefaultValueHandling = DefaultValueHandling.Ignore,
@@ -28,16 +28,22 @@ namespace AvalonDock.Serializer.Json
 		/// Initializes a new instance of the <see cref="JsonLayoutSerializer"/> class.
 		/// </summary>
 		/// <param name="manager">The docking manager whose layout is serialized.</param>
-		public JsonLayoutSerializer(IDockingManager manager)
+		/// <param name="settings">json serializer settings</param>
+		public JsonLayoutSerializer(IDockingManager manager, JsonSerializerSettings settings = null)
 			: base(manager)
 		{
+			if (settings != null)
+			{
+				_settings = settings;
+			}
+
 			_formatting = Formatting.Indented;
 		}
 
 		/// <inheritdoc/>
 		protected override void SerializeCore(Stream stream, LayoutRootDto dto)
 		{
-			var json = JsonConvert.SerializeObject(dto, _formatting, Settings);
+			var json = JsonConvert.SerializeObject(dto, _formatting, _settings);
 			var bytes = Encoding.UTF8.GetBytes(json);
 			stream.Write(bytes, 0, bytes.Length);
 		}
@@ -51,7 +57,7 @@ namespace AvalonDock.Serializer.Json
 				json = reader.ReadToEnd();
 			}
 
-			return JsonConvert.DeserializeObject<LayoutRootDto>(json, Settings);
+			return JsonConvert.DeserializeObject<LayoutRootDto>(json, _settings);
 		}
 
 		/// <summary>
@@ -63,8 +69,8 @@ namespace AvalonDock.Serializer.Json
 			public override bool CanConvert(Type objectType)
 			{
 				return objectType == typeof(LayoutFloatingWindowDto)
-					|| objectType == typeof(LayoutContentDto)
-					|| objectType == typeof(LayoutPositionableGroupDto);
+					   || objectType == typeof(LayoutContentDto)
+					   || objectType == typeof(LayoutPositionableGroupDto);
 			}
 
 			/// <inheritdoc/>
@@ -77,17 +83,19 @@ namespace AvalonDock.Serializer.Json
 			}
 
 			/// <inheritdoc/>
-			public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+			public override object ReadJson(
+				JsonReader reader,
+				Type objectType,
+				object existingValue,
+				JsonSerializer serializer)
 			{
 				var jo = JObject.Load(reader);
 				var typeName = jo["_type"]?.Value<string>();
 
 				var concreteType = ResolveType(typeName, objectType);
 				var result = Activator.CreateInstance(concreteType);
-				using (var jr = jo.CreateReader())
-				{
-					CreateSerializerWithoutThis(serializer).Populate(jr, result);
-				}
+				using var jr = jo.CreateReader();
+				CreateSerializerWithoutThis(serializer).Populate(jr, result);
 
 				return result;
 			}
@@ -122,7 +130,10 @@ namespace AvalonDock.Serializer.Json
 				foreach (var converter in parent.Converters)
 				{
 					if (converter is LayoutDtoJsonConverter)
+					{
 						continue;
+					}
+
 					s.Converters.Add(converter);
 				}
 

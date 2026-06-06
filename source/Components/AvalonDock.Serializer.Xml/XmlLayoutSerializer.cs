@@ -38,16 +38,6 @@ namespace AvalonDock.Serializer.Xml
 			return (LayoutRootDto)DtoSerializer.Deserialize(stream);
 		}
 
-		/// <summary>Serialize the layout into a <see cref="XmlWriter"/>.</summary>
-		/// <param name="writer">The XML writer to write to.</param>
-		public void Serialize(XmlWriter writer)
-		{
-			var dto = Manager.DtoMapper.ToDto(Manager.Layout);
-			var ns = new XmlSerializerNamespaces();
-			ns.Add(string.Empty, string.Empty);
-			DtoSerializer.Serialize(writer, dto, ns);
-		}
-
 		/// <summary>Serialize the layout into a <see cref="TextWriter"/>.</summary>
 		/// <param name="writer">The text writer to write to.</param>
 		public void Serialize(TextWriter writer)
@@ -64,21 +54,6 @@ namespace AvalonDock.Serializer.Xml
 		{
 			var bytes = System.Text.Encoding.UTF8.GetBytes(reader.ReadToEnd());
 			using var ms = new MemoryStream(bytes);
-			Deserialize(ms);
-		}
-
-		/// <summary>Deserialize the layout from a <see cref="XmlReader"/>.</summary>
-		/// <param name="reader">The XML reader to read from.</param>
-		public void Deserialize(XmlReader reader)
-		{
-			using var ms = new MemoryStream();
-			using (var writer = XmlWriter.Create(ms))
-			{
-				writer.WriteNode(reader, true);
-				writer.Flush();
-			}
-
-			ms.Position = 0;
 			Deserialize(ms);
 		}
 	}
