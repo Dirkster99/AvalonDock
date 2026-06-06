@@ -21,7 +21,7 @@ A powerful WPF Document and Tool Window layout container for building Visual Stu
 
 AvalonDock is a WPF layout container that allows you to arrange documents and tool windows in ways similar to many well-known IDEs such as Visual Studio, Eclipse, and PhotoShop. It provides a complete docking system with floating windows, tabbed documents, auto-hide panels, and customizable themes.
 
-Projects like [Edi](https://dirkster99.github.io/Edi/), [Aehnlich](https://github.com/Dirkster99/Aehnlich), and [many others](https://github.com/search?p=4&q=%22dirkster.avalondock%22&type=Code) — both open source and commercial — are powered by AvalonDock.
+AvalonDock is used by [many open source and commercial projects](https://github.com/search?p=4&q=%22dirkster.avalondock%22&type=Code), including [Stride](https://github.com/stride3d/stride) (game engine), [Optick](https://github.com/bombomby/optick) (profiler), [RoslynPad](https://github.com/roslynpad/roslynpad) (C# editor), [DaxStudio](https://github.com/DaxStudio/DaxStudio) (DAX query tool), [Macad3D](https://github.com/Macad3D/Macad3D) (3D CAD), and Microsoft's [Profile Explorer](https://github.com/microsoft/profile-explorer).
 
 ---
 
@@ -78,6 +78,8 @@ Projects like [Edi](https://dirkster99.github.io/Edi/), [Aehnlich](https://githu
 | Package | Description |
 |:--------|:------------|
 | [Dirkster.AvalonDock](https://nuget.org/packages/Dirkster.AvalonDock) | Core docking library |
+| [Dirkster.AvalonDock.Mvvm](https://nuget.org/packages/Dirkster.AvalonDock.Mvvm) | MVVM base classes (no external dependencies) |
+| [Dirkster.AvalonDock.Mvvm.CommunityToolkit](https://nuget.org/packages/Dirkster.AvalonDock.Mvvm.CommunityToolkit) | CommunityToolkit.Mvvm integration |
 | [Dirkster.AvalonDock.Themes.Arc](https://nuget.org/packages/Dirkster.AvalonDock.Themes.Arc) | Modern Arc theme (Dark & Light) |
 | [Dirkster.AvalonDock.Themes.VS2013](https://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013) | VS2013 theme (Dark, Light, Blue) |
 | [Dirkster.AvalonDock.Themes.VS2010](https://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010) | VS2010 theme |

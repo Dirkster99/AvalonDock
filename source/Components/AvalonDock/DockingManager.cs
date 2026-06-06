@@ -99,13 +99,7 @@ namespace AvalonDock
 		/// Override in subclasses to provide a specialized engine.
 		/// </summary>
 		public virtual ILayoutEngine LayoutEngine => _layoutEngine;
-
-		/// <summary>
-		/// Gets the extender providing factory interfaces for visual component creation.
-		/// Themes can set custom factories to override default visual behavior.
-		/// </summary>
-		public DockingManagerExtender Extender { get; } = new DockingManagerExtender();
-
+		
 		/// <summary>
 		/// Indicates whether document source binding is suspended during deserialization.
 		/// </summary>
@@ -387,16 +381,45 @@ namespace AvalonDock
 		/// <summary>Synchronizes the MVVM dock layout with the AvalonDock layout.</summary>
 		private LayoutSyncBridge _syncBridge;
 
+		/// <summary>Tracks the alignment strategy installed by the base DockingManager so it can be cleaned up.</summary>
+		private ILayoutUpdateStrategy _installedAlignmentStrategy;
+
 		private static void OnDockLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
-			var dm = (DockingManager)d;
-			dm._syncBridge?.Detach();
-			dm._syncBridge = null;
+			((DockingManager)d).OnDockLayoutChanged(e.OldValue as Core.IRootDock, e.NewValue as Core.IRootDock);
+		}
 
-			if (e.NewValue is Core.IRootDock rootDock)
+		/// <summary>
+		/// Called when the <see cref="DockLayout"/> property changes.
+		/// Creates/destroys the <see cref="LayoutSyncBridge"/> and installs a
+		/// <see cref="DockAlignmentStrategy"/> when no custom strategy is set.
+		/// </summary>
+		/// <param name="oldValue">The previous root dock, or null.</param>
+		/// <param name="newValue">The new root dock, or null.</param>
+		protected virtual void OnDockLayoutChanged(Core.IRootDock oldValue, Core.IRootDock newValue)
+		{
+			_syncBridge?.Detach();
+			_syncBridge = null;
+
+			if (newValue != null)
 			{
-				dm._syncBridge = new LayoutSyncBridge(dm, rootDock);
-				dm._syncBridge.Attach();
+				_syncBridge = new LayoutSyncBridge(this, newValue);
+				_syncBridge.Attach();
+
+				if (LayoutUpdateStrategy == null)
+				{
+					_installedAlignmentStrategy = new DockAlignmentStrategy(_syncBridge.ContentToSideMap);
+					LayoutUpdateStrategy = _installedAlignmentStrategy;
+				}
+			}
+			else
+			{
+				if (_installedAlignmentStrategy != null && LayoutUpdateStrategy == _installedAlignmentStrategy)
+				{
+					LayoutUpdateStrategy = null;
+				}
+
+				_installedAlignmentStrategy = null;
 			}
 		}
 

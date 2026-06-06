@@ -20,7 +20,12 @@ For a full step-by-step tutorial, see [Tutorial: MVVM IDE Application]({% link t
 ```bash
 dotnet add package Dirkster.AvalonDock.Mvvm
 dotnet add package Dirkster.AvalonDock.DependencyInjection
-dotnet add package CommunityToolkit.Mvvm
+```
+
+If you want to use CommunityToolkit.Mvvm source generators (`[ObservableProperty]`, `[RelayCommand]`), also install:
+
+```bash
+dotnet add package Dirkster.AvalonDock.Mvvm.CommunityToolkit
 ```
 
 ---
@@ -31,11 +36,20 @@ In v5, the layout tree is built automatically from registered `IToolbox` instanc
 
 ### Base Classes
 
+**`AvalonDock.Mvvm`** (no external dependencies):
+
 | Class | Use For | Key Properties |
 |:------|:--------|:---------------|
 | `ToolboxBase` | Tool panels (Explorer, Output, etc.) | `Zone`, `Icon`, `IsOpenByDefault`, `ToolTipText` |
-| `Document` | Document tabs (file editors) | `Title`, `Id`, `IsModified` |
-| `DockableBase` | Abstract base for both | `CanClose`, `CanFloat`, `CanDrag`, `IsActive` |
+| `DockableBase` | Abstract base for all dockables | `CanClose`, `CanFloat`, `CanDrag`, `IsActive` |
+
+**`AvalonDock.Mvvm.CommunityToolkit`** (for `[ObservableProperty]` / `[RelayCommand]` support):
+
+| Class | Use For | Key Properties |
+|:------|:--------|:---------------|
+| `ObservableToolboxBase` | Tool panels with source generators | Same as `ToolboxBase`, backed by `ObservableObject` |
+| `ObservableDockableBase` | Abstract base with source generators | Same as `DockableBase`, backed by `ObservableObject` |
+| `ObservableDocument` / `ObservableTool` | Leaf dockables | Concrete classes for documents and tools |
 
 ### Define a Toolbox
 
@@ -57,14 +71,48 @@ public class ExplorerToolbox : ToolboxBase
 
 ### Define a Document
 
+Using `AvalonDock.Mvvm.CommunityToolkit` (with `[ObservableProperty]` support):
+
 ```csharp
-using AvalonDock.Mvvm;
+using AvalonDock.Mvvm.CommunityToolkit;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-public partial class EditorTab : Document
+public partial class EditorTab : ObservableDocument
 {
     [ObservableProperty] private string _content = string.Empty;
     [ObservableProperty] private string _filePath = string.Empty;
+
+    public void LoadFile(string path)
+    {
+        FilePath = path;
+        Title = System.IO.Path.GetFileName(path);
+        Id = path;
+        Content = System.IO.File.ReadAllText(path);
+    }
+}
+```
+
+Using `AvalonDock.Mvvm` (no external dependencies):
+
+```csharp
+using AvalonDock.Mvvm;
+
+public class EditorTab : DockableBase
+{
+    private string _content = string.Empty;
+    private string _filePath = string.Empty;
+
+    public string Content
+    {
+        get => _content;
+        set => SetProperty(ref _content, value);
+    }
+
+    public string FilePath
+    {
+        get => _filePath;
+        set => SetProperty(ref _filePath, value);
+    }
 
     public void LoadFile(string path)
     {

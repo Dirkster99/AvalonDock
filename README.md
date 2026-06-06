@@ -10,7 +10,16 @@ Support this project with a :star: — report an issue, or even better, place a 
 
 AvalonDock is a WPF Document and Tool Window layout container that is used to arrange documents and tool windows in similar ways to many well known IDEs, such as Visual Studio, Eclipse, JetBrains Rider, and more. **Version 5.0** introduces first-class MVVM support, dependency injection integration, and a modular package architecture.
 
-My projects [Edi](https://dirkster99.github.io/Edi/), [Aehnlich](https://github.com/Dirkster99/Aehnlich), and [many others](https://github.com/search?p=4&q=%22dirkster.avalondock%22&type=Code) (open source and commercial) are powered by this project.
+AvalonDock is used by [many open source and commercial projects](https://github.com/search?p=4&q=%22dirkster.avalondock%22&type=Code), including:
+
+- [Stride](https://github.com/stride3d/stride) — Free and open-source cross-platform C# game engine
+- [Optick](https://github.com/bombomby/optick) — C++ Profiler for Games
+- [RoslynPad](https://github.com/roslynpad/roslynpad) — A cross-platform C# editor based on Roslyn and AvalonEdit
+- [WpfDesigner](https://github.com/icsharpcode/WpfDesigner) — The WPF Designer from SharpDevelop
+- [DaxStudio](https://github.com/DaxStudio/DaxStudio) — DAX query tool for Power BI and Analysis Services
+- [Macad3D](https://github.com/Macad3D/Macad3D) — Free and open-source 3D Construction Tool
+- [Edi](https://dirkster99.github.io/Edi/) — Open source text editor IDE based on AvalonDock and AvalonEdit (330 stars)
+- [Profile Explorer](https://github.com/microsoft/profile-explorer) — Microsoft CPU profiling trace viewer (273 stars)
 
 Be sure to check out the [Wiki](https://github.com/Dirkster99/AvalonDock/wiki) and the [documentation site](docs/) for tutorials and API reference.
 
@@ -24,7 +33,8 @@ Be sure to check out the [Wiki](https://github.com/Dirkster99/AvalonDock/wiki) a
 |:--------|:----------|:------------|
 | [Dirkster.AvalonDock](http://nuget.org/packages/Dirkster.AvalonDock) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.svg)](http://nuget.org/packages/Dirkster.AvalonDock) | Main WPF docking framework package |
 | [Dirkster.AvalonDock.Core](http://nuget.org/packages/Dirkster.AvalonDock.Core) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Core.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Core) | UI-agnostic interfaces and models |
-| [Dirkster.AvalonDock.Mvvm](http://nuget.org/packages/Dirkster.AvalonDock.Mvvm) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Mvvm.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Mvvm) | MVVM base classes (`DockableBase`, `ToolboxBase`, `DockLayoutService`) |
+| [Dirkster.AvalonDock.Mvvm](http://nuget.org/packages/Dirkster.AvalonDock.Mvvm) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Mvvm.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Mvvm) | MVVM base classes (`DockableBase`, `ToolboxBase`, `DockLayoutService`) — no external dependencies |
+| [Dirkster.AvalonDock.Mvvm.CommunityToolkit](http://nuget.org/packages/Dirkster.AvalonDock.Mvvm.CommunityToolkit) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Mvvm.CommunityToolkit.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Mvvm.CommunityToolkit) | CommunityToolkit.Mvvm integration (`ObservableDockableBase`, `ObservableToolboxBase`) with `[ObservableProperty]` support |
 | [Dirkster.AvalonDock.DependencyInjection](http://nuget.org/packages/Dirkster.AvalonDock.DependencyInjection) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.DependencyInjection.svg)](http://nuget.org/packages/Dirkster.AvalonDock.DependencyInjection) | `IServiceCollection` extensions for DI registration |
 
 ### Serializers
@@ -54,6 +64,7 @@ Install the packages you need:
 ```bash
 dotnet add package Dirkster.AvalonDock
 dotnet add package Dirkster.AvalonDock.Mvvm
+dotnet add package Dirkster.AvalonDock.Mvvm.CommunityToolkit  # optional, for [ObservableProperty] support
 dotnet add package Dirkster.AvalonDock.DependencyInjection
 dotnet add package Dirkster.AvalonDock.Themes.Arc
 ```
@@ -145,9 +156,13 @@ For a complete walkthrough, see the [Dependency Injection tutorial](docs/tutoria
 
 ## MVVM
 
-The `AvalonDock.Mvvm` package provides ready-to-use view model base classes built on [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet). These classes implement the core interfaces from `AvalonDock.Core` and handle property change notifications, serialization attributes, and docking behavior out of the box.
+The `AvalonDock.Mvvm` package provides ready-to-use view model base classes with zero external dependencies. These classes implement the core interfaces from `AvalonDock.Core` and handle property change notifications, serialization attributes, and docking behavior out of the box.
+
+For projects using [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) source generators (`[ObservableProperty]`, `[RelayCommand]`), install the optional `AvalonDock.Mvvm.CommunityToolkit` package which provides `ObservableObject`-based equivalents.
 
 ### Base Classes
+
+**`AvalonDock.Mvvm`** (no external dependencies):
 
 | Class | Purpose |
 |:------|:--------|
@@ -157,9 +172,19 @@ The `AvalonDock.Mvvm` package provides ready-to-use view model base classes buil
 | `RootDock` | Root of the layout tree — manages floating and pinned dockables |
 | `DocumentDock` | Container for document tabs |
 | `ToolDock` | Container for tool windows with `Alignment` and `AutoHide` support |
-| `Document` / `Tool` | Leaf nodes for document and tool content |
+
+**`AvalonDock.Mvvm.CommunityToolkit`** (requires CommunityToolkit.Mvvm):
+
+| Class | Purpose |
+|:------|:--------|
+| `ObservableDockableBase` | `ObservableObject`-based equivalent of `DockableBase` — supports `[ObservableProperty]` and `[RelayCommand]` |
+| `ObservableToolboxBase` | `ObservableObject`-based equivalent of `ToolboxBase` |
+| `ObservableDockBase` | `ObservableObject`-based equivalent of `DockBase` |
+| `ObservableDocument` / `ObservableTool` | Leaf dockable classes for documents and tools |
 
 ### Creating a Toolbox View Model
+
+Using `AvalonDock.Mvvm` (no external dependencies):
 
 ```csharp
 using AvalonDock.Core;
@@ -173,6 +198,28 @@ public class ExplorerToolbox : ToolboxBase
         Title = "Explorer";
         Zone = DockZone.LeftTop;        // Sidebar placement zone
         IsOpenByDefault = true;          // Open when app starts
+        ToolTipText = "Solution Explorer";
+    }
+}
+```
+
+Using `AvalonDock.Mvvm.CommunityToolkit` (with `[ObservableProperty]` support):
+
+```csharp
+using AvalonDock.Core;
+using AvalonDock.Mvvm.CommunityToolkit;
+using CommunityToolkit.Mvvm.ComponentModel;
+
+public partial class ExplorerToolbox : ObservableToolboxBase
+{
+    [ObservableProperty] private string _searchFilter = string.Empty;
+
+    public ExplorerToolbox()
+    {
+        Id = "Explorer";
+        Title = "Explorer";
+        Zone = DockZone.LeftTop;
+        IsOpenByDefault = true;
         ToolTipText = "Solution Explorer";
     }
 }
@@ -242,8 +289,11 @@ AvalonDock v5 is organized into modular packages with clear separation of concer
 AvalonDock.Core            UI-agnostic interfaces (IDockable, IDock, IFactory, IToolbox, etc.)
   └── netstandard2.0       Cross-platform abstractions
 
-AvalonDock.Mvvm            CommunityToolkit.Mvvm view models (DockableBase, ToolboxBase, etc.)
+AvalonDock.Mvvm            MVVM base classes (DockableBase, ToolboxBase, etc.) — no external deps
   └── netstandard2.0
+
+AvalonDock.Mvvm.CommunityToolkit  CommunityToolkit.Mvvm integration ([ObservableProperty] support)
+  └── netstandard2.0, net9.0
 
 AvalonDock.DependencyInjection  IServiceCollection extensions
   └── netstandard2.0

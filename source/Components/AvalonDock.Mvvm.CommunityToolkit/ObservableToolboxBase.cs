@@ -1,21 +1,21 @@
 using System.Runtime.Serialization;
 using AvalonDock.Core;
 
-namespace AvalonDock.Mvvm
+namespace AvalonDock.Mvvm.CommunityToolkit
 {
 	/// <summary>
-	/// Base class for toolbox (anchorable tool) view models in the toggle docking system.
-	/// Inherits from <see cref="DockableBase"/> and implements <see cref="IToolbox"/>.
+	/// Base class for toolbox (anchorable tool) view models backed by
+	/// <see cref="global::CommunityToolkit.Mvvm.ComponentModel.ObservableObject"/>.
+	/// Supports <c>[ObservableProperty]</c> and <c>[RelayCommand]</c> source generators.
 	/// </summary>
 	/// <remarks>
-	/// <para>Inherit from this class for your toolbox ViewModels. Set <see cref="Zone"/>
-	/// in the constructor to control placement. Override <see cref="DockableBase.Title"/>
-	/// and <see cref="DockableBase.Id"/> for display and serialization.</para>
-	/// <para>Register with DI using <c>services.AddToolbox&lt;T&gt;()</c> and they will
-	/// be automatically placed into the ToggleDockingManager layout.</para>
+	/// <para>Inherit from this class for your toolbox ViewModels when using
+	/// CommunityToolkit.Mvvm source generators. Set <see cref="Zone"/> in the
+	/// constructor to control placement.</para>
+	/// <para>Register with DI using <c>services.AddToolbox&lt;T&gt;()</c>.</para>
 	/// </remarks>
 	[DataContract]
-	public abstract class ToolboxBase : DockableBase, IToolbox
+	public abstract class ObservableToolboxBase : ObservableDockableBase, IToolbox
 	{
 		private string? _toolTipText;
 		private DockZone _zone = DockZone.LeftTop;

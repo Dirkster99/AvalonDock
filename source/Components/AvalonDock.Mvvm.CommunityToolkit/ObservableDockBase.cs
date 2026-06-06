@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using AvalonDock.Core;
 
-namespace AvalonDock.Mvvm
+namespace AvalonDock.Mvvm.CommunityToolkit
 {
 	/// <summary>
-	/// Base class for dock containers (holds multiple dockables).
+	/// Base class for dock containers backed by <see cref="global::CommunityToolkit.Mvvm.ComponentModel.ObservableObject"/>.
+	/// Supports <c>[ObservableProperty]</c> and <c>[RelayCommand]</c> source generators.
 	/// </summary>
 	[DataContract]
-	public abstract class DockBase : DockableBase, IDock
+	public abstract class ObservableDockBase : ObservableDockableBase, IDock
 	{
 		private IList<IDockable>? _visibleDockables;
 		private IDockable? _activeDockable;

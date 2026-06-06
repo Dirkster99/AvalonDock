@@ -1,18 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using AvalonDock.Core;
+using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace AvalonDock.Mvvm
+namespace AvalonDock.Mvvm.CommunityToolkit
 {
 	/// <summary>
-	/// Base class for all dockable view models.
-	/// Properties decorated with [DataMember] are serialized; [IgnoreDataMember] are runtime-only.
+	/// Base class for dockable view models backed by <see cref="ObservableObject"/>
+	/// from CommunityToolkit.Mvvm. Supports <c>[ObservableProperty]</c> and
+	/// <c>[RelayCommand]</c> source generators in derived classes.
 	/// </summary>
 	[DataContract]
-	public abstract class DockableBase : INotifyPropertyChanged, IDockable
+	public abstract class ObservableDockableBase : ObservableObject, IDockable
 	{
 		private string _id = string.Empty;
 		private string _title = string.Empty;
@@ -27,9 +25,6 @@ namespace AvalonDock.Mvvm
 		private bool _isModified;
 		private bool _isActive;
 		private DockState _dockState = DockState.Docked;
-
-		/// <inheritdoc/>
-		public event PropertyChangedEventHandler? PropertyChanged;
 
 		/// <summary>
 		/// Gets or sets the unique identifier of the dockable.
@@ -172,42 +167,6 @@ namespace AvalonDock.Mvvm
 		/// </summary>
 		public virtual void OnSelected()
 		{
-		}
-
-		/// <summary>
-		/// Raises the <see cref="PropertyChanged"/> event.
-		/// </summary>
-		/// <param name="e">The event args containing the property name.</param>
-		protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
-		{
-			PropertyChanged?.Invoke(this, e);
-		}
-
-		/// <summary>
-		/// Raises the <see cref="PropertyChanged"/> event for the specified property.
-		/// </summary>
-		/// <param name="propertyName">The property name.</param>
-		protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-		{
-			OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-		}
-
-		/// <summary>
-		/// Sets a property value and raises <see cref="PropertyChanged"/> if the value changed.
-		/// </summary>
-		/// <typeparam name="T">The type of the property.</typeparam>
-		/// <param name="field">A reference to the backing field.</param>
-		/// <param name="value">The new value.</param>
-		/// <param name="propertyName">The property name (auto-filled by the compiler).</param>
-		/// <returns><see langword="true"/> if the value changed; otherwise, <see langword="false"/>.</returns>
-		protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-		{
-			if (EqualityComparer<T>.Default.Equals(field, value))
-				return false;
-
-			field = value;
-			OnPropertyChanged(propertyName);
-			return true;
 		}
 	}
 }

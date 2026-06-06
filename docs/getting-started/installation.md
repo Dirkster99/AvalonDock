@@ -62,7 +62,8 @@ For advanced scenarios, AvalonDock provides additional packages:
 |:--------|:----------------|:--------|
 | Serializer (XML) | `dotnet add package Dirkster.AvalonDock.Serializer.Xml` | Save/restore layouts in XML format |
 | Serializer (JSON) | `dotnet add package Dirkster.AvalonDock.Serializer.Json` | Save/restore layouts in JSON format |
-| MVVM | `dotnet add package Dirkster.AvalonDock.Mvvm` | MVVM base classes and services |
+| MVVM | `dotnet add package Dirkster.AvalonDock.Mvvm` | MVVM base classes and services (no external dependencies) |
+| MVVM + CommunityToolkit | `dotnet add package Dirkster.AvalonDock.Mvvm.CommunityToolkit` | `ObservableObject`-based classes with `[ObservableProperty]` support |
 | DI | `dotnet add package Dirkster.AvalonDock.DependencyInjection` | Dependency injection integration |
 
 ---

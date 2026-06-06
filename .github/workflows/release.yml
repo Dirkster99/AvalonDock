@@ -90,6 +90,7 @@ jobs:
             "source/Components/AvalonDock.Core/AvalonDock.Core.csproj"
             "source/Components/AvalonDock.DependencyInjection/AvalonDock.DependencyInjection.csproj"
             "source/Components/AvalonDock.Mvvm/AvalonDock.Mvvm.csproj"
+            "source/Components/AvalonDock.Mvvm.CommunityToolkit/AvalonDock.Mvvm.CommunityToolkit.csproj"
             "source/Components/AvalonDock.Serializer.Json/AvalonDock.Serializer.Json.csproj"
             "source/Components/AvalonDock.Serializer.Xml/AvalonDock.Serializer.Xml.csproj"
             "source/Components/AvalonDock.Themes.Aero/AvalonDock.Themes.Aero.csproj"
@@ -130,10 +131,17 @@ jobs:
         run: |
           packages=(
             "Dirkster.AvalonDock"
+            "Dirkster.AvalonDock.Core"
+            "Dirkster.AvalonDock.DependencyInjection"
+            "Dirkster.AvalonDock.Mvvm"
+            "Dirkster.AvalonDock.Mvvm.CommunityToolkit"
+            "Dirkster.AvalonDock.Serializer.Json"
+            "Dirkster.AvalonDock.Serializer.Xml"
             "Dirkster.AvalonDock.Themes.Aero"
             "Dirkster.AvalonDock.Themes.Arc"
-            "Dirkster.AvalonDock.Themes.Metro"
             "Dirkster.AvalonDock.Themes.Expression"
+            "Dirkster.AvalonDock.Themes.Metro"
+            "Dirkster.AvalonDock.Themes.VS"
             "Dirkster.AvalonDock.Themes.VS2010"
             "Dirkster.AvalonDock.Themes.VS2013"
           )

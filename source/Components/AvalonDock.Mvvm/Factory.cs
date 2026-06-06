@@ -5,7 +5,7 @@ using AvalonDock.Core;
 namespace AvalonDock.Mvvm
 {
 	/// <summary>
-	/// Concrete factory using CommunityToolkit.Mvvm view models.
+	/// Concrete factory using AvalonDock.Mvvm view models.
 	/// Users inherit from this class and override <see cref="CreateLayout"/> to define their layout.
 	/// </summary>
 	public class Factory : FactoryBase
