@@ -71,6 +71,21 @@ dotnet add package Dirkster.AvalonDock.Themes.Arc
 
 ---
 
+## Docking Manager
+The `DockingManager` control is the main entry point for using AvalonDock in your WPF application. It provides the core docking functionality, including layout management, drag-and-drop support, and theme integration.
+AvalonDock also includes a `ToggleDockingManager` which adds a built-in sidebar for toggling tool windows, similar to VS Code's or Jetbrains IDE's behavior.
+
+### DockingManager
+
+The standard `DockingManager` provides a blank canvas for custom layouts and is ideal for applications that require full control over the docking behavior and UI.
+
+<img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Light/Document.png" alt="ClassicDockingManager" width="800">
+
+### ToggleDockingManager
+
+The `ToggleDockingManager` includes a built-in sidebar that automatically populates with registered tool windows (anchorable view models). This is perfect for applications that want a modern, out-of-the-box docking experience without manual layout management.
+<img src="docs/images/AvalonDockCodeApp_Dark_Welcome.png" alt="AvalonDockCodeApp Dark Welcome" width="800">
+
 ## Dependency Injection
 
 The `AvalonDock.DependencyInjection` package provides `IServiceCollection` extension methods to wire up the entire docking system through your DI container. This replaces manual `DocumentsSource`/`AnchorablesSource` binding with a clean, service-oriented composition root.
@@ -273,12 +288,21 @@ public class MainViewModel
 
 ### XAML Binding
 
+For the `ToggleDockingManager`, bind the `DockLayout` property to your view model:
+
 ```xml
 <avalonDock:ToggleDockingManager x:Name="dockManager"
     DockLayout="{Binding DockLayout}"
     LayoutItemContainerStyleSelector="{StaticResource PanesStyleSelector}" />
 ```
 
+For the classic `DockingManager`, bind the `DockLayout` to the `Layout` property:
+
+```xml
+<avalonDock:DockingManager x:Name="dockManager"
+    Layout="{Binding DockLayout}"
+    LayoutItemContainerStyleSelector="{StaticResource PanesStyleSelector}" />
+```
 ---
 
 ## Architecture (v5.0)
@@ -376,7 +400,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 ## Screenshots
 
-The Docking Buttons are [defined in XAML](https://github.com/Dirkster99/AvalonDock/wiki/OverlayWindow), which ensures a good looking image on all resolutions, even 4K or 8K, and enables consistent color theming.
+The Docking Buttons are [defined in XAML](https://github.com/Dirkster99/Docu/master/AvalonDock/wiki/OverlayWindow), which ensures a good looking image on all resolutions, even 4K or 8K, and enables consistent color theming.
 
 <table width="100%">
    <tr>
