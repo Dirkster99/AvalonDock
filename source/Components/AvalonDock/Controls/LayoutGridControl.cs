@@ -256,13 +256,21 @@ namespace AvalonDock.Controls
 				{
 					var cm = _model.Children[iModel] as ILayoutPositionableElement;
 					ColumnDefinitions.Add(new ColumnDefinition { Width = cm.IsVisible ? cm.DockWidth : new GridLength(0, GridUnitType.Pixel), MinWidth = cm.IsVisible ? cm.CalculatedDockMinWidth() : 0 });
+#if HAS_UNO
+					WinUIGrid.SetColumn((Microsoft.UI.Xaml.FrameworkElement)Children[iChild], iCol);
+#else
 					WinUIGrid.SetColumn(Children[iChild], iCol);
+#endif
 					if (iChild >= Children.Count - 1) continue;
 					iChild++; iCol++;
 					bool nv = false;
 					for (var i = iModel + 1; i < _model.Children.Count; i++) if ((_model.Children[i] as ILayoutPositionableElement).IsVisible) { nv = true; break; }
 					ColumnDefinitions.Add(new ColumnDefinition { Width = cm.IsVisible && nv ? new GridLength(manager.GridSplitterWidth) : new GridLength(0, GridUnitType.Pixel) });
+#if HAS_UNO
+					WinUIGrid.SetColumn((Microsoft.UI.Xaml.FrameworkElement)Children[iChild], iCol);
+#else
 					WinUIGrid.SetColumn(Children[iChild], iCol);
+#endif
 				}
 			}
 			else
@@ -272,13 +280,21 @@ namespace AvalonDock.Controls
 				{
 					var cm = _model.Children[iModel] as ILayoutPositionableElement;
 					RowDefinitions.Add(new RowDefinition { Height = cm.IsVisible ? cm.DockHeight : new GridLength(0, GridUnitType.Pixel), MinHeight = cm.IsVisible ? cm.CalculatedDockMinHeight() : 0 });
+#if HAS_UNO
+					WinUIGrid.SetRow((Microsoft.UI.Xaml.FrameworkElement)Children[iChild], iRow);
+#else
 					WinUIGrid.SetRow(Children[iChild], iRow);
+#endif
 					if (iChild >= Children.Count - 1) continue;
 					iChild++; iRow++;
 					bool nv = false;
 					for (var i = iModel + 1; i < _model.Children.Count; i++) if ((_model.Children[i] as ILayoutPositionableElement).IsVisible) { nv = true; break; }
 					RowDefinitions.Add(new RowDefinition { Height = cm.IsVisible && nv ? new GridLength(manager.GridSplitterHeight) : new GridLength(0, GridUnitType.Pixel) });
+#if HAS_UNO
+					WinUIGrid.SetRow((Microsoft.UI.Xaml.FrameworkElement)Children[iChild], iRow);
+#else
 					WinUIGrid.SetRow(Children[iChild], iRow);
+#endif
 				}
 			}
 		}
