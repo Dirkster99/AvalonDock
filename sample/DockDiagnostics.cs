@@ -236,6 +236,69 @@ public static class DockDiagnostics
         return $"ActiveContent={active?.GetType().Name ?? "null"} LayoutActive={layoutActive?.Title ?? "null"}";
     });
 
+    [DevFlowAction("dock-manager-border-probe",
+        Description = "Report DockingManager template-root visual chain and border values.")]
+    public static string ManagerBorderProbe() => RunOnUi(() =>
+    {
+        var dockManager = GetDockManager();
+        if (dockManager == null)
+        {
+            return "no DockingManager";
+        }
+
+        dockManager.ApplyTemplate();
+        return string.Join("; ", EnumerateVisuals(dockManager, 3).Select(DescribeVisual));
+    });
+
+    [DevFlowAction("dock-border-scan",
+        Description = "Report visible Border elements under DockingManager up to the given visual-tree depth.")]
+    public static string BorderScan(int maxDepth = 8) => RunOnUi(() =>
+    {
+        var dockManager = GetDockManager();
+        if (dockManager == null)
+        {
+            return "no DockingManager";
+        }
+
+        dockManager.ApplyTemplate();
+        var rows = EnumerateVisuals(dockManager, maxDepth)
+            .Where(item => item.Visual is System.Windows.Controls.Border)
+            .Select(DescribeVisual)
+            .ToList();
+
+        return rows.Count == 0 ? "no Border visuals" : string.Join("; ", rows);
+    });
+
+    [DevFlowAction("dock-tool-pane-border-probe",
+        Description = "Report the first visible tool pane visual tree, including border layers and tab items.")]
+    public static string ToolPaneBorderProbe(int maxDepth = 10) => RunOnUi(() =>
+    {
+        var dockManager = GetDockManager();
+        if (dockManager == null)
+        {
+            return "no DockingManager";
+        }
+
+        dockManager.ApplyTemplate();
+        var pane = FindVisualDescendants<LayoutAnchorablePaneControl>(dockManager)
+            .FirstOrDefault(p => p.IsVisible && p.ActualWidth > 0 && p.ActualHeight > 0);
+        if (pane == null)
+        {
+            return "no visible LayoutAnchorablePaneControl";
+        }
+
+        pane.ApplyTemplate();
+        var rows = EnumerateVisuals(pane, maxDepth)
+            .Where(item => item.Visual is System.Windows.Controls.Border
+                           || item.Visual is System.Windows.Controls.TabItem
+                           || item.Visual is LayoutAnchorableControl
+                           || item.Visual.GetType().Name.Contains("AnchorablePaneTabPanel"))
+            .Select(DescribeVisual)
+            .ToList();
+
+        return rows.Count == 0 ? "no tool pane visuals" : string.Join("; ", rows);
+    });
+
     [DevFlowAction("dock-show-compass",
         Description = "Show overlay compass for parity screenshots (mirrors Uno ShowOverlayForDiagnostics).")]
     public static string ShowCompass() => RunOnUi(() =>
@@ -269,4 +332,57 @@ public static class DockDiagnostics
             }
         }
     }
+
+    private static IEnumerable<(DependencyObject Visual, int Depth)> EnumerateVisuals(DependencyObject root, int maxDepth)
+    {
+        var stack = new Stack<(DependencyObject Visual, int Depth)>();
+        stack.Push((root, 0));
+        while (stack.Count > 0)
+        {
+            var (visual, depth) = stack.Pop();
+            yield return (visual, depth);
+            if (depth >= maxDepth)
+            {
+                continue;
+            }
+
+            var count = VisualTreeHelper.GetChildrenCount(visual);
+            for (var index = count - 1; index >= 0; index--)
+            {
+                stack.Push((VisualTreeHelper.GetChild(visual, index), depth + 1));
+            }
+        }
+    }
+
+    private static string DescribeVisual((DependencyObject Visual, int Depth) item)
+    {
+        var visual = item.Visual;
+        var name = visual is FrameworkElement fe && !string.IsNullOrWhiteSpace(fe.Name)
+            ? $"#{fe.Name}"
+            : "";
+        var size = visual is FrameworkElement sizeElement
+            ? $" size={sizeElement.ActualWidth:F1}x{sizeElement.ActualHeight:F1}"
+            : "";
+        var grid = visual is UIElement uiElement
+            ? $" grid=({System.Windows.Controls.Grid.GetRow(uiElement)},{System.Windows.Controls.Grid.GetColumn(uiElement)},rs={System.Windows.Controls.Grid.GetRowSpan(uiElement)},cs={System.Windows.Controls.Grid.GetColumnSpan(uiElement)})"
+            : "";
+
+        var border = visual is System.Windows.Controls.Border borderElement
+            ? $" bg={BrushText(borderElement.Background)} border={BrushText(borderElement.BorderBrush)} thickness={borderElement.BorderThickness}"
+            : "";
+
+        var control = visual is System.Windows.Controls.Control controlElement
+            ? $" bg={BrushText(controlElement.Background)} border={BrushText(controlElement.BorderBrush)} thickness={controlElement.BorderThickness}"
+            : "";
+
+        return $"d{item.Depth}:{visual.GetType().Name}{name}{size}{grid}{border}{control}";
+    }
+
+    private static string BrushText(Brush? brush)
+        => brush switch
+        {
+            null => "null",
+            SolidColorBrush solid => solid.Color.ToString(),
+            _ => brush.ToString()
+        };
 }

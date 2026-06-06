@@ -29,6 +29,6 @@ public partial class App : System.Windows.Application
             return parsedPort;
         }
 
-        return DevFlowAgentPortResolver.GetPortFromAssemblyMetadata() ?? AgentOptions.DefaultPort;
+        return DevFlowAgentPortResolver.GetPortFromAssemblyMetadata() ?? 5500;
     }
 }
