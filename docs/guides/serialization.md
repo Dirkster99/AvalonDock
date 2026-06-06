@@ -159,6 +159,74 @@ The serializer does **not** preserve:
 
 ---
 
+## Architecture: DTO-Based Serialization
+
+Under the hood, AvalonDock v5 uses a DTO (Data Transfer Object) layer to decouple the WPF layout tree from the serialization format. This enables both XML and JSON serializers to share the same mapping logic, and makes it possible to implement custom serializers.
+
+### Data Flow
+
+```
+Save:  LayoutRoot → LayoutDtoMapper.ToDto() → LayoutRootDto → Serializer → File
+Load:  File → Serializer → LayoutRootDto → LayoutDtoMapper.FromDto() → LayoutRoot
+```
+
+The `ILayoutDtoMapper` interface defines the mapping:
+
+```csharp
+public interface ILayoutDtoMapper
+{
+    LayoutRootDto ToDto(ISerializableLayoutRoot layout);
+    ISerializableLayoutRoot FromDto(LayoutRootDto dto);
+}
+```
+
+### DTO Classes
+
+All DTOs live in `AvalonDock.Core.Serialization.Dto`:
+
+| DTO | Maps To |
+|:----|:--------|
+| `LayoutRootDto` | Root container (panels, sides, floating windows, hidden items) |
+| `LayoutPanelDto` | Panel with orientation and children |
+| `LayoutDocumentPaneDto` | Document tab container |
+| `LayoutAnchorablePaneDto` | Tool window container |
+| `LayoutDocumentPaneGroupDto` | Splitter group for document panes |
+| `LayoutAnchorablePaneGroupDto` | Splitter group for tool panes |
+| `LayoutDocumentDto` | Individual document |
+| `LayoutAnchorableDto` | Individual tool window |
+| `LayoutFloatingWindowDto` | Floating window (document or anchorable variant) |
+| `LayoutAnchorSideDto` | Auto-hide side |
+| `LayoutAnchorGroupDto` | Auto-hide group |
+
+### Custom Serializer
+
+To implement a custom serialization format, extend `LayoutSerializerBase` and override two methods:
+
+```csharp
+using AvalonDock.Core.Serialization;
+using AvalonDock.Core.Serialization.Dto;
+
+public class YamlLayoutSerializer : LayoutSerializerBase
+{
+    public YamlLayoutSerializer(IDockingManager manager) : base(manager) { }
+
+    protected override void SerializeCore(Stream stream, LayoutRootDto dto)
+    {
+        // Serialize the DTO tree to your format
+    }
+
+    protected override LayoutRootDto DeserializeCore(Stream stream)
+    {
+        // Deserialize your format back to a DTO tree
+        return dto;
+    }
+}
+```
+
+The base class handles all fixup logic: reconnecting content via `LayoutSerializationCallback`, restoring previous containers, and cleaning up empty panes.
+
+---
+
 ## Auto-Save on Exit
 
 A common pattern is to save the layout when the application closes:

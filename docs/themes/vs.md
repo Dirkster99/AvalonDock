@@ -8,7 +8,7 @@ description: "The Visual Studio theme for AvalonDock."
 
 # VS Theme (.vstheme)
 
-Classic Visual Studio styling with three color variants based on .vstheme files. A well-tested, polished theme suitable for professional IDE-like applications.
+Visual Studio styling based on `.vstheme` files. Includes three built-in VS2015 variants and supports loading custom `.vstheme` or `.vstheme.gz` (gzip-compressed) files.
 
 ---
 
@@ -18,19 +18,76 @@ Classic Visual Studio styling with three color variants based on .vstheme files.
 dotnet add package Dirkster.AvalonDock.Themes.VS
 ```
 
-## API
-
-### C#
+## Built-in Variants
 
 ```csharp
-dockManager.Theme = new VsTheme("vs2015dark.vstheme");
+dockManager.Theme = new VS2015DarkTheme();
+dockManager.Theme = new VS2015LightTheme();
+dockManager.Theme = new VS2015BlueTheme();
 ```
 
-Dark color scheme matching Visual Studio 2013's dark mode.
+## Loading Custom .vstheme Files
 
-### WPF/XAML
+### From a File Path
 
-```xaml
- <DockingManager Theme="{vs:VsTheme Path=vs2015blue.vstheme}">
+```csharp
+dockManager.Theme = new VsTheme("path/to/custom.vstheme");
 ```
+
+### From a Stream
+
+```csharp
+using var stream = File.OpenRead("custom.vstheme");
+dockManager.Theme = new VsTheme(stream);
+```
+
+The `VsTheme` constructor auto-detects gzip compression (via magic bytes `0x1F 0x8B`), so both plain `.vstheme` and `.vstheme.gz` files work with the stream constructor.
+
+### From Gzip-Compressed Bytes
+
+For embedded resources stored as `.vstheme.gz`, load the raw bytes directly:
+
+```csharp
+byte[] gzipBytes = VsThemeResourceLoader.Load(
+    Assembly.GetExecutingAssembly(),
+    "MyApp.Resources.mytheme.vstheme.gz");
+
+dockManager.Theme = new VsTheme(gzipBytes);
+```
+
+### From a Pre-Parsed Palette
+
+```csharp
+var palette = VsThemeParser.ParseFile("custom.vstheme");
+dockManager.Theme = new VsTheme(palette);
+```
+
+## XAML Markup Extension
+
+```xml
+<DockingManager Theme="{vs:VsTheme Path=vs2015blue.vstheme}" />
+```
+
+The `Path` can be absolute or relative to the application directory.
+
+## Parsing API
+
+`VsThemeParser` extracts a `VsThemeColorPalette` from `.vstheme` files (the `Environment` category):
+
+| Method | Description |
+|:-------|:------------|
+| `VsThemeParser.Parse(Stream)` | Parse from a stream (auto-detects gzip) |
+| `VsThemeParser.ParseFile(string)` | Parse from a file path |
+| `VsThemeParser.ParseGZip(byte[])` | Parse from gzip-compressed bytes |
+
+The returned `VsThemeColorPalette` provides lookup methods:
+
+```csharp
+var palette = VsThemeParser.ParseFile("mytheme.vstheme");
+
+Color? bg = palette.GetBackground("ToolWindowBackground");
+Color fg = palette.GetForegroundOrDefault("ToolWindowText", Colors.White);
+bool has = palette.Contains("AccentMedium");
+```
+
 ---
