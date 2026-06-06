@@ -558,6 +558,7 @@ namespace AvalonDockTest
 
 		public bool SuspendDocumentsSourceBinding { get; set; }
 		public bool SuspendAnchorablesSourceBinding { get; set; }
+		public ILayoutDtoMapper DtoMapper => new AvalonDock.Serialization.LayoutDtoMapper();
 		public event System.EventHandler? ActiveContentChanged;
 		public event System.EventHandler? LayoutChanged;
 		public event System.EventHandler? LayoutChanging;

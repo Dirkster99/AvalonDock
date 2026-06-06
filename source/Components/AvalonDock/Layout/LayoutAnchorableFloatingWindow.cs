@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Markup;
-using System.Xml;
 using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
@@ -117,48 +116,6 @@ namespace AvalonDock.Layout
 		/// <inheritdoc/>
 		public override bool IsValid => RootPanel != null;
 
-		/// <inheritdoc/>
-		public override void ReadXml(XmlReader reader)
-		{
-			reader.MoveToContent();
-			if (reader.IsEmptyElement)
-			{
-				reader.Read();
-				ComputeVisibility();
-				return;
-			}
-
-			var localName = reader.LocalName;
-			reader.Read();
-
-			while (true)
-			{
-				if (reader.LocalName.Equals(localName) && reader.NodeType == XmlNodeType.EndElement) break;
-
-				if (reader.NodeType == XmlNodeType.Whitespace)
-				{
-					reader.Read();
-					continue;
-				}
-
-				XmlSerializer serializer;
-				if (reader.LocalName.Equals(nameof(LayoutAnchorablePaneGroup)))
-				{
-					serializer = XmlSerializersCache.GetSerializer<LayoutAnchorablePaneGroup>();
-				}
-				else
-				{
-					var type = LayoutRoot.FindType(reader.LocalName);
-					if (type == null)
-						throw new ArgumentException("AvalonDock.LayoutAnchorableFloatingWindow doesn't know how to deserialize " + reader.LocalName);
-					serializer = XmlSerializersCache.GetSerializer(type);
-				}
-
-				RootPanel = (LayoutAnchorablePaneGroup)serializer.Deserialize(reader);
-			}
-
-			reader.ReadEndElement();
-		}
 #if TRACE
 		/// <inheritdoc />
 		public override void ConsoleDump(int tab)

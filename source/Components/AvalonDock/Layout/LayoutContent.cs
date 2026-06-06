@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Markup;
@@ -15,7 +14,7 @@ namespace AvalonDock.Layout
 	/// </summary>
 	[ContentProperty(nameof(Content))]
 	[Serializable]
-	public abstract class LayoutContent : LayoutElement, IXmlSerializable, ILayoutElementForFloatingWindow, IComparable<LayoutContent>, ILayoutPreviousContainer, Core.Serialization.ISerializableLayoutContent, Core.Serialization.ISerializablePreviousContainer
+	public abstract class LayoutContent : LayoutElement, ILayoutElementForFloatingWindow, IComparable<LayoutContent>, ILayoutPreviousContainer, Core.Serialization.ISerializableLayoutContent, Core.Serialization.ISerializablePreviousContainer
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LayoutContent"/> class.
@@ -526,101 +525,6 @@ namespace AvalonDock.Layout
 		/// Executes the close operation.
 		/// </summary>
 		public abstract void Close();
-
-		/// <summary>
-		/// Gets the schema.
-		/// </summary>
-		/// <returns>The resulting value.</returns>
-		public System.Xml.Schema.XmlSchema GetSchema() => null;
-
-		/// <summary>
-		/// Reads the xml.
-		/// </summary>
-		/// <param name="reader">The XML reader to read from.</param>
-		public virtual void ReadXml(System.Xml.XmlReader reader)
-		{
-			if (reader.MoveToAttribute(nameof(Title)))
-				Title = reader.Value;
-			// if (reader.MoveToAttribute("IconSource"))
-			//    IconSource = new Uri(reader.Value, UriKind.RelativeOrAbsolute);
-			if (reader.MoveToAttribute(nameof(IsSelected)))
-				IsSelected = bool.Parse(reader.Value);
-			if (reader.MoveToAttribute(nameof(ContentId)))
-				ContentId = reader.Value;
-			if (reader.MoveToAttribute(nameof(IsLastFocusedDocument)))
-				IsLastFocusedDocument = bool.Parse(reader.Value);
-			if (reader.MoveToAttribute(nameof(PreviousContainerId)))
-				PreviousContainerId = reader.Value;
-			if (reader.MoveToAttribute(nameof(PreviousContainerIndex)))
-				PreviousContainerIndex = int.Parse(reader.Value);
-
-			if (reader.MoveToAttribute(nameof(FloatingLeft)))
-				FloatingLeft = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(FloatingTop)))
-				FloatingTop = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(FloatingWidth)))
-				FloatingWidth = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(FloatingHeight)))
-				FloatingHeight = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(IsMaximized)))
-				IsMaximized = bool.Parse(reader.Value);
-			if (reader.MoveToAttribute(nameof(CanClose)))
-				CanClose = bool.Parse(reader.Value);
-			if (reader.MoveToAttribute(nameof(CanFloat)))
-				CanFloat = bool.Parse(reader.Value);
-			if (reader.MoveToAttribute(nameof(LastActivationTimeStamp)))
-				LastActivationTimeStamp = DateTime.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(CanShowOnHover)))
-				CanShowOnHover = bool.Parse(reader.Value);
-
-			reader.Read();
-		}
-
-		/// <summary>
-		/// Writes the xml.
-		/// </summary>
-		/// <param name="writer">The XML writer to write to.</param>
-		public virtual void WriteXml(System.Xml.XmlWriter writer)
-		{
-			if (!string.IsNullOrWhiteSpace(Title))
-				writer.WriteAttributeString(nameof(Title), Title);
-
-			// if (IconSource != null)
-			//    writer.WriteAttributeString("IconSource", IconSource.ToString());
-			if (IsSelected)
-				writer.WriteAttributeString(nameof(IsSelected), IsSelected.ToString());
-
-			if (IsLastFocusedDocument)
-				writer.WriteAttributeString(nameof(IsLastFocusedDocument), IsLastFocusedDocument.ToString());
-
-			if (!string.IsNullOrWhiteSpace(ContentId))
-				writer.WriteAttributeString(nameof(ContentId), ContentId);
-
-			if (ToolTip is string toolTip && !string.IsNullOrWhiteSpace(toolTip))
-				writer.WriteAttributeString(nameof(ToolTip), toolTip);
-
-			if (FloatingLeft != 0.0) writer.WriteAttributeString(nameof(FloatingLeft), FloatingLeft.ToString(CultureInfo.InvariantCulture));
-			if (FloatingTop != 0.0) writer.WriteAttributeString(nameof(FloatingTop), FloatingTop.ToString(CultureInfo.InvariantCulture));
-			if (FloatingWidth != 0.0) writer.WriteAttributeString(nameof(FloatingWidth), FloatingWidth.ToString(CultureInfo.InvariantCulture));
-			if (FloatingHeight != 0.0) writer.WriteAttributeString(nameof(FloatingHeight), FloatingHeight.ToString(CultureInfo.InvariantCulture));
-
-			if (IsMaximized) writer.WriteAttributeString(nameof(IsMaximized), IsMaximized.ToString());
-			// BD: 14.08.2020 changed to check CanClose value against the default in _canCloseDefault
-			//     thus CanClose property will be serialized only when not equal to its default for given class
-			//     With previous code it was not possible to serialize CanClose if set to true for LayoutAnchorable instance
-			if (CanClose != _canCloseDefault) writer.WriteAttributeString(nameof(CanClose), CanClose.ToString());
-			if (!CanFloat) writer.WriteAttributeString(nameof(CanFloat), CanFloat.ToString());
-
-			if (LastActivationTimeStamp != null) writer.WriteAttributeString(nameof(LastActivationTimeStamp), LastActivationTimeStamp.Value.ToString(CultureInfo.InvariantCulture));
-
-			if (!CanShowOnHover) writer.WriteAttributeString(nameof(CanShowOnHover), CanShowOnHover.ToString());
-
-			if (_previousContainer is ILayoutPaneSerializable paneSerializable)
-			{
-				writer.WriteAttributeString("PreviousContainerId", paneSerializable.Id);
-				writer.WriteAttributeString("PreviousContainerIndex", _previousContainerIndex.ToString());
-			}
-		}
 
 		/// <summary>
 		/// Executes the compare to operation.

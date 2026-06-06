@@ -67,22 +67,6 @@ namespace AvalonDock.Layout
 		}
 
 		/// <inheritdoc/>
-		public override void WriteXml(System.Xml.XmlWriter writer)
-		{
-			base.WriteXml(writer);
-			if (!string.IsNullOrWhiteSpace(Description)) writer.WriteAttributeString(nameof(Description), Description);
-			if (!CanMove) writer.WriteAttributeString(nameof(CanMove), CanMove.ToString());
-		}
-
-		/// <inheritdoc/>
-		public override void ReadXml(System.Xml.XmlReader reader)
-		{
-			if (reader.MoveToAttribute(nameof(Description))) Description = reader.Value;
-			if (reader.MoveToAttribute(nameof(CanMove))) CanMove = bool.Parse(reader.Value);
-			base.ReadXml(reader);
-		}
-
-		/// <inheritdoc/>
 		public override void Close()
 		{
 			if (Root?.Manager != null)

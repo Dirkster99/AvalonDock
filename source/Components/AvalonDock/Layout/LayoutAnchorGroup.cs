@@ -14,22 +14,6 @@ namespace AvalonDock.Layout
 		/// <inheritdoc/>
 		protected override bool GetVisibility() => Children.Count > 0;
 
-		/// <inheritdoc/>
-		public override void WriteXml(System.Xml.XmlWriter writer)
-		{
-			if (_id != null) writer.WriteAttributeString(nameof(ILayoutPaneSerializable.Id), _id);
-			if (_previousContainer is ILayoutPaneSerializable paneSerializable) writer.WriteAttributeString("PreviousContainerId", paneSerializable.Id);
-			base.WriteXml(writer);
-		}
-
-		/// <inheritdoc/>
-		public override void ReadXml(System.Xml.XmlReader reader)
-		{
-			if (reader.MoveToAttribute(nameof(ILayoutPaneSerializable.Id))) _id = reader.Value;
-			if (reader.MoveToAttribute("PreviousContainerId")) ((ILayoutPreviousContainer)this).PreviousContainerId = reader.Value;
-			base.ReadXml(reader);
-		}
-
 		[field: NonSerialized]
 		private ILayoutContainer _previousContainer = null;
 

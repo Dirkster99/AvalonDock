@@ -131,6 +131,11 @@ namespace AvalonDock
 			set => SuspendAnchorablesSourceBinding = value;
 		}
 
+		/// <inheritdoc/>
+		Core.Serialization.ILayoutDtoMapper Core.Serialization.ISerializableDockingManager.DtoMapper => _dtoMapper;
+
+		private readonly Core.Serialization.ILayoutDtoMapper _dtoMapper = new Serialization.LayoutDtoMapper();
+
 		/// <summary>
 		/// Backs the <see cref="Core.IDockingManager.DocumentClosing"/> event.
 		/// </summary>
