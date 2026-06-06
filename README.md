@@ -409,18 +409,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
    </tr>
    <tr>
       <td>Dock Document</td>
-      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/DockDocument.png" width="400"></td>
-      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Light/DockDocument.png" width="400"></td>
-   </tr>
-   <tr>
-      <td>Dock Document</td>
-      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/DockDocument_1.png" width="400"></td>
-      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Light/DockDocument_1.png" width="400"></td>
+      <td><img src="docs/images/AvalonDockCodeApp_Dark_Drag_Document.png" width="400"></td>
+      <td><img src="docs/images/AvalonDockCodeApp_Light_Drag_Document.png" width="400"></td>
    </tr>
    <tr>
       <td>Dock Tool Window</td>
-      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/DockToolWindow.png" width="400"></td>
       <td><img src="docs/images/AvalonDockCodeApp_Dark_Drag.png" width="400"></td>
+      <td><img src="docs/images/AvalonDockCodeApp_Light_Drag.png" width="400"></td>
    </tr>
    <tr>
       <td>Document</td>
@@ -429,8 +424,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
    </tr>
    <tr>
       <td>Tool Window</td>
-      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/ToolWindow.png" width="400"></td>
       <td><img src="docs/images/AvalonDockCodeApp_Dark_Toolbox.png" width="400"></td>
+      <td><img src="docs/images/AvalonDockCodeApp_Light_Toolbox.png" width="400"></td>
    </tr>
 </table>
 
