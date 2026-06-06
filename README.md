@@ -400,8 +400,41 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 ## Screenshots
 
-The Docking Buttons are [defined in XAML](https://github.com/Dirkster99/Docu/master/AvalonDock/wiki/OverlayWindow), which ensures a good looking image on all resolutions, even 4K or 8K, and enables consistent color theming.
+### ToggleDockingManager
+<table width="100%">
+   <tr>
+      <td>Description</td>
+      <td>Dark</td>
+      <td>Light</td>
+   </tr>
+   <tr>
+      <td>Dock Document</td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/DockDocument.png" width="400"></td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Light/DockDocument.png" width="400"></td>
+   </tr>
+   <tr>
+      <td>Dock Document</td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/DockDocument_1.png" width="400"></td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Light/DockDocument_1.png" width="400"></td>
+   </tr>
+   <tr>
+      <td>Dock Tool Window</td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/DockToolWindow.png" width="400"></td>
+      <td><img src="docs/images/AvalonDockCodeApp_Dark_Drag.png" width="400"></td>
+   </tr>
+   <tr>
+      <td>Document</td>
+      <td><img src="docs/images/AvalonDockCodeApp_Dark_Welcome.png" width="400"></td>
+      <td><img src="docs/images/AvalonDockCodeApp_Light_Welcome.png" width="400"></td>
+   </tr>
+   <tr>
+      <td>Tool Window</td>
+      <td><img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Dark/ToolWindow.png" width="400"></td>
+      <td><img src="docs/images/AvalonDockCodeApp_Dark_Toolbox.png" width="400"></td>
+   </tr>
+</table>
 
+### Classic DockingManager
 <table width="100%">
    <tr>
       <td>Description</td>
