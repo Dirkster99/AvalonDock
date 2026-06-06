@@ -38,6 +38,7 @@ dotnet new wpf -n MvvmIdeApp
 cd MvvmIdeApp
 dotnet add package Dirkster.AvalonDock
 dotnet add package Dirkster.AvalonDock.Mvvm
+dotnet add package Dirkster.AvalonDock.Mvvm.CommunityToolkit
 dotnet add package Dirkster.AvalonDock.DependencyInjection
 dotnet add package Dirkster.AvalonDock.Themes.Arc
 dotnet add package CommunityToolkit.Mvvm
@@ -73,9 +74,10 @@ ToggleDockingManager (XAML)
 
 | Class | Package | Purpose |
 |:------|:--------|:--------|
-| `ToolboxBase` | `AvalonDock.Mvvm` | Base for tool panel VMs. Has `Zone`, `Icon`, `IsOpenByDefault`. |
-| `Document` | `AvalonDock.Mvvm` | Base for document tab VMs. Has `Title`, `Id`, `IsModified`. |
-| `DockableBase` | `AvalonDock.Mvvm` | Abstract base for both. Uses `CommunityToolkit.Mvvm.ObservableObject`. |
+| `ObservableToolboxBase` | `AvalonDock.Mvvm.CommunityToolkit` | Base for tool panel VMs with `[ObservableProperty]` support. Has `Zone`, `Icon`, `IsOpenByDefault`. |
+| `ObservableDocument` | `AvalonDock.Mvvm.CommunityToolkit` | Base for document tab VMs with `[ObservableProperty]` support. |
+| `ToolboxBase` | `AvalonDock.Mvvm` | Lightweight base for tool panels (no external dependencies). |
+| `DockableBase` | `AvalonDock.Mvvm` | Abstract base for all dockables (no external dependencies). |
 | `IDockLayoutService` | `AvalonDock.Core` | Manages the layout tree. Open/close documents, get anchorables by type. |
 | `IToolbox` | `AvalonDock.Core` | Interface for toolbox VMs. `DockZone` controls placement. |
 
@@ -83,19 +85,22 @@ ToggleDockingManager (XAML)
 
 ## Step 1: Create Toolbox View Models
 
-Each tool panel inherits from `ToolboxBase` and declares its placement via `DockZone`.
+Each tool panel inherits from `ObservableToolboxBase` (from `AvalonDock.Mvvm.CommunityToolkit`) and declares its placement via `DockZone`. This enables `[ObservableProperty]` and `[RelayCommand]` source generators.
+
+{: .note }
+If you don't need CommunityToolkit.Mvvm source generators, use `ToolboxBase` from `AvalonDock.Mvvm` instead — it has no external dependencies.
 
 **File: `ViewModels/ExplorerToolbox.cs`**
 
 ```csharp
 using System.Collections.ObjectModel;
 using AvalonDock.Core;
-using AvalonDock.Mvvm;
+using AvalonDock.Mvvm.CommunityToolkit;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MvvmIdeApp.ViewModels;
 
-public partial class ExplorerToolbox : ToolboxBase
+public partial class ExplorerToolbox : ObservableToolboxBase
 {
     private Action<string> _openFileCallback = _ => { };
 
@@ -125,12 +130,12 @@ public partial class ExplorerToolbox : ToolboxBase
 
 ```csharp
 using AvalonDock.Core;
-using AvalonDock.Mvvm;
+using AvalonDock.Mvvm.CommunityToolkit;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MvvmIdeApp.ViewModels;
 
-public partial class SearchToolbox : ToolboxBase
+public partial class SearchToolbox : ObservableToolboxBase
 {
     [ObservableProperty]
     private string _searchText = string.Empty;
@@ -149,12 +154,12 @@ public partial class SearchToolbox : ToolboxBase
 
 ```csharp
 using AvalonDock.Core;
-using AvalonDock.Mvvm;
+using AvalonDock.Mvvm.CommunityToolkit;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MvvmIdeApp.ViewModels;
 
-public partial class OutputToolbox : ToolboxBase
+public partial class OutputToolbox : ObservableToolboxBase
 {
     [ObservableProperty]
     private string _outputText = "Ready.\n";
@@ -189,18 +194,18 @@ The `DockZone` enum controls where each toolbox appears:
 
 ## Step 2: Create the Document View Model
 
-Documents inherit from `Document` (which extends `DockableBase`). Each open file gets its own tab.
+Documents inherit from `ObservableDocument` (from `AvalonDock.Mvvm.CommunityToolkit`). Each open file gets its own tab.
 
 **File: `ViewModels/EditorTabViewModel.cs`**
 
 ```csharp
 using System.IO;
-using AvalonDock.Mvvm;
+using AvalonDock.Mvvm.CommunityToolkit;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MvvmIdeApp.ViewModels;
 
-public partial class EditorTabViewModel : Document
+public partial class EditorTabViewModel : ObservableDocument
 {
     [ObservableProperty]
     private string _filePath = string.Empty;
@@ -637,9 +642,9 @@ ToggleDockingManager (XAML)
 
 To add a new tool panel in the v5 architecture:
 
-1. **Create the VM** — inherit from `ToolboxBase`, set `Zone`:
+1. **Create the VM** — inherit from `ObservableToolboxBase` (or `ToolboxBase`), set `Zone`:
    ```csharp
-   public class ProblemsToolbox : ToolboxBase
+   public class ProblemsToolbox : ObservableToolboxBase
    {
        public ProblemsToolbox()
        {
