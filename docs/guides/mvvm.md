@@ -22,11 +22,25 @@ dotnet add package Dirkster.AvalonDock.Mvvm
 dotnet add package Dirkster.AvalonDock.DependencyInjection
 ```
 
-If you want to use CommunityToolkit.Mvvm source generators (`[ObservableProperty]`, `[RelayCommand]`), also install:
+### CommunityToolkit.Mvvm Integration
+
+To use CommunityToolkit.Mvvm source generators (`[ObservableProperty]`, `[RelayCommand]`), install the companion package instead:
 
 ```bash
 dotnet add package Dirkster.AvalonDock.Mvvm.CommunityToolkit
 ```
+
+This package provides `ObservableDockableBase`, `ObservableToolboxBase`, `ObservableDocument`, and `ObservableTool` — drop-in replacements for the base `AvalonDock.Mvvm` classes that inherit from CommunityToolkit's `ObservableObject`. The API surface is identical; the only difference is how change notification works internally.
+
+| Without CommunityToolkit | With CommunityToolkit | Description |
+|:-------------------------|:----------------------|:------------|
+| `DockableBase` | `ObservableDockableBase` | Base for all dockables |
+| `ToolboxBase` | `ObservableToolboxBase` | Base for tool panels with zone placement |
+| `DockBase` | `ObservableDockBase` | Base for dockable containers |
+| (manual property) | `ObservableDocument` | Leaf document class |
+| (manual property) | `ObservableTool` | Leaf tool class |
+
+Both packages implement the same interfaces (`IDockable`, `IToolbox`, `IDock`) and work interchangeably with `IDockLayoutService`.
 
 ---
 
@@ -154,6 +168,34 @@ public partial class MainViewModel : ObservableObject
 }
 ```
 
+### Toggle Entire Sides
+
+Use `SideToggleManager` to toggle all panels on a side at once. It remembers which panels were previously open and restores them on the next toggle.
+
+```csharp
+using AvalonDock.Mvvm;
+
+public partial class MainViewModel : ObservableObject
+{
+    private readonly SideToggleManager _sideToggle;
+
+    public MainViewModel(IDockLayoutService dockService)
+    {
+        _dockService = dockService;
+        _sideToggle = new SideToggleManager(dockService);
+    }
+
+    [RelayCommand]
+    private void TogglePrimarySideBar() => _sideToggle.Toggle(ToolboxSide.Left);
+
+    [RelayCommand]
+    private void ToggleBottomPanel() => _sideToggle.Toggle(ToolboxSide.Bottom);
+
+    [RelayCommand]
+    private void ToggleSecondarySideBar() => _sideToggle.Toggle(ToolboxSide.Right);
+}
+```
+
 ### Bind in XAML (ToggleDockingManager)
 
 ```xml
@@ -163,6 +205,8 @@ public partial class MainViewModel : ObservableObject
     ...
 </avalonDock:ToggleDockingManager>
 ```
+
+See [ToggleDockingManager]({% link guides/toggle-docking-manager.md %}) for the full guide on zones, button customization, and layout priority.
 
 ---
 
@@ -306,3 +350,8 @@ public class DockTemplateSelector : DataTemplateSelector
 | `OpenOrActivateDocument<T>(predicate, factory)` | Find or create a document |
 | `FindDocument<T>(predicate)` | Find an open document by predicate |
 | `GetAnchorable<T>()` | Get a registered toolbox by type |
+| `ShowAnchorable(anchorable)` | Show a toolbox (sets `IsOpen = true`) |
+| `HideAnchorable(anchorable)` | Hide a toolbox (sets `IsOpen = false`) |
+| `IsAnchorableOpen(anchorable)` | Check if a toolbox is docked |
+| `IsSideOpen(ToolboxSide)` | Check if any toolbox on a side is open |
+| `AnchorableStateChanged` | Event fired when any toolbox's `IsOpen` changes |
