@@ -293,7 +293,7 @@ AvalonDock.Mvvm            MVVM base classes (DockableBase, ToolboxBase, etc.) �
   └── netstandard2.0
 
 AvalonDock.Mvvm.CommunityToolkit  CommunityToolkit.Mvvm integration ([ObservableProperty] support)
-  └── netstandard2.0, net9.0
+  └── netstandard2.0
 
 AvalonDock.DependencyInjection  IServiceCollection extensions
   └── netstandard2.0
