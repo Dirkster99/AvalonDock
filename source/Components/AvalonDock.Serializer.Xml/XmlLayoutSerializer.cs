@@ -63,25 +63,23 @@ namespace AvalonDock.Serializer.Xml
 		public void Deserialize(TextReader reader)
 		{
 			var bytes = System.Text.Encoding.UTF8.GetBytes(reader.ReadToEnd());
-			using (var ms = new MemoryStream(bytes))
-				Deserialize(ms);
+			using var ms = new MemoryStream(bytes);
+			Deserialize(ms);
 		}
 
 		/// <summary>Deserialize the layout from a <see cref="XmlReader"/>.</summary>
 		/// <param name="reader">The XML reader to read from.</param>
 		public void Deserialize(XmlReader reader)
 		{
-			using (var ms = new MemoryStream())
+			using var ms = new MemoryStream();
+			using (var writer = XmlWriter.Create(ms))
 			{
-				using (var writer = XmlWriter.Create(ms))
-				{
-					writer.WriteNode(reader, true);
-					writer.Flush();
-				}
-
-				ms.Position = 0;
-				Deserialize(ms);
+				writer.WriteNode(reader, true);
+				writer.Flush();
 			}
+
+			ms.Position = 0;
+			Deserialize(ms);
 		}
 	}
 }
