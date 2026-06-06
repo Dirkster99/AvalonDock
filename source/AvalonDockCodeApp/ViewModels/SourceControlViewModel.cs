@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Threading;
 using AvalonDock.Core;
-using AvalonDock.Mvvm;
+using AvalonDock.Mvvm.CommunityToolkit;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -39,7 +39,7 @@ public partial class ChangeItem : ObservableObject
 	};
 }
 
-public partial class SourceControlViewModel : ToolboxBase
+public partial class SourceControlViewModel : ObservableToolboxBase
 {
 	private readonly Dispatcher _dispatcher;
 	private Action<string>? _openFileCallback;

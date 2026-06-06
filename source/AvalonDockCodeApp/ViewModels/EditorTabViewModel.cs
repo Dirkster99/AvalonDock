@@ -1,12 +1,12 @@
 using System;
 using System.IO;
 using System.Windows.Media;
-using AvalonDock.Mvvm;
+using AvalonDock.Mvvm.CommunityToolkit;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ToggleTestApp.ViewModels;
 
-public partial class EditorTabViewModel : Document
+public partial class EditorTabViewModel : ObservableDocument
 {
 	[ObservableProperty] private string _toolTip = string.Empty;
 

@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using AvalonDock.Core;
-using AvalonDock.Mvvm;
+using AvalonDock.Mvvm.CommunityToolkit;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -32,7 +32,7 @@ public partial class SearchFileGroup : ObservableObject
 	[ObservableProperty] private ObservableCollection<SearchMatch> _matches = new();
 }
 
-public partial class SearchViewModel : ToolboxBase
+public partial class SearchViewModel : ObservableToolboxBase
 {
 	private readonly Dispatcher _dispatcher;
 	private CancellationTokenSource _searchCts = new();

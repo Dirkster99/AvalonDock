@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using AvalonDock.Core;
-using AvalonDock.Mvvm;
+using AvalonDock.Mvvm.CommunityToolkit;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -59,7 +59,7 @@ public partial class FileTreeItem : ObservableObject
 	}
 }
 
-public partial class FolderExplorerViewModel : ToolboxBase
+public partial class FolderExplorerViewModel : ObservableToolboxBase
 {
 	private Action<string> _openFileCallback;
 

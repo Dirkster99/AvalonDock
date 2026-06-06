@@ -18,6 +18,7 @@
         <ProjectReference Include="..\Components\AvalonDock\AvalonDock.csproj" />
         <ProjectReference Include="..\Components\AvalonDock.Core\AvalonDock.Core.csproj" />
         <ProjectReference Include="..\Components\AvalonDock.Mvvm\AvalonDock.Mvvm.csproj" />
+        <ProjectReference Include="..\Components\AvalonDock.Mvvm.CommunityToolkit\AvalonDock.Mvvm.CommunityToolkit.csproj" />
         <ProjectReference Include="..\Components\AvalonDock.DependencyInjection\AvalonDock.DependencyInjection.csproj" />
         <ProjectReference Include="..\Components\AvalonDock.Themes.Arc\AvalonDock.Themes.Arc.csproj" />
         <ProjectReference Include="..\Components\AvalonDock.Themes.VS\AvalonDock.Themes.VS.csproj" />

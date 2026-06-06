@@ -1,10 +1,10 @@
 using AvalonDock.Core;
-using AvalonDock.Mvvm;
+using AvalonDock.Mvvm.CommunityToolkit;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ToggleTestApp.ViewModels;
 
-public partial class ProblemsViewModel : ToolboxBase
+public partial class ProblemsViewModel : ObservableToolboxBase
 {
 	public ProblemsViewModel()
 	{

@@ -3,13 +3,13 @@ using System.Diagnostics;
 using System.Text;
 using System.Windows.Threading;
 using AvalonDock.Core;
-using AvalonDock.Mvvm;
+using AvalonDock.Mvvm.CommunityToolkit;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace ToggleTestApp.ViewModels;
 
-public partial class TerminalViewModel : ToolboxBase, IDisposable
+public partial class TerminalViewModel : ObservableToolboxBase, IDisposable
 {
 	private Process? _shellProcess;
 	private readonly Dispatcher _dispatcher;
