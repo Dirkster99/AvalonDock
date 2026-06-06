@@ -21,7 +21,7 @@ AvalonDock is used by [many open source and commercial projects](https://github.
 - [Edi](https://dirkster99.github.io/Edi/) — Open source text editor IDE based on AvalonDock and AvalonEdit (330 stars)
 - [Profile Explorer](https://github.com/microsoft/profile-explorer) — Microsoft CPU profiling trace viewer (273 stars)
 
-Be sure to check out the [Wiki](https://github.com/Dirkster99/AvalonDock/wiki) and the [documentation site](docs/) for tutorials and API reference.
+Be sure to check out the [Wiki](https://github.com/Dirkster99/AvalonDock/wiki) and the [documentation site](https://dirkster99.github.io/AvalonDock/) for tutorials and API reference.
 
 ---
 
