@@ -8,7 +8,7 @@ description: "The Visual Studio theme for AvalonDock."
 
 # VS Theme (.vstheme)
 
-Visual Studio styling based on `.vstheme` files. Includes three built-in VS2015 variants and supports loading custom `.vstheme` or `.vstheme.gz` (gzip-compressed) files.
+Visual Studio styling based on `.vstheme` files. Includes built-in VS2015 and VS2022 variants and supports loading custom `.vstheme` or `.vstheme.gz` (gzip-compressed) files.
 
 ---
 
@@ -19,6 +19,16 @@ dotnet add package Dirkster.AvalonDock.Themes.VS
 ```
 
 ## Built-in Variants
+
+### VS2022
+
+```csharp
+dockManager.Theme = new VS2022DarkTheme();
+dockManager.Theme = new VS2022LightTheme();
+dockManager.Theme = new VS2022BlueTheme();
+```
+
+### VS2015
 
 ```csharp
 dockManager.Theme = new VS2015DarkTheme();
