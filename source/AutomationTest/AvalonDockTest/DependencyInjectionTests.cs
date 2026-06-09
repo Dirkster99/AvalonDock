@@ -39,10 +39,13 @@ namespace AvalonDockTest
 	public class ServiceCollectionExtensionsTests
 	{
 		[Test]
-		public void AddToolbox_RegistersSingleton()
+		public void AddDockLayoutService_Builder_AddToolbox_RegistersSingleton()
 		{
 			var services = new ServiceCollection();
-			services.AddToolbox<DiTestToolbox>();
+			services.AddDockLayoutService(dock =>
+			{
+				dock.AddToolbox<DiTestToolbox>();
+			});
 
 			var provider = services.BuildServiceProvider();
 			var instance1 = provider.GetRequiredService<DiTestToolbox>();
@@ -53,11 +56,14 @@ namespace AvalonDockTest
 		}
 
 		[Test]
-		public void AddToolbox_WithFactory_RegistersSingleton()
+		public void AddDockLayoutService_Builder_AddToolbox_WithFactory_RegistersSingleton()
 		{
 			var services = new ServiceCollection();
-			services.AddToolbox<DiTestToolboxWithDeps>(sp =>
-				new DiTestToolboxWithDeps("injected-value"));
+			services.AddDockLayoutService(dock =>
+			{
+				dock.AddToolbox<DiTestToolboxWithDeps>(sp =>
+					new DiTestToolboxWithDeps("injected-value"));
+			});
 
 			var provider = services.BuildServiceProvider();
 			var instance = provider.GetRequiredService<DiTestToolboxWithDeps>();
@@ -67,11 +73,14 @@ namespace AvalonDockTest
 		}
 
 		[Test]
-		public void AddToolbox_WithFactory_IsSingleton()
+		public void AddDockLayoutService_Builder_AddToolbox_WithFactory_IsSingleton()
 		{
 			var services = new ServiceCollection();
-			services.AddToolbox<DiTestToolboxWithDeps>(sp =>
-				new DiTestToolboxWithDeps("test"));
+			services.AddDockLayoutService(dock =>
+			{
+				dock.AddToolbox<DiTestToolboxWithDeps>(sp =>
+					new DiTestToolboxWithDeps("test"));
+			});
 
 			var provider = services.BuildServiceProvider();
 			var instance1 = provider.GetRequiredService<DiTestToolboxWithDeps>();
@@ -81,10 +90,13 @@ namespace AvalonDockTest
 		}
 
 		[Test]
-		public void AddToolbox_CanBeResolvedAsIToolbox()
+		public void AddDockLayoutService_Builder_AddToolbox_CanBeResolvedAsIToolbox()
 		{
 			var services = new ServiceCollection();
-			services.AddToolbox<DiTestToolbox>();
+			services.AddDockLayoutService(dock =>
+			{
+				dock.AddToolbox<DiTestToolbox>();
+			});
 
 			var provider = services.BuildServiceProvider();
 			var toolboxes = provider.GetServices<IToolbox>().ToList();
@@ -94,12 +106,15 @@ namespace AvalonDockTest
 		}
 
 		[Test]
-		public void AddToolbox_MultipleToolboxes_AllResolvable()
+		public void AddDockLayoutService_Builder_MultipleToolboxes_AllResolvable()
 		{
 			var services = new ServiceCollection();
-			services.AddToolbox<DiTestToolbox>();
-			services.AddToolbox<DiTestToolboxWithDeps>(sp => new DiTestToolboxWithDeps("v"));
-			
+			services.AddDockLayoutService(dock =>
+			{
+				dock.AddToolbox<DiTestToolbox>();
+				dock.AddToolbox<DiTestToolboxWithDeps>(sp => new DiTestToolboxWithDeps("v"));
+			});
+
 			var provider = services.BuildServiceProvider();
 			var toolboxes = provider.GetServices<IToolbox>().ToList();
 
@@ -107,14 +122,17 @@ namespace AvalonDockTest
 		}
 
 		[Test]
-		public void AddToggleDockOptions_RegistersOptions()
+		public void AddDockLayoutService_Builder_ConfigureToggleDock_RegistersOptions()
 		{
 			var services = new ServiceCollection();
-			services.AddToggleDockOptions(opts =>
+			services.AddDockLayoutService(dock =>
 			{
-				opts.ButtonSize = 32;
-				opts.DefaultDockWidth = 300;
-				opts.DefaultDockHeight = 200;
+				dock.ConfigureToggleDock(opts =>
+				{
+					opts.ButtonSize = 32;
+					opts.DefaultDockWidth = 300;
+					opts.DefaultDockHeight = 200;
+				});
 			});
 
 			var provider = services.BuildServiceProvider();
@@ -126,31 +144,65 @@ namespace AvalonDockTest
 		}
 
 		[Test]
-		public void AddToggleDockOptions_WithoutConfigure_UsesDefaults()
+		public void AddDockLayoutService_Builder_WithoutConfigureToggleDock_RegistersDefaults()
 		{
 			var services = new ServiceCollection();
-			services.AddToggleDockOptions();
+			services.AddDockLayoutService(dock =>
+			{
+				dock.AddToolbox<DiTestToolbox>();
+			});
 
 			var provider = services.BuildServiceProvider();
 			var options = provider.GetRequiredService<ToggleDockOptions>();
 
 			Assert.That(options, Is.Not.Null);
+			Assert.That(options.ButtonSize, Is.EqualTo(25));
+			Assert.That(options.DefaultDockWidth, Is.EqualTo(250));
+			Assert.That(options.DefaultDockHeight, Is.EqualTo(200));
 		}
 
 		[Test]
-		public void AddToolbox_ReturnsSameServiceCollection_ForChaining()
+		public void AddDockLayoutService_Builder_ReturnsSameServiceCollection_ForChaining()
 		{
 			var services = new ServiceCollection();
-			var result = services.AddToolbox<DiTestToolbox>();
+			var result = services.AddDockLayoutService(dock =>
+			{
+				dock.AddToolbox<DiTestToolbox>();
+			});
 			Assert.That(result, Is.SameAs(services));
 		}
 
 		[Test]
-		public void AddToggleDockOptions_ReturnsSameServiceCollection_ForChaining()
+		public void AddDockLayoutService_Builder_RegistersLayoutServiceAndSideToggleManager()
 		{
 			var services = new ServiceCollection();
-			var result = services.AddToggleDockOptions();
-			Assert.That(result, Is.SameAs(services));
+			services.AddDockLayoutService(dock =>
+			{
+				dock.AddToolbox<DiTestToolbox>();
+			});
+
+			var provider = services.BuildServiceProvider();
+			var layoutSvc = provider.GetRequiredService<IDockLayoutService>();
+			var sideToggle = provider.GetRequiredService<SideToggleManager>();
+
+			Assert.That(layoutSvc, Is.Not.Null);
+			Assert.That(sideToggle, Is.Not.Null);
+		}
+
+		[Test]
+		public void AddDockLayoutService_Builder_CollectsToolboxes()
+		{
+			var services = new ServiceCollection();
+			services.AddDockLayoutService(dock =>
+			{
+				dock.AddToolbox<DiTestToolbox>();
+				dock.AddToolbox<DiTestToolboxWithDeps>(sp => new DiTestToolboxWithDeps("val"));
+			});
+
+			var provider = services.BuildServiceProvider();
+			var svc = provider.GetRequiredService<IDockLayoutService>();
+
+			Assert.That(svc.Anchorables.Count(), Is.EqualTo(2));
 		}
 
 		[Test]
@@ -458,9 +510,10 @@ namespace AvalonDockTest
 		public void AddDockLayoutService_RegistersSingleton()
 		{
 			var services = new ServiceCollection();
-			services.AddToolbox<DiTestToolbox>();
-			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<DiTestToolbox>());
-			services.AddDockLayoutService();
+			services.AddDockLayoutService(dock =>
+			{
+				dock.AddToolbox<DiTestToolbox>();
+			});
 
 			var provider = services.BuildServiceProvider();
 			var svc1 = provider.GetRequiredService<IDockLayoutService>();
@@ -475,8 +528,10 @@ namespace AvalonDockTest
 		public void DockLayoutService_CollectsToolboxes()
 		{
 			var services = new ServiceCollection();
-			services.AddToolbox<DiTestToolbox>();
-			services.AddDockLayoutService();
+			services.AddDockLayoutService(dock =>
+			{
+				dock.AddToolbox<DiTestToolbox>();
+			});
 
 			var provider = services.BuildServiceProvider();
 			var svc = provider.GetRequiredService<IDockLayoutService>();

@@ -133,10 +133,12 @@ public class ExplorerToolbox : ToolboxBase
 Register toolboxes with DI:
 
 ```csharp
-services.AddToolbox<ExplorerToolbox>();
-services.AddToolbox<OutputToolbox>();
-services.AddToolbox<SearchToolbox>();
-services.AddDockLayoutService();
+services.AddDockLayoutService(dock =>
+{
+    dock.AddToolbox<ExplorerToolbox>();
+    dock.AddToolbox<OutputToolbox>();
+    dock.AddToolbox<SearchToolbox>();
+});
 ```
 
 See [MVVM Integration]({% link guides/mvvm.md %}) for the full pattern.

@@ -52,11 +52,12 @@ Before diving in, here is how the pieces fit together:
 
 ```
 App.xaml.cs  (Composition Root)
-├── AddToolbox<ExplorerToolbox>()       ← registers tool VMs
-├── AddToolbox<SearchToolbox>()
-├── AddToolbox<OutputToolbox>()
-├── AddDockLayoutService()              ← auto-builds layout tree from toolboxes
-├── AddToggleDockOptions(...)           ← configures sidebar button size, dock sizes
+├── AddDockLayoutService(dock => {      ← single entry point for dock configuration
+│       dock.ConfigureToggleDock(...)   ← configures sidebar button size, dock sizes
+│       dock.AddToolbox<ExplorerToolbox>()  ← registers tool VMs
+│       dock.AddToolbox<SearchToolbox>()
+│       dock.AddToolbox<OutputToolbox>()
+│   })
 └── AddSingleton<MainViewModel>()       ← receives IDockLayoutService via DI
 
 MainViewModel
@@ -350,26 +351,21 @@ public partial class App : Application
 
     private static void ConfigureServices(IServiceCollection services)
     {
-        // Configure sidebar and docking options
-        services.AddToggleDockOptions(opts =>
+        // Configure dock layout: toggle dock options + toolboxes in one call
+        services.AddDockLayoutService(dock =>
         {
-            opts.ButtonSize = 28;
-            opts.DefaultDockWidth = 280;
-            opts.DefaultDockHeight = 220;
+            dock.ConfigureToggleDock(opts =>
+            {
+                opts.ButtonSize = 28;
+                opts.DefaultDockWidth = 280;
+                opts.DefaultDockHeight = 220;
+            });
+
+            // Register toolbox VMs — order determines sidebar button order
+            dock.AddToolbox<ExplorerToolbox>();
+            dock.AddToolbox<SearchToolbox>();
+            dock.AddToolbox<OutputToolbox>();
         });
-
-        // Register toolbox VMs — order determines sidebar button order
-        services.AddToolbox<ExplorerToolbox>();
-        services.AddToolbox<SearchToolbox>();
-        services.AddToolbox<OutputToolbox>();
-
-        // Register each as IToolbox so DockLayoutService can discover them
-        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<ExplorerToolbox>());
-        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SearchToolbox>());
-        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<OutputToolbox>());
-
-        // DockLayoutService auto-builds the MVVM layout tree from registered IToolbox instances
-        services.AddDockLayoutService();
 
         // Main view model — receives IDockLayoutService
         services.AddSingleton<MainViewModel>();
@@ -655,10 +651,9 @@ To add a new tool panel in the v5 architecture:
    }
    ```
 
-2. **Register in DI** — add two lines to `ConfigureServices`:
+2. **Register in DI** — add one line inside the `AddDockLayoutService` builder:
    ```csharp
-   services.AddToolbox<ProblemsToolbox>();
-   services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<ProblemsToolbox>());
+   dock.AddToolbox<ProblemsToolbox>();
    ```
 
 3. **Add a DataTemplate** in XAML:
