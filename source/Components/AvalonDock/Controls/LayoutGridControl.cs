@@ -308,6 +308,7 @@ namespace AvalonDock.Controls
 				var splitter = new LayoutGridResizerControl();
 #if HAS_UNO
 				splitter.IsHorizontalResizer = Orientation == System.Windows.Controls.Orientation.Horizontal;
+				splitter.RefreshResizeCursor();
 				splitter.Style = splitter.IsHorizontalResizer
 					? _model.Root?.Manager?.GridSplitterVerticalStyle
 					: _model.Root?.Manager?.GridSplitterHorizontalStyle;
