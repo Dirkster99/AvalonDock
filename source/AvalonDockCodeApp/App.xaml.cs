@@ -26,25 +26,25 @@ public partial class App : Application
 
 	private static void ConfigureServices(IServiceCollection services)
 	{
-		// AvalonDock toggle options via DI
-		services.AddToggleDockOptions(opts =>
+		// Dock layout service — configure toggle dock options and toolboxes in one call
+		services.AddDockLayoutService(dock =>
 		{
-			opts.ButtonSize = 28;
-			opts.DefaultDockWidth = 280;
-			opts.DefaultDockHeight = 220;
-			opts.LayoutPriority = nameof(DockLayoutPriority.BottomFullWidth);
+			dock.ConfigureToggleDock(opts =>
+			{
+				opts.ButtonSize = 28;
+				opts.DefaultDockWidth = 280;
+				opts.DefaultDockHeight = 220;
+				opts.LayoutPriority = nameof(DockLayoutPriority.BottomFullWidth);
+			});
+
+			// Register toolboxes — order determines sidebar button order
+			dock.AddToolbox<FolderExplorerViewModel>(sp =>
+				new FolderExplorerViewModel(_ => { }));
+			dock.AddToolbox<SearchViewModel>();
+			dock.AddToolbox<SourceControlViewModel>();
+			dock.AddToolbox<ProblemsViewModel>();
+			dock.AddToolbox<TerminalViewModel>();
 		});
-
-		// Register toolboxes — order determines sidebar button order
-		services.AddToolbox<FolderExplorerViewModel>(sp =>
-			new FolderExplorerViewModel(_ => { }));
-		services.AddToolbox<SearchViewModel>();
-		services.AddToolbox<SourceControlViewModel>();
-		services.AddToolbox<ProblemsViewModel>();
-		services.AddToolbox<TerminalViewModel>();
-
-		// Dock layout service — auto-builds the MVVM dock tree from toolboxes
-		services.AddDockLayoutService();
 
 		// MainViewModel uses only the layout service — all anchorables accessible via GetAnchorable<T>()
 		services.AddSingleton<MainViewModel>();

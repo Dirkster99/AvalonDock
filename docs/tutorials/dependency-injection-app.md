@@ -3,7 +3,7 @@ title: "Tutorial: Dependency Injection App"
 layout: default
 parent: Tutorials
 nav_order: 2
-description: "Build a modern AvalonDock application using the v5 DI architecture with AddToolbox, AddDockLayoutService, and ToggleDockingManager."
+description: "Build a modern AvalonDock application using the v5 DI architecture with AddDockLayoutService builder pattern and ToggleDockingManager."
 ---
 
 # Tutorial: Dependency Injection Deep Dive
@@ -17,9 +17,9 @@ This tutorial covers the same DI patterns used in the `AvalonDockCodeApp` sample
 
 ## What You'll Learn
 
-- Every `IServiceCollection` extension method and when to use it
-- How `AddDockLayoutService()` auto-builds the layout tree from registered `IToolbox` instances
-- How `AddToggleDockOptions()` configures the sidebar and docking behavior
+- The `AddDockLayoutService(configure)` builder pattern and when to use it
+- How the `DockLayoutBuilder` auto-builds the layout tree from registered `IToolbox` instances
+- How `ConfigureToggleDock()` configures the sidebar and docking behavior
 - How to use factory overloads (`AddToolbox<T>(factory)`) for toolboxes that need constructor parameters
 - How to register additional AvalonDock services (theme manager, serializer, auto-hide)
 - Testing patterns with DI
@@ -44,10 +44,8 @@ The `AvalonDock.DependencyInjection` package provides these extension methods on
 
 | Method | Purpose |
 |:-------|:--------|
-| `AddToolbox<T>()` | Register a toolbox VM as singleton |
-| `AddToolbox<T>(factory)` | Register a toolbox VM with a custom factory |
-| `AddDockLayoutService()` | Register `IDockLayoutService` — auto-builds layout tree from all `IToolbox` instances |
-| `AddToggleDockOptions(configure)` | Register `ToggleDockOptions` for sidebar/dock configuration |
+| `AddDockLayoutService(configure)` | Register `IDockLayoutService` with a builder to configure toolboxes and options |
+| `AddDockLayoutService()` | Register `IDockLayoutService` without builder configuration |
 | `AddAvalonDock<TFactory>()` | Register a custom `IFactory` implementation |
 | `AddAvalonDockSerializer<T>()` | Register a layout serializer |
 | `AddAvalonDockThemeManager<T>()` | Register a theme manager |
@@ -56,29 +54,41 @@ The `AvalonDock.DependencyInjection` package provides these extension methods on
 | `AddFloatingWindowService<T>()` | Register a floating window service |
 | `AddDragDropHandler<T>()` | Register a drag-and-drop handler |
 
+#### DockLayoutBuilder Methods
+
+| Method | Purpose |
+|:-------|:--------|
+| `ConfigureToggleDock(configure)` | Register `ToggleDockOptions` for sidebar/dock configuration |
+| `AddToolbox<T>()` | Register a toolbox VM as singleton |
+| `AddToolbox<T>(factory)` | Register a toolbox VM with a custom factory |
+
 ---
 
 ## Registration Patterns
 
 ### Basic Toolbox Registration
 
-For toolboxes with parameterless constructors:
+For toolboxes with parameterless constructors, use `AddToolbox<T>()` inside the builder:
 
 ```csharp
-services.AddToolbox<SearchToolbox>();
-services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SearchToolbox>());
+services.AddDockLayoutService(dock =>
+{
+    dock.AddToolbox<SearchToolbox>();
+});
 ```
 
-The first line registers `SearchToolbox` as a singleton. The second line registers it as `IToolbox` so that `DockLayoutService` can discover it.
+This registers `SearchToolbox` as a singleton and also as `IToolbox` so that `DockLayoutService` can discover it.
 
 ### Factory-Based Registration
 
 For toolboxes that need constructor parameters (like callbacks):
 
 ```csharp
-services.AddToolbox<FolderExplorerToolbox>(sp =>
-    new FolderExplorerToolbox(filePath => { /* open file callback */ }));
-services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<FolderExplorerToolbox>());
+services.AddDockLayoutService(dock =>
+{
+    dock.AddToolbox<FolderExplorerToolbox>(sp =>
+        new FolderExplorerToolbox(filePath => { /* open file callback */ }));
+});
 ```
 
 This is used in `AvalonDockCodeApp` for the `FolderExplorerViewModel` which needs a file-open callback.
@@ -86,7 +96,11 @@ This is used in `AvalonDockCodeApp` for the `FolderExplorerViewModel` which need
 ### DockLayoutService
 
 ```csharp
-services.AddDockLayoutService();
+services.AddDockLayoutService(dock =>
+{
+    dock.AddToolbox<ExplorerToolbox>();
+    dock.AddToolbox<SearchToolbox>();
+});
 ```
 
 This registers `IDockLayoutService` as a singleton. On creation, it:
@@ -95,17 +109,24 @@ This registers `IDockLayoutService` as a singleton. On creation, it:
 2. Builds an `IRootDock` layout tree with toolboxes placed by their `DockZone`
 3. Exposes the tree via `Layout` for XAML binding
 
+If `ConfigureToggleDock` is not called, default `ToggleDockOptions` are registered automatically.
+
 ### ToggleDockOptions
 
+Configure via `ConfigureToggleDock` inside the builder:
+
 ```csharp
-services.AddToggleDockOptions(opts =>
+services.AddDockLayoutService(dock =>
 {
-    opts.ButtonSize = 28;           // Sidebar toggle button size in pixels
-    opts.DefaultDockWidth = 280;    // Default width for side-docked panes
-    opts.DefaultDockHeight = 220;   // Default height for bottom-docked panes
-    opts.LayoutPriority = nameof(DockLayoutPriority.BottomFullWidth);
-    opts.ShowHeaderMinimizeButton = true;
-    opts.ShowHeaderOptionsButton = true;
+    dock.ConfigureToggleDock(opts =>
+    {
+        opts.ButtonSize = 28;           // Sidebar toggle button size in pixels
+        opts.DefaultDockWidth = 280;    // Default width for side-docked panes
+        opts.DefaultDockHeight = 220;   // Default height for bottom-docked panes
+        opts.LayoutPriority = nameof(DockLayoutPriority.BottomFullWidth);
+        opts.ShowHeaderMinimizeButton = true;
+        opts.ShowHeaderOptionsButton = true;
+    });
 });
 ```
 
@@ -151,36 +172,29 @@ public partial class App : Application
 
     private static void ConfigureServices(IServiceCollection services)
     {
-        // 1. Configure toggle dock options
-        services.AddToggleDockOptions(opts =>
+        // Configure dock layout: toggle dock options + toolboxes in one call
+        services.AddDockLayoutService(dock =>
         {
-            opts.ButtonSize = 28;
-            opts.DefaultDockWidth = 280;
-            opts.DefaultDockHeight = 220;
-            opts.LayoutPriority = nameof(DockLayoutPriority.BottomFullWidth);
+            dock.ConfigureToggleDock(opts =>
+            {
+                opts.ButtonSize = 28;
+                opts.DefaultDockWidth = 280;
+                opts.DefaultDockHeight = 220;
+                opts.LayoutPriority = nameof(DockLayoutPriority.BottomFullWidth);
+            });
+
+            // Register toolbox VMs — order determines sidebar button order
+            dock.AddToolbox<ExplorerToolbox>();
+            dock.AddToolbox<SearchToolbox>();
+            dock.AddToolbox<SourceControlToolbox>();
+            dock.AddToolbox<ProblemsToolbox>();
+            dock.AddToolbox<TerminalToolbox>();
         });
 
-        // 2. Register toolbox VMs — order determines sidebar button order
-        services.AddToolbox<ExplorerToolbox>();
-        services.AddToolbox<SearchToolbox>();
-        services.AddToolbox<SourceControlToolbox>();
-        services.AddToolbox<ProblemsToolbox>();
-        services.AddToolbox<TerminalToolbox>();
-
-        // 3. Register each as IToolbox for collection injection
-        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<ExplorerToolbox>());
-        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SearchToolbox>());
-        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SourceControlToolbox>());
-        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<ProblemsToolbox>());
-        services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<TerminalToolbox>());
-
-        // 4. DockLayoutService auto-builds the layout tree
-        services.AddDockLayoutService();
-
-        // 5. MainViewModel receives IDockLayoutService
+        // MainViewModel receives IDockLayoutService
         services.AddSingleton<MainViewModel>();
 
-        // 6. MainWindow receives MainViewModel + ToggleDockOptions
+        // MainWindow receives MainViewModel + ToggleDockOptions
         services.AddSingleton<MainWindow>();
     }
 

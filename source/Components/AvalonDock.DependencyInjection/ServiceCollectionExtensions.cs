@@ -59,55 +59,6 @@ namespace AvalonDock.DependencyInjection
 		}
 
 		/// <summary>
-		/// Registers <see cref="ToggleDockOptions"/> with an optional configuration delegate.
-		/// </summary>
-		/// <param name="services">The service collection.</param>
-		/// <param name="configure">Optional delegate to configure the options.</param>
-		/// <returns>The service collection for chaining.</returns>
-		public static IServiceCollection AddToggleDockOptions(
-			this IServiceCollection services,
-			Action<ToggleDockOptions>? configure = null)
-		{
-			var options = new ToggleDockOptions();
-			configure?.Invoke(options);
-			services.AddSingleton(options);
-			return services;
-		}
-
-		/// <summary>
-		/// Registers a toolbox ViewModel for use with the ToggleDockingManager.
-		/// The ViewModel should implement <c>AvalonDock.Core.IToolbox</c>.
-		/// All registered toolboxes are collected via <c>IEnumerable&lt;IToolboxRegistration&gt;</c>.
-		/// </summary>
-		/// <typeparam name="T">The concrete ViewModel type.</typeparam>
-		/// <param name="services">The service collection.</param>
-		/// <returns>The service collection for chaining.</returns>
-		public static IServiceCollection AddToolbox<T>(this IServiceCollection services)
-			where T : class, IToolbox
-		{
-			services.AddSingleton<T>();
-			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<T>());
-			return services;
-		}
-
-		/// <summary>
-		/// Registers a toolbox ViewModel with a factory for use with the ToggleDockingManager.
-		/// </summary>
-		/// <typeparam name="T">The concrete ViewModel type.</typeparam>
-		/// <param name="services">The service collection.</param>
-		/// <param name="factory">Factory to create the ViewModel instance.</param>
-		/// <returns>The service collection for chaining.</returns>
-		public static IServiceCollection AddToolbox<T>(
-			this IServiceCollection services,
-			Func<IServiceProvider, T> factory)
-			where T : class, IToolbox
-		{
-			services.AddSingleton<T>(factory);
-			services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<T>());
-			return services;
-		}
-
-		/// <summary>
 		/// Registers a theme manager implementation.
 		/// </summary>
 		/// <typeparam name="TThemeManager">The concrete type implementing <see cref="IThemeManager"/>.</typeparam>
@@ -176,6 +127,36 @@ namespace AvalonDock.DependencyInjection
 			where TDragDrop : class, IDragDropHandler
 		{
 			services.AddSingleton<IDragDropHandler, TDragDrop>();
+			return services;
+		}
+
+		/// <summary>
+		/// Registers the <see cref="IDockLayoutService"/> which auto-builds the MVVM layout tree
+		/// from all registered <see cref="IToolbox"/> instances, using a builder to configure
+		/// toolboxes and toggle dock options in a single call.
+		/// </summary>
+		/// <param name="services">The service collection.</param>
+		/// <param name="configure">Delegate to configure the dock layout via <see cref="DockLayoutBuilder"/>.</param>
+		/// <returns>The service collection for chaining.</returns>
+		public static IServiceCollection AddDockLayoutService(
+			this IServiceCollection services,
+			Action<DockLayoutBuilder> configure)
+		{
+			var builder = new DockLayoutBuilder(services);
+			configure(builder);
+
+			if (!builder.ToggleDockConfigured)
+			{
+				services.AddSingleton(new ToggleDockOptions());
+			}
+
+			services.AddSingleton<IDockLayoutService>(sp =>
+			{
+				var toolboxes = sp.GetService<IEnumerable<IToolbox>>()
+					?? System.Array.Empty<IToolbox>();
+				return new Mvvm.DockLayoutService(toolboxes);
+			});
+			services.AddSingleton<Mvvm.SideToggleManager>();
 			return services;
 		}
 

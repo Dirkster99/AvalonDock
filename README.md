@@ -95,10 +95,8 @@ The `AvalonDock.DependencyInjection` package provides `IServiceCollection` exten
 
 | Method | Purpose |
 |:-------|:--------|
-| `AddToolbox<T>()` | Register a toolbox (anchorable) view model as a singleton |
-| `AddToolbox<T>(factory)` | Register a toolbox with a custom factory for constructor parameters |
-| `AddDockLayoutService()` | Register `IDockLayoutService` — auto-builds the layout tree from all `IToolbox` instances |
-| `AddToggleDockOptions(configure)` | Configure sidebar button size, default dock dimensions, and layout priority |
+| `AddDockLayoutService(configure)` | Register `IDockLayoutService` with a builder to configure toolboxes and toggle dock options in a single call |
+| `AddDockLayoutService()` | Register `IDockLayoutService` without builder configuration |
 | `AddAvalonDock<TFactory>()` | Register a custom `IFactory` implementation |
 | `AddAvalonDockSerializer<T>()` | Register an `ILayoutSerializer` (XML or JSON) |
 | `AddAvalonDockThemeManager<T>()` | Register a theme manager |
@@ -106,6 +104,14 @@ The `AvalonDock.DependencyInjection` package provides `IServiceCollection` exten
 | `AddAutoHideManager<T>()` | Register an auto-hide manager |
 | `AddFloatingWindowService<T>()` | Register a floating window service |
 | `AddDragDropHandler<T>()` | Register a custom drag-and-drop handler |
+
+#### DockLayoutBuilder Methods
+
+| Method | Purpose |
+|:-------|:--------|
+| `ConfigureToggleDock(configure)` | Configure sidebar button size, default dock dimensions, and layout priority |
+| `AddToolbox<T>()` | Register a toolbox (anchorable) view model as a singleton |
+| `AddToolbox<T>(factory)` | Register a toolbox with a custom factory for constructor parameters |
 
 ### Composition Root Example
 
@@ -124,22 +130,21 @@ public partial class App : Application
 
         var services = new ServiceCollection();
 
-        // Configure toggle dock options (sidebar behavior)
-        services.AddToggleDockOptions(opts =>
+        // Configure dock layout: toggle dock options + toolboxes in one call
+        services.AddDockLayoutService(dock =>
         {
-            opts.ButtonSize = 28;
-            opts.DefaultDockWidth = 280;
-            opts.DefaultDockHeight = 220;
-            opts.LayoutPriority = nameof(AvalonDock.DockLayoutPriority.BottomFullWidth);
+            dock.ConfigureToggleDock(opts =>
+            {
+                opts.ButtonSize = 28;
+                opts.DefaultDockWidth = 280;
+                opts.DefaultDockHeight = 220;
+                opts.LayoutPriority = nameof(AvalonDock.DockLayoutPriority.BottomFullWidth);
+            });
+
+            dock.AddToolbox<ExplorerToolbox>();
+            dock.AddToolbox<SearchToolbox>();
+            dock.AddToolbox<TerminalToolbox>();
         });
-
-        // Register toolbox view models
-        services.AddToolbox<ExplorerToolbox>();
-        services.AddToolbox<SearchToolbox>();
-        services.AddToolbox<TerminalToolbox>();
-
-        // Auto-build layout tree from registered toolboxes
-        services.AddDockLayoutService();
 
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<MainWindow>();

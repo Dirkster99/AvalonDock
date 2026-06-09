@@ -12,7 +12,8 @@ namespace AvalonDock.Mvvm.CommunityToolkit
 	/// <para>Inherit from this class for your toolbox ViewModels when using
 	/// CommunityToolkit.Mvvm source generators. Set <see cref="Zone"/> in the
 	/// constructor to control placement.</para>
-	/// <para>Register with DI using <c>services.AddToolbox&lt;T&gt;()</c>.</para>
+	/// <para>Register with DI using <c>dock.AddToolbox&lt;T&gt;()</c> inside the
+	/// <c>AddDockLayoutService</c> builder.</para>
 	/// </remarks>
 	[DataContract]
 	public abstract class ObservableToolboxBase : ObservableDockableBase, IToolbox
