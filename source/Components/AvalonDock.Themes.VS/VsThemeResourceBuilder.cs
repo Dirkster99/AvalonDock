@@ -12,16 +12,39 @@ namespace AvalonDock.Themes.VS
 	public static class VsThemeResourceBuilder
 	{
 		/// <summary>
-		/// Builds a complete <see cref="ResourceDictionary"/> containing brushes
-		/// for all AvalonDock resource keys, mapped from the given VS theme palette.
+		/// Default pack URI for the shared control templates (VS2015-era Generic.xaml).
+		/// </summary>
+		private static readonly Uri DefaultGenericXamlUri =
+			new Uri("/AvalonDock.Themes.VS;component/Themes/Generic.xaml", UriKind.Relative);
+
+		/// <summary>
+		/// Builds a complete <see cref="ResourceDictionary"/> using the default Generic.xaml templates.
 		/// </summary>
 		/// <param name="palette">The parsed VS theme color palette.</param>
 		/// <returns>A resource dictionary ready to be used with <see cref="DictionaryTheme"/>.</returns>
 		public static ResourceDictionary Build(VsThemeColorPalette palette)
 		{
+			return Build(palette, DefaultGenericXamlUri);
+		}
+
+		/// <summary>
+		/// Builds a complete <see cref="ResourceDictionary"/> containing brushes
+		/// for all AvalonDock resource keys, mapped from the given VS theme palette,
+		/// and merges the specified Generic.xaml control templates.
+		/// </summary>
+		/// <param name="palette">The parsed VS theme color palette.</param>
+		/// <param name="genericXamlUri">Pack URI for the Generic.xaml resource dictionary to merge.</param>
+		/// <returns>A resource dictionary ready to be used with <see cref="DictionaryTheme"/>.</returns>
+		public static ResourceDictionary Build(VsThemeColorPalette palette, Uri genericXamlUri)
+		{
 			if (palette == null)
 			{
 				throw new ArgumentNullException(nameof(palette));
+			}
+
+			if (genericXamlUri == null)
+			{
+				throw new ArgumentNullException(nameof(genericXamlUri));
 			}
 
 			var dict = new ResourceDictionary();
@@ -149,10 +172,10 @@ namespace AvalonDock.Themes.VS
 			// Menu brushes
 			MapMenuBrushes(dict, palette, background, panelBorder, inactiveText, dimText, accent, brightText);
 
-			// Merge the shared control templates (Generic.xaml)
+			// Merge the control templates (Generic.xaml)
 			dict.MergedDictionaries.Add(new ResourceDictionary
 			{
-				Source = new Uri("/AvalonDock.Themes.VS;component/Themes/Generic.xaml", UriKind.Relative),
+				Source = genericXamlUri,
 			});
 
 			return dict;

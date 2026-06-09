@@ -16,6 +16,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:TestApp"
     xmlns:winformsIntegration="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+    xmlns:vs="clr-namespace:AvalonDock.Themes.VS;assembly=AvalonDock.Themes.VS"
     Title="MainWindow"
     Width="800"
     Height="600"
@@ -97,7 +98,7 @@
             IsVirtualizingAnchorable="True"
             IsVirtualizingDocument="True">
             <DockingManager.Theme>
-                <ArcDarkTheme />
+	            <vs:VS2022LightTheme/>
             </DockingManager.Theme>
             <DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>

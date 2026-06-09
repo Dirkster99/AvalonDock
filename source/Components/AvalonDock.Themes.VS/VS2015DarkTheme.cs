@@ -12,7 +12,7 @@ namespace AvalonDock.Themes.VS
 		/// Initializes a new instance of the <see cref="VS2015DarkTheme"/> class.
 		/// </summary>
 		public VS2015DarkTheme()
-			: base(LoadEmbeddedResource("AvalonDock.Themes.VS.Resources.vs2015dark.vstheme"))
+			: base(LoadEmbeddedResource("AvalonDock.Themes.Resources.vs2015dark.vstheme"))
 		{
 		}
 
