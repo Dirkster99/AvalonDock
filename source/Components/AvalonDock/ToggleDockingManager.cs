@@ -462,7 +462,7 @@ public class ToggleDockingManager : DockingManager
 	/// <inheritdoc/>
 	internal override void StartDraggingFloatingWindowForContent(LayoutContent contentModel, bool startDrag = true)
 	{
-		if (contentModel is LayoutAnchorable anchorable)
+		if (startDrag && contentModel is LayoutAnchorable anchorable)
 		{
 			ToggleDockDragOverlay.StartDragFromPane(anchorable, this);
 			return;
