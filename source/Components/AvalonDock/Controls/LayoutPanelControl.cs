@@ -43,6 +43,14 @@ namespace AvalonDock.Controls
 						else if (_model.Children[i] as ILayoutPositionableElement != null && (_model.Children[i] as ILayoutPositionableElement).DockWidth.IsStar)
 						{
 							var childPositionableModelWidthActualSize = _model.Children[i] as ILayoutPositionableElement as ILayoutPositionableElementWithActualSize;
+#if WINDOWS_APP_SDK
+							// WinUI 3: the dispatched children refresh runs after this grid is
+							// arranged but before the new pane controls are, so the model's
+							// ActualWidth is still 0 here. Converting now would pin the pane at
+							// its minimum width. Leave it star — matches Uno, where this code is
+							// only reached before the grid is arranged (early return above).
+							if (childPositionableModelWidthActualSize.ActualWidth == 0) continue;
+#endif
 							var childDockMinWidth = (_model.Children[i] as ILayoutPositionableElement).CalculatedDockMinWidth();
 							var widthToSet = Math.Max(childPositionableModelWidthActualSize.ActualWidth, childDockMinWidth);
 
@@ -81,6 +89,10 @@ namespace AvalonDock.Controls
 						else if (_model.Children[i] as ILayoutPositionableElement != null && (_model.Children[i] as ILayoutPositionableElement).DockHeight.IsStar)
 						{
 							var childPositionableModelWidthActualSize = _model.Children[i] as ILayoutPositionableElement as ILayoutPositionableElementWithActualSize;
+#if WINDOWS_APP_SDK
+							// See the DockWidth branch above — never pin a not-yet-arranged pane.
+							if (childPositionableModelWidthActualSize.ActualHeight == 0) continue;
+#endif
 							var childDockMinHeight = (_model.Children[i] as ILayoutPositionableElement).CalculatedDockMinHeight();
 							var heightToSet = Math.Max(childPositionableModelWidthActualSize.ActualHeight, childDockMinHeight);
 							heightToSet = Math.Min(heightToSet, ActualHeight / 2.0);
