@@ -80,6 +80,14 @@
                 <MenuItem Header="VS2013 Light" Click="OnSwitchTheme" Tag="VS2013Light" IsCheckable="True" />
                 <MenuItem Header="VS2013 Blue" Click="OnSwitchTheme" Tag="VS2013Blue" IsCheckable="True" />
                 <Separator />
+                <MenuItem Header="VS2022 Dark" Click="OnSwitchTheme" Tag="VS2022Dark" IsCheckable="True" />
+                <MenuItem Header="VS2022 Light" Click="OnSwitchTheme" Tag="VS2022Light" IsCheckable="True" />
+                <MenuItem Header="VS2022 Blue" Click="OnSwitchTheme" Tag="VS2022Blue" IsCheckable="True" />
+                <Separator />
+                <MenuItem Header="VS2015 Dark" Click="OnSwitchTheme" Tag="VS2015Dark" IsCheckable="True" />
+                <MenuItem Header="VS2015 Light" Click="OnSwitchTheme" Tag="VS2015Light" IsCheckable="True" />
+                <MenuItem Header="VS2015 Blue" Click="OnSwitchTheme" Tag="VS2015Blue" IsCheckable="True" />
+                <Separator />
                 <MenuItem Header="VS2010" Click="OnSwitchTheme" Tag="VS2010" IsCheckable="True" />
                 <MenuItem Header="Expression Dark" Click="OnSwitchTheme" Tag="ExpressionDark" IsCheckable="True" />
                 <MenuItem Header="Expression Light" Click="OnSwitchTheme" Tag="ExpressionLight" IsCheckable="True" />
@@ -98,7 +106,7 @@
             IsVirtualizingAnchorable="True"
             IsVirtualizingDocument="True">
             <DockingManager.Theme>
-	            <vs:VS2022LightTheme/>
+	            <ArcDarkTheme/>
             </DockingManager.Theme>
             <DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>

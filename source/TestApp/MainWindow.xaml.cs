@@ -24,6 +24,7 @@ using System.IO;
 using AvalonDock.Serializer.Xml;
 using AvalonDock;
 using AvalonDock.Themes;
+using AvalonDock.Themes.VS;
 using System.Diagnostics.CodeAnalysis;
 
 namespace TestApp
@@ -31,6 +32,7 @@ namespace TestApp
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
+	[SuppressMessage("Maintainability", "CA1506:Avoid excessive class coupling", Justification = "MainWindow intentionally orchestrates many UI framework types in this sample app.")]
 	public partial class MainWindow : Window
 	{
 
@@ -282,6 +284,12 @@ namespace TestApp
 				case "VS2013Dark": theme = new Vs2013DarkTheme(); break;
 				case "VS2013Light": theme = new Vs2013LightTheme(); break;
 				case "VS2013Blue": theme = new Vs2013BlueTheme(); break;
+				case "VS2022Dark": theme = new VS2022DarkTheme(); break;
+				case "VS2022Light": theme = new VS2022LightTheme(); break;
+				case "VS2022Blue": theme = new VS2022BlueTheme(); break;
+				case "VS2015Dark": theme = new VS2015DarkTheme(); break;
+				case "VS2015Light": theme = new VS2015LightTheme(); break;
+				case "VS2015Blue": theme = new VS2015BlueTheme(); break;
 				case "VS2010": theme = new VS2010Theme(); break;
 				case "ExpressionDark": theme = new ExpressionDarkTheme(); break;
 				case "ExpressionLight": theme = new ExpressionLightTheme(); break;
