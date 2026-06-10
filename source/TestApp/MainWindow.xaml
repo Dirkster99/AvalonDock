@@ -98,7 +98,7 @@
             IsVirtualizingAnchorable="True"
             IsVirtualizingDocument="True">
             <DockingManager.Theme>
-	            <vs:VS2022LightTheme/>
+	            <ArcDarkTheme/>
             </DockingManager.Theme>
             <DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
