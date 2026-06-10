@@ -32,6 +32,7 @@ namespace TestApp
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
+	[SuppressMessage("Maintainability", "CA1506:Avoid excessive class coupling", Justification = "MainWindow intentionally orchestrates many UI framework types in this sample app.")]
 	public partial class MainWindow : Window
 	{
 
