@@ -165,9 +165,9 @@ namespace AvalonDock.Themes.VS
 			previewBrush.Freeze();
 			dict[ResourceKeys.PreviewBoxBackgroundBrushKey] = previewBrush;
 
-			// Docking button sizes
-			dict[ResourceKeys.DockingButtonWidthKey] = 88.0;
-			dict[ResourceKeys.DockingButtonHeightKey] = 88.0;
+			// Docking button sizes (match VS2013 overlay button dimensions)
+			dict[ResourceKeys.DockingButtonWidthKey] = 40.0;
+			dict[ResourceKeys.DockingButtonHeightKey] = 40.0;
 
 			// Menu brushes
 			MapMenuBrushes(dict, palette, background, panelBorder, inactiveText, dimText, accent, brightText);
