@@ -161,6 +161,20 @@ namespace AvalonDock.Controls
 				OnFixChildrenDockLengths();
 		}
 
+#if WINDOWS_APP_SDK
+		// WinUI 3: a Grid whose fixed columns overflow its slot keeps the overflowed
+		// total as its ActualWidth/ActualHeight (Uno's Grid clamps the arranged size
+		// to the slot). Capture the measure constraint so AdjustFixedChildrenPanelSizes
+		// sees the true available space instead of the overflowed actual size.
+		private Size _lastMeasureConstraint = new Size(double.PositiveInfinity, double.PositiveInfinity);
+
+		protected override Size MeasureOverride(Size availableSize)
+		{
+			_lastMeasureConstraint = availableSize;
+			return base.MeasureOverride(availableSize);
+		}
+#endif
+
 		protected abstract void OnFixChildrenDockLengths();
 
 		private void OnSizeChanged(object sender,
@@ -404,6 +418,12 @@ namespace AvalonDock.Controls
 			var models    = visible.OfType<ILayoutControl>().Select(c => c.Model).OfType<ILayoutPositionableElementWithActualSize>().ToList();
 			var splitters = visible.OfType<LayoutGridResizerControl>().ToList();
 			var avail     = parentSize ?? new Size(ActualWidth, ActualHeight);
+#if WINDOWS_APP_SDK
+			if (!double.IsInfinity(_lastMeasureConstraint.Width))
+				avail.Width = Math.Min(avail.Width, _lastMeasureConstraint.Width);
+			if (!double.IsInfinity(_lastMeasureConstraint.Height))
+				avail.Height = Math.Min(avail.Height, _lastMeasureConstraint.Height);
+#endif
 			List<ILayoutPositionableElementWithActualSize> fixedP, relP;
 			double minH = 0, curH = 0, prefMinH = 0, minW = 0, curW = 0, prefMinW = 0;
 			if (Orientation == Orientation.Vertical)
