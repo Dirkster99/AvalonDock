@@ -86,7 +86,14 @@ namespace AvalonDock.Controls
 #endif
 		}
 
+		/// <summary>
+		/// Gets the layout model represented by this control.
+		/// </summary>
 		public ILayoutElement Model => _model;
+
+		/// <summary>
+		/// Gets the orientation of the represented layout group.
+		/// </summary>
 		public Orientation Orientation => (_model as ILayoutOrientableGroup).Orientation;
 		private bool AsyncRefreshCalled => _asyncRefreshCalled != null;
 
@@ -128,6 +135,11 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <summary>
+		/// Gets the visible layout controls adjacent to a splitter.
+		/// </summary>
+		/// <param name="splitter">The splitter whose neighbours should be returned.</param>
+		/// <returns>The previous and next visible framework elements.</returns>
 		protected (FrameworkElement Prev, FrameworkElement Next) GetResizerNeighbours(LayoutGridResizerControl splitter)
 		{
 			var idx = Children.IndexOf(splitter);
@@ -137,6 +149,7 @@ namespace AvalonDock.Controls
 		// ── Grid lifecycle ────────────────────────────────────────────────────────
 
 #if !HAS_UNO
+		/// <inheritdoc/>
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
@@ -155,6 +168,9 @@ namespace AvalonDock.Controls
 		}
 #endif
 
+		/// <summary>
+		/// Updates child dock lengths while preventing re-entrant length updates.
+		/// </summary>
 		protected void FixChildrenDockLengths()
 		{
 			using (_fixingChildrenDockLengths.Enter())
@@ -175,6 +191,9 @@ namespace AvalonDock.Controls
 		}
 #endif
 
+		/// <summary>
+		/// Updates the dock lengths for child layout elements.
+		/// </summary>
 		protected abstract void OnFixChildrenDockLengths();
 
 		private void OnSizeChanged(object sender,
@@ -411,6 +430,7 @@ namespace AvalonDock.Controls
 
 		// ── Size adjustment ───────────────────────────────────────────────────────
 
+		/// <inheritdoc/>
 		public virtual void AdjustFixedChildrenPanelSizes(Size? parentSize = null)
 		{
 			var visible = GetVisibleChildren();
@@ -478,6 +498,11 @@ namespace AvalonDock.Controls
 
 		// ── Helpers ───────────────────────────────────────────────────────────────
 
+		/// <summary>
+		/// Gets the next visible non-splitter child after the specified child index.
+		/// </summary>
+		/// <param name="index">The child index to start searching after.</param>
+		/// <returns>The next visible child, or <c>null</c> if none exists.</returns>
 		protected FrameworkElement GetNextVisibleChild(int index)
 		{
 			for (var i = index + 1; i < Children.Count; i++)

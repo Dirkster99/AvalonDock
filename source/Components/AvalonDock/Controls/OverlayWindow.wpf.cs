@@ -88,6 +88,7 @@ namespace AvalonDock.Controls
 		[Category("FloatingWindow")]
 		public bool IsHostedInFloatingWindow => _host is LayoutDocumentFloatingWindowControl || _host is LayoutAnchorableFloatingWindowControl;
 
+		/// <inheritdoc/>
 		public override void OnApplyTemplate()
 		{
 			base.OnApplyTemplate();
@@ -135,13 +136,14 @@ namespace AvalonDock.Controls
 			_previewBox = GetTemplateChild("PART_PreviewBox") as Path;
 		}
 
+		/// <inheritdoc/>
 		protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
 		{
 			base.OnClosing(e);
 		}
 
-		/// <summary>Is Invoked when AvalonDock's WPF Theme changes via the <see cref="DockingManager.OnThemeChanged()"/> method.</summary>
-		/// <param name="oldTheme"></param>
+		/// <summary>Invoked when AvalonDock's WPF theme changes.</summary>
+		/// <param name="oldTheme">The previous theme, if one was set.</param>
 		internal void UpdateThemeResources(Theme oldTheme = null)
 		{
 			if (oldTheme != null) // Remove the old theme if present
