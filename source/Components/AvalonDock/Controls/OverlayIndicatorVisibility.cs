@@ -108,6 +108,20 @@ namespace AvalonDock.Controls
 				result.AsBottom = false;
 			}
 
+			if (isAnchorableDrag)
+			{
+				// An anchorable dragged over a document pane can only dock AS AN ANCHORABLE around
+				// the document area (the outer "as-anchorable" ring). It cannot split or tab the
+				// document, so the inner document-split diamond and the center "dock into" target do
+				// not apply and stay hidden — matching WPF AvalonDock/ILSpy, which shows only the
+				// four outer edge arrows in this case.
+				result.InnerLeft = false;
+				result.InnerTop = false;
+				result.InnerRight = false;
+				result.InnerBottom = false;
+				result.CenterVisible = false;
+			}
+
 			return result;
 		}
 

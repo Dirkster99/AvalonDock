@@ -610,6 +610,11 @@ namespace AvalonDock.Controls
 								_documentPaneFullDropTargetRight,
 								_documentPaneFullDropTargetBottom);
 
+							// The full-targets center "dock into" follows the rule's CenterVisible
+							// (false for anchorable drags), so an anchorable over a document pane shows
+							// only the as-anchorable ring — matching ILSpy. (XAML defaults it Visible.)
+							_documentPaneFullDropTargetInto.Visibility = ToVisibility(visibility.CenterVisible);
+
 							ApplyAsDirectionalVisibility(visibility,
 								_documentPaneDropTargetLeftAsAnchorablePane,
 								_documentPaneDropTargetTopAsAnchorablePane,
