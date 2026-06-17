@@ -31,7 +31,8 @@ namespace AvalonDock.Controls
 		internal static OverlayIndicatorVisibility ForDocumentPaneGroup(LayoutDocumentPaneGroup group, LayoutFloatingWindow floatingModel, out LayoutDocumentPane representativePane)
 		{
 			representativePane = group?.Children?.OfType<LayoutDocumentPane>().FirstOrDefault();
-			return OverlayIndicatorVisibilityRules.ForDocumentPaneGroup(CanDropInto(representativePane, floatingModel));
+			var isAnchorableDrag = floatingModel is LayoutAnchorableFloatingWindow;
+			return OverlayIndicatorVisibilityRules.ForDocumentPaneGroup(CanDropInto(representativePane, floatingModel), isAnchorableDrag);
 		}
 	}
 }

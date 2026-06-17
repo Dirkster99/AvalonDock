@@ -29,11 +29,16 @@ namespace AvalonDock.Controls
 			};
 		}
 
-		internal static OverlayIndicatorVisibility ForDocumentPaneGroup(bool canDropInto)
+		internal static OverlayIndicatorVisibility ForDocumentPaneGroup(bool canDropInto, bool isAnchorableDrag)
 		{
 			return new OverlayIndicatorVisibility
 			{
-				CenterVisible = canDropInto,
+				// The document-pane-group center docks the dragged content INTO the group as a
+				// document tab. An anchorable cannot become a document, so it is hidden for
+				// anchorable drags — matching WPF AvalonDock/ILSpy, which over the document area
+				// offers only the outer docking-manager edge arrows (the as-anchorable docking is
+				// offered per-pane, not on the group center).
+				CenterVisible = canDropInto && !isAnchorableDrag,
 				InnerLeft = false,
 				InnerTop = false,
 				InnerRight = false,

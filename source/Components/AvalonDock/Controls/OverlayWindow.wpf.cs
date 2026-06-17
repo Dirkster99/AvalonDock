@@ -571,6 +571,10 @@ namespace AvalonDock.Controls
 						}
 
 						SetDropTargetIntoVisibility(layoutDocumentPane);
+						// The group center docks content INTO the group as a document tab; an anchorable
+						// cannot become a document, so honor the rule's CenterVisible (false for anchorable
+						// drags) — matching ILSpy, which shows no group center for an anchorable drag.
+						_documentPaneDropTargetInto.Visibility = ToVisibility(groupVisibility.CenterVisible);
 						ApplyDirectionalVisibility(groupVisibility,
 							_documentPaneDropTargetLeft,
 							_documentPaneDropTargetTop,
