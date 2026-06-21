@@ -9,13 +9,21 @@ namespace AvalonDock.Layout
 	/// Provides a base class for layout element.
 	/// </summary>
 	[Serializable]
-	public abstract class LayoutElement : DependencyObject, ILayoutElement, Core.Serialization.ISerializableLayoutElement
+	public abstract partial class LayoutElement : DependencyObject, ILayoutElement, Core.Serialization.ISerializableLayoutElement
 	{
 		[NonSerialized]
 		private ILayoutContainer _parent = null;
 
 		[NonSerialized]
 		private ILayoutRoot _root = null;
+
+#if HAS_UNO
+		// WPF's DependencyObject.SetCurrentValue has no WinUI/Uno equivalent. LayoutContent calls
+		// it as an instance method; this shim delegates to SetValue (the model layer never relies
+		// on WPF's value-source distinction between SetValue and SetCurrentValue).
+		protected internal void SetCurrentValue(DependencyProperty dp, object value)
+			=> SetValue(dp, value);
+#endif
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LayoutElement"/> class.

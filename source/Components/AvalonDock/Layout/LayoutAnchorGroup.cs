@@ -7,7 +7,11 @@ namespace AvalonDock.Layout
 	/// <summary>
 	/// Represents a layout anchor group.
 	/// </summary>
+#if HAS_UNO
+	[ContentProperty(Name = nameof(Children))]
+#else
 	[ContentProperty(nameof(Children))]
+#endif
 	[Serializable]
 	public class LayoutAnchorGroup : LayoutGroup<LayoutAnchorable>, ILayoutPreviousContainer, ILayoutPaneSerializable, Core.Serialization.ISerializableLayoutPane
 	{

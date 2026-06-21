@@ -7,7 +7,11 @@ namespace AvalonDock.Layout
 	/// <summary>
 	/// Represents a layout document pane group.
 	/// </summary>
+#if HAS_UNO
+	[ContentProperty(Name = nameof(Children))]
+#else
 	[ContentProperty(nameof(Children))]
+#endif
 	[Serializable]
 	public class LayoutDocumentPaneGroup : LayoutPositionableGroup<ILayoutDocumentPane>, ILayoutDocumentPane, ILayoutOrientableGroup
 	{

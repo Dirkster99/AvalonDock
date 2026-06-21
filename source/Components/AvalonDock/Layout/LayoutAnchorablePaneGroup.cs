@@ -8,7 +8,11 @@ namespace AvalonDock.Layout
 	/// <summary>
 	/// Represents a layout anchorable pane group.
 	/// </summary>
+#if HAS_UNO
+	[ContentProperty(Name = nameof(Children))]
+#else
 	[ContentProperty(nameof(Children))]
+#endif
 	[Serializable]
 	public class LayoutAnchorablePaneGroup : LayoutPositionableGroup<ILayoutAnchorablePane>, ILayoutAnchorablePane, ILayoutOrientableGroup
 	{

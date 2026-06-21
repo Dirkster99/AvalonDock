@@ -9,7 +9,11 @@ namespace AvalonDock.Layout
 	/// <summary>
 	/// Represents a layout document pane.
 	/// </summary>
+#if HAS_UNO
+	[ContentProperty(Name = nameof(Children))]
+#else
 	[ContentProperty(nameof(Children))]
+#endif
 	[Serializable]
 	public class LayoutDocumentPane : LayoutPositionableGroup<LayoutContent>, ILayoutDocumentPane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable, Core.Serialization.ISerializableLayoutPane
 	{

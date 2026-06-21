@@ -10,7 +10,11 @@ namespace AvalonDock.Layout
 	/// <summary>
 	/// Represents a layout document floating window.
 	/// </summary>
+#if HAS_UNO
+	[ContentProperty(Name = nameof(RootPanel))]
+#else
 	[ContentProperty(nameof(RootPanel))]
+#endif
 	[Serializable]
 	public class LayoutDocumentFloatingWindow : LayoutFloatingWindow, ILayoutElementWithVisibility
 	{

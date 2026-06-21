@@ -13,7 +13,11 @@ namespace AvalonDock.Layout
 	/// <summary>
 	/// Represents a layout root.
 	/// </summary>
+#if HAS_UNO
+	[ContentProperty(Name = nameof(RootPanel))]
+#else
 	[ContentProperty(nameof(RootPanel))]
+#endif
 	[Serializable]
 	public class LayoutRoot : LayoutElement, ILayoutContainer, ILayoutRoot, Core.Serialization.ISerializableLayoutRoot
 	{

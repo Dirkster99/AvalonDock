@@ -11,7 +11,11 @@ namespace AvalonDock.Layout
 	/// Represents a layout anchorable floating window.
 	/// </summary>
 	[Serializable]
+#if HAS_UNO
+	[ContentProperty(Name = nameof(RootPanel))]
+#else
 	[ContentProperty(nameof(RootPanel))]
+#endif
 	public class LayoutAnchorableFloatingWindow : LayoutFloatingWindow, ILayoutElementWithVisibility
 	{
 		private LayoutAnchorablePaneGroup _rootPanel;

@@ -12,7 +12,11 @@ namespace AvalonDock.Layout
 	/// <summary>
 	/// Provides a base class for layout content.
 	/// </summary>
+#if HAS_UNO
+	[ContentProperty(Name = nameof(Content))]
+#else
 	[ContentProperty(nameof(Content))]
+#endif
 	[Serializable]
 	public abstract class LayoutContent : LayoutElement, ILayoutElementForFloatingWindow, IComparable<LayoutContent>, ILayoutPreviousContainer, Core.Serialization.ISerializableLayoutContent, Core.Serialization.ISerializablePreviousContainer
 	{

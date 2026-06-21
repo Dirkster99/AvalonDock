@@ -7,7 +7,11 @@ namespace AvalonDock.Layout
 	/// Implements the viewmodel for a a side element (left, right, top, bottom) in AvalonDock's
 	/// visual root of the <see cref="DockingManager"/>.
 	/// </summary>
+#if HAS_UNO
+	[ContentProperty(Name = nameof(Children))]
+#else
 	[ContentProperty(nameof(Children))]
+#endif
 	[Serializable]
 	public class LayoutAnchorSide : LayoutGroup<LayoutAnchorGroup>
 	{
