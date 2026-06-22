@@ -50,6 +50,7 @@ public partial class SourceControlViewModel : ObservableToolboxBase
 		Id = "Git";
 		Title = "Source Control";
 		ToolTipText = "Source Control (Ctrl+Shift+G)";
+		Shortcut = "Ctrl+Shift+G";
 		Zone = DockZone.LeftBottom;
 		Icon = ToolboxIcons.Git;
 		_dispatcher = Dispatcher.CurrentDispatcher;

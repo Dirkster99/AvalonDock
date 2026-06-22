@@ -44,6 +44,7 @@ public partial class SearchViewModel : ObservableToolboxBase
 		Id = "Search";
 		Title = "Search";
 		ToolTipText = "Search (Ctrl+Shift+F)";
+		Shortcut = "Ctrl+Shift+F";
 		Zone = DockZone.LeftTop;
 		Icon = ToolboxIcons.Search;
 		_dispatcher = Dispatcher.CurrentDispatcher;
