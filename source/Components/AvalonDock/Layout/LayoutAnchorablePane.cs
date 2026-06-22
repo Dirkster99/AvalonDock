@@ -17,7 +17,9 @@ namespace AvalonDock.Layout
 	public class LayoutAnchorablePane : LayoutPositionableGroup<LayoutAnchorable>, ILayoutAnchorablePane, ILayoutPositionableElement, ILayoutContentSelector, ILayoutPaneSerializable, Core.Serialization.ISerializableLayoutPane
 	{
 		private int _selectedIndex = -1;
-
+#if HAS_UNO
+		private bool _updatingSelectedContentIndex;
+#endif
 		[XmlIgnore]
 		private bool _autoFixSelectedContent = true;
 
@@ -79,13 +81,33 @@ namespace AvalonDock.Layout
 			{
 				if (value < 0 || value >= Children.Count) value = -1;
 				if (value == _selectedIndex) return;
+#if HAS_UNO
+				if (_updatingSelectedContentIndex)
+				{
+					_selectedIndex = value;
+					return;
+				}
+#endif
 				RaisePropertyChanging(nameof(SelectedContentIndex));
 				RaisePropertyChanging(nameof(SelectedContent));
-				if (_selectedIndex >= 0 && _selectedIndex < Children.Count)
-					Children[_selectedIndex].IsSelected = false;
-				_selectedIndex = value;
-				if (_selectedIndex >= 0 && _selectedIndex < Children.Count)
-					Children[_selectedIndex].IsSelected = true;
+
+#if HAS_UNO
+				_updatingSelectedContentIndex = true;
+#endif
+				try
+				{
+					if (_selectedIndex >= 0 && _selectedIndex < Children.Count)
+						Children[_selectedIndex].IsSelected = false;
+					_selectedIndex = value;
+					if (_selectedIndex >= 0 && _selectedIndex < Children.Count)
+						Children[_selectedIndex].IsSelected = true;
+				}
+				finally
+				{
+#if HAS_UNO
+					_updatingSelectedContentIndex = false;
+#endif
+				}
 				RaisePropertyChanged(nameof(SelectedContentIndex));
 				RaisePropertyChanged(nameof(SelectedContent));
 			}
