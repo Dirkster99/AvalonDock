@@ -66,6 +66,14 @@ namespace AvalonDock.Core
 		/// <summary>Gets or sets the dock zone where this toolbox is placed.</summary>
 		DockZone Zone { get; set; }
 
+		/// <summary>
+		/// Gets or sets the keyboard shortcut that toggles this toolbox open/closed,
+		/// expressed as a WPF gesture string (e.g. <c>"Ctrl+Shift+E"</c>, <c>"Ctrl+OemTilde"</c>).
+		/// When <c>null</c> or empty no shortcut is registered. Pressing the shortcut has the
+		/// same effect as clicking the toolbox's sidebar toggle button.
+		/// </summary>
+		string? Shortcut { get; set; }
+
 		/// <summary>Gets or sets a value indicating whether this toolbox should be toggled open on startup.</summary>
 		bool IsOpenByDefault { get; set; }
 

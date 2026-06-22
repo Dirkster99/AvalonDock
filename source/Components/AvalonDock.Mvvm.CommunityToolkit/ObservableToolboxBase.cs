@@ -20,6 +20,7 @@ namespace AvalonDock.Mvvm.CommunityToolkit
 	{
 		private string? _toolTipText;
 		private DockZone _zone = DockZone.LeftTop;
+		private string? _shortcut;
 		private bool _isOpenByDefault;
 		private bool _isOpen;
 		private object? _icon;
@@ -38,6 +39,14 @@ namespace AvalonDock.Mvvm.CommunityToolkit
 		{
 			get => _zone;
 			set => SetProperty(ref _zone, value);
+		}
+
+		/// <inheritdoc/>
+		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		public string? Shortcut
+		{
+			get => _shortcut;
+			set => SetProperty(ref _shortcut, value);
 		}
 
 		/// <inheritdoc/>
