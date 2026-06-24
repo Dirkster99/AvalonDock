@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -20,12 +11,9 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
-	/// <inheritdoc />
 	/// <summary>
-	/// This class provides a basic wrapper around the custom content view of <see cref="LayoutElement"/>.
-	/// Implements the <see cref="System.Windows.FrameworkElement" />
+	/// Represents the layout item.
 	/// </summary>
-	/// <seealso cref="System.Windows.FrameworkElement" />
 	public abstract class LayoutItem : FrameworkElement
 	{
 		private ICommand _defaultCloseCommand;
@@ -48,14 +36,26 @@ namespace AvalonDock.Controls
 			VisibilityProperty.OverrideMetadata(typeof(LayoutItem), new FrameworkPropertyMetadata(Visibility.Visible, OnVisibilityChanged));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutItem"/> class.
+		/// </summary>
 		internal LayoutItem()
 		{
 		}
 
+		/// <summary>
+		/// Gets the layout element.
+		/// </summary>
 		public LayoutContent LayoutElement { get; private set; }
 
+		/// <summary>
+		/// Gets the model.
+		/// </summary>
 		public object Model { get; private set; }
 
+		/// <summary>
+		/// Gets the view.
+		/// </summary>
 		public ContentPresenter View
 		{
 			get
@@ -71,11 +71,15 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <summary><see cref="Title"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="Title"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title), typeof(string), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnTitleChanged));
 
-		/// <summary>Gets/sets the the title of the element.</summary>
+		/// <summary>
+		/// Gets or sets the title.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the the title of the element.")]
 		[Category("Other")]
@@ -88,17 +92,24 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="Title"/> property.</summary>
 		private static void OnTitleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnTitleChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Title"/> property.</summary>
+		/// <summary>
+		/// Raises the title changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnTitleChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (LayoutElement != null) LayoutElement.Title = (string)e.NewValue;
 		}
 
-		/// <summary><see cref="IconSource"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="IconSource"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty IconSourceProperty = DependencyProperty.Register(nameof(IconSource), typeof(ImageSource), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnIconSourceChanged));
 
-		/// <summary>Gets/sets the icon associated with the item.</summary>
+		/// <summary>
+		/// Gets or sets the icon source.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the icon associated with the item.")]
 		[Category("Other")]
@@ -111,17 +122,24 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="IconSource"/> property.</summary>
 		private static void OnIconSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnIconSourceChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="IconSource"/> property.</summary>
+		/// <summary>
+		/// Raises the icon source changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnIconSourceChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (LayoutElement != null) LayoutElement.IconSource = IconSource;
 		}
 
-		/// <summary><see cref="ContentId"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="ContentId"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ContentIdProperty = DependencyProperty.Register(nameof(ContentId), typeof(string), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnContentIdChanged));
 
-		/// <summary>Gets/sets the content id used to retrieve content when deserializing layouts.</summary>
+		/// <summary>
+		/// Gets or sets the content id.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the content id used to retrieve content when deserializing layouts.")]
 		[Category("Other")]
@@ -134,17 +152,24 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="ContentId"/> property.</summary>
 		private static void OnContentIdChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnContentIdChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="ContentId"/> property.</summary>
+		/// <summary>
+		/// Raises the content id changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnContentIdChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (LayoutElement != null) LayoutElement.ContentId = (string)e.NewValue;
 		}
 
-		/// <summary><see cref="IsSelected"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="IsSelected"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(nameof(IsSelected), typeof(bool), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(false, OnIsSelectedChanged));
 
-		/// <summary>Gets/sets wether the item is selected inside its container or not.</summary>
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance is selected.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets wether the item is selected inside its container or not.")]
 		[Category("Other")]
@@ -157,7 +182,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="IsSelected"/> property.</summary>
 		private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnIsSelectedChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="IsSelected"/> property.</summary>
+		/// <summary>
+		/// Raises the is selected changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnIsSelectedChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (!_isSelectedReentrantFlag.CanEnter) return;
@@ -167,11 +195,15 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <summary><see cref="IsActive"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="IsActive"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty IsActiveProperty = DependencyProperty.Register(nameof(IsActive), typeof(bool), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(false, OnIsActiveChanged));
 
-		/// <summary>Gets/sets wether the item is active in the UI or not.</summary>
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance is active.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets wether the item is active in the UI or not.")]
 		[Category("Other")]
@@ -184,7 +216,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="IsActive"/> property.</summary>
 		private static void OnIsActiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnIsActiveChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="IsActive"/> property.</summary>
+		/// <summary>
+		/// Raises the is active changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnIsActiveChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (!_isActiveReentrantFlag.CanEnter) return;
@@ -194,11 +229,15 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <summary><see cref="CanClose"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="CanClose"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty CanCloseProperty = DependencyProperty.Register(nameof(CanClose), typeof(bool), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(true, OnCanCloseChanged));
 
-		/// <summary>Gets/sets wetherthe item can be closed or not.</summary>
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance can close.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets wetherthe item can be closed or not.")]
 		[Category("Other")]
@@ -211,17 +250,24 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="CanClose"/> property.</summary>
 		private static void OnCanCloseChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnCanCloseChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="CanClose"/> property.</summary>
+		/// <summary>
+		/// Raises the can close changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnCanCloseChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (LayoutElement != null) LayoutElement.CanClose = (bool)e.NewValue;
 		}
 
-		/// <summary><see cref="CanFloat"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="CanFloat"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty CanFloatProperty = DependencyProperty.Register(nameof(CanFloat), typeof(bool), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(true, OnCanFloatChanged));
 
-		/// <summary>Gets/sets wether the user can move the layout element dragging it to another position.</summary>
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance can float.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets wether the user can move the layout element dragging it to another position.")]
 		[Category("Other")]
@@ -234,17 +280,24 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="CanFloat"/> property.</summary>
 		private static void OnCanFloatChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnCanFloatChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="CanFloat"/> property.</summary>
+		/// <summary>
+		/// Raises the can float changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnCanFloatChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (LayoutElement != null) LayoutElement.CanFloat = (bool)e.NewValue;
 		}
 
-		/// <summary><see cref="CloseCommand"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="CloseCommand"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty CloseCommandProperty = DependencyProperty.Register(nameof(CloseCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnCloseCommandChanged, CoerceCloseCommandValue));
 
-		/// <summary>Gets/sets the command to execute when user click the document close button.</summary>
+		/// <summary>
+		/// Gets or sets the close command.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the command to execute when user click the document close button.")]
 		[Category("Other")]
@@ -257,7 +310,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="CloseCommand"/> property.</summary>
 		private static void OnCloseCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnCloseCommandChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="CloseCommand"/>  property.</summary>
+		/// <summary>
+		/// Raises the close command changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnCloseCommandChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
@@ -269,15 +325,20 @@ namespace AvalonDock.Controls
 
 		private void ExecuteCloseCommand(object parameter) => Close();
 
+		/// <summary>
+		/// Close.
+		/// </summary>
 		protected abstract void Close();
 
-		/// <summary><see cref="FloatCommand"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="FloatCommand"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty FloatCommandProperty = DependencyProperty.Register(nameof(FloatCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnFloatCommandChanged, CoerceFloatCommandValue));
 
 		/// <summary>
-		/// Gets/sets the command to execute when the user clicks the float button.</summary>
-		/// <remarks>By default this command move the anchorable inside new floating window.</remarks>
+		/// Gets or sets the float command.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the command to execute when the user clicks the float button.")]
 		[Category("Other")]
@@ -290,7 +351,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="FloatCommand"/> property.</summary>
 		private static void OnFloatCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnFloatCommandChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="FloatCommand"/> property.</summary>
+		/// <summary>
+		/// Raises the float command changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnFloatCommandChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
@@ -301,15 +365,18 @@ namespace AvalonDock.Controls
 		private bool CanExecuteFloatCommand(object anchorable) => LayoutElement != null && LayoutElement.CanFloat && LayoutElement.FindParent<LayoutFloatingWindow>() == null;
 
 		/// <summary>Executes to float the content of this LayoutItem in a separate <see cref="LayoutFloatingWindowControl"/>.</summary>
-		/// <param name="parameter"></param>
+		/// <param name="parameter">The command parameter.</param>
 		private void ExecuteFloatCommand(object parameter) => LayoutElement.Root.Manager.ExecuteFloatCommand(LayoutElement);
 
-		/// <summary><see cref="DockAsDocumentCommand"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="DockAsDocumentCommand"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty DockAsDocumentCommandProperty = DependencyProperty.Register(nameof(DockAsDocumentCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnDockAsDocumentCommandChanged, CoerceDockAsDocumentCommandValue));
 
-		/// <summary>Gets/sets the command to execute when user click the DockAsDocument button.</summary>
-		/// <remarks>By default this command move the anchorable inside the last focused document pane.</remarks>
+		/// <summary>
+		/// Gets or sets the dock as document command.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the command to execute when user click the DockAsDocument button.")]
 		[Category("Other")]
@@ -322,7 +389,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="DockAsDocumentCommand"/> property.</summary>
 		private static void OnDockAsDocumentCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnDockAsDocumentCommandChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="DockAsDocumentCommand"/> property.</summary>
+		/// <summary>
+		/// Raises the dock as document command changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnDockAsDocumentCommandChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
@@ -330,17 +400,25 @@ namespace AvalonDock.Controls
 		/// <summary>Coerces the <see cref="DockAsDocumentCommand"/> value.</summary>
 		private static object CoerceDockAsDocumentCommandValue(DependencyObject d, object value) => value;
 
+		/// <summary>
+		/// Determines whether the dock as document command can execute.
+		/// </summary>
+		/// <returns>true if the instance can execute dock as document command; otherwise, false.</returns>
 		protected virtual bool CanExecuteDockAsDocumentCommand() => LayoutElement != null && LayoutElement.FindParent<LayoutDocumentPane>() == null;
 
 		private bool CanExecuteDockAsDocumentCommand(object parameter) => CanExecuteDockAsDocumentCommand();
 
 		private void ExecuteDockAsDocumentCommand(object parameter) => LayoutElement.Root.Manager.ExecuteDockAsDocumentCommand(LayoutElement);
 
-		/// <summary><see cref="CloseAllButThisCommand"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="CloseAllButThisCommand"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty CloseAllButThisCommandProperty = DependencyProperty.Register(nameof(CloseAllButThisCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnCloseAllButThisCommandChanged, CoerceCloseAllButThisCommandValue));
 
-		/// <summary>Gets/sets the the 'Close All But This' command.</summary>
+		/// <summary>
+		/// Gets or sets the close all but this command.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the the 'Close All But This' command.")]
 		[Category("Other")]
@@ -353,7 +431,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="CloseAllButThisCommand"/> property.</summary>
 		private static void OnCloseAllButThisCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnCloseAllButThisCommandChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="CloseAllButThisCommand"/> property.</summary>
+		/// <summary>
+		/// Raises the close all but this command changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnCloseAllButThisCommandChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
@@ -370,11 +451,15 @@ namespace AvalonDock.Controls
 
 		private void ExecuteCloseAllButThisCommand(object parameter) => LayoutElement.Root.Manager.ExecuteCloseAllButThisCommand(LayoutElement);
 
-		/// <summary><see cref="CloseAllCommand"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="CloseAllCommand"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty CloseAllCommandProperty = DependencyProperty.Register(nameof(CloseAllCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnCloseAllCommandChanged, CoerceCloseAllCommandValue));
 
-		/// <summary>Gets/sets the 'Close All' command.</summary>
+		/// <summary>
+		/// Gets or sets the close all command.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the 'Close All' command.")]
 		[Category("Other")]
@@ -387,7 +472,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="CloseAllCommand"/> property.</summary>
 		private static void OnCloseAllCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnCloseAllCommandChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="CloseAllCommand"/> property.</summary>
+		/// <summary>
+		/// Raises the close all command changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnCloseAllCommandChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
@@ -404,11 +492,15 @@ namespace AvalonDock.Controls
 
 		private void ExecuteCloseAllCommand(object parameter) => LayoutElement.Root.Manager.ExecuteCloseAllCommand(LayoutElement);
 
-		/// <summary><see cref="ActivateCommand"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="ActivateCommand"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ActivateCommandProperty = DependencyProperty.Register(nameof(ActivateCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnActivateCommandChanged, CoerceActivateCommandValue));
 
-		/// <summary>Gets/sets the command to execute when user wants to activate a content (either a Document or an Anchorable).</summary>
+		/// <summary>
+		/// Gets or sets the activate command.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the command to execute when user wants to activate a content (either a Document or an Anchorable).")]
 		[Category("Other")]
@@ -421,7 +513,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="ActivateCommand"/> property.</summary>
 		private static void OnActivateCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnActivateCommandChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="ActivateCommand"/> property.</summary>
+		/// <summary>
+		/// Raises the activate command changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnActivateCommandChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
@@ -433,11 +528,15 @@ namespace AvalonDock.Controls
 
 		private void ExecuteActivateCommand(object parameter) => LayoutElement.Root.Manager.ExecuteContentActivateCommand(LayoutElement);
 
-		/// <summary><see cref="NewVerticalTabGroupCommand"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="NewVerticalTabGroupCommand"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty NewVerticalTabGroupCommandProperty = DependencyProperty.Register(nameof(NewVerticalTabGroupCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnNewVerticalTabGroupCommandChanged));
 
-		/// <summary>Gets/sets the new vertical tab group command.</summary>
+		/// <summary>
+		/// Gets or sets the new vertical tab group command.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the new vertical tab group command.")]
 		[Category("Other")]
@@ -450,7 +549,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="NewVerticalTabGroupCommand"/> property.</summary>
 		private static void OnNewVerticalTabGroupCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnNewVerticalTabGroupCommandChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="NewVerticalTabGroupCommand"/> property.</summary>
+		/// <summary>
+		/// Raises the new vertical tab group command changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnNewVerticalTabGroupCommandChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
@@ -489,11 +591,15 @@ namespace AvalonDock.Controls
 			layoutElement.Root.CollectGarbage();
 		}
 
-		/// <summary><see cref="NewHorizontalTabGroupCommand"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="NewHorizontalTabGroupCommand"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty NewHorizontalTabGroupCommandProperty = DependencyProperty.Register(nameof(NewHorizontalTabGroupCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnNewHorizontalTabGroupCommandChanged));
 
-		/// <summary>Gets/sets the new horizontal tab group command.</summary>
+		/// <summary>
+		/// Gets or sets the new horizontal tab group command.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the new horizontal tab group command.")]
 		[Category("Other")]
@@ -506,7 +612,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="NewHorizontalTabGroupCommand"/> property.</summary>
 		private static void OnNewHorizontalTabGroupCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnNewHorizontalTabGroupCommandChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="NewHorizontalTabGroupCommand"/> property.</summary>
+		/// <summary>
+		/// Raises the new horizontal tab group command changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnNewHorizontalTabGroupCommandChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
@@ -545,11 +654,15 @@ namespace AvalonDock.Controls
 			layoutElement.Root.CollectGarbage();
 		}
 
-		/// <summary><see cref="MoveToNextTabGroupCommand"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="MoveToNextTabGroupCommand"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty MoveToNextTabGroupCommandProperty = DependencyProperty.Register(nameof(MoveToNextTabGroupCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnMoveToNextTabGroupCommandChanged));
 
-		/// <summary>Gets/sets the move to next tab group command.</summary>
+		/// <summary>
+		/// Gets or sets the move to next tab group command.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the move to next tab group command.")]
 		[Category("Other")]
@@ -562,7 +675,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="MoveToNextTabGroupCommand"/> property.</summary>
 		private static void OnMoveToNextTabGroupCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnMoveToNextTabGroupCommandChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="MoveToNextTabGroupCommand"/> property.</summary>
+		/// <summary>
+		/// Raises the move to next tab group command changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnMoveToNextTabGroupCommandChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
@@ -590,11 +706,15 @@ namespace AvalonDock.Controls
 			layoutElement.Root.CollectGarbage();
 		}
 
-		/// <summary><see cref="MoveToPreviousTabGroupCommand"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="MoveToPreviousTabGroupCommand"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty MoveToPreviousTabGroupCommandProperty = DependencyProperty.Register(nameof(MoveToPreviousTabGroupCommand), typeof(ICommand), typeof(LayoutItem),
 				new FrameworkPropertyMetadata(null, OnMoveToPreviousTabGroupCommandChanged));
 
-		/// <summary>Gets/sets the move to previous tab group command.</summary>
+		/// <summary>
+		/// Gets or sets the move to previous tab group command.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the move to previous tab group command.")]
 		[Category("Other")]
@@ -607,7 +727,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="MoveToPreviousTabGroupCommand"/> property.</summary>
 		private static void OnMoveToPreviousTabGroupCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutItem)d).OnMoveToPreviousTabGroupCommandChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="MoveToPreviousTabGroupCommand"/> property.</summary>
+		/// <summary>
+		/// Raises the move to previous tab group command changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnMoveToPreviousTabGroupCommandChanged(DependencyPropertyChangedEventArgs e)
 		{
 		}
@@ -635,6 +758,9 @@ namespace AvalonDock.Controls
 			layoutElement.Root.CollectGarbage();
 		}
 
+		/// <summary>
+		/// Init default commands.
+		/// </summary>
 		protected virtual void InitDefaultCommands()
 		{
 			_defaultCloseCommand = new RelayCommand<object>(ExecuteCloseCommand, CanExecuteCloseCommand);
@@ -649,6 +775,9 @@ namespace AvalonDock.Controls
 			_defaultMoveToPreviousTabGroupCommand = new RelayCommand<object>(ExecuteMoveToPreviousTabGroupCommand, CanExecuteMoveToPreviousTabGroupCommand);
 		}
 
+		/// <summary>
+		/// Clear default bindings.
+		/// </summary>
 		protected virtual void ClearDefaultBindings()
 		{
 			if (CloseCommand == _defaultCloseCommand)
@@ -673,6 +802,9 @@ namespace AvalonDock.Controls
 				BindingOperations.ClearBinding(this, MoveToPreviousTabGroupCommandProperty);
 		}
 
+		/// <summary>
+		/// Sets the default bindings.
+		/// </summary>
 		protected virtual void SetDefaultBindings()
 		{
 			if (CloseCommand == null)
@@ -701,12 +833,19 @@ namespace AvalonDock.Controls
 			CanClose = LayoutElement.CanClose;
 		}
 
+		/// <summary>
+		/// Raises the visibility changed event.
+		/// </summary>
 		protected virtual void OnVisibilityChanged()
 		{
 			if (LayoutElement != null && Visibility == Visibility.Collapsed)
 				LayoutElement.Close();
 		}
 
+		/// <summary>
+		/// Attaches the handler.
+		/// </summary>
+		/// <param name="model">The layout model.</param>
 		internal virtual void Attach(LayoutContent model)
 		{
 			LayoutElement = model;
@@ -717,6 +856,9 @@ namespace AvalonDock.Controls
 			DataContext = this;
 		}
 
+		/// <summary>
+		/// Detaches the handler.
+		/// </summary>
 		internal virtual void Detach()
 		{
 			LayoutElement.IsSelectedChanged -= LayoutElement_IsSelectedChanged;
@@ -725,10 +867,20 @@ namespace AvalonDock.Controls
 			Model = null;
 		}
 
+		/// <summary>
+		/// Clear default bindings.
+		/// </summary>
 		internal void _ClearDefaultBindings() => ClearDefaultBindings();
 
+		/// <summary>
+		/// Set default bindings.
+		/// </summary>
 		internal void _SetDefaultBindings() => SetDefaultBindings();
 
+		/// <summary>
+		/// Is view exists.
+		/// </summary>
+		/// <returns>true if the instance is view exists; otherwise, false.</returns>
 		internal bool IsViewExists() => _view != null;
 
 		private void LayoutElement_IsActiveChanged(object sender, EventArgs e)

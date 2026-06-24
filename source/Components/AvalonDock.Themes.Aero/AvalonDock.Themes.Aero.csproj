@@ -6,15 +6,11 @@
         <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
         <SignAssembly>true</SignAssembly>
         <UseWPF>true</UseWPF>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<Resource Include="**\*.png"/>
-	</ItemGroup>
-
-	<!-- NuGet Packaging -->
-	<ItemGroup>
-		<None Include="LICENSE" Pack="true" PackagePath=""/>
 	</ItemGroup>
 
 	<ItemGroup>

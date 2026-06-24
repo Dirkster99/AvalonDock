@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,19 +6,23 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a <see cref="Grid"/> based panel base class
-	/// that hosts a <see cref="LayoutPanel"/> as its model.
+	/// Represents the layout Panel Control.
 	/// </summary>
 	public class LayoutPanelControl : LayoutGridControl<ILayoutPanelElement>, ILayoutControl
 	{
 		private readonly LayoutPanel _model;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutPanelControl"/> class.
+		/// </summary>
+		/// <param name="model">The model.</param>
 		internal LayoutPanelControl(LayoutPanel model)
 			: base(model, model.Orientation)
 		{
 			_model = model;
 		}
 
+		/// <inheritdoc/>
 		protected override void OnFixChildrenDockLengths()
 		{
 			if (ActualWidth == 0.0 || ActualHeight == 0.0) return;

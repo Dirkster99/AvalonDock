@@ -1,19 +1,19 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System.Windows;
 using System.Windows.Media;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Represents the transform extensions.
+	/// </summary>
 	internal static class TransformExtensions
 	{
+		/// <summary>
+		/// Point to screen dpi.
+		/// </summary>
+		/// <param name="visual">The visual.</param>
+		/// <param name="pt">The pt.</param>
+		/// <returns>The point to screen dpi.</returns>
 		public static Point PointToScreenDPI(this Visual visual, Point pt)
 		{
 			if (PresentationSource.FromVisual(visual) == null)
@@ -25,6 +25,12 @@ namespace AvalonDock.Controls
 			return TransformToDeviceDPI(visual, resultPt);
 		}
 
+		/// <summary>
+		/// Point to screen dpi without flow direction.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		/// <param name="point">The point.</param>
+		/// <returns>The point to screen dpi without flow direction.</returns>
 		public static Point PointToScreenDPIWithoutFlowDirection(this FrameworkElement element, Point point)
 		{
 			if (FrameworkElement.GetFlowDirection(element) == FlowDirection.RightToLeft)
@@ -39,6 +45,11 @@ namespace AvalonDock.Controls
 			return element.PointToScreenDPI(point);
 		}
 
+		/// <summary>
+		/// Gets the screen area.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		/// <returns>The screen area.</returns>
 		public static Rect GetScreenArea(this FrameworkElement element)
 		{
 			// return new Rect(element.PointToScreenDPI(new Point()),
@@ -64,6 +75,12 @@ namespace AvalonDock.Controls
 				element.TransformActualSizeToAncestor());
 		}
 
+		/// <summary>
+		/// Transform to device dpi.
+		/// </summary>
+		/// <param name="visual">The visual.</param>
+		/// <param name="pt">The pt.</param>
+		/// <returns>The transform to device dpi.</returns>
 		public static Point TransformToDeviceDPI(this Visual visual, Point pt)
 		{
 			var compositionTarget = PresentationSource.FromVisual(visual)?.CompositionTarget ?? null;
@@ -73,6 +90,12 @@ namespace AvalonDock.Controls
 			return new Point(pt.X / m.M11, pt.Y / m.M22);
 		}
 
+		/// <summary>
+		/// Transform from device dpi.
+		/// </summary>
+		/// <param name="visual">The visual.</param>
+		/// <param name="size">The size.</param>
+		/// <returns>The transform from device dpi.</returns>
 		public static Size TransformFromDeviceDPI(this Visual visual, Size size)
 		{
 			var compositionTarget = PresentationSource.FromVisual(visual)?.CompositionTarget;
@@ -85,6 +108,12 @@ namespace AvalonDock.Controls
 			return new Size(size.Width * m.M11, size.Height * m.M22);
 		}
 
+		/// <summary>
+		/// Transform from device dpi.
+		/// </summary>
+		/// <param name="visual">The visual.</param>
+		/// <param name="pt">The pt.</param>
+		/// <returns>The transform from device dpi.</returns>
 		public static Point TransformFromDeviceDPI(this Visual visual, Point pt)
 		{
 			var compositionTarget = PresentationSource.FromVisual(visual)?.CompositionTarget;
@@ -97,11 +126,21 @@ namespace AvalonDock.Controls
 			return new Point(pt.X * m.M11, pt.Y * m.M22);
 		}
 
+		/// <summary>
+		/// Can transform.
+		/// </summary>
+		/// <param name="visual">The visual.</param>
+		/// <returns>true if the instance can transform; otherwise, false.</returns>
 		public static bool CanTransform(this Visual visual)
 		{
 			return PresentationSource.FromVisual(visual) != null;
 		}
 
+		/// <summary>
+		/// Transform actual size to ancestor.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		/// <returns>The transform actual size to ancestor.</returns>
 		public static Size TransformActualSizeToAncestor(this FrameworkElement element)
 		{
 			if (PresentationSource.FromVisual(element) == null)
@@ -112,6 +151,12 @@ namespace AvalonDock.Controls
 			return transformToWindow.TransformBounds(new Rect(0, 0, element.ActualWidth, element.ActualHeight)).Size;
 		}
 
+		/// <summary>
+		/// Transform size to ancestor.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		/// <param name="sizeToTransform">The size to transform.</param>
+		/// <returns>The transform size to ancestor.</returns>
 		public static Size TransformSizeToAncestor(this FrameworkElement element, Size sizeToTransform)
 		{
 			if (PresentationSource.FromVisual(element) == null)
@@ -122,6 +167,11 @@ namespace AvalonDock.Controls
 			return transformToWindow.TransformBounds(new Rect(0, 0, sizeToTransform.Width, sizeToTransform.Height)).Size;
 		}
 
+		/// <summary>
+		/// Tansform to ancestor.
+		/// </summary>
+		/// <param name="element">The element.</param>
+		/// <returns>The tansform to ancestor.</returns>
 		public static GeneralTransform TansformToAncestor(this FrameworkElement element)
 		{
 			if (PresentationSource.FromVisual(element) == null)

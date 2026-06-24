@@ -1,13 +1,4 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-/**************************************************************************\
+﻿/**************************************************************************\
 	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
@@ -32,11 +23,20 @@ namespace Standard
 	using System.Windows.Media;
 	using System.Windows.Media.Imaging;
 
+	/// <summary>Represents the Utility class.</summary>
 	internal static partial class Utility
 	{
+		/// <summary>The _osVersion value.</summary>
 		private static readonly Version _osVersion = Environment.OSVersion.Version;
+
+		/// <summary>The _presentationFrameworkVersion value.</summary>
 		private static readonly Version _presentationFrameworkVersion = Assembly.GetAssembly(typeof(Window)).GetName().Version;
 
+		/// <summary>Performs the _MemCmp operation.</summary>
+		/// <param name="left">The left value.</param>
+		/// <param name="right">The right value.</param>
+		/// <param name="cb">The cb value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		private static bool _MemCmp(IntPtr left, IntPtr right, long cb)
 		{
@@ -58,29 +58,45 @@ namespace Standard
 			return true;
 		}
 
-		/// <summary>The native RGB macro.</summary>
-		/// <param name="c"></param>
-		/// <returns></returns>
+		/// <summary>Performs the RGB operation.</summary>
+		/// <param name="c">The c value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static int RGB(Color c) => c.R | (c.G << 8) | (c.B << 16);
 
-		/// <summary>Convert a native integer that represent a color with an alpha channel into a Color struct.</summary>
-		/// <param name="color">The integer that represents the color.  Its bits are of the format 0xAARRGGBB.</param>
-		/// <returns>A Color representation of the parameter.</returns>
+		/// <summary>Performs the ColorFromArgbDword operation.</summary>
+		/// <param name="color">The color value.</param>
+		/// <returns>The result of the operation.</returns>
 		public static Color ColorFromArgbDword(uint color) => Color.FromArgb((byte)((color & 0xFF000000) >> 24), (byte)((color & 0x00FF0000) >> 16), (byte)((color & 0x0000FF00) >> 8), (byte)((color & 0x000000FF) >> 0));
 
+		/// <summary>Performs the GET_X_LPARAM operation.</summary>
+		/// <param name="lParam">The lParam value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static int GET_X_LPARAM(IntPtr lParam) => LOWORD(lParam.ToInt32());
 
+		/// <summary>Performs the GET_Y_LPARAM operation.</summary>
+		/// <param name="lParam">The lParam value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static int GET_Y_LPARAM(IntPtr lParam) => HIWORD(lParam.ToInt32());
 
+		/// <summary>Performs the HIWORD operation.</summary>
+		/// <param name="i">The i value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static int HIWORD(int i) => (short)(i >> 16);
 
+		/// <summary>Performs the LOWORD operation.</summary>
+		/// <param name="i">The i value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static int LOWORD(int i) => (short)(i & 0xFFFF);
 
+		/// <summary>Performs the AreStreamsEqual operation.</summary>
+		/// <param name="left">The left value.</param>
+		/// <param name="right">The right value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public static bool AreStreamsEqual(Stream left, Stream right)
@@ -142,6 +158,10 @@ namespace Standard
 			}
 		}
 
+		/// <summary>Performs the GuidTryParse operation.</summary>
+		/// <param name="guidString">The guidString value.</param>
+		/// <param name="guid">The guid value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static bool GuidTryParse(string guidString, out Guid guid)
 		{
@@ -163,38 +183,56 @@ namespace Standard
 			return false;
 		}
 
+		/// <summary>Performs the IsFlagSet operation.</summary>
+		/// <param name="value">The value value.</param>
+		/// <param name="mask">The mask value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static bool IsFlagSet(int value, int mask) => (value & mask) != 0;
 
+		/// <summary>Performs the IsFlagSet operation.</summary>
+		/// <param name="value">The value value.</param>
+		/// <param name="mask">The mask value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static bool IsFlagSet(uint value, uint mask) => (value & mask) != 0;
 
+		/// <summary>Performs the IsFlagSet operation.</summary>
+		/// <param name="value">The value value.</param>
+		/// <param name="mask">The mask value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static bool IsFlagSet(long value, long mask) => (value & mask) != 0;
 
+		/// <summary>Performs the IsFlagSet operation.</summary>
+		/// <param name="value">The value value.</param>
+		/// <param name="mask">The mask value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static bool IsFlagSet(ulong value, ulong mask) => (value & mask) != 0;
 
+		/// <summary>Gets a value indicating whether IsOSVistaOrNewer.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static bool IsOSVistaOrNewer => _osVersion >= new Version(6, 0);
 
+		/// <summary>Gets a value indicating whether IsOSWindows7OrNewer.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static bool IsOSWindows7OrNewer => _osVersion >= new Version(6, 1);
 
+		/// <summary>Gets a value indicating whether IsOSWindows8OrNewer.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static bool IsOSWindows8OrNewer => _osVersion >= new Version(6, 2);
 
-		/// <summary>
-		/// Is this using WPF4?
-		/// </summary>
-		/// <remarks>
-		/// There are a few specific bugs in Window in 3.5SP1 and below that require workarounds
-		/// when handling WM_NCCALCSIZE on the HWND.
-		/// </remarks>
+		/// <summary>Gets a value indicating whether IsPresentationFrameworkVersionLessThan4.</summary>
 		public static bool IsPresentationFrameworkVersionLessThan4 => _presentationFrameworkVersion < new Version(4, 0);
 
 		// Caller is responsible for destroying the HICON
 		// Caller is responsible to ensure that GDI+ has been initialized.
+
+		/// <summary>Performs the GenerateHICON operation.</summary>
+		/// <param name="image">The image value.</param>
+		/// <param name="dimensions">The dimensions value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static IntPtr GenerateHICON(ImageSource image, Size dimensions)
@@ -268,8 +306,20 @@ namespace Standard
 			}
 		}
 
+		/// <summary>Performs the GetBestMatch operation.</summary>
+		/// <param name="frames">The frames value.</param>
+		/// <param name="width">The width value.</param>
+		/// <param name="height">The height value.</param>
+		/// <returns>The result of the operation.</returns>
 		public static BitmapFrame GetBestMatch(IList<BitmapFrame> frames, int width, int height) => _GetBestMatch(frames, _GetBitDepth(), width, height);
 
+		/// <summary>Performs the _MatchImage operation.</summary>
+		/// <param name="frame">The frame value.</param>
+		/// <param name="bitDepth">The bitDepth value.</param>
+		/// <param name="width">The width value.</param>
+		/// <param name="height">The height value.</param>
+		/// <param name="bpp">The bpp value.</param>
+		/// <returns>The result of the operation.</returns>
 		private static int _MatchImage(BitmapFrame frame, int bitDepth, int width, int height, int bpp)
 		{
 			return 2 * _WeightedAbs(bpp, bitDepth, false) +
@@ -277,15 +327,23 @@ namespace Standard
 							_WeightedAbs(frame.PixelHeight, height, true);
 		}
 
+		/// <summary>Performs the _WeightedAbs operation.</summary>
+		/// <param name="valueHave">The valueHave value.</param>
+		/// <param name="valueWant">The valueWant value.</param>
+		/// <param name="fPunish">The fPunish value.</param>
+		/// <returns>The result of the operation.</returns>
 		private static int _WeightedAbs(int valueHave, int valueWant, bool fPunish)
 		{
 			var diff = valueHave - valueWant;
 			return diff >= 0 ? diff : (fPunish ? -2 : -1) * diff;
 		}
 
-		/// From a list of BitmapFrames find the one that best matches the requested dimensions.
-		/// The methods used here are copied from Win32 sources.  We want to be consistent with
-		/// system behaviors.
+		/// <summary>Performs the _GetBestMatch operation.</summary>
+		/// <param name="frames">The frames value.</param>
+		/// <param name="bitDepth">The bitDepth value.</param>
+		/// <param name="width">The width value.</param>
+		/// <param name="height">The height value.</param>
+		/// <returns>The result of the operation.</returns>
 		private static BitmapFrame _GetBestMatch(IList<BitmapFrame> frames, int bitDepth, int width, int height)
 		{
 			var bestScore = int.MaxValue;
@@ -316,8 +374,12 @@ namespace Standard
 		}
 
 		// This can be cached.  It's not going to change under reasonable circumstances.
+
+		/// <summary>The s_bitDepth value.</summary>
 		private static int s_bitDepth; // = 0;
 
+		/// <summary>Performs the _GetBitDepth operation.</summary>
+		/// <returns>The result of the operation.</returns>
 		private static int _GetBitDepth()
 		{
 			if (s_bitDepth != 0) return s_bitDepth;
@@ -326,21 +388,16 @@ namespace Standard
 			return s_bitDepth;
 		}
 
-		/// <summary>
-		/// Simple guard against the exceptions that File.Delete throws on null and empty strings.
-		/// </summary>
-		/// <param name="path">The path to delete.  Unlike File.Delete, this can be null or empty.</param>
-		/// <remarks>
-		/// Note that File.Delete, and by extension SafeDeleteFile, does not throw an exception
-		/// if the file does not exist.
-		/// </remarks>
+		/// <summary>Performs the SafeDeleteFile operation.</summary>
+		/// <param name="path">The path value.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SafeDeleteFile(string path)
 		{
 			if (!string.IsNullOrEmpty(path)) File.Delete(path);
 		}
 
-		/// <summary>GDI's DeleteObject</summary>
+		/// <summary>Performs the SafeDeleteObject operation.</summary>
+		/// <param name="gdiObject">The gdiObject value.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SafeDeleteObject(ref IntPtr gdiObject)
 		{
@@ -349,6 +406,8 @@ namespace Standard
 			if (p != IntPtr.Zero) NativeMethods.DeleteObject(p);
 		}
 
+		/// <summary>Performs the SafeDestroyIcon operation.</summary>
+		/// <param name="hicon">The hicon value.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SafeDestroyIcon(ref IntPtr hicon)
 		{
@@ -357,6 +416,8 @@ namespace Standard
 			if (p != IntPtr.Zero) NativeMethods.DestroyIcon(p);
 		}
 
+		/// <summary>Performs the SafeDestroyWindow operation.</summary>
+		/// <param name="hwnd">The hwnd value.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SafeDestroyWindow(ref IntPtr hwnd)
 		{
@@ -365,6 +426,9 @@ namespace Standard
 			if (NativeMethods.IsWindow(p)) NativeMethods.DestroyWindow(p);
 		}
 
+		/// <summary>Performs the SafeDispose operation.</summary>
+		/// <typeparam name="T">The type of the value.</typeparam>
+		/// <param name="disposable">The disposable value.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SafeDispose<T>(ref T disposable)
 			where T : IDisposable
@@ -375,8 +439,8 @@ namespace Standard
 			t?.Dispose();
 		}
 
-		/// <summary>GDI+'s DisposeImage</summary>
-		/// <param name="gdipImage"></param>
+		/// <summary>Performs the SafeDisposeImage operation.</summary>
+		/// <param name="gdipImage">The gdipImage value.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void SafeDisposeImage(ref IntPtr gdipImage)
 		{
@@ -385,6 +449,8 @@ namespace Standard
 			if (p != IntPtr.Zero) NativeMethods.GdipDisposeImage(p);
 		}
 
+		/// <summary>Performs the SafeCoTaskMemFree operation.</summary>
+		/// <param name="ptr">The ptr value.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public static void SafeCoTaskMemFree(ref IntPtr ptr)
@@ -394,6 +460,8 @@ namespace Standard
 			if (p != IntPtr.Zero) Marshal.FreeCoTaskMem(p);
 		}
 
+		/// <summary>Performs the SafeFreeHGlobal operation.</summary>
+		/// <param name="hglobal">The hglobal value.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public static void SafeFreeHGlobal(ref IntPtr hglobal)
@@ -403,6 +471,9 @@ namespace Standard
 			if (p != IntPtr.Zero) Marshal.FreeHGlobal(p);
 		}
 
+		/// <summary>Performs the SafeRelease operation.</summary>
+		/// <typeparam name="T">The type of the value.</typeparam>
+		/// <param name="comObject">The comObject value.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public static void SafeRelease<T>(ref T comObject)
@@ -415,12 +486,10 @@ namespace Standard
 			Marshal.ReleaseComObject(t);
 		}
 
-		/// <summary>
-		/// Utility to help classes concatenate their properties for implementing ToString().
-		/// </summary>
-		/// <param name="source">The <see cref="StringBuilder"/> to concatenate the results into.</param>
-		/// <param name="propertyName">The name of the property to be concatenated.</param>
-		/// <param name="value">The value of the property to be concatenated.</param>
+		/// <summary>Performs the GeneratePropertyString operation.</summary>
+		/// <param name="source">The source value.</param>
+		/// <param name="propertyName">The propertyName value.</param>
+		/// <param name="value">The value value.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void GeneratePropertyString(StringBuilder source, string propertyName, string value)
 		{
@@ -441,15 +510,10 @@ namespace Standard
 			}
 		}
 
-		/// <summary>
-		/// Generates ToString functionality for a struct.  This is an expensive way to do it,
-		/// it exists for the sake of debugging while classes are in flux.
-		/// Eventually this should just be removed and the classes should
-		/// do this without reflection.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="object"></param>
-		/// <returns></returns>
+		/// <summary>Performs the GenerateToString operation.</summary>
+		/// <typeparam name="T">The type of the value.</typeparam>
+		/// <param name="object">The object value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		[Obsolete]
 		public static string GenerateToString<T>(T @object)
@@ -468,6 +532,9 @@ namespace Standard
 			return sbRet.ToString();
 		}
 
+		/// <summary>Performs the CopyStream operation.</summary>
+		/// <param name="destination">The destination value.</param>
+		/// <param name="source">The source value.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void CopyStream(Stream destination, Stream source)
 		{
@@ -496,6 +563,9 @@ namespace Standard
 			destination.Position = 0;
 		}
 
+		/// <summary>Performs the HashStreamMD5 operation.</summary>
+		/// <param name="stm">The stm value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static string HashStreamMD5(Stream stm)
 		{
@@ -508,12 +578,19 @@ namespace Standard
 			}
 		}
 
+		/// <summary>Performs the EnsureDirectory operation.</summary>
+		/// <param name="path">The path value.</param>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static void EnsureDirectory(string path)
 		{
 			if (!Directory.Exists(Path.GetDirectoryName(path))) Directory.CreateDirectory(Path.GetDirectoryName(path));
 		}
 
+		/// <summary>Performs the MemCmp operation.</summary>
+		/// <param name="left">The left value.</param>
+		/// <param name="right">The right value.</param>
+		/// <param name="cb">The cb value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static bool MemCmp(byte[] left, byte[] right, int cb)
 		{
@@ -533,14 +610,27 @@ namespace Standard
 			return fRet;
 		}
 
+		/// <summary>Represents the _UrlDecoder class.</summary>
 		private class _UrlDecoder
 		{
+			/// <summary>The _encoding value.</summary>
 			private readonly Encoding _encoding;
+
+			/// <summary>The _charBuffer value.</summary>
 			private readonly char[] _charBuffer;
+
+			/// <summary>The _byteBuffer value.</summary>
 			private readonly byte[] _byteBuffer;
+
+			/// <summary>The _byteCount value.</summary>
 			private int _byteCount;
+
+			/// <summary>The _charCount value.</summary>
 			private int _charCount;
 
+			/// <summary>Initializes a new instance of the <see cref="_UrlDecoder"/> class.</summary>
+			/// <param name="size">The size value.</param>
+			/// <param name="encoding">The encoding value.</param>
 			[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 			public _UrlDecoder(int size, Encoding encoding)
 			{
@@ -549,9 +639,13 @@ namespace Standard
 				_byteBuffer = new byte[size];
 			}
 
+			/// <summary>Performs the AddByte operation.</summary>
+			/// <param name="b">The b value.</param>
 			[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 			public void AddByte(byte b) => _byteBuffer[_byteCount++] = b;
 
+			/// <summary>Performs the AddChar operation.</summary>
+			/// <param name="ch">The ch value.</param>
 			[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 			public void AddChar(char ch)
 			{
@@ -559,6 +653,7 @@ namespace Standard
 				_charBuffer[_charCount++] = ch;
 			}
 
+			/// <summary>Performs the _FlushBytes operation.</summary>
 			[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 			private void _FlushBytes()
 			{
@@ -567,6 +662,8 @@ namespace Standard
 				_byteCount = 0;
 			}
 
+			/// <summary>Performs the GetString operation.</summary>
+			/// <returns>The result of the operation.</returns>
 			[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 			public string GetString()
 			{
@@ -575,6 +672,9 @@ namespace Standard
 			}
 		}
 
+		/// <summary>Performs the UrlDecode operation.</summary>
+		/// <param name="url">The url value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static string UrlDecode(string url)
 		{
@@ -634,18 +734,9 @@ namespace Standard
 			return decoder.GetString();
 		}
 
-		/// <summary>
-		/// Encodes a URL string.  Duplicated functionality from System.Web.HttpUtility.UrlEncode.
-		/// </summary>
-		/// <param name="url"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// Duplicated from System.Web.HttpUtility because System.Web isn't part of the client profile.
-		/// URL Encoding replaces ' ' with '+' and unsafe ASCII characters with '%XX'.
-		/// Safe characters are defined in RFC2396 (http://www.ietf.org/rfc/rfc2396.txt).
-		/// They are the 7-bit ASCII alphanumerics and the mark characters "-_.!~*'()".
-		/// This implementation does not treat '~' as a safe character to be consistent with the System.Web version.
-		/// </remarks>
+		/// <summary>Performs the UrlEncode operation.</summary>
+		/// <param name="url">The url value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static string UrlEncode(string url)
 		{
@@ -697,6 +788,10 @@ namespace Standard
 		// the list "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")"
 		// The System.Web version unnecessarily escapes '~', which should be okay...
 		// Keeping that same pattern here just to be consistent.
+
+		/// <summary>Performs the _UrlEncodeIsSafe operation.</summary>
+		/// <param name="b">The b value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		private static bool _UrlEncodeIsSafe(byte b)
 		{
@@ -719,9 +814,15 @@ namespace Standard
 			}
 		}
 
+		/// <summary>Performs the _IsAsciiAlphaNumeric operation.</summary>
+		/// <param name="b">The b value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		private static bool _IsAsciiAlphaNumeric(byte b) => b >= 'a' && b <= 'z' || b >= 'A' && b <= 'Z' || b >= '0' && b <= '9';
 
+		/// <summary>Performs the _IntToHex operation.</summary>
+		/// <param name="n">The n value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		private static byte _IntToHex(int n)
 		{
@@ -729,6 +830,9 @@ namespace Standard
 			return n <= 9 ? (byte)(n + '0') : (byte)(n - 10 + 'A');
 		}
 
+		/// <summary>Performs the _HexToInt operation.</summary>
+		/// <param name="h">The h value.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		private static int _HexToInt(char h)
 		{
@@ -739,6 +843,10 @@ namespace Standard
 			return -1;
 		}
 
+		/// <summary>Performs the AddDependencyPropertyChangeListener operation.</summary>
+		/// <param name="component">The component value.</param>
+		/// <param name="property">The property value.</param>
+		/// <param name="listener">The listener value.</param>
 		public static void AddDependencyPropertyChangeListener(object component, DependencyProperty property, EventHandler listener)
 		{
 			if (component == null) return;
@@ -748,6 +856,10 @@ namespace Standard
 			dpd.AddValueChanged(component, listener);
 		}
 
+		/// <summary>Performs the RemoveDependencyPropertyChangeListener operation.</summary>
+		/// <param name="component">The component value.</param>
+		/// <param name="property">The property value.</param>
+		/// <param name="listener">The listener value.</param>
 		public static void RemoveDependencyPropertyChangeListener(object component, DependencyProperty property, EventHandler listener)
 		{
 			if (component == null) return;
@@ -757,6 +869,9 @@ namespace Standard
 			dpd.RemoveValueChanged(component, listener);
 		}
 
+		/// <summary>Performs the IsThicknessNonNegative operation.</summary>
+		/// <param name="thickness">The thickness value.</param>
+		/// <returns>The result of the operation.</returns>
 		public static bool IsThicknessNonNegative(Thickness thickness)
 		{
 			if (!IsDoubleFiniteAndNonNegative(thickness.Top)) return false;
@@ -766,6 +881,9 @@ namespace Standard
 			return true;
 		}
 
+		/// <summary>Performs the IsCornerRadiusValid operation.</summary>
+		/// <param name="cornerRadius">The cornerRadius value.</param>
+		/// <returns>The result of the operation.</returns>
 		public static bool IsCornerRadiusValid(CornerRadius cornerRadius)
 		{
 			if (!IsDoubleFiniteAndNonNegative(cornerRadius.TopLeft)) return false;
@@ -775,6 +893,9 @@ namespace Standard
 			return true;
 		}
 
+		/// <summary>Performs the IsDoubleFiniteAndNonNegative operation.</summary>
+		/// <param name="d">The d value.</param>
+		/// <returns>The result of the operation.</returns>
 		public static bool IsDoubleFiniteAndNonNegative(double d) => !double.IsNaN(d) && !double.IsInfinity(d) && !(d < 0);
 	}
 }

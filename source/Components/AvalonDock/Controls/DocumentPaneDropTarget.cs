@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
@@ -15,8 +6,7 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a  <see cref="LayoutDocumentPaneControl"/> drop target
-	/// on which other items (<see cref="LayoutDocument"/>) can be dropped.
+	/// Represents the document pane drop target.
 	/// </summary>
 	internal class DocumentPaneDropTarget : DropTarget<LayoutDocumentPaneControl>
 	{
@@ -24,11 +14,11 @@ namespace AvalonDock.Controls
 		private int _tabIndex = -1;
 
 		/// <summary>
-		/// Class constructor from parameters without a specific tabindex as dock position.
+		/// Initializes a new instance of the <see cref="DocumentPaneDropTarget"/> class.
 		/// </summary>
-		/// <param name="paneControl"></param>
-		/// <param name="detectionRect"></param>
-		/// <param name="type"></param>
+		/// <param name="paneControl">The pane control.</param>
+		/// <param name="detectionRect">The detection rectangle.</param>
+		/// <param name="type">The drop target type.</param>
 		internal DocumentPaneDropTarget(
 			LayoutDocumentPaneControl paneControl,
 			Rect detectionRect,
@@ -39,14 +29,12 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Class constructor from parameters with a specific tabindex as dock position.
-		/// This constructor can be used to drop a document at a specific tab index.
-		/// in a given <see cref="LayoutDocumentPaneControl"/>.
+		/// Initializes a new instance of the <see cref="DocumentPaneDropTarget"/> class.
 		/// </summary>
-		/// <param name="paneControl"></param>
-		/// <param name="detectionRect"></param>
-		/// <param name="type"></param>
-		/// <param name="tabIndex"></param>
+		/// <param name="paneControl">The pane control.</param>
+		/// <param name="detectionRect">The detection rectangle.</param>
+		/// <param name="type">The drop target type.</param>
+		/// <param name="tabIndex">The tab index.</param>
 		internal DocumentPaneDropTarget(
 			LayoutDocumentPaneControl paneControl,
 			Rect detectionRect,
@@ -58,11 +46,7 @@ namespace AvalonDock.Controls
 			_tabIndex = tabIndex;
 		}
 
-		/// <summary>
-		/// Method is invoked to complete a drag & drop operation with a (new) docking position
-		/// by docking of the LayoutDocument <paramref name="floatingWindow"/> into this drop target.
-		/// </summary>
-		/// <param name="floatingWindow"></param>
+		/// <inheritdoc/>
 		protected override void Drop(LayoutDocumentFloatingWindow floatingWindow)
 		{
 			var targetModel = (ILayoutDocumentPane)_targetPane.Model;
@@ -111,8 +95,9 @@ namespace AvalonDock.Controls
 							paneGroup.Orientation = System.Windows.Controls.Orientation.Vertical;
 						}
 
-						var insertToIndex = paneGroup.IndexOfChild(targetModel);
-						if (insertToIndex == (paneGroup.Children.Count - 1))
+						var targetIndex = paneGroup.IndexOfChild(targetModel);
+						var insertToIndex = targetIndex < 0 ? paneGroup.Children.Count : targetIndex + 1;
+						if (insertToIndex > paneGroup.Children.Count)
 						{
 							insertToIndex = paneGroup.Children.Count;
 						}
@@ -180,8 +165,9 @@ namespace AvalonDock.Controls
 							paneGroup.Orientation = System.Windows.Controls.Orientation.Horizontal;
 						}
 
-						var insertToIndex = paneGroup.IndexOfChild(targetModel);
-						if (insertToIndex == (paneGroup.Children.Count - 1))
+						var targetIndex = paneGroup.IndexOfChild(targetModel);
+						var insertToIndex = targetIndex < 0 ? paneGroup.Children.Count : targetIndex + 1;
+						if (insertToIndex > paneGroup.Children.Count)
 						{
 							insertToIndex = paneGroup.Children.Count;
 						}
@@ -226,11 +212,7 @@ namespace AvalonDock.Controls
 			base.Drop(floatingWindow);
 		}
 
-		/// <summary>
-		/// Method is invoked to complete a drag & drop operation with a (new) docking position
-		/// by docking of the LayoutAnchorable <paramref name="floatingWindow"/> into this drop target.
-		/// </summary>
-		/// <param name="floatingWindow"></param>
+		/// <inheritdoc/>
 		protected override void Drop(LayoutAnchorableFloatingWindow floatingWindow)
 		{
 			ILayoutDocumentPane targetModel = _targetPane.Model as ILayoutDocumentPane;
@@ -433,14 +415,7 @@ namespace AvalonDock.Controls
 			base.Drop(floatingWindow);
 		}
 
-		/// <summary>
-		/// Gets a <see cref="Geometry"/> that is used to highlight/preview the docking position
-		/// of this drop target for a <paramref name="floatingWindowModel"/> being docked inside an
-		/// <paramref name="overlayWindow"/>.
-		/// </summary>
-		/// <param name="overlayWindow"></param>
-		/// <param name="floatingWindowModel"></param>
-		/// <returns>The geometry of the preview/highlighting WPF figure path.</returns>
+		/// <inheritdoc/>
 		public override Geometry GetPreviewPath(
 			OverlayWindow overlayWindow,
 			LayoutFloatingWindow floatingWindowModel)
@@ -478,36 +453,29 @@ namespace AvalonDock.Controls
 					}
 
 				case DropTargetType.DocumentPaneDockBottom:
-					{
-						var targetScreenRect = TargetElement.GetScreenArea();
-						targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
-						targetScreenRect.Offset(0.0, targetScreenRect.Height / 2.0);
-						targetScreenRect.Height /= 2.0;
-						return new RectangleGeometry(targetScreenRect);
-					}
-
 				case DropTargetType.DocumentPaneDockTop:
-					{
-						var targetScreenRect = TargetElement.GetScreenArea();
-						targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
-						targetScreenRect.Height /= 2.0;
-						return new RectangleGeometry(targetScreenRect);
-					}
-
 				case DropTargetType.DocumentPaneDockLeft:
-					{
-						var targetScreenRect = TargetElement.GetScreenArea();
-						targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
-						targetScreenRect.Width /= 2.0;
-						return new RectangleGeometry(targetScreenRect);
-					}
-
 				case DropTargetType.DocumentPaneDockRight:
 					{
 						var targetScreenRect = TargetElement.GetScreenArea();
 						targetScreenRect.Offset(-overlayWindow.Left, -overlayWindow.Top);
-						targetScreenRect.Offset(targetScreenRect.Width / 2.0, 0.0);
-						targetScreenRect.Width /= 2.0;
+
+						if (OverlayPreviewRules.TryComputePanePreviewRect(
+							Type,
+							targetScreenRect.Width,
+							targetScreenRect.Height,
+							out var left,
+							out var top,
+							out var width,
+							out var height))
+						{
+							targetScreenRect = new Rect(
+								targetScreenRect.Left + left,
+								targetScreenRect.Top + top,
+								width,
+								height);
+						}
+
 						return new RectangleGeometry(targetScreenRect);
 					}
 			}

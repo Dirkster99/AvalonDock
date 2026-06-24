@@ -1,13 +1,4 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-/**************************************************************************\
+﻿/**************************************************************************\
 	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
@@ -25,44 +16,101 @@ namespace Microsoft.Windows.Shell
 	using Standard;
 	using HANDLE_MESSAGE = System.Collections.Generic.KeyValuePair<Standard.WM, Standard.MessageHandler>;
 
+	/// <summary>
+	/// Represents the window Chrome Worker.
+	/// </summary>
 	internal class WindowChromeWorker : DependencyObject
 	{
 		// Delegate signature used for Dispatcher.BeginInvoke.
+
+		/// <summary>Represents the _Action callback.</summary>
 		private delegate void _Action();
 
+		/// <summary>
+		/// The swp Flags field.
+		/// </summary>
 		private const SWP _SwpFlags = SWP.FRAMECHANGED | SWP.NOSIZE | SWP.NOMOVE | SWP.NOZORDER | SWP.NOOWNERZORDER | SWP.NOACTIVATE;
 
+		/// <summary>
+		/// The message Table field.
+		/// </summary>
 		private readonly List<HANDLE_MESSAGE> _messageTable;
 
-		/// <summary>The Window that's chrome is being modified.</summary>
+		/// <summary>
+		/// The window field.
+		/// </summary>
 		private Window _window;
 
-		/// <summary>Underlying HWND for the _window.</summary>
+		/// <summary>
+		/// The hwnd field.
+		/// </summary>
 		private IntPtr _hwnd;
 
+		/// <summary>
+		/// The hwnd Source field.
+		/// </summary>
 		private HwndSource _hwndSource = null;
+
+		/// <summary>
+		/// The is Hooked field.
+		/// </summary>
 		private bool _isHooked = false;
 
 		// These fields are for tracking workarounds for WPF 3.5SP1 behaviors.
+
+		/// <summary>
+		/// The is Fixed Up field.
+		/// </summary>
 		private bool _isFixedUp = false;
 
+		/// <summary>
+		/// The is User Resizing field.
+		/// </summary>
 		private bool _isUserResizing = false;
+
+		/// <summary>
+		/// The has User Moved Window field.
+		/// </summary>
 		private bool _hasUserMovedWindow = false;
+
+		/// <summary>
+		/// The window Pos At Start Of User Move field.
+		/// </summary>
 		private Point _windowPosAtStartOfUserMove = default;
 
 		// Field to track attempts to force off Device Bitmaps on Win7.
+
+		/// <summary>
+		/// The black Glass Fixup Attempt Count field.
+		/// </summary>
 		private int _blackGlassFixupAttemptCount;
 
-		/// <summary>Object that describes the current modifications being made to the chrome.</summary>
+		/// <summary>
+		/// The chrome Info field.
+		/// </summary>
 		private WindowChrome _chromeInfo;
 
 		// Keep track of this so we can detect when we need to apply changes.  Tracking these separately
 		// as I've seen using just one cause things to get enough out of sync that occasionally the caption will redraw.
+
+		/// <summary>
+		/// The last Rounding State field.
+		/// </summary>
 		private WindowState _lastRoundingState;
 
+		/// <summary>
+		/// The last Menu State field.
+		/// </summary>
 		private WindowState _lastMenuState;
+
+		/// <summary>
+		/// The is Glass Enabled field.
+		/// </summary>
 		private bool _isGlassEnabled;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="WindowChromeWorker"/> class.
+		/// </summary>
 		public WindowChromeWorker()
 		{
 			_messageTable = new List<HANDLE_MESSAGE>
@@ -90,6 +138,10 @@ namespace Microsoft.Windows.Shell
 			}
 		}
 
+		/// <summary>
+		/// Sets the set Window Chrome.
+		/// </summary>
+		/// <param name="newChrome">The new Chrome.</param>
 		public void SetWindowChrome(WindowChrome newChrome)
 		{
 			VerifyAccess();
@@ -103,11 +155,24 @@ namespace Microsoft.Windows.Shell
 			_ApplyNewCustomChrome();
 		}
 
+		/// <summary>
+		/// Executes the on Chrome Property Changed That Requires Repaint operation.
+		/// </summary>
+		/// <param name="sender">The event sender.</param>
+		/// <param name="e">The event arguments.</param>
 		private void _OnChromePropertyChangedThatRequiresRepaint(object sender, EventArgs e) => _UpdateFrameState(true);
 
+		/// <summary>
+		/// <see cref="WindowChromeWorker"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty WindowChromeWorkerProperty = DependencyProperty.RegisterAttached(nameof(WindowChromeWorker), typeof(WindowChromeWorker), typeof(WindowChromeWorker),
 			new PropertyMetadata(null, _OnChromeWorkerChanged));
 
+		/// <summary>
+		/// Executes the on Chrome Worker Changed operation.
+		/// </summary>
+		/// <param name="d">The d.</param>
+		/// <param name="e">The event arguments.</param>
 		private static void _OnChromeWorkerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
 			var w = (Window)d;
@@ -119,6 +184,10 @@ namespace Microsoft.Windows.Shell
 			cw._SetWindow(w);
 		}
 
+		/// <summary>
+		/// Executes the set Window operation.
+		/// </summary>
+		/// <param name="window">The window.</param>
 		private void _SetWindow(Window window)
 		{
 			Assert.IsNull(_window);
@@ -161,6 +230,11 @@ namespace Microsoft.Windows.Shell
 			}
 		}
 
+		/// <summary>
+		/// Executes the unset Window operation.
+		/// </summary>
+		/// <param name="sender">The event sender.</param>
+		/// <param name="e">The event arguments.</param>
 		private void _UnsetWindow(object sender, EventArgs e)
 		{
 			if (Utility.IsPresentationFrameworkVersionLessThan4)
@@ -173,6 +247,11 @@ namespace Microsoft.Windows.Shell
 			_RestoreStandardChromeState(true);
 		}
 
+		/// <summary>
+		/// Gets the get Window Chrome Worker.
+		/// </summary>
+		/// <param name="window">The window.</param>
+		/// <returns>The requested value.</returns>
 		[SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
 		public static WindowChromeWorker GetWindowChromeWorker(Window window)
 		{
@@ -180,6 +259,11 @@ namespace Microsoft.Windows.Shell
 			return (WindowChromeWorker)window.GetValue(WindowChromeWorkerProperty);
 		}
 
+		/// <summary>
+		/// Sets the set Window Chrome Worker.
+		/// </summary>
+		/// <param name="window">The window.</param>
+		/// <param name="chrome">The chrome.</param>
 		[SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
 		public static void SetWindowChromeWorker(Window window, WindowChromeWorker chrome)
 		{
@@ -187,6 +271,11 @@ namespace Microsoft.Windows.Shell
 			window.SetValue(WindowChromeWorkerProperty, chrome);
 		}
 
+		/// <summary>
+		/// Executes the on Window Property Changed That Requires Template Fixup operation.
+		/// </summary>
+		/// <param name="sender">The event sender.</param>
+		/// <param name="e">The event arguments.</param>
 		private void _OnWindowPropertyChangedThatRequiresTemplateFixup(object sender, EventArgs e)
 		{
 			Assert.IsTrue(Utility.IsPresentationFrameworkVersionLessThan4);
@@ -199,6 +288,9 @@ namespace Microsoft.Windows.Shell
 			_window.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, (_Action)_FixupFrameworkIssues);
 		}
 
+		/// <summary>
+		/// Executes the apply New Custom Chrome operation.
+		/// </summary>
 		private void _ApplyNewCustomChrome()
 		{
 			// Not yet hooked.
@@ -223,6 +315,9 @@ namespace Microsoft.Windows.Shell
 			NativeMethods.SetWindowPos(_hwnd, IntPtr.Zero, 0, 0, 0, 0, _SwpFlags);
 		}
 
+		/// <summary>
+		/// Executes the fixup Framework Issues operation.
+		/// </summary>
 		private void _FixupFrameworkIssues()
 		{
 			Assert.IsNotNull(_chromeInfo);
@@ -288,6 +383,10 @@ namespace Microsoft.Windows.Shell
 		// the system, just the application.
 		// WPF also tends to call this function anyways during animations, so we're just forcing the issue
 		// consistently and a bit earlier.
+
+		/// <summary>
+		/// Executes the fixup Windows 7 Issues operation.
+		/// </summary>
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
 		private void _FixupWindows7Issues()
 		{
@@ -324,6 +423,11 @@ namespace Microsoft.Windows.Shell
 				_blackGlassFixupAttemptCount = 0;
 		}
 
+		/// <summary>
+		/// Executes the fixup Restore Bounds operation.
+		/// </summary>
+		/// <param name="sender">The event sender.</param>
+		/// <param name="e">The event arguments.</param>
 		private void _FixupRestoreBounds(object sender, EventArgs e)
 		{
 			Assert.IsTrue(Utility.IsPresentationFrameworkVersionLessThan4);
@@ -340,6 +444,11 @@ namespace Microsoft.Windows.Shell
 			_window.Left = adjustedTopLeft.X;
 		}
 
+		/// <summary>
+		/// Executes the get Adjusted Window Rect operation.
+		/// </summary>
+		/// <param name="rcWindow">The rc Window.</param>
+		/// <returns>The result of the operation.</returns>
 		private RECT _GetAdjustedWindowRect(RECT rcWindow)
 		{
 			// This should only be used to work around issues in the Framework that were fixed in 4.0
@@ -354,6 +463,10 @@ namespace Microsoft.Windows.Shell
 		// don't match the current window location and it's not in a maximized or minimized state.
 		// Because this isn't doced or supported, it's also not incredibly consistent.  Sometimes some things get updated in
 		// different orders, so this isn't absolutely reliable.
+
+		/// <summary>
+		/// Gets a value indicating whether is Window Docked.
+		/// </summary>
 		private bool _IsWindowDocked
 		{
 			get
@@ -369,6 +482,15 @@ namespace Microsoft.Windows.Shell
 			}
 		}
 
+		/// <summary>
+		/// Executes the wnd Proc operation.
+		/// </summary>
+		/// <param name="hwnd">The hwnd.</param>
+		/// <param name="msg">The msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
 		private IntPtr _WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
 		{
 			// Only expecting messages for our cached HWND.
@@ -384,6 +506,14 @@ namespace Microsoft.Windows.Shell
 			return IntPtr.Zero;
 		}
 
+		/// <summary>
+		/// Executes the handle Set Text Or Icon operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
 		private IntPtr _HandleSetTextOrIcon(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
 		{
 			var modified = _ModifyStyle(WS.VISIBLE, 0);
@@ -399,6 +529,14 @@ namespace Microsoft.Windows.Shell
 			return lRet;
 		}
 
+		/// <summary>
+		/// Executes the handle NC Activate operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
 		private IntPtr _HandleNCActivate(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
 		{
 			// Despite MSDN's documentation of lParam not being used,
@@ -411,6 +549,14 @@ namespace Microsoft.Windows.Shell
 			return lRet;
 		}
 
+		/// <summary>
+		/// Executes the handle NC Calc Size operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
 		private IntPtr _HandleNCCalcSize(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
 		{
 			// lParam is an [in, out] that can be either a RECT* (wParam == FALSE) or an NCCALCSIZE_PARAMS*.
@@ -423,6 +569,14 @@ namespace Microsoft.Windows.Shell
 			return new IntPtr((int)WVR.REDRAW);
 		}
 
+		/// <summary>
+		/// Executes the handle NC Hit Test operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
 		private IntPtr _HandleNCHitTest(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
 		{
 			var lRet = IntPtr.Zero;
@@ -457,6 +611,14 @@ namespace Microsoft.Windows.Shell
 			return lRet;
 		}
 
+		/// <summary>
+		/// Executes the handle NCR Button Up operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
 		private IntPtr _HandleNCRButtonUp(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
 		{
 			// Emulate the system behavior of clicking the right mouse button over the caption area
@@ -478,6 +640,14 @@ namespace Microsoft.Windows.Shell
 			return IntPtr.Zero;
 		}
 
+		/// <summary>
+		/// Executes the handle Size operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
 		private IntPtr _HandleSize(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
 		{
 			const int SIZE_MAXIMIZED = 2;
@@ -495,6 +665,14 @@ namespace Microsoft.Windows.Shell
 			return IntPtr.Zero;
 		}
 
+		/// <summary>
+		/// Executes the handle Window Pos Changed operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
 		private IntPtr _HandleWindowPosChanged(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
 		{
 			// http://blogs.msdn.com/oldnewthing/archive/2008/01/15/7113860.aspx
@@ -517,6 +695,14 @@ namespace Microsoft.Windows.Shell
 			return IntPtr.Zero;
 		}
 
+		/// <summary>
+		/// Executes the handle Dwm Composition Changed operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
 		private IntPtr _HandleDwmCompositionChanged(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
 		{
 			_UpdateFrameState(false);
@@ -524,6 +710,14 @@ namespace Microsoft.Windows.Shell
 			return IntPtr.Zero;
 		}
 
+		/// <summary>
+		/// Executes the handle Setting Change operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
 		private IntPtr _HandleSettingChange(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
 		{
 			// There are several settings that can cause fixups for the template to become invalid when changed.
@@ -534,6 +728,14 @@ namespace Microsoft.Windows.Shell
 			return IntPtr.Zero;
 		}
 
+		/// <summary>
+		/// Executes the handle Enter Size Move operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
 		private IntPtr _HandleEnterSizeMove(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
 		{
 			// This is only intercepted to deal with bugs in Window in .Net 3.5 and below.
@@ -562,6 +764,14 @@ namespace Microsoft.Windows.Shell
 			return IntPtr.Zero;
 		}
 
+		/// <summary>
+		/// Executes the handle Exit Size Move operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
 		private IntPtr _HandleExitSizeMove(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
 		{
 			// This is only intercepted to deal with bugs in Window in .Net 3.5 and below.
@@ -580,6 +790,14 @@ namespace Microsoft.Windows.Shell
 			return IntPtr.Zero;
 		}
 
+		/// <summary>
+		/// Executes the handle Move operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
 		private IntPtr _HandleMove(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
 		{
 			// This is only intercepted to deal with bugs in Window in .Net 3.5 and below.
@@ -589,10 +807,12 @@ namespace Microsoft.Windows.Shell
 			return IntPtr.Zero;
 		}
 
-		/// <summary>Add and remove a native WindowStyle from the HWND.</summary>
-		/// <param name="removeStyle">The styles to be removed.  These can be bitwise combined.</param>
-		/// <param name="addStyle">The styles to be added.  These can be bitwise combined.</param>
-		/// <returns>Whether the styles of the HWND were modified as a result of this call.</returns>
+		/// <summary>
+		/// Executes the modify Style operation.
+		/// </summary>
+		/// <param name="removeStyle">The remove Style.</param>
+		/// <param name="addStyle">The add Style.</param>
+		/// <returns>true if the operation succeeds; otherwise, false.</returns>
 		private bool _ModifyStyle(WS removeStyle, WS addStyle)
 		{
 			Assert.IsNotDefault(_hwnd);
@@ -604,8 +824,9 @@ namespace Microsoft.Windows.Shell
 		}
 
 		/// <summary>
-		/// Get the WindowState as the native HWND knows it to be.  This isn't necessarily the same as what Window thinks.
+		/// Executes the get Hwnd State operation.
 		/// </summary>
+		/// <returns>The result of the operation.</returns>
 		private WindowState _GetHwndState()
 		{
 			var wpl = NativeMethods.GetWindowPlacement(_hwnd);
@@ -622,9 +843,9 @@ namespace Microsoft.Windows.Shell
 		}
 
 		/// <summary>
-		/// Get the bounding rectangle for the window in physical coordinates.
+		/// Executes the get Window Rect operation.
 		/// </summary>
-		/// <returns>The bounding rectangle for the window.</returns>
+		/// <returns>The result of the operation.</returns>
 		private Rect _GetWindowRect()
 		{
 			// Get the window rectangle.
@@ -633,14 +854,9 @@ namespace Microsoft.Windows.Shell
 		}
 
 		/// <summary>
-		/// Update the items in the system menu based on the current, or assumed, WindowState.
+		/// Executes the update System Menu operation.
 		/// </summary>
-		/// <param name="assumeState">
-		/// The state to assume that the Window is in.  This can be null to query the Window's state.
-		/// </param>
-		/// <remarks>
-		/// We want to update the menu while we have some control over whether the caption will be repainted.
-		/// </remarks>
+		/// <param name="assumeState">The assume State.</param>
 		private void _UpdateSystemMenu(WindowState? assumeState)
 		{
 			const MF mfEnabled = MF.ENABLED | MF.BYCOMMAND;
@@ -692,6 +908,10 @@ namespace Microsoft.Windows.Shell
 			if (modified) _ModifyStyle(0, WS.VISIBLE);
 		}
 
+		/// <summary>
+		/// Executes the update Frame State operation.
+		/// </summary>
+		/// <param name="force">The force.</param>
 		private void _UpdateFrameState(bool force)
 		{
 			if (_hwnd == IntPtr.Zero) return;
@@ -715,11 +935,18 @@ namespace Microsoft.Windows.Shell
 			NativeMethods.SetWindowPos(_hwnd, IntPtr.Zero, 0, 0, 0, 0, _SwpFlags);
 		}
 
+		/// <summary>
+		/// Executes the clear Rounding Region operation.
+		/// </summary>
 		private void _ClearRoundingRegion()
 		{
 			NativeMethods.SetWindowRgn(_hwnd, IntPtr.Zero, NativeMethods.IsWindowVisible(_hwnd));
 		}
 
+		/// <summary>
+		/// Executes the set Rounding Region operation.
+		/// </summary>
+		/// <param name="wp">The wp.</param>
 		private void _SetRoundingRegion(WINDOWPOS? wp)
 		{
 			const int MONITOR_DEFAULTTONEAREST = 0x00000002;
@@ -836,6 +1063,12 @@ namespace Microsoft.Windows.Shell
 			}
 		}
 
+		/// <summary>
+		/// Executes the create Round Rect Rgn operation.
+		/// </summary>
+		/// <param name="region">The region.</param>
+		/// <param name="radius">The radius.</param>
+		/// <returns>The result of the operation.</returns>
 		private static IntPtr _CreateRoundRectRgn(Rect region, double radius)
 		{
 			// Round outwards.
@@ -855,6 +1088,12 @@ namespace Microsoft.Windows.Shell
 				(int)Math.Ceiling(radius));
 		}
 
+		/// <summary>
+		/// Executes the create And Combine Round Rect Rgn operation.
+		/// </summary>
+		/// <param name="hrgnSource">The hrgn Source.</param>
+		/// <param name="region">The region.</param>
+		/// <param name="radius">The radius.</param>
 		[SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "HRGNs")]
 		private static void _CreateAndCombineRoundRectRgn(IntPtr hrgnSource, Rect region, double radius)
 		{
@@ -873,6 +1112,11 @@ namespace Microsoft.Windows.Shell
 			}
 		}
 
+		/// <summary>
+		/// Executes the is Uniform operation.
+		/// </summary>
+		/// <param name="cornerRadius">The corner Radius.</param>
+		/// <returns>true if the operation succeeds; otherwise, false.</returns>
 		private static bool _IsUniform(CornerRadius cornerRadius)
 		{
 			if (!DoubleUtilities.AreClose(cornerRadius.BottomLeft, cornerRadius.BottomRight)) return false;
@@ -881,6 +1125,9 @@ namespace Microsoft.Windows.Shell
 			return true;
 		}
 
+		/// <summary>
+		/// Executes the extend Glass Frame operation.
+		/// </summary>
 		private void _ExtendGlassFrame()
 		{
 			Assert.IsNotNull(_window);
@@ -929,7 +1176,7 @@ namespace Microsoft.Windows.Shell
 		}
 
 		/// <summary>
-		/// Matrix of the HT values to return when responding to NC window messages.
+		/// The hit Test Borders field.
 		/// </summary>
 		[SuppressMessage("Microsoft.Performance", "CA1814:PreferJaggedArraysOverMultidimensional", MessageId = "Member")]
 		private static readonly HT[,] _HitTestBorders =
@@ -939,6 +1186,12 @@ namespace Microsoft.Windows.Shell
 			{ HT.BOTTOMLEFT, HT.BOTTOM,  HT.BOTTOMRIGHT },
 		};
 
+		/// <summary>
+		/// Executes the hit Test Nca operation.
+		/// </summary>
+		/// <param name="windowPosition">The window Position.</param>
+		/// <param name="mousePosition">The mouse Position.</param>
+		/// <returns>The result of the operation.</returns>
 		private HT _HitTestNca(Rect windowPosition, Point mousePosition)
 		{
 			// Determine if hit test is for resizing, default middle (1,1).
@@ -971,6 +1224,10 @@ namespace Microsoft.Windows.Shell
 			return ht;
 		}
 
+		/// <summary>
+		/// Executes the restore Standard Chrome State operation.
+		/// </summary>
+		/// <param name="isClosing">The is Closing.</param>
 		private void _RestoreStandardChromeState(bool isClosing)
 		{
 			VerifyAccess();
@@ -982,6 +1239,9 @@ namespace Microsoft.Windows.Shell
 			_window.InvalidateMeasure();
 		}
 
+		/// <summary>
+		/// Executes the unhook Custom Chrome operation.
+		/// </summary>
 		private void _UnhookCustomChrome()
 		{
 			Assert.IsNotDefault(_hwnd);
@@ -991,6 +1251,9 @@ namespace Microsoft.Windows.Shell
 			_isHooked = false;
 		}
 
+		/// <summary>
+		/// Executes the restore Framework Issue Fixups operation.
+		/// </summary>
 		private void _RestoreFrameworkIssueFixups()
 		{
 			// This margin is only necessary if the client rect is going to be calculated incorrectly by WPF.
@@ -1008,6 +1271,9 @@ namespace Microsoft.Windows.Shell
 			_isFixedUp = false;
 		}
 
+		/// <summary>
+		/// Executes the restore Glass Frame operation.
+		/// </summary>
 		private void _RestoreGlassFrame()
 		{
 			Assert.IsNull(_chromeInfo);
@@ -1023,6 +1289,9 @@ namespace Microsoft.Windows.Shell
 			NativeMethods.DwmExtendFrameIntoClientArea(_hwnd, ref dwmMargin);
 		}
 
+		/// <summary>
+		/// Executes the restore Hrgn operation.
+		/// </summary>
 		private void _RestoreHrgn()
 		{
 			_ClearRoundingRegion();

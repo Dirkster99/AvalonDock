@@ -19,7 +19,9 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>
     <ItemGroup>
+      <ProjectReference Include="..\Components\AvalonDock.Themes.VS\AvalonDock.Themes.VS.csproj" />
       <ProjectReference Include="..\Components\AvalonDock\AvalonDock.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Serializer.Xml\AvalonDock.Serializer.Xml.csproj" />
       <ProjectReference Include="..\Components\AvalonDock.Themes.Aero\AvalonDock.Themes.Aero.csproj" />
       <ProjectReference Include="..\Components\AvalonDock.Themes.Expression\AvalonDock.Themes.Expression.csproj" />
       <ProjectReference Include="..\Components\AvalonDock.Themes.Arc\AvalonDock.Themes.Arc.csproj" />

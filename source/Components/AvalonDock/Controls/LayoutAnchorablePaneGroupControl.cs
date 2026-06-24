@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System.Windows;
 using System.Windows.Controls;
 using AvalonDock.Layout;
@@ -14,25 +5,23 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a group control that hosts a <see cref="LayoutAnchorablePaneGroup"/> model.
-	///
-	/// This Grid based control can host multiple other controls in its Children collection
-	/// (<see cref="LayoutAnchorableControl"/>).
+	/// Represents the layout Anchorable Pane Group Control.
 	/// </summary>
 	public class LayoutAnchorablePaneGroupControl : LayoutGridControl<ILayoutAnchorablePane>, ILayoutControl
 	{
 		private LayoutAnchorablePaneGroup _model;
 
 		/// <summary>
-		/// Class constructor from layout model.
+		/// Initializes a new instance of the <see cref="LayoutAnchorablePaneGroupControl"/> class.
 		/// </summary>
-		/// <param name="model"></param>
+		/// <param name="model">The model.</param>
 		internal LayoutAnchorablePaneGroupControl(LayoutAnchorablePaneGroup model)
 			: base(model, model.Orientation)
 		{
 			_model = model;
 		}
 
+		/// <inheritdoc/>
 		protected override void OnFixChildrenDockLengths()
 		{
 			if (_model.Orientation == Orientation.Horizontal)

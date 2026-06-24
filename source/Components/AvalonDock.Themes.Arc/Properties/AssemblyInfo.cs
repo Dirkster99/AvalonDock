@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -17,7 +8,7 @@ using System.Windows.Markup;
 
 [assembly: ThemeInfo(
 	ResourceDictionaryLocation.None,
-	ResourceDictionaryLocation.SourceAssembly)]
+	ResourceDictionaryLocation.None)]
 
 [assembly: XmlnsDefinition("https://github.com/Dirkster99/AvalonDock", "AvalonDock.Themes")]
 [assembly: XmlnsPrefix("http://schemas.microsoft.com/winfx/2006/xaml/presentation", "AvalonDock.Themes")]

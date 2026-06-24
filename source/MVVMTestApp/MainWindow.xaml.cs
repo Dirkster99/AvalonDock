@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace AvalonDock.MVVMTestApp
 {
-	using AvalonDock.Layout.Serialization;
+	using AvalonDock.Serializer.Xml;
 
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
@@ -23,7 +23,7 @@ namespace AvalonDock.MVVMTestApp
 
 		private void MainWindow_Loaded(object sender, RoutedEventArgs e)
 		{
-			var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
+			var serializer = new XmlLayoutSerializer(dockManager);
 			serializer.LayoutSerializationCallback += (s, args) =>
 			{
 				args.Content = args.Content;
@@ -35,7 +35,7 @@ namespace AvalonDock.MVVMTestApp
 
 		private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
 		{
-			var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
+			var serializer = new XmlLayoutSerializer(dockManager);
 			serializer.Serialize(@".\AvalonDock.config");
 		}
 

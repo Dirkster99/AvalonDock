@@ -16,6 +16,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:TestApp"
     xmlns:winformsIntegration="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+    xmlns:vs="clr-namespace:AvalonDock.Themes.VS;assembly=AvalonDock.Themes.VS"
     Title="MainWindow"
     Width="800"
     Height="600"
@@ -79,6 +80,14 @@
                 <MenuItem Header="VS2013 Light" Click="OnSwitchTheme" Tag="VS2013Light" IsCheckable="True" />
                 <MenuItem Header="VS2013 Blue" Click="OnSwitchTheme" Tag="VS2013Blue" IsCheckable="True" />
                 <Separator />
+                <MenuItem Header="VS2022 Dark" Click="OnSwitchTheme" Tag="VS2022Dark" IsCheckable="True" />
+                <MenuItem Header="VS2022 Light" Click="OnSwitchTheme" Tag="VS2022Light" IsCheckable="True" />
+                <MenuItem Header="VS2022 Blue" Click="OnSwitchTheme" Tag="VS2022Blue" IsCheckable="True" />
+                <Separator />
+                <MenuItem Header="VS2015 Dark" Click="OnSwitchTheme" Tag="VS2015Dark" IsCheckable="True" />
+                <MenuItem Header="VS2015 Light" Click="OnSwitchTheme" Tag="VS2015Light" IsCheckable="True" />
+                <MenuItem Header="VS2015 Blue" Click="OnSwitchTheme" Tag="VS2015Blue" IsCheckable="True" />
+                <Separator />
                 <MenuItem Header="VS2010" Click="OnSwitchTheme" Tag="VS2010" IsCheckable="True" />
                 <MenuItem Header="Expression Dark" Click="OnSwitchTheme" Tag="ExpressionDark" IsCheckable="True" />
                 <MenuItem Header="Expression Light" Click="OnSwitchTheme" Tag="ExpressionLight" IsCheckable="True" />
@@ -97,7 +106,7 @@
             IsVirtualizingAnchorable="True"
             IsVirtualizingDocument="True">
             <DockingManager.Theme>
-                <ArcDarkTheme />
+	            <ArcDarkTheme/>
             </DockingManager.Theme>
             <DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
@@ -152,7 +161,7 @@
                                 <TextBox x:Name="tbDocument2Timer"
                                     Background="Transparent"
                                     BorderThickness="0"
-                                    Text="{Binding TestTimer, Mode=OneWay, StringFormat='Document 2 Attached to Timer ->\{0\}'}" />
+                                    Text="{Binding TestTimer, RelativeSource={RelativeSource AncestorType=Window}, Mode=OneWay, StringFormat='Document 2 Attached to Timer ->\{0\}'}" />
                             </LayoutDocument>
                         </LayoutDocumentPane>
                     </LayoutDocumentPaneGroup>
@@ -164,7 +173,7 @@
                                 Hiding="OnToolWindow1Hiding">
                                 <StackPanel MinHeight="450" Background="Transparent">
                                     <local:TestUserControl />
-                                <TextBox x:Name="tbToolWindow1Timer" Background="Transparent" Text="{Binding TestTimer, Mode=OneWay, StringFormat='Tool Window 1 Attached to Timer ->\{0\}'}" />
+                                <TextBox x:Name="tbToolWindow1Timer" Background="Transparent" Text="{Binding TestTimer, RelativeSource={RelativeSource AncestorType=Window}, Mode=OneWay, StringFormat='Tool Window 1 Attached to Timer ->\{0\}'}" />
                                 </StackPanel>
                             </LayoutAnchorable>
                             <LayoutAnchorable Title="Tool Window 2" ContentId="toolWindow2">
@@ -181,7 +190,7 @@
                                 Title="AutoHide1 Content"
                                 ContentId="AutoHide1Content"
                                 IconSource="/TestApp;component/Images/address-book--pencil.png">
-                                <TextBox x:Name="tbAutoHide1Timer" Background="Transparent" Text="{Binding TestTimer, Mode=OneWay, StringFormat='AutoHide Attached to Timer ->\{0\}'}" />
+                                <TextBox x:Name="tbAutoHide1Timer" Background="Transparent" Text="{Binding TestTimer, RelativeSource={RelativeSource AncestorType=Window}, Mode=OneWay, StringFormat='AutoHide Attached to Timer ->\{0\}'}" />
                             </LayoutAnchorable>
                             <LayoutAnchorable Title="AutoHide2 Content" ContentId="AutoHide2Content">
                                 <StackPanel x:Name="spAutoHide2" Orientation="Vertical" Background="Transparent">

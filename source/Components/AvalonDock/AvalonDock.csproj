@@ -6,6 +6,7 @@
 		<UseWPF>true</UseWPF>
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net.5.0-windows|AnyCPU'">
 		<DefineConstants/>
@@ -15,9 +16,8 @@
 		<Resource Include="**\*.png"/>
 	</ItemGroup>
 
-	<!-- NuGet Packaging -->
 	<ItemGroup>
-		<None Include="LICENSE" Pack="true" PackagePath=""/>
+		<ProjectReference Include="..\AvalonDock.Core\AvalonDock.Core.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="Properties\Resources.Designer.cs">

@@ -4,23 +4,43 @@
 	using System.Windows;
 
 	/// <summary>
-	/// SetWindowPlacement won't correct placement for WPF tool windows
-	///
-	/// https://stackoverflow.com/questions/19203031/setwindowplacement-wont-correct-placement-for-wpf-tool-windows
+	/// Represents a layout element for floating window extension.
 	/// </summary>
 	public static class ILayoutElementForFloatingWindowExtension
 	{
 		/// <summary>
-		/// RECT structure required by WINDOWPLACEMENT structure
+		/// Represents a Win32 rectangle.
 		/// </summary>
 		[StructLayout(LayoutKind.Sequential)]
 		internal struct RECT
 		{
+			/// <summary>
+			/// Gets or sets the left edge.
+			/// </summary>
 			public int Left;
+
+			/// <summary>
+			/// Gets or sets the top edge.
+			/// </summary>
 			public int Top;
+
+			/// <summary>
+			/// Gets or sets the right edge.
+			/// </summary>
 			public int Right;
+
+			/// <summary>
+			/// Gets or sets the bottom edge.
+			/// </summary>
 			public int Bottom;
 
+			/// <summary>
+			/// Initializes a new instance of the <see cref="RECT"/> struct.
+			/// </summary>
+			/// <param name="left">The left.</param>
+			/// <param name="top">The top.</param>
+			/// <param name="right">The right.</param>
+			/// <param name="bottom">The bottom.</param>
 			public RECT(int left, int top, int right, int bottom)
 			{
 				this.Left = left;
@@ -30,6 +50,10 @@
 			}
 		}
 
+		/// <summary>
+		/// Executes the keep inside nearest monitor operation.
+		/// </summary>
+		/// <param name="paneInsideFloatingWindow">The pane inside floating window.</param>
 		internal static void KeepInsideNearestMonitor(this ILayoutElementForFloatingWindow paneInsideFloatingWindow)
 		{
 			RECT normalPosition = new RECT();
@@ -81,12 +105,11 @@
 		}
 
 		/// <summary>
-		/// Determine whether <paramref name="a"/> and <paramref name="b"/>
-		/// have an intersection or not.
+		/// Executes the rectangles intersect operation.
 		/// </summary>
-		/// <param name="a"></param>
-		/// <param name="b"></param>
-		/// <returns></returns>
+		/// <param name="a">The a.</param>
+		/// <param name="b">The b.</param>
+		/// <returns><see langword="true"/> if the operation succeeds; otherwise, <see langword="false"/>.</returns>
 		private static bool RectanglesIntersect(RECT a, RECT b)
 		{
 			if (a.Left > b.Right || a.Right < b.Left)
@@ -103,12 +126,11 @@
 		}
 
 		/// <summary>
-		/// Determine the place where <paramref name="windowRect"/> should be placed
-		/// inside the <paramref name="monitorRect"/>.
+		/// Executes the place on screen operation.
 		/// </summary>
-		/// <param name="monitorRect"></param>
-		/// <param name="windowRect"></param>
-		/// <returns></returns>
+		/// <param name="monitorRect">The monitor rect.</param>
+		/// <param name="windowRect">The window rect.</param>
+		/// <returns>The resulting value.</returns>
 		private static RECT PlaceOnScreen(RECT monitorRect, RECT windowRect)
 		{
 			int monitorWidth = monitorRect.Right - monitorRect.Left;

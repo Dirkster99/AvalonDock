@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,19 +6,13 @@ using System.Windows.Input;
 
 namespace AvalonDock.Controls
 {
-	/// <inheritdoc />
 	/// <summary>
-	/// Implements the title display for various items: <see cref="LayoutAnchorablePaneControl"/>,
-	/// <see cref="LayoutDocumentTabItem"/>, <see cref="LayoutAnchorableTabItem"/>,
-	/// <see cref="LayoutDocumentFloatingWindowControl"/>, and <see cref="LayoutAnchorableFloatingWindowControl"/>.
-	///
-	/// The content is usually displayed via ContentPresenter binding in the theme definition.
+	/// Represents the drop Down Control Area.
 	/// </summary>
-	/// <seealso cref="ContentControl"/>
 	public class DropDownControlArea : ContentControl
 	{
 		/// <summary>
-		/// Static class constructor
+		/// Initializes static members of the <see cref="DropDownControlArea"/> class.
 		/// </summary>
 		static DropDownControlArea()
 		{
@@ -42,11 +27,15 @@ namespace AvalonDock.Controls
 				new MouseButtonEventHandler((s, e) => (s as DropDownControlArea)?.PreviewMouseRightButtonUpCallback(e)));
 		}
 
-		/// <summary><see cref="DropDownContextMenu"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="DropDownContextMenu"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty DropDownContextMenuProperty = DependencyProperty.Register(nameof(DropDownContextMenu), typeof(ContextMenu), typeof(DropDownControlArea),
 				new FrameworkPropertyMetadata(null));
 
-		/// <summary>Gets/sets the drop down menu to show up when user click on an anchorable menu pin.</summary>
+		/// <summary>
+		/// Gets or sets the drop Down Context Menu.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the drop down menu to show up when user click on an anchorable menu pin.")]
 		[Category("Menu")]
@@ -56,11 +45,15 @@ namespace AvalonDock.Controls
 			set => SetValue(DropDownContextMenuProperty, value);
 		}
 
-		/// <summary><see cref="DropDownContextMenuDataContext"/> dependency property. </summary>
+		/// <summary>
+		/// <see cref="DropDownContextMenuDataContext"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty DropDownContextMenuDataContextProperty = DependencyProperty.Register(nameof(DropDownContextMenuDataContext), typeof(object), typeof(DropDownControlArea),
 				new FrameworkPropertyMetadata(null));
 
-		/// <summary>Gets/sets the DataContext to set for the DropDownContext menu property.</summary>
+		/// <summary>
+		/// Gets or sets the drop Down Context Menu Data Context.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets/sets the DataContext to set for the DropDownContext menu property.")]
 		[Category("Menu")]

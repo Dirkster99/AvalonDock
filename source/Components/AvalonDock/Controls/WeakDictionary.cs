@@ -1,23 +1,13 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System;
 using System.Collections.Generic;
 
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a dictionary class that uses weak references for keys
-	/// while values are referenced with normal references.
+	/// Represents the weak dictionary.
 	/// </summary>
-	/// <typeparam name="K"></typeparam>
-	/// <typeparam name="V"></typeparam>
+	/// <typeparam name="K">The type of k.</typeparam>
+	/// <typeparam name="V">The type of v.</typeparam>
 	internal class WeakDictionary<K, V>
 		where K : class
 	{
@@ -25,10 +15,9 @@ namespace AvalonDock.Controls
 		private List<V> _values = new List<V>();
 
 		/// <summary>
-		/// Get a value by its key index.
+		/// Gets or sets the value associated with the specified index.
 		/// </summary>
-		/// <param name="key"></param>
-		/// <returns></returns>
+		/// <param name="key">The key.</param>
 		public V this[K key]
 		{
 			get
@@ -45,10 +34,10 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Gets whether a <paramref name="key"/> is included in the dictionary or not.
+		/// Contains key.
 		/// </summary>
-		/// <param name="key"></param>
-		/// <returns></returns>
+		/// <param name="key">The key.</param>
+		/// <returns>true if the collection contains the specified item; otherwise, false.</returns>
 		public bool ContainsKey(K key)
 		{
 			CollectGarbage();
@@ -56,13 +45,10 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Set the <paramref name="value"/> for a given <paramref name="key"/>.
-		/// Either
-		/// - inserts both key and value pair if key was not present or
-		/// - resets the value only if key was already present.
+		/// Sets the value.
 		/// </summary>
-		/// <param name="key"></param>
-		/// <param name="value"></param>
+		/// <param name="key">The key.</param>
+		/// <param name="value">The value.</param>
 		public void SetValue(K key, V value)
 		{
 			CollectGarbage();
@@ -79,11 +65,11 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Get whether a key value pair exists and return its <paramref name="value"/> if so.
+		/// Gets the value.
 		/// </summary>
-		/// <param name="key"></param>
-		/// <param name="value"></param>
-		/// <returns>True if key exists in the collection, otherwise false.</returns>
+		/// <param name="key">The key.</param>
+		/// <param name="value">The value.</param>
+		/// <returns>true if the operation for get value succeeds; otherwise, false.</returns>
 		public bool GetValue(K key, out V value)
 		{
 			CollectGarbage();

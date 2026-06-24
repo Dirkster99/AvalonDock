@@ -1,0 +1,31 @@
+<UserControl x:Class="ToggleTestApp.Views.EditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+             Background="{DynamicResource AppEditorBg}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- File path bar -->
+        <Border Grid.Row="0" Background="{DynamicResource AppPanelBg}" Padding="8,4">
+            <TextBlock Text="{Binding FilePath}" Foreground="{DynamicResource AppSubText}" FontSize="11"
+                       FontFamily="Cascadia Mono,Consolas" TextTrimming="CharacterEllipsis" />
+        </Border>
+
+        <avalonedit:TextEditor Grid.Row="1"
+                               x:Name="Editor"
+                               FontFamily="Consolas, Courier New, monospace"
+                               FontSize="13"
+                               Background="{DynamicResource AppEditorBg}"
+                               Foreground="{DynamicResource AppEditorText}"
+                               ShowLineNumbers="True"
+                               LineNumbersForeground="{DynamicResource AppLineNumbers}"
+                               IsReadOnly="True"
+                               HorizontalScrollBarVisibility="Auto"
+                               VerticalScrollBarVisibility="Auto"
+                               Padding="4" />
+    </Grid>
+</UserControl>

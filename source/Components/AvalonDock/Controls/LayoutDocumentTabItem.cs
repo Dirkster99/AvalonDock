@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,13 +9,9 @@ using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
-	/// <inheritdoc />
 	/// <summary>
-	/// Implements the control for the TabItem Header of a <see cref="LayoutDocumentPaneControl"/>.
-	/// The Document's TabItem Header displays the title of a document and can be used to drag a
-	/// document from its docking position.
+	/// Represents the layout Document Tab Item.
 	/// </summary>
-	/// <seealso cref="Control"/>
 	public class LayoutDocumentTabItem : ContentControl
 	{
 		private List<Rect> _otherTabsScreenArea = null;
@@ -35,17 +22,23 @@ namespace AvalonDock.Controls
 		private Point _mouseDownPoint;
 		private bool _allowDrag = false;
 
-		/// <summary>Static class constructor to register WPF style keys.</summary>
+		/// <summary>
+		/// Initializes static members of the <see cref="LayoutDocumentTabItem"/> class.
+		/// </summary>
 		static LayoutDocumentTabItem()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(LayoutDocumentTabItem), new FrameworkPropertyMetadata(typeof(LayoutDocumentTabItem)));
 		}
 
-		/// <summary><see cref="Model"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="Model"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(nameof(Model), typeof(LayoutContent), typeof(LayoutDocumentTabItem),
 				new FrameworkPropertyMetadata(null, OnModelChanged));
 
-		/// <summary>Gets/sets the layout content model attached to the tab item.</summary>
+		/// <summary>
+		/// Gets or sets the model.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets wether this floating window is being dragged.")]
 		[Category("Other")]
@@ -55,10 +48,17 @@ namespace AvalonDock.Controls
 			set => SetValue(ModelProperty, value);
 		}
 
-		/// <summary>Handles changes to the <see cref="Model"/> property.</summary>
+		/// <summary>
+		/// Handles the on Model Changed.
+		/// </summary>
+		/// <param name="d">The d.</param>
+		/// <param name="e">The event arguments.</param>
 		private static void OnModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutDocumentTabItem)d).OnModelChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Model"/> property.</summary>
+		/// <summary>
+		/// Handles the on Model Changed.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnModelChanged(DependencyPropertyChangedEventArgs e)
 		{
 			var layoutItem = (Model?.Root?.Manager)?.GetLayoutItemFromModel(Model);
@@ -68,26 +68,32 @@ namespace AvalonDock.Controls
 			// UpdateLogicalParent();
 		}
 
-		/// <summary><see cref="LayoutItem"/> Read-Only dependency property.</summary>
+		/// <summary>
+		/// The layout Item Property Key field.
+		/// </summary>
 		private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(LayoutItem), typeof(LayoutItem), typeof(LayoutDocumentTabItem),
 				new FrameworkPropertyMetadata(null));
 
+		/// <summary>
+		/// <see cref="LayoutItem"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
-		/// <summary>Gets the LayoutItem attached to this tag item.</summary>
+		/// <summary>
+		/// Gets the layout Item.
+		/// </summary>
 		[Bindable(true)]
 		[Description("Gets the LayoutItem attached to this tag item.")]
 		[Category("Other")]
 		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
 
 		/// <summary>
-		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.
-		/// This dependency property indicates the LayoutItem attached to this tag item.
+		/// Sets the set Layout Item.
 		/// </summary>
-		/// <param name="value">The new value for the property.</param>
+		/// <param name="value">The value.</param>
 		protected void SetLayoutItem(LayoutItem value) => SetValue(LayoutItemPropertyKey, value);
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
 			if (!IsLoaded) return;
@@ -110,7 +116,7 @@ namespace AvalonDock.Controls
 			_isMouseDown = true;
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			if (!IsLoaded) return;
@@ -154,7 +160,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
 			if (!IsLoaded) return;
@@ -165,7 +171,7 @@ namespace AvalonDock.Controls
 			base.OnMouseLeftButtonUp(e);
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnMouseLeave(MouseEventArgs e)
 		{
 			if (!IsLoaded) return;
@@ -174,7 +180,7 @@ namespace AvalonDock.Controls
 			_isMouseDown = false;
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnMouseEnter(MouseEventArgs e)
 		{
 			if (!IsLoaded) return;
@@ -183,7 +189,7 @@ namespace AvalonDock.Controls
 			_isMouseDown = false;
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnMouseDown(MouseButtonEventArgs e)
 		{
 			if (!IsLoaded) return;
@@ -212,9 +218,7 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Is invoked when the user started to drag this control and its content
-		/// should be contained in a <see cref="LayoutFloatingWindowControl"/> to allow
-		/// dragging out of the currently docked position.
+		/// Executes the start Dragging Floating Window For Content operation.
 		/// </summary>
 		private void StartDraggingFloatingWindowForContent()
 		{

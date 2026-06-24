@@ -1,13 +1,4 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Markup;
@@ -15,9 +6,7 @@ using System.Windows.Markup;
 namespace AvalonDock.Layout
 {
 	/// <summary>
-	/// Implements an element in the layout model tree that can contain and arrange multiple
-	/// <see cref="LayoutAnchorablePane"/> elements in x or y directions, which in turn contain
-	/// <see cref="LayoutAnchorable"/> elements.
+	/// Represents a layout anchorable pane group.
 	/// </summary>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
@@ -25,19 +14,24 @@ namespace AvalonDock.Layout
 	{
 		private Orientation _orientation;
 
-		/// <summary>Class constructor</summary>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutAnchorablePaneGroup"/> class.
+		/// </summary>
 		public LayoutAnchorablePaneGroup()
 		{
 		}
 
-		/// <summary>Class constructor <paramref name="firstChild"/> to be inserted into collection of children models.</summary>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutAnchorablePaneGroup"/> class.
+		/// </summary>
+		/// <param name="firstChild">The first child.</param>
 		public LayoutAnchorablePaneGroup(LayoutAnchorablePane firstChild)
 		{
 			Children.Add(firstChild);
 		}
 
 		/// <summary>
-		/// Gets/sets the <see cref="System.Windows.Controls.Orientation"/> of this object.
+		/// Gets or sets the orientation.
 		/// </summary>
 		public Orientation Orientation
 		{
@@ -51,17 +45,17 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override bool GetVisibility() => Children.Count > 0 && Children.Any(c => c.IsVisible);
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnIsVisibleChanged()
 		{
 			UpdateParentVisibility();
 			base.OnIsVisibleChanged();
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnDockWidthChanged()
 		{
 			if (DockWidth.IsAbsolute && ChildrenCount == 1)
@@ -69,7 +63,7 @@ namespace AvalonDock.Layout
 			base.OnDockWidthChanged();
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnDockHeightChanged()
 		{
 			if (DockHeight.IsAbsolute && ChildrenCount == 1)
@@ -77,7 +71,7 @@ namespace AvalonDock.Layout
 			base.OnDockHeightChanged();
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnChildrenCollectionChanged()
 		{
 			if (DockWidth.IsAbsolute && ChildrenCount == 1)
@@ -85,21 +79,6 @@ namespace AvalonDock.Layout
 			if (DockHeight.IsAbsolute && ChildrenCount == 1)
 				((ILayoutPositionableElement)Children[0]).DockHeight = DockHeight;
 			base.OnChildrenCollectionChanged();
-		}
-
-		/// <inheritdoc />
-		public override void WriteXml(System.Xml.XmlWriter writer)
-		{
-			writer.WriteAttributeString(nameof(Orientation), Orientation.ToString());
-			base.WriteXml(writer);
-		}
-
-		/// <inheritdoc />
-		public override void ReadXml(System.Xml.XmlReader reader)
-		{
-			if (reader.MoveToAttribute(nameof(Orientation)))
-				Orientation = (Orientation)Enum.Parse(typeof(Orientation), reader.Value, true);
-			base.ReadXml(reader);
 		}
 
 #if TRACE
@@ -114,6 +93,9 @@ namespace AvalonDock.Layout
 		}
 #endif
 
+		/// <summary>
+		/// Updates the parent visibility.
+		/// </summary>
 		private void UpdateParentVisibility()
 		{
 			if (Parent is ILayoutElementWithVisibility parentPane) parentPane.ComputeVisibility();

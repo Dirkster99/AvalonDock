@@ -6,18 +6,22 @@
 		<UseWPF>true</UseWPF>
         <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
         <SignAssembly>true</SignAssembly>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		
 	</PropertyGroup>
 
 	<ItemGroup>
 		<Resource Include="**\*.png"/>
 	</ItemGroup>
 
-	<!-- NuGet Packaging -->
 	<ItemGroup>
-		<None Include="LICENSE" Pack="true" PackagePath=""/>
+		<EmbeddedResource Include="Resources\vs2013blue.vstheme.gz"/>
+		<EmbeddedResource Include="Resources\vs2013dark.vstheme.gz"/>
+		<EmbeddedResource Include="Resources\vs2013light.vstheme.gz"/>
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\AvalonDock\AvalonDock.csproj"/>
+		<ProjectReference Include="..\AvalonDock.Themes.VS\AvalonDock.Themes.VS.csproj"/>
 	</ItemGroup>
 </Project>

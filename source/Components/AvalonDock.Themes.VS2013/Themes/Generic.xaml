@@ -1,14 +1,3 @@
-<!--
-	************************************************************************
-	AvalonDock
-	
-	Copyright (C) 2007-2013 Xceed Software Inc.
-	
-	This program is provided to you under the terms of the Microsoft Public
-	License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
-	************************************************************************
--->
-
 <ResourceDictionary
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -1582,6 +1571,7 @@
                             </MultiDataTrigger.Conditions>
 							<Setter TargetName="Header" Property="BorderThickness" Value="0" />
 							<Setter TargetName="Header" Property="Padding" Value="0" />
+							<!-- Active tab close button hover uses Color B (#1C97EA) — same as inactive tab hover bg. -->
 							<Setter TargetName="DocumentCloseButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveHoveredBackground}}" />
                             <Setter TargetName="DocumentCloseButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveHoveredBorder}}" />
                             <Setter TargetName="PART_ImgPinClose" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedActiveHoveredGlyph}}" />
@@ -2729,6 +2719,208 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!--  ToggleDockingManager: VS2013 theme ToggleAnchorablePaneTitle style  -->
+    <Style TargetType="{x:Type avalonDockControls:ToggleAnchorablePaneTitle}">
+        <Setter Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionInactiveBackground}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionInactiveText}}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type avalonDockControls:ToggleAnchorablePaneTitle}">
+                    <Border
+                        x:Name="TitleBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid Margin="2,2,3,3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Background="Transparent">
+                                <avalonDockControls:DropDownControlArea
+                                    DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
+                                    DropDownContextMenuDataContext="{Binding Path=LayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
+                                    Style="{DynamicResource DropDownControlArea}">
+                                    <ContentPresenter
+                                        x:Name="Header"
+                                        Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
+                                        ContentTemplate="{Binding Model.Root.Manager.AnchorableTitleTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                        ContentTemplateSelector="{Binding Model.Root.Manager.AnchorableTitleTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"
+                                        TextElement.Foreground="{TemplateBinding Foreground}" />
+                                </avalonDockControls:DropDownControlArea>
+                            </Border>
+
+                            <Button
+                                x:Name="PART_OptionsButton"
+                                Grid.Column="1"
+                                Width="15"
+                                Height="15"
+                                Margin="1,1,1,0"
+                                VerticalAlignment="Center"
+                                Focusable="False"
+                                Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
+                                ToolTip="Options"
+                                Visibility="{Binding ShowHeaderOptionsButton, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=Visible, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
+                                <Canvas Width="10" Height="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Ellipse x:Name="Dot1" Canvas.Left="3.5" Canvas.Top="0" Width="2" Height="2"
+                                             Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}" />
+                                    <Ellipse x:Name="Dot2" Canvas.Left="3.5" Canvas.Top="3.5" Width="2" Height="2"
+                                             Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}" />
+                                    <Ellipse x:Name="Dot3" Canvas.Left="3.5" Canvas.Top="7" Width="2" Height="2"
+                                             Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}" />
+                                </Canvas>
+                            </Button>
+
+                            <Button
+                                x:Name="PART_MinimizeButton"
+                                Grid.Column="2"
+                                Width="15"
+                                Height="15"
+                                Margin="0,1,1,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Command="{Binding Path=LayoutItem.AutoHideCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                Focusable="False"
+                                Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
+                                ToolTip="Minimize"
+                                Visibility="{Binding ShowHeaderMinimizeButton, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=Visible, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
+                                <Path
+                                    x:Name="PART_ImgMinimize"
+                                    Width="8"
+                                    Height="8"
+                                    Data="M0,4 L8,4"
+                                    Stroke="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
+                                    StrokeThickness="1.5"
+                                    Stretch="Uniform" />
+                            </Button>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Model.IsActive, RelativeSource={RelativeSource Mode=Self}}" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionActiveBackground}}" />
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionActiveText}}" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Model.IsActive, RelativeSource={RelativeSource Mode=Self}}" Value="True">
+                            <Setter TargetName="Dot1" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveGlyph}}" />
+                            <Setter TargetName="Dot2" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveGlyph}}" />
+                            <Setter TargetName="Dot3" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveGlyph}}" />
+                            <Setter TargetName="PART_ImgMinimize" Property="Stroke" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveGlyph}}" />
+                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=PART_OptionsButton}" Value="True" />
+                                <Condition Binding="{Binding Model.IsActive, RelativeSource={RelativeSource Mode=Self}}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="PART_OptionsButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredBackground}}" />
+                            <Setter TargetName="PART_OptionsButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredBorder}}" />
+                            <Setter TargetName="Dot1" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredGlyph}}" />
+                            <Setter TargetName="Dot2" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredGlyph}}" />
+                            <Setter TargetName="Dot3" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredGlyph}}" />
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=PART_MinimizeButton}" Value="True" />
+                                <Condition Binding="{Binding Model.IsActive, RelativeSource={RelativeSource Mode=Self}}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="PART_MinimizeButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredBackground}}" />
+                            <Setter TargetName="PART_MinimizeButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredBorder}}" />
+                            <Setter TargetName="PART_ImgMinimize" Property="Stroke" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonActiveHoveredGlyph}}" />
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=PART_OptionsButton}" Value="True" />
+                                <Condition Binding="{Binding Model.IsActive, RelativeSource={RelativeSource Mode=Self}}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="PART_OptionsButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredBackground}}" />
+                            <Setter TargetName="PART_OptionsButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredBorder}}" />
+                            <Setter TargetName="Dot1" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredGlyph}}" />
+                            <Setter TargetName="Dot2" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredGlyph}}" />
+                            <Setter TargetName="Dot3" Property="Fill" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredGlyph}}" />
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, ElementName=PART_MinimizeButton}" Value="True" />
+                                <Condition Binding="{Binding Model.IsActive, RelativeSource={RelativeSource Mode=Self}}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="PART_MinimizeButton" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredBackground}}" />
+                            <Setter TargetName="PART_MinimizeButton" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredBorder}}" />
+                            <Setter TargetName="PART_ImgMinimize" Property="Stroke" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveHoveredGlyph}}" />
+                        </MultiDataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  ToggleDockingManager: VS2013 theme toggle anchorable pane style  -->
+    <Style x:Key="ToggleAnchorablePaneControlStyle"
+           TargetType="{x:Type avalonDockControls:LayoutAnchorablePaneControl}"
+           BasedOn="{StaticResource AvalonDockThemeVs2013AnchorablePaneControlStyle}">
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <avalonDockControls:LayoutAnchorableControl Model="{Binding}"
+                        Background="{DynamicResource {x:Static reskeys:ResourceKeys.TabBackground}}">
+                        <avalonDockControls:LayoutAnchorableControl.Template>
+                            <ControlTemplate TargetType="{x:Type avalonDockControls:LayoutAnchorableControl}">
+                                <Border
+                                    x:Name="Bd"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.PanelBorderBrush}}"
+                                    BorderThickness="1"
+                                    KeyboardNavigation.TabNavigation="Cycle">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <Border x:Name="Header">
+                                            <avalonDockControls:ToggleAnchorablePaneTitle Model="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}" />
+                                        </Border>
+                                        <ContentPresenter
+                                            Grid.Row="1"
+                                            Content="{Binding LayoutItem.View, RelativeSource={RelativeSource TemplatedParent}}"
+                                            ContentTemplate="{Binding LayoutItem.View.ContentTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                            ContentTemplateSelector="{Binding LayoutItem.View.ContentTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"
+                                            FlowDirection="{TemplateBinding FlowDirection}" />
+                                    </Grid>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.IsFloating}" Value="True" />
+                                            <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model.Parent.IsDirectlyHostedInFloatingWindow}" Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter TargetName="Header" Property="Visibility" Value="Collapsed" />
+                                    </MultiDataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=Model}" Value="{x:Null}" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter TargetName="Header" Property="Visibility" Value="Collapsed" />
+                                    </MultiDataTrigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </avalonDockControls:LayoutAnchorableControl.Template>
+                    </avalonDockControls:LayoutAnchorableControl>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  ToggleDockingManager  -->
+    <Style x:Key="{x:Type avalonDock:ToggleDockingManager}" TargetType="{x:Type avalonDock:ToggleDockingManager}"
+           BasedOn="{StaticResource {x:Type avalonDock:DockingManager}}">
+        <Setter Property="BorderThickness" Value="0" />
     </Style>
 
 </ResourceDictionary>

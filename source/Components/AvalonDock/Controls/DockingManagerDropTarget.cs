@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System;
 using System.Linq;
 using System.Windows;
@@ -16,23 +7,18 @@ using AvalonDock.Layout;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a <see cref="DockingManager"/> drop target
-	/// on which other items (<see cref="LayoutDocument"/> or <see cref="LayoutAnchorable"/>) can be dropped.
-	///
-	/// The resulting drop targets are usually the 4 outer drop target buttons
-	/// re-presenting a <see cref="LayoutAnchorSideControl"/> shown as overlay
-	/// on the <see cref="DockingManager"/> when the user drags an item over it.
+	/// Represents the docking manager drop target.
 	/// </summary>
 	internal class DockingManagerDropTarget : DropTarget<DockingManager>
 	{
 		private DockingManager _manager;
 
 		/// <summary>
-		/// Class constructor
+		/// Initializes a new instance of the <see cref="DockingManagerDropTarget"/> class.
 		/// </summary>
-		/// <param name="manager"></param>
-		/// <param name="detectionRect"></param>
-		/// <param name="type"></param>
+		/// <param name="manager">The manager.</param>
+		/// <param name="detectionRect">The detection rectangle.</param>
+		/// <param name="type">The drop target type.</param>
 		internal DockingManagerDropTarget(
 			DockingManager manager,
 			Rect detectionRect,
@@ -42,11 +28,7 @@ namespace AvalonDock.Controls
 			_manager = manager;
 		}
 
-		/// <summary>
-		/// Method is invoked to complete a drag & drop operation with a (new) docking position
-		/// by docking of the LayoutAnchorable <paramref name="floatingWindow"/> into this drop target.
-		/// </summary>
-		/// <param name="floatingWindow"></param>
+		/// <inheritdoc/>
 		protected override void Drop(LayoutAnchorableFloatingWindow floatingWindow)
 		{
 			switch (Type)
@@ -203,14 +185,7 @@ namespace AvalonDock.Controls
 			base.Drop(floatingWindow);
 		}
 
-		/// <summary>
-		/// Gets a <see cref="Geometry"/> that is used to highlight/preview the docking position
-		/// of this drop target for a <paramref name="floatingWindowModel"/> being docked inside an
-		/// <paramref name="overlayWindow"/>.
-		/// </summary>
-		/// <param name="overlayWindow"></param>
-		/// <param name="floatingWindowModel"></param>
-		/// <returns>The geometry of the preview/highlighting WPF figure path.</returns>
+		/// <inheritdoc/>
 		public override Geometry GetPreviewPath(
 			OverlayWindow overlayWindow,
 			LayoutFloatingWindow floatingWindowModel)
@@ -221,55 +196,28 @@ namespace AvalonDock.Controls
 
 			var targetScreenRect = TargetElement.GetScreenArea();
 
-			switch (Type)
+			// Preferred dock size used by the outer-edge rules: width for Left/Right, height for Top/Bottom.
+			var preferredSize = Type == DropTargetType.DockingManagerDockTop || Type == DropTargetType.DockingManagerDockBottom
+				? (layoutAnchorablePane.DockHeight.IsAbsolute ? layoutAnchorablePane.DockHeight.Value : layoutAnchorablePaneWithActualSize.ActualHeight)
+				: (layoutAnchorablePane.DockWidth.IsAbsolute ? layoutAnchorablePane.DockWidth.Value : layoutAnchorablePaneWithActualSize.ActualWidth);
+
+			if (OverlayPreviewRules.TryComputeManagerPreviewRect(
+				Type,
+				targetScreenRect.Width,
+				targetScreenRect.Height,
+				preferredSize,
+				out var left,
+				out var top,
+				out var width,
+				out var height))
 			{
-				case DropTargetType.DockingManagerDockLeft:
-					{
-						var desideredWidth = layoutAnchorablePane.DockWidth.IsAbsolute ? layoutAnchorablePane.DockWidth.Value : layoutAnchorablePaneWithActualSize.ActualWidth;
-						var previewBoxRect = new Rect(
-							targetScreenRect.Left - overlayWindow.Left,
-							targetScreenRect.Top - overlayWindow.Top,
-							Math.Min(desideredWidth, targetScreenRect.Width / 2.0),
-							targetScreenRect.Height);
+				var previewBoxRect = new Rect(
+					targetScreenRect.Left - overlayWindow.Left + left,
+					targetScreenRect.Top - overlayWindow.Top + top,
+					width,
+					height);
 
-						return new RectangleGeometry(previewBoxRect);
-					}
-
-				case DropTargetType.DockingManagerDockTop:
-					{
-						var desideredHeight = layoutAnchorablePane.DockHeight.IsAbsolute ? layoutAnchorablePane.DockHeight.Value : layoutAnchorablePaneWithActualSize.ActualHeight;
-						var previewBoxRect = new Rect(
-							targetScreenRect.Left - overlayWindow.Left,
-							targetScreenRect.Top - overlayWindow.Top,
-							targetScreenRect.Width,
-							Math.Min(desideredHeight, targetScreenRect.Height / 2.0));
-
-						return new RectangleGeometry(previewBoxRect);
-					}
-
-				case DropTargetType.DockingManagerDockRight:
-					{
-						var desideredWidth = layoutAnchorablePane.DockWidth.IsAbsolute ? layoutAnchorablePane.DockWidth.Value : layoutAnchorablePaneWithActualSize.ActualWidth;
-						var previewBoxRect = new Rect(
-							targetScreenRect.Right - overlayWindow.Left - Math.Min(desideredWidth, targetScreenRect.Width / 2.0),
-							targetScreenRect.Top - overlayWindow.Top,
-							Math.Min(desideredWidth, targetScreenRect.Width / 2.0),
-							targetScreenRect.Height);
-
-						return new RectangleGeometry(previewBoxRect);
-					}
-
-				case DropTargetType.DockingManagerDockBottom:
-					{
-						var desideredHeight = layoutAnchorablePane.DockHeight.IsAbsolute ? layoutAnchorablePane.DockHeight.Value : layoutAnchorablePaneWithActualSize.ActualHeight;
-						var previewBoxRect = new Rect(
-							targetScreenRect.Left - overlayWindow.Left,
-							targetScreenRect.Bottom - overlayWindow.Top - Math.Min(desideredHeight, targetScreenRect.Height / 2.0),
-							targetScreenRect.Width,
-							Math.Min(desideredHeight, targetScreenRect.Height / 2.0));
-
-						return new RectangleGeometry(previewBoxRect);
-					}
+				return new RectangleGeometry(previewBoxRect);
 			}
 
 			throw new InvalidOperationException();
