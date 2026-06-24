@@ -277,8 +277,12 @@ namespace AvalonDock.Controls
 				if (attachedIconTemplate != null)
 					btn.IconTemplate = attachedIconTemplate;
 
-				// ToolTip: prefer attached ToggleDock.ToolTip, fall back to Title
-				btn.ToolTip = attachedToolTip ?? anc.Title;
+				// ToolTip: prefer attached ToggleDock.ToolTip, fall back to Title; append shortcut when available
+				var baseToolTip = attachedToolTip ?? anc.Title;
+				if (anc.Content is IToolbox toolboxForTip && !string.IsNullOrWhiteSpace(toolboxForTip.Shortcut))
+					btn.ToolTip = $"{baseToolTip} ({toolboxForTip.Shortcut})";
+				else
+					btn.ToolTip = baseToolTip;
 			}
 		}
 
