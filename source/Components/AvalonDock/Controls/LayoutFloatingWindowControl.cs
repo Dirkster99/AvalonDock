@@ -650,25 +650,11 @@ namespace AvalonDock.Controls
 			if (OwnedByDockingManagerWindow && manager != null)
 			{
 				this.SetParentToMainWindowOf(manager);
-				CopyInputBindingsFromOwner();
 			}
 			else
 			{
 				this.SetParentWindowToNull();
 			}
-		}
-
-		/// <summary>
-		/// Copies InputBindings from the Owner window so that keyboard shortcuts
-		/// defined on the main window also work in floating windows.
-		/// </summary>
-		private void CopyInputBindingsFromOwner()
-		{
-			if (Owner == null) return;
-
-			InputBindings.Clear();
-			foreach (InputBinding binding in Owner.InputBindings)
-				InputBindings.Add(binding);
 		}
 
 		private const double KeyboardMoveStep = 10.0;
