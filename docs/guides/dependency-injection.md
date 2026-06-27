@@ -29,10 +29,18 @@ dotnet add package Dirkster.AvalonDock.DependencyInjection
 
 | Method | Purpose |
 |:-------|:--------|
+| `AddDockLayoutService(configure)` | Register `IDockLayoutService` with a builder to configure toolboxes and options |
+| `AddDockLayoutService()` | Register `IDockLayoutService` without builder configuration |
+
+#### DockLayoutBuilder Methods
+
+Used inside the `AddDockLayoutService(dock => { ... })` builder:
+
+| Method | Purpose |
+|:-------|:--------|
+| `ConfigureToggleDock(configure)` | Configure sidebar button size, dock dimensions, layout priority |
 | `AddToolbox<T>()` | Register a toolbox VM as singleton |
 | `AddToolbox<T>(factory)` | Register a toolbox VM with a custom factory |
-| `AddDockLayoutService()` | Register `IDockLayoutService` — auto-builds layout tree from `IToolbox` instances |
-| `AddToggleDockOptions(configure)` | Configure sidebar button size, dock dimensions, layout priority |
 
 ### Additional Services
 
@@ -60,29 +68,24 @@ using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
-// 1. Configure toggle dock options
-services.AddToggleDockOptions(opts =>
+// Configure dock layout: toggle dock options + toolboxes in one call
+services.AddDockLayoutService(dock =>
 {
-    opts.ButtonSize = 28;
-    opts.DefaultDockWidth = 280;
-    opts.DefaultDockHeight = 220;
-    opts.LayoutPriority = nameof(DockLayoutPriority.BottomFullWidth);
+    dock.ConfigureToggleDock(opts =>
+    {
+        opts.ButtonSize = 28;
+        opts.DefaultDockWidth = 280;
+        opts.DefaultDockHeight = 220;
+        opts.LayoutPriority = nameof(DockLayoutPriority.BottomFullWidth);
+    });
+
+    // Register toolboxes — order determines sidebar button order
+    dock.AddToolbox<ExplorerToolbox>();
+    dock.AddToolbox<SearchToolbox>();
+    dock.AddToolbox<OutputToolbox>();
 });
 
-// 2. Register toolboxes — order determines sidebar button order
-services.AddToolbox<ExplorerToolbox>();
-services.AddToolbox<SearchToolbox>();
-services.AddToolbox<OutputToolbox>();
-
-// 3. Register each as IToolbox for collection injection
-services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<ExplorerToolbox>());
-services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<SearchToolbox>());
-services.AddSingleton<IToolbox>(sp => sp.GetRequiredService<OutputToolbox>());
-
-// 4. DockLayoutService auto-builds the MVVM layout tree
-services.AddDockLayoutService();
-
-// 5. Application view models and windows
+// Application view models and windows
 services.AddSingleton<MainViewModel>();
 services.AddSingleton<MainWindow>();
 
@@ -93,19 +96,24 @@ var provider = services.BuildServiceProvider();
 
 ## ToggleDockOptions
 
-Configure the sidebar and docking behavior:
+Configure the sidebar and docking behavior via `ConfigureToggleDock` inside the builder:
 
 ```csharp
-services.AddToggleDockOptions(opts =>
+services.AddDockLayoutService(dock =>
 {
-    opts.ButtonSize = 28;                // Sidebar button size (px)
-    opts.DefaultDockWidth = 280;         // Default width for side panes
-    opts.DefaultDockHeight = 220;        // Default height for bottom panes
-    opts.LayoutPriority = "BottomFullWidth";  // Layout restructuring mode
-    opts.ShowHeaderMinimizeButton = true; // Show minimize in pane headers
-    opts.ShowHeaderOptionsButton = true;  // Show options (⋯) in pane headers
+    dock.ConfigureToggleDock(opts =>
+    {
+        opts.ButtonSize = 28;                // Sidebar button size (px)
+        opts.DefaultDockWidth = 280;         // Default width for side panes
+        opts.DefaultDockHeight = 220;        // Default height for bottom panes
+        opts.LayoutPriority = "BottomFullWidth";  // Layout restructuring mode
+        opts.ShowHeaderMinimizeButton = true; // Show minimize in pane headers
+        opts.ShowHeaderOptionsButton = true;  // Show options (⋯) in pane headers
+    });
 });
 ```
+
+If `ConfigureToggleDock` is not called, default `ToggleDockOptions` are registered automatically.
 
 ### Layout Priority Modes
 
@@ -119,11 +127,14 @@ services.AddToggleDockOptions(opts =>
 
 ## Factory Registration
 
-For toolboxes that need constructor parameters:
+For toolboxes that need constructor parameters, use the factory overload inside the builder:
 
 ```csharp
-services.AddToolbox<FolderExplorerToolbox>(sp =>
-    new FolderExplorerToolbox(filePath => { /* callback */ }));
+services.AddDockLayoutService(dock =>
+{
+    dock.AddToolbox<FolderExplorerToolbox>(sp =>
+        new FolderExplorerToolbox(filePath => { /* callback */ }));
+});
 ```
 
 ---

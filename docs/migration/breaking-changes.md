@@ -101,11 +101,14 @@ These additions are new in v5.0.0 and do not break existing code:
 
 | Feature | Package | Description |
 |:--------|:--------|:------------|
+| ToggleDockingManager | `AvalonDock` | VS Code / Rider-style sidebar with toggle buttons. |
 | Arc Theme | `AvalonDock.Themes.Arc` | Modern theme with dark/light variants. |
 | JSON Serializer | `AvalonDock.Serializer.Json` | JSON-based layout serialization. |
-| MVVM Base Classes | `AvalonDock.Mvvm` | `DockableBase`, `DockLayoutService`, etc. |
+| MVVM Base Classes | `AvalonDock.Mvvm` | `DockableBase`, `ToolboxBase`, `DockLayoutService`, etc. |
+| MVVM CommunityToolkit | `AvalonDock.Mvvm.CommunityToolkit` | `ObservableDockableBase`, `ObservableToolboxBase` with source generators. |
 | DI Integration | `AvalonDock.DependencyInjection` | `AddAvalonDock()` extension method. |
 | Core Abstractions | `AvalonDock.Core` | `IFactory`, `IDockingManager`, `IAutoHideManager`, etc. |
+| DTO Serialization | `AvalonDock.Core` | Serialization refactored to DTO layer; custom serializers can extend `LayoutSerializerBase`. |
 
 ---
 

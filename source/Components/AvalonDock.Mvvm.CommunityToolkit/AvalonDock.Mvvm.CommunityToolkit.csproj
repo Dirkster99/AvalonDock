@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		<RootNamespace>AvalonDock.Mvvm.CommunityToolkit</RootNamespace>
 		<AssemblyName>AvalonDock.Mvvm.CommunityToolkit</AssemblyName>
 		<PackageId>Dirkster.AvalonDock.Mvvm.CommunityToolkit</PackageId>

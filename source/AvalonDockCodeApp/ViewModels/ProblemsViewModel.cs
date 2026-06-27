@@ -11,6 +11,7 @@ public partial class ProblemsViewModel : ObservableToolboxBase
 		Id = "Problems";
 		Title = "Problems";
 		ToolTipText = "Problems (Ctrl+Shift+M)";
+		Shortcut = "Ctrl+Shift+M";
 		Zone = DockZone.BottomLeft;
 		Icon = ToolboxIcons.Problems;
 	}

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Xml.Serialization;
 
 namespace AvalonDock.Layout
 {
@@ -12,7 +11,7 @@ namespace AvalonDock.Layout
 	/// </summary>
 	/// <typeparam name="T">The type of the related layout element.</typeparam>
 	[Serializable]
-	public abstract class LayoutGroup<T> : LayoutGroupBase, ILayoutGroup, IXmlSerializable
+	public abstract class LayoutGroup<T> : LayoutGroupBase, ILayoutGroup
 		where T : class, ILayoutElement
 	{
 		private readonly ObservableCollection<T> _children = new ObservableCollection<T>();
@@ -137,65 +136,6 @@ namespace AvalonDock.Layout
 			_children[index] = (T)element;
 		}
 
-		/// <inheritdoc/>
-		System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema() => null;
-
-		/// <summary>
-		/// Reads the xml.
-		/// </summary>
-		/// <param name="reader">The XML reader to read from.</param>
-		public virtual void ReadXml(System.Xml.XmlReader reader)
-		{
-			reader.MoveToContent();
-			if (reader.IsEmptyElement)
-			{
-				reader.Read();
-				ComputeVisibility();
-				return;
-			}
-
-			var localName = reader.LocalName;
-			reader.Read();
-			while (true)
-			{
-				if (reader.LocalName == localName && reader.NodeType == System.Xml.XmlNodeType.EndElement)
-					break;
-				if (reader.NodeType == System.Xml.XmlNodeType.Whitespace)
-				{
-					reader.Read();
-					continue;
-				}
-
-				string fullName = string.Format("{0}.{1}", GetType().Namespace, reader.LocalName);
-				Type typeForSerializer = Type.GetType(fullName);
-
-				if (typeForSerializer == null)
-					typeForSerializer = FindType(reader.LocalName);
-
-				if (typeForSerializer == null)
-					throw new ArgumentException("AvalonDock.LayoutGroup doesn't know how to deserialize " + reader.LocalName);
-
-				XmlSerializer serializer = XmlSerializersCache.GetSerializer(typeForSerializer);
-				Children.Add((T)serializer.Deserialize(reader));
-			}
-
-			reader.ReadEndElement();
-		}
-
-		/// <summary>
-		/// Writes the xml.
-		/// </summary>
-		/// <param name="writer">The XML writer to write to.</param>
-		public virtual void WriteXml(System.Xml.XmlWriter writer)
-		{
-			foreach (var child in Children)
-			{
-				var type = child.GetType();
-				var serializer = XmlSerializersCache.GetSerializer(type);
-				serializer.Serialize(writer, child);
-			}
-		}
-
 		/// <summary>
 		/// Executes the on is visible changed operation.
 		/// </summary>
@@ -273,22 +213,6 @@ namespace AvalonDock.Layout
 		{
 			if (Parent is ILayoutElementWithVisibility parentPane)
 				parentPane.ComputeVisibility();
-		}
-
-		/// <summary>
-		/// Finds the type.
-		/// </summary>
-		/// <param name="name">The name.</param>
-		/// <returns>The resulting value.</returns>
-		private Type FindType(string name)
-		{
-			foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
-			{
-				foreach (var t in a.GetTypes())
-					if (t.Name.Equals(name)) return t;
-			}
-
-			return null;
 		}
 	}
 }

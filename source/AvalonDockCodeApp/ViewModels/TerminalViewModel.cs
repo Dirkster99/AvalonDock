@@ -23,6 +23,7 @@ public partial class TerminalViewModel : ObservableToolboxBase, IDisposable
 		Id = "Terminal";
 		Title = "Terminal";
 		ToolTipText = "Terminal (Ctrl+`)";
+		Shortcut = "Ctrl+OemTilde";
 		Zone = DockZone.BottomRight;
 		IsOpenByDefault = true;
 		Icon = ToolboxIcons.Terminal;

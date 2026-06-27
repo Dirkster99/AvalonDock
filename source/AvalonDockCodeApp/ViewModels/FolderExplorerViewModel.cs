@@ -75,6 +75,7 @@ public partial class FolderExplorerViewModel : ObservableToolboxBase
 		Id = "Explorer";
 		Title = "Explorer";
 		ToolTipText = "Explorer (Ctrl+Shift+E)";
+		Shortcut = "Ctrl+Shift+E";
 		Zone = DockZone.LeftTop;
 		Icon = ToolboxIcons.Explorer;
 	}

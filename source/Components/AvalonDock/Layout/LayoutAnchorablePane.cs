@@ -148,24 +148,6 @@ namespace AvalonDock.Layout
 			base.OnParentChanged(oldValue, newValue);
 		}
 
-		/// <inheritdoc/>
-		public override void WriteXml(System.Xml.XmlWriter writer)
-		{
-			if (_id != null) writer.WriteAttributeString(nameof(ILayoutPaneSerializable.Id), _id);
-			if (_name != null) writer.WriteAttributeString(nameof(Name), _name);
-			base.WriteXml(writer);
-		}
-
-		/// <inheritdoc/>
-		public override void ReadXml(System.Xml.XmlReader reader)
-		{
-			if (reader.MoveToAttribute(nameof(ILayoutPaneSerializable.Id))) _id = reader.Value;
-			if (reader.MoveToAttribute(nameof(Name))) _name = reader.Value;
-			_autoFixSelectedContent = false;
-			base.ReadXml(reader);
-			_autoFixSelectedContent = true;
-			AutoFixSelectedContent();
-		}
 #if TRACE
 		/// <inheritdoc />
 		public override void ConsoleDump(int tab)

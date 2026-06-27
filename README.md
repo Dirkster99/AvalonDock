@@ -52,8 +52,9 @@ Be sure to check out the [Wiki](https://github.com/Dirkster99/AvalonDock/wiki) a
 | [Dirkster.AvalonDock.Themes.Aero](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Aero) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Aero.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Aero) | Aero theme |
 | [Dirkster.AvalonDock.Themes.Expression](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Expression) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Expression.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Expression) | Expression theme |
 | [Dirkster.AvalonDock.Themes.Metro](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Metro) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.Metro.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.Metro) | Metro theme |
-| [Dirkster.AvalonDock.Themes.VS2010](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2010.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010) | Visual Studio 2010 theme |
-| [Dirkster.AvalonDock.Themes.VS2013](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2013.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013) | Visual Studio 2013 theme |
+| [Dirkster.AvalonDock.Themes.VS](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS) | Visual Studio Themes (2015, 2022) incl. .vstheme support |
+| [Dirkster.AvalonDock.Themes.VS2010](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2010.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010) | Visual Studio 2010 theme (Legacy) |
+| [Dirkster.AvalonDock.Themes.VS2013](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013) | [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.Themes.VS2013.svg)](http://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013) | Visual Studio 2013 theme (Legacy) |
 
 ---
 
@@ -71,6 +72,21 @@ dotnet add package Dirkster.AvalonDock.Themes.Arc
 
 ---
 
+## Docking Manager
+The `DockingManager` control is the main entry point for using AvalonDock in your WPF application. It provides the core docking functionality, including layout management, drag-and-drop support, and theme integration.
+AvalonDock also includes a `ToggleDockingManager` which adds a built-in sidebar for toggling tool windows, similar to VS Code's or Jetbrains IDE's behavior.
+
+### DockingManager
+
+The standard `DockingManager` provides a blank canvas for custom layouts and is ideal for applications that require full control over the docking behavior and UI.
+
+<img src="https://raw.githubusercontent.com/Dirkster99/Docu/master/AvalonDock/VS2013/AD_MLib/Light/Document.png" alt="ClassicDockingManager" width="800">
+
+### ToggleDockingManager
+
+The `ToggleDockingManager` includes a built-in sidebar that automatically populates with registered tool windows (anchorable view models). This is perfect for applications that want a modern, out-of-the-box docking experience without manual layout management.
+<img src="docs/images/AvalonDockCodeApp_Dark_Welcome.png" alt="AvalonDockCodeApp Dark Welcome" width="800">
+
 ## Dependency Injection
 
 The `AvalonDock.DependencyInjection` package provides `IServiceCollection` extension methods to wire up the entire docking system through your DI container. This replaces manual `DocumentsSource`/`AnchorablesSource` binding with a clean, service-oriented composition root.
@@ -79,10 +95,8 @@ The `AvalonDock.DependencyInjection` package provides `IServiceCollection` exten
 
 | Method | Purpose |
 |:-------|:--------|
-| `AddToolbox<T>()` | Register a toolbox (anchorable) view model as a singleton |
-| `AddToolbox<T>(factory)` | Register a toolbox with a custom factory for constructor parameters |
-| `AddDockLayoutService()` | Register `IDockLayoutService` — auto-builds the layout tree from all `IToolbox` instances |
-| `AddToggleDockOptions(configure)` | Configure sidebar button size, default dock dimensions, and layout priority |
+| `AddDockLayoutService(configure)` | Register `IDockLayoutService` with a builder to configure toolboxes and toggle dock options in a single call |
+| `AddDockLayoutService()` | Register `IDockLayoutService` without builder configuration |
 | `AddAvalonDock<TFactory>()` | Register a custom `IFactory` implementation |
 | `AddAvalonDockSerializer<T>()` | Register an `ILayoutSerializer` (XML or JSON) |
 | `AddAvalonDockThemeManager<T>()` | Register a theme manager |
@@ -90,6 +104,14 @@ The `AvalonDock.DependencyInjection` package provides `IServiceCollection` exten
 | `AddAutoHideManager<T>()` | Register an auto-hide manager |
 | `AddFloatingWindowService<T>()` | Register a floating window service |
 | `AddDragDropHandler<T>()` | Register a custom drag-and-drop handler |
+
+#### DockLayoutBuilder Methods
+
+| Method | Purpose |
+|:-------|:--------|
+| `ConfigureToggleDock(configure)` | Configure sidebar button size, default dock dimensions, and layout priority |
+| `AddToolbox<T>()` | Register a toolbox (anchorable) view model as a singleton |
+| `AddToolbox<T>(factory)` | Register a toolbox with a custom factory for constructor parameters |
 
 ### Composition Root Example
 
@@ -108,22 +130,21 @@ public partial class App : Application
 
         var services = new ServiceCollection();
 
-        // Configure toggle dock options (sidebar behavior)
-        services.AddToggleDockOptions(opts =>
+        // Configure dock layout: toggle dock options + toolboxes in one call
+        services.AddDockLayoutService(dock =>
         {
-            opts.ButtonSize = 28;
-            opts.DefaultDockWidth = 280;
-            opts.DefaultDockHeight = 220;
-            opts.LayoutPriority = nameof(AvalonDock.DockLayoutPriority.BottomFullWidth);
+            dock.ConfigureToggleDock(opts =>
+            {
+                opts.ButtonSize = 28;
+                opts.DefaultDockWidth = 280;
+                opts.DefaultDockHeight = 220;
+                opts.LayoutPriority = nameof(AvalonDock.DockLayoutPriority.BottomFullWidth);
+            });
+
+            dock.AddToolbox<ExplorerToolbox>();
+            dock.AddToolbox<SearchToolbox>();
+            dock.AddToolbox<TerminalToolbox>();
         });
-
-        // Register toolbox view models
-        services.AddToolbox<ExplorerToolbox>();
-        services.AddToolbox<SearchToolbox>();
-        services.AddToolbox<TerminalToolbox>();
-
-        // Auto-build layout tree from registered toolboxes
-        services.AddDockLayoutService();
 
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<MainWindow>();
@@ -273,12 +294,21 @@ public class MainViewModel
 
 ### XAML Binding
 
+For the `ToggleDockingManager`, bind the `DockLayout` property to your view model:
+
 ```xml
 <avalonDock:ToggleDockingManager x:Name="dockManager"
     DockLayout="{Binding DockLayout}"
     LayoutItemContainerStyleSelector="{StaticResource PanesStyleSelector}" />
 ```
 
+For the classic `DockingManager`, bind the `DockLayout` to the `Layout` property:
+
+```xml
+<avalonDock:DockingManager x:Name="dockManager"
+    Layout="{Binding DockLayout}"
+    LayoutItemContainerStyleSelector="{StaticResource PanesStyleSelector}" />
+```
 ---
 
 ## Architecture (v5.0)
@@ -293,7 +323,7 @@ AvalonDock.Mvvm            MVVM base classes (DockableBase, ToolboxBase, etc.) �
   └── netstandard2.0
 
 AvalonDock.Mvvm.CommunityToolkit  CommunityToolkit.Mvvm integration ([ObservableProperty] support)
-  └── netstandard2.0, net9.0
+  └── netstandard2.0
 
 AvalonDock.DependencyInjection  IServiceCollection extensions
   └── netstandard2.0
@@ -376,8 +406,36 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 ## Screenshots
 
-The Docking Buttons are [defined in XAML](https://github.com/Dirkster99/AvalonDock/wiki/OverlayWindow), which ensures a good looking image on all resolutions, even 4K or 8K, and enables consistent color theming.
+### ToggleDockingManager
+<table width="100%">
+   <tr>
+      <td>Description</td>
+      <td>Dark</td>
+      <td>Light</td>
+   </tr>
+   <tr>
+      <td>Dock Document</td>
+      <td><img src="docs/images/AvalonDockCodeApp_Dark_Drag_Document.png" width="400"></td>
+      <td><img src="docs/images/AvalonDockCodeApp_Light_Drag_Document.png" width="400"></td>
+   </tr>
+   <tr>
+      <td>Dock Tool Window</td>
+      <td><img src="docs/images/AvalonDockCodeApp_Dark_Drag.png" width="400"></td>
+      <td><img src="docs/images/AvalonDockCodeApp_Light_Drag.png" width="400"></td>
+   </tr>
+   <tr>
+      <td>Document</td>
+      <td><img src="docs/images/AvalonDockCodeApp_Dark_Welcome.png" width="400"></td>
+      <td><img src="docs/images/AvalonDockCodeApp_Light_Welcome.png" width="400"></td>
+   </tr>
+   <tr>
+      <td>Tool Window</td>
+      <td><img src="docs/images/AvalonDockCodeApp_Dark_Toolbox.png" width="400"></td>
+      <td><img src="docs/images/AvalonDockCodeApp_Light_Toolbox.png" width="400"></td>
+   </tr>
+</table>
 
+### Classic DockingManager
 <table width="100%">
    <tr>
       <td>Description</td>

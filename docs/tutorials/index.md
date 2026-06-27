@@ -21,7 +21,7 @@ These tutorials assume you have already completed the [Quick Start]({% link gett
 | Tutorial | What You'll Build | Key Topics |
 |:---------|:------------------|:-----------|
 | [MVVM IDE Application]({% link tutorials/mvvm-ide.md %}) | A VS Code-style IDE with sidebar toggles | ToolboxBase, Document, IDockLayoutService, ToggleDockingManager, DockZone, DI |
-| [Dependency Injection Deep Dive]({% link tutorials/dependency-injection-app.md %}) | DI patterns and APIs in depth | AddToolbox, AddDockLayoutService, ToggleDockOptions, factory registration, testing |
+| [Dependency Injection Deep Dive]({% link tutorials/dependency-injection-app.md %}) | DI patterns and APIs in depth | AddDockLayoutService builder, DockLayoutBuilder, ConfigureToggleDock, factory registration, testing |
 | [Styling & Theming]({% link tutorials/styling-and-theming.md %}) | A theme-switchable app with custom branding | Runtime theme switching, brush overrides, custom theme classes, application-wide theming |
 | [Layout Persistence]({% link tutorials/layout-persistence.md %}) | An app that remembers its window layout | XML/JSON serialization, MVVM serialization callbacks, auto-save, layout reset |
 

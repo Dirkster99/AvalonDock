@@ -2,7 +2,7 @@ namespace AvalonDock.DependencyInjection
 {
 	/// <summary>
 	/// Configuration options for the Toggle Docking Manager.
-	/// Register via <see cref="ServiceCollectionExtensions.AddToggleDockOptions"/>
+	/// Register via <see cref="DockLayoutBuilder.ConfigureToggleDock"/>
 	/// and resolve in your window to apply settings.
 	/// </summary>
 	public class ToggleDockOptions

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using AvalonDock.Controls;
 using AvalonDock.Core;
@@ -93,6 +94,14 @@ public class ToggleDockingManager : DockingManager
 
 	private readonly Dictionary<IToolbox, LayoutAnchorable> _toolboxToAnchorable =
 		new Dictionary<IToolbox, LayoutAnchorable>();
+
+	/// <summary>
+	/// Key bindings registered on the host window for toolbox shortcuts.
+	/// Tracked so they can be removed and rebuilt when toolboxes change.
+	/// </summary>
+	private readonly List<KeyBinding> _shortcutBindings = new List<KeyBinding>();
+
+	private static readonly KeyGestureConverter _gestureConverter = new KeyGestureConverter();
 
 	private int _syncDepth;
 
@@ -462,7 +471,7 @@ public class ToggleDockingManager : DockingManager
 	/// <inheritdoc/>
 	internal override void StartDraggingFloatingWindowForContent(LayoutContent contentModel, bool startDrag = true)
 	{
-		if (contentModel is LayoutAnchorable anchorable)
+		if (startDrag && contentModel is LayoutAnchorable anchorable)
 		{
 			ToggleDockDragOverlay.StartDragFromPane(anchorable, this);
 			return;
@@ -476,6 +485,7 @@ public class ToggleDockingManager : DockingManager
 		ApplyToggleAnchorableStyle();
 		SetupToggleDockButtonBars();
 		OpenDefaultToolboxes();
+		RefreshShortcuts();
 		Dispatcher.BeginInvoke(
 			System.Windows.Threading.DispatcherPriority.Loaded,
 			new System.Action(UpdatePinButtonsToMinimize));
@@ -1603,6 +1613,8 @@ public class ToggleDockingManager : DockingManager
 		{
 			npc.PropertyChanged += OnToolboxPropertyChanged;
 		}
+
+		RefreshShortcuts();
 	}
 
 	/// <summary>
@@ -1617,6 +1629,8 @@ public class ToggleDockingManager : DockingManager
 		{
 			npc.PropertyChanged -= OnToolboxPropertyChanged;
 		}
+
+		RefreshShortcuts();
 	}
 
 	private void OnToolboxPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -1680,6 +1694,103 @@ public class ToggleDockingManager : DockingManager
 		finally
 		{
 			_syncDepth--;
+		}
+	}
+
+	/// <summary>
+	/// Rebuilds the keyboard shortcut <see cref="KeyBinding"/>s on the host window from the
+	/// <see cref="IToolbox.Shortcut"/> of every registered toolbox. Existing bindings created by
+	/// this manager are removed first so the method is safe to call repeatedly. A no-op until the
+	/// manager is hosted in a <see cref="Window"/>.
+	/// </summary>
+	private void RefreshShortcuts()
+	{
+		var window = Window.GetWindow(this);
+		if (window == null)
+		{
+			return;
+		}
+
+		foreach (var binding in _shortcutBindings)
+		{
+			window.InputBindings.Remove(binding);
+		}
+
+		_shortcutBindings.Clear();
+
+		foreach (var pair in _toolboxToAnchorable)
+		{
+			var gesture = TryParseGesture(pair.Key.Shortcut);
+			if (gesture == null)
+			{
+				continue;
+			}
+
+			var binding = new KeyBinding(new ToggleToolboxCommand(this, pair.Key), gesture);
+			window.InputBindings.Add(binding);
+			_shortcutBindings.Add(binding);
+		}
+	}
+
+	/// <summary>
+	/// Parses a WPF gesture string (e.g. <c>"Ctrl+Shift+E"</c>) into a <see cref="KeyGesture"/>.
+	/// Returns <c>null</c> for null/empty/invalid input rather than throwing.
+	/// </summary>
+	/// <param name="text">The gesture string.</param>
+	/// <returns>The parsed gesture, or <c>null</c>.</returns>
+	private static KeyGesture TryParseGesture(string text)
+	{
+		if (string.IsNullOrWhiteSpace(text))
+		{
+			return null;
+		}
+
+		try
+		{
+			return _gestureConverter.ConvertFromInvariantString(text) as KeyGesture;
+		}
+		catch (NotSupportedException)
+		{
+			return null;
+		}
+		catch (FormatException)
+		{
+			return null;
+		}
+	}
+
+	/// <summary>
+	/// Toggles the docked/auto-hidden state of a toolbox's anchorable, mirroring a click on its
+	/// sidebar button. Used as the command target for keyboard shortcut <see cref="KeyBinding"/>s.
+	/// </summary>
+	private sealed class ToggleToolboxCommand : ICommand
+	{
+		private readonly ToggleDockingManager _manager;
+		private readonly IToolbox _toolbox;
+
+		public ToggleToolboxCommand(ToggleDockingManager manager, IToolbox toolbox)
+		{
+			_manager = manager;
+			_toolbox = toolbox;
+		}
+
+		event EventHandler ICommand.CanExecuteChanged
+		{
+			add { }
+			remove { }
+		}
+
+		public bool CanExecute(object parameter) => true;
+
+		public void Execute(object parameter)
+		{
+			if (!_manager._toolboxToAnchorable.TryGetValue(_toolbox, out var anchorable))
+			{
+				return;
+			}
+
+			var zone = _manager.GetAnchorableZone(anchorable);
+			_manager.ToggleAnchorable(anchorable, zone);
 		}
 	}
 

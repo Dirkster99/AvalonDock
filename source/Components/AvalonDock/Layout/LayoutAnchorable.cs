@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -233,50 +232,6 @@ namespace AvalonDock.Layout
 
 			root.Manager.LayoutUpdateStrategy?.AfterInsertAnchorable(root, this);
 			base.InternalDock();
-		}
-
-		/// <inheritdoc/>
-		public override void ReadXml(System.Xml.XmlReader reader)
-		{
-			if (reader.MoveToAttribute(nameof(CanHide)))
-				CanHide = bool.Parse(reader.Value);
-			if (reader.MoveToAttribute(nameof(CanAutoHide)))
-				CanAutoHide = bool.Parse(reader.Value);
-			if (reader.MoveToAttribute(nameof(AutoHideWidth)))
-				AutoHideWidth = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(AutoHideHeight)))
-				AutoHideHeight = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(AutoHideMinWidth)))
-				AutoHideMinWidth = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(AutoHideMinHeight)))
-				AutoHideMinHeight = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(CanDockAsTabbedDocument)))
-				CanDockAsTabbedDocument = bool.Parse(reader.Value);
-			if (reader.MoveToAttribute(nameof(CanMove)))
-				CanMove = bool.Parse(reader.Value);
-			base.ReadXml(reader);
-		}
-
-		/// <inheritdoc/>
-		public override void WriteXml(System.Xml.XmlWriter writer)
-		{
-			if (!CanHide)
-				writer.WriteAttributeString(nameof(CanHide), CanHide.ToString());
-			if (!CanAutoHide)
-				writer.WriteAttributeString(nameof(CanAutoHide), CanAutoHide.ToString(CultureInfo.InvariantCulture));
-			if (AutoHideWidth > 0)
-				writer.WriteAttributeString(nameof(AutoHideWidth), AutoHideWidth.ToString(CultureInfo.InvariantCulture));
-			if (AutoHideHeight > 0)
-				writer.WriteAttributeString(nameof(AutoHideHeight), AutoHideHeight.ToString(CultureInfo.InvariantCulture));
-			if (AutoHideMinWidth != 25.0)
-				writer.WriteAttributeString(nameof(AutoHideMinWidth), AutoHideMinWidth.ToString(CultureInfo.InvariantCulture));
-			if (AutoHideMinHeight != 25.0)
-				writer.WriteAttributeString(nameof(AutoHideMinHeight), AutoHideMinHeight.ToString(CultureInfo.InvariantCulture));
-			if (!CanDockAsTabbedDocument)
-				writer.WriteAttributeString(nameof(CanDockAsTabbedDocument), CanDockAsTabbedDocument.ToString(CultureInfo.InvariantCulture));
-			if (!CanMove)
-				writer.WriteAttributeString(nameof(CanMove), CanMove.ToString());
-			base.WriteXml(writer);
 		}
 
 		/// <inheritdoc/>

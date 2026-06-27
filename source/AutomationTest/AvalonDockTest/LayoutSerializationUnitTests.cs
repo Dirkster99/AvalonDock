@@ -1,5 +1,8 @@
 using NUnit.Framework;
 using AvalonDock.Layout;
+using AvalonDock.Core.Serialization;
+using AvalonDock.Core.Serialization.Dto;
+using AvalonDock.Serialization;
 using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
@@ -7,7 +10,7 @@ using System.Xml.Serialization;
 namespace AvalonDockTest
 {
 	/// <summary>
-	/// Unit tests for LayoutRoot XML serialization — using IXmlSerializable directly.
+	/// Unit tests for LayoutRoot serialization via the DTO mapper.
 	/// Tests the model layer without a DockingManager.
 	/// Covers issues:
 	///   #111 - LayoutRoot doesn't know how to deserialize
@@ -19,6 +22,9 @@ namespace AvalonDockTest
 	[TestFixture]
 	public class LayoutSerializationUnitTests
 	{
+		private static readonly ILayoutDtoMapper Mapper = new LayoutDtoMapper();
+		private static readonly XmlSerializer DtoSerializer = new XmlSerializer(typeof(LayoutRootDto));
+
 		private LayoutRoot CreateSampleLayout()
 		{
 			var docPane = new LayoutDocumentPane();
@@ -47,21 +53,25 @@ namespace AvalonDockTest
 
 		private string SerializeLayout(LayoutRoot root)
 		{
-			var serializer = new XmlSerializer(typeof(LayoutRoot));
+			var dto = Mapper.ToDto(root);
+			var ns = new XmlSerializerNamespaces();
+			ns.Add(string.Empty, string.Empty);
 			using (var sw = new StringWriter())
 			{
-				serializer.Serialize(sw, root);
+				DtoSerializer.Serialize(sw, dto, ns);
 				return sw.ToString();
 			}
 		}
 
 		private LayoutRoot DeserializeLayout(string xml)
 		{
-			var serializer = new XmlSerializer(typeof(LayoutRoot));
+			LayoutRootDto dto;
 			using (var sr = new StringReader(xml))
 			{
-				return (LayoutRoot)serializer.Deserialize(sr);
+				dto = (LayoutRootDto)DtoSerializer.Deserialize(sr);
 			}
+
+			return (LayoutRoot)Mapper.FromDto(dto);
 		}
 
 		/// <summary>
@@ -195,6 +205,94 @@ namespace AvalonDockTest
 			Assert.That(autoHideItems.Count, Is.EqualTo(1));
 			Assert.That(autoHideItems[0].ContentId, Is.EqualTo("autohide1"));
 			Assert.That(autoHideItems[0].IsAutoHidden, Is.True);
+		}
+
+		/// <summary>
+		/// Verifies mapper round-trip: LayoutRoot -> DTO -> LayoutRoot preserves structure.
+		/// </summary>
+		[Test]
+		public void Mapper_RoundTrip_PreservesStructure()
+		{
+			var root = CreateSampleLayout();
+
+			var dto = Mapper.ToDto(root);
+			var restored = (LayoutRoot)Mapper.FromDto(dto);
+
+			// Verify structure
+			Assert.That(restored.RootPanel, Is.Not.Null);
+			Assert.That(restored.RootPanel.Orientation, Is.EqualTo(System.Windows.Controls.Orientation.Horizontal));
+
+			var docs = restored.Descendents().OfType<LayoutDocument>().ToList();
+			Assert.That(docs.Count, Is.EqualTo(2));
+
+			var anchs = restored.Descendents().OfType<LayoutAnchorable>().ToList();
+			Assert.That(anchs.Count, Is.GreaterThanOrEqualTo(3));
+		}
+
+		/// <summary>
+		/// Verifies DTO XML round-trip: DTO -> XML -> DTO preserves all content IDs.
+		/// </summary>
+		[Test]
+		public void DtoXml_RoundTrip_PreservesContentIds()
+		{
+			var root = CreateSampleLayout();
+			var dto = Mapper.ToDto(root);
+
+			// Serialize DTO to XML
+			var ns = new XmlSerializerNamespaces();
+			ns.Add(string.Empty, string.Empty);
+			string xml;
+			using (var sw = new StringWriter())
+			{
+				DtoSerializer.Serialize(sw, dto, ns);
+				xml = sw.ToString();
+			}
+
+			// Deserialize XML back to DTO
+			LayoutRootDto restored;
+			using (var sr = new StringReader(xml))
+			{
+				restored = (LayoutRootDto)DtoSerializer.Deserialize(sr);
+			}
+
+			// Verify panel children
+			Assert.That(restored.RootPanel, Is.Not.Null);
+			Assert.That(restored.RootPanel.Children.Count, Is.EqualTo(2));
+
+			// Check hidden
+			Assert.That(restored.Hidden, Is.Not.Null);
+		}
+
+		/// <summary>
+		/// Backward-compat test: deserialize a known XML format string via DTO.
+		/// </summary>
+		[Test]
+		public void BackwardCompat_DeserializeKnownXml()
+		{
+			const string xml = @"<?xml version=""1.0"" encoding=""utf-16""?>
+<LayoutRoot>
+  <RootPanel Orientation=""Horizontal"">
+    <LayoutDocumentPaneGroup Orientation=""Horizontal"">
+      <LayoutDocumentPane>
+        <LayoutDocument Title=""TestDoc"" ContentId=""test-doc"" />
+      </LayoutDocumentPane>
+    </LayoutDocumentPaneGroup>
+  </RootPanel>
+  <TopSide />
+  <RightSide />
+  <LeftSide />
+  <BottomSide />
+  <FloatingWindows />
+  <Hidden />
+</LayoutRoot>";
+
+			var restored = DeserializeLayout(xml);
+			Assert.That(restored, Is.Not.Null);
+
+			var docs = restored.Descendents().OfType<LayoutDocument>().ToList();
+			Assert.That(docs.Count, Is.EqualTo(1));
+			Assert.That(docs[0].ContentId, Is.EqualTo("test-doc"));
+			Assert.That(docs[0].Title, Is.EqualTo("TestDoc"));
 		}
 	}
 }

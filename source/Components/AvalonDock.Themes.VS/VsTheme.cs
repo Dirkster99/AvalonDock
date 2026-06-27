@@ -53,6 +53,17 @@ namespace AvalonDock.Themes.VS
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="VsTheme"/> class
+		/// from a .vstheme file stream, using an alternate Generic.xaml for control templates.
+		/// </summary>
+		/// <param name="stream">The stream containing the .vstheme XML content.</param>
+		/// <param name="genericXamlUri">Pack URI for the Generic.xaml resource dictionary to merge.</param>
+		protected VsTheme(Stream stream, Uri genericXamlUri)
+			: base(BuildFromStream(stream, genericXamlUri))
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="VsTheme"/> class
 		/// from a pre-built resource dictionary.
 		/// </summary>
 		/// <param name="resourceDictionary">The resource dictionary.</param>
@@ -70,6 +81,17 @@ namespace AvalonDock.Themes.VS
 
 			var palette = VsThemeParser.Parse(stream);
 			return VsThemeResourceBuilder.Build(palette);
+		}
+
+		private static ResourceDictionary BuildFromStream(Stream stream, Uri genericXamlUri)
+		{
+			if (stream == null)
+			{
+				throw new ArgumentNullException(nameof(stream));
+			}
+
+			var palette = VsThemeParser.Parse(stream);
+			return VsThemeResourceBuilder.Build(palette, genericXamlUri);
 		}
 
 		private static ResourceDictionary BuildFromFile(string filePath)

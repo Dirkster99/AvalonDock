@@ -18,6 +18,9 @@ namespace AvalonDock.Core.Serialization
 
 		/// <summary>Gets or sets a value indicating whether anchorable source binding is suspended during deserialization.</summary>
 		bool SuspendAnchorablesSourceBinding { get; set; }
+
+		/// <summary>Gets the DTO mapper for converting between layout tree and serialization DTOs.</summary>
+		ILayoutDtoMapper DtoMapper { get; }
 	}
 
 	/// <summary>

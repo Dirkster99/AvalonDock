@@ -170,21 +170,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		/// <inheritdoc/>
-		public override void WriteXml(System.Xml.XmlWriter writer)
-		{
-			if (_id != null) writer.WriteAttributeString(nameof(ILayoutPaneSerializable.Id), _id);
-			if (!_showHeader) writer.WriteAttributeString(nameof(ShowHeader), _showHeader.ToString());
-			base.WriteXml(writer);
-		}
-
-		/// <inheritdoc/>
-		public override void ReadXml(System.Xml.XmlReader reader)
-		{
-			if (reader.MoveToAttribute(nameof(ILayoutPaneSerializable.Id))) _id = reader.Value;
-			if (reader.MoveToAttribute(nameof(ShowHeader))) _showHeader = bool.Parse(reader.Value);
-			base.ReadXml(reader);
-		}
 #if TRACE
 		/// <inheritdoc/>
 		public override void ConsoleDump(int tab)
