@@ -1285,7 +1285,11 @@
     </DataTemplate>
 
     <DataTemplate x:Key="AvalonDockThemeVs2013IconContentTemplate">
-        <Image Source="{Binding IconSource, Converter={avalonDockConverters:NullToDoNothingConverter}}" Stretch="Uniform" />
+        <Image
+            Width="16"
+            Height="16"
+            Source="{Binding IconSource, Converter={avalonDockConverters:NullToDoNothingConverter}}"
+            Stretch="Uniform" />
     </DataTemplate>
 
     <ContextMenu x:Key="AvalonDockThemeVs2013AnchorableContextMenu">
