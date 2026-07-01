@@ -1,0 +1,7 @@
+[
+  { "Name": "FileTabSelectedBorder", "Category": "5af241b7-5627-4d12-bfb1-2b67d11127d7", "Background": "FF0E639C" },
+  { "Name": "EnvironmentHeader", "Category": "5af241b7-5627-4d12-bfb1-2b67d11127d7", "Background": "FF2D2D30" },
+  { "Name": "EnvironmentHeaderInactive", "Category": "5af241b7-5627-4d12-bfb1-2b67d11127d7", "Background": "FF252526" },
+  { "Name": "EnvironmentTab", "Category": "5af241b7-5627-4d12-bfb1-2b67d11127d7", "Background": "FF252526" },
+  { "Name": "EnvironmentTabInactive", "Category": "5af241b7-5627-4d12-bfb1-2b67d11127d7", "Background": "FF2D2D30" }
+]

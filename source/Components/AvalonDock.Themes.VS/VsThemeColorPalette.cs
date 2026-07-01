@@ -64,6 +64,43 @@ namespace AvalonDock.Themes.VS
 		}
 
 		/// <summary>
+		/// Creates a new palette by layering the given override entries on top of this one.
+		/// </summary>
+		/// <remarks>
+		/// This is used to apply a VS2026 JSON override file (which only contains the
+		/// tokens that were changed) on top of a full base palette. The merge is performed
+		/// per field: an override that only specifies a background keeps the base
+		/// foreground for that token, and vice versa. Tokens present only in
+		/// <paramref name="overrides"/> are added.
+		/// </remarks>
+		/// <param name="overrides">The palette whose entries take precedence.</param>
+		/// <returns>A new merged palette. Neither input palette is modified.</returns>
+		public VsThemeColorPalette Merge(VsThemeColorPalette overrides)
+		{
+			if (overrides == null)
+			{
+				throw new ArgumentNullException(nameof(overrides));
+			}
+
+			var merged = new Dictionary<string, VsThemeColorEntry>(_colors);
+			foreach (var kvp in overrides._colors)
+			{
+				if (merged.TryGetValue(kvp.Key, out var baseEntry))
+				{
+					merged[kvp.Key] = new VsThemeColorEntry(
+						kvp.Value.Background ?? baseEntry.Background,
+						kvp.Value.Foreground ?? baseEntry.Foreground);
+				}
+				else
+				{
+					merged[kvp.Key] = kvp.Value;
+				}
+			}
+
+			return new VsThemeColorPalette(merged);
+		}
+
+		/// <summary>
 		/// Gets the total number of color entries in the palette.
 		/// </summary>
 		public int Count => _colors.Count;

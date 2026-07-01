@@ -70,7 +70,7 @@ namespace TestApp
 		/// TestTimer Dependency Property
 		/// </summary>
 		public static readonly DependencyProperty TestTimerProperty =
-			DependencyProperty.Register("TestTimer", typeof(int), typeof(MainWindow),
+			DependencyProperty.Register(nameof(TestTimer), typeof(int), typeof(MainWindow),
 				new FrameworkPropertyMetadata((int)0));
 
 		/// <summary>
@@ -89,7 +89,7 @@ namespace TestApp
 		/// TestBackground Dependency Property
 		/// </summary>
 		public static readonly DependencyProperty TestBackgroundProperty =
-			DependencyProperty.Register("TestBackground", typeof(Brush), typeof(MainWindow),
+			DependencyProperty.Register(nameof(TestBackground), typeof(Brush), typeof(MainWindow),
 				new FrameworkPropertyMetadata((Brush)null));
 
 		/// <summary>
@@ -108,7 +108,7 @@ namespace TestApp
 		/// FocusedElement Dependency Property
 		/// </summary>
 		public static readonly DependencyProperty FocusedElementProperty =
-			DependencyProperty.Register("FocusedElement", typeof(string), typeof(MainWindow),
+			DependencyProperty.Register(nameof(FocusedElement), typeof(string), typeof(MainWindow),
 				new FrameworkPropertyMetadata((IInputElement)null));
 
 		/// <summary>
@@ -284,6 +284,9 @@ namespace TestApp
 				case "VS2013Dark": theme = new Vs2013DarkTheme(); break;
 				case "VS2013Light": theme = new Vs2013LightTheme(); break;
 				case "VS2013Blue": theme = new Vs2013BlueTheme(); break;
+				case "VS2026Dark": theme = new VS2026DarkTheme(); break;
+				case "VS2026Light": theme = new VS2026LightTheme(); break;
+				case "VS2026Blue": theme = new VS2026BlueTheme(); break;
 				case "VS2022Dark": theme = new VS2022DarkTheme(); break;
 				case "VS2022Light": theme = new VS2022LightTheme(); break;
 				case "VS2022Blue": theme = new VS2022BlueTheme(); break;
