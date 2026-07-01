@@ -421,8 +421,21 @@ namespace AvalonDock.Controls
 				return;
 			// The content control in the grid, this has a different tree to walk up
 			var layoutContent = (LayoutContent)contentControl.Content;
-			if (grid != null && layoutContent.Content is FrameworkElement content)
+			if (grid != null)
 			{
+				FrameworkElement content = null;
+				var contentObj = layoutContent.Content;
+
+				if (contentObj is ILayoutContentElement layoutContentElement)
+				{
+					content = layoutContentElement.Content;
+				}
+				else if (contentObj is FrameworkElement frameworkElement)
+				{
+					content = frameworkElement;
+				}
+
+				if (content == null) return;
 				var parents = content.GetParents().ToArray();
 				var children = this.GetChildrenRecursive()
 					.TakeWhile(c => c != grid)
@@ -470,7 +483,10 @@ namespace AvalonDock.Controls
 						.Select(c => c.Content)
 						.OfType<LayoutContent>()
 						.Select(lc => lc.Content);
-					var contents = layoutContents.OfType<FrameworkElement>();
+					var contents = layoutContents.Select(obj => obj is ILayoutContentElement elem 
+																? elem.Content
+																: obj as FrameworkElement)
+												 .Where(fe => fe != null);
 					foreach (var content in contents)
 					{
 						ContentMinHeight = Math.Max(content.MinHeight, ContentMinHeight);

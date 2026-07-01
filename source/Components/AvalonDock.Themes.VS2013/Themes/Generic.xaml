@@ -2601,9 +2601,11 @@
 											Text="{Binding SelectedDocument.LayoutElement.Title, RelativeSource={RelativeSource TemplatedParent}}"
 											TextTrimming="CharacterEllipsis" />
                                     </Grid>
-                                    <TextBlock
+									<TextBlock 
+										Grid.Row="1"
 										x:Name="selectedElementDescription"
-										VerticalAlignment="Center"
+										VerticalAlignment="Center" 
+										Foreground="{DynamicResource {x:Static reskeys:ResourceKeys.NavigatorWindowForeground}}"                                       
 										Text="{Binding SelectedDocument.LayoutElement.Description}"
 										TextTrimming="CharacterEllipsis" />
                                 </Grid>
