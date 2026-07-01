@@ -186,18 +186,11 @@ namespace AvalonDock.Controls
 		/// <param name="e">The event arguments.</param>
 		protected virtual void OnSelectedDocumentChanged(DependencyPropertyChangedEventArgs e)
 		{
-			if (_internalSetSelectedDocument || SelectedDocument == null)
+			if (!_internalSetSelectedDocument && SelectedDocument != null && SelectedDocument.ActivateCommand.CanExecute(null))
 			{
-				return;
+				SelectedAnchorable = null;
+				CloseAndActiveSelected();
 			}
-
-			if (!SelectedDocument.ActivateCommand.CanExecute(null))
-			{
-				return;
-			}
-
-			Close();
-			SelectedDocument.ActivateCommand.Execute(null);
 		}
 
 		/// <summary>
@@ -227,13 +220,10 @@ namespace AvalonDock.Controls
 		/// <param name="e">The event arguments.</param>
 		protected virtual void OnSelectedAnchorableChanged(DependencyPropertyChangedEventArgs e)
 		{
-			if (_internalSetSelectedAnchorable) return;
-			// TODO: What goes on here??
-			var selectedAnchorable = e.NewValue as LayoutAnchorableItem;
-			if (SelectedAnchorable != null && SelectedAnchorable.ActivateCommand.CanExecute(null))
+			if (!_internalSetSelectedAnchorable && SelectedAnchorable != null && SelectedAnchorable.ActivateCommand.CanExecute(null))
 			{
-				Close();
-				SelectedAnchorable.ActivateCommand.Execute(null);
+				SelectedDocument = null;
+				CloseAndActiveSelected();
 			}
 		}
 
@@ -271,16 +261,26 @@ namespace AvalonDock.Controls
 							if (isListOfDocuments)
 							{
 								container.IsKeyboardFocusedChanged += DocumentsItemContainer_IsKeyboardFocusedChanged;
+								container.PreviewMouseLeftButtonDown += DocumentsItemContainer_PreviewMouseLeftButtonDown;
 							}
 							else
 							{
 								container.IsKeyboardFocusedChanged += AnchorablesItemContainer_IsKeyboardFocusedChanged;
+								container.PreviewMouseLeftButtonDown += AnchorablesItemContainer_PreviewMouseLeftButtonDown;
 							}
 						}
 					}
 
 					break;
 			}
+		}
+
+		private void AnchorablesItemContainer_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			ListBoxItem item = (ListBoxItem)sender;
+			_internalSetSelectedAnchorable = false;
+			item.IsSelected = true;
+			_internalSetSelectedAnchorable = false;
 		}
 
 		private void AnchorablesItemContainer_IsKeyboardFocusedChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -292,6 +292,14 @@ namespace AvalonDock.Controls
 				item.IsSelected = true;
 				_internalSetSelectedAnchorable = false;
 			}
+		}
+
+		private void DocumentsItemContainer_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			ListBoxItem item = (ListBoxItem)sender;
+			_internalSetSelectedDocument = false;
+			item.IsSelected = true;
+			_internalSetSelectedDocument = false;
 		}
 
 		private void DocumentsItemContainer_IsKeyboardFocusedChanged(object sender, DependencyPropertyChangedEventArgs e)
