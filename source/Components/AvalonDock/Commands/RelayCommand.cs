@@ -1,70 +1,36 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 
 namespace AvalonDock.Commands
 {
-	/// <inheritdoc />
 	/// <summary>
-	/// A command whose sole purpose is to  relay its functionality to other
-	/// objects by invoking delegates.
-	/// The default return value for the <see cref="ICommand.CanExecute"/> method is <c>true</c>.
-	///
-	/// Source: <see href="http://www.codeproject.com/Articles/31837/Creating-an-Internationalized-Wizard-in-WPF"/>
+	/// Represents the relay Command.
 	/// </summary>
-	/// <seealso cref="ICommand"/>
-	/// <summary>
-	/// Class RelayCommand.
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <seealso cref="System.Windows.Input.ICommand" />
+	/// <typeparam name="T">The t type.</typeparam>
 	internal class RelayCommand<T> : ICommand
 	{
-		#region Private Fields
-
-		/// <summary>
-		/// The can execute
-		/// </summary>
 		private readonly WeakFunc<T, bool> _canExecute;
 
 		/// <summary>
-		/// The execute
+		/// The execute field.
 		/// </summary>
 		private readonly WeakAction<T> _execute;
 
-		#endregion Private Fields
-
-		#region Public Constructors
-
 		/// <summary>
-		/// Initializes a new instance of the RelayCommand class that
-		/// can always execute.
+		/// Initializes a new instance of the <see cref="RelayCommand{T}"/> class.
 		/// </summary>
-		/// <param name="execute">The execution logic. IMPORTANT: Note that closures are not supported at the moment
-		/// due to the use of WeakActions (see http://stackoverflow.com/questions/25730530/).</param>
-		/// <exception cref="ArgumentNullException">If the execute argument is null.</exception>
+		/// <param name="execute">The execute.</param>
 		public RelayCommand(Action<T> execute)
 			: this(execute, null)
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the RelayCommand class.
+		/// Initializes a new instance of the <see cref="RelayCommand{T}"/> class.
 		/// </summary>
-		/// <param name="execute">The execution logic. IMPORTANT: Note that closures are not supported at the moment
-		/// due to the use of WeakActions (see http://stackoverflow.com/questions/25730530/).</param>
-		/// <param name="canExecute">The execution status logic. IMPORTANT: Note that closures are not supported at the moment
-		/// due to the use of WeakActions (see http://stackoverflow.com/questions/25730530/).</param>
-		/// <exception cref="ArgumentNullException">If the execute argument is null.</exception>
+		/// <param name="execute">The execute.</param>
+		/// <param name="canExecute">The can Execute.</param>
 		public RelayCommand(Action<T> execute, Func<T, bool> canExecute)
 		{
 			if (execute == null)
@@ -80,12 +46,8 @@ namespace AvalonDock.Commands
 			}
 		}
 
-		#endregion Public Constructors
-
-		#region Public Events
-
 		/// <summary>
-		/// Occurs when changes occur that affect whether the command should execute.
+		/// Occurs when can Execute Changed.
 		/// </summary>
 		public event EventHandler CanExecuteChanged
 		{
@@ -106,16 +68,11 @@ namespace AvalonDock.Commands
 			}
 		}
 
-		#endregion Public Events
-
-		#region Public Methods
-
 		/// <summary>
-		/// Defines the method that determines whether the command can execute in its current state.
+		/// Executes the can Execute operation.
 		/// </summary>
-		/// <param name="parameter">Data used by the command. If the command does not require data
-		/// to be passed, this object can be set to a null reference</param>
-		/// <returns>true if this command can be executed; otherwise, false.</returns>
+		/// <param name="parameter">The converter parameter.</param>
+		/// <returns>true if the operation succeeds; otherwise, false.</returns>
 		public bool CanExecute(object parameter)
 		{
 			if (_canExecute == null)
@@ -132,7 +89,7 @@ namespace AvalonDock.Commands
 
 				if (parameter == null || parameter is T)
 				{
-					return (_canExecute.Execute((T)parameter));
+					return _canExecute.Execute((T)parameter);
 				}
 			}
 
@@ -140,10 +97,9 @@ namespace AvalonDock.Commands
 		}
 
 		/// <summary>
-		/// Defines the method to be called when the command is invoked.
+		/// Executes the execute operation.
 		/// </summary>
-		/// <param name="parameter">Data used by the command. If the command does not require data
-		/// to be passed, this object can be set to a null reference</param>
+		/// <param name="parameter">The converter parameter.</param>
 		public virtual void Execute(object parameter)
 		{
 			var val = parameter;
@@ -186,7 +142,7 @@ namespace AvalonDock.Commands
 		}
 
 		/// <summary>
-		/// Raises the <see cref="CanExecuteChanged" /> event.
+		/// Executes the raise Can Execute Changed operation.
 		/// </summary>
 		[SuppressMessage(
 			"Microsoft.Performance",
@@ -200,7 +156,5 @@ namespace AvalonDock.Commands
 		{
 			CommandManager.InvalidateRequerySuggested();
 		}
-
-		#endregion Public Methods
 	}
 }

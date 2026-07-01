@@ -1,25 +1,16 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using System;
-
 namespace AvalonDock.Themes
 {
-	/// <inheritdoc/>
-	public class Vs2013LightTheme : Theme
+	/// <summary>
+	/// VS2013 Light theme, built at runtime from the embedded GZIP-compressed .vstheme palette.
+	/// </summary>
+	public class Vs2013LightTheme : DictionaryTheme
 	{
-		/// <inheritdoc/>
-		public override Uri GetResourceUri()
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Vs2013LightTheme"/> class.
+		/// </summary>
+		public Vs2013LightTheme()
+			: base(VsThemePaletteFactory.BuildDictionary(VsThemeResources.Light))
 		{
-			return new Uri(
-				"/AvalonDock.Themes.VS2013;component/LightTheme.xaml",
-				UriKind.Relative);
 		}
 	}
-}
+}

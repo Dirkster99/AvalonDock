@@ -1,39 +1,30 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Abstract class to implement base for various drop target implementations on <see cref="DockingManager"/>,
-	/// <see cref="LayoutAnchorablePaneControl"/>, <see cref="LayoutDocumentPaneControl"/> etc.
+	/// Represents the drop target.
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	internal abstract class DropTarget<T> : DropTargetBase, IDropTarget where T : FrameworkElement
+	/// <typeparam name="T">The type of t.</typeparam>
+	internal abstract class DropTarget<T> : DropTargetBase, IDropTarget
+		where T : FrameworkElement
 	{
-		#region fields
-
 		private Rect[] _detectionRect;
 		private T _targetElement;
 		private DropTargetType _type;
 
-		#endregion fields
-
-		#region Constructors
-
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DropTarget{T}"/> class.
+		/// </summary>
+		/// <param name="targetElement">The target element.</param>
+		/// <param name="detectionRect">The detection rectangle.</param>
+		/// <param name="type">The drop target type.</param>
 		protected DropTarget(T targetElement, Rect detectionRect, DropTargetType type)
 		{
 			_targetElement = targetElement;
@@ -41,6 +32,12 @@ namespace AvalonDock.Controls
 			_type = type;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DropTarget{T}"/> class.
+		/// </summary>
+		/// <param name="targetElement">The target element.</param>
+		/// <param name="detectionRects">The detection rectangles.</param>
+		/// <param name="type">The drop target type.</param>
 		protected DropTarget(T targetElement, IEnumerable<Rect> detectionRects, DropTargetType type)
 		{
 			_targetElement = targetElement;
@@ -48,10 +45,9 @@ namespace AvalonDock.Controls
 			_type = type;
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
+		/// <summary>
+		/// Gets the detection rects.
+		/// </summary>
 		public Rect[] DetectionRects
 		{
 			get
@@ -60,6 +56,9 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <summary>
+		/// Gets the target element.
+		/// </summary>
 		public T TargetElement
 		{
 			get
@@ -68,6 +67,9 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <summary>
+		/// Gets the type.
+		/// </summary>
 		public DropTargetType Type
 		{
 			get
@@ -76,41 +78,36 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion Properties
-
-		#region Overrides
-
 		/// <summary>
-		/// Method is invoked to complete a drag & drop operation with a (new) docking position
-		/// by docking of the LayoutAnchorable <paramref name="floatingWindow"/> into this drop target.
-		///
-		/// Inheriting classes should override this method to implement their own custom logic.
+		/// Drops the specified floating window onto the target.
 		/// </summary>
-		/// <param name="floatingWindow"></param>
+		/// <param name="floatingWindow">The floating window.</param>
 		protected virtual void Drop(LayoutAnchorableFloatingWindow floatingWindow)
 		{
 		}
 
 		/// <summary>
-		/// Method is invoked to complete a drag & drop operation with a (new) docking position
-		/// by docking of the LayoutDocument <paramref name="floatingWindow"/> into this drop target.
-		///
-		/// Inheriting classes should override this method to implement their own custom logic.
+		/// Drops the specified floating window onto the target.
 		/// </summary>
-		/// <param name="floatingWindow"></param>
+		/// <param name="floatingWindow">The floating window.</param>
 		protected virtual void Drop(LayoutDocumentFloatingWindow floatingWindow)
 		{
 		}
 
-		#endregion Overrides
-
-		#region Public Methods
-
+		/// <summary>
+		/// Determines whether the specified point intersects the target.
+		/// </summary>
+		/// <param name="dragPoint">The drag point.</param>
+		/// <returns>true if the specified point intersects the target; otherwise, false.</returns>
 		public bool HitTestScreen(Point dragPoint)
 		{
 			return HitTest(_targetElement.TransformToDeviceDPI(dragPoint));
 		}
 
+		/// <summary>
+		/// Drops the specified floating window onto the target.
+		/// </summary>
+		/// <param name="floatingWindow">The floating window.</param>
 		public void Drop(LayoutFloatingWindow floatingWindow)
 		{
 			var root = floatingWindow.Root;
@@ -126,9 +123,11 @@ namespace AvalonDock.Controls
 				var fwAsDocument = floatingWindow as LayoutDocumentFloatingWindow;
 				this.Drop(fwAsDocument);
 			}
+
 			if (currentActiveContent == null)
 				return;
-			Dispatcher.BeginInvoke(new Action(() =>
+			Dispatcher.BeginInvoke(
+				new Action(() =>
 				{
 					currentActiveContent.IsSelected = false;
 					currentActiveContent.IsActive = false;
@@ -136,23 +135,38 @@ namespace AvalonDock.Controls
 				}), DispatcherPriority.Background);
 		}
 
+		/// <summary>
+		/// Determines whether the specified point intersects the target.
+		/// </summary>
+		/// <param name="dragPoint">The drag point.</param>
+		/// <returns>true if the specified point intersects the target; otherwise, false.</returns>
 		public virtual bool HitTest(Point dragPoint)
 		{
 			return _detectionRect.Any(dr => dr.Contains(dragPoint));
 		}
 
+		/// <summary>
+		/// Gets the preview path.
+		/// </summary>
+		/// <param name="overlayWindow">The overlay window.</param>
+		/// <param name="floatingWindow">The floating window.</param>
+		/// <returns>The preview path.</returns>
 		public abstract Geometry GetPreviewPath(OverlayWindow overlayWindow, LayoutFloatingWindow floatingWindow);
 
+		/// <summary>
+		/// Drag enter.
+		/// </summary>
 		public void DragEnter()
 		{
 			SetIsDraggingOver(TargetElement, true);
 		}
 
+		/// <summary>
+		/// Drag leave.
+		/// </summary>
 		public void DragLeave()
 		{
 			SetIsDraggingOver(TargetElement, false);
 		}
-
-		#endregion Public Methods
 	}
 }

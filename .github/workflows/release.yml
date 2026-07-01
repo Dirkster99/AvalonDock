@@ -1,0 +1,192 @@
+name: Release
+
+on:
+  push:
+    branches: [master, 'release/**']
+    tags: ['v*']
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build-test-publish:
+    name: Build, Test & Publish
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Determine version
+        id: version
+        shell: bash
+        run: |
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            # Stable release from tag (fires regardless of branch, e.g. master or release/v4)
+            version="${GITHUB_REF#refs/tags/v}"
+            version_args=""
+            is_release='true'
+            echo "Stable release: $version"
+
+            # Mark as the repo's "latest" GitHub release only when this is the highest
+            # version tag. A maintenance bugfix (e.g. a v4.x release cut while v5 exists)
+            # must not steal "latest" from the newer line.
+            highest=$(git tag -l 'v*' | sed 's#^v##' | sort -V | tail -1)
+            newest=$(printf '%s\n%s\n' "$highest" "$version" | sort -V | tail -1)
+            if [ "$newest" = "$version" ]; then make_latest='true'; else make_latest='false'; fi
+            echo "Mark as latest release: $make_latest"
+          else
+            # Pre-release preview from a tracked branch (master or release/**)
+            version=""
+            make_latest='false'
+            version_suffix="preview.${{ github.run_number }}"
+            version_args="--version-suffix $version_suffix"
+            is_release='false'
+            echo "Pre-release with suffix: $version_suffix"
+          fi
+          echo "VERSION=$version" >> $GITHUB_OUTPUT
+          echo "MAKE_LATEST=$make_latest" >> $GITHUB_OUTPUT
+          echo "VERSION_ARGS=$version_args" >> $GITHUB_OUTPUT
+          echo "IS_RELEASE=$is_release" >> $GITHUB_OUTPUT
+
+      - name: Restore dependencies
+        run: dotnet restore source/AvalonDock.sln
+
+      - name: Build
+        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore --warnaserror ${{ steps.version.outputs.VERSION_ARGS }}
+
+      - name: Test (Unit Tests)
+        run: >
+          dotnet test source/AvalonDock.sln
+          --configuration Release
+          --no-restore
+          --filter "Category!=FlaUI"
+          --logger "trx;LogFilePrefix=unit-test-results"
+          --results-directory TestResults
+          -m:1
+
+      - name: Test (FlaUI UI Tests)
+        run: >
+          dotnet test source/AvalonDock.sln
+          --configuration Release
+          --no-restore
+          --filter "Category=FlaUI"
+          --framework net10.0-windows
+          --logger "trx;LogFilePrefix=flaui-test-results"
+          --results-directory TestResults
+          -m:1
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: test-results
+          path: TestResults/*.trx
+          retention-days: 14
+
+      - name: Pack NuGet packages
+        shell: bash
+        run: |
+          mkdir -p nupkg
+          
+          projects=(
+            "source/Components/AvalonDock/AvalonDock.csproj"
+            "source/Components/AvalonDock.Core/AvalonDock.Core.csproj"
+            "source/Components/AvalonDock.DependencyInjection/AvalonDock.DependencyInjection.csproj"
+            "source/Components/AvalonDock.Mvvm/AvalonDock.Mvvm.csproj"
+            "source/Components/AvalonDock.Mvvm.CommunityToolkit/AvalonDock.Mvvm.CommunityToolkit.csproj"
+            "source/Components/AvalonDock.Serializer.Json/AvalonDock.Serializer.Json.csproj"
+            "source/Components/AvalonDock.Serializer.Xml/AvalonDock.Serializer.Xml.csproj"
+            "source/Components/AvalonDock.Themes.Aero/AvalonDock.Themes.Aero.csproj"
+            "source/Components/AvalonDock.Themes.Arc/AvalonDock.Themes.Arc.csproj"
+            "source/Components/AvalonDock.Themes.Metro/AvalonDock.Themes.Metro.csproj"
+            "source/Components/AvalonDock.Themes.Expression/AvalonDock.Themes.Expression.csproj"
+            "source/Components/AvalonDock.Themes.VS2010/AvalonDock.Themes.VS2010.csproj"
+            "source/Components/AvalonDock.Themes.VS2013/AvalonDock.Themes.VS2013.csproj"
+            "source/Components/AvalonDock.Themes.VS/AvalonDock.Themes.VS.csproj"
+          )
+          
+          for project in "${projects[@]}"; do
+            echo "Packing: $project"
+            dotnet pack "$project" --configuration Release --no-build -o nupkg/ ${{ steps.version.outputs.VERSION_ARGS }}
+          done
+          
+          echo -e "\nCreated packages:"
+          ls -1 nupkg/*.nupkg
+
+      - name: Upload NuGet packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: nuget-packages
+          path: nupkg/*.nupkg
+          retention-days: 30
+
+      - name: Push to NuGet.org
+        shell: bash
+        run: |
+          dotnet nuget push nupkg/*.nupkg \
+          --api-key "${{ secrets.AVALONDOCK_APP_KEY }}" \
+          --source https://api.nuget.org/v3/index.json \
+          --skip-duplicate
+
+      - name: Unlist preview NuGet packages
+        if: steps.version.outputs.IS_RELEASE == 'true'
+        shell: bash
+        run: |
+          packages=(
+            "Dirkster.AvalonDock"
+            "Dirkster.AvalonDock.Core"
+            "Dirkster.AvalonDock.DependencyInjection"
+            "Dirkster.AvalonDock.Mvvm"
+            "Dirkster.AvalonDock.Mvvm.CommunityToolkit"
+            "Dirkster.AvalonDock.Serializer.Json"
+            "Dirkster.AvalonDock.Serializer.Xml"
+            "Dirkster.AvalonDock.Themes.Aero"
+            "Dirkster.AvalonDock.Themes.Arc"
+            "Dirkster.AvalonDock.Themes.Expression"
+            "Dirkster.AvalonDock.Themes.Metro"
+            "Dirkster.AvalonDock.Themes.VS"
+            "Dirkster.AvalonDock.Themes.VS2010"
+            "Dirkster.AvalonDock.Themes.VS2013"
+          )
+
+          for package in "${packages[@]}"; do
+            echo "Checking preview versions for: $package"
+            lower_package=$(echo "$package" | tr '[:upper:]' '[:lower:]')
+            versions_json=$(curl -sf "https://api.nuget.org/v3-flatcontainer/${lower_package}/index.json" || echo '{"versions":[]}')
+            # Only unlist previews this exact release supersedes (e.g. 4.74.2-preview.*), so a
+            # maintenance release does not remove previews belonging to other version lines.
+            preview_versions=$(echo "$versions_json" | jq -r --arg v "${{ steps.version.outputs.VERSION }}" '.versions[] | select(startswith($v + "-preview"))' || true)
+
+            if [ -z "$preview_versions" ]; then
+              echo "  No preview versions found."
+              continue
+            fi
+
+            echo "  Found preview versions:"
+            echo "$preview_versions" | sed 's/^/    /'
+
+            while IFS= read -r version; do
+              echo "  Unlisting $package $version ..."
+              dotnet nuget delete "$package" "$version" \
+                --api-key "${{ secrets.AVALONDOCK_APP_KEY }}" \
+                --source https://api.nuget.org/v3/index.json \
+                --non-interactive || echo "  Warning: Failed to unlist $package $version"
+            done <<< "$preview_versions"
+          done
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.IS_RELEASE == 'true'
+        uses: softprops/action-gh-release@v3
+        with:
+          generate_release_notes: true
+          make_latest: ${{ steps.version.outputs.MAKE_LATEST }}
+          files: nupkg/*.nupkg

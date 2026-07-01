@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<RootNamespace>AvalonDock.Mvvm.CommunityToolkit</RootNamespace>
+		<AssemblyName>AvalonDock.Mvvm.CommunityToolkit</AssemblyName>
+		<PackageId>Dirkster.AvalonDock.Mvvm.CommunityToolkit</PackageId>
+		<Description>CommunityToolkit.Mvvm integration for AvalonDock. Provides ObservableObject-based base classes that support [ObservableProperty] and [RelayCommand] source generators.</Description>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\AvalonDock\sn.snk</AssemblyOriginatorKeyFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AvalonDock.Core\AvalonDock.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+	</ItemGroup>
+
+</Project>

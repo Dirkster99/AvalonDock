@@ -1,4 +1,4 @@
-﻿namespace AvalonDock.WinFormsTestApp
+namespace AvalonDock.WinFormsTestApp
 {
     partial class FormMain
     {
@@ -20,7 +20,6 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
 
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -165,7 +164,6 @@
 
         }
 
-        #endregion
 
         private System.Windows.Forms.Integration.ElementHost dockingManagerHost;
         private System.Windows.Forms.MenuStrip menuStrip1;

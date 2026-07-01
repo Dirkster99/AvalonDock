@@ -1,14 +1,5 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-/**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+﻿/**************************************************************************\
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 namespace Standard
@@ -20,107 +11,104 @@ namespace Standard
 	using System.Reflection;
 	using System.Runtime.InteropServices;
 
-	/// <summary>
-	/// Wrapper for common Win32 status codes.
-	/// </summary>
+	/// <summary>Represents the Win32Error structure.</summary>
 	[StructLayout(LayoutKind.Explicit)]
 	internal struct Win32Error
 	{
+		/// <summary>The _value value.</summary>
 		[FieldOffset(0)]
 		private readonly int _value;
 
 		// NOTE: These public static field declarations are automatically
 		// picked up by (HRESULT's) ToString through reflection.
 
-		/// <summary>The operation completed successfully.</summary>
+		/// <summary>The ERROR_SUCCESS value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_SUCCESS = new Win32Error(0);
 
-		/// <summary>Incorrect function.</summary>
+		/// <summary>The ERROR_INVALID_FUNCTION value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_INVALID_FUNCTION = new Win32Error(1);
 
-		/// <summary>The system cannot find the file specified.</summary>
+		/// <summary>The ERROR_FILE_NOT_FOUND value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_FILE_NOT_FOUND = new Win32Error(2);
 
-		/// <summary>The system cannot find the path specified.</summary>
+		/// <summary>The ERROR_PATH_NOT_FOUND value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_PATH_NOT_FOUND = new Win32Error(3);
 
-		/// <summary>The system cannot open the file.</summary>
+		/// <summary>The ERROR_TOO_MANY_OPEN_FILES value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_TOO_MANY_OPEN_FILES = new Win32Error(4);
 
-		/// <summary>Access is denied.</summary>
+		/// <summary>The ERROR_ACCESS_DENIED value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_ACCESS_DENIED = new Win32Error(5);
 
-		/// <summary>The handle is invalid.</summary>
+		/// <summary>The ERROR_INVALID_HANDLE value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_INVALID_HANDLE = new Win32Error(6);
 
-		/// <summary>Not enough storage is available to complete this operation.</summary>
+		/// <summary>The ERROR_OUTOFMEMORY value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_OUTOFMEMORY = new Win32Error(14);
 
-		/// <summary>There are no more files.</summary>
+		/// <summary>The ERROR_NO_MORE_FILES value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_NO_MORE_FILES = new Win32Error(18);
 
-		/// <summary>The process cannot access the file because it is being used by another process.</summary>
+		/// <summary>The ERROR_SHARING_VIOLATION value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_SHARING_VIOLATION = new Win32Error(32);
 
-		/// <summary>The parameter is incorrect.</summary>
+		/// <summary>The ERROR_INVALID_PARAMETER value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_INVALID_PARAMETER = new Win32Error(87);
 
-		/// <summary>The data area passed to a system call is too small.</summary>
+		/// <summary>The ERROR_INSUFFICIENT_BUFFER value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_INSUFFICIENT_BUFFER = new Win32Error(122);
 
-		/// <summary>Cannot nest calls to LoadModule.</summary>
+		/// <summary>The ERROR_NESTING_NOT_ALLOWED value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_NESTING_NOT_ALLOWED = new Win32Error(215);
 
-		/// <summary>Illegal operation attempted on a registry key that has been marked for deletion.</summary>
+		/// <summary>The ERROR_KEY_DELETED value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_KEY_DELETED = new Win32Error(1018);
 
-		/// <summary>Element not found.</summary>
+		/// <summary>The ERROR_NOT_FOUND value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_NOT_FOUND = new Win32Error(1168);
 
-		/// <summary>There was no match for the specified key in the index.</summary>
+		/// <summary>The ERROR_NO_MATCH value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_NO_MATCH = new Win32Error(1169);
 
-		/// <summary>An invalid device was specified.</summary>
+		/// <summary>The ERROR_BAD_DEVICE value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_BAD_DEVICE = new Win32Error(1200);
 
-		/// <summary>The operation was canceled by the user.</summary>
+		/// <summary>The ERROR_CANCELLED value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_CANCELLED = new Win32Error(1223);
 
-		/// <summary>The window class was already registered.</summary>
+		/// <summary>The ERROR_CLASS_ALREADY_EXISTS value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_CLASS_ALREADY_EXISTS = new Win32Error(1410);
 
-		/// <summary>The specified datatype is invalid.</summary>
+		/// <summary>The ERROR_INVALID_DATATYPE value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly Win32Error ERROR_INVALID_DATATYPE = new Win32Error(1804);
 
-		/// <summary>
-		/// Create a new Win32 error.
-		/// </summary>
-		/// <param name="i">The integer value of the error.</param>
+		/// <summary>Initializes a new instance of the <see cref="Win32Error"/> struct.</summary>
+		/// <param name="i">The i value.</param>
 		public Win32Error(int i) => _value = i;
 
-		/// <summary>Performs HRESULT_FROM_WIN32 conversion.</summary>
-		/// <param name="error">The Win32 error being converted to an HRESULT.</param>
-		/// <returns>The equivilent HRESULT value.</returns>
+		/// <summary>Converts the value.</summary>
+		/// <param name="error">The error value.</param>
+		/// <returns>The result of the operation.</returns>
 		public static explicit operator HRESULT(Win32Error error)
 		{
 			// #define __HRESULT_FROM_WIN32(x)
@@ -129,16 +117,19 @@ namespace Standard
 		}
 
 		// Method version of the cast operation
-		/// <summary>Performs HRESULT_FROM_WIN32 conversion.</summary>
-		/// <param name="error">The Win32 error being converted to an HRESULT.</param>
-		/// <returns>The equivalent HRESULT value.</returns>
+
+		/// <summary>Performs the ToHRESULT operation.</summary>
+		/// <returns>The result of the operation.</returns>
 		public HRESULT ToHRESULT() => (HRESULT)this;
 
-		/// <summary>Performs the equivalent of Win32's GetLastError()</summary>
-		/// <returns>A Win32Error instance with the result of the native GetLastError</returns>
+		/// <summary>Performs the GetLastError operation.</summary>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public static Win32Error GetLastError() => new Win32Error(Marshal.GetLastWin32Error());
 
+		/// <summary>Performs the Equals operation.</summary>
+		/// <param name="obj">The obj value.</param>
+		/// <returns>The result of the operation.</returns>
 		public override bool Equals(object obj)
 		{
 			try
@@ -151,166 +142,164 @@ namespace Standard
 			}
 		}
 
+		/// <summary>Performs the GetHashCode operation.</summary>
+		/// <returns>The result of the operation.</returns>
 		public override int GetHashCode() => _value.GetHashCode();
 
-		/// <summary>
-		/// Compare two Win32 error codes for equality.
-		/// </summary>
-		/// <param name="errLeft">The first error code to compare.</param>
-		/// <param name="errRight">The second error code to compare.</param>
-		/// <returns>Whether the two error codes are the same.</returns>
+		/// <summary>Determines whether two values are equal.</summary>
+		/// <param name="errLeft">The errLeft value.</param>
+		/// <param name="errRight">The errRight value.</param>
+		/// <returns>The result of the operation.</returns>
 		public static bool operator ==(Win32Error errLeft, Win32Error errRight)
 		{
 			return errLeft._value == errRight._value;
 		}
 
-		/// <summary>
-		/// Compare two Win32 error codes for inequality.
-		/// </summary>
-		/// <param name="errLeft">The first error code to compare.</param>
-		/// <param name="errRight">The second error code to compare.</param>
-		/// <returns>Whether the two error codes are not the same.</returns>
+		/// <summary>Determines whether two values are not equal.</summary>
+		/// <param name="errLeft">The errLeft value.</param>
+		/// <param name="errRight">The errRight value.</param>
+		/// <returns>The result of the operation.</returns>
 		public static bool operator !=(Win32Error errLeft, Win32Error errRight) => errLeft != errRight;
 	}
 
+	/// <summary>Defines Facility values.</summary>
 	internal enum Facility
 	{
-		/// <summary>FACILITY_NULL</summary>
+		/// <summary>The Null value.</summary>
 		Null = 0,
 
-		/// <summary>FACILITY_RPC</summary>
+		/// <summary>The Rpc value.</summary>
 		Rpc = 1,
 
-		/// <summary>FACILITY_DISPATCH</summary>
+		/// <summary>The Dispatch value.</summary>
 		Dispatch = 2,
 
-		/// <summary>FACILITY_STORAGE</summary>
+		/// <summary>The Storage value.</summary>
 		Storage = 3,
 
-		/// <summary>FACILITY_ITF</summary>
+		/// <summary>The Itf value.</summary>
 		Itf = 4,
 
-		/// <summary>FACILITY_WIN32</summary>
+		/// <summary>The Win32 value.</summary>
 		Win32 = 7,
 
-		/// <summary>FACILITY_WINDOWS</summary>
+		/// <summary>The Windows value.</summary>
 		Windows = 8,
 
-		/// <summary>FACILITY_CONTROL</summary>
+		/// <summary>The Control value.</summary>
 		Control = 10,
 
-		/// <summary>MSDN doced facility code for ESE errors.</summary>
+		/// <summary>The Ese value.</summary>
 		Ese = 0xE5E,
 
-		/// <summary>FACILITY_WINCODEC (WIC)</summary>
+		/// <summary>The WinCodec value.</summary>
 		WinCodec = 0x898,
 	}
 
-	/// <summary>Wrapper for HRESULT status codes.</summary>
+	/// <summary>Represents the HRESULT structure.</summary>
 	[StructLayout(LayoutKind.Explicit)]
 	internal struct HRESULT
 	{
+		/// <summary>The _value value.</summary>
 		[FieldOffset(0)]
 		private readonly uint _value;
 
 		// NOTE: These public static field declarations are automatically
 		// picked up by ToString through reflection.
-		/// <summary>S_OK</summary>
+
+		/// <summary>The S_OK value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT S_OK = new HRESULT(0x00000000);
 
-		/// <summary>S_FALSE</summary>
+		/// <summary>The S_FALSE value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT S_FALSE = new HRESULT(0x00000001);
 
-		/// <summary>E_PENDING</summary>
+		/// <summary>The E_PENDING value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT E_PENDING = new HRESULT(0x8000000A);
 
-		/// <summary>E_NOTIMPL</summary>
+		/// <summary>The E_NOTIMPL value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT E_NOTIMPL = new HRESULT(0x80004001);
 
-		/// <summary>E_NOINTERFACE</summary>
+		/// <summary>The E_NOINTERFACE value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT E_NOINTERFACE = new HRESULT(0x80004002);
 
-		/// <summary>E_POINTER</summary>
+		/// <summary>The E_POINTER value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT E_POINTER = new HRESULT(0x80004003);
 
-		/// <summary>E_ABORT</summary>
+		/// <summary>The E_ABORT value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT E_ABORT = new HRESULT(0x80004004);
 
-		/// <summary>E_FAIL</summary>
+		/// <summary>The E_FAIL value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT E_FAIL = new HRESULT(0x80004005);
 
-		/// <summary>E_UNEXPECTED</summary>
+		/// <summary>The E_UNEXPECTED value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT E_UNEXPECTED = new HRESULT(0x8000FFFF);
 
-		/// <summary>STG_E_INVALIDFUNCTION</summary>
+		/// <summary>The STG_E_INVALIDFUNCTION value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT STG_E_INVALIDFUNCTION = new HRESULT(0x80030001);
 
-		/// <summary>REGDB_E_CLASSNOTREG</summary>
+		/// <summary>The REGDB_E_CLASSNOTREG value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT REGDB_E_CLASSNOTREG = new HRESULT(0x80040154);
 
-		/// <summary>DESTS_E_NO_MATCHING_ASSOC_HANDLER.  Win7 internal error code for Jump Lists.</summary>
-		/// <remarks>There is no Assoc Handler for the given item registered by the specified application.</remarks>
+		/// <summary>The DESTS_E_NO_MATCHING_ASSOC_HANDLER value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT DESTS_E_NO_MATCHING_ASSOC_HANDLER = new HRESULT(0x80040F03);
 
-		/// <summary>DESTS_E_NORECDOCS.  Win7 internal error code for Jump Lists.</summary>
-		/// <remarks>The given item is excluded from the recent docs folder by the NoRecDocs bit on its registration.</remarks>
+		/// <summary>The DESTS_E_NORECDOCS value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT DESTS_E_NORECDOCS = new HRESULT(0x80040F04);
 
-		/// <summary>DESTS_E_NOTALLCLEARED.  Win7 internal error code for Jump Lists.</summary>
-		/// <remarks>Not all of the items were successfully cleared</remarks>
+		/// <summary>The DESTS_E_NOTALLCLEARED value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT DESTS_E_NOTALLCLEARED = new HRESULT(0x80040F05);
 
-		/// <summary>E_ACCESSDENIED</summary>
-		/// <remarks>Win32Error ERROR_ACCESS_DENIED.</remarks>
+		/// <summary>The E_ACCESSDENIED value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT E_ACCESSDENIED = new HRESULT(0x80070005);
 
-		/// <summary>E_OUTOFMEMORY</summary>
-		/// <remarks>Win32Error ERROR_OUTOFMEMORY.</remarks>
+		/// <summary>The E_OUTOFMEMORY value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT E_OUTOFMEMORY = new HRESULT(0x8007000E);
 
-		/// <summary>E_INVALIDARG</summary>
-		/// <remarks>Win32Error ERROR_INVALID_PARAMETER.</remarks>
+		/// <summary>The E_INVALIDARG value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT E_INVALIDARG = new HRESULT(0x80070057);
 
-		/// <summary>INTSAFE_E_ARITHMETIC_OVERFLOW</summary>
+		/// <summary>The INTSAFE_E_ARITHMETIC_OVERFLOW value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT INTSAFE_E_ARITHMETIC_OVERFLOW = new HRESULT(0x80070216);
 
-		/// <summary>COR_E_OBJECTDISPOSED</summary>
+		/// <summary>The COR_E_OBJECTDISPOSED value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT COR_E_OBJECTDISPOSED = new HRESULT(0x80131622);
 
-		/// <summary>WC_E_GREATERTHAN</summary>
+		/// <summary>The WC_E_GREATERTHAN value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT WC_E_GREATERTHAN = new HRESULT(0xC00CEE23);
 
-		/// <summary>WC_E_SYNTAX</summary>
+		/// <summary>The WC_E_SYNTAX value.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
 		public static readonly HRESULT WC_E_SYNTAX = new HRESULT(0xC00CEE2D);
 
-		/// <summary>
-		/// Create an HRESULT from an integer value.
-		/// </summary>
-		/// <param name="i"></param>
+		/// <summary>Initializes a new instance of the <see cref="HRESULT"/> struct.</summary>
+		/// <param name="i">The i value.</param>
 		public HRESULT(uint i) => _value = i;
 
+		/// <summary>Performs the Make operation.</summary>
+		/// <param name="severe">The severe value.</param>
+		/// <param name="facility">The facility value.</param>
+		/// <param name="code">The code value.</param>
+		/// <returns>The result of the operation.</returns>
 		public static HRESULT Make(bool severe, Facility facility, int code)
 		{
 			// #define MAKE_HRESULT(sev,fac,code) \
@@ -329,34 +318,32 @@ namespace Standard
 			return new HRESULT((uint)((severe ? (1 << 31) : 0) | ((int)facility << 16) | code));
 		}
 
-		/// <summary>
-		/// retrieve HRESULT_FACILITY
-		/// </summary>
+		/// <summary>Gets the Facility value.</summary>
 		public Facility Facility => GetFacility((int)_value);
 
+		/// <summary>Performs the GetFacility operation.</summary>
+		/// <param name="errorCode">The errorCode value.</param>
+		/// <returns>The result of the operation.</returns>
 		public static Facility GetFacility(int errorCode)
 		{
 			// #define HRESULT_FACILITY(hr)  (((hr) >> 16) & 0x1fff)
 			return (Facility)((errorCode >> 16) & 0x1fff);
 		}
 
-		/// <summary>
-		/// retrieve HRESULT_CODE
-		/// </summary>
+		/// <summary>Gets the Code value.</summary>
 		public int Code => GetCode((int)_value);
 
+		/// <summary>Performs the GetCode operation.</summary>
+		/// <param name="error">The error value.</param>
+		/// <returns>The result of the operation.</returns>
 		public static int GetCode(int error)
 		{
 			// #define HRESULT_CODE(hr)    ((hr) & 0xFFFF)
 			return (int)(error & 0xFFFF);
 		}
 
-		#region Overrides
-
-		/// <summary>
-		/// Get a string representation of this HRESULT.
-		/// </summary>
-		/// <returns></returns>
+		/// <summary>Performs the ToString operation.</summary>
+		/// <returns>The result of the operation.</returns>
 		public override string ToString()
 		{
 			// Use reflection to try to name this HRESULT.
@@ -369,7 +356,6 @@ namespace Standard
 			//
 			// CONSIDER: This data is static.  It could be cached
 			// after first usage for fast lookup since the keys are unique.
-			//
 			foreach (var publicStaticField in typeof(HRESULT).GetFields(BindingFlags.Static | BindingFlags.Public))
 			{
 				if (publicStaticField.FieldType == typeof(HRESULT))
@@ -399,7 +385,9 @@ namespace Standard
 			return string.Format(CultureInfo.InvariantCulture, "0x{0:X8}", _value);
 		}
 
-		/// <inheritdoc />
+		/// <summary>Performs the Equals operation.</summary>
+		/// <param name="obj">The obj value.</param>
+		/// <returns>The result of the operation.</returns>
 		public override bool Equals(object obj)
 		{
 			try
@@ -412,23 +400,35 @@ namespace Standard
 			}
 		}
 
-		/// <inheritdoc />
+		/// <summary>Performs the GetHashCode operation.</summary>
+		/// <returns>The result of the operation.</returns>
 		public override int GetHashCode() => _value.GetHashCode();
 
-		#endregion Overrides
-
+		/// <summary>Determines whether two values are equal.</summary>
+		/// <param name="hrLeft">The hrLeft value.</param>
+		/// <param name="hrRight">The hrRight value.</param>
+		/// <returns>The result of the operation.</returns>
 		public static bool operator ==(HRESULT hrLeft, HRESULT hrRight) => hrLeft._value == hrRight._value;
 
+		/// <summary>Determines whether two values are not equal.</summary>
+		/// <param name="hrLeft">The hrLeft value.</param>
+		/// <param name="hrRight">The hrRight value.</param>
+		/// <returns>The result of the operation.</returns>
 		public static bool operator !=(HRESULT hrLeft, HRESULT hrRight) => !(hrLeft == hrRight);
 
+		/// <summary>Gets a value indicating whether Succeeded.</summary>
 		public bool Succeeded => (int)_value >= 0;
 
+		/// <summary>Gets a value indicating whether Failed.</summary>
 		public bool Failed => (int)_value < 0;
 
+		/// <summary>Performs the ThrowIfFailed operation.</summary>
 		public void ThrowIfFailed() => ThrowIfFailed(null);
 
-		[SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes", Justification = "Only recreating Exceptions that were already raised."),
-		 SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
+		/// <summary>Performs the ThrowIfFailed operation.</summary>
+		/// <param name="message">The message value.</param>
+		[SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes", Justification = "Only recreating Exceptions that were already raised.")]
+		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public void ThrowIfFailed(string message)
 		{
 			if (!Failed) return;
@@ -476,12 +476,11 @@ namespace Standard
 					Assert.IsNotNull(e);
 				}
 			}
+
 			throw e;
 		}
 
-		/// <summary>
-		/// Convert the result of Win32 GetLastError() into a raised exception.
-		/// </summary>
+		/// <summary>Performs the ThrowLastError operation.</summary>
 		public static void ThrowLastError()
 		{
 			((HRESULT)Win32Error.GetLastError()).ThrowIfFailed();

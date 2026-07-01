@@ -1,14 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using AvalonDock.Layout;
-using AvalonDock.Themes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,20 +7,18 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using AvalonDock.Layout;
+using AvalonDock.Themes;
 
 namespace AvalonDock.Controls
 {
-	/// <inheritdoc />
 	/// <summary>
-	/// Implements a floating window for navigating between documents and toolwindows in AvalonDock.
-	/// The floating navigator window can be invoked with CTRL+TAB.
+	/// Represents the navigator window.
 	/// </summary>
-	/// <seealso cref="Window"/>
 	[TemplatePart(Name = PART_AnchorableListBox, Type = typeof(ListBox))]
 	[TemplatePart(Name = PART_DocumentListBox, Type = typeof(ListBox))]
 	public class NavigatorWindow : Window
 	{
-		#region fields
 		private ResourceDictionary currentThemeResourceDictionary; // = null
 
 		private const string PART_AnchorableListBox = "PART_AnchorableListBox";
@@ -44,10 +31,6 @@ namespace AvalonDock.Controls
 		private bool _internalSetSelectedDocument = false;
 		private bool _internalSetSelectedAnchorable = false;
 
-		#endregion fields
-
-		#region Constructors
-
 		static NavigatorWindow()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(NavigatorWindow), new FrameworkPropertyMetadata(typeof(NavigatorWindow)));
@@ -55,6 +38,10 @@ namespace AvalonDock.Controls
 			ShowInTaskbarProperty.OverrideMetadata(typeof(NavigatorWindow), new FrameworkPropertyMetadata(false));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="NavigatorWindow"/> class.
+		/// </summary>
+		/// <param name="manager">The manager.</param>
 		internal NavigatorWindow(DockingManager manager)
 		{
 			_manager = manager;
@@ -102,46 +89,88 @@ namespace AvalonDock.Controls
 			UpdateThemeResources();
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
-		#region Documents
-
 		/// <summary><see cref="Documents"/> read-only dependency property.</summary>
 		private static readonly DependencyPropertyKey DocumentsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Documents), typeof(IEnumerable<LayoutDocumentItem>), typeof(NavigatorWindow),
 				new FrameworkPropertyMetadata(null));
 
+		/// <summary>
+		/// <see cref="Documents"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty DocumentsProperty = DocumentsPropertyKey.DependencyProperty;
 
-		/// <summary>Gets the list of documents managed in this framework.</summary>
-		[Bindable(true), Description("Gets the list of documents managed in this framework."), Category("Document")]
+		/// <summary>
+		/// Gets the documents.
+		/// </summary>
+		[Bindable(true)]
+		[Description("Gets the list of documents managed in this framework.")]
+		[Category("Document")]
 		public LayoutDocumentItem[] Documents => (LayoutDocumentItem[])GetValue(DocumentsProperty);
-
-		#endregion Documents
-
-		#region Anchorables
 
 		/// <summary><see cref="Anchorables"/> read-only dependency property.</summary>
 		private static readonly DependencyPropertyKey AnchorablesPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Anchorables), typeof(IEnumerable<LayoutAnchorableItem>), typeof(NavigatorWindow),
 				new FrameworkPropertyMetadata((IEnumerable<LayoutAnchorableItem>)null));
 
+		/// <summary>
+		/// <see cref="Anchorables"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty AnchorablesProperty = AnchorablesPropertyKey.DependencyProperty;
 
-		/// <summary>Gets the list of anchorables managed in the framework.</summary>
-		[Bindable(true), Description("Gets the list of anchorables managed in the framework."), Category("Anchorable")]
+		/// <summary>
+		/// Gets the anchorables.
+		/// </summary>
+		[Bindable(true)]
+		[Description("Gets the list of anchorables managed in the framework.")]
+		[Category("Anchorable")]
 		public IEnumerable<LayoutAnchorableItem> Anchorables => (IEnumerable<LayoutAnchorableItem>)GetValue(AnchorablesProperty);
 
-		#endregion Anchorables
+		/// <summary>
+		/// <see cref="AnchorablesLabel"/> dependency property.
+		/// </summary>
+		public static readonly DependencyProperty AnchorablesLabelProperty = DependencyProperty.Register(nameof(AnchorablesLabel), typeof(string), typeof(NavigatorWindow),
+				new FrameworkPropertyMetadata(Properties.Resources.Active_ToolWindows));
 
-		#region SelectedDocument
+		/// <summary>
+		/// Gets or sets the anchorables label.
+		/// </summary>
+		[Bindable(true)]
+		[Description("Gets/sets the label displayed above the anchorables list in the navigator.")]
+		[Category("Navigator")]
+		public string AnchorablesLabel
+		{
+			get => (string)GetValue(AnchorablesLabelProperty);
+			set => SetValue(AnchorablesLabelProperty, value);
+		}
 
-		/// <summary><see cref="SelectedDocument"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="DocumentsLabel"/> dependency property.
+		/// </summary>
+		public static readonly DependencyProperty DocumentsLabelProperty = DependencyProperty.Register(nameof(DocumentsLabel), typeof(string), typeof(NavigatorWindow),
+				new FrameworkPropertyMetadata(Properties.Resources.Active_Files));
+
+		/// <summary>
+		/// Gets or sets the documents label.
+		/// </summary>
+		[Bindable(true)]
+		[Description("Gets/sets the label displayed above the documents list in the navigator.")]
+		[Category("Navigator")]
+		public string DocumentsLabel
+		{
+			get => (string)GetValue(DocumentsLabelProperty);
+			set => SetValue(DocumentsLabelProperty, value);
+		}
+
+		/// <summary>
+		/// <see cref="SelectedDocument"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty SelectedDocumentProperty = DependencyProperty.Register(nameof(SelectedDocument), typeof(LayoutDocumentItem), typeof(NavigatorWindow),
 				new FrameworkPropertyMetadata(null, OnSelectedDocumentChanged));
 
-		/// <summary>Gets/sets the currently selected document.</summary>
-		[Bindable(true), Description("Gets/sets the currently selected document."), Category("Document")]
+		/// <summary>
+		/// Gets or sets the selected document.
+		/// </summary>
+		[Bindable(true)]
+		[Description("Gets/sets the currently selected document.")]
+		[Category("Document")]
 		public LayoutDocumentItem SelectedDocument
 		{
 			get => (LayoutDocumentItem)GetValue(SelectedDocumentProperty);
@@ -151,7 +180,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="SelectedDocument"/> property.</summary>
 		private static void OnSelectedDocumentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((NavigatorWindow)d).OnSelectedDocumentChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="SelectedDocument"/> property.</summary>
+		/// <summary>
+		/// Raises the selected document changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnSelectedDocumentChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (!_internalSetSelectedDocument && SelectedDocument != null && SelectedDocument.ActivateCommand.CanExecute(null))
@@ -161,16 +193,18 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion SelectedDocument
-
-		#region SelectedAnchorable
-
-		/// <summary><see cref="SelectedAnchorable"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="SelectedAnchorable"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty SelectedAnchorableProperty = DependencyProperty.Register(nameof(SelectedAnchorable), typeof(LayoutAnchorableItem), typeof(NavigatorWindow),
 				new FrameworkPropertyMetadata(null, OnSelectedAnchorableChanged));
 
-		/// <summary>Gets/sets the currently selected anchorable.</summary>
-		[Bindable(true), Description("Gets/sets the currently selected anchorable."), Category("Anchorable")]
+		/// <summary>
+		/// Gets or sets the selected anchorable.
+		/// </summary>
+		[Bindable(true)]
+		[Description("Gets/sets the currently selected anchorable.")]
+		[Category("Anchorable")]
 		public LayoutAnchorableItem SelectedAnchorable
 		{
 			get => (LayoutAnchorableItem)GetValue(SelectedAnchorableProperty);
@@ -180,7 +214,10 @@ namespace AvalonDock.Controls
 		/// <summary>Handles changes to the <see cref="SelectedAnchorable"/> property.</summary>
 		private static void OnSelectedAnchorableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((NavigatorWindow)d).OnSelectedAnchorableChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="SelectedAnchorable"/> property.</summary>
+		/// <summary>
+		/// Raises the selected anchorable changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnSelectedAnchorableChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (!_internalSetSelectedAnchorable && SelectedAnchorable != null && SelectedAnchorable.ActivateCommand.CanExecute(null))
@@ -190,13 +227,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion SelectedAnchorable
-
-		#endregion Properties
-
-		#region Overrides
-
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		public override void OnApplyTemplate()
 		{
 			base.OnApplyTemplate();
@@ -239,6 +270,7 @@ namespace AvalonDock.Controls
 							}
 						}
 					}
+
 					break;
 			}
 		}
@@ -317,6 +349,7 @@ namespace AvalonDock.Controls
 							InternalSetSelectedDocument(document);
 						}
 					}
+
 					e.Handled = true;
 					break;
 				case Key.Up:
@@ -328,6 +361,7 @@ namespace AvalonDock.Controls
 					e.Handled = true;
 					break;
 			}
+
 			if (!e.Handled)
 			{
 				base.OnKeyDown(e);
@@ -350,12 +384,14 @@ namespace AvalonDock.Controls
 							SelectPreviousDocument();
 						}
 					}
+
 					// There is no SelectedDocument, select the first one.
 					else if (Documents.Length > 0)
 					{
 						InternalSetSelectedDocument(Documents[0]);
 					}
 				}
+
 				// Selecting LayoutAnchorables
 				else
 				{
@@ -371,6 +407,7 @@ namespace AvalonDock.Controls
 							SelectPreviousAnchorable();
 						}
 					}
+
 					// There is no SelectedAnchorable, select the first one.
 					else
 					{
@@ -384,7 +421,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnKeyUp(KeyEventArgs e)
 		{
 			if (!(e.Key == Key.Tab || e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down))
@@ -392,29 +429,26 @@ namespace AvalonDock.Controls
 				CloseAndActiveSelected();
 				e.Handled = true;
 			}
+
 			base.OnKeyUp(e);
 		}
 
-		#endregion Overrides
-
-		#region Internal Methods
-
 		/// <summary>
-		/// Provides a secure method for setting the Anchorables property.
-		/// This dependency property indicates the list of anchorables.
+		/// Sets the anchorables.
 		/// </summary>
-		/// <param name="value">The new value for the property.</param>
+		/// <param name="value">The value.</param>
 		protected void SetAnchorables(IEnumerable<LayoutAnchorableItem> value) => SetValue(AnchorablesPropertyKey, value);
 
 		/// <summary>
-		/// Provides a secure method for setting the Documents property.
-		/// This dependency property indicates the list of documents.
+		/// Sets the documents.
 		/// </summary>
-		/// <param name="value">The new value for the property.</param>
+		/// <param name="value">The value.</param>
 		protected void SetDocuments(LayoutDocumentItem[] value) => SetValue(DocumentsPropertyKey, value);
 
-		/// <summary>Is Invoked when AvalonDock's WPF Theme changes via the <see cref="DockingManager.OnThemeChanged()"/> method.</summary>
-		/// <param name="oldTheme"></param>
+		/// <summary>
+		/// Updates the theme resources.
+		/// </summary>
+		/// <param name="oldTheme">The old theme.</param>
 		internal void UpdateThemeResources(Theme oldTheme = null)
 		{
 			if (oldTheme != null) // Remove the old theme if present
@@ -442,9 +476,14 @@ namespace AvalonDock.Controls
 				Resources.MergedDictionaries.Add(currentThemeResourceDictionary);
 			}
 			else
+			{
 				Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = _manager.Theme.GetResourceUri() });
+			}
 		}
 
+		/// <summary>
+		/// Select next document.
+		/// </summary>
 		internal void SelectNextDocument()
 		{
 			if (SelectedDocument == null) return;
@@ -454,6 +493,9 @@ namespace AvalonDock.Controls
 			InternalSetSelectedDocument(Documents[docIndex]);
 		}
 
+		/// <summary>
+		/// Select next anchorable.
+		/// </summary>
 		internal void SelectNextAnchorable()
 		{
 			if (SelectedAnchorable == null) return;
@@ -464,6 +506,9 @@ namespace AvalonDock.Controls
 			InternalSetSelectedAnchorable(anchorablesArray[anchorableIndex]);
 		}
 
+		/// <summary>
+		/// Select previous document.
+		/// </summary>
 		internal void SelectPreviousDocument()
 		{
 			if (SelectedDocument == null) return;
@@ -473,6 +518,9 @@ namespace AvalonDock.Controls
 			InternalSetSelectedDocument(Documents[docIndex]);
 		}
 
+		/// <summary>
+		/// Select previous anchorable.
+		/// </summary>
 		internal void SelectPreviousAnchorable()
 		{
 			if (SelectedAnchorable == null) return;
@@ -482,10 +530,6 @@ namespace AvalonDock.Controls
 			if (anchorableIndex < 0) anchorableIndex = anchorablesArray.Length - 1;
 			InternalSetSelectedAnchorable(anchorablesArray[anchorableIndex]);
 		}
-
-		#endregion Internal Methods
-
-		#region Private Methods
 
 		private void InternalSetSelectedAnchorable(LayoutAnchorableItem anchorableToSelect)
 		{
@@ -520,6 +564,7 @@ namespace AvalonDock.Controls
 			{
 				FocusSelectedItem(_anchorableListBox);
 			}
+
 			WindowStartupLocation = WindowStartupLocation.CenterOwner;
 		}
 
@@ -551,7 +596,5 @@ namespace AvalonDock.Controls
 				}
 			}
 		}
-
-		#endregion Private Methods
 	}
 }

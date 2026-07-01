@@ -1,14 +1,5 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-/**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+﻿/**************************************************************************\
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 using System.Diagnostics.CodeAnalysis;
@@ -17,11 +8,24 @@ using System.Windows.Media;
 
 namespace Standard
 {
+	/// <summary>
+	/// Provides helper members for dpi Helper.
+	/// </summary>
 	internal static class DpiHelper
 	{
+		/// <summary>
+		/// The transform To Device field.
+		/// </summary>
 		private static Matrix _transformToDevice;
+
+		/// <summary>
+		/// The transform To Dip field.
+		/// </summary>
 		private static Matrix _transformToDip;
 
+		/// <summary>
+		/// Initializes static members of the <see cref="DpiHelper"/> class.
+		/// </summary>
 		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
 		static DpiHelper()
 		{
@@ -39,19 +43,24 @@ namespace Standard
 		}
 
 		/// <summary>
-		/// Convert a point in device independent pixels (1/96") to a point in the system coordinates.
+		/// Executes the logical Pixels To Device operation.
 		/// </summary>
-		/// <param name="logicalPoint">A point in the logical coordinate system.</param>
-		/// <returns>Returns the parameter converted to the system's coordinates.</returns>
+		/// <param name="logicalPoint">The logical Point.</param>
+		/// <returns>The result of the operation.</returns>
 		public static Point LogicalPixelsToDevice(Point logicalPoint) => _transformToDevice.Transform(logicalPoint);
 
 		/// <summary>
-		/// Convert a point in system coordinates to a point in device independent pixels (1/96").
+		/// Executes the device Pixels To Logical operation.
 		/// </summary>
-		/// <param name="logicalPoint">A point in the physical coordinate system.</param>
-		/// <returns>Returns the parameter converted to the device independent coordinate system.</returns>
+		/// <param name="devicePoint">The device Point.</param>
+		/// <returns>The result of the operation.</returns>
 		public static Point DevicePixelsToLogical(Point devicePoint) => _transformToDip.Transform(devicePoint);
 
+		/// <summary>
+		/// Executes the logical Rect To Device operation.
+		/// </summary>
+		/// <param name="logicalRectangle">The logical Rectangle.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static Rect LogicalRectToDevice(Rect logicalRectangle)
 		{
@@ -60,6 +69,11 @@ namespace Standard
 			return new Rect(topLeft, bottomRight);
 		}
 
+		/// <summary>
+		/// Executes the device Rect To Logical operation.
+		/// </summary>
+		/// <param name="deviceRectangle">The device Rectangle.</param>
+		/// <returns>The result of the operation.</returns>
 		public static Rect DeviceRectToLogical(Rect deviceRectangle)
 		{
 			var topLeft = DevicePixelsToLogical(new Point(deviceRectangle.Left, deviceRectangle.Top));
@@ -67,6 +81,11 @@ namespace Standard
 			return new Rect(topLeft, bottomRight);
 		}
 
+		/// <summary>
+		/// Executes the logical Size To Device operation.
+		/// </summary>
+		/// <param name="logicalSize">The logical Size.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static Size LogicalSizeToDevice(Size logicalSize)
 		{
@@ -74,6 +93,11 @@ namespace Standard
 			return new Size { Width = pt.X, Height = pt.Y };
 		}
 
+		/// <summary>
+		/// Executes the device Size To Logical operation.
+		/// </summary>
+		/// <param name="deviceSize">The device Size.</param>
+		/// <returns>The result of the operation.</returns>
 		public static Size DeviceSizeToLogical(Size deviceSize)
 		{
 			var pt = DevicePixelsToLogical(new Point(deviceSize.Width, deviceSize.Height));

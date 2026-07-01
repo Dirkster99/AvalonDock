@@ -1,13 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,25 +6,17 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
-	/// <inheritdoc cref="Grid"/>
-	/// <inheritdoc cref="ILayoutControl"/>
-	/// <inheritdoc cref="IAdjustableSizeLayout"/>
 	/// <summary>
-	/// The abstract LayoutGridControl<T> class (and its inheriting classes) are used to layout non-floating
-	/// windows and documents in AvalonDock. This contains a definition of size proportion per item and
-	/// includes user interactions with Grid Splitter elements to resize UI items in an interactive way.
+	/// Represents the layout grid control.
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <seealso cref="Grid"/>
-	/// <seealso cref="ILayoutControl"/>
-	/// <seealso cref="IAdjustableSizeLayout"/>
-	public abstract class LayoutGridControl<T> : Grid, ILayoutControl, IAdjustableSizeLayout where T : class, ILayoutPanelElement
+	/// <typeparam name="T">The type of t.</typeparam>
+	public abstract class LayoutGridControl<T> : Grid, ILayoutControl, IAdjustableSizeLayout
+		where T : class, ILayoutPanelElement
 	{
-		#region fields
-
 		private readonly LayoutPositionableGroup<T> _model;
 		private readonly Orientation _orientation;
 		private bool _initialized;
@@ -44,15 +26,11 @@ namespace AvalonDock.Controls
 		private Window _resizerWindowHost = null;
 		private Vector _initialStartPoint;
 
-		#endregion fields
-
-		#region Constructors
-
 		/// <summary>
-		/// Class constructor
+		/// Initializes a new instance of the <see cref="LayoutGridControl{T}"/> class.
 		/// </summary>
-		/// <param name="model"></param>
-		/// <param name="orientation"></param>
+		/// <param name="model">The layout model.</param>
+		/// <param name="orientation">The orientation.</param>
 		internal LayoutGridControl(LayoutPositionableGroup<T> model, Orientation orientation)
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));
@@ -61,19 +39,17 @@ namespace AvalonDock.Controls
 			Unloaded += OnUnloaded;
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
+		/// <summary>
+		/// Gets the model.
+		/// </summary>
 		public ILayoutElement Model => _model;
 
+		/// <summary>
+		/// Gets the orientation.
+		/// </summary>
 		public Orientation Orientation => (_model as ILayoutOrientableGroup).Orientation;
 
 		private bool AsyncRefreshCalled => _asyncRefreshCalled != null;
-
-		#endregion Properties
-
-		#region Overrides
 
 		/// <inheritdoc/>
 		protected override void OnInitialized(EventArgs e)
@@ -84,7 +60,8 @@ namespace AvalonDock.Controls
 				if (args.Change != ChildrenTreeChange.DirectChildrenChanged) return;
 				if (_asyncRefreshCalled.HasValue && _asyncRefreshCalled.Value == args.Change) return;
 				_asyncRefreshCalled = args.Change;
-				Dispatcher.BeginInvoke(new Action(() =>
+				Dispatcher.BeginInvoke(
+					new Action(() =>
 				{
 					_asyncRefreshCalled = null;
 					UpdateChildren();
@@ -93,21 +70,19 @@ namespace AvalonDock.Controls
 			this.SizeChanged += OnSizeChanged;
 		}
 
-		#endregion Overrides
-
-		#region Internal Methods
-
+		/// <summary>
+		/// Fix children dock lengths.
+		/// </summary>
 		protected void FixChildrenDockLengths()
 		{
 			using (_fixingChildrenDockLengths.Enter())
 				OnFixChildrenDockLengths();
 		}
 
+		/// <summary>
+		/// Raises the fix children dock lengths event.
+		/// </summary>
 		protected abstract void OnFixChildrenDockLengths();
-
-		#endregion Internal Methods
-
-		#region Private Methods
 
 		private void OnSizeChanged(object sender, SizeChangedEventArgs e)
 		{
@@ -119,14 +94,15 @@ namespace AvalonDock.Controls
 				_initialized = true;
 				UpdateChildren();
 			}
+
 			AdjustFixedChildrenPanelSizes();
 		}
 
 		/// <summary>
-		/// Method executes when the element is removed from within an element tree of loaded elements.
+		/// Handles the unloaded event.
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
+		/// <param name="sender">The event sender.</param>
+		/// <param name="e">The event arguments.</param>
 		private void OnUnloaded(object sender, RoutedEventArgs e)
 		{
 			// In order to prevent resource leaks, unsubscribe from SizeChanged events.
@@ -152,6 +128,7 @@ namespace AvalonDock.Controls
 				else
 					Children.Add(manager.CreateUIElementForModel(child));
 			}
+
 			CreateSplitters();
 			UpdateRowColDefinitions();
 			AttachNewSplitters();
@@ -190,7 +167,9 @@ namespace AvalonDock.Controls
 				RowDefinitions[indexOfChild].Height = changedElement.DockHeight;
 			}
 			else if (e.PropertyName == nameof(ILayoutPositionableElement.IsVisible))
+			{
 				UpdateRowColDefinitions();
+			}
 		}
 
 		private void UpdateRowColDefinitions()
@@ -199,10 +178,7 @@ namespace AvalonDock.Controls
 			var manager = root?.Manager;
 			if (manager == null) return;
 			FixChildrenDockLengths();
-			//Debug.Assert(InternalChildren.Count == _model.ChildrenCount + (_model.ChildrenCount - 1));
-
-			#region Setup GridRows/Cols
-
+			// Debug.Assert(InternalChildren.Count == _model.ChildrenCount + (_model.ChildrenCount - 1));
 			RowDefinitions.Clear();
 			ColumnDefinitions.Clear();
 			if (Orientation == Orientation.Horizontal)
@@ -220,7 +196,7 @@ namespace AvalonDock.Controls
 					});
 					Grid.SetColumn(InternalChildren[iChild], iColumn);
 
-					//append column for splitter
+					// append column for splitter
 					if (iChild >= InternalChildren.Count - 1) continue;
 					iChild++;
 					iColumn++;
@@ -241,7 +217,7 @@ namespace AvalonDock.Controls
 					Grid.SetColumn(InternalChildren[iChild], iColumn);
 				}
 			}
-			else //if (_model.Orientation == Orientation.Vertical)
+			else // if (_model.Orientation == Orientation.Vertical)
 			{
 				var iRow = 0;
 				var iChild = 0;
@@ -256,10 +232,10 @@ namespace AvalonDock.Controls
 					});
 					Grid.SetRow(InternalChildren[iChild], iRow);
 
-					//if (RowDefinitions.Last().Height.Value == 0.0)
+					// if (RowDefinitions.Last().Height.Value == 0.0)
 					//    System.Diagnostics.Debugger.Break();
 
-					//append row for splitter (if necessary)
+					// append row for splitter (if necessary)
 					if (iChild >= InternalChildren.Count - 1) continue;
 					iChild++;
 					iRow++;
@@ -277,13 +253,11 @@ namespace AvalonDock.Controls
 					{
 						Height = childModel.IsVisible && nextChildModelVisibleExist ? new GridLength(manager.GridSplitterHeight) : new GridLength(0.0, GridUnitType.Pixel)
 					});
-					//if (RowDefinitions.Last().Height.Value == 0.0)
+					// if (RowDefinitions.Last().Height.Value == 0.0)
 					//    System.Diagnostics.Debugger.Break();
 					Grid.SetRow(InternalChildren[iChild], iRow);
 				}
 			}
-
-			#endregion Setup GridRows/Cols
 		}
 
 		/// <summary>Apply Horizontal/Vertical cursor style
@@ -304,7 +278,6 @@ namespace AvalonDock.Controls
 					splitter.Cursor = Cursors.SizeNS;
 					splitter.Style = _model.Root?.Manager?.GridSplitterHorizontalStyle;
 				}
-
 
 				Children.Insert(iChild, splitter);
 				// TODO: MK Is this a bug????
@@ -373,19 +346,23 @@ namespace AvalonDock.Controls
 			if (Orientation == System.Windows.Controls.Orientation.Horizontal)
 			{
 				if (prevChildModel.DockWidth.IsStar)
+				{
 					prevChildModel.DockWidth = new GridLength(prevChildModel.DockWidth.Value * (prevChildActualSize.Width + delta) / prevChildActualSize.Width, GridUnitType.Star);
+				}
 				else
 				{
-					var width = (prevChildModel.DockWidth.IsAuto) ? prevChildActualSize.Width : prevChildModel.DockWidth.Value;
+					var width = prevChildModel.DockWidth.IsAuto ? prevChildActualSize.Width : prevChildModel.DockWidth.Value;
 					var resizedWidth = width + delta;
 					prevChildModel.DockWidth = new GridLength(double.IsNaN(resizedWidth) ? width : resizedWidth, GridUnitType.Pixel);
 				}
 
 				if (nextChildModel.DockWidth.IsStar)
+				{
 					nextChildModel.DockWidth = new GridLength(nextChildModel.DockWidth.Value * (nextChildActualSize.Width - delta) / nextChildActualSize.Width, GridUnitType.Star);
+				}
 				else
 				{
-					var width = (nextChildModel.DockWidth.IsAuto) ? nextChildActualSize.Width : nextChildModel.DockWidth.Value;
+					var width = nextChildModel.DockWidth.IsAuto ? nextChildActualSize.Width : nextChildModel.DockWidth.Value;
 					var resizedWidth = width - delta;
 					nextChildModel.DockWidth = new GridLength(double.IsNaN(resizedWidth) ? width : resizedWidth, GridUnitType.Pixel);
 				}
@@ -393,19 +370,23 @@ namespace AvalonDock.Controls
 			else
 			{
 				if (prevChildModel.DockHeight.IsStar)
+				{
 					prevChildModel.DockHeight = new GridLength(prevChildModel.DockHeight.Value * (prevChildActualSize.Height + delta) / prevChildActualSize.Height, GridUnitType.Star);
+				}
 				else
 				{
-					var height = (prevChildModel.DockHeight.IsAuto) ? prevChildActualSize.Height : prevChildModel.DockHeight.Value;
+					var height = prevChildModel.DockHeight.IsAuto ? prevChildActualSize.Height : prevChildModel.DockHeight.Value;
 					var resizedHeight = height + delta;
 					prevChildModel.DockHeight = new GridLength(double.IsNaN(resizedHeight) ? height : resizedHeight, GridUnitType.Pixel);
 				}
 
 				if (nextChildModel.DockHeight.IsStar)
+				{
 					nextChildModel.DockHeight = new GridLength(nextChildModel.DockHeight.Value * (nextChildActualSize.Height - delta) / nextChildActualSize.Height, GridUnitType.Star);
+				}
 				else
 				{
-					var height = (nextChildModel.DockHeight.IsAuto) ? nextChildActualSize.Height : nextChildModel.DockHeight.Value;
+					var height = nextChildModel.DockHeight.IsAuto ? nextChildActualSize.Height : nextChildModel.DockHeight.Value;
 					var resizedHeight = height - delta;
 					nextChildModel.DockHeight = new GridLength(double.IsNaN(resizedHeight) ? height : resizedHeight, GridUnitType.Pixel);
 				}
@@ -414,6 +395,10 @@ namespace AvalonDock.Controls
 			HideResizerOverlayWindow();
 		}
 
+		/// <summary>
+		/// Adjust fixed children panel sizes.
+		/// </summary>
+		/// <param name="parentSize">The parent size.</param>
 		public virtual void AdjustFixedChildrenPanelSizes(Size? parentSize = null)
 		{
 			var visibleChildren = GetVisibleChildren();
@@ -471,9 +456,13 @@ namespace AvalonDock.Controls
 				foreach (var fixedChild in fixedPanels)
 				{
 					if (minimumSize.Height >= availableSize.Height)
+					{
 						fixedChild.ResizableAbsoluteDockHeight = fixedChild.CalculatedDockMinHeight();
+					}
 					else if (preferredMinimumSize.Height <= availableSize.Height)
+					{
 						fixedChild.ResizableAbsoluteDockHeight = fixedChild.FixedDockHeight;
+					}
 					else if (relativePanels.All(child => Math.Abs(child.ActualHeight - child.CalculatedDockMinHeight()) <= 1))
 					{
 						double panelFraction;
@@ -506,9 +495,13 @@ namespace AvalonDock.Controls
 				foreach (var fixedChild in fixedPanels)
 				{
 					if (minimumSize.Width >= availableSize.Width)
+					{
 						fixedChild.ResizableAbsoluteDockWidth = fixedChild.CalculatedDockMinWidth();
+					}
 					else if (preferredMinimumSize.Width <= availableSize.Width)
+					{
 						fixedChild.ResizableAbsoluteDockWidth = fixedChild.FixedDockWidth;
+					}
 					else
 					{
 						double panelFraction;
@@ -545,6 +538,7 @@ namespace AvalonDock.Controls
 				if (InternalChildren[i] is LayoutGridResizerControl) continue;
 				if (IsChildVisible(i)) return InternalChildren[i] as FrameworkElement;
 			}
+
 			return null;
 		}
 
@@ -556,6 +550,7 @@ namespace AvalonDock.Controls
 				if (IsChildVisible(i) && InternalChildren[i] is FrameworkElement)
 					visibleChildren.Add(InternalChildren[i] as FrameworkElement);
 			}
+
 			return visibleChildren;
 		}
 
@@ -567,7 +562,9 @@ namespace AvalonDock.Controls
 					return ColumnDefinitions[index].Width.IsStar || ColumnDefinitions[index].Width.Value > 0;
 			}
 			else if (index < RowDefinitions.Count)
+			{
 				return RowDefinitions[index].Height.IsStar || RowDefinitions[index].Height.Value > 0;
+			}
 
 			return false;
 		}
@@ -649,7 +646,5 @@ namespace AvalonDock.Controls
 			_resizerWindowHost.Close();
 			_resizerWindowHost = null;
 		}
-
-		#endregion Private Methods
 	}
 }

@@ -1,30 +1,19 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using AvalonDock.Layout;
-using AvalonDock.Themes;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
+using AvalonDock.Layout;
+using AvalonDock.Themes;
 
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements <see cref="IOverlayWindow"/> and is used to visualize floating
-	/// docking target buttons in several areas of AvalonDock.
+	/// Represents the overlay Window.
 	/// </summary>
 	public class OverlayWindow : Window, IOverlayWindow
 	{
-		#region fields
 		private ResourceDictionary currentThemeResourceDictionary; // = null
 
 		private Canvas _mainCanvasPanel;
@@ -33,16 +22,10 @@ namespace AvalonDock.Controls
 		private Grid _gridDocumentPaneDropTargets;      // Showing and activating 5 inner drop target buttons over document pane
 		private Grid _gridDocumentPaneFullDropTargets;  // Showing and activating 9 inner drop target buttons over document pane
 
-		#region DockingManagerDropTargets
-
 		private FrameworkElement _dockingManagerDropTargetBottom; // 4 outer drop taget buttons over DockingManager
 		private FrameworkElement _dockingManagerDropTargetTop;
 		private FrameworkElement _dockingManagerDropTargetLeft;
 		private FrameworkElement _dockingManagerDropTargetRight;
-
-		#endregion DockingManagerDropTargets
-
-		#region AnchorablePaneDropTargets
 
 		private FrameworkElement _anchorablePaneDropTargetBottom; // 5 inner drop target buttons over layout anchorable pane
 		private FrameworkElement _anchorablePaneDropTargetTop;
@@ -50,19 +33,11 @@ namespace AvalonDock.Controls
 		private FrameworkElement _anchorablePaneDropTargetRight;
 		private FrameworkElement _anchorablePaneDropTargetInto;
 
-		#endregion AnchorablePaneDropTargets
-
-		#region DocumentPaneDropTargets
-
 		private FrameworkElement _documentPaneDropTargetBottom;   // 5 inner drop target buttons over document pane
 		private FrameworkElement _documentPaneDropTargetTop;
 		private FrameworkElement _documentPaneDropTargetLeft;
 		private FrameworkElement _documentPaneDropTargetRight;
 		private FrameworkElement _documentPaneDropTargetInto;
-
-		#endregion DocumentPaneDropTargets
-
-		#region DocumentPaneFullDropTargets
 
 		private FrameworkElement _documentPaneDropTargetBottomAsAnchorablePane; // 9 inner drop target buttons over document pane
 		private FrameworkElement _documentPaneDropTargetTopAsAnchorablePane;
@@ -75,17 +50,14 @@ namespace AvalonDock.Controls
 		private FrameworkElement _documentPaneFullDropTargetRight;
 		private FrameworkElement _documentPaneFullDropTargetInto;
 
-		#endregion DocumentPaneFullDropTargets
-
 		private Path _previewBox;
 		private readonly IOverlayWindowHost _host;
 		private LayoutFloatingWindowControl _floatingWindow = null;
 		private readonly List<IDropArea> _visibleAreas = new List<IDropArea>();
 
-		#endregion fields
-
-		#region Constructors
-
+		/// <summary>
+		/// Initializes static members of the <see cref="OverlayWindow"/> class.
+		/// </summary>
 		static OverlayWindow()
 		{
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(OverlayWindow), new FrameworkPropertyMetadata(typeof(OverlayWindow)));
@@ -97,24 +69,25 @@ namespace AvalonDock.Controls
 			OverlayWindow.VisibilityProperty.OverrideMetadata(typeof(OverlayWindow), new FrameworkPropertyMetadata(Visibility.Hidden));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="OverlayWindow"/> class.
+		/// </summary>
+		/// <param name="host">The host.</param>
 		internal OverlayWindow(IOverlayWindowHost host)
 		{
 			_host = host;
 			UpdateThemeResources();
 		}
 
-		#endregion Constructors
-
-		#region Properties.
-
-		/// <summary>Gets whether the window is hosted in a floating window.</summary>
-		[Bindable(false), Description("Gets whether the window is hosted in a floating window."), Category("FloatingWindow")]
+		/// <summary>
+		/// Gets a value indicating whether is Hosted In Floating Window.
+		/// </summary>
+		[Bindable(false)]
+		[Description("Gets whether the window is hosted in a floating window.")]
+		[Category("FloatingWindow")]
 		public bool IsHostedInFloatingWindow => _host is LayoutDocumentFloatingWindowControl || _host is LayoutAnchorableFloatingWindowControl;
 
-		#endregion Properties.
-
-		#region Overrides
-
+		/// <inheritdoc/>
 		public override void OnApplyTemplate()
 		{
 			base.OnApplyTemplate();
@@ -162,16 +135,16 @@ namespace AvalonDock.Controls
 			_previewBox = GetTemplateChild("PART_PreviewBox") as Path;
 		}
 
+		/// <inheritdoc/>
 		protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
 		{
 			base.OnClosing(e);
 		}
 
-		#endregion Overrides
-
-		#region Internal Methods
-		/// <summary>Is Invoked when AvalonDock's WPF Theme changes via the <see cref="DockingManager.OnThemeChanged()"/> method.</summary>
-		/// <param name="oldTheme"></param>
+		/// <summary>
+		/// Executes the update Theme Resources operation.
+		/// </summary>
+		/// <param name="oldTheme">The old Theme.</param>
 		internal void UpdateThemeResources(Theme oldTheme = null)
 		{
 			if (oldTheme != null) // Remove the old theme if present
@@ -189,8 +162,10 @@ namespace AvalonDock.Controls
 					var resourceDictionaryToRemove =
 						Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
 					if (resourceDictionaryToRemove != null)
+					{
 						Resources.MergedDictionaries.Remove(
 							resourceDictionaryToRemove);
+					}
 				}
 			}
 
@@ -208,30 +183,28 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <summary>
+		/// Executes the enable Drop Targets operation.
+		/// </summary>
 		internal void EnableDropTargets()
 		{
 			if (_mainCanvasPanel != null)
 				_mainCanvasPanel.Visibility = System.Windows.Visibility.Visible;
 		}
 
+		/// <summary>
+		/// Executes the hide Drop Targets operation.
+		/// </summary>
 		internal void HideDropTargets()
 		{
 			if (_mainCanvasPanel != null)
 				_mainCanvasPanel.Visibility = System.Windows.Visibility.Hidden;
 		}
 
-		#endregion Internal Methods
-
-		#region Private Methods
-
 		/// <summary>
-		/// This method controls the DropTargetInto button of the overlay window.
-		/// It checks that only 1 of the defined ContentLayouts can be present on the LayoutDocumentPane or LayoutAnchorablePane.
-		/// The combination between the ContentLayout Title and the ContentId is the search key, and has to be unique.
-		/// If a floating window is dropped on a LayoutDocumentPane or LayoutAnchorablePane, it checks if one of the containing LayoutContents
-		/// is already present on the LayoutDocumentPane or LayoutAnchorablePane. If so, then it will disable the DropTargetInto button.
+		/// Sets the set Drop Target Into Visibility.
 		/// </summary>
-		/// <param name="positionableElement">The given LayoutDocumentPane or LayoutAnchorablePane</param>
+		/// <param name="positionableElement">The positionable Element.</param>
 		private void SetDropTargetIntoVisibility(ILayoutPositionableElement positionableElement)
 		{
 			if (positionableElement is LayoutAnchorablePane)
@@ -272,15 +245,16 @@ namespace AvalonDock.Controls
 				{
 					_documentPaneDropTargetInto.Visibility = Visibility.Hidden;
 				}
+
 				break;
 			}
 		}
 
 		/// <summary>
-		/// Find any LayoutDocument or LayoutAnchorable from a given source (e.g. LayoutDocumentPane, LayoutAnchorableFloatingWindow, etc.)
+		/// Gets the get All Layout Contents.
 		/// </summary>
-		/// <param name="source">The given source to search in</param>
-		/// <returns>A list of all LayoutContent's</returns>
+		/// <param name="source">The source.</param>
+		/// <returns>The requested value.</returns>
 		private List<LayoutContent> GetAllLayoutContents(object source)
 		{
 			var result = new List<LayoutContent>();
@@ -346,11 +320,7 @@ namespace AvalonDock.Controls
 			return result;
 		}
 
-		#endregion Private Methods
-
-		#region IOverlayWindow
-
-		/// <inheritdoc cref="IOverlayWindow"/>
+		/// <inheritdoc/>
 		IEnumerable<IDropTarget> IOverlayWindow.GetTargets()
 		{
 			foreach (var visibleArea in _visibleAreas)
@@ -366,6 +336,7 @@ namespace AvalonDock.Controls
 							yield return new DockingManagerDropTarget(dropAreaDockingManager.AreaElement, _dockingManagerDropTargetBottom.GetScreenArea(), DropTargetType.DockingManagerDockBottom);
 							yield return new DockingManagerDropTarget(dropAreaDockingManager.AreaElement, _dockingManagerDropTargetRight.GetScreenArea(), DropTargetType.DockingManagerDockRight);
 						}
+
 						break;
 
 					case DropAreaType.AnchorablePane:
@@ -402,6 +373,7 @@ namespace AvalonDock.Controls
 							if (dropAreaTitle != null)
 								yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, dropAreaTitle.GetScreenArea(), DropTargetType.AnchorablePaneDockInside);
 						}
+
 						break;
 
 					case DropAreaType.DocumentPane:
@@ -488,6 +460,7 @@ namespace AvalonDock.Controls
 								}
 							}
 						}
+
 						break;
 
 					case DropAreaType.DocumentPaneGroup:
@@ -497,20 +470,22 @@ namespace AvalonDock.Controls
 							if (_documentPaneDropTargetInto.IsVisible)
 								yield return new DocumentPaneGroupDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetInto.GetScreenArea(), DropTargetType.DocumentPaneGroupDockInside);
 						}
+
 						break;
 				}
 			}
+
 			yield break;
 		}
 
-		/// <inheritdoc cref="IOverlayWindow"/>
+		/// <inheritdoc/>
 		void IOverlayWindow.DragEnter(LayoutFloatingWindowControl floatingWindow)
 		{
 			_floatingWindow = floatingWindow;
 			EnableDropTargets();
 		}
 
-		/// <inheritdoc cref="IOverlayWindow"/>
+		/// <inheritdoc/>
 		void IOverlayWindow.DragLeave(LayoutFloatingWindowControl floatingWindow)
 		{
 			Visibility = System.Windows.Visibility.Hidden;
@@ -518,7 +493,9 @@ namespace AvalonDock.Controls
 		}
 
 		/// <inheritdoc cref="IOverlayWindow"/>
+#pragma warning disable CA1502
 		void IOverlayWindow.DragEnter(IDropArea area)
+#pragma warning restore CA1502
 		{
 			var floatingWindowManager = _floatingWindow.Model.Root.Manager;
 
@@ -534,6 +511,7 @@ namespace AvalonDock.Controls
 						_visibleAreas.Remove(area);
 						return;
 					}
+
 					areaElement = _gridDockingManagerDropTargets;
 					break;
 
@@ -547,6 +525,7 @@ namespace AvalonDock.Controls
 						_visibleAreas.Remove(area);
 						return;
 					}
+
 					SetDropTargetIntoVisibility(layoutAnchorablePane);
 					break;
 
@@ -561,11 +540,13 @@ namespace AvalonDock.Controls
 							_visibleAreas.Remove(area);
 							return;
 						}
+
 						_documentPaneDropTargetLeft.Visibility = Visibility.Hidden;
 						_documentPaneDropTargetRight.Visibility = Visibility.Hidden;
 						_documentPaneDropTargetTop.Visibility = Visibility.Hidden;
 						_documentPaneDropTargetBottom.Visibility = Visibility.Hidden;
 					}
+
 					break;
 
 				case DropAreaType.DocumentPane:
@@ -728,9 +709,12 @@ namespace AvalonDock.Controls
 							}
 						}
 					}
+
 					break;
 			}
 
+			if (areaElement == null)
+				return;
 			Canvas.SetLeft(areaElement, area.DetectionRect.Left - Left);
 			Canvas.SetTop(areaElement, area.DetectionRect.Top - Top);
 			areaElement.Width = area.DetectionRect.Width;
@@ -738,7 +722,7 @@ namespace AvalonDock.Controls
 			areaElement.Visibility = System.Windows.Visibility.Visible;
 		}
 
-		/// <inheritdoc cref="IOverlayWindow"/>
+		/// <inheritdoc/>
 		void IOverlayWindow.DragLeave(IDropArea area)
 		{
 			_visibleAreas.Remove(area);
@@ -767,13 +751,14 @@ namespace AvalonDock.Controls
 						else
 							areaElement = _gridDocumentPaneDropTargets;
 					}
+
 					break;
 			}
 
 			areaElement.Visibility = System.Windows.Visibility.Hidden;
 		}
 
-		/// <inheritdoc cref="IOverlayWindow"/>
+		/// <inheritdoc/>
 		void IOverlayWindow.DragEnter(IDropTarget target)
 		{
 			var previewBoxPath = target.GetPreviewPath(this, _floatingWindow.Model as LayoutFloatingWindow);
@@ -784,18 +769,16 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <inheritdoc cref="IOverlayWindow"/>
+		/// <inheritdoc/>
 		void IOverlayWindow.DragLeave(IDropTarget target)
 		{
 			_previewBox.Visibility = System.Windows.Visibility.Hidden;
 		}
 
-		/// <inheritdoc cref="IOverlayWindow"/>
+		/// <inheritdoc/>
 		void IOverlayWindow.DragDrop(IDropTarget target)
 		{
 			target.Drop(_floatingWindow.Model as LayoutFloatingWindow);
 		}
-
-		#endregion IOverlayWindow
 	}
 }

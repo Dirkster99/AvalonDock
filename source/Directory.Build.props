@@ -1,0 +1,64 @@
+<Project>
+	<PropertyGroup>
+		<!-- Centralized Target Frameworks -->
+		<ComponentTargetFrameworks>net9.0-windows;net10.0-windows;net48</ComponentTargetFrameworks>
+		<TestTargetFrameworks>net9.0-windows;net10.0-windows;net48</TestTargetFrameworks>
+		<LangVersion>13</LangVersion>
+
+		<!-- Version Information -->
+		<VersionPrefix>5.0.0</VersionPrefix>
+		<AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+		<FileVersion>$(VersionPrefix).0</FileVersion>
+		<Company>Open Source</Company>
+		<Product>Dirkster.AvalonDock</Product>
+		<Copyright>2017-2026</Copyright>
+		<Description>This assembly implements a docking layout system for WPF.</Description>
+		<PackageProjectUrl>https://github.com/Dirkster99/AvalonDock</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/Dirkster99/AvalonDock</RepositoryUrl>
+		<Authors>https://github.com/Dirkster99/AvalonDock</Authors>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageTags>WPF avalondock docking layout MVVM</PackageTags>
+
+		<!-- Single source of truth for the license shipped in every NuGet package -->
+		<PackageLicenseSourceFile>$(MSBuildThisFileDirectory)..\LICENSE</PackageLicenseSourceFile>
+
+		<!-- Enforce zero warnings policy -->
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
+	<ItemGroup>
+		<!-- Pack the shared root LICENSE into every package without copying it per project -->
+		<None Include="$(PackageLicenseSourceFile)" Pack="true" PackagePath="" Visible="false" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers"
+			Version="10.*">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers;
+				buildtransitive
+			</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="SonarAnalyzer.CSharp" Version="10.*">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+		<AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeMetricsConfig.txt"
+			Condition="Exists('$(MSBuildThisFileDirectory)CodeMetricsConfig.txt')" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Metrics" Version="4.14.0">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+	</ItemGroup>
+	<Choose>
+		<When
+			Condition="'$(MSBuildProjectName.Contains(`Test`))' == 'false'">
+			<ItemGroup>
+				<!--        Enable to active stylecop for the whole solution-->
+				<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
+					<PrivateAssets>all</PrivateAssets>
+					<IncludeAssets>runtime; build; native; contentfiles; analyzers;
+						buildtransitive
+					</IncludeAssets>
+				</PackageReference>
+			</ItemGroup>
+		</When>
+	</Choose>
+</Project>

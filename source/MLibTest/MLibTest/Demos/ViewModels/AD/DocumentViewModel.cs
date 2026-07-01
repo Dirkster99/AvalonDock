@@ -10,7 +10,6 @@ namespace MLibTest.Demos.ViewModels.AD
 
 	internal class DocumentViewModel : PaneViewModel, IDocumentViewModel
 	{
-		#region fields
 		private static ImageSourceConverter ISC = new ImageSourceConverter();
 		private IWorkSpaceViewModel _workSpaceViewModel = null;
 
@@ -25,9 +24,7 @@ namespace MLibTest.Demos.ViewModels.AD
 		private string _initialPath;
 		private bool _isInitialized;
 		private bool _IsExistingInFileSystem;
-		#endregion fields
 
-		#region ctors
 		/// <summary>
 		/// class constructor
 		/// </summary>
@@ -70,9 +67,7 @@ namespace MLibTest.Demos.ViewModels.AD
 			//Set the icon only for open documents (just a test)
 			IconSource = ISC.ConvertFromInvariantString(@"pack://application:,,/Demos/Images/document.png") as ImageSource;
 		}
-		#endregion ctors
 
-		#region Properties
 		/// <summary>Gets the current path of the file being managed in this document viewmodel.</summary>
 		public string FilePath
 		{
@@ -182,9 +177,7 @@ namespace MLibTest.Demos.ViewModels.AD
 				return _closeCommand;
 			}
 		}
-		#endregion Properties
 
-		#region methods
 		/// <summary>
 		/// Attempts to read the contents of a text file defined via initialPath
 		/// and assigns it to text content of this viewmodel.
@@ -316,6 +309,5 @@ namespace MLibTest.Demos.ViewModels.AD
 		{
 			_workSpaceViewModel.Save(this, true);
 		}
-		#endregion methods
 	}
 }

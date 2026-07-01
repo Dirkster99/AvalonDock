@@ -1,4 +1,4 @@
-﻿namespace MLibTest.ViewModels
+namespace MLibTest.ViewModels
 {
 	using Base;
 	using Demos.ViewModels;
@@ -15,7 +15,6 @@
 	/// </summary>
 	internal class AppViewModel : Base.ViewModelBase, IDisposable
 	{
-		#region private fields
 		private bool _isInitialized = false;       // application should be initialized through one method ONLY!
 		private object _lockObject = new object(); // thread lock semaphore
 
@@ -25,9 +24,7 @@
 		private ThemeViewModel _AppTheme = null;
 		private readonly IWorkSpaceViewModel _AD_WorkSpace = null;
 		private bool _Disposed = false;
-		#endregion private fields
 
-		#region constructors
 		/// <summary>
 		/// Standard Constructor
 		/// </summary>
@@ -45,9 +42,7 @@
 			_AD_WorkSpace = new WorkSpaceViewModel();
 			_AppTheme = new ThemeViewModel();
 		}
-		#endregion constructors
 
-		#region properties
 		public AppLifeCycleViewModel AppLifeCycle
 		{
 			get
@@ -61,7 +56,6 @@
 			}
 		}
 
-		#region app theme
 		/// <summary>
 		/// Command executes when the user has selected
 		/// a different UI theme to display.
@@ -132,7 +126,6 @@
 				}
 			}
 		}
-		#endregion app theme
 
 		/// <summary>
 		/// Gets the demo viewmodel and all its properties and commands
@@ -144,10 +137,7 @@
 				return _AD_WorkSpace;
 			}
 		}
-		#endregion properties
 
-		#region methods
-		#region Get/set Session Application Data
 		internal void GetSessionData(IProfile sessionData)
 		{
 			/***
@@ -184,7 +174,6 @@
 		{
 			_AD_WorkSpace.CloseAllDocuments();
 		}
-		#endregion Get/set Session Application Data
 
 		/// <summary>
 		/// Call this method if you want to initialize a headless
@@ -267,6 +256,5 @@
 		{
 
 		}
-		#endregion methods
 	}
 }

@@ -1,4 +1,4 @@
-﻿namespace MLibTest.ViewModels.Base
+namespace MLibTest.ViewModels.Base
 {
 	using System;
 	using System.Diagnostics;
@@ -13,12 +13,9 @@
 	/// </summary>
 	internal class RelayCommand<T> : ICommand
 	{
-		#region fields
 		private readonly Action<T> mExecute = null;
 		private readonly Predicate<T> mCanExecute = null;
-		#endregion fields
 
-		#region Constructors
 		/// <summary>Class constructor.</summary>
 		/// <param name="execute"></param>
 		public RelayCommand(Action<T> execute) : this(execute, null)
@@ -34,18 +31,14 @@
 			this.mCanExecute = canExecute;
 		}
 
-		#endregion Constructors
 
-		#region events
 		/// <summary>Event handler to re-evaluate whether this command can execute or not.</summary>
 		public event EventHandler CanExecuteChanged
 		{
 			add { if (this.mCanExecute != null) CommandManager.RequerySuggested += value; }
 			remove { if (this.mCanExecute != null) CommandManager.RequerySuggested -= value; }
 		}
-		#endregion
 
-		#region methods
 		/// <summary>Determine whether this pre-requisites to execute this command are given or not.</summary>
 		/// <param name="parameter"></param>
 		/// <returns></returns>
@@ -56,7 +49,6 @@
 		/// <param name="parameter"></param>
 		public void Execute(object parameter) => this.mExecute((T)parameter);
 
-		#endregion methods
 	}
 
 	/// <summary>
@@ -66,12 +58,9 @@
 	/// </summary>
 	internal class RelayCommand : ICommand
 	{
-		#region Fields
 		private readonly Action mExecute;
 		private readonly Func<bool> mCanExecute;
-		#endregion Fields
 
-		#region Constructors
 
 		/// <summary>Creates a new command that can always execute.</summary>
 		/// <param name="execute">The execution logic.</param>
@@ -95,18 +84,14 @@
 			this.mCanExecute = canExecute;
 		}
 
-		#endregion Constructors
 
-		#region Events
 		/// <summary>Event handler to re-evaluate whether this command can execute or not.</summary>
 		public event EventHandler CanExecuteChanged
 		{
 			add { if (this.mCanExecute != null) CommandManager.RequerySuggested += value; }
 			remove { if (this.mCanExecute != null) CommandManager.RequerySuggested -= value; }
 		}
-		#endregion Events
 
-		#region Methods
 		/// <summary>
 		/// Execute the attached CanExecute method delegate (or always return <c>true</c>)
 		/// to determine whether the command managed in this object can execute or not.
@@ -120,6 +105,5 @@
 		/// <param name="parameter"></param>
 		public void Execute(object parameter) => this.mExecute();
 
-		#endregion Methods
 	}
 }

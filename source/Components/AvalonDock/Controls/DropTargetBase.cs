@@ -1,46 +1,40 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System.ComponentModel;
 using System.Windows;
 
 namespace AvalonDock.Controls
 {
-	/// <summary>Implements a base implementation for the abstract <see cref="DropTarget{T}"/> class.</summary>
+	/// <summary>
+	/// Represents the drop Target Base.
+	/// </summary>
 	internal abstract class DropTargetBase : DependencyObject
 	{
-		#region Properties
-
-		#region IsDraggingOver
-
-		/// <summary>IsDraggingOver Attached Dependency Property</summary>
+		/// <summary>
+		/// IsDraggingOver attached dependency property.
+		/// </summary>
 		public static readonly DependencyProperty IsDraggingOverProperty = DependencyProperty.RegisterAttached("IsDraggingOver", typeof(bool), typeof(DropTargetBase),
 				new FrameworkPropertyMetadata((bool)false));
 
-		/// <summary>Gets wether the user is dragging a window over the target element.</summary>
-		[Bindable(true), Description("Gets wether the user is dragging a window over the target element."), Category("Other")]
+		/// <summary>
+		/// Gets the get Is Dragging Over.
+		/// </summary>
+		/// <param name="d">The d.</param>
+		/// <returns>true if the operation succeeds; otherwise, false.</returns>
+		[Bindable(true)]
+		[Description("Gets wether the user is dragging a window over the target element.")]
+		[Category("Other")]
 		public static bool GetIsDraggingOver(DependencyObject d)
 		{
 			return (bool)d.GetValue(IsDraggingOverProperty);
 		}
 
 		/// <summary>
-		/// Sets the IsDraggingOver property.
-		/// This dependency property indicates if user is dragging away a window from the target element.
+		/// Sets the set Is Dragging Over.
 		/// </summary>
+		/// <param name="d">The d.</param>
+		/// <param name="value">The value.</param>
 		public static void SetIsDraggingOver(DependencyObject d, bool value)
 		{
 			d.SetValue(IsDraggingOverProperty, value);
 		}
-
-		#endregion IsDraggingOver
-
-		#endregion Properties
 	}
 }

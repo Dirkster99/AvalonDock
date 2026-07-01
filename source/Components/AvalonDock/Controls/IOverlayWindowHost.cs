@@ -1,12 +1,3 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System.Collections.Generic;
 using System.Windows;
 
@@ -18,17 +9,11 @@ namespace AvalonDock.Controls
 	/// </summary>
 	internal interface IOverlayWindowHost
 	{
-		#region Properties
-
 		/// <summary>
 		/// Gets the <see cref="DockingManager"/> control that should be invoked to do the actual docking
 		/// if docking into this <see cref="IOverlayWindowHost"/> should be performed.
 		/// </summary>
 		DockingManager Manager { get; }
-
-		#endregion Properties
-
-		#region Methods
 
 		/// <summary>
 		/// Determines whether the given screen coordinates are part of the <see cref="IOverlayWindowHost"/>
@@ -62,7 +47,5 @@ namespace AvalonDock.Controls
 		/// <param name="draggingWindow">The window to examine.</param>
 		/// <returns>The associated drop areas.</returns>
 		IEnumerable<IDropArea> GetDropAreas(LayoutFloatingWindowControl draggingWindow);
-
-		#endregion Methods
 	}
 }

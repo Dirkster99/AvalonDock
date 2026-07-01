@@ -18,10 +18,7 @@ namespace Settings.UserProfile
 	/// </summary>
 	public class Profile : IProfile
 	{
-		#region fields
-		#endregion fields
 
-		#region constructor
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -35,9 +32,7 @@ namespace Settings.UserProfile
 
 			LastActiveSourceFiles = new List<FileReference>();
 		}
-		#endregion constructor
 
-		#region properties
 		/// <summary>
 		/// Gets the key name of the MainWindow item in the collection.
 		/// Ths name can be used as key in the WindowPosSz property
@@ -78,9 +73,7 @@ namespace Settings.UserProfile
 		/// </summary>
 		[XmlAttribute(AttributeName = "LastActiveTargetFile")]
 		public string LastActiveTargetFile { get; set; }
-		#endregion properties
 
-		#region methods
 		/// <summary>
 		/// Checks the MainWindow for visibility when re-starting application
 		/// (with different screen configuration).
@@ -147,6 +140,5 @@ namespace Settings.UserProfile
 
 			return string.Empty;
 		}
-		#endregion methods
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -6,35 +6,26 @@ using System.Reflection;
 namespace AvalonDock.Commands
 {
 	/// <summary>
-	/// Class WeakAction.
+	/// Represents the weak Action.
 	/// </summary>
 	internal class WeakAction
 	{
-		#region Private Fields
-
-		/// <summary>
-		/// The static action
-		/// </summary>
 		private Action _staticAction;
 
-		#endregion Private Fields
-
-		#region Public Constructors
-
 		/// <summary>
-		/// Initializes a new instance of the <see cref="WeakAction" /> class.
+		/// Initializes a new instance of the <see cref="WeakAction"/> class.
 		/// </summary>
-		/// <param name="action">The action that will be associated to this instance.</param>
+		/// <param name="action">The action.</param>
 		public WeakAction(Action action)
 			: this(action?.Target, action)
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="WeakAction" /> class.
+		/// Initializes a new instance of the <see cref="WeakAction"/> class.
 		/// </summary>
-		/// <param name="target">The action's owner.</param>
-		/// <param name="action">The action that will be associated to this instance.</param>
+		/// <param name="target">The target.</param>
+		/// <param name="action">The action.</param>
 		[SuppressMessage(
 			"Microsoft.Design",
 			"CA1062:Validate arguments of public methods",
@@ -55,31 +46,22 @@ namespace AvalonDock.Commands
 
 				return;
 			}
+
 			Method = action.Method;
 			ActionReference = new WeakReference(action.Target);
 			Reference = new WeakReference(target);
 		}
 
-		#endregion Public Constructors
-
-		#region Protected Constructors
-
 		/// <summary>
-		/// Initializes an empty instance of the <see cref="WeakAction" /> class.
+		/// Initializes a new instance of the <see cref="WeakAction"/> class.
 		/// </summary>
 		protected WeakAction()
 		{
 		}
 
-		#endregion Protected Constructors
-
-		#region Public Properties
-
 		/// <summary>
-		/// Gets a value indicating whether the Action's owner is still alive, or if it was collected
-		/// by the Garbage Collector already.
+		/// Gets a value indicating whether is Alive.
 		/// </summary>
-		/// <value><c>true</c> 如果 this instance is alive; 否则, <c>false</c>.</value>
 		public virtual bool IsAlive
 		{
 			get
@@ -105,9 +87,8 @@ namespace AvalonDock.Commands
 		}
 
 		/// <summary>
-		/// Gets a value indicating whether the WeakAction is static or not.
+		/// Gets a value indicating whether is Static.
 		/// </summary>
-		/// <value><c>true</c> 如果 this instance is static; 否则, <c>false</c>.</value>
 		public bool IsStatic
 		{
 			get
@@ -122,9 +103,8 @@ namespace AvalonDock.Commands
 		}
 
 		/// <summary>
-		/// Gets the name of the method that this WeakAction represents.
+		/// Gets the method Name.
 		/// </summary>
-		/// <value>The name of the method.</value>
 		public virtual string MethodName
 		{
 			get
@@ -133,15 +113,14 @@ namespace AvalonDock.Commands
 				{
 					return _staticAction.Method.Name;
 				}
+
 				return Method.Name;
 			}
 		}
 
 		/// <summary>
-		/// Gets the Action's owner. This object is stored as a
-		/// <see cref="WeakReference" />.
+		/// Gets the target.
 		/// </summary>
-		/// <value>The target.</value>
 		public object Target
 		{
 			get
@@ -155,17 +134,9 @@ namespace AvalonDock.Commands
 			}
 		}
 
-		#endregion Public Properties
-
-		#region Protected Properties
-
 		/// <summary>
-		/// Gets or sets a WeakReference to this WeakAction's action's target.
-		/// This is not necessarily the same as
-		/// <see cref="Reference" />, for example if the
-		/// method is anonymous.
+		/// Gets or sets the action Reference.
 		/// </summary>
-		/// <value>The action reference.</value>
 		protected WeakReference ActionReference
 		{
 			get;
@@ -173,9 +144,8 @@ namespace AvalonDock.Commands
 		}
 
 		/// <summary>
-		/// The target of the weak reference.
+		/// Gets the action Target.
 		/// </summary>
-		/// <value>The action target.</value>
 		protected object ActionTarget
 		{
 			get
@@ -190,10 +160,8 @@ namespace AvalonDock.Commands
 		}
 
 		/// <summary>
-		/// Gets or sets the <see cref="MethodInfo" /> corresponding to this WeakAction's
-		/// method passed in the constructor.
+		/// Gets or sets the method.
 		/// </summary>
-		/// <value>The method.</value>
 		protected MethodInfo Method
 		{
 			get;
@@ -201,26 +169,18 @@ namespace AvalonDock.Commands
 		}
 
 		/// <summary>
-		/// Gets or sets a WeakReference to the target passed when constructing
-		/// the WeakAction. This is not necessarily the same as
-		/// <see cref="ActionReference" />, for example if the
-		/// method is anonymous.
+		/// Gets or sets the reference.
 		/// </summary>
-		/// <value>The reference.</value>
 		protected WeakReference Reference
 		{
 			get;
 			set;
 		}
 
-		#endregion Protected Properties
-
-		#region Public Methods
-
 		/// <summary>
-		/// Executes the action. This only happens if the action's owner
-		/// is still alive.
+		/// Executes the execute operation.
 		/// </summary>
+		/// <param name="param">The param.</param>
 		public void Execute(object param = null)
 		{
 			if (_staticAction != null)
@@ -249,7 +209,10 @@ namespace AvalonDock.Commands
 							Method.Invoke(actionTarget, null);
 						}
 					}
-					catch { }
+					catch
+					{
+					}
+
 					// ReSharper disable RedundantJumpStatement
 					return;
 					// ReSharper restore RedundantJumpStatement
@@ -265,7 +228,7 @@ namespace AvalonDock.Commands
 		}
 
 		/// <summary>
-		/// Sets the reference that this instance stores to null.
+		/// Executes the mark For Deletion operation.
 		/// </summary>
 		public void MarkForDeletion()
 		{
@@ -278,7 +241,5 @@ namespace AvalonDock.Commands
             _action = null;
 #endif
 		}
-
-		#endregion Public Methods
 	}
 }

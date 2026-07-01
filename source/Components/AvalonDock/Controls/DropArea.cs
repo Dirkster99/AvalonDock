@@ -1,60 +1,69 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System.ComponentModel;
 using System.Windows;
 
 namespace AvalonDock.Controls
 {
-	/// <summary>Determines the type of drop area of a <see cref="FrameworkElement"/> that may be valid as a drop target of a drag and drop operation.</summary>
+	/// <summary>
+	/// Defines the drop Area Type values.
+	/// </summary>
 	public enum DropAreaType
 	{
-		/// <summary> This type of drop area identifies a <seealso cref="AvalonDock.DockingManager"/> which is the visual root of the AvalonDock control library.</summary>
+		/// <summary>
+		/// The docking Manager option.
+		/// </summary>
 		DockingManager,
 
-		/// <summary>This type of drop area identifies a <see cref="LayoutDocumentPaneControl"/>.</summary>
+		/// <summary>
+		/// The document Pane option.
+		/// </summary>
 		DocumentPane,
 
-		/// <summary>This type of drop area identifies a <see cref="LayoutDocumentPaneGroupControl"/>.</summary>
+		/// <summary>
+		/// The document Pane Group option.
+		/// </summary>
 		DocumentPaneGroup,
 
-		/// <summary>This type of drop area identifies a <see cref="LayoutAnchorablePaneControl"/>.</summary>
+		/// <summary>
+		/// The anchorable Pane option.
+		/// </summary>
 		AnchorablePane,
 	}
 
-	/// <summary>Describes a drop target which can be the final position of an item that is being dragged and dropped to dock it somewhere else in the UI of the framework.</summary>
+	/// <summary>
+	/// Defines the contract for drop Area.
+	/// </summary>
 	public interface IDropArea
 	{
-		/// <summary>Gets the width, height, and location of a rectangle that describes the drop target of a drag and drop operation on the users screen.</summary>
+		/// <summary>
+		/// Gets the detection Rect.
+		/// </summary>
 		Rect DetectionRect { get; }
 
-		/// <summary> Gets the type of drop area for this drop target.</summary>
+		/// <summary>
+		/// Gets the type.
+		/// </summary>
 		DropAreaType Type { get; }
 
+		/// <summary>
+		/// Executes the transform To Device DPI operation.
+		/// </summary>
+		/// <param name="dragPosition">The drag Position.</param>
+		/// <returns>The result of the operation.</returns>
 		Point TransformToDeviceDPI(Point dragPosition);
 	}
 
-	/// <inheritdoc />
 	/// <summary>
-	/// Implements a control class that can act as a drop target. A drop target is a control that can
-	/// be the target of drag & drop (dock) operation of a second control.
+	/// Represents the drop Area.
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <seealso cref="IDropArea"/>
-	/// <seealso cref="FrameworkElement"/>
-	public class DropArea<T> : IDropArea where T : FrameworkElement
+	/// <typeparam name="T">The t type.</typeparam>
+	public class DropArea<T> : IDropArea
+		where T : FrameworkElement
 	{
-		#region Constructors
-
-		/// <summary>Class constructor from control that can be used as drop target and it's type of drop area. </summary>
-		/// <param name="areaElement"></param>
-		/// <param name="type">the type of drop area for this drop target.</param>
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DropArea{T}"/> class.
+		/// </summary>
+		/// <param name="areaElement">The area Element.</param>
+		/// <param name="type">The type.</param>
 		internal DropArea(T areaElement, DropAreaType type)
 		{
 			AreaElement = areaElement;
@@ -62,29 +71,32 @@ namespace AvalonDock.Controls
 			Type = type;
 		}
 
-		#endregion Constructors
-
-		#region IDropArea
-
-		/// <inheritdoc />
+		/// <summary>
+		/// Gets the detection Rect.
+		/// </summary>
 		public Rect DetectionRect { get; }
 
-		/// <inheritdoc />
+		/// <summary>
+		/// Gets the type.
+		/// </summary>
 		public DropAreaType Type { get; }
 
+		/// <summary>
+		/// Executes the transform To Device DPI operation.
+		/// </summary>
+		/// <param name="dragPosition">The drag Position.</param>
+		/// <returns>The result of the operation.</returns>
 		public Point TransformToDeviceDPI(Point dragPosition)
 		{
 			return AreaElement.TransformToDeviceDPI(dragPosition);
 		}
 
-		#endregion IDropArea
-
-		#region Properties
-
-		/// <summary>Gets the <see cref="FrameworkElement"/> that implements a drop target for a drag & drop (dock) operation.</summary>
-		[Bindable(false), Description("Gets the FrameworkElement that implements a drop target for a drag & drop (dock) operation."), Category("Other")]
+		/// <summary>
+		/// Gets the area Element.
+		/// </summary>
+		[Bindable(false)]
+		[Description("Gets the FrameworkElement that implements a drop target for a drag & drop (dock) operation.")]
+		[Category("Other")]
 		public T AreaElement { get; }
-
-		#endregion Properties
 	}
 }

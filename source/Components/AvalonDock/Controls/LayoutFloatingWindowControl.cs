@@ -1,16 +1,8 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
@@ -22,24 +14,17 @@ using System.Windows.Media;
 
 using AvalonDock.Layout;
 using AvalonDock.Themes;
+using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
-	/// <inheritdoc cref="Window"/>
-	/// <inheritdoc cref="ILayoutControl"/>
 	/// <summary>
-	/// Implements an abstraction layer for floating windows that can host other controls
-	/// (eg. documents and/or <see cref="LayoutAnchorable"/>).
-	///
-	/// A floating window can be dragged around independently of the <see cref="DockingManager"/>.
+	/// Represents the layout floating window control.
 	/// </summary>
-	/// <seealso cref="Window"/>
-	/// <seealso cref="ILayoutControl"/>
 	public abstract class LayoutFloatingWindowControl : Window, ILayoutControl
 	{
-		#region fields
 		private ResourceDictionary currentThemeResourceDictionary; // = null
-		private bool _isInternalChange; //false
+		private bool _isInternalChange; // false
 		private readonly ILayoutElement _model;
 		private bool _attachDrag = false;
 		private HwndSource _hwndSrc;
@@ -54,10 +39,6 @@ namespace AvalonDock.Controls
 		/// <see cref="TotalMargin"/>
 		private bool _isTotalMarginSet = false;
 
-		#endregion fields
-
-		#region Constructors
-
 		static LayoutFloatingWindowControl()
 		{
 			AllowsTransparencyProperty.OverrideMetadata(typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(false));
@@ -65,6 +46,10 @@ namespace AvalonDock.Controls
 			ShowInTaskbarProperty.OverrideMetadata(typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(false));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutFloatingWindowControl"/> class.
+		/// </summary>
+		/// <param name="model">The layout model.</param>
 		protected LayoutFloatingWindowControl(ILayoutElement model)
 		{
 			Loaded += OnLoaded;
@@ -74,68 +59,75 @@ namespace AvalonDock.Controls
 			_model = model;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutFloatingWindowControl"/> class.
+		/// </summary>
+		/// <param name="model">The layout model.</param>
+		/// <param name="isContentImmutable">The is content immutable.</param>
 		protected LayoutFloatingWindowControl(ILayoutElement model, bool isContentImmutable)
 		  : this(model)
 		{
 			IsContentImmutable = isContentImmutable;
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
 		/// <summary>
-		/// Gets/Sets the X,Y delta between the element being dragged and the
-		/// mouse position. The value of this property is used during the drag
-		/// cycle to position the dragged item under the mouse pointer.
-		///
-		/// Set this property on initialization to ensure that
-		/// the delta between mouse and control being dragged
-		/// remains constant.
+		/// Gets or sets the drag delta.
 		/// </summary>
 		internal Point DragDelta { get; set; }
 
+		/// <summary>
+		/// Gets the model.
+		/// </summary>
 		public abstract ILayoutElement Model { get; }
 
-		#region IsContentImmutable
-
-		/// <summary> <see cref="IsContentImmutable"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="IsContentImmutable"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty IsContentImmutableProperty = DependencyProperty.Register(nameof(IsContentImmutable), typeof(bool), typeof(LayoutFloatingWindowControl),
 				  new FrameworkPropertyMetadata(false));
 
-		/// <summary>Gets/sets wether the content can be modified.</summary>
-		[Bindable(true), Description("Gets/sets wether the content can be modified."), Category("Other")]
+		/// <summary>
+		/// Gets a value indicating whether this instance is content immutable.
+		/// </summary>
+		[Bindable(true)]
+		[Description("Gets/sets wether the content can be modified.")]
+		[Category("Other")]
 		public bool IsContentImmutable
 		{
 			get => (bool)GetValue(IsContentImmutableProperty);
 			private set => SetValue(IsContentImmutableProperty, value);
 		}
 
-		#endregion IsContentImmutable
-
-		#region IsDragging
-
 		/// <summary><see cref="IsDragging"/> Read-Only dependency property.</summary>
 		private static readonly DependencyPropertyKey IsDraggingPropertyKey = DependencyProperty.RegisterReadOnly(nameof(IsDragging), typeof(bool), typeof(LayoutFloatingWindowControl),
 				new FrameworkPropertyMetadata(false, OnIsDraggingChanged));
 
+		/// <summary>
+		/// <see cref="IsDragging"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty IsDraggingProperty = IsDraggingPropertyKey.DependencyProperty;
 
-		/// <summary>Gets wether this floating window is being dragged.</summary>
-		[Bindable(true), Description("Gets wether this floating window is being dragged."), Category("FloatingWindow")]
+		/// <summary>
+		/// Gets a value indicating whether this instance is dragging.
+		/// </summary>
+		[Bindable(true)]
+		[Description("Gets wether this floating window is being dragged.")]
+		[Category("FloatingWindow")]
 		public bool IsDragging => (bool)GetValue(IsDraggingProperty);
 
 		/// <summary>
-		/// Provides a secure method for setting the <see cref="IsDragging"/> property.
-		/// This dependency property indicates that this floating window is being dragged.
+		/// Sets the is dragging.
 		/// </summary>
-		/// <param name="value">The new value for the property.</param>
+		/// <param name="value">The value.</param>
 		protected void SetIsDragging(bool value) => SetValue(IsDraggingPropertyKey, value);
 
 		/// <summary>Handles changes to the <see cref="IsDragging"/> property.</summary>
 		private static void OnIsDraggingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutFloatingWindowControl)d).OnIsDraggingChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="IsDragging"/> property.</summary>
+		/// <summary>
+		/// Raises the is dragging changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnIsDraggingChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if ((bool)e.NewValue)
@@ -144,25 +136,24 @@ namespace AvalonDock.Controls
 				ReleaseMouseCapture();
 		}
 
-		#endregion IsDragging
-
-		#region CloseInitiatedByUser
-
+		/// <summary>
+		/// Gets a value indicating whether the close initiated by user flag is set.
+		/// </summary>
 		protected bool CloseInitiatedByUser => !_internalCloseFlag;
 
-		#endregion CloseInitiatedByUser
-
+		/// <summary>
+		/// Gets or sets a value indicating whether the keep content visible on close flag is set.
+		/// </summary>
 		internal bool KeepContentVisibleOnClose { get; set; }
 
-		#region OwnedByDockingManagerWindow
-
-		/// <summary><see cref="OwnedByDockingManagerWindow"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="OwnedByDockingManagerWindow"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty OwnedByDockingManagerWindowProperty =
 			DependencyProperty.Register("OwnedByDockingManagerWindow", typeof(bool), typeof(LayoutFloatingWindowControl), new PropertyMetadata(true, OwnedByDockingManagerWindowPropertyChanged));
 
 		/// <summary>
-		/// Gets or sets a value indicating whether an undocked child window should be "owned" by the window
-		/// that hosts the docking manager or whether it should be an independent window.
+		/// Gets or sets a value indicating whether the owned by docking manager window flag is set.
 		/// </summary>
 		public bool OwnedByDockingManagerWindow
 		{
@@ -178,16 +169,14 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion
-
-		#region AllowMinimize
-
-		/// <summary><see cref="AllowMinimize"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="AllowMinimize"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty AllowMinimizeProperty =
 			DependencyProperty.Register("AllowMinimize", typeof(bool), typeof(LayoutFloatingWindowControl), new PropertyMetadata(false));
 
 		/// <summary>
-		/// Gets/sets whether the floating window supports being minimized.
+		/// Gets or sets a value indicating whether the allow minimize flag is set.
 		/// </summary>
 		public bool AllowMinimize
 		{
@@ -195,16 +184,57 @@ namespace AvalonDock.Controls
 			set { SetValue(AllowMinimizeProperty, value); }
 		}
 
-		#endregion AllowMinimize
+		/// <summary>
+		/// <see cref="ResizeBorderThickness"/> dependency property.
+		/// </summary>
+		public static readonly DependencyProperty ResizeBorderThicknessProperty =
+			DependencyProperty.Register(nameof(ResizeBorderThickness), typeof(Thickness), typeof(LayoutFloatingWindowControl),
+				new PropertyMetadata(default(Thickness), OnResizeBorderThicknessChanged));
 
-		#region IsMaximized
+		/// <summary>
+		/// Gets or sets the resize border thickness.
+		/// </summary>
+		[Bindable(true)]
+		[Description("Gets/sets the resize border thickness for this floating window.")]
+		[Category("FloatingWindow")]
+		public Thickness ResizeBorderThickness
+		{
+			get { return (Thickness)GetValue(ResizeBorderThicknessProperty); }
+			set { SetValue(ResizeBorderThicknessProperty, value); }
+		}
 
-		/// <summary><see cref="IsMaximized"/> dependency property.</summary>
+		private static void OnResizeBorderThicknessChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			if (d is LayoutFloatingWindowControl w && w.IsLoaded)
+			{
+				w.ApplyResizeBorderThickness();
+			}
+		}
+
+		private void ApplyResizeBorderThickness()
+		{
+			var thickness = ResizeBorderThickness;
+			if (thickness == default(Thickness))
+			{
+				return;
+			}
+
+			var chrome = WindowChrome.GetWindowChrome(this);
+			if (chrome != null)
+			{
+				chrome.ResizeBorderThickness = thickness;
+			}
+		}
+
+		/// <summary>
+		/// <see cref="IsMaximized"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty IsMaximizedProperty = DependencyProperty.Register(nameof(IsMaximized), typeof(bool), typeof(LayoutFloatingWindowControl),
 						  new FrameworkPropertyMetadata(false));
 
-		/// <summary>Gets/sets the <see cref="IsMaximized"/> property. This dependency property indicates if the window is maximized.</summary>
-		/// <remarks>Provides a secure method for setting the <see cref="IsMaximized"/> property.</remarks>
+		/// <summary>
+		/// Gets a value indicating whether this instance is maximized.
+		/// </summary>
 		public bool IsMaximized
 		{
 			get => (bool)GetValue(IsMaximizedProperty);
@@ -215,7 +245,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnStateChanged(EventArgs e)
 		{
 			if (!_isInternalChange)
@@ -238,22 +268,20 @@ namespace AvalonDock.Controls
 			base.OnStateChanged(e);
 		}
 
-		#endregion IsMaximized
-
-		#region TotalMargin
-
 		private static readonly DependencyPropertyKey TotalMarginPropertyKey =
-			DependencyProperty.RegisterReadOnly(nameof(TotalMargin),
+			DependencyProperty.RegisterReadOnly(
+				nameof(TotalMargin),
 				typeof(Thickness),
 				typeof(LayoutFloatingWindowControl),
 				new FrameworkPropertyMetadata(default(Thickness)));
 
+		/// <summary>
+		/// <see cref="TotalMargin"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty TotalMarginProperty = TotalMarginPropertyKey.DependencyProperty;
 
 		/// <summary>
-		/// The total margin (including window chrome and title bar).
-		///
-		/// The margin is queried from the visual tree the first time it is rendered, zero until the first call of FilterMessage(WM_ACTIVATE)
+		/// Gets or sets the total margin.
 		/// </summary>
 		public Thickness TotalMargin
 		{
@@ -261,18 +289,20 @@ namespace AvalonDock.Controls
 			protected set { SetValue(TotalMarginPropertyKey, value); }
 		}
 
-		#endregion TotalMargin
-
-		#region ContentMinHeight
-
+		/// <summary>
+		/// The content min height property key.
+		/// </summary>
 		public static readonly DependencyPropertyKey ContentMinHeightPropertyKey = DependencyProperty.RegisterReadOnly(
 			nameof(ContentMinHeight), typeof(double), typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(0.0));
 
+		/// <summary>
+		/// <see cref="ContentMinHeight"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ContentMinHeightProperty =
 			ContentMinHeightPropertyKey.DependencyProperty;
 
 		/// <summary>
-		/// The MinHeight of the content of the window, will be 0 until the window has been rendered, or if the MinHeight is unset for the content
+		/// Gets or sets the content min height.
 		/// </summary>
 		public double ContentMinHeight
 		{
@@ -280,18 +310,20 @@ namespace AvalonDock.Controls
 			set { SetValue(ContentMinHeightPropertyKey, value); }
 		}
 
-		#endregion ContentMinHeight
-
-		#region ContentMinWidth
-
+		/// <summary>
+		/// The content min width property key.
+		/// </summary>
 		public static readonly DependencyPropertyKey ContentMinWidthPropertyKey = DependencyProperty.RegisterReadOnly(
 			nameof(ContentMinWidth), typeof(double), typeof(LayoutFloatingWindowControl), new FrameworkPropertyMetadata(0.0));
 
+		/// <summary>
+		/// <see cref="ContentMinWidth"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ContentMinWidthProperty =
 			ContentMinWidthPropertyKey.DependencyProperty;
 
 		/// <summary>
-		/// The MinWidth ocf the content of the window, will be 0 until the window has been rendered, or if the MinWidth is unset for the content
+		/// Gets or sets the content min width.
 		/// </summary>
 		public double ContentMinWidth
 		{
@@ -299,13 +331,10 @@ namespace AvalonDock.Controls
 			set { SetValue(ContentMinWidthPropertyKey, value); }
 		}
 
-		#endregion ContentMinWidth
-
-		#endregion Properties
-
-		#region Internal Methods
-		/// <summary>Is Invoked when AvalonDock's WPF Theme changes via the <see cref="DockingManager.OnThemeChanged()"/> method.</summary>
-		/// <param name="oldTheme"></param>
+		/// <summary>
+		/// Updates the theme resources.
+		/// </summary>
+		/// <param name="oldTheme">The old theme.</param>
 		internal virtual void UpdateThemeResources(Theme oldTheme = null)
 		{
 			if (oldTheme != null) // Remove the old theme if present
@@ -323,8 +352,10 @@ namespace AvalonDock.Controls
 					var resourceDictionaryToRemove =
 						Resources.MergedDictionaries.FirstOrDefault(r => r.Source == oldTheme.GetResourceUri());
 					if (resourceDictionaryToRemove != null)
+					{
 						Resources.MergedDictionaries.Remove(
 							resourceDictionaryToRemove);
+					}
 				}
 			}
 
@@ -337,9 +368,15 @@ namespace AvalonDock.Controls
 				Resources.MergedDictionaries.Add(currentThemeResourceDictionary);
 			}
 			else
+			{
 				Resources.MergedDictionaries.Add(new ResourceDictionary { Source = manager.Theme.GetResourceUri() });
+			}
 		}
 
+		/// <summary>
+		/// Attach drag.
+		/// </summary>
+		/// <param name="onActivated">The on activated.</param>
 		internal void AttachDrag(bool onActivated = true)
 		{
 			if (onActivated)
@@ -349,13 +386,21 @@ namespace AvalonDock.Controls
 			}
 			else
 			{
-				CaptureMouse();
 				var windowHandle = new WindowInteropHelper(this).Handle;
 				var lParam = new IntPtr(((int)Left & 0xFFFF) | ((int)Top << 16));
 				Win32Helper.SendMessage(windowHandle, Win32Helper.WM_NCLBUTTONDOWN, new IntPtr(Win32Helper.HT_CAPTION), lParam);
 			}
 		}
 
+		/// <summary>
+		/// Filter message.
+		/// </summary>
+		/// <param name="hwnd">The hwnd.</param>
+		/// <param name="msg">The msg.</param>
+		/// <param name="wParam">The w param.</param>
+		/// <param name="lParam">The l param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The filter message.</returns>
 		protected virtual IntPtr FilterMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
 		{
 			handled = false;
@@ -371,12 +416,13 @@ namespace AvalonDock.Controls
 
 					if (_dragService != null)
 					{
-						var mousePosition = (Win32Helper.GetMousePosition());
+						var mousePosition = Win32Helper.GetMousePosition();
 						_dragService.Drop(mousePosition, out var dropFlag);
 						_dragService = null;
 						SetIsDragging(false);
 						if (dropFlag) InternalClose();
 					}
+
 					break;
 
 				case Win32Helper.WM_MOVING:
@@ -384,15 +430,17 @@ namespace AvalonDock.Controls
 						UpdateDragPosition();
 						if (IsMaximized) UpdateMaximizedState(false);
 					}
+
 					break;
 
-				case Win32Helper.WM_LBUTTONUP: //set as handled right button click on title area (after showing context menu)
+				case Win32Helper.WM_LBUTTONUP: // set as handled right button click on title area (after showing context menu)
 					if (_dragService != null && Mouse.LeftButton == MouseButtonState.Released)
 					{
 						_dragService.Abort();
 						_dragService = null;
 						SetIsDragging(false);
 					}
+
 					break;
 
 				case Win32Helper.WM_SYSCOMMAND:
@@ -400,6 +448,7 @@ namespace AvalonDock.Controls
 					if (command == Win32Helper.SC_MAXIMIZE || command == Win32Helper.SC_RESTORE) UpdateMaximizedState(command == Win32Helper.SC_MAXIMIZE);
 					break;
 			}
+
 			return IntPtr.Zero;
 		}
 
@@ -524,6 +573,10 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <summary>
+		/// Internal close.
+		/// </summary>
+		/// <param name="closeInitiatedByUser">The close initiated by user.</param>
 		internal void InternalClose(bool closeInitiatedByUser = false)
 		{
 			_internalCloseFlag = !closeInitiatedByUser;
@@ -532,11 +585,7 @@ namespace AvalonDock.Controls
 			Close();
 		}
 
-		#endregion Internal Methods
-
-		#region Overrides
-
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnClosed(EventArgs e)
 		{
 			SizeChanged -= OnSizeChanged;
@@ -550,24 +599,30 @@ namespace AvalonDock.Controls
 					_hwndSrc = null;
 				}
 			}
+
 			base.OnClosed(e);
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnInitialized(EventArgs e)
 		{
-			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.CloseWindowCommand,
+			CommandBindings.Add(new CommandBinding(
+				Microsoft.Windows.Shell.SystemCommands.CloseWindowCommand,
 				(s, args) => Microsoft.Windows.Shell.SystemCommands.CloseWindow((Window)args.Parameter)));
-			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.MaximizeWindowCommand,
+			CommandBindings.Add(new CommandBinding(
+				Microsoft.Windows.Shell.SystemCommands.MaximizeWindowCommand,
 				(s, args) => Microsoft.Windows.Shell.SystemCommands.MaximizeWindow((Window)args.Parameter)));
-			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.MinimizeWindowCommand,
+			CommandBindings.Add(new CommandBinding(
+				Microsoft.Windows.Shell.SystemCommands.MinimizeWindowCommand,
 				(s, args) => Microsoft.Windows.Shell.SystemCommands.MinimizeWindow((Window)args.Parameter)));
-			CommandBindings.Add(new CommandBinding(Microsoft.Windows.Shell.SystemCommands.RestoreWindowCommand,
+			CommandBindings.Add(new CommandBinding(
+				Microsoft.Windows.Shell.SystemCommands.RestoreWindowCommand,
 				(s, args) => Microsoft.Windows.Shell.SystemCommands.RestoreWindow((Window)args.Parameter)));
-			//Debug.Assert(this.Owner != null);
+			// Debug.Assert(this.Owner != null);
 			base.OnInitialized(e);
 		}
 
+		/// <inheritdoc/>
 		protected override void OnClosing(CancelEventArgs e)
 		{
 			base.OnClosing(e);
@@ -588,10 +643,6 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		private static object CoerceContentValue(DependencyObject sender, object content)
 		{
 			if (!(sender is LayoutFloatingWindowControl lfwc)) return null;
@@ -604,6 +655,7 @@ namespace AvalonDock.Controls
 			Loaded -= OnLoaded;
 
 			this.UpdateOwnership();
+			ApplyResizeBorderThickness();
 
 			_hwndSrc = PresentationSource.FromDependencyObject(this) as HwndSource;
 			_hwndSrcHook = FilterMessage;
@@ -613,15 +665,55 @@ namespace AvalonDock.Controls
 			UpdateMaximizedState(maximized);
 		}
 
+		/// <summary>
+		/// Updates the ownership.
+		/// </summary>
 		internal void UpdateOwnership()
 		{
 			// Determine whether the child window should be owned by the parent or act independently
 			// according to OwnedByDockingManagerWindow property.
 			var manager = Model?.Root?.Manager;
 			if (OwnedByDockingManagerWindow && manager != null)
+			{
 				this.SetParentToMainWindowOf(manager);
+			}
 			else
+			{
 				this.SetParentWindowToNull();
+			}
+		}
+
+		private const double KeyboardMoveStep = 10.0;
+
+		/// <inheritdoc/>
+		protected override void OnPreviewKeyDown(KeyEventArgs e)
+		{
+			base.OnPreviewKeyDown(e);
+			var manager = Model?.Root?.Manager;
+			if (manager == null || !manager.AllowMovingFloatingWindowWithKeyboard)
+			{
+				return;
+			}
+
+			switch (e.Key)
+			{
+				case Key.Left:
+					Left -= KeyboardMoveStep;
+					e.Handled = true;
+					break;
+				case Key.Right:
+					Left += KeyboardMoveStep;
+					e.Handled = true;
+					break;
+				case Key.Up:
+					Top -= KeyboardMoveStep;
+					e.Handled = true;
+					break;
+				case Key.Down:
+					Top += KeyboardMoveStep;
+					e.Handled = true;
+					break;
+			}
 		}
 
 		private void OnUnloaded(object sender, RoutedEventArgs e)
@@ -653,10 +745,45 @@ namespace AvalonDock.Controls
 
 		private void OnActivated(object sender, EventArgs e)
 		{
+			InternalOnActivated(sender, e);
+		}
+
+		private void InternalOnActivated(object sender, EventArgs e, int retryCount = 0)
+		{
 			Activated -= OnActivated;
 
-			if (!_attachDrag || Mouse.LeftButton != MouseButtonState.Pressed) return;
+			if (!_attachDrag || Mouse.LeftButton != MouseButtonState.Pressed)
+			{
+				return;
+			}
+			
 			var windowHandle = new WindowInteropHelper(this).Handle;
+			
+			// Check if the visual is connected to a PresentationSource to avoid InvalidOperationException
+			// in multi-DPI scenarios where the window might not be fully initialized yet
+			if (PresentationSource.FromVisual(this) == null)
+			{
+				if (retryCount >= 5)
+				{
+					// Give up after several retries to avoid infinite loops
+					_attachDrag = false;
+					return;
+				}
+				
+				// If not connected, defer the operation until the visual is properly initialized
+				Dispatcher.Invoke(
+					async () =>
+					{
+					if (_attachDrag && Mouse.LeftButton == MouseButtonState.Pressed)
+					{
+						await Task.Delay(10);
+						retryCount++;
+						InternalOnActivated(sender, e, retryCount);
+					}
+				}, System.Windows.Threading.DispatcherPriority.Loaded);
+				return;
+			}
+			
 			var mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
 
 			var area = this.GetScreenArea();
@@ -670,9 +797,13 @@ namespace AvalonDock.Controls
 
 			if (this.GetScreenArea().Size != area.Size) // setting the top/left co-ordinates has changed the size - this means moving to a screen with a different DPI. Recalculate mouse position based on new DPI to avoid wrong drag location
 			{
-				mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
-				Left = mousePosition.X - DragDelta.X;
-				Top = mousePosition.Y - DragDelta.Y;
+				// Ensure the visual is still connected before recalculating mouse position
+				if (PresentationSource.FromVisual(this) != null)
+				{
+					mousePosition = this.PointToScreenDPI(Mouse.GetPosition(this));
+					Left = mousePosition.X - DragDelta.X;
+					Top = mousePosition.Y - DragDelta.Y;
+				}
 			}
 
 			_attachDrag = false;
@@ -718,38 +849,44 @@ namespace AvalonDock.Controls
 		{
 			if (_dragService == null)
 			{
+				if (Model?.Root?.Manager == null)
+					return;
 				_dragService = new DragService(this);
 				SetIsDragging(true);
 			}
-			var mousePosition = (Win32Helper.GetMousePosition());
+
+			var mousePosition = Win32Helper.GetMousePosition();
 			_dragService.UpdateMouseLocation(mousePosition);
 		}
 
-		#endregion Private Methods
-
+		/// <summary>
+		/// Enable bindings.
+		/// </summary>
 		public virtual void EnableBindings()
 		{
 		}
 
+		/// <summary>
+		/// Disable bindings.
+		/// </summary>
 		public virtual void DisableBindings()
 		{
 		}
 
-		#region Internal Classes
-
+		/// <summary>
+		/// Represents the floating window content host.
+		/// </summary>
 		protected internal class FloatingWindowContentHost : HwndHost
 		{
-			#region fields
-
 			private readonly LayoutFloatingWindowControl _owner;
 			private HwndSource _wpfContentHost = null;
 			private Border _rootPresenter = null;
 			private DockingManager _manager = null;
 
-			#endregion fields
-
-			#region Constructors
-
+			/// <summary>
+			/// Initializes a new instance of the <see cref="FloatingWindowContentHost"/> class.
+			/// </summary>
+			/// <param name="owner">The owner.</param>
 			public FloatingWindowContentHost(LayoutFloatingWindowControl owner)
 			{
 				_owner = owner;
@@ -757,21 +894,19 @@ namespace AvalonDock.Controls
 				BindingOperations.SetBinding(this, SizeToContentProperty, binding);
 			}
 
-			#endregion Constructors
-
-			#region Properties
-
+			/// <summary>
+			/// Gets the root visual.
+			/// </summary>
 			public Visual RootVisual => _rootPresenter;
 
-			#region Content
-
-			/// <summary><see cref="Content"/> dependency property. </summary>
+			/// <summary>
+			/// <see cref="Content"/> dependency property.
+			/// </summary>
 			public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(nameof(Content), typeof(UIElement), typeof(FloatingWindowContentHost),
 					new FrameworkPropertyMetadata(null, OnContentChanged));
 
 			/// <summary>
-			/// Gets or sets the <see cref="Content"/> property.  This dependency property
-			/// indicates ....
+			/// Gets or sets the content.
 			/// </summary>
 			public UIElement Content
 			{
@@ -782,7 +917,11 @@ namespace AvalonDock.Controls
 			/// <summary>Handles changes to the <see cref="Content"/> property.</summary>
 			private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((FloatingWindowContentHost)d).OnContentChanged((UIElement)e.OldValue, (UIElement)e.NewValue);
 
-			/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Content"/> property.</summary>
+			/// <summary>
+			/// Raises the content changed event.
+			/// </summary>
+			/// <param name="oldValue">The old value.</param>
+			/// <param name="newValue">The new value.</param>
 			protected virtual void OnContentChanged(UIElement oldValue, UIElement newValue)
 			{
 				if (_rootPresenter != null) _rootPresenter.Child = Content;
@@ -790,15 +929,15 @@ namespace AvalonDock.Controls
 				if (newValue is FrameworkElement newContent) newContent.SizeChanged += Content_SizeChanged;
 			}
 
-			#endregion Content
-
-			#region SizeToContent
-
-			/// <summary><see cref="SizeToContent"/> dependency property.</summary>
+			/// <summary>
+			/// <see cref="SizeToContent"/> dependency property.
+			/// </summary>
 			public static readonly DependencyProperty SizeToContentProperty = DependencyProperty.Register(nameof(SizeToContent), typeof(SizeToContent), typeof(FloatingWindowContentHost),
 					new FrameworkPropertyMetadata(SizeToContent.Manual, OnSizeToContentChanged));
 
-			/// <summary>Gets or sets the <see cref="SizeToContent"/> property.</summary>
+			/// <summary>
+			/// Gets or sets the size to content.
+			/// </summary>
 			public SizeToContent SizeToContent
 			{
 				get => (SizeToContent)GetValue(SizeToContentProperty);
@@ -808,19 +947,17 @@ namespace AvalonDock.Controls
 			/// <summary>Handles changes to the <see cref="SizeToContent"/> property.</summary>
 			private static void OnSizeToContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((FloatingWindowContentHost)d).OnSizeToContentChanged((SizeToContent)e.OldValue, (SizeToContent)e.NewValue);
 
-			/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="SizeToContent"/> property.</summary>
+			/// <summary>
+			/// Raises the size to content changed event.
+			/// </summary>
+			/// <param name="oldValue">The old value.</param>
+			/// <param name="newValue">The new value.</param>
 			protected virtual void OnSizeToContentChanged(SizeToContent oldValue, SizeToContent newValue)
 			{
 				if (_wpfContentHost != null) _wpfContentHost.SizeToContent = newValue;
 			}
 
-			#endregion SizeToContent
-
-			#endregion Properties
-
-			#region Overrides
-
-			/// <inheritdoc />
+			/// <inheritdoc/>
 			protected override HandleRef BuildWindowCore(HandleRef hwndParent)
 			{
 				_wpfContentHost = new HwndSource(new HwndSourceParameters
@@ -841,7 +978,7 @@ namespace AvalonDock.Controls
 				return new HandleRef(this, _wpfContentHost.Handle);
 			}
 
-			/// <inheritdoc />
+			/// <inheritdoc/>
 			protected override void DestroyWindowCore(HandleRef hwnd)
 			{
 				_manager.InternalRemoveLogicalChild(_rootPresenter);
@@ -850,17 +987,13 @@ namespace AvalonDock.Controls
 				_wpfContentHost = null;
 			}
 
-			/// <inheritdoc />
+			/// <inheritdoc/>
 			protected override Size MeasureOverride(Size constraint)
 			{
 				if (Content == null) return base.MeasureOverride(constraint);
 				Content.Measure(constraint);
 				return Content.DesiredSize;
 			}
-
-			#endregion Overrides
-
-			#region Methods
 
 			/// <summary>
 			/// Content_SizeChanged event handler.
@@ -870,10 +1003,6 @@ namespace AvalonDock.Controls
 				InvalidateMeasure();
 				InvalidateArrange();
 			}
-
-			#endregion Methods
 		}
-
-		#endregion Internal Classes
 	}
 }

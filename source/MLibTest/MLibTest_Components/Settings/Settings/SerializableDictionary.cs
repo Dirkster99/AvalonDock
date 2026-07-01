@@ -1,4 +1,4 @@
-﻿namespace Settings
+namespace Settings
 {
 	using System;
 	using System.Collections.Generic;
@@ -16,12 +16,9 @@
 	[Serializable]
 	public class SerializableDictionary<TKey, TVal> : Dictionary<TKey, TVal>, IXmlSerializable, ISerializable
 	{
-		#region fields
 		private XmlSerializer _keySerializer;
 		private XmlSerializer _valueSerializer;
-		#endregion fields
 
-		#region Constructors
 		public SerializableDictionary()
 		{
 		}
@@ -51,9 +48,7 @@
 		{
 		}
 
-		#endregion
 
-		#region Private Properties
 		protected XmlSerializer ValueSerializer
 		{
 			get => _valueSerializer ?? (_valueSerializer = new XmlSerializer(typeof(TVal)));
@@ -63,9 +58,7 @@
 		{
 			get => _keySerializer ?? (_keySerializer = new XmlSerializer(typeof(TKey)));
 		}
-		#endregion
 
-		#region ISerializable Members
 		protected SerializableDictionary(SerializationInfo info, StreamingContext context)
 		{
 			int itemCount = info.GetInt32("itemsCount");
@@ -86,9 +79,7 @@
 				itemIdx++;
 			}
 		}
-		#endregion
 
-		#region IXmlSerializable Members
 		void IXmlSerializable.WriteXml(XmlWriter writer)
 		{
 			foreach (KeyValuePair<TKey, TVal> kvp in this)
@@ -143,6 +134,5 @@
 		{
 			return null;
 		}
-		#endregion
 	}
 }

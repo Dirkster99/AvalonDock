@@ -1,29 +1,18 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using System;
-using System.Globalization;
+﻿using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace AvalonDock.Layout
 {
-	/// <summary>Provides a base class for other layout panel models that support a specific class of panel.</summary>
-	/// <typeparam name="T"></typeparam>
+	/// <summary>
+	/// Provides a base class for layout positionable group.
+	/// </summary>
+	/// <typeparam name="T">The type of the related layout element.</typeparam>
 	[Serializable]
-	public abstract class LayoutPositionableGroup<T> : LayoutGroup<T>, ILayoutPositionableElementWithActualSize where T : class, ILayoutElement
+	public abstract class LayoutPositionableGroup<T> : LayoutGroup<T>, ILayoutPositionableElementWithActualSize
+		where T : class, ILayoutElement
 	{
-		#region fields
-
-		private static GridLengthConverter _gridLengthConverter = new GridLengthConverter();
-
 		// DockWidth fields
 		private GridLength _dockWidth = new GridLength(1.0, GridUnitType.Star);
 
@@ -52,21 +41,14 @@ namespace AvalonDock.Layout
 		[NonSerialized]
 		private double _actualHeight;
 
-		#endregion fields
-
-		#region Events
-
 		/// <summary>
-		/// Event fired when floating properties were updated.
+		/// Occurs when the floating properties updated event is raised.
 		/// </summary>
 		public event EventHandler FloatingPropertiesUpdated;
 
-		#endregion Events
-
-		#region Properties
-
-		#region DockWidth
-
+		/// <summary>
+		/// Gets or sets the dock width.
+		/// </summary>
 		public GridLength DockWidth
 		{
 			get => _dockWidth.IsAbsolute && _resizableAbsoluteDockWidth < _dockWidth.Value && _resizableAbsoluteDockWidth.HasValue ?
@@ -82,8 +64,14 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets the fixed dock width.
+		/// </summary>
 		public double FixedDockWidth => _dockWidth.IsAbsolute && _dockWidth.Value >= _dockMinWidth ? _dockWidth.Value : _dockMinWidth;
 
+		/// <summary>
+		/// Gets or sets the resizable absolute dock width.
+		/// </summary>
 		public double ResizableAbsoluteDockWidth
 		{
 			get => _resizableAbsoluteDockWidth ?? 0;
@@ -98,14 +86,15 @@ namespace AvalonDock.Layout
 					OnDockWidthChanged();
 				}
 				else if (value > _dockWidth.Value && _resizableAbsoluteDockWidth < _dockWidth.Value)
+				{
 					_resizableAbsoluteDockWidth = _dockWidth.Value;
+				}
 			}
 		}
 
-		#endregion DockWidth
-
-		#region DockHeight
-
+		/// <summary>
+		/// Gets or sets the dock height.
+		/// </summary>
 		public GridLength DockHeight
 		{
 			get => _dockHeight.IsAbsolute && _resizableAbsoluteDockHeight < _dockHeight.Value && _resizableAbsoluteDockHeight.HasValue ?
@@ -121,8 +110,14 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets the fixed dock height.
+		/// </summary>
 		public double FixedDockHeight => _dockHeight.IsAbsolute && _dockHeight.Value >= _dockMinHeight ? _dockHeight.Value : _dockMinHeight;
 
+		/// <summary>
+		/// Gets or sets the resizable absolute dock height.
+		/// </summary>
 		public double ResizableAbsoluteDockHeight
 		{
 			get => _resizableAbsoluteDockHeight ?? 0;
@@ -137,18 +132,18 @@ namespace AvalonDock.Layout
 					OnDockHeightChanged();
 				}
 				else if (value > _dockHeight.Value && _resizableAbsoluteDockHeight < _dockHeight.Value)
+				{
 					_resizableAbsoluteDockHeight = _dockHeight.Value;
-				else if (value == 0) _resizableAbsoluteDockHeight = DockMinHeight;
+				}
+				else if (value == 0)
+				{
+					_resizableAbsoluteDockHeight = DockMinHeight;
+				}
 			}
 		}
 
-		#endregion DockHeight
-
 		/// <summary>
-		/// Gets or sets the AllowDuplicateContent property.
-		/// When this property is true, then the LayoutDocumentPane or LayoutAnchorablePane allows dropping
-		/// duplicate content (according to its Title and ContentId). When this dependency property is false,
-		/// then the LayoutDocumentPane or LayoutAnchorablePane hides the OverlayWindow.DropInto button to prevent dropping of duplicate content.
+		/// Gets or sets a value indicating whether duplicate content is allowed.
 		/// </summary>
 		public bool AllowDuplicateContent
 		{
@@ -162,6 +157,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance can reposition items.
+		/// </summary>
 		public bool CanRepositionItems
 		{
 			get => _canRepositionItems;
@@ -174,6 +172,10 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Executes the calculated dock min width operation.
+		/// </summary>
+		/// <returns>The resulting value.</returns>
 		public double CalculatedDockMinWidth()
 		{
 			var childrenDockMinWidth = 0.0;
@@ -184,14 +186,12 @@ namespace AvalonDock.Layout
 					visibleChildren.Max(child => child.CalculatedDockMinWidth())
 				  : visibleChildren.Sum(child => child.CalculatedDockMinWidth() + (Root?.Manager?.GridSplitterWidth ?? 0) * (visibleChildren.Count - 1));
 			}
+
 			return Math.Max(this._dockMinWidth, childrenDockMinWidth);
 		}
 
 		/// <summary>
-		/// Defines the smallest available width that can be applied to a deriving element.
-		///
-		/// The system ensures the minimum width by blocking/limiting <see cref="GridSplitter"/>
-		/// movement when the user resizes a deriving element or resizes the main window.
+		/// Gets or sets the dock min width.
 		/// </summary>
 		public double DockMinWidth
 		{
@@ -206,6 +206,10 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Executes the calculated dock min height operation.
+		/// </summary>
+		/// <returns>The resulting value.</returns>
 		public double CalculatedDockMinHeight()
 		{
 			var childrenDockMinHeight = 0.0;
@@ -221,10 +225,7 @@ namespace AvalonDock.Layout
 		}
 
 		/// <summary>
-		/// Defines the smallest available height that can be applied to a deriving element.
-		///
-		/// The system ensures the minimum height by blocking/limiting <see cref="GridSplitter"/>
-		/// movement when the user resizes a deriving element or resizes the main window.
+		/// Gets or sets the dock min height.
 		/// </summary>
 		public double DockMinHeight
 		{
@@ -239,6 +240,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the floating width.
+		/// </summary>
 		public double FloatingWidth
 		{
 			get => _floatingWidth;
@@ -251,6 +255,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the floating height.
+		/// </summary>
 		public double FloatingHeight
 		{
 			get => _floatingHeight;
@@ -263,6 +270,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the floating left.
+		/// </summary>
 		public double FloatingLeft
 		{
 			get => _floatingLeft;
@@ -275,6 +285,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the floating top.
+		/// </summary>
 		public double FloatingTop
 		{
 			get => _floatingTop;
@@ -287,6 +300,9 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance is maximized.
+		/// </summary>
 		public bool IsMaximized
 		{
 			get => _isMaximized;
@@ -298,66 +314,35 @@ namespace AvalonDock.Layout
 			}
 		}
 
+		/// <inheritdoc/>
 		double ILayoutPositionableElementWithActualSize.ActualWidth
 		{
 			get => _actualWidth;
 			set => _actualWidth = value;
 		}
 
+		/// <inheritdoc/>
 		double ILayoutPositionableElementWithActualSize.ActualHeight
 		{
 			get => _actualHeight;
 			set => _actualHeight = value;
 		}
 
-		#endregion Properties
-
-		#region Internal Methods
-
+		/// <inheritdoc/>
 		void ILayoutElementForFloatingWindow.RaiseFloatingPropertiesUpdated() => FloatingPropertiesUpdated?.Invoke(this, EventArgs.Empty);
 
-		#endregion Internal Methods
-
-		#region Overrides
-
-		public override void WriteXml(System.Xml.XmlWriter writer)
-		{
-			if (DockWidth.Value != 1.0 || !DockWidth.IsStar)
-				writer.WriteAttributeString(nameof(DockWidth), _gridLengthConverter.ConvertToInvariantString(DockWidth.IsAbsolute ? new GridLength(FixedDockWidth) : DockWidth));
-			if (DockHeight.Value != 1.0 || !DockHeight.IsStar)
-				writer.WriteAttributeString(nameof(DockHeight), _gridLengthConverter.ConvertToInvariantString(DockHeight.IsAbsolute ? new GridLength(FixedDockHeight) : DockHeight));
-			if (DockMinWidth != 25.0) writer.WriteAttributeString(nameof(DockMinWidth), DockMinWidth.ToString(CultureInfo.InvariantCulture));
-			if (DockMinHeight != 25.0) writer.WriteAttributeString(nameof(DockMinHeight), DockMinHeight.ToString(CultureInfo.InvariantCulture));
-			if (FloatingWidth != 0.0) writer.WriteAttributeString(nameof(FloatingWidth), FloatingWidth.ToString(CultureInfo.InvariantCulture));
-			if (FloatingHeight != 0.0) writer.WriteAttributeString(nameof(FloatingHeight), FloatingHeight.ToString(CultureInfo.InvariantCulture));
-			if (FloatingLeft != 0.0) writer.WriteAttributeString(nameof(FloatingLeft), FloatingLeft.ToString(CultureInfo.InvariantCulture));
-			if (FloatingTop != 0.0) writer.WriteAttributeString(nameof(FloatingTop), FloatingTop.ToString(CultureInfo.InvariantCulture));
-			if (IsMaximized) writer.WriteAttributeString(nameof(IsMaximized), IsMaximized.ToString());
-			base.WriteXml(writer);
-		}
-
-		public override void ReadXml(System.Xml.XmlReader reader)
-		{
-			if (reader.MoveToAttribute(nameof(DockWidth))) _dockWidth = (GridLength)_gridLengthConverter.ConvertFromInvariantString(reader.Value);
-			if (reader.MoveToAttribute(nameof(DockHeight))) _dockHeight = (GridLength)_gridLengthConverter.ConvertFromInvariantString(reader.Value);
-			if (reader.MoveToAttribute(nameof(DockMinWidth))) _dockMinWidth = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(DockMinHeight))) _dockMinHeight = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(FloatingWidth))) _floatingWidth = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(FloatingHeight))) _floatingHeight = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(FloatingLeft))) _floatingLeft = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(FloatingTop))) _floatingTop = double.Parse(reader.Value, CultureInfo.InvariantCulture);
-			if (reader.MoveToAttribute(nameof(IsMaximized))) _isMaximized = bool.Parse(reader.Value);
-			base.ReadXml(reader);
-		}
-
+		/// <summary>
+		/// Executes the on dock width changed operation.
+		/// </summary>
 		protected virtual void OnDockWidthChanged()
 		{
 		}
 
+		/// <summary>
+		/// Executes the on dock height changed operation.
+		/// </summary>
 		protected virtual void OnDockHeightChanged()
 		{
 		}
-
-		#endregion Overrides
 	}
 }

@@ -1,27 +1,24 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-/**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+﻿/**************************************************************************\
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 namespace Microsoft.Windows.Shell
 {
-	using Standard;
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics.CodeAnalysis;
 	using System.Windows;
 	using System.Windows.Data;
+	using Standard;
 
+	/// <summary>
+	/// Represents the window Chrome.
+	/// </summary>
 	public class WindowChrome : Freezable
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="WindowChrome"/> class.
+		/// </summary>
 		public WindowChrome()
 		{
 			// Effective default values for some of these properties are set to be bindings
@@ -44,22 +41,43 @@ namespace Microsoft.Windows.Shell
 			}
 		}
 
+		/// <summary>
+		/// Occurs when property Changed That Requires Repaint.
+		/// </summary>
 		internal event EventHandler PropertyChangedThatRequiresRepaint;
 
+		/// <summary>Represents the _SystemParameterBoundProperty structure.</summary>
 		private struct _SystemParameterBoundProperty
 		{
+			/// <summary>
+			/// Gets or sets the system Parameter Property Name.
+			/// </summary>
 			public string SystemParameterPropertyName { get; set; }
+
+			/// <summary>
+			/// Gets or sets the DependencyProperty value.
+			/// </summary>
 			public DependencyProperty DependencyProperty { get; set; }
 		}
 
 		// Named property available for fully extending the glass frame.
+
+		/// <summary>
+		/// Gets the glass Frame Complete Thickness.
+		/// </summary>
 		public static Thickness GlassFrameCompleteThickness => new Thickness(-1);
 
-		#region Attached Properties
-
+		/// <summary>
+		/// <see cref="WindowChrome"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty WindowChromeProperty = DependencyProperty.RegisterAttached("WindowChrome", typeof(WindowChrome), typeof(WindowChrome),
 			new PropertyMetadata(null, _OnChromeChanged));
 
+		/// <summary>
+		/// Executes the on Chrome Changed operation.
+		/// </summary>
+		/// <param name="d">The d.</param>
+		/// <param name="e">The event arguments.</param>
 		private static void _OnChromeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
 			// The different design tools handle drawing outside their custom window objects differently.
@@ -82,9 +100,15 @@ namespace Microsoft.Windows.Shell
 				chromeWorker = new WindowChromeWorker();
 				WindowChromeWorker.SetWindowChromeWorker(window, chromeWorker);
 			}
+
 			chromeWorker.SetWindowChrome(newChrome);
 		}
 
+		/// <summary>
+		/// Gets the get Window Chrome.
+		/// </summary>
+		/// <param name="window">The window.</param>
+		/// <returns>The requested value.</returns>
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
 		[SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
 		public static WindowChrome GetWindowChrome(Window window)
@@ -93,6 +117,11 @@ namespace Microsoft.Windows.Shell
 			return (WindowChrome)window.GetValue(WindowChromeProperty);
 		}
 
+		/// <summary>
+		/// Sets the set Window Chrome.
+		/// </summary>
+		/// <param name="window">The window.</param>
+		/// <param name="chrome">The chrome.</param>
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
 		[SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
 		public static void SetWindowChrome(Window window, WindowChrome chrome)
@@ -101,10 +130,18 @@ namespace Microsoft.Windows.Shell
 			window.SetValue(WindowChromeProperty, chrome);
 		}
 
+		/// <summary>
+		/// Gets the IsHitTestVisibleInChromeProperty value.
+		/// </summary>
 		public static readonly DependencyProperty IsHitTestVisibleInChromeProperty = DependencyProperty.RegisterAttached(
 			"IsHitTestVisibleInChrome", typeof(bool), typeof(WindowChrome),
 			new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.Inherits));
 
+		/// <summary>
+		/// Gets the get Is Hit Test Visible In Chrome.
+		/// </summary>
+		/// <param name="inputElement">The input Element.</param>
+		/// <returns>true if the operation succeeds; otherwise, false.</returns>
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
 		[SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
 		public static bool GetIsHitTestVisibleInChrome(IInputElement inputElement)
@@ -115,6 +152,11 @@ namespace Microsoft.Windows.Shell
 			return (bool)dobj.GetValue(IsHitTestVisibleInChromeProperty);
 		}
 
+		/// <summary>
+		/// Sets the set Is Hit Test Visible In Chrome.
+		/// </summary>
+		/// <param name="inputElement">The input Element.</param>
+		/// <param name="hitTestVisible">The hit Test Visible.</param>
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0")]
 		[SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
 		public static void SetIsHitTestVisibleInChrome(IInputElement inputElement, bool hitTestVisible)
@@ -125,32 +167,47 @@ namespace Microsoft.Windows.Shell
 			dobj.SetValue(IsHitTestVisibleInChromeProperty, hitTestVisible);
 		}
 
-		#endregion Attached Properties
-
-		#region Dependency Properties
-
+		/// <summary>
+		/// <see cref="CaptionHeight"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty CaptionHeightProperty = DependencyProperty.Register(nameof(CaptionHeight), typeof(double), typeof(WindowChrome),
 			new PropertyMetadata(0d, (d, e) => ((WindowChrome)d)._OnPropertyChangedThatRequiresRepaint()), value => (double)value >= 0d);
 
-		/// <summary>The extent of the top of the window to treat as the caption.</summary>
+		/// <summary>
+		/// Gets or sets the caption Height.
+		/// </summary>
 		public double CaptionHeight
 		{
 			get => (double)GetValue(CaptionHeightProperty);
 			set => SetValue(CaptionHeightProperty, value);
 		}
 
+		/// <summary>
+		/// <see cref="ResizeBorderThickness"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ResizeBorderThicknessProperty = DependencyProperty.Register(nameof(ResizeBorderThickness), typeof(Thickness), typeof(WindowChrome),
 			new PropertyMetadata(default(Thickness)), (value) => Utility.IsThicknessNonNegative((Thickness)value));
 
+		/// <summary>
+		/// Gets or sets the resize Border Thickness.
+		/// </summary>
 		public Thickness ResizeBorderThickness
 		{
 			get => (Thickness)GetValue(ResizeBorderThicknessProperty);
 			set => SetValue(ResizeBorderThicknessProperty, value);
 		}
 
+		/// <summary>
+		/// <see cref="GlassFrameThickness"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty GlassFrameThicknessProperty = DependencyProperty.Register(nameof(GlassFrameThickness), typeof(Thickness), typeof(WindowChrome),
 			new PropertyMetadata(default(Thickness), (d, e) => ((WindowChrome)d)._OnPropertyChangedThatRequiresRepaint(), (d, o) => _CoerceGlassFrameThickness((Thickness)o)));
 
+		/// <summary>
+		/// Executes the coerce Glass Frame Thickness operation.
+		/// </summary>
+		/// <param name="thickness">The thickness.</param>
+		/// <returns>The result of the operation.</returns>
 		private static object _CoerceGlassFrameThickness(Thickness thickness)
 		{
 			// If it's explicitly set, but set to a thickness with at least one negative side then
@@ -158,32 +215,44 @@ namespace Microsoft.Windows.Shell
 			return !Utility.IsThicknessNonNegative(thickness) ? GlassFrameCompleteThickness : thickness;
 		}
 
+		/// <summary>
+		/// Gets or sets the glass Frame Thickness.
+		/// </summary>
 		public Thickness GlassFrameThickness
 		{
 			get => (Thickness)GetValue(GlassFrameThicknessProperty);
 			set => SetValue(GlassFrameThicknessProperty, value);
 		}
 
+		/// <summary>
+		/// <see cref="CornerRadius"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty CornerRadiusProperty = DependencyProperty.Register(nameof(CornerRadius), typeof(CornerRadius), typeof(WindowChrome),
 			new PropertyMetadata(default(CornerRadius), (d, e) => ((WindowChrome)d)._OnPropertyChangedThatRequiresRepaint()), (value) => Utility.IsCornerRadiusValid((CornerRadius)value));
 
+		/// <summary>
+		/// Gets or sets the corner Radius.
+		/// </summary>
 		public CornerRadius CornerRadius
 		{
 			get => (CornerRadius)GetValue(CornerRadiusProperty);
 			set => SetValue(CornerRadiusProperty, value);
 		}
 
-		/// <summary>Gets or sets the ShowSystemMenu property.  This dependency property indicates if the system menu should be shown at right click on the caption. </summary>
+		/// <summary>
+		/// Gets or sets a value indicating whether show System Menu.
+		/// </summary>
 		public bool ShowSystemMenu { get; set; }
 
-		#endregion Dependency Properties
-
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override Freezable CreateInstanceCore()
 		{
 			return new WindowChrome();
 		}
 
+		/// <summary>
+		/// The bound Properties field.
+		/// </summary>
 		private static readonly List<_SystemParameterBoundProperty> _BoundProperties = new List<_SystemParameterBoundProperty>
 		{
 			new _SystemParameterBoundProperty { DependencyProperty = CornerRadiusProperty, SystemParameterPropertyName = "WindowCornerRadius" },
@@ -192,6 +261,9 @@ namespace Microsoft.Windows.Shell
 			new _SystemParameterBoundProperty { DependencyProperty = GlassFrameThicknessProperty, SystemParameterPropertyName = "WindowNonClientFrameThickness" },
 		};
 
+		/// <summary>
+		/// Executes the on Property Changed That Requires Repaint operation.
+		/// </summary>
 		private void _OnPropertyChangedThatRequiresRepaint() => PropertyChangedThatRequiresRepaint?.Invoke(this, EventArgs.Empty);
 	}
 }
