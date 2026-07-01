@@ -483,7 +483,7 @@ namespace AvalonDock.Controls
 						.Select(c => c.Content)
 						.OfType<LayoutContent>()
 						.Select(lc => lc.Content);
-					var contents = layoutContents.Select(obj => obj is ILayoutContentElement elem 
+					var contents = layoutContents.Select(obj => obj is ILayoutContentElement elem
 																? elem.Content
 																: obj as FrameworkElement)
 												 .Where(fe => fe != null);
@@ -507,6 +507,16 @@ namespace AvalonDock.Controls
 								parent != null && parent.ActualWidth < content.MinWidth)
 							{
 								Width = content.MinWidth + TotalMargin.Left + TotalMargin.Right;
+							}
+
+							if (Height > content.ActualHeight)
+							{
+								Height = content.ActualHeight + TotalMargin.Top + TotalMargin.Bottom;
+							}
+
+							if (Width > content.ActualWidth)
+							{
+								Width = content.ActualWidth + TotalMargin.Left + TotalMargin.Right;
 							}
 						}
 					}
