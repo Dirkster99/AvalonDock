@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -147,20 +146,7 @@ namespace AvalonDock.Themes.VS
 			}
 
 			var source = element.Attribute("Source")?.Value;
-			if (string.IsNullOrEmpty(source) || source.Length != 8)
-			{
-				return null;
-			}
-
-			if (!byte.TryParse(source.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var a) ||
-				!byte.TryParse(source.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var r) ||
-				!byte.TryParse(source.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var g) ||
-				!byte.TryParse(source.Substring(6, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var b))
-			{
-				return null;
-			}
-
-			return Color.FromArgb(a, r, g, b);
+			return VsColorParser.FromArgbHex(source);
 		}
 	}
 }

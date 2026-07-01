@@ -72,6 +72,56 @@ namespace AvalonDock.Themes.VS
 		{
 		}
 
+		/// <summary>
+		/// Creates a <see cref="VsTheme"/> from a Visual Studio 2026 JSON theme file.
+		/// </summary>
+		/// <remarks>
+		/// VS2026 JSON theme files are override only: they list just the color tokens that
+		/// were changed. Pass <paramref name="basePalette"/> (for example, the palette of a
+		/// built-in VS theme) to layer the overrides on top of a full base; if omitted, only
+		/// the tokens defined in the file are used and all other colors fall back to the
+		/// resource builder's defaults.
+		/// </remarks>
+		/// <param name="filePath">The path to the VS2026 JSON theme file.</param>
+		/// <param name="basePalette">An optional base palette to merge the overrides onto.</param>
+		/// <param name="genericXamlUri">An optional pack URI for the Generic.xaml control templates to merge.</param>
+		/// <returns>A theme built from the merged palette.</returns>
+		public static VsTheme FromJson(string filePath, VsThemeColorPalette basePalette = null, Uri genericXamlUri = null)
+		{
+			if (string.IsNullOrEmpty(filePath))
+			{
+				throw new ArgumentNullException(nameof(filePath));
+			}
+
+			return FromPalette(VsJsonThemeParser.ParseFile(filePath), basePalette, genericXamlUri);
+		}
+
+		/// <summary>
+		/// Creates a <see cref="VsTheme"/> from a Visual Studio 2026 JSON theme stream.
+		/// </summary>
+		/// <param name="jsonStream">The stream containing the VS2026 JSON theme content.</param>
+		/// <param name="basePalette">An optional base palette to merge the overrides onto.</param>
+		/// <param name="genericXamlUri">An optional pack URI for the Generic.xaml control templates to merge.</param>
+		/// <returns>A theme built from the merged palette.</returns>
+		public static VsTheme FromJson(Stream jsonStream, VsThemeColorPalette basePalette = null, Uri genericXamlUri = null)
+		{
+			if (jsonStream == null)
+			{
+				throw new ArgumentNullException(nameof(jsonStream));
+			}
+
+			return FromPalette(VsJsonThemeParser.Parse(jsonStream), basePalette, genericXamlUri);
+		}
+
+		private static VsTheme FromPalette(VsThemeColorPalette overrides, VsThemeColorPalette basePalette, Uri genericXamlUri)
+		{
+			var palette = basePalette != null ? basePalette.Merge(overrides) : overrides;
+			var dict = genericXamlUri != null
+				? VsThemeResourceBuilder.Build(palette, genericXamlUri)
+				: VsThemeResourceBuilder.Build(palette);
+			return new VsTheme(dict);
+		}
+
 		private static ResourceDictionary BuildFromStream(Stream stream)
 		{
 			if (stream == null)
