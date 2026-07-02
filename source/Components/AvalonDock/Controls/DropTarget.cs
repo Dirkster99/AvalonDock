@@ -112,6 +112,20 @@ namespace AvalonDock.Controls
 		{
 			var root = floatingWindow.Root;
 			var currentActiveContent = floatingWindow.Root.ActiveContent;
+			var manager = root.Manager;
+
+			// Check ContentDocking before any layout mutation starts - the only point where the operation
+			// can still be cancelled atomically. The matching ContentDocked is raised centrally by
+			// DockingManager.OnLayoutContentsStructureChanged once the layout mutations have settled.
+			if (manager != null)
+			{
+				foreach (var content in floatingWindow.Descendents().OfType<LayoutContent>().ToArray())
+				{
+					if (!manager.RaiseContentDocking(content))
+						return;
+				}
+			}
+
 			var fwAsAnchorable = floatingWindow as LayoutAnchorableFloatingWindow;
 
 			if (fwAsAnchorable != null)

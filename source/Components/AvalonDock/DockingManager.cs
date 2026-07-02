@@ -75,6 +75,13 @@ namespace AvalonDock
 		private readonly List<LayoutItem> _layoutItems = new List<LayoutItem>();
 
 		/// <summary>
+		/// Tracks which contents of the current layout are hosted in a floating window, so that
+		/// <see cref="OnLayoutContentsStructureChanged"/> can detect floating-to-docked transitions
+		/// and raise <see cref="ContentDocked"/> from a single place.
+		/// </summary>
+		private readonly HashSet<LayoutContent> _floatingContents = new HashSet<LayoutContent>();
+
+		/// <summary>
 		/// Indicates whether layout item creation is temporarily suspended.
 		/// </summary>
 		private bool _suspendLayoutItemCreation = false;
@@ -463,6 +470,15 @@ namespace AvalonDock
 			DetachLayoutItems();
 
 			Layout.Manager = this;
+
+			// Seed the floating-contents cache from the new layout without raising events: content that is
+			// already floating when a layout is attached (e.g. after deserialization) has not "just docked".
+			_floatingContents.Clear();
+			if (newLayout != null)
+			{
+				foreach (var floatingContent in newLayout.Descendents().OfType<LayoutContent>().Where(c => c.IsFloating))
+					_floatingContents.Add(floatingContent);
+			}
 
 			AttachLayoutItems();
 			AttachDocumentsSource(newLayout, DocumentsSource);
@@ -2320,36 +2336,77 @@ namespace AvalonDock
 		/// <param name="anchorable">The anchorable to dock.</param>
 		internal void ExecuteDockCommand(LayoutAnchorable anchorable)
 		{
-			var dockingArgs = new ContentDockingEventArgs(anchorable);
-			ContentDocking?.Invoke(this, dockingArgs);
-			if (dockingArgs.Cancel)
-				return;
-
-			var coreDockingArgs = new Core.Events.ContentCancelEventArgs(anchorable);
-			_coreContentDocking?.Invoke(this, coreDockingArgs);
-			if (coreDockingArgs.Cancel)
+			if (!RaiseContentDocking(anchorable))
 				return;
 
 			anchorable.Dock();
-			ContentDocked?.Invoke(this, new ContentDockedEventArgs(anchorable));
-			_coreContentDocked?.Invoke(this, new Core.Events.ContentEventArgs(anchorable));
 		}
 
 		/// <summary>Docks the specified content as a document.</summary>
 		/// <param name="content">The content to dock as a document.</param>
 		internal void ExecuteDockAsDocumentCommand(LayoutContent content)
 		{
-			var dockingArgs = new ContentDockingEventArgs(content);
-			ContentDocking?.Invoke(this, dockingArgs);
-			if (dockingArgs.Cancel)
-				return;
-
-			var coreDockingArgs = new Core.Events.ContentCancelEventArgs(content);
-			_coreContentDocking?.Invoke(this, coreDockingArgs);
-			if (coreDockingArgs.Cancel)
+			if (!RaiseContentDocking(content))
 				return;
 
 			content.DockAsDocument();
+		}
+
+		/// <summary>
+		/// Raises the <see cref="ContentDocking"/> event (and its core counterpart) for the specified content.
+		/// This must run before any layout mutation starts, since it is the only point where the operation
+		/// can still be cancelled atomically. The matching <see cref="ContentDocked"/> is not raised by the
+		/// caller but by <see cref="OnLayoutContentsStructureChanged"/> once the layout mutation has settled.
+		/// </summary>
+		/// <param name="content">The content that is about to be docked.</param>
+		/// <returns><c>false</c> if a handler cancelled the operation; otherwise <c>true</c>.</returns>
+		internal bool RaiseContentDocking(LayoutContent content)
+		{
+			var dockingArgs = new ContentDockingEventArgs(content);
+			ContentDocking?.Invoke(this, dockingArgs);
+			if (dockingArgs.Cancel)
+				return false;
+
+			var coreDockingArgs = new Core.Events.ContentCancelEventArgs(content);
+			_coreContentDocking?.Invoke(this, coreDockingArgs);
+			return !coreDockingArgs.Cancel;
+		}
+
+		/// <summary>
+		/// Detects float/dock transitions of layout contents and raises <see cref="ContentDocked"/> for each
+		/// content that moved from a floating window into the docked layout. This is the single place where
+		/// <see cref="ContentDocked"/> is raised. <see cref="LayoutRoot"/> invokes it from the two points
+		/// every structural layout operation passes through once its mutations have settled:
+		/// <see cref="LayoutRoot.CollectGarbage"/> and the floating-windows collection change. Because the
+		/// detection is state-based rather than call-site-based, it also covers direct calls to the public
+		/// <see cref="LayoutContent.Dock"/>/<see cref="LayoutContent.DockAsDocument"/> APIs.
+		/// </summary>
+		internal void OnLayoutContentsStructureChanged()
+		{
+			if (Layout == null) return;
+
+			foreach (var content in Layout.Descendents().OfType<LayoutContent>().ToArray())
+			{
+				if (content.IsFloating)
+				{
+					_floatingContents.Add(content);
+				}
+				else if (_floatingContents.Remove(content))
+				{
+					// Hidden anchorables are parented directly to the LayoutRoot; leaving a floating
+					// window for the hidden list is not a dock. Only a move into a pane/group counts.
+					if (content.Parent != null && !(content.Parent is LayoutRoot))
+						RaiseContentDocked(content);
+				}
+			}
+
+			_floatingContents.RemoveWhere(c => c.Root != Layout);
+		}
+
+		/// <summary>Raises the <see cref="ContentDocked"/> event (and its core counterpart) for the specified content.</summary>
+		/// <param name="content">The content that has just been docked.</param>
+		private void RaiseContentDocked(LayoutContent content)
+		{
 			ContentDocked?.Invoke(this, new ContentDockedEventArgs(content));
 			_coreContentDocked?.Invoke(this, new Core.Events.ContentEventArgs(content));
 		}

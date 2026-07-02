@@ -548,6 +548,10 @@ namespace AvalonDock.Layout
 			// Update ActiveContent and LastFocusedDocument properties
 			UpdateActiveContentProperty();
 
+			// Every structural layout operation (dock, float, drag-drop, close) finalizes through this
+			// method, so this is where the manager gets to observe settled float/dock transitions.
+			Manager?.OnLayoutContentsStructureChanged();
+
 #if DEBUG
 			Debug.Assert(!this.Descendents().OfType<LayoutAnchorablePane>().Any(a => a.ChildrenCount == 0 && a.IsVisible));
 			// DumpTree(true);
@@ -608,6 +612,10 @@ namespace AvalonDock.Layout
 					bNotifyChildren = true;
 				}
 			}
+
+			// A floating window entering or leaving the layout changes the floating state of the contents
+			// it hosts; let the manager observe the transition (see OnLayoutContentsStructureChanged).
+			Manager?.OnLayoutContentsStructureChanged();
 
 			// descendants of LayoutElement notify when their Children and ChildrenCount properties change
 			// https://github.com/xceedsoftware/wpftoolkit/issues/1313

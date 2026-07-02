@@ -13,11 +13,9 @@ namespace Standard
 	using System.Collections.Generic;
 	using System.ComponentModel;
 	using System.Diagnostics.CodeAnalysis;
-	using System.Globalization;
 	using System.IO;
 	using System.Reflection;
 	using System.Runtime.InteropServices;
-	using System.Security.Cryptography;
 	using System.Text;
 	using System.Windows;
 	using System.Windows.Media;
@@ -561,21 +559,6 @@ namespace Standard
 
 			// Reset the Seek pointer before returning.
 			destination.Position = 0;
-		}
-
-		/// <summary>Performs the HashStreamMD5 operation.</summary>
-		/// <param name="stm">The stm value.</param>
-		/// <returns>The result of the operation.</returns>
-		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-		public static string HashStreamMD5(Stream stm)
-		{
-			stm.Position = 0;
-			var hashBuilder = new StringBuilder();
-			using (var md5 = MD5.Create())
-			{
-				foreach (var b in md5.ComputeHash(stm)) hashBuilder.Append(b.ToString("x2", CultureInfo.InvariantCulture));
-				return hashBuilder.ToString();
-			}
 		}
 
 		/// <summary>Performs the EnsureDirectory operation.</summary>
