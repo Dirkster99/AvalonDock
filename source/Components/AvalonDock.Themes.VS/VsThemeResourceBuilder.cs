@@ -57,6 +57,15 @@ namespace AvalonDock.Themes.VS
 			var dimText = palette.GetForegroundOrDefault("ToolWindowTabText", Color.FromRgb(0x8C, 0x8C, 0x8C));
 			var brightText = Colors.White;
 
+			// VS2026 introduced tokens that color the tab strip and window/tool headers
+			// independently from the rest of the shell chrome. When present they take
+			// precedence over the classic per-element tokens; otherwise the original
+			// fallbacks below are used, so existing XML themes are unaffected.
+			var environmentTab = palette.GetBackground("EnvironmentTab");
+			var environmentTabInactive = palette.GetBackground("EnvironmentTabInactive");
+			var environmentHeader = palette.GetBackground("EnvironmentHeader");
+			var environmentHeaderInactive = palette.GetBackground("EnvironmentHeaderInactive");
+
 			// Accent
 			dict[ResourceKeys.ControlAccentColorKey] = accent;
 			SetBrush(dict, ResourceKeys.ControlAccentBrushKey, accent);
@@ -64,7 +73,7 @@ namespace AvalonDock.Themes.VS
 			// General
 			SetBrush(dict, ResourceKeys.Background, background);
 			SetBrush(dict, ResourceKeys.PanelBorderBrush, panelBorder);
-			SetBrush(dict, ResourceKeys.TabBackground, tabBg);
+			SetBrush(dict, ResourceKeys.TabBackground, environmentTab ?? tabBg);
 
 			// Auto Hide : Tab
 			SetBrush(dict, ResourceKeys.AutoHideTabDefaultBackground, palette.GetBackgroundOrDefault("AutoHideTabBackgroundBegin", background));
@@ -86,9 +95,9 @@ namespace AvalonDock.Themes.VS
 			// Document Well : Tab
 			SetBrush(dict, ResourceKeys.DocumentWellTabSelectedActiveBackground, palette.GetBackgroundOrDefault("FileTabSelectedBorder", accent));
 			SetBrush(dict, ResourceKeys.DocumentWellTabSelectedActiveText, palette.GetBackgroundOrDefault("FileTabSelectedText", brightText));
-			SetBrush(dict, ResourceKeys.DocumentWellTabSelectedInactiveBackground, palette.GetBackgroundOrDefault("FileTabInactiveBorder", background));
+			SetBrush(dict, ResourceKeys.DocumentWellTabSelectedInactiveBackground, environmentTabInactive ?? palette.GetBackgroundOrDefault("FileTabInactiveBorder", background));
 			SetBrush(dict, ResourceKeys.DocumentWellTabSelectedInactiveText, palette.GetBackgroundOrDefault("FileTabInactiveText", inactiveText));
-			SetBrush(dict, ResourceKeys.DocumentWellTabUnselectedBackground, palette.GetBackgroundOrDefault("FileTabBackground", tabBg));
+			SetBrush(dict, ResourceKeys.DocumentWellTabUnselectedBackground, environmentTab ?? palette.GetBackgroundOrDefault("FileTabBackground", tabBg));
 			SetBrush(dict, ResourceKeys.DocumentWellTabUnselectedText, palette.GetBackgroundOrDefault("FileTabText", dimText));
 			SetBrush(dict, ResourceKeys.DocumentWellTabUnselectedHoveredBackground, palette.GetBackgroundOrDefault("FileTabHotBorder", panelBorder));
 			SetBrush(dict, ResourceKeys.DocumentWellTabUnselectedHoveredText, palette.GetBackgroundOrDefault("FileTabHotText", brightText));
@@ -105,10 +114,10 @@ namespace AvalonDock.Themes.VS
 			MapCloseButton(dict, palette, "FileTabButtonDownInactive", ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonPressedBackground, ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonPressedBorder, ResourceKeys.DocumentWellTabButtonUnselectedTabHoveredButtonPressedGlyph, accent);
 
 			// Tool Window : Caption
-			SetBrush(dict, ResourceKeys.ToolWindowCaptionActiveBackground, palette.GetBackgroundOrDefault("TitleBarActiveBorder", accent));
+			SetBrush(dict, ResourceKeys.ToolWindowCaptionActiveBackground, environmentHeader ?? palette.GetBackgroundOrDefault("TitleBarActiveBorder", accent));
 			SetBrush(dict, ResourceKeys.ToolWindowCaptionActiveGrip, palette.GetBackgroundOrDefault("TitleBarDragHandleActive", panelBorder));
 			SetBrush(dict, ResourceKeys.ToolWindowCaptionActiveText, palette.GetBackgroundOrDefault("TitleBarActiveText", brightText));
-			SetBrush(dict, ResourceKeys.ToolWindowCaptionInactiveBackground, palette.GetBackgroundOrDefault("TitleBarInactive", background));
+			SetBrush(dict, ResourceKeys.ToolWindowCaptionInactiveBackground, environmentHeaderInactive ?? palette.GetBackgroundOrDefault("TitleBarInactive", background));
 			SetBrush(dict, ResourceKeys.ToolWindowCaptionInactiveGrip, palette.GetBackgroundOrDefault("TitleBarDragHandle", background));
 			SetBrush(dict, ResourceKeys.ToolWindowCaptionInactiveText, palette.GetBackgroundOrDefault("TitleBarInactiveText", dimText));
 
@@ -131,9 +140,9 @@ namespace AvalonDock.Themes.VS
 			// Tool Window : Tab
 			SetBrush(dict, ResourceKeys.ToolWindowTabSelectedActiveBackground, palette.GetBackgroundOrDefault("ToolWindowTabSelectedTab", accent));
 			SetBrush(dict, ResourceKeys.ToolWindowTabSelectedActiveText, palette.GetBackgroundOrDefault("ToolWindowTabSelectedActiveText", brightText));
-			SetBrush(dict, ResourceKeys.ToolWindowTabSelectedInactiveBackground, palette.GetBackgroundOrDefault("ToolWindowTabSelectedTab", panelBorder));
+			SetBrush(dict, ResourceKeys.ToolWindowTabSelectedInactiveBackground, environmentTabInactive ?? palette.GetBackgroundOrDefault("ToolWindowTabSelectedTab", panelBorder));
 			SetBrush(dict, ResourceKeys.ToolWindowTabSelectedInactiveText, palette.GetBackgroundOrDefault("ToolWindowTabSelectedText", inactiveText));
-			SetBrush(dict, ResourceKeys.ToolWindowTabUnselectedBackground, palette.GetBackgroundOrDefault("ToolWindowTabGradientBegin", tabBg));
+			SetBrush(dict, ResourceKeys.ToolWindowTabUnselectedBackground, environmentTab ?? palette.GetBackgroundOrDefault("ToolWindowTabGradientBegin", tabBg));
 			SetBrush(dict, ResourceKeys.ToolWindowTabUnselectedText, palette.GetBackgroundOrDefault("ToolWindowTabText", dimText));
 			SetBrush(dict, ResourceKeys.ToolWindowTabUnselectedHoveredBackground, palette.GetBackgroundOrDefault("ToolWindowTabMouseOverBackgroundBegin", panelBorder));
 			SetBrush(dict, ResourceKeys.ToolWindowTabUnselectedHoveredText, palette.GetBackgroundOrDefault("ToolWindowTabMouseOverText", brightText));

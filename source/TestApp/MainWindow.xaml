@@ -80,6 +80,10 @@
                 <MenuItem Header="VS2013 Light" Click="OnSwitchTheme" Tag="VS2013Light" IsCheckable="True" />
                 <MenuItem Header="VS2013 Blue" Click="OnSwitchTheme" Tag="VS2013Blue" IsCheckable="True" />
                 <Separator />
+                <MenuItem Header="VS2026 Dark" Click="OnSwitchTheme" Tag="VS2026Dark" IsCheckable="True" />
+                <MenuItem Header="VS2026 Light" Click="OnSwitchTheme" Tag="VS2026Light" IsCheckable="True" />
+                <MenuItem Header="VS2026 Blue" Click="OnSwitchTheme" Tag="VS2026Blue" IsCheckable="True" />
+                <Separator />
                 <MenuItem Header="VS2022 Dark" Click="OnSwitchTheme" Tag="VS2022Dark" IsCheckable="True" />
                 <MenuItem Header="VS2022 Light" Click="OnSwitchTheme" Tag="VS2022Light" IsCheckable="True" />
                 <MenuItem Header="VS2022 Blue" Click="OnSwitchTheme" Tag="VS2022Blue" IsCheckable="True" />
