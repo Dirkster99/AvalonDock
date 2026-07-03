@@ -577,6 +577,7 @@ namespace AvalonDock.Layout
 		public void DockAsDocument()
 		{
 			if (!(Root is LayoutRoot root)) throw new InvalidOperationException();
+			var wasFloating = IsFloating;
 
 			if (PreviousContainer is LayoutDocumentPane previousDocumentPane &&
 				previousDocumentPane.FindParent<LayoutDocumentFloatingWindow>() == null)
@@ -614,6 +615,9 @@ namespace AvalonDock.Layout
 
 			// BD: 14.08.2020 raise IsFloating property changed
 			RaisePropertyChanged(nameof(IsFloating));
+
+			if (wasFloating && !IsFloating)
+				root.Manager?.RaiseContentDocked(this);
 		}
 
 		/// <summary>
@@ -621,6 +625,8 @@ namespace AvalonDock.Layout
 		/// </summary>
 		public void Dock()
 		{
+			var wasFloating = IsFloating;
+
 			if (PreviousContainer != null)
 			{
 				var currentContainer = Parent;
@@ -655,6 +661,9 @@ namespace AvalonDock.Layout
 
 			// BD: 14.08.2020 raise IsFloating property changed
 			RaisePropertyChanged(nameof(IsFloating));
+
+			if (wasFloating && !IsFloating)
+				Root.Manager?.RaiseContentDocked(this);
 		}
 
 		/// <inheritdoc/>

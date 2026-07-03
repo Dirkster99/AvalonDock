@@ -14,12 +14,11 @@ namespace AvalonDockTest
 	///   #599 - ContentDocking / ContentDocked never fire when content is re-docked
 	///
 	/// ContentDocking (cancellable) is raised at the operation entry points before any layout mutation.
-	/// ContentDocked is raised from a single place - <c>DockingManager.OnLayoutContentsStructureChanged</c> -
-	/// which <see cref="AvalonDock.Layout.LayoutRoot"/> invokes from the points every structural layout
-	/// operation finalizes through (<c>CollectGarbage</c> and the floating-windows collection change),
-	/// detecting floating-to-docked transitions by state rather than by call site. This makes the event
-	/// fire for the commands, for drag-and-drop drops, and for direct calls to the public
-	/// <see cref="AvalonDock.Layout.LayoutContent.Dock"/> API alike.
+	/// ContentDocked is raised where the mutation completes: at the end of
+	/// <see cref="AvalonDock.Layout.LayoutContent.Dock"/> and
+	/// <see cref="AvalonDock.Layout.LayoutContent.DockAsDocument"/> (covering the commands and direct
+	/// calls to the public API alike, guarded by a floating-to-docked transition check), and in the
+	/// drag-and-drop <c>DropTarget.Drop</c> for contents that actually left their floating window.
 	///
 	/// These tests need neither a shown window nor the dispatcher message loop: an unshown
 	/// <see cref="DockingManager"/> has <see cref="System.Windows.FrameworkElement.IsLoaded"/> == false,
@@ -168,8 +167,9 @@ namespace AvalonDockTest
 
 		/// <summary>
 		/// Docking through the public <see cref="LayoutContent.Dock"/> API (not the command) must also raise
-		/// ContentDocked, since the event is detected from the layout transition itself. ContentDocking is
-		/// not raised here: the app invoked the operation directly, so there is nothing to cancel.
+		/// ContentDocked, since <see cref="LayoutContent.Dock"/> itself raises it on a floating-to-docked
+		/// transition. ContentDocking is not raised here: the app invoked the operation directly, so there
+		/// is nothing to cancel.
 		/// </summary>
 		[Test]
 		public void PublicDockApi_FiresContentDocked_Issue599()

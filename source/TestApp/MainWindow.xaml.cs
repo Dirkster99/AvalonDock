@@ -42,10 +42,7 @@ namespace TestApp
 
 
 			DispatcherTimer timer = new DispatcherTimer();
-			// Pseudo-random suffices for cycling a demo background color; nothing security-relevant here.
-#pragma warning disable S2245 // Using pseudorandom number generators (PRNGs) is security-sensitive
 			Random rnd = new Random();
-#pragma warning restore S2245
 			timer.Interval = TimeSpan.FromSeconds(1.0);
 			timer.Tick += (s, e) =>
 				{
