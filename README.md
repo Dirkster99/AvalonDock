@@ -1,6 +1,6 @@
 # AvalonDock
 
-[![CI](https://github.com/Dirkster99/AvalonDock/actions/workflows/ci.yml/badge.svg)](https://github.com/Dirkster99/AvalonDock/actions/workflows/ci.yml)
+[![CI](https://github.com/Dirkster99/AvalonDock/actions/workflows/release.yml/badge.svg)](https://github.com/Dirkster99/AvalonDock/actions/workflows/release.yml)
 [![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)
 [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.svg)](http://nuget.org/packages/Dirkster.AvalonDock)
 
@@ -18,8 +18,8 @@ AvalonDock is used by [many open source and commercial projects](https://github.
 - [WpfDesigner](https://github.com/icsharpcode/WpfDesigner) — The WPF Designer from SharpDevelop
 - [DaxStudio](https://github.com/DaxStudio/DaxStudio) — DAX query tool for Power BI and Analysis Services
 - [Macad3D](https://github.com/Macad3D/Macad3D) — Free and open-source 3D Construction Tool
-- [Edi](https://dirkster99.github.io/Edi/) — Open source text editor IDE based on AvalonDock and AvalonEdit (330 stars)
-- [Profile Explorer](https://github.com/microsoft/profile-explorer) — Microsoft CPU profiling trace viewer (273 stars)
+- [Edi](https://dirkster99.github.io/Edi/) — Open source text editor IDE based on AvalonDock and AvalonEdit
+- [Profile Explorer](https://github.com/microsoft/profile-explorer) — Microsoft CPU profiling trace viewer
 
 Be sure to check out the [Wiki](https://github.com/Dirkster99/AvalonDock/wiki) and the [documentation site](https://dirkster99.github.io/AvalonDock/) for tutorials and API reference.
 
