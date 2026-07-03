@@ -1,6 +1,6 @@
 # AvalonDock
 
-[![CI](https://github.com/Dirkster99/AvalonDock/actions/workflows/ci.yml/badge.svg)](https://github.com/Dirkster99/AvalonDock/actions/workflows/ci.yml)
+[![CI](https://github.com/Dirkster99/AvalonDock/actions/workflows/release.yml/badge.svg)](https://github.com/Dirkster99/AvalonDock/actions/workflows/release.yml)
 [![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)
 [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.svg)](http://nuget.org/packages/Dirkster.AvalonDock)
 
