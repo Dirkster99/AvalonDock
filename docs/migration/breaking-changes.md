@@ -126,11 +126,11 @@ A bug fix in v5.0.0 corrects the restacking behavior for bottom-docked panels. I
 
 | Category | Change | Impact | Action |
 |:---------|:-------|:-------|:-------|
-| Packages | Serializers separated | High | Install serializer package |
-| Namespaces | Serializer namespace moved | High | Update `using` statements |
+| Packages | Serializers separated | Low | Install serializer package |
+| Namespaces | Serializer namespace moved | Low | Update `using` statements |
 | Architecture | `ILayoutEngine` added | Low | No action for default behavior |
 | Frameworks | .NET < 4.8 dropped | High | Upgrade target framework |
 | Frameworks | .NET Core 3.x / 5 dropped | High | Upgrade target framework |
 | Themes | Arc theme added | None | Optional adoption |
 | Serialization | JSON serializer added | None | Optional adoption |
-| Behavior | Bottom restack fix | Low | Test and verify layouts |
+| Behavior | Bottom restack fix | High | Test and verify layouts |
