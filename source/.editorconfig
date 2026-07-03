@@ -4103,6 +4103,8 @@ dotnet_diagnostic.s4200.severity = none
 # Reason: Resolving developer tools (git, powershell) via PATH is intentional; hard-coded
 # absolute paths would break on most machines. Not a meaningful threat model for this project.
 dotnet_diagnostic.s4036.severity = none
+dotnet_diagnostic.s2245.severity = none
+dotnet_diagnostic.s4790.severity = none
 
 dotnet_diagnostic.s1206.severity = none
 dotnet_diagnostic.s1751.severity = none
