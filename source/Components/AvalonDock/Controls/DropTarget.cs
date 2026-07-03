@@ -112,6 +112,26 @@ namespace AvalonDock.Controls
 		{
 			var root = floatingWindow.Root;
 			var currentActiveContent = floatingWindow.Root.ActiveContent;
+			var manager = root.Manager;
+
+			// A drop onto a target that itself lives in a floating window merely re-hosts the contents;
+			// they stay floating, so it is not a docking operation and must not raise the docking events.
+			var isDockingDrop = (_targetElement as ILayoutControl)?.Model?.FindParent<LayoutFloatingWindow>() == null;
+
+			// Check ContentDocking before any layout mutation starts - the only point where the operation
+			// can still be cancelled atomically. The matching ContentDocked is raised after the drop has
+			// settled, for each content that actually left its floating window.
+			LayoutContent[] droppedContents = null;
+			if (manager != null && isDockingDrop)
+			{
+				droppedContents = floatingWindow.Descendents().OfType<LayoutContent>().ToArray();
+				foreach (var content in droppedContents)
+				{
+					if (!manager.RaiseContentDocking(content))
+						return;
+				}
+			}
+
 			var fwAsAnchorable = floatingWindow as LayoutAnchorableFloatingWindow;
 
 			if (fwAsAnchorable != null)
@@ -122,6 +142,15 @@ namespace AvalonDock.Controls
 			{
 				var fwAsDocument = floatingWindow as LayoutDocumentFloatingWindow;
 				this.Drop(fwAsDocument);
+			}
+
+			if (droppedContents != null)
+			{
+				foreach (var content in droppedContents)
+				{
+					if (!content.IsFloating && content.Root == root)
+						manager.RaiseContentDocked(content);
+				}
 			}
 
 			if (currentActiveContent == null)

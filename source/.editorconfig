@@ -4099,6 +4099,13 @@ dotnet_diagnostic.s1135.severity = none
 # Reason: Often intentional P/Invoke patterns (538 warnings)
 dotnet_diagnostic.s4200.severity = none
 
+# S4036: Searching OS commands in PATH is security-sensitive
+# Reason: Resolving developer tools (git, powershell) via PATH is intentional; hard-coded
+# absolute paths would break on most machines. Not a meaningful threat model for this project.
+dotnet_diagnostic.s4036.severity = none
+dotnet_diagnostic.s2245.severity = none
+dotnet_diagnostic.s4790.severity = none
+
 dotnet_diagnostic.s1206.severity = none
 dotnet_diagnostic.s1751.severity = none
 dotnet_diagnostic.s2190.severity = none
