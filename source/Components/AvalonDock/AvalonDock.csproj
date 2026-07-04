@@ -1,12 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="ProGPU.Wpf.Sdk/11.0.0-dev">
+	<!-- Cross-platform (ProGPU/macOS) adaptation for OpenDevelop: single net11.0-windows target via
+	     ProGPU.Wpf.Sdk instead of the upstream Microsoft.NET.Sdk.WindowsDesktop multi-target
+	     ($(ComponentTargetFrameworks) = net9.0-windows;net10.0-windows;net48). Analyzers and
+	     TreatWarningsAsErrors (injected by source/Directory.Build.props) are disabled here so the
+	     library builds cleanly as an OpenDevelop dependency without the fork's dev-time quality gates
+	     failing the ProGPU build. -->
 	<PropertyGroup>
 		<RootNamespace>AvalonDock</RootNamespace>
 		<PackageId>Dirkster.AvalonDock</PackageId>
-		<TargetFrameworks>$(ComponentTargetFrameworks)</TargetFrameworks>
+		<TargetFramework>net11.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<RunAnalyzers>false</RunAnalyzers>
+		<EnableNETAnalyzers>false</EnableNETAnalyzers>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net.5.0-windows|AnyCPU'">
 		<DefineConstants/>

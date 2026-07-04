@@ -11,7 +11,11 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\AvalonDock\sn.snk</AssemblyOriginatorKeyFile>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<!-- OpenDevelop: disable the fork's dev-time analyzer/warnings-as-errors gates. -->
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<RunAnalyzers>false</RunAnalyzers>
+		<EnableNETAnalyzers>false</EnableNETAnalyzers>
 	</PropertyGroup>
 
 	<ItemGroup>
