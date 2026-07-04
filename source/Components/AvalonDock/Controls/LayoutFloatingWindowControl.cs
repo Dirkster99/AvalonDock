@@ -13,6 +13,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 
 using AvalonDock.Layout;
+using AvalonDock.Platform;
 using AvalonDock.Themes;
 using Microsoft.Windows.Shell;
 
@@ -416,8 +417,8 @@ namespace AvalonDock.Controls
 
 					if (_dragService != null)
 					{
-						var mousePosition = Win32Helper.GetMousePosition();
-						_dragService.Drop(mousePosition, out var dropFlag);
+					var mousePosition = PlatformHelper.GetCursorPosition();
+					_dragService.Drop(mousePosition, out var dropFlag);
 						_dragService = null;
 						SetIsDragging(false);
 						if (dropFlag) InternalClose();
@@ -855,7 +856,7 @@ namespace AvalonDock.Controls
 				SetIsDragging(true);
 			}
 
-			var mousePosition = Win32Helper.GetMousePosition();
+			var mousePosition = PlatformHelper.GetCursorPosition();
 			_dragService.UpdateMouseLocation(mousePosition);
 		}
 
