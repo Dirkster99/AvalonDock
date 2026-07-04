@@ -45,6 +45,7 @@ namespace AvalonDockTest
 			public System.Collections.IEnumerable DocumentsSource { get; set; }
 			public System.Collections.IEnumerable AnchorablesSource { get; set; }
 			public int AutoHideDelay { get; set; }
+			public bool SupportsAutoHideFlyout => true;
 			public bool AllowMixedOrientation { get; set; }
 
 			public event EventHandler ActiveContentChanged;
