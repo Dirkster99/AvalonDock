@@ -164,7 +164,8 @@ namespace AvalonDock.Controls
 			}
 			else if (_model.IsSelected)
 			{
-				_model.Root.Manager.ShowAutoHideWindow(this);
+				if (CanShowAutoHideWindow())
+					_model.Root.Manager.ShowAutoHideWindow(this);
 				_model.IsSelected = false;
 			}
 		}
@@ -173,8 +174,24 @@ namespace AvalonDock.Controls
 		{
 			if (!_model.IsAutoHidden)
 				_model.IsActiveChanged -= new EventHandler(_model_IsActiveChanged);
-			else if (_model.IsActive)
+			else if (_model.IsActive && CanShowAutoHideWindow())
 				_model.Root.Manager.ShowAutoHideWindow(this);
+		}
+
+		/// <summary>
+		/// Determines whether the classic auto-hide flyout may be shown for the model.
+		/// The <see cref="ToggleDockingManager"/> replaces the auto-hide side panels with
+		/// toggle button bars, so the flyout must never open there. The model also has to be
+		/// anchored to a side: while the toggle layout engine restructures the layout the
+		/// model can be selected/activated in a state where its parent chain is detached,
+		/// which would crash <see cref="LayoutAutoHideWindowControl.Show"/>.
+		/// </summary>
+		private bool CanShowAutoHideWindow()
+		{
+			var manager = _model.Root?.Manager;
+			if (manager == null || manager is ToggleDockingManager)
+				return false;
+			return _model.Parent?.Parent is LayoutAnchorSide;
 		}
 
 		private void _openUpTimer_Tick(object sender, EventArgs e)
