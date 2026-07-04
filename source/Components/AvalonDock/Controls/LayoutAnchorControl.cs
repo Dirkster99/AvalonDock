@@ -180,16 +180,16 @@ namespace AvalonDock.Controls
 
 		/// <summary>
 		/// Determines whether the classic auto-hide flyout may be shown for the model.
-		/// The <see cref="ToggleDockingManager"/> replaces the auto-hide side panels with
-		/// toggle button bars, so the flyout must never open there. The model also has to be
-		/// anchored to a side: while the toggle layout engine restructures the layout the
-		/// model can be selected/activated in a state where its parent chain is detached,
-		/// which would crash <see cref="LayoutAutoHideWindowControl.Show"/>.
+		/// The manager has to support the flyout (see
+		/// <see cref="DockingManager.SupportsAutoHideFlyout"/>) and the model has to be
+		/// anchored to a side: while the layout is being restructured the model can be
+		/// selected/activated in a state where its parent chain is detached, which would
+		/// crash <see cref="LayoutAutoHideWindowControl.Show"/>.
 		/// </summary>
 		private bool CanShowAutoHideWindow()
 		{
 			var manager = _model.Root?.Manager;
-			if (manager == null || manager is ToggleDockingManager)
+			if (manager == null || !manager.SupportsAutoHideFlyout)
 				return false;
 			return _model.Parent?.Parent is LayoutAnchorSide;
 		}

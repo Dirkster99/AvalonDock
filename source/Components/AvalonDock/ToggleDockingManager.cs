@@ -269,6 +269,7 @@ public class ToggleDockingManager : DockingManager
 	/// </summary>
 	public ToggleDockingManager()
 	{
+		SupportsAutoHideFlyout = false;
 		LayoutUpdateStrategy = new ToggleLayoutStrategy();
 		AnchorablePaneControlStyle = LoadToggleStyle();
 		Loaded += ToggleDockingManager_Loaded;
