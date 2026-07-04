@@ -197,6 +197,26 @@ namespace AvalonDock.MVVMTestApp
 
 
 
+		/// <summary>
+		/// Add an in-memory document with an explicit, unique <paramref name="contentId"/>.
+		/// Used by DevFlow diagnostic actions to seed a deterministic layout for
+		/// integration tests (see DockDiagnostics.SeedDocuments).
+		/// </summary>
+		internal FileViewModel AddDocument(string contentId)
+		{
+			var existing = _files.FirstOrDefault(f => f.ContentId == contentId);
+			if (existing != null) return existing;
+
+			var fileViewModel = new FileViewModel
+			{
+				Title = contentId,
+				ContentId = contentId,
+			};
+			_files.Add(fileViewModel);
+			ActiveDocument = fileViewModel;
+			return fileViewModel;
+		}
+
 		private bool CanNew(object parameter)
 		{
 			return true;

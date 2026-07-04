@@ -21,6 +21,9 @@ namespace AvalonDock.MVVMTestApp
 			this.Unloaded += new RoutedEventHandler(MainWindow_Unloaded);
 		}
 
+		/// <summary>Exposes the docking manager for DevFlow diagnostic actions (integration tests).</summary>
+		public DockingManager DockManager => dockManager;
+
 		private void MainWindow_Loaded(object sender, RoutedEventArgs e)
 		{
 			var serializer = new XmlLayoutSerializer(dockManager);

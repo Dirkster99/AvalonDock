@@ -15,7 +15,6 @@
     xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:TestApp"
-    xmlns:winformsIntegration="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
     xmlns:vs="clr-namespace:AvalonDock.Themes.VS;assembly=AvalonDock.Themes.VS"
     Title="MainWindow"
     Width="800"
@@ -139,7 +138,7 @@
                             CanHide="False"
                             ContentId="WinFormsWindow"
                             ToolTip="My WinForms Tool">
-                            <winformsIntegration:WindowsFormsHost x:Name="winFormsHost" />
+                            <TextBlock Text="WinForms placeholder" VerticalAlignment="Center" HorizontalAlignment="Center" />
                         </LayoutAnchorable>
                     </LayoutAnchorablePane>
                     <LayoutDocumentPaneGroup>

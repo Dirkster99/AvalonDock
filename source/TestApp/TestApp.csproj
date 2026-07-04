@@ -1,9 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="ProGPU.Wpf.Sdk/11.0.0-dev">
     <PropertyGroup>
         <RootNamespace>TestApp</RootNamespace>
-        <TargetFrameworks>net9.0-windows;net48</TargetFrameworks>
-        <UseWPF>true</UseWPF>
-        <UseWindowsForms>true</UseWindowsForms>
+        <TargetFramework>net11.0-windows</TargetFramework>
+        <UseWindowsForms>false</UseWindowsForms>
         <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
         <ApplicationIcon />
         <OutputType>WinExe</OutputType>
@@ -11,10 +10,32 @@
         <AssemblyName>TestApp</AssemblyName>
         <!-- Sample app: allow warnings -->
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
+        <GitVersion_NoFetchEnabled>true</GitVersion_NoFetchEnabled>
+        <GitVersionTaskEnabled>false</GitVersionTaskEnabled>
+        <ProGpuWpfRuntimeFrameworkVersion>11.0.0-preview.1.26104.118</ProGpuWpfRuntimeFrameworkVersion>
        </PropertyGroup>
     <ItemGroup>
         <Resource Include="**\*.png" />
     </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="UserControl1.cs" />
+        <Compile Remove="UserControl1.Designer.cs" />
+        <EmbeddedResource Remove="UserControl1.resx" />
+    </ItemGroup>
+    <ItemGroup>
+        <FrameworkReference Remove="Microsoft.WindowsDesktop.App" />
+        <FrameworkReference Remove="Microsoft.WindowsDesktop.App.WPF" />
+    </ItemGroup>
+    <Target Name="_TestAppRemoveWindowsDesktopTransitiveFrameworkReferences"
+            BeforeTargets="AddTransitiveFrameworkReferences"
+            Condition="'$(ProGpuWpfUsePortableFrameworkReferences)' == 'true'">
+        <ItemGroup>
+            <TransitiveFrameworkReference Remove="Microsoft.WindowsDesktop.App" />
+            <TransitiveFrameworkReference Remove="Microsoft.WindowsDesktop.App.WPF" />
+            <TransitiveFrameworkReference Remove="Microsoft.WindowsDesktop.App.WindowsForms" />
+        </ItemGroup>
+    </Target>
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>
@@ -28,5 +49,8 @@
       <ProjectReference Include="..\Components\AvalonDock.Themes.Metro\AvalonDock.Themes.Metro.csproj" />
       <ProjectReference Include="..\Components\AvalonDock.Themes.VS2010\AvalonDock.Themes.VS2010.csproj" />
       <ProjectReference Include="..\Components\AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="/Users/lextm/uno-tools/wpf-labs/src/DevFlow/LeXtudio.DevFlow.Agent.WPF/LeXtudio.DevFlow.Agent.WPF.csproj" />
     </ItemGroup>
 </Project>
