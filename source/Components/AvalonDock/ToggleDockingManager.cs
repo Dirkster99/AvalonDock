@@ -126,9 +126,12 @@ public class ToggleDockingManager : DockingManager
 	{
 		if (_staticToggleStyle == null)
 		{
+			// Use an absolute pack URI: relative URIs are resolved against the ambient
+			// base URI, which is not reliable outside of XAML loading contexts
+			// (e.g. when the manager is created on a worker thread in unit tests).
 			var dict = new ResourceDictionary
 			{
-				Source = new Uri("/AvalonDock;component/Themes/generic.xaml", UriKind.Relative)
+				Source = new Uri("pack://application:,,,/AvalonDock;component/Themes/generic.xaml", UriKind.Absolute)
 			};
 
 			_staticToggleStyle = dict["ToggleAnchorablePaneControlStyle"] as Style;

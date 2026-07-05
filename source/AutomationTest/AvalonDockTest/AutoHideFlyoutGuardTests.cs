@@ -2,7 +2,6 @@
 using System;
 using System.Reflection;
 using System.Threading;
-using System.Windows;
 using AvalonDock;
 using AvalonDock.Controls;
 using AvalonDock.Layout;
@@ -32,7 +31,7 @@ public class AutoHideFlyoutGuardTests : AutomationTestBase
 	public void DockingManager_SupportsAutoHideFlyout()
 	{
 		bool? supportsFlyout = null;
-		var failure = RunOnAppThread(() =>
+		var failure = RunOnStaThread(() =>
 		{
 			AvalonDock.Core.IDockingManager manager = new DockingManager();
 			supportsFlyout = manager.SupportsAutoHideFlyout;
@@ -49,7 +48,7 @@ public class AutoHideFlyoutGuardTests : AutomationTestBase
 	public void ToggleDockingManager_DoesNotSupportAutoHideFlyout()
 	{
 		bool? supportsFlyout = null;
-		var failure = RunOnAppThread(() =>
+		var failure = RunOnStaThread(() =>
 		{
 			AvalonDock.Core.IDockingManager manager = new ToggleDockingManager();
 			supportsFlyout = manager.SupportsAutoHideFlyout;
@@ -68,7 +67,7 @@ public class AutoHideFlyoutGuardTests : AutomationTestBase
 	public void SelectingAutoHiddenAnchorable_UnderToggleDockingManager_DoesNotOpenFlyout()
 	{
 		bool? isSelectedAfter = null;
-		var failure = RunOnAppThread(() =>
+		var failure = RunOnStaThread(() =>
 		{
 			var manager = new ToggleDockingManager();
 			var anchorable = AddAutoHiddenAnchorable(manager, out _);
@@ -91,7 +90,7 @@ public class AutoHideFlyoutGuardTests : AutomationTestBase
 	[Test]
 	public void ActivatingAutoHiddenAnchorable_UnderToggleDockingManager_DoesNotOpenFlyout()
 	{
-		var failure = RunOnAppThread(() =>
+		var failure = RunOnStaThread(() =>
 		{
 			var manager = new ToggleDockingManager();
 			var anchorable = AddAutoHiddenAnchorable(manager, out _);
@@ -112,7 +111,7 @@ public class AutoHideFlyoutGuardTests : AutomationTestBase
 	public void SelectingAutoHiddenAnchorable_WithDetachedAnchorGroup_DoesNotThrow()
 	{
 		bool? isSelectedAfter = null;
-		var failure = RunOnAppThread(() =>
+		var failure = RunOnStaThread(() =>
 		{
 			var manager = new DockingManager();
 			var anchorable = AddAutoHiddenAnchorable(manager, out var group);
@@ -139,7 +138,7 @@ public class AutoHideFlyoutGuardTests : AutomationTestBase
 	[Test]
 	public void AutoHideWindowControl_Show_WithDetachedParentChain_DoesNotThrow()
 	{
-		var failure = RunOnAppThread(() =>
+		var failure = RunOnStaThread(() =>
 		{
 			var manager = new DockingManager();
 			var anchorable = AddAutoHiddenAnchorable(manager, out var group);
@@ -220,13 +219,14 @@ public class AutoHideFlyoutGuardTests : AutomationTestBase
 	}
 
 	/// <summary>
-	/// Runs the action on the shared application dispatcher and captures any exception,
-	/// because <see cref="ThreadExecutor.RunCodeAsSTA"/> swallows exceptions thrown on
-	/// its worker thread.
+	/// Runs the action on a fresh STA thread (the same pattern the other UI tests use;
+	/// controls and layout models do not need the shared test application) and captures
+	/// any exception, because <see cref="ThreadExecutor.RunCodeAsSTA"/> swallows
+	/// exceptions thrown on its worker thread.
 	/// </summary>
 	/// <param name="action">The test body.</param>
 	/// <returns>The captured exception or null.</returns>
-	private Exception? RunOnAppThread(Action action)
+	private Exception? RunOnStaThread(Action action)
 	{
 		Exception? failure = null;
 		ThreadExecutor.RunCodeAsSTA(
@@ -235,7 +235,7 @@ public class AutoHideFlyoutGuardTests : AutomationTestBase
 			{
 				try
 				{
-					Application.Current.Dispatcher.Invoke(action);
+					action();
 				}
 				catch (Exception ex)
 				{
