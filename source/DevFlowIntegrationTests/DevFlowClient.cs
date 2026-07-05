@@ -16,7 +16,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 	//
 	// Reachability is opt-in: tests resolve the port from DEVFLOW_TEST_PORT and skip
 	// when no sample is running, so the default (headless) test run stays green.
-	internal sealed class DevFlowClient : IDisposable
+	public sealed class DevFlowClient : IDisposable
 	{
 		private readonly HttpClient _http;
 
@@ -51,6 +51,23 @@ namespace AvalonDock.DevFlowIntegrationTests
 			return JsonDocument.Parse(raw).RootElement.Clone();
 		}
 
+		public async Task<List<string>> ListActionsAsync(CancellationToken ct = default)
+		{
+			var raw = await GetStringAsync("/api/v1/invoke/actions", ct).ConfigureAwait(false);
+			using var doc = JsonDocument.Parse(raw);
+			var result = new List<string>();
+			if (doc.RootElement.TryGetProperty("actions", out var actions) && actions.ValueKind == JsonValueKind.Array)
+			{
+				foreach (var action in actions.EnumerateArray())
+				{
+					if (action.TryGetProperty("name", out var name) && name.ValueKind == JsonValueKind.String)
+						result.Add(name.GetString());
+				}
+			}
+
+			return result;
+		}
+
 		/// <summary>
 		/// Invoke a custom [DevFlowAction] and return its string result (the wrapper's
 		/// "result"/"value"/"output" field if present, otherwise the raw body).
@@ -76,6 +93,33 @@ namespace AvalonDock.DevFlowIntegrationTests
 			if (!resp.IsSuccessStatusCode)
 				throw new HttpRequestException($"DevFlow drag returned {(int)resp.StatusCode}: {raw}");
 			return JsonDocument.Parse(raw).RootElement.Clone();
+		}
+
+		public async Task<JsonElement> DragAndAssertOkAsync(DragRequest request, CancellationToken ct = default)
+		{
+			var result = await DragAsync(request, ct).ConfigureAwait(false);
+			if (!result.TryGetProperty("ok", out var ok) || ok.ValueKind != JsonValueKind.True)
+				throw new InvalidOperationException($"DevFlow drag did not report success: {result.GetRawText()}");
+			return result;
+		}
+
+		public async Task<ElementBounds> QueryBoundsAsync(string target, string contentId = null)
+		{
+			var json = contentId == null
+				? await InvokeAsync("avd.query.bounds", target).ConfigureAwait(false)
+				: await InvokeAsync("avd.query.bounds", target, contentId).ConfigureAwait(false);
+			using var doc = JsonDocument.Parse(json);
+			var root = doc.RootElement;
+			if (!root.TryGetProperty("found", out var found) || found.ValueKind != JsonValueKind.True)
+				throw new InvalidOperationException($"AvalonDock target bounds not found: {json}");
+			var bounds = new ElementBounds(
+				root.GetProperty("x").GetDouble(),
+				root.GetProperty("y").GetDouble(),
+				root.GetProperty("width").GetDouble(),
+				root.GetProperty("height").GetDouble());
+			if (bounds.Width <= 0 || bounds.Height <= 0)
+				throw new InvalidOperationException($"AvalonDock target bounds are empty: {json}");
+			return bounds;
 		}
 
 		public async Task<List<JsonElement>> QueryElementsAsync(string type, int maxResults = 20, int maxDepth = 96, CancellationToken ct = default)
@@ -139,7 +183,6 @@ namespace AvalonDock.DevFlowIntegrationTests
 				ct.ThrowIfCancellationRequested();
 				try
 				{
-					await WaitForStableElementBoundsAsync("LayoutDocumentTabItem", ct).ConfigureAwait(false);
 					var json = await InvokeAsync("avd.query.layout").ConfigureAwait(false);
 					snapshot = DockLayoutSnapshot.Parse(json);
 					if (snapshot.Documents.Exists(d => d.ContentId == "document1")
@@ -156,6 +199,34 @@ namespace AvalonDock.DevFlowIntegrationTests
 			}
 
 			throw new TimeoutException("Timed out waiting for AvalonDock TestApp layout and visual bounds to become ready.");
+		}
+
+		public async Task<DockLayoutSnapshot> WaitForAvalonDockTestLayoutReadyAsync(CancellationToken ct)
+		{
+			var deadline = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(30);
+			DockLayoutSnapshot snapshot = null;
+
+			while (DateTimeOffset.UtcNow < deadline)
+			{
+				ct.ThrowIfCancellationRequested();
+				try
+				{
+					var json = await InvokeAsync("avd.query.layout").ConfigureAwait(false);
+					snapshot = DockLayoutSnapshot.Parse(json);
+					if (snapshot.Documents.Exists(d => d.ContentId == "dragTestDocument")
+						&& snapshot.Anchorables.Exists(a => a.ContentId == "dragTestTool"))
+					{
+						return snapshot;
+					}
+				}
+				catch (Exception ex) when (ex is HttpRequestException or JsonException or TimeoutException or TaskCanceledException)
+				{
+				}
+
+				await Task.Delay(500, ct).ConfigureAwait(false);
+			}
+
+			throw new TimeoutException("Timed out waiting for AvalonDock drag/drop test layout to become ready.");
 		}
 
 		private async Task<string> GetStringAsync(string path, CancellationToken ct)
@@ -191,7 +262,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 		public void Dispose() => _http.Dispose();
 	}
 
-	internal sealed class DragRequest
+	public sealed class DragRequest
 	{
 		public string FromId { get; set; }
 		public string ToId { get; set; }
@@ -205,7 +276,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 		public bool Global { get; set; }
 	}
 
-	internal readonly struct ElementBounds
+	public readonly struct ElementBounds
 	{
 		public ElementBounds(double x, double y, double width, double height)
 		{
@@ -234,7 +305,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 				&& Math.Abs(Height - other.Height) < 0.5;
 	}
 
-	internal static class DevFlowTree
+	public static class DevFlowTree
 	{
 		public static JsonElement ParseTree(string json)
 			=> JsonDocument.Parse(json).RootElement.Clone();
@@ -294,7 +365,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 	}
 
 	// Strongly-typed view of the dock-query-layout JSON, so assertions read cleanly.
-	internal sealed class DockLayoutSnapshot
+	public sealed class DockLayoutSnapshot
 	{
 		public List<ContentInfo> Documents { get; } = new();
 		public List<ContentInfo> Anchorables { get; } = new();
@@ -322,6 +393,10 @@ namespace AvalonDock.DevFlowIntegrationTests
 		{
 			public string Kind { get; set; }
 			public List<string> Contents { get; } = new();
+			public double? FloatingLeft { get; set; }
+			public double? FloatingTop { get; set; }
+			public double? FloatingWidth { get; set; }
+			public double? FloatingHeight { get; set; }
 		}
 
 		public static DockLayoutSnapshot Parse(string json)
@@ -342,11 +417,19 @@ namespace AvalonDock.DevFlowIntegrationTests
 			{
 				var fi = new FloatingInfo
 				{
-					Kind = f.TryGetProperty("kind", out var k) ? k.GetString() : null,
+					Kind = f.TryGetProperty("kind", out var k)
+						? k.GetString()
+						: f.TryGetProperty("type", out var t) ? t.GetString() : null,
 				};
-				if (f.TryGetProperty("contents", out var contents))
+				if (!f.TryGetProperty("contents", out var contents))
+					f.TryGetProperty("contentIds", out contents);
+				if (contents.ValueKind == JsonValueKind.Array)
 					foreach (var c in contents.EnumerateArray())
 						fi.Contents.Add(c.GetString());
+				fi.FloatingLeft = ReadNullableDouble(f, "floatingLeft");
+				fi.FloatingTop = ReadNullableDouble(f, "floatingTop");
+				fi.FloatingWidth = ReadNullableDouble(f, "floatingWidth");
+				fi.FloatingHeight = ReadNullableDouble(f, "floatingHeight");
 				snap.FloatingWindows.Add(fi);
 			}
 			if (root.TryGetProperty("hidden", out var hidden) && hidden.ValueKind == JsonValueKind.Array)
@@ -384,6 +467,13 @@ namespace AvalonDock.DevFlowIntegrationTests
 				IsHidden = element.TryGetProperty("isHidden", out var isHidden) && isHidden.ValueKind == JsonValueKind.True,
 				IsFloat = element.TryGetProperty("isFloat", out var isFloat) && isFloat.ValueKind == JsonValueKind.True,
 			};
+		}
+
+		private static double? ReadNullableDouble(JsonElement element, string name)
+		{
+			if (!element.TryGetProperty(name, out var value) || value.ValueKind == JsonValueKind.Null)
+				return null;
+			return value.ValueKind == JsonValueKind.Number ? value.GetDouble() : null;
 		}
 	}
 }
