@@ -12,7 +12,7 @@ namespace AvalonDock.Serializer.Xml
 	/// </summary>
 	public class XmlLayoutSerializer : LayoutSerializerBase
 	{
-		private static readonly XmlSerializer DtoSerializer = new XmlSerializer(typeof(LayoutRootDto));
+		private static readonly XmlSerializer DtoSerializer = new XmlSerializer(typeof(LayoutRootDto), new XmlAttributeOverrides());
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="XmlLayoutSerializer"/> class.
