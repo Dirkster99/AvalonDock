@@ -1,4 +1,4 @@
-<Project Sdk="ProGPU.Wpf.Sdk/11.0.0-dev">
+<Project Sdk="LibreWPF.Sdk/11.0.0-dev">
     <PropertyGroup>
         <RootNamespace>TestApp</RootNamespace>
         <TargetFramework>net11.0-windows</TargetFramework>

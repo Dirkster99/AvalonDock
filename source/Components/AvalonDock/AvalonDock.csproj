@@ -1,4 +1,4 @@
-<Project Sdk="ProGPU.Wpf.Sdk/11.0.0-dev">
+<Project Sdk="LibreWPF.Sdk/11.0.0-dev">
 	<!-- Cross-platform (ProGPU/macOS) adaptation for OpenDevelop: single net11.0-windows target via
 	     ProGPU.Wpf.Sdk instead of the upstream Microsoft.NET.Sdk.WindowsDesktop multi-target
 	     ($(ComponentTargetFrameworks) = net9.0-windows;net10.0-windows;net48). Analyzers and
