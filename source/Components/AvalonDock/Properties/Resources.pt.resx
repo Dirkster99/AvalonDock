@@ -183,4 +183,7 @@
   <data name="Window_Restore" xml:space="preserve">
     <value>Recuperar</value>
   </data>
+  <data name="Document_BtnPinned_Hint" xml:space="preserve">
+    <value>Alternar estado fixo</value>
+  </data>
 </root>
