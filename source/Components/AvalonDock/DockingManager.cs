@@ -2486,6 +2486,7 @@ namespace AvalonDock
 				fwc.EnableBindings();
 				if (fwc.KeepContentVisibleOnClose)
 				{
+					fwc.UpdateOwnership();
 					fwc.Show();
 					fwc.KeepContentVisibleOnClose = false;
 				}
