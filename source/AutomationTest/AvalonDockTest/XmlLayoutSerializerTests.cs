@@ -45,6 +45,7 @@ namespace AvalonDockTest
 			public System.Collections.IEnumerable DocumentsSource { get; set; }
 			public System.Collections.IEnumerable AnchorablesSource { get; set; }
 			public int AutoHideDelay { get; set; }
+			public bool SupportsAutoHideFlyout => true;
 			public bool AllowMixedOrientation { get; set; }
 
 			public event EventHandler ActiveContentChanged;
@@ -711,6 +712,212 @@ namespace AvalonDockTest
 			Assert.That(manager.Layout, Is.Not.Null);
 			var resultDto = ((FakeDtoMapper)manager.DtoMapper).LastFromDtoInput;
 			Assert.That(resultDto.RootPanel, Is.Not.Null);
+		}
+
+		#endregion
+
+		#region Legacy / cross-version compatibility
+
+		[Test]
+		public void Deserialize_LegacyCapitalizedBooleans_AreAccepted()
+		{
+			// Older AvalonDock layouts (and hand-edited files) may contain
+			// capitalized boolean values, which the XmlSerializer rejects out of
+			// the box. They must still deserialize.
+			var xml =
+				"<LayoutRoot>" +
+				"<RootPanel Orientation=\"Horizontal\">" +
+				"<LayoutAnchorablePane Id=\"anchorPane1\">" +
+				"<LayoutAnchorable Title=\"Properties\" ContentId=\"props\" " +
+				"CanHide=\"False\" CanAutoHide=\"False\" IsSelected=\"True\" CanClose=\"True\" />" +
+				"</LayoutAnchorablePane>" +
+				"</RootPanel>" +
+				"<TopSide /><RightSide /><LeftSide /><BottomSide />" +
+				"</LayoutRoot>";
+
+			var manager = new FakeDockingManager();
+			var result = DeserializeFromXml(xml, manager);
+
+			var anchor = result.RootPanel.Children
+				.OfType<LayoutAnchorablePaneDto>().First()
+				.Children.First();
+
+			Assert.That(anchor.CanHide, Is.False);
+			Assert.That(anchor.CanAutoHide, Is.False);
+			Assert.That(anchor.IsSelected, Is.True);
+			Assert.That(anchor.CanClose, Is.True);
+		}
+
+		[Test]
+		public void Deserialize_CapitalizedBooleanInStringAttribute_IsNotAltered()
+		{
+			// Only real boolean attributes are normalized; a string attribute whose
+			// value happens to be "True" must be preserved verbatim.
+			var xml =
+				"<LayoutRoot>" +
+				"<RootPanel Orientation=\"Horizontal\">" +
+				"<LayoutDocumentPane Id=\"docPane1\">" +
+				"<LayoutDocument Title=\"True\" ContentId=\"False\" IsSelected=\"True\" />" +
+				"</LayoutDocumentPane>" +
+				"</RootPanel>" +
+				"<TopSide /><RightSide /><LeftSide /><BottomSide />" +
+				"</LayoutRoot>";
+
+			var manager = new FakeDockingManager();
+			var result = DeserializeFromXml(xml, manager);
+
+			var doc = result.RootPanel.Children
+				.OfType<LayoutDocumentPaneDto>().First()
+				.Children.OfType<LayoutDocumentDto>().First();
+
+			Assert.That(doc.Title, Is.EqualTo("True"));
+			Assert.That(doc.ContentId, Is.EqualTo("False"));
+			Assert.That(doc.IsSelected, Is.True);
+		}
+
+		[Test]
+		public void Deserialize_MismatchedUtf16EncodingDeclaration_IsTolerated()
+		{
+			// A layout persisted as a UTF-16 string (declaration says utf-16) but
+			// handed to us as UTF-8 bytes must still load rather than failing with
+			// "There is no Unicode byte order mark".
+			var xml =
+				"<?xml version=\"1.0\" encoding=\"utf-16\"?>" +
+				"<LayoutRoot>" +
+				"<RootPanel Orientation=\"Horizontal\">" +
+				"<LayoutDocumentPane Id=\"docPane1\" />" +
+				"</RootPanel>" +
+				"<TopSide /><RightSide /><LeftSide /><BottomSide />" +
+				"</LayoutRoot>";
+
+			var manager = new FakeDockingManager();
+			var serializer = new XmlLayoutSerializer(manager);
+			using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+
+			Assert.DoesNotThrow(() => serializer.Deserialize(stream));
+
+			var result = ((FakeDtoMapper)manager.DtoMapper).LastFromDtoInput;
+			Assert.That(result.RootPanel.Children.Count, Is.EqualTo(1));
+			Assert.That(((LayoutDocumentPaneDto)result.RootPanel.Children[0]).Id, Is.EqualTo("docPane1"));
+		}
+
+		[Test]
+		public void Deserialize_Utf16BomEncodedStream_IsTolerated()
+		{
+			// Bytes that are genuinely UTF-16 (with BOM) must be decoded correctly.
+			var xml =
+				"<?xml version=\"1.0\" encoding=\"utf-16\"?>" +
+				"<LayoutRoot>" +
+				"<RootPanel Orientation=\"Horizontal\">" +
+				"<LayoutDocumentPane Id=\"docPane1\" />" +
+				"</RootPanel>" +
+				"<TopSide /><RightSide /><LeftSide /><BottomSide />" +
+				"</LayoutRoot>";
+
+			var manager = new FakeDockingManager();
+			var serializer = new XmlLayoutSerializer(manager);
+			var bytes = Encoding.Unicode.GetPreamble()
+				.Concat(Encoding.Unicode.GetBytes(xml)).ToArray();
+			using var stream = new MemoryStream(bytes);
+
+			Assert.DoesNotThrow(() => serializer.Deserialize(stream));
+
+			var result = ((FakeDtoMapper)manager.DtoMapper).LastFromDtoInput;
+			Assert.That(((LayoutDocumentPaneDto)result.RootPanel.Children[0]).Id, Is.EqualTo("docPane1"));
+		}
+
+		[Test]
+		public void Deserialize_GoldenV4Layout_LoadsCompletely()
+		{
+			// A layout exactly as AvalonDock v4 wrote it: utf-16 declaration (while the
+			// bytes are UTF-8), capitalised booleans (v4 used bool.ToString()),
+			// xmlns:xsi/xsd declarations on nested elements (v4 serialized children with
+			// per-type XmlSerializers), floating-window children named by their type,
+			// anchor groups on the sides and a Hidden section.
+			var xml =
+				"<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n" +
+				"<LayoutRoot xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n" +
+				"  <RootPanel Orientation=\"Horizontal\">\r\n" +
+				"    <LayoutAnchorablePane xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Id=\"toolsPane\" Name=\"ToolsPane\" DockWidth=\"200\">\r\n" +
+				"      <LayoutAnchorable Title=\"Solution Explorer\" IsSelected=\"True\" ContentId=\"explorer\" CanHide=\"False\" CanClose=\"True\" LastActivationTimeStamp=\"06/25/2026 14:16:56\" />\r\n" +
+				"    </LayoutAnchorablePane>\r\n" +
+				"    <LayoutDocumentPane xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Id=\"docPane\" ShowHeader=\"False\">\r\n" +
+				"      <LayoutDocument Title=\"Readme\" IsSelected=\"True\" IsLastFocusedDocument=\"True\" ContentId=\"readme\" CanMove=\"False\" Description=\"Docs\" />\r\n" +
+				"    </LayoutDocumentPane>\r\n" +
+				"  </RootPanel>\r\n" +
+				"  <TopSide />\r\n" +
+				"  <RightSide />\r\n" +
+				"  <LeftSide>\r\n" +
+				"    <LayoutAnchorGroup xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Id=\"group1\" PreviousContainerId=\"toolsPane\">\r\n" +
+				"      <LayoutAnchorable Title=\"Output\" ContentId=\"output\" CanAutoHide=\"True\" />\r\n" +
+				"    </LayoutAnchorGroup>\r\n" +
+				"  </LeftSide>\r\n" +
+				"  <BottomSide />\r\n" +
+				"  <FloatingWindows>\r\n" +
+				"    <LayoutAnchorableFloatingWindow>\r\n" +
+				"      <LayoutAnchorablePaneGroup xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Orientation=\"Horizontal\" FloatingWidth=\"400\" FloatingHeight=\"300\" FloatingLeft=\"10.5\" FloatingTop=\"20.5\">\r\n" +
+				"        <LayoutAnchorablePane Id=\"floatPane\" DockWidth=\"1*\">\r\n" +
+				"          <LayoutAnchorable Title=\"Watch\" ContentId=\"watch\" />\r\n" +
+				"        </LayoutAnchorablePane>\r\n" +
+				"      </LayoutAnchorablePaneGroup>\r\n" +
+				"    </LayoutAnchorableFloatingWindow>\r\n" +
+				"  </FloatingWindows>\r\n" +
+				"  <Hidden>\r\n" +
+				"    <LayoutAnchorable Title=\"Hidden Tool\" ContentId=\"hiddenTool\" PreviousContainerId=\"toolsPane\" PreviousContainerIndex=\"0\" CanShowOnHover=\"False\" />\r\n" +
+				"  </Hidden>\r\n" +
+				"</LayoutRoot>";
+
+			var manager = new FakeDockingManager();
+			var serializer = new XmlLayoutSerializer(manager);
+			using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+			serializer.Deserialize(stream);
+			var root = ((FakeDtoMapper)manager.DtoMapper).LastFromDtoInput;
+
+			// Root panel with anchorable pane and document pane
+			Assert.That(root.RootPanel.Orientation, Is.EqualTo("Horizontal"));
+			Assert.That(root.RootPanel.Children.Count, Is.EqualTo(2));
+
+			var toolsPane = (LayoutAnchorablePaneDto)root.RootPanel.Children[0];
+			Assert.That(toolsPane.Id, Is.EqualTo("toolsPane"));
+			Assert.That(toolsPane.Name, Is.EqualTo("ToolsPane"));
+			Assert.That(toolsPane.DockWidth, Is.EqualTo("200"));
+
+			var explorer = toolsPane.Children.Single();
+			Assert.That(explorer.Title, Is.EqualTo("Solution Explorer"));
+			Assert.That(explorer.IsSelected, Is.True);
+			Assert.That(explorer.CanHide, Is.False);
+			Assert.That(explorer.CanClose, Is.True);
+			Assert.That(explorer.LastActivationTimeStamp, Is.EqualTo("06/25/2026 14:16:56"));
+
+			var docPane = (LayoutDocumentPaneDto)root.RootPanel.Children[1];
+			Assert.That(docPane.ShowHeader, Is.False);
+
+			var readme = (LayoutDocumentDto)docPane.Children.Single();
+			Assert.That(readme.IsLastFocusedDocument, Is.True);
+			Assert.That(readme.CanMove, Is.False);
+			Assert.That(readme.Description, Is.EqualTo("Docs"));
+
+			// Auto-hidden anchor group on the left side
+			var group = root.LeftSide.Children.Single();
+			Assert.That(group.Id, Is.EqualTo("group1"));
+			Assert.That(group.PreviousContainerId, Is.EqualTo("toolsPane"));
+			Assert.That(group.Children.Single().ContentId, Is.EqualTo("output"));
+
+			// Floating window with its type-named pane group child
+			var floating = (LayoutAnchorableFloatingWindowDto)root.FloatingWindows.Single();
+			Assert.That(floating.RootPanel.FloatingWidth, Is.EqualTo(400.0));
+			Assert.That(floating.RootPanel.FloatingLeft, Is.EqualTo(10.5));
+
+			var floatPane = (LayoutAnchorablePaneDto)floating.RootPanel.Children.Single();
+			Assert.That(floatPane.DockWidth, Is.EqualTo("1*"));
+			Assert.That(floatPane.Children.Single().ContentId, Is.EqualTo("watch"));
+
+			// Hidden section
+			var hidden = root.Hidden.Single();
+			Assert.That(hidden.ContentId, Is.EqualTo("hiddenTool"));
+			Assert.That(hidden.PreviousContainerId, Is.EqualTo("toolsPane"));
+			Assert.That(hidden.PreviousContainerIndex, Is.EqualTo(0));
+			Assert.That(hidden.CanShowOnHover, Is.False);
 		}
 
 		#endregion

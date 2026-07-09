@@ -1102,6 +1102,17 @@ namespace AvalonDock
 			set => SetValue(AutoHideDelayProperty, value);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether auto-hidden anchorables are presented in the classic
+		/// auto-hide flyout that slides out of the side anchor panels.
+		/// Derived managers that present auto-hidden content differently override this
+		/// with <see langword="false"/> to prevent the flyout from being shown.
+		/// </summary>
+		[Bindable(false)]
+		[Description("Gets whether auto-hidden anchorables are presented in the classic auto-hide flyout.")]
+		[Category("AutoHideWindow")]
+		public bool SupportsAutoHideFlyout { get; protected set; } = true;
+
 		/// <summary>Gets all <see cref="LayoutFloatingWindowControl"/> instances managed by this framework.</summary>
 		[Bindable(false)]
 		[Description("Enumerates all LayoutFloatingWindowControls managed by this framework.")]
@@ -2475,6 +2486,7 @@ namespace AvalonDock
 				fwc.EnableBindings();
 				if (fwc.KeepContentVisibleOnClose)
 				{
+					fwc.UpdateOwnership();
 					fwc.Show();
 					fwc.KeepContentVisibleOnClose = false;
 				}

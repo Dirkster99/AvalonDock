@@ -267,9 +267,14 @@ namespace AvalonDock.Controls
 				var attachedToolTip = ToggleDock.GetToolTip(anc);
 				var attachedIconTemplate = ToggleDock.GetIconTemplate(anc);
 
-				// Icon: prefer attached ToggleDock.Icon, fall back to LayoutAnchorable.IconSource
+				// Icon: prefer attached ToggleDock.Icon, then the IToolbox view model icon
+				// (anchorables restored by layout deserialization never pass the
+				// ToggleLayoutStrategy which copies it to the attached property),
+				// fall back to LayoutAnchorable.IconSource
 				if (attachedIcon != null)
 					btn.IconContent = attachedIcon;
+				else if (anc.Content is IToolbox toolboxWithIcon && toolboxWithIcon.Icon != null)
+					btn.IconContent = toolboxWithIcon.Icon;
 				else if (anc.IconSource != null)
 					btn.IconSource = anc.IconSource;
 
