@@ -1,0 +1,276 @@
+<Project>
+  <PropertyGroup>
+    <AssemblyName>AvalonDock.Themes.VS</AssemblyName>
+    <IntermediateOutputPath>obj/Debug/net10.0-windows/</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj/</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>/Users/lextm/uno-tools/OpenDevelop/src/Libraries/AvalonDock/source/Components/AvalonDock.Themes.VS/obj/</MSBuildProjectExtensionsPath>
+    <_TargetAssemblyProjectName>AvalonDock.Themes.VS</_TargetAssemblyProjectName>
+    <RootNamespace>AvalonDock.Themes</RootNamespace>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="LibreWPF.Sdk" Version="11.0.0-dev" />
+  <PropertyGroup>
+    <RootNamespace>AvalonDock.Themes</RootNamespace>
+    <PackageId>Dirkster.AvalonDock.Themes.VS</PackageId>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\*.vstheme" />
+    <EmbeddedResource Include="Resources\*.json" />
+  </ItemGroup>
+  <!-- System.Text.Json ships in the shared framework on net9/net10; only net48 needs the package. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AvalonDock\AvalonDock.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ReferencePath Include="/Users/lextm/uno-tools/OpenDevelop/src/Libraries/AvalonDock/source/Components/AvalonDock.Core/bin/Debug/netstandard2.0/AvalonDock.Core.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/OpenDevelop/src/Libraries/AvalonDock/source/Components/AvalonDock/bin/Debug/net10.0-windows/AvalonDock.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.CSharp.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/microsoft.dotnet.platformabstractions/3.1.6/lib/netstandard2.0/Microsoft.DotNet.PlatformAbstractions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.Extensions.Caching.Abstractions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.Extensions.Configuration.Abstractions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/microsoft.extensions.dependencymodel/9.0.9/lib/net9.0/Microsoft.Extensions.DependencyModel.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.Extensions.Diagnostics.Abstractions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.Extensions.FileProviders.Abstractions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.Extensions.Hosting.Abstractions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.Extensions.Logging.Abstractions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.Extensions.Options.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.Extensions.Primitives.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.VisualBasic.Core.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.VisualBasic.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.Win32.Primitives.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/Microsoft.Win32.Registry.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/mscorlib.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/netstandard.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/PresentationCore.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/PresentationFramework.Aero.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/PresentationFramework.Aero2.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/PresentationFramework.AeroLite.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/PresentationFramework.Classic.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/PresentationFramework.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/PresentationFramework.Fluent.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/PresentationFramework.Luna.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/PresentationFramework.Royale.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/PresentationUI.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/progpu.backend/11.0.0-dev/lib/net10.0/ProGPU.Backend.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/progpu.compute/11.0.0-dev/lib/net10.0/ProGPU.Compute.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/progpu.directx/11.0.0-dev/lib/net10.0/ProGPU.DirectX.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/progpu.scene/11.0.0-dev/lib/net10.0/ProGPU.Scene.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/progpu.text/11.0.0-dev/lib/net10.0/ProGPU.Text.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/progpu.transpiler/11.0.0-dev/lib/net10.0/ProGPU.Transpiler.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/progpu.vector/11.0.0-dev/lib/net10.0/ProGPU.Vector.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.progpu/11.0.0-dev/lib/net10.0/ProGPU.Wpf.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.interop/11.0.0-dev/lib/net10.0/ProGPU.Wpf.Interop.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/ReachFramework.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/silk.net.core/2.23.0/lib/net6.0/Silk.NET.Core.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/silk.net.glfw/2.23.0/lib/net5.0/Silk.NET.GLFW.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/silk.net.input.common/2.23.0/lib/net5.0/Silk.NET.Input.Common.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/silk.net.input.glfw/2.23.0/lib/net5.0/Silk.NET.Input.Glfw.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/silk.net.maths/2.23.0/lib/net5.0/Silk.NET.Maths.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/silk.net.webgpu/2.23.0/lib/net5.0/Silk.NET.WebGPU.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/silk.net.windowing.common/2.23.0/lib/netstandard2.1/Silk.NET.Windowing.Common.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/silk.net.windowing.glfw/2.23.0/lib/net5.0/Silk.NET.Windowing.Glfw.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/stbimagesharp/2.30.15/lib/netstandard2.0/StbImageSharp.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.AppContext.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Buffers.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Collections.Concurrent.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Collections.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Collections.Immutable.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Collections.NonGeneric.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Collections.Specialized.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.ComponentModel.Annotations.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.ComponentModel.DataAnnotations.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.ComponentModel.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.ComponentModel.EventBasedAsync.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.ComponentModel.Primitives.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.ComponentModel.TypeConverter.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/system.configuration.configurationmanager/11.0.0-preview.5.26302.115/lib/net10.0/System.Configuration.ConfigurationManager.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Configuration.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Console.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Core.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Data.Common.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Data.DataSetExtensions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Data.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Diagnostics.Contracts.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Diagnostics.Debug.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Diagnostics.DiagnosticSource.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/system.diagnostics.eventlog/11.0.0-preview.5.26302.115/lib/net10.0/System.Diagnostics.EventLog.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Diagnostics.FileVersionInfo.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Diagnostics.Process.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Diagnostics.StackTrace.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Diagnostics.TextWriterTraceListener.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Diagnostics.Tools.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Diagnostics.TraceSource.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Diagnostics.Tracing.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Drawing.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Drawing.Primitives.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Dynamic.Runtime.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Formats.Asn1.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/system.formats.nrbf/11.0.0-preview.5.26302.115/lib/net10.0/System.Formats.Nrbf.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Formats.Tar.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Globalization.Calendars.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Globalization.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Globalization.Extensions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.Compression.Brotli.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.Compression.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.Compression.FileSystem.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.Compression.ZipFile.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.FileSystem.AccessControl.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.FileSystem.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.FileSystem.DriveInfo.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.FileSystem.Primitives.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.FileSystem.Watcher.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.IsolatedStorage.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.MemoryMappedFiles.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/system.io.packaging/11.0.0-preview.5.26302.115/lib/net10.0/System.IO.Packaging.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.Pipelines.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.Pipes.AccessControl.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.Pipes.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.IO.UnmanagedMemoryStream.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Linq.AsyncEnumerable.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Linq.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Linq.Expressions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Linq.Parallel.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Linq.Queryable.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Memory.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.Http.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.Http.Json.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.HttpListener.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.Mail.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.NameResolution.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.NetworkInformation.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.Ping.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.Primitives.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.Quic.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.Requests.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.Security.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.ServerSentEvents.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.ServicePoint.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.Sockets.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.WebClient.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.WebHeaderCollection.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.WebProxy.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.WebSockets.Client.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Net.WebSockets.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Numerics.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Numerics.Vectors.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.ObjectModel.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/System.Printing.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Reflection.DispatchProxy.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Reflection.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Reflection.Emit.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Reflection.Emit.ILGeneration.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Reflection.Emit.Lightweight.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Reflection.Extensions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Reflection.Metadata.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Reflection.Primitives.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Reflection.TypeExtensions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Resources.Reader.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Resources.ResourceManager.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Resources.Writer.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.CompilerServices.Unsafe.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.CompilerServices.VisualC.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.Extensions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.Handles.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.InteropServices.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.InteropServices.JavaScript.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.InteropServices.RuntimeInformation.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.Intrinsics.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.Loader.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.Numerics.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.Serialization.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.Serialization.Formatters.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.Serialization.Json.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.Serialization.Primitives.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Runtime.Serialization.Xml.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.AccessControl.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.Claims.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.Cryptography.Algorithms.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.Cryptography.Cng.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.Cryptography.Csp.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.Cryptography.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.Cryptography.Encoding.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.Cryptography.OpenSsl.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.Cryptography.Primitives.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/system.security.cryptography.protecteddata/11.0.0-preview.5.26302.115/lib/net10.0/System.Security.Cryptography.ProtectedData.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.Cryptography.X509Certificates.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.Principal.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.Principal.Windows.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Security.SecureString.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.ServiceModel.Web.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.ServiceProcess.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Text.Encoding.CodePages.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Text.Encoding.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Text.Encoding.Extensions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Text.Encodings.Web.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Text.Json.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Text.RegularExpressions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Threading.AccessControl.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Threading.Channels.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Threading.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Threading.Overlapped.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Threading.Tasks.Dataflow.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Threading.Tasks.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Threading.Tasks.Extensions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Threading.Tasks.Parallel.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Threading.Thread.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Threading.ThreadPool.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Threading.Timer.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Transactions.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Transactions.Local.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.ValueTuple.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Web.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Web.HttpUtility.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/System.Windows.Controls.Ribbon.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Windows.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/system.windows.extensions/11.0.0-preview.5.26302.115/lib/net10.0/System.Windows.Extensions.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/System.Windows.Input.Manipulations.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/System.Windows.Primitives.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/System.Xaml.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Xml.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Xml.Linq.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Xml.ReaderWriter.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Xml.Serialization.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Xml.XDocument.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Xml.XmlDocument.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Xml.XmlSerializer.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Xml.XPath.dll" />
+    <ReferencePath Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/ref/net10.0/System.Xml.XPath.XDocument.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/UIAutomationProvider.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/UIAutomationTypes.dll" />
+    <ReferencePath Include="/Users/lextm/.nuget/packages/librewpf.transport/11.0.0-dev/ref/net10.0/WindowsBase.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="/Users/lextm/uno-tools/OpenDevelop/src/Libraries/AvalonDock/source/Components/AvalonDock.Themes.VS/obj/Debug/net10.0-windows/GeneratedInternalTypeHelper.g.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="/Users/lextm/uno-tools/librewpf/.dotnet/sdk/11.0.100-preview.4.26210.111/Sdks/Microsoft.NET.Sdk/targets/../analyzers/Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll" />
+    <Analyzer Include="/Users/lextm/uno-tools/librewpf/.dotnet/sdk/11.0.100-preview.4.26210.111/Sdks/Microsoft.NET.Sdk/targets/../analyzers/Microsoft.CodeAnalysis.NetAnalyzers.dll" />
+    <Analyzer Include="/Users/lextm/.nuget/packages/sonaranalyzer.csharp/10.28.0.143324/analyzers/SonarAnalyzer.CSharp.dll" />
+    <Analyzer Include="/Users/lextm/.nuget/packages/stylecop.analyzers.unstable/1.2.0.556/analyzers/dotnet/cs/StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="/Users/lextm/.nuget/packages/stylecop.analyzers.unstable/1.2.0.556/analyzers/dotnet/cs/StyleCop.Analyzers.dll" />
+    <Analyzer Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/analyzers/dotnet/cs/Microsoft.Extensions.Logging.Generators.dll" />
+    <Analyzer Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/analyzers/dotnet/cs/Microsoft.Extensions.Options.SourceGeneration.dll" />
+    <Analyzer Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/analyzers/dotnet/cs/Microsoft.Interop.ComInterfaceGenerator.dll" />
+    <Analyzer Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/analyzers/dotnet/cs/Microsoft.Interop.JavaScript.JSImportGenerator.dll" />
+    <Analyzer Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/analyzers/dotnet/cs/Microsoft.Interop.LibraryImportGenerator.dll" />
+    <Analyzer Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/analyzers/dotnet/cs/Microsoft.Interop.SourceGeneration.dll" />
+    <Analyzer Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/analyzers/dotnet/cs/System.Text.Json.SourceGeneration.dll" />
+    <Analyzer Include="/Users/lextm/uno-tools/librewpf/.dotnet/packs/Microsoft.NETCore.App.Ref/11.0.0-preview.4.26210.111/analyzers/dotnet/cs/System.Text.RegularExpressions.Generator.dll" />
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="LibreWPF.Sdk" Version="11.0.0-dev" />
+</Project>

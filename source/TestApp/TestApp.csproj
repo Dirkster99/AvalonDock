@@ -1,7 +1,7 @@
 <Project Sdk="LibreWPF.Sdk/11.0.0-dev">
     <PropertyGroup>
         <RootNamespace>TestApp</RootNamespace>
-        <TargetFramework>net11.0-windows</TargetFramework>
+        <TargetFramework>net10.0-windows</TargetFramework>
         <UseWindowsForms>false</UseWindowsForms>
         <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
         <ApplicationIcon />

@@ -1,5 +1,5 @@
 <Project Sdk="LibreWPF.Sdk/11.0.0-dev">
-	<!-- Cross-platform (ProGPU/macOS) adaptation for OpenDevelop: single net11.0-windows target via
+	<!-- Cross-platform (ProGPU/macOS) adaptation for OpenDevelop: single net10.0-windows target via
 	     ProGPU.Wpf.Sdk instead of the upstream Microsoft.NET.Sdk.WindowsDesktop multi-target
 	     ($(ComponentTargetFrameworks) = net9.0-windows;net10.0-windows;net48). Analyzers and
 	     TreatWarningsAsErrors (injected by source/Directory.Build.props) are disabled here so the
@@ -8,7 +8,7 @@
 	<PropertyGroup>
 		<RootNamespace>AvalonDock</RootNamespace>
 		<PackageId>Dirkster.AvalonDock</PackageId>
-		<TargetFramework>net11.0-windows</TargetFramework>
+		<TargetFramework>net10.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>

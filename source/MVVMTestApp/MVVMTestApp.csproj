@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net11.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <RootNamespace>AvalonDock.MVVMTestApp</RootNamespace>
     <AssemblyName>MVVMTestApp</AssemblyName>
     <UseWPF>true</UseWPF>

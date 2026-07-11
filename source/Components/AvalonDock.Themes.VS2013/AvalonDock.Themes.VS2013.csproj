@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<RootNamespace>AvalonDock.Themes</RootNamespace>
 		<PackageId>Dirkster.AvalonDock.Themes.VS2013</PackageId>
-		<TargetFramework>net11.0-windows</TargetFramework>
+		<TargetFramework>net10.0-windows</TargetFramework>
 		<UseWPF>true</UseWPF>
         <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
         <SignAssembly>true</SignAssembly>
