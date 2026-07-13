@@ -208,6 +208,15 @@ namespace TestApp
 				toolWindow1.AddToLayout(dockManager, AnchorableShowStrategy.Bottom | AnchorableShowStrategy.Most);
 		}
 
+		private void OnFloatToolWindow1(object sender, RoutedEventArgs e)
+		{
+			var toolWindow1 = dockManager.Layout.Descendents().OfType<LayoutAnchorable>().Single(a => a.ContentId == "toolWindow1");
+			if (toolWindow1.IsHidden)
+				toolWindow1.Show();
+			if (toolWindow1.CanFloat && !toolWindow1.IsFloating)
+				toolWindow1.Float();
+		}
+
 		private void DockManager_DocumentClosing(object sender, DocumentClosingEventArgs e)
 		{
 			if (MessageBox.Show("Are you sure you want to close the document?", "AvalonDock Sample", MessageBoxButton.YesNo) == MessageBoxResult.No)
