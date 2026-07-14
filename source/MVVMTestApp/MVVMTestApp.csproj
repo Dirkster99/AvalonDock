@@ -1,4 +1,4 @@
-<Project Sdk="LibreWPF.Sdk/11.0.0-dev">
+<Project Sdk="LibreWPF.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>

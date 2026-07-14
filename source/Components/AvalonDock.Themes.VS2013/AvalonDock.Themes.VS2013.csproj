@@ -1,4 +1,4 @@
-<Project Sdk="LibreWPF.Sdk/11.0.0-dev">
+<Project Sdk="LibreWPF.Sdk">
 	<PropertyGroup>
 		<RootNamespace>AvalonDock.Themes</RootNamespace>
 		<PackageId>Dirkster.AvalonDock.Themes.VS2013</PackageId>
