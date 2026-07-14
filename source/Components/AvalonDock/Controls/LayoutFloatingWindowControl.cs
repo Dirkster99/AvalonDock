@@ -542,20 +542,20 @@ namespace AvalonDock.Controls
 						ContentMinWidth = Math.Max(content.MinWidth, ContentMinWidth);
 						if ((this.Model?.Root?.Manager?.AutoWindowSizeWhenOpened).GetValueOrDefault())
 						{
-							var parent = content.GetParents()
-								.OfType<FrameworkElement>()
-								.FirstOrDefault();
-							// StackPanels among others have an ActualHeight larger than visible, hence we check the parent control as well
-							if (content.ActualHeight < content.MinHeight ||
-								parent != null && parent.ActualHeight < content.MinHeight)
+							content.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+							var desiredWidth = content.DesiredSize.Width;
+							var desiredHeight = content.DesiredSize.Height;
+
+							if (desiredHeight > 0)
 							{
-								Height = content.MinHeight + TotalMargin.Top + TotalMargin.Bottom;
+								var contentHeight = Math.Max(desiredHeight, content.MinHeight);
+								Height = contentHeight + TotalMargin.Top + TotalMargin.Bottom;
 							}
 
-							if (content.ActualWidth < content.MinWidth ||
-								parent != null && parent.ActualWidth < content.MinWidth)
+							if (desiredWidth > 0)
 							{
-								Width = content.MinWidth + TotalMargin.Left + TotalMargin.Right;
+								var contentWidth = Math.Max(desiredWidth, content.MinWidth);
+								Width = contentWidth + TotalMargin.Left + TotalMargin.Right;
 							}
 
 							if (Height > content.ActualHeight)

@@ -1,4 +1,4 @@
-﻿/**************************************************************************\
+/**************************************************************************\
 	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
@@ -571,11 +571,13 @@ namespace Standard
 		{
 			stm.Position = 0;
 			var hashBuilder = new StringBuilder();
+#pragma warning disable S4790
 			using (var md5 = MD5.Create())
 			{
 				foreach (var b in md5.ComputeHash(stm)) hashBuilder.Append(b.ToString("x2", CultureInfo.InvariantCulture));
 				return hashBuilder.ToString();
 			}
+#pragma warning restore S4790
 		}
 
 		/// <summary>Performs the EnsureDirectory operation.</summary>
