@@ -103,6 +103,75 @@ namespace AvalonDock.DevFlowIntegrationTests
 			return result;
 		}
 
+		// Decomposed press/drag-move/release: unlike DragAsync (one monolithic press-move...-release
+		// call), these let a caller inspect live app state BETWEEN steps of a real drag gesture - e.g.
+		// AvalonDock's drop-target compass, which only shows/updates once the pointer enters the
+		// relevant host and only for whichever host it's currently over. Used to precisely target a
+		// specific DropTargetType compass indicator instead of guessing screen offsets.
+		public Task PressAsync(double x, double y, CancellationToken ct = default)
+			=> PostPointActionAndAssertOkAsync("/api/v1/ui/actions/press", x, y, "press", ct);
+
+		public Task DragMoveAsync(double x, double y, CancellationToken ct = default)
+			=> PostPointActionAndAssertOkAsync("/api/v1/ui/actions/drag-move", x, y, "drag-move", ct);
+
+		public Task ReleaseAsync(double x, double y, CancellationToken ct = default)
+			=> PostPointActionAndAssertOkAsync("/api/v1/ui/actions/release", x, y, "release", ct);
+
+		private async Task PostPointActionAndAssertOkAsync(string path, double x, double y, string label, CancellationToken ct)
+		{
+			var body = JsonSerializer.Serialize(new { x, y });
+			using var content = new StringContent(body, Encoding.UTF8, "application/json");
+			using var resp = await _http.PostAsync(path, content, ct).ConfigureAwait(false);
+			var raw = await resp.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+			if (!resp.IsSuccessStatusCode)
+				throw new HttpRequestException($"DevFlow {label} returned {(int)resp.StatusCode}: {raw}");
+			using var doc = JsonDocument.Parse(raw);
+			if (!doc.RootElement.TryGetProperty("ok", out var ok) || ok.ValueKind != JsonValueKind.True)
+				throw new InvalidOperationException($"DevFlow {label} did not report success: {raw}");
+		}
+
+		/// <summary>
+		/// Queries every drop-target compass indicator currently visible during an in-progress drag
+		/// (see avd.query.active-drop-targets), keyed by DropTargetType name.
+		/// </summary>
+		public async Task<List<DropTargetInfo>> QueryActiveDropTargetsAsync(CancellationToken ct = default)
+		{
+			var json = await InvokeAsync("avd.query.active-drop-targets").ConfigureAwait(false);
+			using var doc = JsonDocument.Parse(json);
+			var result = new List<DropTargetInfo>();
+			foreach (var element in doc.RootElement.EnumerateArray())
+			{
+				result.Add(new DropTargetInfo(
+					element.GetProperty("type").GetString(),
+					element.GetProperty("centerX").GetDouble(),
+					element.GetProperty("centerY").GetDouble()));
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Polls avd.query.active-drop-targets until a target of the given DropTargetType name appears
+		/// (the compass only populates once the pointer has settled over the relevant host after a
+		/// drag-move), or throws after the timeout.
+		/// </summary>
+		public async Task<DropTargetInfo> WaitForActiveDropTargetAsync(string dropTargetType, CancellationToken ct, TimeSpan? timeout = null)
+		{
+			var deadline = DateTimeOffset.UtcNow + (timeout ?? TimeSpan.FromSeconds(8));
+			while (DateTimeOffset.UtcNow < deadline)
+			{
+				ct.ThrowIfCancellationRequested();
+				var targets = await QueryActiveDropTargetsAsync(ct).ConfigureAwait(false);
+				var match = targets.Find(t => t.Type == dropTargetType);
+				if (match != null)
+					return match;
+
+				await Task.Delay(250, ct).ConfigureAwait(false);
+			}
+
+			throw new TimeoutException($"Timed out waiting for drop target '{dropTargetType}' to appear in the active compass.");
+		}
+
 		public async Task<ElementBounds> QueryBoundsAsync(string target, string contentId = null)
 		{
 			var json = contentId == null
@@ -274,6 +343,23 @@ namespace AvalonDock.DevFlowIntegrationTests
 		public double? Dy { get; set; }
 		public int? Steps { get; set; }
 		public bool Global { get; set; }
+	}
+
+	/// <summary>A live drop-target compass indicator: its DropTargetType name and screen center.</summary>
+	public sealed class DropTargetInfo
+	{
+		public DropTargetInfo(string type, double centerX, double centerY)
+		{
+			Type = type;
+			CenterX = centerX;
+			CenterY = centerY;
+		}
+
+		public string Type { get; }
+		public double CenterX { get; }
+		public double CenterY { get; }
+
+		public override string ToString() => $"{Type} @ {CenterX},{CenterY}";
 	}
 
 	public readonly struct ElementBounds

@@ -435,6 +435,39 @@ namespace TestApp
 			return $"Floated '{contentId}'";
 		}
 
+		[DevFlowAction("avd.position-floating",
+			Description = "Move the floating window containing the given ContentId to a fixed screen " +
+			              "position (default: clear of the main window and screen origin, where other " +
+			              "app windows commonly sit and can steal synthetic clicks aimed at the tester).")]
+		public string PositionFloatingWindow(string contentId, double left = 900, double top = 200)
+		{
+			var floating = dockManager.FloatingWindows
+				.FirstOrDefault(fw => fw.Model?.Descendents().OfType<LayoutAnchorable>()
+					.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true);
+			if (floating == null)
+				return $"No floating window found for '{contentId}'";
+
+			floating.Left = left;
+			floating.Top = top;
+			// Bring THIS window in front of every other OS-level window (including other apps'), not
+			// just its sibling windows within the process - Topmost alone only affects Z-order among
+			// this app's own windows and does not reliably win over an unrelated app (terminal, IDE)
+			// that happens to be in front. Activate() is what actually raises it above other processes
+			// (mirrors avd.activate's proven pattern for the main window).
+			floating.Activate();
+			// Do NOT leave Topmost=true: AvalonDock's drop-zone compass is a separate OverlayWindow
+			// shown ABOVE the dragged floating window during a drag (IOverlayWindowHost.ShowOverlayWindow).
+			// A permanently-topmost floating window can sit above that overlay instead of below it, so
+			// the drop-target hit-test silently never resolves - the drag still "succeeds" (mouse events
+			// process, ok=true) but nothing ever docks. A one-shot true->false toggle still raises the
+			// window once (matching avd.activate's pattern) without leaving it pinned above everything.
+			floating.Topmost = true;
+			floating.Topmost = false;
+			floating.Focus();
+			floating.UpdateLayout();
+			return $"Positioned floating window for '{contentId}' at {left},{top}";
+		}
+
 		[DevFlowAction("avd.dock", Description = "Dock a floating anchorable back to main layout")]
 		public string DockAnchorable(string contentId)
 		{
@@ -546,6 +579,31 @@ namespace TestApp
 				ContentId = "dragTestDocument",
 				Content = new Grid { Background = Brushes.Transparent }
 			});
+			// A second, separate DOCKED anchorable pane. AnchorablePaneDock{Left,Top,Right,Bottom,Inside}
+			// compass indicators only appear while the pointer hovers an EXISTING anchorable pane, and
+			// with only one anchorable (dragTestTool, which is what gets floated/dragged in these tests)
+			// there would be no remaining docked anchorable pane left to host them once it floats away.
+			var tool2 = new LayoutAnchorable
+			{
+				Title = "Drag Test Tool 2",
+				ContentId = "dragTestTool2",
+				CanHide = true,
+				CanClose = false,
+				Content = new Border
+				{
+					Background = Brushes.Transparent,
+					Child = new TextBlock
+					{
+						Text = "Drag Test Tool 2",
+						HorizontalAlignment = HorizontalAlignment.Center,
+						VerticalAlignment = VerticalAlignment.Center
+					}
+				}
+			};
+			var toolPane2 = new LayoutAnchorablePane(tool2)
+			{
+				DockWidth = new GridLength(260)
+			};
 			var root = new LayoutRoot
 			{
 				RootPanel = new LayoutPanel
@@ -554,7 +612,8 @@ namespace TestApp
 					Children =
 					{
 						toolPane,
-						documentPane
+						documentPane,
+						toolPane2
 					}
 				}
 			};
@@ -686,6 +745,12 @@ namespace TestApp
 							.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true)
 					.Where(x => x.FindVisualAncestor<LayoutAnchorablePaneControl>() != null)
 					.FirstOrDefault(IsHitTestableAtCenter) ??
+					// A single-content floating anchorable window has no AnchorablePaneTitle at all -
+					// that control belongs to a multi-tab LayoutAnchorablePaneControl. Its caption is
+					// the floating window's own DropDownControlArea (see
+					// LayoutAnchorableFloatingWindowControl's template). Fall back to that so a drag
+					// handle can still be resolved for a floated tool window's title/caption.
+					FindFloatingWindowCaption(contentId) ??
 					(contentId == "dragTestTool"
 						? GetAvalonDockVisualRoots()
 							.SelectMany(FindVisualDescendants<AnchorablePaneTitle>)
@@ -748,6 +813,42 @@ namespace TestApp
 			};
 
 			return System.Text.Json.JsonSerializer.Serialize(result);
+		}
+
+		[DevFlowAction("avd.query.active-drop-targets",
+			Description = "During an active drag (a floating window whose caption is currently being " +
+			              "dragged), returns every currently-visible compass drop-target indicator as " +
+			              "{type, x, y, width, height, centerX, centerY} - type is a DropTargetType name " +
+			              "(e.g. DockingManagerDockLeft, AnchorablePaneDockInside). Which indicators are " +
+			              "visible depends on which host area the pointer is currently over, matching " +
+			              "real AvalonDock drag behavior, so move the pointer near the desired target's " +
+			              "pane/edge before calling this.")]
+		public string QueryActiveDropTargets()
+		{
+			var results = new List<Dictionary<string, object>>();
+			foreach (var floating in dockManager.FloatingWindows)
+			{
+				var overlay = floating.CurrentDragService?.CurrentOverlayWindow;
+				if (overlay == null)
+					continue;
+
+				foreach (var target in overlay.GetTargets())
+				{
+					var bounds = target.GetScreenBounds();
+					results.Add(new Dictionary<string, object>
+					{
+						["type"] = target.Type.ToString(),
+						["x"] = bounds.X,
+						["y"] = bounds.Y,
+						["width"] = bounds.Width,
+						["height"] = bounds.Height,
+						["centerX"] = bounds.X + bounds.Width / 2d,
+						["centerY"] = bounds.Y + bounds.Height / 2d,
+					});
+				}
+			}
+
+			return System.Text.Json.JsonSerializer.Serialize(results);
 		}
 
 		[DevFlowAction("avd.hit-test", Description = "Hit test a screen point against the AvalonDock manager")]
@@ -953,6 +1054,22 @@ namespace TestApp
 			yield return dockManager;
 			foreach (var floatingWindow in dockManager.FloatingWindows)
 				yield return floatingWindow;
+		}
+
+		// Drag handle for a single-content floating anchorable's caption, which is a
+		// DropDownControlArea in the floating window's own template rather than an
+		// AnchorablePaneTitle (that control only exists for multi-tab docked panes).
+		private FrameworkElement FindFloatingWindowCaption(string contentId)
+		{
+			var floating = dockManager.FloatingWindows
+				.OfType<LayoutAnchorableFloatingWindowControl>()
+				.FirstOrDefault(fw => fw.Model?.Descendents().OfType<LayoutAnchorable>()
+					.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true);
+			if (floating == null)
+				return null;
+
+			return FindVisualDescendants<DropDownControlArea>(floating)
+				.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
 		}
 
 		[DevFlowAction("avd.new-floating", Description = "Create a new floating anchorable window")]

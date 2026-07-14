@@ -31,6 +31,14 @@ namespace AvalonDock.Controls
 		private HwndSource _hwndSrc;
 		private HwndSourceHook _hwndSrcHook;
 		private DragService _dragService = null;
+
+		/// <summary>
+		/// The <see cref="DragService"/> driving the current drag of this floating window, or null when
+		/// no drag is in progress. Test-only surface (see TestInternalsVisibleTo.cs): lets a test query
+		/// the live compass drop-target geometry (<see cref="DragService.CurrentOverlayWindow"/>) by
+		/// <see cref="DropTargetType"/> during a real drag, instead of guessing screen offsets.
+		/// </summary>
+		internal DragService CurrentDragService => _dragService;
 		private bool _internalCloseFlag = false;
 		private bool _isClosing = false;
 

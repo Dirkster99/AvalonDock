@@ -8,6 +8,11 @@
         <OutputType>WinExe</OutputType>
         <StartupObject />
         <AssemblyName>TestApp</AssemblyName>
+        <!-- Signed with the same key as AvalonDock so AvalonDock's InternalsVisibleTo("TestApp") can
+             list this assembly's public key (strong-name-signed assemblies require friend assemblies
+             to be identified by public key, not name alone). Test-only; not part of any shipped app. -->
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../Components/AvalonDock/sn.snk</AssemblyOriginatorKeyFile>
         <!-- Sample app: allow warnings -->
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
         <EnableWindowsTargeting>true</EnableWindowsTargeting>

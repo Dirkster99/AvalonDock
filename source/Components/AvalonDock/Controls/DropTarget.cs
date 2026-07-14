@@ -104,6 +104,32 @@ namespace AvalonDock.Controls
 			return HitTest(_targetElement.TransformToDeviceDPI(dragPoint));
 		}
 
+		/// <inheritdoc/>
+		public Rect GetScreenBounds()
+		{
+			if (_detectionRect == null || _detectionRect.Length == 0)
+				return Rect.Empty;
+
+			// _detectionRect is compared against TransformToDeviceDPI(dragPoint) - i.e. dragPoint / dpiScale
+			// (TransformExtentions.TransformToDeviceDPI) - so invert that scale to recover real screen
+			// coordinates from the stored rect. Union all detection rects: some targets (e.g. auto-hide
+			// pane strips) report more than one.
+			var compositionTarget = PresentationSource.FromVisual(_targetElement)?.CompositionTarget;
+			var scaleX = compositionTarget?.TransformToDevice.M11 ?? 1.0;
+			var scaleY = compositionTarget?.TransformToDevice.M22 ?? 1.0;
+			if (!double.IsFinite(scaleX) || scaleX <= 0.0) scaleX = 1.0;
+			if (!double.IsFinite(scaleY) || scaleY <= 0.0) scaleY = 1.0;
+
+			var union = Rect.Empty;
+			foreach (var rect in _detectionRect)
+			{
+				var screenRect = new Rect(rect.X * scaleX, rect.Y * scaleY, rect.Width * scaleX, rect.Height * scaleY);
+				union.Union(screenRect);
+			}
+
+			return union;
+		}
+
 		/// <summary>
 		/// Drops the specified floating window onto the target.
 		/// </summary>
