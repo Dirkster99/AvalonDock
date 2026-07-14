@@ -659,8 +659,20 @@ namespace AvalonDock.Controls
 			ApplyResizeBorderThickness();
 
 			_hwndSrc = PresentationSource.FromDependencyObject(this) as HwndSource;
-			_hwndSrcHook = FilterMessage;
-			_hwndSrc.AddHook(_hwndSrcHook);
+			if (UsePortableCaptionDrag)
+			{
+				// Portable backend (LibreWPF on macOS/Linux): the HwndSource is a shim that does not
+				// pump the WM_NCLBUTTONDOWN/WM_MOVING/WM_EXITSIZEMOVE modal-move messages the Win32
+				// caption drag relies on, and WindowChrome caption dragging is equally inert. Drive the
+				// drag engine from a managed caption drag instead (OnPortableCaptionMouseDown).
+				AddHandler(PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(OnPortableCaptionMouseDown), handledEventsToo: true);
+			}
+			else if (_hwndSrc != null)
+			{
+				// Win32 path: the modal move loop + WM_MOVING/WM_EXITSIZEMOVE drive the drag engine.
+				_hwndSrcHook = FilterMessage;
+				_hwndSrc.AddHook(_hwndSrcHook);
+			}
 			// Restore maximize state
 			var maximized = Model.Descendents().OfType<ILayoutElementForFloatingWindow>().Any(l => l.IsMaximized);
 			UpdateMaximizedState(maximized);
@@ -859,6 +871,110 @@ namespace AvalonDock.Controls
 			var mousePosition = PlatformHelper.GetCursorPosition();
 			_dragService.UpdateMouseLocation(mousePosition);
 		}
+
+		#region Portable (non-HWND) caption drag
+
+		// Managed replacement for the Win32 caption drag on backends without an HwndSource (LibreWPF).
+		// A press on the caption starts a mouse-captured move: each move repositions the window to
+		// follow the pointer and feeds the DragService (which shows the OverlayWindow drop targets),
+		// and the release drops onto the current target - the same DragService the WM_MOVING path uses.
+		private bool _portableDragging;
+		private Point _portableDragOffset;   // pointer-to-window-origin offset, in screen coords
+		private Point _portableLastPointer;  // last pointer screen position seen during the drag
+
+		// The Win32 caption-drag path (WM_NCLBUTTONDOWN + WM_MOVING/WM_EXITSIZEMOVE) only works on real
+		// Windows HWNDs. Everywhere else (LibreWPF on macOS/Linux) use the managed caption drag.
+		internal static bool UsePortableCaptionDrag { get; } = !RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+		private void OnPortableCaptionMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (_portableDragging || e.ChangedButton != MouseButton.Left) return;
+			if (Model?.Root?.Manager == null) return;
+
+			// Only the caption drags the window. Buttons/menus in the title bar opt out of caption
+			// treatment via WindowChrome.IsHitTestVisibleInChrome (the same flag the Win32 chrome uses),
+			// so walk up from the hit element and bail if any ancestor is marked interactive.
+			for (var d = e.OriginalSource as DependencyObject; d != null; d = VisualTreeHelperGetParent(d))
+			{
+				if (d is UIElement ui && WindowChrome.GetIsHitTestVisibleInChrome(ui))
+					return;
+				if (d is System.Windows.Controls.Primitives.ButtonBase)
+					return;
+			}
+
+			var pointer = PointToScreen(e.GetPosition(this));
+			_portableDragOffset = new Point(pointer.X - Left, pointer.Y - Top);
+			_portableLastPointer = pointer;
+			_portableDragging = true;
+			if (_dragService == null)
+				_dragService = new DragService(this);
+			SetIsDragging(true);
+			CaptureMouse();
+		}
+
+		private static DependencyObject VisualTreeHelperGetParent(DependencyObject d)
+		{
+			// LogicalTreeHelper for content, VisualTreeHelper for template parts - use visual first.
+			return (d is Visual || d is System.Windows.Media.Media3D.Visual3D)
+				? VisualTreeHelper.GetParent(d)
+				: LogicalTreeHelper.GetParent(d);
+		}
+
+		/// <inheritdoc/>
+		protected override void OnMouseMove(MouseEventArgs e)
+		{
+			base.OnMouseMove(e);
+			if (!_portableDragging) return;
+
+			if (e.LeftButton != MouseButtonState.Pressed)
+			{
+				EndPortableDrag(drop: true);
+				return;
+			}
+
+			var pointer = PointToScreen(e.GetPosition(this));
+			_portableLastPointer = pointer;
+			Left = pointer.X - _portableDragOffset.X;
+			Top = pointer.Y - _portableDragOffset.Y;
+			_dragService?.UpdateMouseLocation(pointer);
+		}
+
+		/// <inheritdoc/>
+		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+		{
+			base.OnMouseLeftButtonUp(e);
+			if (_portableDragging) EndPortableDrag(drop: true);
+		}
+
+		/// <inheritdoc/>
+		protected override void OnLostMouseCapture(MouseEventArgs e)
+		{
+			base.OnLostMouseCapture(e);
+			// Lost capture without a normal release: abort rather than drop at a stale position.
+			if (_portableDragging) EndPortableDrag(drop: false);
+		}
+
+		private void EndPortableDrag(bool drop)
+		{
+			if (!_portableDragging) return;
+			_portableDragging = false;
+			if (IsMouseCaptured) ReleaseMouseCapture();
+
+			var dropHandled = false;
+			if (_dragService != null)
+			{
+				if (drop)
+					_dragService.Drop(_portableLastPointer, out dropHandled);
+				else
+					_dragService.Abort();
+				_dragService = null;
+			}
+
+			SetIsDragging(false);
+			if (dropHandled) InternalClose();
+		}
+
+		#endregion Portable (non-HWND) caption drag
 
 		/// <summary>
 		/// Enable bindings.
