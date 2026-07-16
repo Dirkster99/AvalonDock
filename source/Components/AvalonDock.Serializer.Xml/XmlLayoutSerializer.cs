@@ -14,7 +14,7 @@ namespace AvalonDock.Serializer.Xml
 	/// </summary>
 	public class XmlLayoutSerializer : LayoutSerializerBase
 	{
-		private static readonly XmlSerializer DtoSerializer = new XmlSerializer(typeof(LayoutRootDto));
+		private static readonly XmlSerializer DtoSerializer = new XmlSerializer(typeof(LayoutRootDto), new XmlAttributeOverrides());
 
 		/// <summary>
 		/// Matches capitalised <c>True</c>/<c>False</c> values of the boolean layout

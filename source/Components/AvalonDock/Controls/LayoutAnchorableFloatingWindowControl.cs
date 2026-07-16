@@ -265,6 +265,26 @@ namespace AvalonDock.Controls
 					}
 
 					break;
+
+				case Win32Helper.WM_CLOSE:
+					if (CloseInitiatedByUser && !KeepContentVisibleOnClose)
+					{
+						// BugFix Issue #368: a close initiated outside of our code
+						// (Alt+F4, the taskbar close button or the system menu) must go
+						// through the same hide/close logic as the close button of the title bar.
+						if (HideWindowCommand.CanExecute(null))
+						{
+							HideWindowCommand.Execute(null);
+						}
+						else if (CloseWindowCommand.CanExecute(null))
+						{
+							CloseWindowCommand.Execute(null);
+						}
+
+						handled = true;
+					}
+
+					break;
 			}
 
 			return base.FilterMessage(hwnd, msg, wParam, lParam, ref handled);

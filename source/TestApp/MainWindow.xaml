@@ -70,6 +70,7 @@
             <MenuItem Header="Tools">
                 <MenuItem Click="OnShowWinformsWindow" Header="WinForms Window" />
                 <MenuItem Click="OnShowToolWindow1" Header="Tool Window1" />
+                <MenuItem Click="OnFloatToolWindow1" Header="Float Tool Window1" />
                 <MenuItem Click="OnNewFloatingWindow" Header="New floating window" />
             </MenuItem>
             <MenuItem x:Name="themeMenu" Header="Theme">
