@@ -1407,7 +1407,7 @@ namespace AvalonDock
 					new FrameworkPropertyMetadata(null));
 
 		/// <summary>Gets/sets the <see cref="Style"/> to apply to a <see cref="LayoutDocumentItem"/> object.</summary>
-		[Bindable(true), Description("Gets/sets the Style to apply to a LayoutDocumentItem object."), Category("Layout")]
+		[Bindable(true), Description("Gets/sets whether the standard tab control key bindings are ignored or not."), Category("Document")]
 		public bool IgnoreTabControlKeyBindings
 		{
 			get => (bool)GetValue(IgnoreTabControlKeyBindingsProperty);
