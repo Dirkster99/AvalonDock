@@ -58,8 +58,7 @@
 			AllowAnchorDoubleClickDock="True"
        		AllowAnchorRightClickContextMenu="True"
 			DocumentsSource="{Binding Files}"
-			Theme="{Binding SelectedTheme.Item2}"
-			IgnoreTabControlKeyBindings="True">
+			Theme="{Binding SelectedTheme.Item2}">
 			<DockingManager.LayoutItemTemplateSelector>
 				<local:PanesTemplateSelector>
 					<local:PanesTemplateSelector.FileViewTemplate>
