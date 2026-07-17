@@ -4,6 +4,7 @@ using Xunit;
 
 namespace AvalonDock.DevFlowIntegrationTests
 {
+	[Collection("DevFlow")]
 	public sealed class AvalonDockLayoutIntegrationTests : IntegrationTestBase
 	{
 		[Fact]

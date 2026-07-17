@@ -56,6 +56,6 @@
       <ProjectReference Include="..\Components\AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="/Users/lextm/uno-tools/wpf-labs/src/DevFlow/LeXtudio.DevFlow.Agent.WPF/LeXtudio.DevFlow.Agent.WPF.csproj" />
+      <ProjectReference Include="/Users/lextm/uno-tools/wpf-labs/src/DevFlow/LeXtudio.DevFlow.Agent.LibreWpf/LeXtudio.DevFlow.Agent.LibreWpf.csproj" />
     </ItemGroup>
 </Project>

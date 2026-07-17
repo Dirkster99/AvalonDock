@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,13 +7,19 @@ using Xunit;
 
 namespace AvalonDock.DevFlowIntegrationTests
 {
+	[Collection("DevFlow")]
 	public sealed class NativeInputIntegrationTests : IntegrationTestBase
 	{
+		public NativeInputIntegrationTests(DevFlowAppFixture fixture)
+			: base(fixture)
+		{
+		}
+
 		[Fact]
 		public async Task GlobalDragEndpoint_UsesNativeMouseInjectionOnMacOS()
 		{
-			if (!IsNativeSmokeEnabled())
-				return;
+			NativeInputEnvironment.EnsureNativeDragAvailable();
+			await IsolateDesktopForNativeInputAsync();
 
 			using var client = await TryConnectAsync();
 			if (client == null)
@@ -39,19 +46,20 @@ namespace AvalonDock.DevFlowIntegrationTests
 			var raw = result.GetRawText();
 			Assert.DoesNotContain("only supported on Windows", raw);
 
-			// The agent prefers real OS-level mouse events via the `cliclick` CLI when it's installed
-			// (drives the genuine native input path); it falls back to the original Quartz-based
-			// native-global injection otherwise. Either is a valid "native mouse injection on macOS".
+			// The agent prefers cliclick (a real CGEventPost-backed native input tool) when it's
+			// installed; it falls back to macos-native (direct CGEventPost) or the original
+			// Quartz-based native-global injection otherwise. All three are genuine native OS mouse
+			// injection on macOS.
 			if (OperatingSystem.IsMacOS())
-				Assert.True(raw.Contains("native-global") || raw.Contains("cliclick"),
-					$"Expected a native mouse injection mode (native-global or cliclick), got: {raw}");
+				Assert.True(raw.Contains("cliclick") || raw.Contains("macos-native") || raw.Contains("native-global"),
+					$"Expected a native mouse injection mode (cliclick, macos-native, or native-global), got: {raw}");
 		}
 
 		[Fact]
 		public async Task DragDockedAnchorableTitle_ToFreeSpace_FloatsToolWindow()
 		{
-			if (!IsNativeInputEnabled())
-				return;
+			NativeInputEnvironment.EnsureDecomposedInputAvailable();
+			await IsolateDesktopForNativeInputAsync();
 
 			using var client = await TryConnectAsync();
 			if (client == null)
@@ -128,8 +136,8 @@ namespace AvalonDock.DevFlowIntegrationTests
 		[Fact]
 		public async Task DragDockedPaneResizer_ResizesToolPane()
 		{
-			if (!IsNativeInputEnabled())
-				return;
+			NativeInputEnvironment.EnsureDecomposedInputAvailable();
+			await IsolateDesktopForNativeInputAsync();
 
 			using var client = await TryConnectAsync();
 			if (client == null)
@@ -184,8 +192,8 @@ namespace AvalonDock.DevFlowIntegrationTests
 		[Fact]
 		public async Task DragFloatingToolWindow_ToDocumentPane_DocksBackIntoLayout()
 		{
-			if (!IsNativeInputEnabled())
-				return;
+			NativeInputEnvironment.EnsureDecomposedInputAvailable();
+			await IsolateDesktopForNativeInputAsync();
 
 			using var client = await TryConnectAsync();
 			if (client == null)
@@ -207,94 +215,72 @@ namespace AvalonDock.DevFlowIntegrationTests
 					s => s.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool")),
 					TestContext.Current.CancellationToken);
 
-				// A newly floated tool opens as its own top-level OS window, by default flush against
-				// the screen origin - exactly where other apps' windows (terminal, IDE) commonly sit. A
-				// synthetic click there can land on whatever else is frontmost at that screen position
-				// instead of this window. Move it clear of the MAIN window's own area entirely (not
-				// just elsewhere on screen, but non-overlapping with it) and don't call avd.activate
-				// afterwards (that raises the MAIN window and undoes the floating window's own one-shot
-				// raise done by avd.position-floating). Overlapping the two windows was tried and is
-				// NOT safe: even with the floating window raised once, a synthetic press in the
-				// overlapping region can still land on the main window underneath (its own drop-zone
-				// compass, a separate OverlayWindow, is anchored to the main window and evidently wins
-				// the overlap there).
 				var mainArea = await client.QueryBoundsAsync("manager");
 				await client.InvokeAsync(
 					"avd.position-floating",
 					"dragTestTool",
 					mainArea.Right + 40,
 					mainArea.Y + 40);
-
-				// The WPF-side Left/Top/PointToScreen values above update the instant the action
-				// returns, but the native OS window they describe settles into that new position and
-				// raised state asynchronously. A synthetic click issued immediately can land before the
-				// native window has actually finished moving/raising. Give it a moment.
 				await Task.Delay(500, TestContext.Current.CancellationToken);
+				await client.AssertFloatingWindowAboveMainAsync("dragTestTool");
 
-				var floatingTitle = await WaitForBoundsAsync(
-					client,
-					"anchorable-title",
-					"dragTestTool",
-					_ => true,
-					TestContext.Current.CancellationToken);
 				var documentPane = await client.QueryBoundsAsync("document-pane");
 
-				// The drag itself is a real OS-level window-manager race that setup alone doesn't fully
-				// eliminate: the floated window's native raise can occasionally lose to something else
-				// at the click point by the time the synthetic press actually lands, and the drop then
-				// silently no-ops (DevFlow still reports ok=true - a click landed, just not on the right
-				// window/at the right moment).
-				//
-				// Retrying is safe ONLY if we are certain the previous attempt genuinely left the tool
-				// floating - not merely that OUR poll happened to time out while the drop had actually
-				// already landed. Re-issuing a drag from stale (now-docked) title coordinates hits a
-				// DIFFERENT AvalonDock code path (AnchorablePaneTitle.OnMouseLeave ->
-				// StartDraggingFloatingWindowForPane, the "drag a DOCKED title back out" gesture) and
-				// previously corrupted the model into a duplicate dragTestTool anchorable. So after a
-				// timeout, explicitly re-check the CURRENT layout before deciding whether to retry: if
-				// it's actually docked already (a pure observation race), accept that snapshot; only
-				// retry the drag if it is still genuinely floating.
-				DockLayoutSnapshot docked = null;
-				const int maxAttempts = 3;
-				for (var attempt = 1; attempt <= maxAttempts && docked == null; attempt++)
-				{
-					await client.DragAndAssertOkAsync(new DragRequest
-					{
-						Global = true,
-						FromX = floatingTitle.CenterX,
-						FromY = floatingTitle.CenterY,
-						ToX = documentPane.CenterX,
-						ToY = documentPane.CenterY,
-						Steps = 48
-					}, TestContext.Current.CancellationToken);
+				var floatingTitle = await WaitForBoundsAsync(
+						client,
+						"anchorable-title",
+						"dragTestTool",
+						_ => true,
+						TestContext.Current.CancellationToken);
+				var dragStartX = floatingTitle.X + Math.Min(60, floatingTitle.Width / 4);
+				var dragStartY = floatingTitle.CenterY;
 
+				using var gesture = StartCliclickDragWithInspectionPause(
+					dragStartX,
+					dragStartY,
+					documentPane.CenterX,
+					documentPane.CenterY);
+
+				DropTargetInfo compassTarget;
 					try
 					{
-						docked = await WaitForLayoutAsync(
+						compassTarget = await client.WaitForActiveDropTargetAsync(
+							"DocumentPaneDockInside",
+							TestContext.Current.CancellationToken,
+							TimeSpan.FromSeconds(4));
+					}
+					catch (TimeoutException ex)
+					{
+						var activeTargets = await client.InvokeAsync("avd.query.active-drop-targets");
+						var dragState = await client.InvokeAsync("avd.query.drag-state");
+						var inputState = await client.InvokeAsync("avd.input.query");
+						var managerBounds = await client.InvokeAsync("avd.query.bounds", "manager");
+						var documentBounds = await client.InvokeAsync("avd.query.bounds", "document-pane");
+						var hitTest = await client.InvokeAsync(
+							"avd.hit-test",
+							documentPane.CenterX,
+							documentPane.CenterY);
+						throw new Xunit.Sdk.XunitException(
+							"AvalonDock compass overlay did not show the DocumentPaneDockInside target while dragging over the document pane. " +
+							$"ActiveTargets={activeTargets}; DragState={dragState}; Input={inputState}; ManagerBounds={managerBounds}; " +
+							$"DocumentBounds={documentBounds}; HitTest={hitTest}",
+							ex);
+					}
+
+				Assert.True(
+					Math.Abs(compassTarget.CenterX - documentPane.CenterX) < documentPane.Width / 4 &&
+					Math.Abs(compassTarget.CenterY - documentPane.CenterY) < documentPane.Height / 4,
+					$"DocumentPaneDockInside target is unexpectedly far from the document pane center: target={compassTarget}, pane={documentPane}");
+
+				await gesture.WaitForExitAsync(TestContext.Current.CancellationToken);
+				Assert.Equal(0, gesture.ExitCode);
+
+				var docked = await WaitForLayoutAsync(
 							client,
 							s => !s.Anchorables.Single(a => a.ContentId == "dragTestTool").IsFloat
 								&& !s.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool")),
 							TestContext.Current.CancellationToken,
 							timeout: TimeSpan.FromSeconds(6));
-					}
-					catch (TimeoutException)
-					{
-						var current = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));
-						var stillFloating = current.Anchorables.Single(a => a.ContentId == "dragTestTool").IsFloat
-							|| current.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool"));
-						if (!stillFloating)
-						{
-							// Actually docked - our poll just lost the race. Don't retry the drag.
-							docked = current;
-						}
-						else if (attempt >= maxAttempts)
-						{
-							throw;
-						}
-						// else: genuinely still floating and attempts remain - loop and retry the drag
-						// from the SAME (still valid, still-floating) title coordinates.
-					}
-				}
 
 				Assert.NotNull(docked);
 				Assert.False(docked.Anchorables.Single(a => a.ContentId == "dragTestTool").IsFloat);
@@ -305,11 +291,28 @@ namespace AvalonDock.DevFlowIntegrationTests
 			}
 		}
 
-		private static bool IsNativeInputEnabled()
-			=> string.Equals(Environment.GetEnvironmentVariable("DEVFLOW_TEST_NATIVE_INPUT"), "1", StringComparison.Ordinal);
-
-		private static bool IsNativeSmokeEnabled()
-			=> string.Equals(Environment.GetEnvironmentVariable("DEVFLOW_TEST_NATIVE_SMOKE"), "1", StringComparison.Ordinal);
+		private static Process StartCliclickDragWithInspectionPause(
+			double fromX, double fromY, double toX, double toY)
+		{
+			var startInfo = new ProcessStartInfo
+			{
+				FileName = NativeInputEnvironment.CliclickPath,
+				UseShellExecute = false,
+			};
+			startInfo.ArgumentList.Add("-w");
+			startInfo.ArgumentList.Add("40");
+			startInfo.ArgumentList.Add($"m:{Math.Round(fromX)},{Math.Round(fromY)}");
+			startInfo.ArgumentList.Add($"dd:{Math.Round(fromX)},{Math.Round(fromY)}");
+			for (var step = 1; step <= 24; step++)
+			{
+				var progress = step / 24d;
+				startInfo.ArgumentList.Add(
+					$"dm:{Math.Round(fromX + (toX - fromX) * progress)},{Math.Round(fromY + (toY - fromY) * progress)}");
+			}
+			startInfo.ArgumentList.Add("w:5000");
+			startInfo.ArgumentList.Add($"du:{Math.Round(toX)},{Math.Round(toY)}");
+			return Process.Start(startInfo) ?? throw new InvalidOperationException("Failed to start cliclick drag gesture.");
+		}
 
 		private static async Task<DockLayoutSnapshot> WaitForLayoutAsync(
 			DevFlowClient client,

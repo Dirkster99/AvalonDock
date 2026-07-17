@@ -17,6 +17,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.ProGPU;
 using System.Windows.Threading;
 using AvalonDock.Core;
 using AvalonDock.Controls;
@@ -29,6 +30,7 @@ using AvalonDock.Themes;
 using AvalonDock.Themes.VS;
 using System.Diagnostics.CodeAnalysis;
 using LeXtudio.DevFlow.Agent.Core;
+using Microsoft.Maui.DevFlow.Agent.Core;
 
 namespace TestApp
 {
@@ -39,6 +41,48 @@ namespace TestApp
 	[DevFlowUIThread]
 	public partial class MainWindow : Window
 	{
+		private const string ObjC = "/usr/lib/libobjc.dylib";
+
+		private enum GetWindowCmd : uint
+		{
+			GW_HWNDLAST = 1,
+			GW_HWNDPREV = 3,
+		}
+
+		[DllImport("user32.dll", SetLastError = true)]
+		private static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
+
+		[DllImport(ObjC, EntryPoint = "objc_getClass")]
+		private static extern IntPtr ObjCGetClass(string name);
+
+		[DllImport(ObjC, EntryPoint = "sel_registerName")]
+		private static extern IntPtr Sel(string name);
+
+		[DllImport(ObjC, EntryPoint = "objc_msgSend")]
+		private static extern IntPtr ObjCMsgSend(IntPtr receiver, IntPtr selector);
+
+		[DllImport(ObjC, EntryPoint = "objc_msgSend")]
+		private static extern nuint ObjCMsgSendRetNUInt(IntPtr receiver, IntPtr selector);
+
+		[DllImport(ObjC, EntryPoint = "objc_msgSend")]
+		private static extern IntPtr ObjCMsgSendNUInt(IntPtr receiver, IntPtr selector, nuint arg);
+
+		private static readonly IntPtr _nsApplicationClass = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+			? ObjCGetClass("NSApplication")
+			: IntPtr.Zero;
+		private static readonly IntPtr _selSharedApplication = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+			? Sel("sharedApplication")
+			: IntPtr.Zero;
+		private static readonly IntPtr _selOrderedWindows = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+			? Sel("orderedWindows")
+			: IntPtr.Zero;
+		private static readonly IntPtr _selCount = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+			? Sel("count")
+			: IntPtr.Zero;
+		private static readonly IntPtr _selObjectAtIndex = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+			? Sel("objectAtIndex:")
+			: IntPtr.Zero;
+
 		private readonly Dictionary<string, int> _inputEventCounts = new Dictionary<string, int>();
 		private readonly HashSet<UIElement> _inputDiagnosticElements = new HashSet<UIElement>();
 		private Point _lastDockManagerMousePosition;
@@ -449,23 +493,59 @@ namespace TestApp
 
 			floating.Left = left;
 			floating.Top = top;
-			// Bring THIS window in front of every other OS-level window (including other apps'), not
-			// just its sibling windows within the process - Topmost alone only affects Z-order among
-			// this app's own windows and does not reliably win over an unrelated app (terminal, IDE)
-			// that happens to be in front. Activate() is what actually raises it above other processes
-			// (mirrors avd.activate's proven pattern for the main window).
-			floating.Activate();
-			// Do NOT leave Topmost=true: AvalonDock's drop-zone compass is a separate OverlayWindow
-			// shown ABOVE the dragged floating window during a drag (IOverlayWindowHost.ShowOverlayWindow).
-			// A permanently-topmost floating window can sit above that overlay instead of below it, so
-			// the drop-target hit-test silently never resolves - the drag still "succeeds" (mouse events
-			// process, ok=true) but nothing ever docks. A one-shot true->false toggle still raises the
-			// window once (matching avd.activate's pattern) without leaving it pinned above everything.
-			floating.Topmost = true;
-			floating.Topmost = false;
-			floating.Focus();
 			floating.UpdateLayout();
 			return $"Positioned floating window for '{contentId}' at {left},{top}";
+		}
+
+		[DevFlowAction("avd.query.floating-zorder", Description = "Compare a floating window's OS z-order against the main window")]
+		public string QueryFloatingZOrder(string contentId)
+		{
+			var floating = dockManager.FloatingWindows
+				.FirstOrDefault(fw => fw.Model?.Descendents().OfType<LayoutAnchorable>()
+					.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true);
+			if (floating == null)
+			{
+				return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+				{
+					["found"] = false,
+					["contentId"] = contentId,
+				});
+			}
+
+			var mainHandle = new WindowInteropHelper(this).Handle;
+			var floatingHandle = new WindowInteropHelper(floating).Handle;
+			var floatingContentTitle = floating.Model?.Descendents()
+				.OfType<LayoutAnchorable>()
+				.FirstOrDefault(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal))
+				?.Title;
+			var mainFound = ProGpuWpfDiagnostics.TryGetWindowZOrder(this, out var mainZ) ||
+				TryGetPlatformWindowZOrder(mainHandle, out mainZ);
+			var floatingFound = ProGpuWpfDiagnostics.TryGetWindowZOrder(floating, out var floatingZ) ||
+				TryGetPlatformWindowZOrder(floatingHandle, out floatingZ);
+			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			{
+				["found"] = true,
+				["contentId"] = contentId,
+				["mainTitle"] = Title,
+				["floatingTitle"] = string.IsNullOrWhiteSpace(floating.Title) ? floatingContentTitle : floating.Title,
+				["mainHandle"] = mainHandle.ToInt64(),
+				["floatingHandle"] = floatingHandle.ToInt64(),
+				["mainZOrderFound"] = mainFound,
+				["floatingZOrderFound"] = floatingFound,
+				["mainZOrder"] = mainZ,
+				["floatingZOrder"] = floatingZ,
+				["isFloatingAboveMain"] = mainFound && floatingFound && IsPlatformZOrderAbove(floatingZ, mainZ),
+				["zOrderConvention"] = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+					? "lower index is frontmost in NSApplication.orderedWindows"
+					: "higher z-order is frontmost in Win32 GetWindow walk",
+				["floatingLeft"] = floating.Left,
+				["floatingTop"] = floating.Top,
+				["floatingWidth"] = floating.ActualWidth,
+				["floatingHeight"] = floating.ActualHeight,
+				["mainIsActive"] = IsActive,
+				["floatingIsActive"] = floating.IsActive,
+				["floatingTopmost"] = floating.Topmost,
+			});
 		}
 
 		[DevFlowAction("avd.dock", Description = "Dock a floating anchorable back to main layout")]
@@ -778,8 +858,6 @@ namespace TestApp
 			if (WindowState == WindowState.Minimized)
 				WindowState = WindowState.Normal;
 			Activate();
-			Topmost = true;
-			Topmost = false;
 			Focus();
 			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
 			{
@@ -849,6 +927,19 @@ namespace TestApp
 			}
 
 			return System.Text.Json.JsonSerializer.Serialize(results);
+		}
+
+		[DevFlowAction("avd.query.drag-state", Description = "Query live floating-window drag state")]
+		public string QueryDragState()
+		{
+			return System.Text.Json.JsonSerializer.Serialize(dockManager.FloatingWindows.Select(floating => new
+			{
+				title = floating.Title,
+				isPortableDragging = floating.IsPortableDraggingForDiagnostics,
+				hasDragService = floating.CurrentDragService != null,
+				hasOverlay = floating.CurrentDragService?.CurrentOverlayWindow != null,
+				isMouseCaptured = floating.IsMouseCaptured,
+			}).ToArray());
 		}
 
 		[DevFlowAction("avd.hit-test", Description = "Hit test a screen point against the AvalonDock manager")]
@@ -1084,6 +1175,67 @@ namespace TestApp
 			anchorable.AddToLayout(dockManager, AnchorableShowStrategy.Most);
 			anchorable.Float();
 			return $"Created floating '{anchorable.ContentId}'";
+		}
+
+		private static bool TryGetPlatformWindowZOrder(IntPtr hwnd, out int zOrder)
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				return TryGetMacWindowOrder(hwnd, out zOrder);
+
+			return TryGetWindowZOrder(hwnd, out zOrder);
+		}
+
+		private static bool IsPlatformZOrderAbove(int candidateZOrder, int referenceZOrder)
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				return candidateZOrder < referenceZOrder;
+
+			return candidateZOrder > referenceZOrder;
+		}
+
+		private static bool TryGetMacWindowOrder(IntPtr window, out int zOrder)
+		{
+			try
+			{
+				var app = ObjCMsgSend(_nsApplicationClass, _selSharedApplication);
+				var windows = ObjCMsgSend(app, _selOrderedWindows);
+				var count = ObjCMsgSendRetNUInt(windows, _selCount);
+				for (nuint i = 0; i < count; i++)
+				{
+					if (ObjCMsgSendNUInt(windows, _selObjectAtIndex, i) == window)
+					{
+						zOrder = checked((int)i);
+						return true;
+					}
+				}
+			}
+			catch
+			{
+			}
+
+			zOrder = int.MinValue;
+			return false;
+		}
+
+		private static bool TryGetWindowZOrder(IntPtr hwnd, out int zOrder)
+		{
+			var lowestHwnd = GetWindow(hwnd, (uint)GetWindowCmd.GW_HWNDLAST);
+			var z = 0;
+			var current = lowestHwnd;
+			while (current != IntPtr.Zero)
+			{
+				if (current == hwnd)
+				{
+					zOrder = z;
+					return true;
+				}
+
+				current = GetWindow(current, (uint)GetWindowCmd.GW_HWNDPREV);
+				z++;
+			}
+
+			zOrder = int.MinValue;
+			return false;
 		}
 
 		[DevFlowAction("avd.close-document", Description = "Close a document by ContentId")]

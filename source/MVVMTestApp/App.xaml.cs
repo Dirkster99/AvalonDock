@@ -1,5 +1,5 @@
 using System.Windows;
-using LeXtudio.DevFlow.Agent.WPF;
+using LeXtudio.DevFlow.Agent.Wpf;
 
 namespace AvalonDock.MVVMTestApp
 {

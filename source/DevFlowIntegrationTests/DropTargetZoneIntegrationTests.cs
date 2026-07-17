@@ -21,8 +21,14 @@ namespace AvalonDock.DevFlowIntegrationTests
 	/// document-pane-group's children are visible (an auto-hide/collapsed edge case), which the
 	/// deterministic test layout never produces. See ZoneCases for the exact list driven here.
 	/// </summary>
+	[Collection("DevFlow")]
 	public sealed class DropTargetZoneIntegrationTests : IntegrationTestBase
 	{
+		public DropTargetZoneIntegrationTests(DevFlowAppFixture fixture)
+			: base(fixture)
+		{
+		}
+
 		// zone name -> which existing pane's screen area the pointer needs to be near for that zone's
 		// compass indicator to appear. "document" = near document-pane (also surfaces the 4
 		// DockingManager-level and 4 DocumentPaneDockAsAnchorable indicators, since AvalonDock shows
@@ -54,8 +60,8 @@ namespace AvalonDock.DevFlowIntegrationTests
 		[MemberData(nameof(ZoneCases))]
 		public async Task DragFloatingTool_OntoSpecificZone_DocksThere(string zoneType, string pathTarget)
 		{
-			if (!IsNativeInputEnabled())
-				return;
+			NativeInputEnvironment.EnsureDecomposedInputAvailable();
+			await IsolateDesktopForNativeInputAsync();
 
 			using var client = await TryConnectAsync();
 			if (client == null)
@@ -78,13 +84,10 @@ namespace AvalonDock.DevFlowIntegrationTests
 					s => s.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool")),
 					TestContext.Current.CancellationToken);
 
-				// Move the floating window clear of the main window's own area (see
-				// DragFloatingToolWindow_ToDocumentPane_DocksBackIntoLayout for why: a synthetic press
-				// can land on whatever unrelated window/app is at the screen position otherwise, and
-				// overlapping the main window is not safe even with a one-shot raise).
 				var mainArea = await client.QueryBoundsAsync("manager");
 				await client.InvokeAsync("avd.position-floating", "dragTestTool", mainArea.Right + 40, mainArea.Y + 40);
 				await Task.Delay(500, TestContext.Current.CancellationToken);
+				await client.AssertFloatingWindowAboveMainAsync("dragTestTool");
 
 				var pathTargetBounds = pathTarget == "anchorable2"
 					? await client.QueryBoundsAsync("anchorable-pane", "dragTestTool2")
@@ -94,10 +97,6 @@ namespace AvalonDock.DevFlowIntegrationTests
 
 				Assert.True(docked, $"Failed to dock onto zone '{zoneType}' after all attempts.");
 
-				// A successful dock must leave EXACTLY one dragTestTool anchorable, no longer floating.
-				// (An earlier iteration of this suite's retry logic could re-issue a drag from stale,
-				// already-docked coordinates and corrupt the model into a duplicate - this assertion
-				// would catch that regression.)
 				var final = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));
 				Assert.Single(final.Anchorables, a => a.ContentId == "dragTestTool");
 				Assert.False(final.Anchorables.Single(a => a.ContentId == "dragTestTool").IsFloat);
@@ -108,14 +107,6 @@ namespace AvalonDock.DevFlowIntegrationTests
 			}
 		}
 
-		/// <summary>
-		/// Runs the press -> drag-move-near -> query -> drag-move-onto -> release choreography, with
-		/// retries: real native OS-level drags on this backend have a low-frequency window-manager
-		/// timing race (see DragFloatingToolWindow_ToDocumentPane_DocksBackIntoLayout), so a single
-		/// attempt occasionally fails to make the compass populate at all. Each retry re-presses fresh
-		/// (the previous attempt's release, even onto empty space, cleanly ends the gesture) rather than
-		/// assuming any stale state from a prior attempt.
-		/// </summary>
 		private static async Task<bool> TryDragOntoZoneAsync(
 			DevFlowClient client,
 			string zoneType,
@@ -123,15 +114,13 @@ namespace AvalonDock.DevFlowIntegrationTests
 			CancellationToken ct)
 		{
 			const int maxAttempts = 3;
+			TimeoutException lastCompassFailure = null;
 			for (var attempt = 1; attempt <= maxAttempts; attempt++)
 			{
 				var title = await client.QueryBoundsAsync("anchorable-title", "dragTestTool");
 				await client.PressAsync(title.CenterX, title.CenterY, ct);
 				await Task.Delay(500, ct);
 
-				// Step toward the relevant host in a few increments - AvalonDock's DragService updates
-				// on each move, and a single huge jump has proven less reliable than several smaller
-				// ones at making the compass populate.
 				for (var i = 1; i <= 3; i++)
 				{
 					var t = i / 3d;
@@ -146,16 +135,9 @@ namespace AvalonDock.DevFlowIntegrationTests
 				{
 					target = await client.WaitForActiveDropTargetAsync(zoneType, ct, TimeSpan.FromSeconds(4));
 				}
-				catch (TimeoutException)
+				catch (TimeoutException ex)
 				{
-					// Compass never populated this attempt - release back at the drag's OWN origin
-					// (the floating window's own caption position) to cleanly abort. Releasing at
-					// pathTargetBounds' center is NOT safe here: that point is deliberately chosen to be
-					// near/inside the relevant host, which is often ALSO exactly where an "Inside"-style
-					// target sits - an "abort" release there could accidentally complete a real (wrong-
-					// zone) dock instead of aborting, and the next retry's press would then land on a
-					// now-DOCKED title, which drives a different AvalonDock code path
-					// (AnchorablePaneTitle.OnMouseLeave) that isn't accounted for here.
+					lastCompassFailure = ex;
 					await client.ReleaseAsync(title.CenterX, title.CenterY, ct);
 					await Task.Delay(500, ct);
 					continue;
@@ -171,16 +153,17 @@ namespace AvalonDock.DevFlowIntegrationTests
 					|| snapshot.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool"));
 				if (!stillFloating)
 					return true;
+			}
 
-				// Didn't dock - genuinely still floating, retry the whole gesture (not just the last
-				// step): the compass populating is itself part of what can race.
+			if (lastCompassFailure != null)
+			{
+				throw new Xunit.Sdk.XunitException(
+					$"AvalonDock compass overlay did not show drop target '{zoneType}' while dragging over its host.",
+					lastCompassFailure);
 			}
 
 			return false;
 		}
-
-		private static bool IsNativeInputEnabled()
-			=> string.Equals(Environment.GetEnvironmentVariable("DEVFLOW_TEST_NATIVE_INPUT"), "1", StringComparison.Ordinal);
 
 		private static async Task<DockLayoutSnapshot> WaitForLayoutAsync(
 			DevFlowClient client,

@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -189,6 +192,121 @@ namespace AvalonDock.DevFlowIntegrationTests
 			if (bounds.Width <= 0 || bounds.Height <= 0)
 				throw new InvalidOperationException($"AvalonDock target bounds are empty: {json}");
 			return bounds;
+		}
+
+		public async Task AssertFloatingWindowAboveMainAsync(string contentId)
+		{
+			var json = await InvokeAsync("avd.query.floating-zorder", contentId).ConfigureAwait(false);
+			using var doc = JsonDocument.Parse(json);
+			var root = doc.RootElement;
+			if (!root.TryGetProperty("found", out var found) || found.ValueKind != JsonValueKind.True)
+				throw new InvalidOperationException($"Floating window '{contentId}' was not found while checking z-order: {json}");
+
+			var hasMainZ = root.TryGetProperty("mainZOrderFound", out var mainFound) && mainFound.ValueKind == JsonValueKind.True;
+			var hasFloatingZ = root.TryGetProperty("floatingZOrderFound", out var floatingFound) && floatingFound.ValueKind == JsonValueKind.True;
+			if (!hasMainZ || !hasFloatingZ)
+			{
+				string systemEventsFailure = null;
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+					&& TryAssertFloatingWindowAboveMainWithSystemEvents(root, out systemEventsFailure))
+				{
+					return;
+				}
+
+				if (systemEventsFailure != null)
+					throw new InvalidOperationException(systemEventsFailure + $" Raw z-order payload: {json}");
+
+				throw new InvalidOperationException($"Could not read OS z-order for floating window '{contentId}': {json}");
+			}
+
+			if (!root.TryGetProperty("isFloatingAboveMain", out var above) || above.ValueKind != JsonValueKind.True)
+				throw new InvalidOperationException($"Floating window '{contentId}' is not above the main window: {json}");
+		}
+
+		private static bool TryAssertFloatingWindowAboveMainWithSystemEvents(JsonElement zOrderPayload, out string failure)
+		{
+			failure = null;
+			var mainTitle = zOrderPayload.TryGetProperty("mainTitle", out var mainTitleElement)
+				? mainTitleElement.GetString()
+				: "MainWindow";
+			var floatingTitle = zOrderPayload.TryGetProperty("floatingTitle", out var floatingTitleElement)
+				? floatingTitleElement.GetString()
+				: null;
+			if (string.IsNullOrWhiteSpace(floatingTitle))
+			{
+				failure = "Could not verify z-order with System Events because the floating window title was empty.";
+				return false;
+			}
+
+			var script =
+				"tell application \"System Events\"\n" +
+				"  tell process \"TestApp\"\n" +
+				"    set rows to {}\n" +
+				"    repeat with i from 1 to count of windows\n" +
+				"      try\n" +
+				"        set w to window i\n" +
+				"        set rows to rows & ((i as text) & tab & (name of w as text))\n" +
+				"      end try\n" +
+				"    end repeat\n" +
+				"  end tell\n" +
+				"end tell\n" +
+				"set AppleScript's text item delimiters to linefeed\n" +
+				"return rows as text";
+
+			string output;
+			try
+			{
+				output = RunOsaScript(script);
+			}
+			catch (Exception ex)
+			{
+				failure = $"Could not verify z-order with System Events: {ex.Message}";
+				return false;
+			}
+
+			var windows = output
+				.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+				.Select(line => line.Split('\t', 2))
+				.Where(parts => parts.Length == 2 && int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
+				.Select(parts => new
+				{
+					Index = int.Parse(parts[0], CultureInfo.InvariantCulture),
+					Title = parts[1],
+				})
+				.ToList();
+			var main = windows.FirstOrDefault(w => string.Equals(w.Title, mainTitle, StringComparison.Ordinal));
+			var floating = windows.FirstOrDefault(w => string.Equals(w.Title, floatingTitle, StringComparison.Ordinal));
+			if (main == null || floating == null)
+			{
+				failure = $"System Events could not find both windows. main='{mainTitle}', floating='{floatingTitle}', windows=[{string.Join(", ", windows.Select(w => $"{w.Index}:{w.Title}"))}]";
+				return false;
+			}
+
+			if (floating.Index < main.Index)
+				return true;
+
+			failure = $"Floating window '{floatingTitle}' is not above main window '{mainTitle}' according to System Events. " +
+				$"Lower index is frontmost; mainIndex={main.Index}, floatingIndex={floating.Index}, windows=[{string.Join(", ", windows.Select(w => $"{w.Index}:{w.Title}"))}]";
+			return false;
+		}
+
+		private static string RunOsaScript(string script)
+		{
+			var psi = new ProcessStartInfo("osascript")
+			{
+				UseShellExecute = false,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+			};
+			psi.ArgumentList.Add("-e");
+			psi.ArgumentList.Add(script);
+			using var process = Process.Start(psi) ?? throw new InvalidOperationException("Failed to start osascript.");
+			var stdout = process.StandardOutput.ReadToEnd();
+			var stderr = process.StandardError.ReadToEnd();
+			process.WaitForExit();
+			if (process.ExitCode != 0)
+				throw new InvalidOperationException(stderr.Trim());
+			return stdout.Trim();
 		}
 
 		public async Task<List<JsonElement>> QueryElementsAsync(string type, int maxResults = 20, int maxDepth = 96, CancellationToken ct = default)
