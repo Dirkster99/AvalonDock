@@ -1406,7 +1406,7 @@ namespace AvalonDock
 		public static readonly DependencyProperty IgnoreTabControlKeyBindingsProperty = DependencyProperty.Register(nameof(IgnoreTabControlKeyBindings), typeof(bool), typeof(DockingManager),
 					new FrameworkPropertyMetadata(null));
 
-		/// <summary>Gets/sets the <see cref="Style"/> to apply to a <see cref="LayoutDocumentItem"/> object.</summary>
+		/// <summary>Gets/sets whether the standard tab control key bindings are ignored or not.</summary>
 		[Bindable(true), Description("Gets/sets whether the standard tab control key bindings are ignored or not."), Category("Document")]
 		public bool IgnoreTabControlKeyBindings
 		{
