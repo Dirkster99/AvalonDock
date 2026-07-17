@@ -1,4 +1,4 @@
-﻿namespace SettingsModel.Models.XML
+namespace SettingsModel.Models.XML
 {
 	using SettingsModel.Interfaces;
 	using SettingsModel.Models.XML.Converters;
@@ -15,9 +15,7 @@
 	/// </summary>
 	internal class XMLLayer
 	{
-		#region fields
 		public readonly static char[] ResvedOptionListCharacters = new char[] { '$', '{', '}' };
-		#endregion fields
 
 		/// <summary>
 		/// Write current settings stored and manage in <paramref name="engine"/>

@@ -1,74 +1,48 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using AvalonDock.Layout;
 using System.Windows;
 using System.Windows.Media;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Defines relevant methods and property for a drop target in the AvalonDock library.
-	///
-	/// A drop target is an individual/specific docking position where a user can drop an item to dock it.
-	///
-	/// This drag & drop operation (which can result in new docking position) can include interaction elements
-	/// such as a preview of the new docking position while the user hovers with the mouse
-	/// (and the item being dragged) over a specific enabled drop target.
-	///
-	/// This interface defines the means for implementing these interaction elements.
+	/// Defines the contract for drop Target.
 	/// </summary>
 	internal interface IDropTarget
 	{
-		#region Properties
-
-		/// <summary>Gets the type of a drop target that descries a specific docking position inside a <see cref="DropAreaType"/>.</summary>
+		/// <summary>
+		/// Gets the type.
+		/// </summary>
 		DropTargetType Type { get; }
 
-		#endregion Properties
-
-		#region Methods
-
 		/// <summary>
-		/// Gets a <see cref="Geometry"/> that is used to highlight/preview the docking position
-		/// of this drop target for a <paramref name="floatingWindowModel"/> being docked inside an
-		/// <paramref name="overlayWindow"/>.
+		/// Gets the get Preview Path.
 		/// </summary>
-		/// <param name="overlayWindow"></param>
-		/// <param name="floatingWindowModel"></param>
-		/// <returns>The geometry of the preview/highlighting WPF figure path.</returns>
+		/// <param name="overlayWindow">The overlay Window.</param>
+		/// <param name="floatingWindowModel">The floating Window Model.</param>
+		/// <returns>The requested value.</returns>
 		Geometry GetPreviewPath(OverlayWindow overlayWindow, LayoutFloatingWindow floatingWindowModel);
 
-		/// <summary>Determines whether the <paramref name="dragPoint"/> is part of this drop target or not.</summary>
-		/// <param name="dragPoint">The point to test.</param>
-		/// <returns><c>true</c> if it is inside the target.</returns>
+		/// <summary>
+		/// Executes the hit Test Screen operation.
+		/// </summary>
+		/// <param name="dragPoint">The drag Point.</param>
+		/// <returns>true if the operation succeeds; otherwise, false.</returns>
 		bool HitTestScreen(Point dragPoint);
 
 		/// <summary>
-		/// Method is invoked to complete a drag & drop operation with a (new) docking position
-		/// by docking of the <paramref name="floatingWindow"/> into this drop target.
+		/// Executes the drop operation.
 		/// </summary>
-		/// <param name="floatingWindow"></param>
+		/// <param name="floatingWindow">The floating Window.</param>
 		void Drop(LayoutFloatingWindow floatingWindow);
 
 		/// <summary>
-		/// Method is invoked to signal that the mouse is starting to hover
-		/// (while dragging a <see cref="LayoutFloatingWindow"/>) over this drop target.
+		/// Executes the drag Enter operation.
 		/// </summary>
 		void DragEnter();
 
 		/// <summary>
-		/// Method is invoked to signal that the mouse is no longer hovering
-		/// (while dragging a <see cref="LayoutFloatingWindow"/>) over this drop target.
+		/// Executes the drag Leave operation.
 		/// </summary>
 		void DragLeave();
-
-		#endregion Methods
 	}
 }

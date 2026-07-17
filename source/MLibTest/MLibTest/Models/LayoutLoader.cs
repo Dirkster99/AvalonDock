@@ -12,13 +12,10 @@ namespace MLibTest.Models
 	/// </summary>
 	internal class LayoutLoader : IDisposable
 	{
-		#region fields
 		private SemaphoreSlim _LayoutSemaphore;
 		private readonly string _layoutFileName;
 		private LayoutLoaderResult _LayoutLoaded;
-		#endregion fields
 
-		#region ctors
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -35,18 +32,14 @@ namespace MLibTest.Models
 		{
 			_LayoutSemaphore = new SemaphoreSlim(1, 1);
 		}
-		#endregion ctors
 
-		#region events
 		/// <summary>
 		/// Implements an event that is raised when the AvalonDock layout
 		/// was successfully loaded.
 		/// </summary>
 		public EventHandler<LayoutLoadedEventArgs> LayoutLoadedEvent;
 		private bool _Disposed;
-		#endregion events
 
-		#region methods
 		/// <summary>
 		/// Loads the AvalonDockLayout with a background task and makes the result
 		/// available in a private <see cref="_LayoutLoaded"/> field.
@@ -82,7 +75,6 @@ namespace MLibTest.Models
 			}
 		}
 
-		#region IDisposable
 
 		/// <summary>
 		/// Standard dispose method of the <seealso cref="IDisposable" /> interface.
@@ -116,7 +108,6 @@ namespace MLibTest.Models
 			//// base class's Dispose(Boolean) method
 			////base.Dispose(disposing);
 		}
-		#endregion IDisposable
 
 		/// <summary>
 		/// Loads the layout object queried via <see cref="LoadLayoutAsync"/> method or
@@ -236,6 +227,5 @@ namespace MLibTest.Models
 
 			return Encoding.Default;
 		}
-		#endregion methods
 	}
 }

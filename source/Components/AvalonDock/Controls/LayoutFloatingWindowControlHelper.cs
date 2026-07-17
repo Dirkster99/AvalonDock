@@ -6,14 +6,23 @@ using System.Windows.Input;
 
 using AvalonDock.Layout;
 
-
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Provides helper members for layout Floating Window Control Helper.
+	/// </summary>
 	internal static class LayoutFloatingWindowControlHelper
 	{
 		private const string Excp_NotSupportedFloatingWindowType = "Not Supported Floating Window Type: {0}";
 
-		public static void ActiveTheContentOfSinglePane<T>(T fwc, bool isActive) where T : LayoutFloatingWindowControl
+		/// <summary>
+		/// Executes the active The Content Of Single Pane operation.
+		/// </summary>
+		/// <typeparam name="T">The t type.</typeparam>
+		/// <param name="fwc">The fwc.</param>
+		/// <param name="isActive">The is Active.</param>
+		public static void ActiveTheContentOfSinglePane<T>(T fwc, bool isActive)
+			where T : LayoutFloatingWindowControl
 		{
 			ILayoutContentSelector selector = null;
 			if (fwc is LayoutAnchorableFloatingWindowControl)
@@ -52,7 +61,14 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		public static void ActiveTheContentOfMultiPane<T>(T fwc, bool isActive) where T : LayoutFloatingWindowControl
+		/// <summary>
+		/// Executes the active The Content Of Multi Pane operation.
+		/// </summary>
+		/// <typeparam name="T">The t type.</typeparam>
+		/// <param name="fwc">The fwc.</param>
+		/// <param name="isActive">The is Active.</param>
+		public static void ActiveTheContentOfMultiPane<T>(T fwc, bool isActive)
+			where T : LayoutFloatingWindowControl
 		{
 			if (isActive)
 			{
@@ -91,6 +107,11 @@ namespace AvalonDock.Controls
 			ActiveTheLastActivedContent(fwc, isActive);
 		}
 
+		/// <summary>
+		/// Executes the active The Last Actived Content operation.
+		/// </summary>
+		/// <param name="fwc">The fwc.</param>
+		/// <param name="isActive">The is Active.</param>
 		public static void ActiveTheLastActivedContent(LayoutFloatingWindowControl fwc, bool isActive)
 		{
 			var items = fwc.Model.Descendents().OfType<LayoutContent>().ToList();
@@ -101,33 +122,42 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <summary>
+		/// Executes the active The Last Actived Content Of Pane operation.
+		/// </summary>
+		/// <param name="anchorablePane">The anchorable Pane.</param>
 		public static void ActiveTheLastActivedContentOfPane(LayoutAnchorablePane anchorablePane)
 		{
 			var index = IndexOfLastActivedContent(anchorablePane.Children);
 			if (index != -1)
 			{
 				anchorablePane.SelectedContentIndex = index;
-				if (!anchorablePane.SelectedContent.IsActive)
+				if (anchorablePane.SelectedContent != null && !anchorablePane.SelectedContent.IsActive)
 				{
 					anchorablePane.SelectedContent.IsActive = true;
 				}
 			}
 		}
 
+		/// <summary>
+		/// Executes the active The Last Actived Content Of Pane operation.
+		/// </summary>
+		/// <param name="documentPane">The document Pane.</param>
 		public static void ActiveTheLastActivedContentOfPane(LayoutDocumentPane documentPane)
 		{
 			var index = IndexOfLastActivedContent(documentPane.Children);
 			if (index != -1)
 			{
 				documentPane.SelectedContentIndex = index;
-				if (!documentPane.SelectedContent.IsActive)
+				if (documentPane.SelectedContent != null && !documentPane.SelectedContent.IsActive)
 				{
 					documentPane.SelectedContent.IsActive = true;
 				}
 			}
 		}
 
-		private static T GetLayoutControlByMousePosition<T>(LayoutFloatingWindowControl fwc) where T : FrameworkElement, ILayoutControl
+		private static T GetLayoutControlByMousePosition<T>(LayoutFloatingWindowControl fwc)
+			where T : FrameworkElement, ILayoutControl
 		{
 			var mousePosition = fwc.PointToScreenDPI(Mouse.GetPosition(fwc));
 			var rootVisual = ((LayoutFloatingWindowControl.FloatingWindowContentHost)fwc.Content).RootVisual;
@@ -144,7 +174,8 @@ namespace AvalonDock.Controls
 			return null;
 		}
 
-		private static int IndexOfLastActivedContent<T>(IList<T> list) where T : LayoutContent
+		private static int IndexOfLastActivedContent<T>(IList<T> list)
+			where T : LayoutContent
 		{
 			if (list.Count > 0)
 			{

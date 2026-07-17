@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<RootNamespace>AvalonDock.Core</RootNamespace>
+		<AssemblyName>AvalonDock.Core</AssemblyName>
+		<PackageId>Dirkster.AvalonDock.Core</PackageId>
+		<Description>UI-agnostic core interfaces and base classes for AvalonDock docking layout engine.</Description>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<SignAssembly>true</SignAssembly>
+
+		<!-- Enable XML doc generation so StyleCop documentation rules (SA16xx) fire during build -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<AssemblyOriginatorKeyFile>..\AvalonDock\sn.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+
+</Project>

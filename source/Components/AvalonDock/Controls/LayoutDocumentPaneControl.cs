@@ -1,53 +1,35 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using AvalonDock.Layout;
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
-	/// <inheritdoc cref="TabControl"/>
-	/// <inheritdoc cref="ILayoutControl"/>
 	/// <summary>
-	/// Implements the document container control with the
-	/// TabItem Header (<see cref="LayoutDocumentTabItem"/>) that contains the document titles
-	/// inside the <see cref="DocumentPaneTabPanel"/>.
+	/// Represents the layout Document Pane Control.
 	/// </summary>
-	/// <seealso cref="TabControlEx"/>
-	/// <seealso cref="ILayoutControl"/>
-	public class LayoutDocumentPaneControl : TabControlEx, ILayoutControl//, ILogicalChildrenContainer
+	public class LayoutDocumentPaneControl : TabControlEx, ILayoutControl// , ILogicalChildrenContainer
 	{
-		#region fields
-
 		private readonly LayoutDocumentPane _model;
 
-		#endregion fields
-
-		#region Constructors
-
-		/// <summary>Static class constructor to register WPF style keys.</summary>
+		/// <summary>
+		/// Initializes static members of the <see cref="LayoutDocumentPaneControl"/> class.
+		/// </summary>
 		static LayoutDocumentPaneControl()
 		{
 			FocusableProperty.OverrideMetadata(typeof(LayoutDocumentPaneControl), new FrameworkPropertyMetadata(false));
 		}
 
-		/// <summary>Class constructor from model and virtualization parameter.</summary>
-		/// <param name="model"></param>
-		/// <param name="isVirtualizing">Whether tabbed items are virtualized or not.</param>
-		/// <param name="ignoreTabControlKeyBindingBindings">Whether TabControl keybindings are ignored or not.</param>
-		internal LayoutDocumentPaneControl(LayoutDocumentPane model, bool isVirtualizing, bool ignoreTabControlKeyBindingBindings = false)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutDocumentPaneControl"/> class.
+		/// </summary>
+		/// <param name="model">The model.</param>
+		/// <param name="isVirtualizing">The is Virtualizing.</param>
+    /// <param name="ignoreTabControlKeyBindingBindings">Whether TabControl keybindings are ignored or not.</param>
+		internal LayoutDocumentPaneControl(LayoutDocumentPane model, bool isVirtualizing, , bool ignoreTabControlKeyBindingBindings = false)
 			: base(isVirtualizing, ignoreTabControlKeyBindingBindings)
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));
@@ -58,24 +40,15 @@ namespace AvalonDock.Controls
 			this.SizeChanged += OnSizeChanged;
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
-		/// <summary>Gets the layout model of this control.</summary>
-		[Bindable(false), Description("Gets the layout model of this control."), Category("Other")]
+		/// <summary>
+		/// Gets the model.
+		/// </summary>
+		[Bindable(false)]
+		[Description("Gets the layout model of this control.")]
+		[Category("Other")]
 		public ILayoutElement Model => _model;
 
-		#endregion Properties
-
-		#region Overrides
-
-		/// <summary>
-		/// Invoked when an unhandled SelectionChanged routed event is raised on this element. Implement this method
-		/// to add class handling for this event.
-		/// </summary>
-		/// <param name="e">The <see cref="SelectionChangedEventArgs"/> that contains the event data.
-		/// The event reports that the selection changed.</param>
+		/// <inheritdoc/>
 		protected override void OnSelectionChanged(SelectionChangedEventArgs e)
 		{
 			base.OnSelectionChanged(e);
@@ -83,13 +56,7 @@ namespace AvalonDock.Controls
 				_model.SelectedContent.IsActive = true;
 		}
 
-		/// <summary>
-		/// Invoked when an unhandled <see cref="System.Windows.UIElement.MouseLeftButtonDown"/> routed
-		/// event is raised on this element. Implement this method to add class handling
-		/// for this event.
-		/// </summary>
-		/// <param name="e">The <see cref="System.Windows.Input.MouseButtonEventArgs"/> that contains the event data.
-		/// The event data reports that the left mouse button was pressed.</param>
+		/// <inheritdoc/>
 		protected override void OnMouseLeftButtonDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonDown(e);
@@ -97,13 +64,7 @@ namespace AvalonDock.Controls
 				_model.SelectedContent.IsActive = true;
 		}
 
-		/// <summary>
-		/// Invoked when an unhandled <see cref="System.Windows.UIElement.MouseRightButtonDown"/> routed
-		/// event reaches an element in its route that is derived from this class. Implement
-		/// this method to add class handling for this event.
-		/// </summary>
-		/// <param name="e">The <see cref="System.Windows.Input.MouseButtonEventArgs"/> that contains the event data. The
-		/// event data reports that the right mouse button was pressed.</param>
+		/// <inheritdoc/>
 		protected override void OnMouseRightButtonDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseRightButtonDown(e);
@@ -111,6 +72,7 @@ namespace AvalonDock.Controls
 				_model.SelectedContent.IsActive = true;
 		}
 
+		/// <inheritdoc/>
 		protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
 		{
 			base.OnItemsChanged(e);
@@ -131,17 +93,11 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		private void OnSizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			var modelWithAtcualSize = _model as ILayoutPositionableElementWithActualSize;
 			modelWithAtcualSize.ActualWidth = ActualWidth;
 			modelWithAtcualSize.ActualHeight = ActualHeight;
 		}
-
-		#endregion Private Methods
 	}
 }

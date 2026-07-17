@@ -1,13 +1,3 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using AvalonDock.Layout;
 using System;
 using System.ComponentModel;
 using System.Windows;
@@ -15,23 +5,17 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Threading;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements a control that is displayed when a <see cref="LayoutAnchorableControl"/>
-	/// is in AutoHide mode (which can be applied via context menu drop entry or click on the Pin symbol.
+	/// Represents the layout anchor control.
 	/// </summary>
 	public class LayoutAnchorControl : Control, ILayoutControl
 	{
-		#region fields
-
 		private LayoutAnchorable _model;
 		private DispatcherTimer _openUpTimer = null;
-
-		#endregion fields
-
-		#region Constructors
 
 		static LayoutAnchorControl()
 		{
@@ -39,6 +23,10 @@ namespace AvalonDock.Controls
 			Control.IsHitTestVisibleProperty.AddOwner(typeof(LayoutAnchorControl), new FrameworkPropertyMetadata(true));
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LayoutAnchorControl"/> class.
+		/// </summary>
+		/// <param name="model">The layout model.</param>
 		internal LayoutAnchorControl(LayoutAnchorable model)
 		{
 			_model = model;
@@ -48,10 +36,9 @@ namespace AvalonDock.Controls
 			SetSide(_model.FindParent<LayoutAnchorSide>().Side);
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
+		/// <summary>
+		/// Gets the model.
+		/// </summary>
 		public ILayoutElement Model
 		{
 			get
@@ -60,18 +47,23 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		#region Side
-
 		/// <summary>
 		/// Side Read-Only Dependency Property
 		/// </summary>
 		private static readonly DependencyPropertyKey SidePropertyKey = DependencyProperty.RegisterReadOnly("Side", typeof(AnchorSide), typeof(LayoutAnchorControl),
 				new FrameworkPropertyMetadata((AnchorSide)AnchorSide.Left));
 
+		/// <summary>
+		/// <see cref="Side"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty SideProperty = SidePropertyKey.DependencyProperty;
 
-		/// <summary>Gets the anchor side of the control.</summary>
-		[Bindable(true), Description("Gets the anchor side of the control."), Category("Anchor")]
+		/// <summary>
+		/// Gets the side.
+		/// </summary>
+		[Bindable(true)]
+		[Description("Gets the anchor side of the control.")]
+		[Category("Anchor")]
 		public AnchorSide Side
 		{
 			get
@@ -81,50 +73,15 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Provides a secure method for setting the Side property.
-		/// This dependency property indicates the anchor side of the control.
+		/// Sets the side.
 		/// </summary>
-		/// <param name="value">The new value for the property.</param>
+		/// <param name="value">The value.</param>
 		protected void SetSide(AnchorSide value)
 		{
 			SetValue(SidePropertyKey, value);
 		}
 
-		#endregion Side
-
-		#endregion Properties
-
-		#region Overrides
-
-		//protected override void OnVisualParentChanged(DependencyObject oldParent)
-		//{
-		//    base.OnVisualParentChanged(oldParent);
-
-		//    var contentModel = _model;
-
-		//    if (oldParent != null && contentModel != null && contentModel.Content is UIElement)
-		//    {
-		//        var oldParentPaneControl = oldParent.FindVisualAncestor<LayoutAnchorablePaneControl>();
-		//        if (oldParentPaneControl != null)
-		//        {
-		//            ((ILogicalChildrenContainer)oldParentPaneControl).InternalRemoveLogicalChild(contentModel.Content);
-		//        }
-		//    }
-
-		//    if (contentModel.Content != null && contentModel.Content is UIElement)
-		//    {
-		//        var oldLogicalParentPaneControl = LogicalTreeHelper.GetParent(contentModel.Content as UIElement)
-		//            as ILogicalChildrenContainer;
-		//        if (oldLogicalParentPaneControl != null)
-		//            oldLogicalParentPaneControl.InternalRemoveLogicalChild(contentModel.Content);
-		//    }
-
-		//    if (contentModel != null && contentModel.Content != null && contentModel.Root != null && contentModel.Content is UIElement)
-		//    {
-		//        ((ILogicalChildrenContainer)contentModel.Root.Manager).InternalAddLogicalChild(contentModel.Content);
-		//    }
-		//}
-
+		/// <inheritdoc/>
 		protected override void OnMouseDown(System.Windows.Input.MouseButtonEventArgs e)
 		{
 			base.OnMouseDown(e);
@@ -136,9 +93,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <summary>
-		/// Handles double-click to toggle auto-hide (dock/pin the anchorable).
-		/// </summary>
+		/// <inheritdoc/>
 		protected override void OnMouseDoubleClick(MouseButtonEventArgs e)
 		{
 			base.OnMouseDoubleClick(e);
@@ -151,9 +106,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <summary>
-		/// Handles right-click to show the anchorable context menu (Float, Dock, Auto Hide, etc.).
-		/// </summary>
+		/// <inheritdoc/>
 		protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
 		{
 			base.OnMouseRightButtonUp(e);
@@ -175,6 +128,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <inheritdoc/>
 		protected override void OnMouseEnter(System.Windows.Input.MouseEventArgs e)
 		{
 			base.OnMouseEnter(e);
@@ -189,6 +143,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
+		/// <inheritdoc/>
 		protected override void OnMouseLeave(System.Windows.Input.MouseEventArgs e)
 		{
 			if (_openUpTimer != null)
@@ -197,20 +152,20 @@ namespace AvalonDock.Controls
 				_openUpTimer.Stop();
 				_openUpTimer = null;
 			}
+
 			base.OnMouseLeave(e);
 		}
-
-		#endregion Overrides
-
-		#region Private Methods
 
 		private void _model_IsSelectedChanged(object sender, EventArgs e)
 		{
 			if (!_model.IsAutoHidden)
+			{
 				_model.IsSelectedChanged -= new EventHandler(_model_IsSelectedChanged);
+			}
 			else if (_model.IsSelected)
 			{
-				_model.Root.Manager.ShowAutoHideWindow(this);
+				if (CanShowAutoHideWindow())
+					_model.Root.Manager.ShowAutoHideWindow(this);
 				_model.IsSelected = false;
 			}
 		}
@@ -219,8 +174,24 @@ namespace AvalonDock.Controls
 		{
 			if (!_model.IsAutoHidden)
 				_model.IsActiveChanged -= new EventHandler(_model_IsActiveChanged);
-			else if (_model.IsActive)
+			else if (_model.IsActive && CanShowAutoHideWindow())
 				_model.Root.Manager.ShowAutoHideWindow(this);
+		}
+
+		/// <summary>
+		/// Determines whether the classic auto-hide flyout may be shown for the model.
+		/// The manager has to support the flyout (see
+		/// <see cref="DockingManager.SupportsAutoHideFlyout"/>) and the model has to be
+		/// anchored to a side: while the layout is being restructured the model can be
+		/// selected/activated in a state where its parent chain is detached, which would
+		/// crash <see cref="LayoutAutoHideWindowControl.Show"/>.
+		/// </summary>
+		private bool CanShowAutoHideWindow()
+		{
+			var manager = _model.Root?.Manager;
+			if (manager == null || !manager.SupportsAutoHideFlyout)
+				return false;
+			return _model.Parent?.Parent is LayoutAnchorSide;
 		}
 
 		private void _openUpTimer_Tick(object sender, EventArgs e)
@@ -230,7 +201,5 @@ namespace AvalonDock.Controls
 			_openUpTimer = null;
 			_model.Root.Manager.ShowAutoHideWindow(this);
 		}
-
-		#endregion Private Methods
 	}
 }

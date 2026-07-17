@@ -10,27 +10,17 @@ using System.Windows.Input;
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// This control added to mitigate issue with tab (document) switching speed
-	/// See this https://stackoverflow.com/questions/2080764/how-to-preserve-control-state-within-tab-items-in-a-tabcontrol
-	/// and this https://stackoverflow.com/questions/31030293/cefsharp-in-tabcontrol-not-working/37171847#37171847
-	///
-	/// by implmenting an option to enable virtualization for tabbed document containers.
+	/// Represents the tab Control Ex.
 	/// </summary>
 	[TemplatePart(Name = "PART_ItemsHolder", Type = typeof(Panel))]
 	public class TabControlEx : TabControl
 	{
-		#region fields
-
 		private Panel ItemsHolderPanel = null;
 		private readonly bool _IsVirtualizing;
 		private readonly bool _IgnoreTabControlKeyBindings;
 
-		#endregion fields
-
-		#region constructors
-
 		/// <summary>
-		/// Class constructor from virtualization parameter.
+		/// Initializes a new instance of the <see cref="TabControlEx"/> class.
 		/// </summary>
 		/// <param name="isVirtualizing">Whether tabbed items are virtualized or not.</param>
 		public TabControlEx(bool isVirtualizing, bool ignoreTabControlKeyBindingBindings)
@@ -41,7 +31,7 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Class constructor
+		/// Initializes a new instance of the <see cref="TabControlEx"/> class.
 		/// </summary>
 		protected TabControlEx()
 			: base()
@@ -67,8 +57,14 @@ namespace AvalonDock.Controls
 		#region methods
 
 		/// <summary>
-		/// Get the ItemsHolder and generate any children
+		/// Gets a value indicating whether is Virtualiting.
 		/// </summary>
+		[Bindable(false)]
+		[Description("Gets whether the control and its inheriting classes are virtualizing their items or not.")]
+		[Category("Other")]
+		public bool IsVirtualiting => _IsVirtualizing;
+
+		/// <inheritdoc/>
 		public override void OnApplyTemplate()
 		{
 			base.OnApplyTemplate();
@@ -101,10 +97,7 @@ namespace AvalonDock.Controls
 			UpdateSelectedItem();
 		}
 
-		/// <summary>
-		/// When the items change we remove any generated panel children and add any new ones as necessary
-		/// </summary>
-		/// <param name="e"></param>
+		/// <inheritdoc/>
 		protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
 		{
 			base.OnItemsChanged(e);
@@ -136,7 +129,6 @@ namespace AvalonDock.Controls
 
 					// Don't do anything with new items because we don't want to
 					// create visuals that aren't being shown
-
 					UpdateSelectedItem();
 					break;
 
@@ -145,10 +137,7 @@ namespace AvalonDock.Controls
 			}
 		}
 
-		/// <summary>
-		/// Raises the <see cref="System.Windows.Controls.Primitives.Selector.SelectionChanged"/> routed event.
-		/// </summary>
-		/// <param name="e">Provides data for <see cref="SelectionChangedEventArgs"/>.</param>
+		/// <inheritdoc/>
 		protected override void OnSelectionChanged(SelectionChangedEventArgs e)
 		{
 			base.OnSelectionChanged(e);
@@ -161,12 +150,12 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Gets the currently selected item (including its generation if Virtualization is currently switched on).
+		/// Gets the get Selected Tab Item.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>The requested value.</returns>
 		protected TabItem GetSelectedTabItem()
 		{
-			object selectedItem = base.SelectedItem;
+			object selectedItem = this.SelectedItem;
 
 			// Code below is required only if virtualization is turned ON
 			if (_IsVirtualizing)
@@ -177,16 +166,16 @@ namespace AvalonDock.Controls
 
 			TabItem item = selectedItem as TabItem;
 			if (item == null)
-				item = base.ItemContainerGenerator.ContainerFromIndex(base.SelectedIndex) as TabItem;
+				item = this.ItemContainerGenerator.ContainerFromIndex(this.SelectedIndex) as TabItem;
 
 			return item;
 		}
 
 		/// <summary>
-		/// If containers are done, generate the selected item
+		/// Executes the item Container Generator Status Changed operation.
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
+		/// <param name="sender">The event sender.</param>
+		/// <param name="e">The event arguments.</param>
 		private void ItemContainerGenerator_StatusChanged(object sender, EventArgs e)
 		{
 			if (this.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
@@ -222,7 +211,7 @@ namespace AvalonDock.Controls
 
 			// show the right child
 			foreach (ContentPresenter child in ItemsHolderPanel.Children)
-				child.Visibility = ((child.Tag as TabItem).IsSelected) ? Visibility.Visible : Visibility.Collapsed;
+				child.Visibility = (child.Tag as TabItem).IsSelected ? Visibility.Visible : Visibility.Collapsed;
 		}
 
 		private ContentPresenter CreateChildContentPresenter(object item)
@@ -242,7 +231,7 @@ namespace AvalonDock.Controls
 			cp.ContentTemplateSelector = this.SelectedContentTemplateSelector;
 			cp.ContentStringFormat = this.SelectedContentStringFormat;
 			cp.Visibility = Visibility.Collapsed;
-			cp.Tag = (item is TabItem) ? item : (this.ItemContainerGenerator.ContainerFromItem(item));
+			cp.Tag = (item is TabItem) ? item : this.ItemContainerGenerator.ContainerFromItem(item);
 			ItemsHolderPanel.Children.Add(cp);
 			return cp;
 		}

@@ -1,4 +1,4 @@
-﻿namespace Settings.Interfaces
+namespace Settings.Interfaces
 {
 	using Settings.UserProfile;
 	using SettingsModel.Models;
@@ -7,7 +7,6 @@
 
 	public interface IProfile
 	{
-		#region properties
 		string GetLastActivePath();
 		string LastActiveSolution { get; set; }
 
@@ -27,9 +26,7 @@
 		/// Gets a collection of window position and size items.
 		/// </summary>
 		SerializableDictionary<string, ViewPosSizeModel> WindowPosSz { get; }
-		#endregion properties
 
-		#region methods
 		/// <summary>
 		/// Checks the MainWindow for visibility when re-starting application
 		/// (with different screen configuration).
@@ -45,6 +42,5 @@
 		/// <param name="model"></param>
 		/// <returns></returns>
 		void UpdateInsertWindowPosSize(string windowName, ViewPosSizeModel model);
-		#endregion methods
 	}
 }

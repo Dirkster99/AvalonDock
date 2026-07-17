@@ -1,52 +1,17 @@
-/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using AvalonDock.Layout;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Interop;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// This class manages the drag & drop behavior when the user drags a:
-	/// - document (<see cref="LayoutDocument"/>) or
-	/// - tool window (<see cref="LayoutAnchorable"/>) and drops it in an alternative position.
-	///
-	/// The <see cref="LayoutFloatingWindowControl"/> contains a <see cref="DragService"/> field
-	/// in order to implement the drag behavior for inheriting classes
-	/// (<see cref="LayoutDocumentFloatingWindowControl"/> and <see cref="LayoutAnchorableFloatingWindowControl"/>).
-	///
-	/// Dragging a <see cref="LayoutDocument"/> usually results in a converted <see cref="LayoutDocumentFloatingWindow"/>
-	/// being actually dragged around. Likewise, Dragging a <see cref="LayoutAnchorable"/> usually
-	/// results in a converted <see cref="LayoutAnchorableFloatingWindow"/> being dragged around.
-	///
-	/// The behavior at the drop position can be that the floating window control is converted back into its
-	/// original class type and being inserted/dropped at the final drop target position. But its also possible
-	/// that the floating window control remains a floating window if the user simply drags an item out and positions
-	/// it at no specific drop target position. The behavior at the final drop position is not always the
-	/// same since it depends on:
-	/// 1- the item being dragged around (and its content) and
-	/// 2- the drop position (and its content).
+	/// Represents the drag Service.
 	/// </summary>
-	/// <seealso cref="LayoutAnchorable"/>
-	/// <seealso cref="LayoutDocument"/>
-	/// <seealso cref="LayoutAnchorableFloatingWindow"/>
-	/// <seealso cref="LayoutDocumentFloatingWindow"/>
-	/// <seealso cref="LayoutDocumentFloatingWindowControl"/>
-	/// <seeslso cref="LayoutAnchorableFloatingWindowControl"/>).
 	internal class DragService
 	{
-		#region fields
-
 		private DockingManager _manager;
 		private LayoutFloatingWindowControl _floatingWindow;
 
@@ -59,35 +24,24 @@ namespace AvalonDock.Controls
 		private IDropTarget _currentDropTarget;
 		private bool _isDrag;
 
-		#endregion fields
-
-		#region Constructors
-
 		/// <summary>
-		/// Class constructor from <see cref="LayoutFloatingWindowControl"/> that is using this
-		/// service to implement its drag and drop (dock) behavior.
+		/// Initializes a new instance of the <see cref="DragService"/> class.
 		/// </summary>
-		/// <param name="floatingWindow">Floating window manipulated by this drag service.</param>
+		/// <param name="floatingWindow">The floating Window.</param>
 		public DragService(LayoutFloatingWindowControl floatingWindow)
 		{
 			_floatingWindow = floatingWindow;
 			_manager = floatingWindow.Model.Root.Manager;
 		}
 
-		#endregion Constructors
-
-		#region Internal Methods
-
 		/// <summary>
-		/// Method is invoked by the <see cref="LayoutFloatingWindowControl"/> to update the
-		/// current mouse position as the user drags the floating window with the mouse cursor.
+		/// Executes the update Mouse Location operation.
 		/// </summary>
-		/// <param name="dragPosition">The screen coordinates of the current mouse cursor position.</param>
+		/// <param name="dragPosition">The drag Position.</param>
 		internal void UpdateMouseLocation(Point dragPosition)
 		{
 			////var floatingWindowModel = _floatingWindow.Model as LayoutFloatingWindow;
 			// TODO - pass in without DPI adjustment, screen co-ords, adjust inside the target window
-
 			if (!_isDrag)
 			{
 				GetOverlayWindowHosts();
@@ -98,22 +52,22 @@ namespace AvalonDock.Controls
 
 			if (_currentHost != null || _currentHost != newHost)
 			{
-				//is mouse still inside current overlay window host?
+				// is mouse still inside current overlay window host?
 				if ((_currentHost != null && !_currentHost.HitTestScreen(dragPosition)) ||
 					_currentHost != newHost)
 				{
-					//esit drop target
+					// esit drop target
 					if (_currentDropTarget != null)
 						_currentWindow.DragLeave(_currentDropTarget);
 
 					_currentDropTarget = null;
 
-					//exit area
+					// exit area
 					_currentWindowAreas.ForEach(a =>
 						_currentWindow.DragLeave(a));
 					_currentWindowAreas.Clear();
 
-					//hide current overlay window
+					// hide current overlay window
 					if (_currentWindow != null)
 						_currentWindow.DragLeave(_floatingWindow);
 					if (_currentHost != null)
@@ -165,7 +119,7 @@ namespace AvalonDock.Controls
 			List<IDropArea> areasToRemove = new List<IDropArea>();
 			_currentWindowAreas.ForEach(a =>
 			{
-				//is mouse still inside this area?
+				// is mouse still inside this area?
 				if (!a.DetectionRect.Contains(a.TransformToDeviceDPI(dragPosition)))
 				{
 					_currentWindow.DragLeave(a);
@@ -204,17 +158,10 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Method is invoked by the <see cref="LayoutFloatingWindowControl"/> to indicate that the
-		/// <see cref="LayoutFloatingWindowControl"/> (and its content) should be dropped/docked at
-		/// the current mouse position.
-		///
-		/// The drop/dock behavior depends on whether the current mouse position is an actual drop target
-		/// the item being dragged, and the item being docked (if any) etc.
+		/// Executes the drop operation.
 		/// </summary>
-		/// <param name="dropLocation">The screen coordinates of the drop/dock position.</param>
-		/// <param name="dropHandled">Indicates whether the drop was handled such that the
-		/// dropped <see cref="LayoutFloatingWindowControl"/> can be removed now (since it content
-		/// is docked into a new visual tree position).</param>
+		/// <param name="dropLocation">The drop Location.</param>
+		/// <param name="dropHandled">The drop Handled.</param>
 		internal void Drop(Point dropLocation, out bool dropHandled)
 		{
 			// TODO - pass in without DPI adjustment, screen co-ords, adjust inside the target window
@@ -249,9 +196,7 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Method can be invoked to cancel the current drag and drop process and leave the
-		/// <see cref="LayoutFloatingWindowControl"/> at its current position without performing
-		/// a drop/dock operation.
+		/// Executes the abort operation.
 		/// </summary>
 		internal void Abort()
 		{
@@ -273,32 +218,24 @@ namespace AvalonDock.Controls
 			_currentHost = null;
 		}
 
-		#endregion Internal Methods
-
-		#region Private Methods
-
 		private void BringWindowToTop2(Window window)
 		{
 			if (window == null) return;
 
-			Win32Helper.SetWindowPos(new WindowInteropHelper(window).Handle,
+			Win32Helper.SetWindowPos(
+				new WindowInteropHelper(window).Handle,
 				IntPtr.Zero, 0, 0, 0, 0, Win32Helper.SetWindowPosFlags.IgnoreResize | Win32Helper.SetWindowPosFlags.IgnoreMove | Win32Helper.SetWindowPosFlags.DoNotActivate);
 		}
 
 		/// <summary>
-		/// Adds <see cref="IOverlayWindowHost"/>s into a private collection of possible
-		/// drop target hosts that can show a drop target button to drop a dragged
-		/// <see cref="LayoutAnchorableFloatingWindowControl"/> or
-		/// <see cref="LayoutDocumentFloatingWindowControl"/> into it.
+		/// Gets the get Overlay Window Hosts.
 		/// </summary>
 		private void GetOverlayWindowHosts()
 		{
-			if (_manager.Layout.RootPanel.CanDock)
+			if (_manager?.Layout?.RootPanel?.CanDock == true)
 			{
 				_manager.GetOverlayWindowHostsByZOrder(ref _overlayWindowHosts, _floatingWindow);
 			}
 		}
-
-		#endregion Private Methods
 	}
 }

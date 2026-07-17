@@ -1,65 +1,58 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System;
 
 namespace AvalonDock.Controls
 {
+	/// <summary>
+	/// Represents the focus change event args.
+	/// </summary>
 	internal class FocusChangeEventArgs : EventArgs
 	{
-		#region Constructors
-
+		/// <summary>
+		/// Initializes a new instance of the <see cref="FocusChangeEventArgs"/> class.
+		/// </summary>
+		/// <param name="gotFocusWinHandle">The got focus win handle.</param>
+		/// <param name="lostFocusWinHandle">The lost focus win handle.</param>
 		public FocusChangeEventArgs(IntPtr gotFocusWinHandle, IntPtr lostFocusWinHandle)
 		{
 			GotFocusWinHandle = gotFocusWinHandle;
 			LostFocusWinHandle = lostFocusWinHandle;
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
+		/// <summary>
+		/// Gets the got focus win handle.
+		/// </summary>
 		public IntPtr GotFocusWinHandle { get; private set; }
 
+		/// <summary>
+		/// Gets the lost focus win handle.
+		/// </summary>
 		public IntPtr LostFocusWinHandle { get; private set; }
-
-		#endregion Properties
 	}
 
+	/// <summary>
+	/// Represents the window hook handler.
+	/// </summary>
 	internal class WindowHookHandler
 	{
-		#region fields
-
 		private IntPtr _windowHook;
 		private Win32Helper.HookProc _hookProc;
 		private ReentrantFlag _insideActivateEvent = new ReentrantFlag();
 
-		#endregion fields
-
-		#region Constructors
-
+		/// <summary>
+		/// Initializes a new instance of the <see cref="WindowHookHandler"/> class.
+		/// </summary>
 		public WindowHookHandler()
 		{
 		}
 
-		#endregion Constructors
-
-		#region Events
-
+		/// <summary>
+		/// Occurs when focus changed.
+		/// </summary>
 		public event EventHandler<FocusChangeEventArgs> FocusChanged;
 
-		//public event EventHandler<WindowActivateEventArgs> Activate;
-
-		#endregion Events
-
-		#region Public Methods
-
+		/// <summary>
+		/// Attaches the handler.
+		/// </summary>
 		public void Attach()
 		{
 			_hookProc = new Win32Helper.HookProc(this.HookProc);
@@ -70,11 +63,21 @@ namespace AvalonDock.Controls
 				(int)Win32Helper.GetCurrentThreadId());
 		}
 
+		/// <summary>
+		/// Detaches the handler.
+		/// </summary>
 		public void Detach()
 		{
 			Win32Helper.UnhookWindowsHookEx(_windowHook);
 		}
 
+		/// <summary>
+		/// Hook proc.
+		/// </summary>
+		/// <param name="code">The code.</param>
+		/// <param name="wParam">The w param.</param>
+		/// <param name="lParam">The l param.</param>
+		/// <returns>The hook proc.</returns>
 		public int HookProc(int code, IntPtr wParam, IntPtr lParam)
 		{
 			if (code == Win32Helper.HCBT_SETFOCUS)
@@ -88,7 +91,7 @@ namespace AvalonDock.Controls
 				{
 					using (_insideActivateEvent.Enter())
 					{
-						//if (Activate != null)
+						// if (Activate != null)
 						//    Activate(this, new WindowActivateEventArgs(wParam));
 					}
 				}
@@ -96,7 +99,5 @@ namespace AvalonDock.Controls
 
 			return Win32Helper.CallNextHookEx(_windowHook, code, wParam, lParam);
 		}
-
-		#endregion Public Methods
 	}
 }

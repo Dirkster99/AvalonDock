@@ -1,4 +1,4 @@
-﻿namespace MLibTest.Models
+namespace MLibTest.Models
 {
 	using System;
 	using System.Diagnostics;
@@ -11,7 +11,6 @@
 	/// </summary>
 	public class AppCore
 	{
-		#region properties
 		/// <summary>
 		/// Get the name of the executing assembly (usually name of *.exe file)
 		/// </summary>
@@ -103,9 +102,7 @@
 											  string.Format(CultureInfo.InvariantCulture, "{0}.App.session", AppCore.AssemblyTitle));
 			}
 		}
-		#endregion properties
 
-		#region methods
 		/// <summary>
 		/// Create a dedicated directory to store program settings and session data
 		/// </summary>
@@ -125,6 +122,5 @@
 
 			return true;
 		}
-		#endregion methods
 	}
 }

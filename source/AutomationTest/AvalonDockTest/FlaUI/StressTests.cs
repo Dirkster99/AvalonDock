@@ -55,7 +55,6 @@ namespace AvalonDockTest.FlaUITests
         {
             // Activate Document 1 which has a TextBox with "Document 1 Content"
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(300);
 
             // Find the textbox and type something
             var textBoxes = MainWindow.FindAllDescendants(CF.ByControlType(ControlType.Edit));
@@ -64,22 +63,19 @@ namespace AvalonDockTest.FlaUITests
                 var textBox = textBoxes[0];
                 textBox.Click();
                 Wait.UntilInputIsProcessed();
-                System.Threading.Thread.Sleep(100);
 
                 // Select all and type new text
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
                 System.Threading.Thread.Sleep(50);
                 Keyboard.Type("TestData_Issue139");
                 Wait.UntilInputIsProcessed();
-                System.Threading.Thread.Sleep(200);
+                System.Threading.Thread.Sleep(100);
 
                 // Switch to Document 2
                 ActivateDocumentTab("Document 2");
-                System.Threading.Thread.Sleep(300);
 
                 // Switch back to Document 1
                 ActivateDocumentTab("Document 1");
-                System.Threading.Thread.Sleep(300);
 
                 // Find the textbox again and check value
                 textBoxes = MainWindow.FindAllDescendants(CF.ByControlType(ControlType.Edit));
@@ -128,19 +124,17 @@ namespace AvalonDockTest.FlaUITests
         public void RapidKeyboardInput_DoesNotLag_Issue162()
         {
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(300);
 
             var textBoxes = MainWindow.FindAllDescendants(CF.ByControlType(ControlType.Edit));
             if (textBoxes.Length > 0)
             {
                 textBoxes[0].Click();
                 Wait.UntilInputIsProcessed();
-                System.Threading.Thread.Sleep(100);
 
                 // Type rapidly
                 Keyboard.Type("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
                 Wait.UntilInputIsProcessed();
-                System.Threading.Thread.Sleep(200);
+                System.Threading.Thread.Sleep(100);
 
                 // Arrow keys rapidly
                 for (int i = 0; i < 10; i++)
@@ -190,7 +184,7 @@ namespace AvalonDockTest.FlaUITests
             }
             catch { }
 
-            System.Threading.Thread.Sleep(300);
+            System.Threading.Thread.Sleep(200);
 
             Assert.That(App.HasExited, Is.False,
                 "App should not crash during rapid window resizing (Issue #101).");
@@ -218,7 +212,7 @@ namespace AvalonDockTest.FlaUITests
 
             // Immediately try to interact
             ActivateDocumentTab("Document 1");
-            System.Threading.Thread.Sleep(500);
+            System.Threading.Thread.Sleep(300);
 
             Assert.That(App.HasExited, Is.False,
                 "App should not crash during layout operations with concurrent interaction (Issue #42).");

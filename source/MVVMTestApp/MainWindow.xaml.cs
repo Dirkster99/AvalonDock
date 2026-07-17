@@ -1,10 +1,10 @@
-﻿using System.IO;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 
 namespace AvalonDock.MVVMTestApp
 {
-	using AvalonDock.Layout.Serialization;
+	using AvalonDock.Serializer.Xml;
 
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
@@ -23,7 +23,7 @@ namespace AvalonDock.MVVMTestApp
 
 		private void MainWindow_Loaded(object sender, RoutedEventArgs e)
 		{
-			var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
+			var serializer = new XmlLayoutSerializer(dockManager);
 			serializer.LayoutSerializationCallback += (s, args) =>
 			{
 				args.Content = args.Content;
@@ -35,11 +35,10 @@ namespace AvalonDock.MVVMTestApp
 
 		private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
 		{
-			var serializer = new AvalonDock.Layout.Serialization.XmlLayoutSerializer(dockManager);
+			var serializer = new XmlLayoutSerializer(dockManager);
 			serializer.Serialize(@".\AvalonDock.config");
 		}
 
-		#region LoadLayoutCommand
 
 		private RelayCommand _loadLayoutCommand = null;
 
@@ -82,9 +81,7 @@ namespace AvalonDock.MVVMTestApp
 			layoutSerializer.Deserialize(@".\AvalonDock.Layout.config");
 		}
 
-		#endregion LoadLayoutCommand
 
-		#region SaveLayoutCommand
 
 		private RelayCommand _saveLayoutCommand = null;
 
@@ -112,7 +109,6 @@ namespace AvalonDock.MVVMTestApp
 			layoutSerializer.Serialize(@".\AvalonDock.Layout.config");
 		}
 
-		#endregion SaveLayoutCommand
 
 		private void OnDumpToConsole(object sender, RoutedEventArgs e)
 		{

@@ -1,4 +1,4 @@
-﻿namespace SettingsModel
+namespace SettingsModel
 {
 	using SettingsModel.Interfaces;
 	using SettingsModel.Models.XML;
@@ -12,22 +12,17 @@
 	/// </summary>
 	internal class OptionsEngine : Interfaces.IEngine
 	{
-		#region fields
 		private readonly Dictionary<string, OptionGroup> mOptionGroups = new Dictionary<string, OptionGroup>();
 
 		private bool mIsDirty = false;
-		#endregion fields
 
-		#region constructor
 		/// <summary>
 		/// Class constructor
 		/// </summary>
 		public OptionsEngine()
 		{
 		}
-		#endregion constructor
 
-		#region properties
 		/// <summary>
 		/// Gets whether any of the properties stored in any options group have changed or not.
 		/// </summary>
@@ -65,9 +60,7 @@
 				}
 			}
 		}
-		#endregion properties
 
-		#region methods
 		public override int GetHashCode()
 		{
 			return base.GetHashCode() | mOptionGroups.GetHashCode();
@@ -335,7 +328,6 @@
 			mOptionGroups.Clear();
 		}
 
-		#region XML
 		/// <summary>
 		/// Stores option groups and their values in an XML file and sets the
 		/// IsDirty flag to false.
@@ -389,7 +381,6 @@
 			xmlReader.ReadXML(reader, this);
 			IsDirty = false;
 		}
-		#endregion XML
 
 		/// <summary>
 		/// Checks if the name contains reserved characters and
@@ -411,6 +402,5 @@
 
 			return null;
 		}
-		#endregion methods
 	}
 }

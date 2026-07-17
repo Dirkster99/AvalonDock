@@ -1,42 +1,31 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace AvalonDock.Commands
 {
 	/// <summary>
-	/// Class WeakFunc.
+	/// Represents the weak Func.
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <typeparam name="TResult">The type of the t result.</typeparam>
-	/// <seealso cref="AvalonDock.Commands.WeakFunc{TResult}" />
-	/// <seealso cref="AvalonDock.Commands.IExecuteWithObjectAndResult" />
+	/// <typeparam name="T">The t type.</typeparam>
+	/// <typeparam name="TResult">The result type.</typeparam>
 	internal class WeakFunc<T, TResult> : WeakFunc<TResult>, IExecuteWithObjectAndResult
 	{
-		#region Private Fields
-
-		/// <summary>
-		/// The static function
-		/// </summary>
 		private Func<T, TResult> _staticFunc;
 
-		#endregion Private Fields
-
-		#region Public Constructors
-
 		/// <summary>
-		/// Initializes a new instance of the WeakFunc class.
+		/// Initializes a new instance of the <see cref="WeakFunc{T, TResult}"/> class.
 		/// </summary>
-		/// <param name="func">The Func that will be associated to this instance.</param>
+		/// <param name="func">The func.</param>
 		public WeakFunc(Func<T, TResult> func)
 			: this(func?.Target, func)
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the WeakFunc class.
+		/// Initializes a new instance of the <see cref="WeakFunc{T, TResult}"/> class.
 		/// </summary>
-		/// <param name="target">The Func's owner.</param>
-		/// <param name="func">The Func that will be associated to this instance.</param>
+		/// <param name="target">The target.</param>
+		/// <param name="func">The func.</param>
 		[SuppressMessage(
 			"Microsoft.Design",
 			"CA1062:Validate arguments of public methods",
@@ -57,20 +46,13 @@ namespace AvalonDock.Commands
 
 				return;
 			}
+
 			Method = func.Method;
 			FuncReference = new WeakReference(func.Target);
 			Reference = new WeakReference(target);
 		}
 
-		#endregion Public Constructors
-
-		#region Public Properties
-
-		/// <summary>
-		/// Gets a value indicating whether the Func's owner is still alive, or if it was collected
-		/// by the Garbage Collector already.
-		/// </summary>
-		/// <value><c>true</c> 如果 this instance is alive; 否则, <c>false</c>.</value>
+		/// <inheritdoc/>
 		public override bool IsAlive
 		{
 			get
@@ -95,10 +77,7 @@ namespace AvalonDock.Commands
 			}
 		}
 
-		/// <summary>
-		/// Gets or sets the name of the method that this WeakFunc represents.
-		/// </summary>
-		/// <value>The name of the method.</value>
+		/// <inheritdoc/>
 		public override string MethodName
 		{
 			get
@@ -107,30 +86,25 @@ namespace AvalonDock.Commands
 				{
 					return _staticFunc.Method.Name;
 				}
+
 				return Method.Name;
 			}
 		}
 
-		#endregion Public Properties
-
-		#region Public Methods
-
 		/// <summary>
-		/// Executes the Func. This only happens if the Func's owner
-		/// is still alive. The Func's parameter is set to default(T).
+		/// Executes the execute operation.
 		/// </summary>
-		/// <returns>The result of the Func stored as reference.</returns>
+		/// <returns>The result of the operation.</returns>
 		public new TResult Execute()
 		{
 			return Execute(default);
 		}
 
 		/// <summary>
-		/// Executes the Func. This only happens if the Func's owner
-		/// is still alive.
+		/// Executes the execute operation.
 		/// </summary>
-		/// <param name="parameter">A parameter to be passed to the action.</param>
-		/// <returns>The result of the Func stored as reference.</returns>
+		/// <param name="parameter">The converter parameter.</param>
+		/// <returns>The result of the operation.</returns>
 		public TResult Execute(T parameter)
 		{
 			if (_staticFunc != null)
@@ -159,14 +133,10 @@ namespace AvalonDock.Commands
 		}
 
 		/// <summary>
-		/// Executes the Func with a parameter of type object. This parameter
-		/// will be casted to T. This method implements <see cref="IExecuteWithObject.ExecuteWithObject" />
-		/// and can be useful if you store multiple WeakFunc{T} instances but don't know in advance
-		/// what type T represents.
+		/// Executes the execute With Object operation.
 		/// </summary>
-		/// <param name="parameter">The parameter that will be passed to the Func after
-		/// being casted to T.</param>
-		/// <returns>The result of the execution as object, to be casted to T.</returns>
+		/// <param name="parameter">The converter parameter.</param>
+		/// <returns>The result of the operation.</returns>
 		public object ExecuteWithObject(object parameter)
 		{
 			var parameterCasted = (T)parameter;
@@ -174,16 +144,12 @@ namespace AvalonDock.Commands
 		}
 
 		/// <summary>
-		/// Sets all the funcs that this WeakFunc contains to null,
-		/// which is a signal for containing objects that this WeakFunc
-		/// should be deleted.
+		/// Executes the mark For Deletion operation.
 		/// </summary>
 		public new void MarkForDeletion()
 		{
 			_staticFunc = null;
 			base.MarkForDeletion();
 		}
-
-		#endregion Public Methods
 	}
 }

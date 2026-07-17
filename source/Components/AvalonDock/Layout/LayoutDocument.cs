@@ -1,36 +1,21 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using System;
+﻿using System;
 using System.Linq;
 
 namespace AvalonDock.Layout
 {
 	/// <summary>
-	/// Implements the layout model for the <see cref="Controls.LayoutDocumentControl"/>.
+	/// Represents a layout document.
 	/// </summary>
 	[Serializable]
-	public class LayoutDocument : LayoutContent
+	public class LayoutDocument : LayoutContent, Core.Serialization.ISerializableLayoutDocument
 	{
-		#region fields
-
 		private bool _canMove = true;
 		private bool _isVisible = true;
 		private string _description = null;
 
-		#endregion fields
-
-		#region Properties
-
-		/// <summary>Gets/sets whether a document can be dragged (to be dropped in a different location) or not.
-		/// Use this property in conjunction with <see cref="CanMove"/> and <see cref="CanClose"/> and <see cref="LayoutPanel.CanDock"/>
-		/// to lock a document in its layout position.</summary>
+		/// <summary>
+		/// Gets or sets a value indicating whether this instance can move.
+		/// </summary>
 		public bool CanMove
 		{
 			get => _canMove;
@@ -42,18 +27,22 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		/// <summary>Documents can't be just hidden so always return false.</summary>
+		/// <summary>
+		/// Gets a value indicating whether this instance can hide.
+		/// </summary>
 		public bool CanHide => false;
 
-		/// <summary>Gets whether a document is visible or not.</summary>
+		/// <summary>
+		/// Gets a value indicating whether this instance is visible.
+		/// </summary>
 		public bool IsVisible
 		{
 			get => _isVisible;
 			internal set => _isVisible = value;
 		}
 
-		/// <summary>Gets/sets the document's description.
-		/// Indicates the description to display (in the <see cref="NavigatorWindow"/>) for the document item.
+		/// <summary>
+		/// Gets or sets the description.
 		/// </summary>
 		public string Description
 		{
@@ -66,10 +55,10 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion Properties
-
-		#region Internal Methods
-
+		/// <summary>
+		/// Executes the close document operation.
+		/// </summary>
+		/// <returns><see langword="true"/> if the operation succeeds; otherwise, <see langword="false"/>.</returns>
 		internal bool CloseDocument()
 		{
 			if (!TestCanClose()) return false;
@@ -77,27 +66,7 @@ namespace AvalonDock.Layout
 			return true;
 		}
 
-		#endregion Internal Methods
-
-		#region Overrides
-
-		/// <inheritdoc />
-		public override void WriteXml(System.Xml.XmlWriter writer)
-		{
-			base.WriteXml(writer);
-			if (!string.IsNullOrWhiteSpace(Description)) writer.WriteAttributeString(nameof(Description), Description);
-			if (!CanMove) writer.WriteAttributeString(nameof(CanMove), CanMove.ToString());
-		}
-
-		/// <inheritdoc />
-		public override void ReadXml(System.Xml.XmlReader reader)
-		{
-			if (reader.MoveToAttribute(nameof(Description))) Description = reader.Value;
-			if (reader.MoveToAttribute(nameof(CanMove))) CanMove = bool.Parse(reader.Value);
-			base.ReadXml(reader);
-		}
-
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		public override void Close()
 		{
 			if (Root?.Manager != null)
@@ -106,10 +75,12 @@ namespace AvalonDock.Layout
 				dockingManager.ExecuteCloseCommand(this);
 			}
 			else
+			{
 				CloseDocument();
+			}
 		}
-
 #if TRACE
+		/// <inheritdoc/>
 		public override void ConsoleDump(int tab)
 		{
 			System.Diagnostics.Trace.Write(new string(' ', tab * 4));
@@ -117,6 +88,7 @@ namespace AvalonDock.Layout
 		}
 #endif
 
+		/// <inheritdoc/>
 		protected override void InternalDock()
 		{
 			var root = Root as LayoutRoot;
@@ -130,10 +102,9 @@ namespace AvalonDock.Layout
 				if (documentPane == null) throw new InvalidOperationException("Layout must contains at least one LayoutDocumentPane in order to host documents");
 				documentPane.Children.Add(this);
 			}
+
 			root?.Manager.LayoutUpdateStrategy?.AfterInsertDocument(root, this);
 			base.InternalDock();
 		}
-
-		#endregion Overrides
 	}
 }

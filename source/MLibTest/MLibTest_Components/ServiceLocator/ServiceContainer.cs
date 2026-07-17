@@ -1,4 +1,4 @@
-﻿namespace ServiceLocator
+namespace ServiceLocator
 {
 	using System;
 	using System.Collections.Generic;
@@ -8,14 +8,11 @@
 	/// </summary>
 	public class ServiceContainer
 	{
-		#region fields
 		public static readonly ServiceContainer Instance = new ServiceContainer();
 
 		readonly Dictionary<Type, object> _serviceMap;
 		readonly object _serviceMapLock;
-		#endregion fields
 
-		#region constructors
 		/// <summary>
 		/// Class Constructor
 		/// </summary>
@@ -24,9 +21,7 @@
 			_serviceMap = new Dictionary<Type, object>();
 			_serviceMapLock = new object();
 		}
-		#endregion constructors
 
-		#region methods
 		public void AddService<TServiceContract>(TServiceContract implementation)
 			where TServiceContract : class
 		{
@@ -47,6 +42,5 @@
 
 			return service as TServiceContract;
 		}
-		#endregion methods
 	}
 }

@@ -1,4 +1,4 @@
-﻿namespace SettingsModel
+namespace SettingsModel
 {
 	using SettingsModel.Interfaces;
 	using SettingsModel.Models;
@@ -16,7 +16,6 @@
 	/// </summary>
 	internal class OptionGroup : IOptionGroup
 	{
-		#region constructors
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -27,9 +26,7 @@
 			OptionDefinitions = new Dictionary<string, OptionsSchema>();
 			IsDirty = false;
 		}
-		#endregion constructors
 
-		#region properties
 		/// <summary>
 		/// Gets the name of the <seealso cref="OptionGroup"/>.
 		/// </summary>
@@ -44,9 +41,7 @@
 		/// Gets a dictionary of otpions defined for this <seealso cref="OptionGroup"/>.
 		/// </summary>
 		private Dictionary<string, OptionsSchema> OptionDefinitions { get; set; }
-		#endregion properties
 
-		#region methods
 		/// <summary>
 		/// Retrieves the schema of each option in this optiongroup.
 		/// </summary>
@@ -156,7 +151,6 @@
 			return bdirty;
 		}
 
-		#region List related methods
 		/// <summary>
 		/// Add a list item in a list schema
 		/// </summary>
@@ -244,7 +238,6 @@
 
 			return schema.List_GetListOfKeyValues();
 		}
-		#endregion List related methods
 
 		/// <summary>
 		/// Resets the IsDirty flag to false to indicate that the current
@@ -284,6 +277,5 @@
 		{
 			return OptionDefinitions.Remove(optionName);
 		}
-		#endregion methods
 	}
 }

@@ -1,36 +1,25 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using AvalonDock.Layout;
 using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// provides a <see cref="Panel"/> that contains the TabItem Headers of the <see cref="LayoutAnchorablePaneControl"/>.
+	/// Represents the anchorable Pane Tab Panel.
 	/// </summary>
 	public class AnchorablePaneTabPanel : Panel
 	{
-		#region Constructors
-
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AnchorablePaneTabPanel"/> class.
+		/// </summary>
 		public AnchorablePaneTabPanel()
 		{
 			this.FlowDirection = System.Windows.FlowDirection.LeftToRight;
 		}
 
-		#endregion Constructors
-
-		#region Overrides
-
+		/// <inheritdoc/>
 		protected override Size MeasureOverride(Size availableSize)
 		{
 			double totWidth = 0;
@@ -55,6 +44,7 @@ namespace AvalonDock.Controls
 			return new Size(Math.Min(availableSize.Width, totWidth), maxHeight);
 		}
 
+		/// <inheritdoc/>
 		protected override Size ArrangeOverride(Size finalSize)
 		{
 			var visibleChildren = Children.Cast<UIElement>().Where(ch => ch.Visibility != System.Windows.Visibility.Collapsed);
@@ -87,6 +77,7 @@ namespace AvalonDock.Controls
 			return finalSize;
 		}
 
+		/// <inheritdoc/>
 		protected override void OnMouseLeave(System.Windows.Input.MouseEventArgs e)
 		{
 			if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed &&
@@ -101,7 +92,5 @@ namespace AvalonDock.Controls
 
 			base.OnMouseLeave(e);
 		}
-
-		#endregion Overrides
 	}
 }

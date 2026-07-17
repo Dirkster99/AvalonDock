@@ -1,12 +1,3 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
 using System;
 using System.Windows.Markup;
 
@@ -20,13 +11,7 @@ namespace AvalonDock.Layout
 	[Serializable]
 	public class LayoutAnchorSide : LayoutGroup<LayoutAnchorGroup>
 	{
-		#region fields
-
 		private AnchorSide _side;
-
-		#endregion fields
-
-		#region Properties
 
 		/// <summary>Gets the side (top, bottom, left, right) that this layout is anchored in the layout.</summary>
 		public AnchorSide Side
@@ -41,10 +26,6 @@ namespace AvalonDock.Layout
 			}
 		}
 
-		#endregion Properties
-
-		#region Overrides
-
 		/// <inheritdoc />
 		protected override bool GetVisibility() => Children.Count > 0;
 
@@ -55,10 +36,6 @@ namespace AvalonDock.Layout
 			UpdateSide();
 		}
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		private void UpdateSide()
 		{
 			if (this == Root.LeftSide) Side = AnchorSide.Left;
@@ -66,7 +43,5 @@ namespace AvalonDock.Layout
 			else if (this == Root.RightSide) Side = AnchorSide.Right;
 			else if (this == Root.BottomSide) Side = AnchorSide.Bottom;
 		}
-
-		#endregion Private Methods
 	}
 }

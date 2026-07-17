@@ -1,31 +1,19 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-using AvalonDock.Layout;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using AvalonDock.Layout;
 
 namespace AvalonDock.Controls
 {
 	/// <summary>
-	/// Implements the content part of the document control.
-	/// It hosts a <see cref="LayoutDocument"/> as its <see cref="Model"/>.
+	/// Represents the layout Document Control.
 	/// </summary>
 	public class LayoutDocumentControl : Control
 	{
-		#region Constructors
-
 		/// <summary>
-		/// Static class constructor
+		/// Initializes static members of the <see cref="LayoutDocumentControl"/> class.
 		/// </summary>
 		static LayoutDocumentControl()
 		{
@@ -33,19 +21,14 @@ namespace AvalonDock.Controls
 			FocusableProperty.OverrideMetadata(typeof(LayoutDocumentControl), new FrameworkPropertyMetadata(true));
 		}
 
-		#endregion Constructors
-
-		#region Properties
-
-		#region Model
-
-		/// <summary><see cref="Model"/> dependency property.</summary>
+		/// <summary>
+		/// <see cref="Model"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(nameof(Model), typeof(LayoutContent), typeof(LayoutDocumentControl),
 		  new FrameworkPropertyMetadata(null, OnModelChanged));
 
 		/// <summary>
-		/// Gets or sets the <see cref="Model"/> property.
-		/// This dependency property indicates the model attached to this view.
+		/// Gets or sets the model.
 		/// </summary>
 		public LayoutContent Model
 		{
@@ -53,10 +36,17 @@ namespace AvalonDock.Controls
 			set => SetValue(ModelProperty, value);
 		}
 
-		/// <summary>Handles changes to the <see cref="Model"/> property.</summary>
+		/// <summary>
+		/// Handles the on Model Changed.
+		/// </summary>
+		/// <param name="d">The d.</param>
+		/// <param name="e">The event arguments.</param>
 		private static void OnModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutDocumentControl)d).OnModelChanged(e);
 
-		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="Model"/> property.</summary>
+		/// <summary>
+		/// Handles the on Model Changed.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
 		protected virtual void OnModelChanged(DependencyPropertyChangedEventArgs e)
 		{
 			if (e.OldValue != null) ((LayoutContent)e.OldValue).PropertyChanged -= Model_PropertyChanged;
@@ -66,7 +56,9 @@ namespace AvalonDock.Controls
 				SetLayoutItem(Model?.Root?.Manager?.GetLayoutItemFromModel(Model));
 			}
 			else
+			{
 				SetLayoutItem(null);
+			}
 		}
 
 		private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -78,36 +70,29 @@ namespace AvalonDock.Controls
 			if (Model.Parent is LayoutDocumentPane layoutDocumentPane) layoutDocumentPane.SetNextSelectedIndex();
 		}
 
-		#endregion Model
-
-		#region LayoutItem
-
-		/// <summary><see cref="LayoutItem"/> Read-Only dependency property.</summary>
+		/// <summary>
+		/// The layout Item Property Key field.
+		/// </summary>
 		private static readonly DependencyPropertyKey LayoutItemPropertyKey = DependencyProperty.RegisterReadOnly(nameof(LayoutItem), typeof(LayoutItem), typeof(LayoutDocumentControl),
 		  new FrameworkPropertyMetadata(null));
 
+		/// <summary>
+		/// <see cref="LayoutItem"/> dependency property.
+		/// </summary>
 		public static readonly DependencyProperty LayoutItemProperty = LayoutItemPropertyKey.DependencyProperty;
 
 		/// <summary>
-		/// Gets the <see cref="LayoutItem"/> property. This dependency property
-		/// indicates the LayoutItem attached to this tag item.
+		/// Gets the layout Item.
 		/// </summary>
 		public LayoutItem LayoutItem => (LayoutItem)GetValue(LayoutItemProperty);
 
 		/// <summary>
-		/// Provides a secure method for setting the <see cref="LayoutItem"/> property.
-		/// This dependency property indicates the LayoutItem attached to this tag item.
+		/// Sets the set Layout Item.
 		/// </summary>
-		/// <param name="value">The new value for the property.</param>
+		/// <param name="value">The value.</param>
 		protected void SetLayoutItem(LayoutItem value) => SetValue(LayoutItemPropertyKey, value);
 
-		#endregion LayoutItem
-
-		#endregion Properties
-
-		#region Overrides
-
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
 			Debug.WriteLine($"{nameof(OnPreviewMouseLeftButtonUp)}: {LayoutItem.ContentId}");
@@ -115,29 +100,23 @@ namespace AvalonDock.Controls
 			base.OnPreviewMouseLeftButtonUp(e);
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
 			SetIsActive();
 			base.OnMouseLeftButtonDown(e);
 		}
 
-		/// <inheritdoc />
+		/// <inheritdoc/>
 		protected override void OnMouseRightButtonDown(MouseButtonEventArgs e)
 		{
 			SetIsActive();
 			base.OnMouseLeftButtonDown(e);
 		}
 
-		#endregion Overrides
-
-		#region Private Methods
-
 		private void SetIsActive()
 		{
 			if (Model != null && !Model.IsActive) Model.IsActive = true;
 		}
-
-		#endregion Private Methods
 	}
 }

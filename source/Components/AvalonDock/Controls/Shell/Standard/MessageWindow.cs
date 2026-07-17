@@ -1,14 +1,5 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-/**************************************************************************\
-    Copyright Microsoft Corporation. All Rights Reserved.
+﻿/**************************************************************************\
+	Copyright Microsoft Corporation. All Rights Reserved.
 \**************************************************************************/
 
 namespace Standard
@@ -20,22 +11,55 @@ namespace Standard
 	using System.Windows;
 	using System.Windows.Threading;
 
+	/// <summary>
+	/// Represents the message Window.
+	/// </summary>
 	internal sealed class MessageWindow : DispatcherObject, IDisposable
 	{
 		// Alias this to a static so the wrapper doesn't get GC'd
+
+		/// <summary>
+		/// The s Wnd Proc field.
+		/// </summary>
 		private static readonly WndProc s_WndProc = new WndProc(_WndProc);
 
+		/// <summary>
+		/// The s window Lookup field.
+		/// </summary>
 		private static readonly Dictionary<IntPtr, MessageWindow> s_windowLookup = new Dictionary<IntPtr, MessageWindow>();
 
+		/// <summary>
+		/// The wnd Proc Callback field.
+		/// </summary>
 		private WndProc _wndProcCallback;
+
+		/// <summary>
+		/// The class Name field.
+		/// </summary>
 		private string _className;
+
+		/// <summary>
+		/// The is Disposed field.
+		/// </summary>
 		private bool _isDisposed;
 
+		/// <summary>
+		/// Gets the handle.
+		/// </summary>
 		public IntPtr Handle
 		{
 			get; private set;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MessageWindow"/> class.
+		/// </summary>
+		/// <param name="classStyle">The class Style.</param>
+		/// <param name="style">The style.</param>
+		/// <param name="exStyle">The ex Style.</param>
+		/// <param name="location">The location.</param>
+		/// <param name="name">The name.</param>
+		/// <param name="callback">The callback.</param>
 		[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 		public MessageWindow(CS classStyle, WS style, WS_EX exStyle, Rect location, string name, WndProc callback)
 		{
@@ -50,7 +74,7 @@ namespace Standard
 				lpfnWndProc = s_WndProc,
 				hInstance = NativeMethods.GetModuleHandle(null),
 				hbrBackground = NativeMethods.GetStockObject(StockObject.NULL_BRUSH),
-				lpszMenuName = "",
+				lpszMenuName = string.Empty,
 				lpszClassName = _className,
 			};
 
@@ -82,11 +106,17 @@ namespace Standard
 			}
 		}
 
+		/// <summary>
+		/// Finalizes an instance of the <see cref="MessageWindow"/> class.
+		/// </summary>
 		~MessageWindow()
 		{
 			_Dispose(false, false);
 		}
 
+		/// <summary>
+		/// Executes the dispose operation.
+		/// </summary>
 		public void Dispose()
 		{
 			_Dispose(true, false);
@@ -95,6 +125,12 @@ namespace Standard
 
 		// This isn't right if the Dispatcher has already started shutting down.
 		// It will wind up leaking the class ATOM...
+
+		/// <summary>
+		/// Executes the dispose operation.
+		/// </summary>
+		/// <param name="disposing">The disposing.</param>
+		/// <param name="isHwndBeingDestroyed">The is Hwnd Being Destroyed.</param>
 		[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "disposing")]
 		private void _Dispose(bool disposing, bool isHwndBeingDestroyed)
 		{
@@ -105,7 +141,9 @@ namespace Standard
 			var className = _className;
 
 			if (isHwndBeingDestroyed)
+			{
 				Dispatcher.BeginInvoke(DispatcherPriority.Normal, (DispatcherOperationCallback)(arg => _DestroyWindow(IntPtr.Zero, className)));
+			}
 			else if (Handle != IntPtr.Zero)
 			{
 				if (CheckAccess())
@@ -113,11 +151,20 @@ namespace Standard
 				else
 					Dispatcher.BeginInvoke(DispatcherPriority.Normal, (DispatcherOperationCallback)(arg => _DestroyWindow(hwnd, className)));
 			}
+
 			s_windowLookup.Remove(hwnd);
 			_className = null;
 			Handle = IntPtr.Zero;
 		}
 
+		/// <summary>
+		/// Executes the wnd Proc operation.
+		/// </summary>
+		/// <param name="hwnd">The hwnd.</param>
+		/// <param name="msg">The msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <returns>The result of the operation.</returns>
 		[SuppressMessage("Microsoft.Usage", "CA1816:CallGCSuppressFinalizeCorrectly")]
 		private static IntPtr _WndProc(IntPtr hwnd, WM msg, IntPtr wParam, IntPtr lParam)
 		{
@@ -136,6 +183,7 @@ namespace Standard
 				if (!s_windowLookup.TryGetValue(hwnd, out hwndWrapper))
 					return NativeMethods.DefWindowProc(hwnd, msg, wParam, lParam);
 			}
+
 			Assert.IsNotNull(hwndWrapper);
 
 			var callback = hwndWrapper._wndProcCallback;
@@ -153,6 +201,12 @@ namespace Standard
 			return ret;
 		}
 
+		/// <summary>
+		/// Executes the destroy Window operation.
+		/// </summary>
+		/// <param name="hwnd">The hwnd.</param>
+		/// <param name="className">The class Name.</param>
+		/// <returns>The result of the operation.</returns>
 		private static object _DestroyWindow(IntPtr hwnd, string className)
 		{
 			Utility.SafeDestroyWindow(ref hwnd);

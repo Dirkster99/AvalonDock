@@ -4,6 +4,7 @@
         <TargetFrameworks>net9.0-windows;net48</TargetFrameworks>
         <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
+        <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
         <ApplicationIcon />
         <OutputType>WinExe</OutputType>
         <StartupObject />
@@ -18,8 +19,14 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>
     <ItemGroup>
+      <ProjectReference Include="..\Components\AvalonDock.Themes.VS\AvalonDock.Themes.VS.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock\AvalonDock.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Serializer.Xml\AvalonDock.Serializer.Xml.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Themes.Aero\AvalonDock.Themes.Aero.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Themes.Expression\AvalonDock.Themes.Expression.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Themes.Arc\AvalonDock.Themes.Arc.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Themes.Metro\AvalonDock.Themes.Metro.csproj" />
       <ProjectReference Include="..\Components\AvalonDock.Themes.VS2010\AvalonDock.Themes.VS2010.csproj" />
       <ProjectReference Include="..\Components\AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj" />
-      <ProjectReference Include="..\Components\AvalonDock\AvalonDock.csproj" />
     </ItemGroup>
 </Project>

@@ -6,15 +6,12 @@ namespace AvalonDock.VS2013Test.ViewModels
 {
 	internal class ToolboxViewModel : ToolViewModel
 	{
-		#region fields
 		public const string ToolContentId = "FileStatsTool";
 		private DateTime _lastModified;
 		private long _fileSize;
 		private string _FileName;
 		private string _FilePath;
-		#endregion fields
 
-		#region constructors
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -24,9 +21,7 @@ namespace AvalonDock.VS2013Test.ViewModels
 			Workspace.This.ActiveDocumentChanged += new EventHandler(OnActiveDocumentChanged);
 			ContentId = ToolContentId;
 		}
-		#endregion constructors
 
-		#region Properties
 
 		public long FileSize
 		{
@@ -80,9 +75,7 @@ namespace AvalonDock.VS2013Test.ViewModels
 			}
 		}
 
-		#endregion Properties
 
-		#region methods
 		private void OnActiveDocumentChanged(object sender, EventArgs e)
 		{
 			if (Workspace.This.ActiveDocument != null &&
@@ -103,7 +96,6 @@ namespace AvalonDock.VS2013Test.ViewModels
 				FilePath = string.Empty;
 			}
 		}
-		#endregion methods
 
 	}
 }

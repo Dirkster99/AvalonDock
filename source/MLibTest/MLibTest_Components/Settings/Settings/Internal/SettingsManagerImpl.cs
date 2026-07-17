@@ -20,13 +20,10 @@ namespace Settings.Internal
 	/// </summary>
 	internal class SettingsManagerImpl : ISettingsManager
 	{
-		#region fields
 		private readonly IOptionsPanel mSettingsDataPanel = null;
 
 		private IProfile mSessionData = null;
-		#endregion fields
 
-		#region constructor
 		/// <summary>
 		/// Class cosntructor
 		/// </summary>
@@ -44,9 +41,7 @@ namespace Settings.Internal
 			mSettingsDataPanel = new OptionsPanel();
 			SessionData = new Profile();
 		}
-		#endregion constructor
 
-		#region properties
 		/// <summary>
 		/// Implement <seealso cref="IOptionsPanel"/> method to query options from model container.
 		/// </summary>
@@ -75,7 +70,6 @@ namespace Settings.Internal
 			}
 		}
 
-		#region min max definitions for useful option values
 		/// <summary>
 		/// Gets the minimum font size that should be used in this application.
 		/// </summary>
@@ -159,16 +153,13 @@ namespace Settings.Internal
 				return 12;
 			}
 		}
-		#endregion min max definitions for useful option values
 
 		/// <summary>
 		/// Gets the internal name and Uri source for all available themes.
 		/// </summary>
 		[XmlIgnore]
 		public IThemeInfos Themes { get; private set; }
-		#endregion properties
 
-		#region methods
 		/// <summary>
 		/// Get a list of all supported languages in Edi.
 		/// </summary>
@@ -195,7 +186,6 @@ namespace Settings.Internal
 			////                                      SystemParameters_VirtualScreenTop);
 		}
 
-		#region Load Save UserSessionData
 		/// <summary>
 		/// Save program options into persistence.
 		/// See <seealso cref="SaveOptions"/> to save program options on program end.
@@ -282,7 +272,5 @@ namespace Settings.Internal
 
 			}
 		}
-		#endregion Load Save UserSessionData
-		#endregion methods
 	}
 }

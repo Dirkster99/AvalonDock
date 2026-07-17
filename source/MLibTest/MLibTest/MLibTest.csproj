@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>netcoreapp3.0;net5.0-windows;net452</TargetFrameworks>
+    <TargetFrameworks>net9.0-windows;net48</TargetFrameworks>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
@@ -38,6 +38,7 @@
     <ProjectReference Include="..\..\Components\AvalonDock.Themes.Expression\AvalonDock.Themes.Expression.csproj" />
     <ProjectReference Include="..\..\Components\AvalonDock.Themes.Metro\AvalonDock.Themes.Metro.csproj" />
     <ProjectReference Include="..\..\Components\AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj" />
+    <ProjectReference Include="..\..\Components\AvalonDock.Serializer.Xml\AvalonDock.Serializer.Xml.csproj" />
     <ProjectReference Include="..\..\Components\AvalonDock\AvalonDock.csproj" />
     <ProjectReference Include="..\..\MLibTest\MLibTest_Components\ServiceLocator\ServiceLocator.csproj" />
     <ProjectReference Include="..\..\MLibTest\MLibTest_Components\Settings\SettingsModel\SettingsModel.csproj" />

@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
    AvalonDock
 
    Copyright (C) 2007-2013 Xceed Software Inc.
@@ -9,16 +9,22 @@
 
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using AvalonDock.Core;
 using AvalonDock.Layout;
 using System.Diagnostics;
 using System.IO;
-using AvalonDock.Layout.Serialization;
+using AvalonDock.Serializer.Xml;
 using AvalonDock;
+using AvalonDock.Themes;
+using AvalonDock.Themes.VS;
 using System.Diagnostics.CodeAnalysis;
 
 namespace TestApp
@@ -26,6 +32,7 @@ namespace TestApp
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
+	[SuppressMessage("Maintainability", "CA1506:Avoid excessive class coupling", Justification = "MainWindow intentionally orchestrates many UI framework types in this sample app.")]
 	public partial class MainWindow : Window
 	{
 
@@ -54,15 +61,16 @@ namespace TestApp
 
 			winFormsHost.Child = new UserControl1();
 
+			UpdateThemeColors();
+
 		}
 
-		#region TestTimer
 
 		/// <summary>
 		/// TestTimer Dependency Property
 		/// </summary>
 		public static readonly DependencyProperty TestTimerProperty =
-			DependencyProperty.Register("TestTimer", typeof(int), typeof(MainWindow),
+			DependencyProperty.Register(nameof(TestTimer), typeof(int), typeof(MainWindow),
 				new FrameworkPropertyMetadata((int)0));
 
 		/// <summary>
@@ -75,15 +83,13 @@ namespace TestApp
 			set => SetValue(TestTimerProperty, value);
 		}
 
-		#endregion
 
-		#region TestBackground
 
 		/// <summary>
 		/// TestBackground Dependency Property
 		/// </summary>
 		public static readonly DependencyProperty TestBackgroundProperty =
-			DependencyProperty.Register("TestBackground", typeof(Brush), typeof(MainWindow),
+			DependencyProperty.Register(nameof(TestBackground), typeof(Brush), typeof(MainWindow),
 				new FrameworkPropertyMetadata((Brush)null));
 
 		/// <summary>
@@ -96,15 +102,13 @@ namespace TestApp
 			set => SetValue(TestBackgroundProperty, value);
 		}
 
-		#endregion
 
-		#region FocusedElement
 
 		/// <summary>
 		/// FocusedElement Dependency Property
 		/// </summary>
 		public static readonly DependencyProperty FocusedElementProperty =
-			DependencyProperty.Register("FocusedElement", typeof(string), typeof(MainWindow),
+			DependencyProperty.Register(nameof(FocusedElement), typeof(string), typeof(MainWindow),
 				new FrameworkPropertyMetadata((IInputElement)null));
 
 		/// <summary>
@@ -117,7 +121,6 @@ namespace TestApp
 			set => SetValue(FocusedElementProperty, value);
 		}
 
-		#endregion
 
 		private void OnLayoutRootPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
@@ -205,6 +208,15 @@ namespace TestApp
 				toolWindow1.AddToLayout(dockManager, AnchorableShowStrategy.Bottom | AnchorableShowStrategy.Most);
 		}
 
+		private void OnFloatToolWindow1(object sender, RoutedEventArgs e)
+		{
+			var toolWindow1 = dockManager.Layout.Descendents().OfType<LayoutAnchorable>().Single(a => a.ContentId == "toolWindow1");
+			if (toolWindow1.IsHidden)
+				toolWindow1.Show();
+			if (toolWindow1.CanFloat && !toolWindow1.IsFloating)
+				toolWindow1.Float();
+		}
+
 		private void DockManager_DocumentClosing(object sender, DocumentClosingEventArgs e)
 		{
 			if (MessageBox.Show("Are you sure you want to close the document?", "AvalonDock Sample", MessageBoxButton.YesNo) == MessageBoxResult.No)
@@ -262,5 +274,111 @@ namespace TestApp
             anchorable.AddToLayout(dockManager,AnchorableShowStrategy.Most);
             anchorable.Float();
         }
+
+		private void OnSwitchTheme(object sender, RoutedEventArgs e)
+		{
+			var menuItem = sender as MenuItem;
+			if (menuItem == null)
+				return;
+
+			var themeTag = menuItem.Tag as string;
+			if (themeTag == null)
+				return;
+
+			Theme theme;
+			switch (themeTag)
+			{
+				case "ArcDark": theme = new ArcDarkTheme(); break;
+				case "ArcLight": theme = new ArcLightTheme(); break;
+				case "VS2013Dark": theme = new Vs2013DarkTheme(); break;
+				case "VS2013Light": theme = new Vs2013LightTheme(); break;
+				case "VS2013Blue": theme = new Vs2013BlueTheme(); break;
+				case "VS2026Dark": theme = new VS2026DarkTheme(); break;
+				case "VS2026Light": theme = new VS2026LightTheme(); break;
+				case "VS2026Blue": theme = new VS2026BlueTheme(); break;
+				case "VS2022Dark": theme = new VS2022DarkTheme(); break;
+				case "VS2022Light": theme = new VS2022LightTheme(); break;
+				case "VS2022Blue": theme = new VS2022BlueTheme(); break;
+				case "VS2015Dark": theme = new VS2015DarkTheme(); break;
+				case "VS2015Light": theme = new VS2015LightTheme(); break;
+				case "VS2015Blue": theme = new VS2015BlueTheme(); break;
+				case "VS2010": theme = new VS2010Theme(); break;
+				case "ExpressionDark": theme = new ExpressionDarkTheme(); break;
+				case "ExpressionLight": theme = new ExpressionLightTheme(); break;
+				case "Metro": theme = new MetroTheme(); break;
+				case "Aero": theme = new AeroTheme(); break;
+				case "Generic": theme = new GenericTheme(); break;
+				default: theme = new ArcDarkTheme(); break;
+			}
+
+			dockManager.Theme = theme;
+
+			// Mark only the selected theme in the menu
+			foreach (var item in themeMenu.Items)
+			{
+				if (item is MenuItem mi && mi.IsCheckable)
+					mi.IsChecked = mi == menuItem;
+			}
+
+			// Adapt UI colors to match the theme
+			UpdateThemeColors();
+		}
+
+		private void UpdateThemeColors()
+		{
+			Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() =>
+			{
+				bool isDark = IsDarkBrush(dockManager.Background);
+				var foreground = isDark ? Brushes.White : Brushes.Black;
+
+				// Set foreground on content that needs adaptive text
+				Foreground = foreground;
+				mainMenu.Foreground = foreground;
+				tbToolWindow1Timer.Foreground = foreground;
+				tbAutoHide1Timer.Foreground = foreground;
+				tbDocument2Timer.Foreground = foreground;
+				TextElement.SetForeground(spAutoHide2, foreground);
+
+				// Update window title bar color via DWM
+				UpdateTitleBarColor();
+			}));
+		}
+
+		[DllImport("dwmapi.dll", PreserveSig = true)]
+		private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
+
+		private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+		private const int DWMWA_CAPTION_COLOR = 35;
+
+		private void UpdateTitleBarColor()
+		{
+			var hwnd = new WindowInteropHelper(this).Handle;
+			if (hwnd == IntPtr.Zero)
+				return;
+
+			bool isDark = IsDarkBrush(dockManager.Background);
+			int darkMode = isDark ? 1 : 0;
+			DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref darkMode, sizeof(int));
+
+			// Windows 11+: set exact caption color
+			var scb = dockManager.Background as SolidColorBrush;
+			if (scb != null)
+			{
+				var c = scb.Color;
+				int colorRef = c.R | (c.G << 8) | (c.B << 16);
+				DwmSetWindowAttribute(hwnd, DWMWA_CAPTION_COLOR, ref colorRef, sizeof(int));
+			}
+		}
+
+		private static bool IsDarkBrush(Brush brush)
+		{
+			if (brush is SolidColorBrush scb)
+			{
+				var c = scb.Color;
+				double luminance = 0.299 * c.R + 0.587 * c.G + 0.114 * c.B;
+				return luminance < 128;
+			}
+			return false;
+		}
     }
 }

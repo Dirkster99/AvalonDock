@@ -1,38 +1,27 @@
-﻿namespace AvalonDock.Commands
+namespace AvalonDock.Commands
 {
 	/// <summary>
-	/// Interface IExecuteWithObject
+	/// Defines the contract for execute With Object.
 	/// </summary>
 	internal interface IExecuteWithObject
 	{
-		#region Public Properties
-
 		/// <summary>
-		/// The target of the WeakAction.
+		/// Gets the target.
 		/// </summary>
-		/// <value>The target.</value>
 		object Target
 		{
 			get;
 		}
 
-		#endregion Public Properties
-
-		#region Public Methods
-
 		/// <summary>
-		/// Executes an action.
+		/// Executes the execute With Object operation.
 		/// </summary>
-		/// <param name="parameter">A parameter passed as an object,
-		/// to be casted to the appropriate type.</param>
+		/// <param name="parameter">The converter parameter.</param>
 		void ExecuteWithObject(object parameter);
 
 		/// <summary>
-		/// Deletes all references, which notifies the cleanup method
-		/// that this entry must be deleted.
+		/// Executes the mark For Deletion operation.
 		/// </summary>
 		void MarkForDeletion();
-
-		#endregion Public Methods
 	}
 }

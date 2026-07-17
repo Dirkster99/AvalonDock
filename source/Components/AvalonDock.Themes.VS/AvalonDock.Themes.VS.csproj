@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+	<PropertyGroup>
+		<RootNamespace>AvalonDock.Themes</RootNamespace>
+		<PackageId>Dirkster.AvalonDock.Themes.VS</PackageId>
+		<TargetFrameworks>$(ComponentTargetFrameworks)</TargetFrameworks>
+		<UseWPF>true</UseWPF>
+		<AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
+		<SignAssembly>true</SignAssembly>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Resource Include="**\*.png"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\*.vstheme" />
+		<EmbeddedResource Include="Resources\*.json" />
+	</ItemGroup>
+
+	<!-- System.Text.Json ships in the shared framework on net9/net10; only net48 needs the package. -->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+		<PackageReference Include="System.Text.Json" Version="9.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AvalonDock\AvalonDock.csproj"/>
+	</ItemGroup>
+</Project>

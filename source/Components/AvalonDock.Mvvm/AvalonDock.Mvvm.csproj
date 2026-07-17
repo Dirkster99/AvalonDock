@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<RootNamespace>AvalonDock.Mvvm</RootNamespace>
+		<AssemblyName>AvalonDock.Mvvm</AssemblyName>
+		<PackageId>Dirkster.AvalonDock.Mvvm</PackageId>
+		<Description>MVVM support for AvalonDock.</Description>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\AvalonDock\sn.snk</AssemblyOriginatorKeyFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AvalonDock.Core\AvalonDock.Core.csproj" />
+	</ItemGroup>
+
+</Project>

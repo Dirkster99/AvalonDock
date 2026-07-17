@@ -1,34 +1,25 @@
-﻿/************************************************************************
-   AvalonDock
-
-   Copyright (C) 2007-2013 Xceed Software Inc.
-
-   This program is provided to you under the terms of the Microsoft Public
-   License (Ms-PL) as published at https://opensource.org/licenses/MS-PL
- ************************************************************************/
-
-namespace AvalonDock.Layout
+﻿namespace AvalonDock.Layout
 {
-	/// <summary>Defines an API for interacting with (selected) content in a pane.</summary>
+	/// <summary>
+	/// Interface for layout content selector.
+	/// </summary>
 	public interface ILayoutContentSelector
 	{
-		#region Properties
-
-		/// <summary>Gets or sets the index of the selected content in the pane.</summary>
+		/// <summary>
+		/// Gets or sets the selected content index.
+		/// </summary>
 		int SelectedContentIndex { get; set; }
 
-		/// <summary>Gets the selected content in the pane.</summary>
+		/// <summary>
+		/// Gets the selected content.
+		/// </summary>
 		LayoutContent SelectedContent { get; }
 
-		#endregion Properties
-
-		#region Methods
-
-		/// <summary>Gets the index or -1 of the specified child content.</summary>
-		/// <param name="content"></param>
-		/// <returns></returns>
+		/// <summary>
+		/// Executes the index of operation.
+		/// </summary>
+		/// <param name="content">The layout content.</param>
+		/// <returns>The resulting value.</returns>
 		int IndexOf(LayoutContent content);
-
-		#endregion Methods
 	}
 }
