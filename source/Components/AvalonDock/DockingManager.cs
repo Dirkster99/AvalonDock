@@ -3205,8 +3205,7 @@ namespace AvalonDock
 				Top = fwTop,
 				Left = fwLeft
 			};
-			// fwc.Owner = Window.GetWindow(this);
-			// fwc.SetParentToMainWindowOf(this);
+			fwc.UpdateOwnership();
 			_fwList.Add(fwc);
 			Layout.CollectGarbage();
 			InvalidateArrange();
@@ -3302,8 +3301,7 @@ namespace AvalonDock
 				};
 			}
 
-			// fwc.Owner = Window.GetWindow(this);
-			// fwc.SetParentToMainWindowOf(this);
+			fwc.UpdateOwnership();
 			_fwList.Add(fwc);
 			Layout.CollectGarbage();
 			UpdateLayout();
