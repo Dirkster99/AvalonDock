@@ -23,6 +23,7 @@ namespace AvalonDock.Controls
 		/// Initializes a new instance of the <see cref="TabControlEx"/> class.
 		/// </summary>
 		/// <param name="isVirtualizing">Whether tabbed items are virtualized or not.</param>
+		/// <param name="ignoreTabControlKeyBindingBindings">whether the TabControl keybindings are ignored or not.</param>
 		public TabControlEx(bool isVirtualizing, bool ignoreTabControlKeyBindingBindings)
 			: this()
 		{
@@ -42,20 +43,6 @@ namespace AvalonDock.Controls
 			ItemContainerGenerator.StatusChanged += ItemContainerGenerator_StatusChanged;
 		}
 
-		#endregion constructors
-
-		#region properties
-
-		/// <summary>Gets whether the control and its inheriting classes are virtualizing their items or not.</summary>
-		[Bindable(false), Description("Gets whether the control and its inheriting classes are virtualizing their items or not."), Category("Other")]
-		public bool IsVirtualiting => _IsVirtualizing;
-
-		[Bindable(false), Description("Gets whether the TabControl keybindings are ignored or not.")]
-		public bool IgnoreTabControlKeyBindings => _IgnoreTabControlKeyBindings;
-		#endregion properties
-
-		#region methods
-
 		/// <summary>
 		/// Gets a value indicating whether is Virtualiting.
 		/// </summary>
@@ -63,6 +50,14 @@ namespace AvalonDock.Controls
 		[Description("Gets whether the control and its inheriting classes are virtualizing their items or not.")]
 		[Category("Other")]
 		public bool IsVirtualiting => _IsVirtualizing;
+
+		/// <summary>
+		/// Gets a value indicating whether the TabControl keybindings are ignored or not.
+		/// </summary>
+		[Bindable(false)]
+		[Description("Gets whether the TabControl keybindings are ignored or not.")]
+		[Category("Document")]
+		public bool IgnoreTabControlKeyBindings => _IgnoreTabControlKeyBindings;
 
 		/// <inheritdoc/>
 		public override void OnApplyTemplate()
@@ -256,8 +251,10 @@ namespace AvalonDock.Controls
 			return null;
 		}
 
-		#endregion methods
-
+		/// <summary>
+		/// Override of the OnKeyDown event, used to ignore the TabControl keybindings (if enabled)
+		/// </summary>
+		/// <param name="e">The key event args.</param>
 		protected override void OnKeyDown(KeyEventArgs e)
 		{
 			if (!IgnoreTabControlKeyBindings) base.OnKeyDown(e); 

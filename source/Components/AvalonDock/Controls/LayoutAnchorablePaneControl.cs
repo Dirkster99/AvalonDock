@@ -27,7 +27,7 @@ namespace AvalonDock.Controls
 		/// </summary>
 		/// <param name="model">The model.</param>
 		/// <param name="IsVirtualizing">The is Virtualizing.</param>
-    /// <param name="ignoreTabControlKeyBindingBindings">Whether TabControl keybindings are ignored or not.</param>
+		/// <param name="ignoreTabControlKeyBindingBindings">Whether TabControl keybindings are ignored or not.</param>
 		internal LayoutAnchorablePaneControl(LayoutAnchorablePane model, bool IsVirtualizing, bool ignoreTabControlKeyBindingBindings = false)
 			: base(IsVirtualizing, ignoreTabControlKeyBindingBindings)
 		{

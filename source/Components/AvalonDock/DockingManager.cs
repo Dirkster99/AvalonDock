@@ -1602,25 +1602,19 @@ namespace AvalonDock
 		[Category("Anchorable")]
 		public bool IsVirtualizingAnchorable { get; set; }
 
-		#endregion IsVirtualizingLayoutDocument IsVirtualizingLayoutAnchorable
-
-		#region IgnoreTabControlKeyBindings
-
 		/// <summary><see cref="IgnoreTabControlKeyBindings"/> dependency property.</summary>
 		public static readonly DependencyProperty IgnoreTabControlKeyBindingsProperty = DependencyProperty.Register(nameof(IgnoreTabControlKeyBindings), typeof(bool), typeof(DockingManager),
 					new FrameworkPropertyMetadata(null));
 
-		/// <summary>Gets/sets whether the standard tab control key bindings are ignored or not.</summary>
-		[Bindable(true), Description("Gets/sets whether the standard tab control key bindings are ignored or not."), Category("Document")]
+		/// <summary>Gets or sets a value indicating whether the standard tab control key bindings are ignored or not.</summary>
+		[Bindable(true)]
+		[Description("Gets or sets a value indicating whether the standard tab control key bindings are ignored or not.")]
+		[Category("Document")]
 		public bool IgnoreTabControlKeyBindings
 		{
 			get => (bool)GetValue(IgnoreTabControlKeyBindingsProperty);
 			set => SetValue(IgnoreTabControlKeyBindingsProperty, value);
 		}
-
-		#endregion IgnoreTabControlKeyBindings
-
-		#region AutoWindowSizeWhenOpened
 
 		/// <summary>
 		/// Gets or sets a value indicating whether the floating window size of a <see cref="LayoutFloatingWindowControl"/> is determined automatically when the window is opened.
