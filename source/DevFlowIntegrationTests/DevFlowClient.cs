@@ -187,6 +187,19 @@ namespace AvalonDock.DevFlowIntegrationTests
 			var json = contentId == null
 				? await InvokeAsync("avd.query.bounds", target).ConfigureAwait(false)
 				: await InvokeAsync("avd.query.bounds", target, contentId).ConfigureAwait(false);
+			return ReadElementBounds(json);
+		}
+
+		public async Task<ElementBounds> QueryDragHandleAsync(string target, string contentId = null)
+		{
+			var json = contentId == null
+				? await InvokeAsync("avd.query.drag-handle", target).ConfigureAwait(false)
+				: await InvokeAsync("avd.query.drag-handle", target, contentId).ConfigureAwait(false);
+			return ReadElementBounds(json);
+		}
+
+		private static ElementBounds ReadElementBounds(string json)
+		{
 			using var doc = JsonDocument.Parse(json);
 			var root = doc.RootElement;
 			if (!root.TryGetProperty("found", out var found) || found.ValueKind != JsonValueKind.True)
@@ -510,11 +523,12 @@ namespace AvalonDock.DevFlowIntegrationTests
 		public double Width { get; }
 		public double Height { get; }
 		public double CenterX => X + Width / 2d;
-		public double CenterY => Y + Height / 2d;
-		public double Right => X + Width;
-		public double Bottom => Y + Height;
+			public double CenterY => Y + Height / 2d;
+			public double Right => X + Width;
+			public double Bottom => Y + Height;
+			public bool Contains(double x, double y) => x >= X && x <= Right && y >= Y && y <= Bottom;
 
-		public override string ToString()
+			public override string ToString()
 			=> string.Create(CultureInfo.InvariantCulture, $"{X},{Y} {Width}x{Height}");
 
 		public bool IsCloseTo(ElementBounds other)

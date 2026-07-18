@@ -183,9 +183,8 @@ public class DevFlowAppFixture : IAsyncLifetime
     }
 
     // Native-input tests (see NativeInputEnvironment) drive REAL OS-level mouse events via cliclick,
-    // at absolute screen coordinates. Bring TestApp foreground immediately before those gestures, but
-    // do not hide the user's desktop by default: that makes local debugging painful and looks like the
-    // app is stealing focus. Set DEVFLOW_TEST_ISOLATE_DESKTOP=1 for the old full-desktop isolation.
+    // at absolute screen coordinates. Keep this limited to positioning and activating TestApp; hiding
+    // other apps can mask bad drag-start coordinates by making an invalid screen point appear safe.
     internal async Task IsolateDesktopForNativeInputAsync()
     {
         if (!OperatingSystem.IsMacOS())
@@ -194,42 +193,10 @@ public class DevFlowAppFixture : IAsyncLifetime
         try
         {
             using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
-            if (!string.Equals(
-                    Environment.GetEnvironmentVariable("DEVFLOW_TEST_ISOLATE_DESKTOP"),
-                    "1",
-                    StringComparison.Ordinal))
-            {
-                using var foregroundResp = await httpClient.PostAsync(
-                    $"http://localhost:{Port}/api/v1/invoke/actions/avd.activate",
-                    new StringContent("{\"args\":[]}", Encoding.UTF8, "application/json"));
-                return;
-            }
+            using var positionResp = await httpClient.PostAsync(
+                $"http://localhost:{Port}/api/v1/invoke/actions/avd.position-main-window",
+                new StringContent("{\"args\":[50,40]}", Encoding.UTF8, "application/json"));
 
-            var namesRaw = await RunOsaScriptAsync(
-                "tell application \"System Events\"\n" +
-                "    set procList to {}\n" +
-                "    repeat with p in (every application process whose visible is true)\n" +
-                "        set n to name of p\n" +
-                "        if n is not \"Finder\" then\n" +
-                "            set procList to procList & n\n" +
-                "        end if\n" +
-                "    end repeat\n" +
-                "end tell\n" +
-                "set AppleScript's text item delimiters to linefeed\n" +
-                "return procList as text");
-
-            _hiddenAppNames = namesRaw
-                .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Distinct(StringComparer.Ordinal)
-                .ToList();
-
-            foreach (var name in _hiddenAppNames)
-            {
-                await RunOsaScriptAsync(
-                    $"tell application \"System Events\" to set visible of process \"{EscapeForAppleScript(name)}\" to false");
-            }
-
-            // Bring TestApp itself to the foreground now that nothing else is competing for it.
             using var resp = await httpClient.PostAsync(
                 $"http://localhost:{Port}/api/v1/invoke/actions/avd.activate",
                 new StringContent("{\"args\":[]}", Encoding.UTF8, "application/json"));

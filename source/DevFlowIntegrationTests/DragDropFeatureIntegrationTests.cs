@@ -179,15 +179,20 @@ namespace AvalonDock.DevFlowIntegrationTests
 				var floatResult = await client.InvokeAsync("avd.new-floating", "Drag Test Window");
 				Assert.Contains("Created floating", floatResult);
 
-				var layout = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));
-				Assert.NotEmpty(layout.FloatingWindows);
+					var manager = await client.QueryBoundsAsync("manager");
+					await NativeInputIntegrationTests.AssertSafeDragStartAsync(
+						client,
+						manager.CenterX,
+						manager.CenterY,
+						"DockingManager",
+						TestContext.Current.CancellationToken);
 
-				var dragResult = await client.DragAsync(new DragRequest
+					var dragResult = await client.DragAsync(new DragRequest
 				{
-					FromX = 400.0,
-					FromY = 300.0,
-					ToX = 500.0,
-					ToY = 400.0,
+					FromX = manager.CenterX,
+					FromY = manager.CenterY,
+					ToX = manager.CenterX + 8,
+					ToY = manager.CenterY + 8,
 					Steps = 12,
 					Global = true,
 				}, TestContext.Current.CancellationToken);

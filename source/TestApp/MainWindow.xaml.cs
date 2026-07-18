@@ -125,7 +125,9 @@ namespace TestApp
 		private void RefreshInputDiagnostics()
 		{
 			AddInputDiagnostics(dockManager, "manager");
-			foreach (var root in GetAvalonDockVisualRoots())
+			var hitRoots = dockManager.FloatingWindows.Cast<DependencyObject>()
+				.Concat(new DependencyObject[] { dockManager });
+			foreach (var root in hitRoots)
 			{
 				foreach (var title in FindVisualDescendants<AnchorablePaneTitle>(root))
 					AddInputDiagnostics(title, $"anchorable-title:{title.Model?.ContentId}");
@@ -808,46 +810,141 @@ namespace TestApp
 			return System.Text.Json.JsonSerializer.Serialize(result);
 		}
 
-		[DevFlowAction("avd.query.bounds", Description = "Query screen bounds for a dock test target")]
-		public string QueryBounds(string target, string contentId = null)
-		{
+			[DevFlowAction("avd.query.bounds", Description = "Query screen bounds for a dock test target")]
+			public string QueryBounds(string target, string contentId = null)
+			{
 				FrameworkElement element = target switch
 				{
-					"main-window" => this,
-					"menu" => mainMenu,
-					"manager" => dockManager,
-				"anchorable-title" => FindFloatingWindowCaption(contentId),
-				"anchorable-tab" => FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
-					.Where(x => string.Equals((x.Model as LayoutAnchorable)?.ContentId, contentId, StringComparison.Ordinal))
-					.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0),
-				"document-pane" => FindVisualDescendant<LayoutDocumentPaneControl>(dockManager, _ => true),
-				"anchorable-pane" => FindVisualDescendant<LayoutAnchorablePaneControl>(
-					dockManager,
-					x => x.Model?.Descendents().OfType<LayoutAnchorable>()
+				"main-window" => this,
+				"menu" => mainMenu,
+				"manager" => dockManager,
+					"anchorable-title" => FindAnchorableTitle(contentId),
+					"anchorable-tab" => FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
+						.Where(x => string.Equals((x.Model as LayoutAnchorable)?.ContentId, contentId, StringComparison.Ordinal))
+						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0),
+					"document-tab" => FindVisualDescendants<LayoutDocumentTabItem>(dockManager)
+						.Where(x => string.Equals(x.Model?.ContentId, contentId, StringComparison.Ordinal))
+						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0),
+					"document-pane" => FindVisualDescendant<LayoutDocumentPaneControl>(dockManager, _ => true),
+					"anchorable-pane" => FindVisualDescendant<LayoutAnchorablePaneControl>(
+						dockManager,
+						x => x.Model?.Descendents().OfType<LayoutAnchorable>()
 						.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true),
 				"anchorable-resizer" => FindAnchorablePaneResizer(contentId),
-				"floating-window" => dockManager.FloatingWindows.FirstOrDefault(),
+					"floating-window" => string.IsNullOrEmpty(contentId)
+						? dockManager.FloatingWindows.FirstOrDefault()
+						: FindVisibleFloatingWindow(contentId),
 				_ => null
 			};
 
-			return System.Text.Json.JsonSerializer.Serialize(CreateBoundsPayload(target, contentId, element));
-		}
+				return System.Text.Json.JsonSerializer.Serialize(CreateBoundsPayload(target, contentId, element));
+			}
 
-		[DevFlowAction("avd.activate", Description = "Activate and foreground the AvalonDock test window")]
-		public string ActivateTestWindow()
-		{
-			if (WindowState == WindowState.Minimized)
-				WindowState = WindowState.Normal;
+			[DevFlowAction("avd.query.drag-handle", Description = "Query a verified screen drag start point for an AvalonDock target")]
+			public string QueryDragHandle(string target, string contentId = null)
+			{
+				if (target == "floating-caption")
+					return QueryFloatingCaptionDragHandle(contentId);
+
+				FrameworkElement element = target switch
+				{
+					"docked-anchorable" => FindDockedAnchorableDragHandle(contentId),
+					"anchorable-resizer" => FindAnchorablePaneResizer(contentId),
+					"document-body" => FindVisualDescendant<LayoutDocumentPaneControl>(dockManager, _ => true),
+					"manager" => dockManager,
+					_ => null
+				};
+
+				var payload = CreateBoundsPayload(target, contentId, element);
+				if (element != null)
+				{
+					payload["handleKind"] = target;
+					payload["hitTest"] = HitTest((double)payload["centerX"], (double)payload["centerY"]);
+					payload["managerBounds"] = CreateBoundsPayload("manager", null, dockManager);
+					var window = Window.GetWindow(element);
+					if (window != null)
+						payload["windowBounds"] = CreateBoundsPayload("window", null, window);
+				}
+
+				return System.Text.Json.JsonSerializer.Serialize(payload);
+			}
+
+			private string QueryFloatingCaptionDragHandle(string contentId)
+			{
+				var floating = FindVisibleFloatingWindow(contentId);
+				if (floating == null)
+				{
+					return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+					{
+						["target"] = "floating-caption",
+						["contentId"] = contentId,
+						["found"] = false,
+						["reason"] = "floating window not found",
+					});
+				}
+
+				var captionHeight = Math.Min(28d, Math.Max(12d, floating.ActualHeight / 6d));
+				var leftInset = 8d;
+				var topInset = 6d;
+				var width = Math.Max(24d, Math.Min(180d, floating.ActualWidth - leftInset * 2d));
+				var height = Math.Max(12d, captionHeight - topInset);
+				var result = new Dictionary<string, object>
+				{
+					["target"] = "floating-caption",
+					["contentId"] = contentId,
+					["found"] = true,
+					["x"] = floating.Left + leftInset,
+					["y"] = floating.Top + topInset,
+					["width"] = width,
+					["height"] = height,
+					["centerX"] = floating.Left + leftInset + width / 2d,
+					["centerY"] = floating.Top + topInset + height / 2d,
+					["hitTestPoint"] = false,
+					["handleKind"] = "floating-caption",
+					["windowBounds"] = CreateBoundsPayload("floating-window", contentId, floating),
+					["managerBounds"] = CreateBoundsPayload("manager", null, dockManager),
+				};
+				result["hitTest"] = HitTest((double)result["centerX"], (double)result["centerY"]);
+				return System.Text.Json.JsonSerializer.Serialize(result);
+			}
+
+			[DevFlowAction("avd.activate", Description = "Activate and foreground the AvalonDock test window")]
+			public string ActivateTestWindow()
+			{
+				if (WindowState == WindowState.Minimized)
+					WindowState = WindowState.Normal;
 			Activate();
 			Focus();
 			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
 			{
 				["isActive"] = IsActive,
-				["isKeyboardFocusWithin"] = IsKeyboardFocusWithin,
-			});
-		}
+					["isKeyboardFocusWithin"] = IsKeyboardFocusWithin,
+				});
+			}
 
-		[DevFlowAction("avd.input.reset", Description = "Reset AvalonDock routed input diagnostics")]
+			[DevFlowAction("avd.position-main-window", Description = "Move the AvalonDock test window to the primary-screen test area")]
+			public string PositionMainWindow(double left = 50, double top = 40)
+			{
+				if (WindowState == WindowState.Minimized)
+					WindowState = WindowState.Normal;
+				WindowStartupLocation = WindowStartupLocation.Manual;
+				Left = left;
+				Top = top;
+				Width = 900;
+				Height = 700;
+				UpdateLayout();
+				Activate();
+				return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+				{
+					["left"] = Left,
+					["top"] = Top,
+					["width"] = ActualWidth,
+					["height"] = ActualHeight,
+					["isActive"] = IsActive,
+				});
+			}
+
+			[DevFlowAction("avd.input.reset", Description = "Reset AvalonDock routed input diagnostics")]
 		public string ResetInputDiagnostics()
 		{
 			_inputEventCounts.Clear();
@@ -924,23 +1021,46 @@ namespace TestApp
 				menuBounds = CreateBoundsPayload("menu", null, mainMenu),
 				managerBounds = CreateBoundsPayload("manager", null, dockManager),
 				title = floating.Title,
-				currentDropTarget = floating.CurrentDragService?.CurrentDropTargetType,
-				left = floating.Left,
-				top = floating.Top,
-				currentPointer = floating.CurrentPointerScreenPosition,
-			}).ToArray());
+					currentDropTarget = floating.CurrentDragService?.CurrentDropTargetType,
+					left = floating.Left,
+					top = floating.Top,
+					dragOffset = floating.PortableDragOffsetForDiagnostics,
+					currentPointer = floating.CurrentPointerScreenPosition,
+				}).ToArray());
 		}
 
 		[DevFlowAction("avd.hit-test", Description = "Hit test a screen point against the AvalonDock manager")]
 		public string HitTest(double screenX, double screenY)
 		{
-			var point = dockManager.PointFromScreen(new Point(screenX, screenY));
-			var hit = dockManager.InputHitTest(point) as DependencyObject;
+			var screenPoint = new Point(screenX, screenY);
+			var managerPoint = dockManager.PointFromScreen(screenPoint);
+			DependencyObject hit = null;
+			DependencyObject hitRoot = null;
+			foreach (var root in GetAvalonDockVisualRoots())
+			{
+				if (root is not UIElement rootElement || root is not Visual rootVisual)
+					continue;
+
+				if (root is FrameworkElement frameworkElement)
+				{
+					var topLeft = PointToScreenPortable(frameworkElement, new Point(0, 0));
+					var bottomRight = PointToScreenPortable(frameworkElement, new Point(frameworkElement.ActualWidth, frameworkElement.ActualHeight));
+					if (!new Rect(topLeft, bottomRight).Contains(screenPoint))
+						continue;
+				}
+
+				var rootPoint = PointFromScreenPortable(rootElement, screenPoint);
+				hit = rootElement.InputHitTest(rootPoint) as DependencyObject;
+				hitRoot = root;
+				if (hit != null)
+					break;
+			}
+
 			var ancestors = new List<string>();
 			for (var current = hit; current != null; current = VisualTreeHelper.GetParent(current))
 			{
 				ancestors.Add(current.GetType().FullName);
-				if (ReferenceEquals(current, dockManager))
+				if (ReferenceEquals(current, hitRoot))
 					break;
 			}
 
@@ -948,8 +1068,9 @@ namespace TestApp
 			{
 				["screenX"] = screenX,
 				["screenY"] = screenY,
-				["managerX"] = point.X,
-				["managerY"] = point.Y,
+				["managerX"] = managerPoint.X,
+				["managerY"] = managerPoint.Y,
+				["root"] = hitRoot?.GetType().FullName,
 				["hit"] = hit?.GetType().FullName,
 				["ancestors"] = ancestors,
 			});
@@ -1044,8 +1165,8 @@ namespace TestApp
 			if (element == null)
 				return result;
 
-			var topLeft = element.PointToScreen(new Point(0, 0));
-			var bottomRight = element.PointToScreen(new Point(element.ActualWidth, element.ActualHeight));
+				var topLeft = PointToScreenPortable(element, new Point(0, 0));
+				var bottomRight = PointToScreenPortable(element, new Point(element.ActualWidth, element.ActualHeight));
 			result["x"] = topLeft.X;
 			result["y"] = topLeft.Y;
 			result["width"] = bottomRight.X - topLeft.X;
@@ -1065,7 +1186,7 @@ namespace TestApp
 			return result;
 		}
 
-		private static bool TryFindHitTestableScreenPoint(FrameworkElement element, out Point screenPoint)
+			private static bool TryFindHitTestableScreenPoint(FrameworkElement element, out Point screenPoint)
 		{
 			screenPoint = default;
 			var root = FindVisualRoot(element);
@@ -1088,15 +1209,60 @@ namespace TestApp
 
 						if (rootElement is FrameworkElement rootFrameworkElement)
 						{
-							screenPoint = rootFrameworkElement.PointToScreen(pointInRoot);
+							screenPoint = PointToScreenPortable(rootFrameworkElement, pointInRoot);
 							return true;
 						}
 					}
 				}
 			}
 
-			return false;
-		}
+				return false;
+			}
+
+			private static Point PointToScreenPortable(FrameworkElement element, Point point)
+			{
+				if (element is Window directWindow)
+					return new Point(directWindow.Left + point.X, directWindow.Top + point.Y);
+
+				var window = Window.GetWindow(element);
+				if (window is LayoutFloatingWindowControl && !ReferenceEquals(window, element))
+				{
+					try
+					{
+						var pointInWindow = element.TransformToAncestor(window).Transform(point);
+						return new Point(window.Left + pointInWindow.X, window.Top + pointInWindow.Y);
+					}
+					catch (InvalidOperationException)
+					{
+					}
+				}
+
+				return element.PointToScreen(point);
+			}
+
+			private static Point PointFromScreenPortable(UIElement element, Point point)
+			{
+				if (element is Window directWindow)
+					return new Point(point.X - directWindow.Left, point.Y - directWindow.Top);
+
+				if (element is FrameworkElement frameworkElement)
+				{
+					var window = Window.GetWindow(frameworkElement);
+					if (window is LayoutFloatingWindowControl && !ReferenceEquals(window, frameworkElement))
+					{
+						try
+						{
+							var pointInWindow = new Point(point.X - window.Left, point.Y - window.Top);
+							return window.TransformToDescendant(frameworkElement).Transform(pointInWindow);
+						}
+						catch (InvalidOperationException)
+						{
+						}
+					}
+				}
+
+				return element.PointFromScreen(point);
+			}
 
 		private static T FindVisualDescendant<T>(DependencyObject root, Func<T, bool> predicate)
 			where T : DependencyObject
@@ -1149,7 +1315,33 @@ namespace TestApp
 				.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
 		}
 
-		private LayoutFloatingWindowControl FindVisibleFloatingWindow(string contentId)
+			private FrameworkElement FindAnchorableTitle(string contentId)
+			{
+				return FindFloatingWindowCaption(contentId) ??
+					GetAvalonDockVisualRoots()
+						.SelectMany(FindVisualDescendants<AnchorablePaneTitle>)
+					.Where(x => string.Equals(x.Model?.ContentId, contentId, StringComparison.Ordinal) ||
+						x.FindVisualAncestor<LayoutAnchorablePaneControl>()?.Model?.Descendents().OfType<LayoutAnchorable>()
+						.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true)
+						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
+			}
+
+			private FrameworkElement FindDockedAnchorableDragHandle(string contentId)
+			{
+				var title = FindVisualDescendants<AnchorablePaneTitle>(dockManager)
+					.Where(x => string.Equals(x.Model?.ContentId, contentId, StringComparison.Ordinal) ||
+						x.FindVisualAncestor<LayoutAnchorablePaneControl>()?.Model?.Descendents().OfType<LayoutAnchorable>()
+							.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true)
+					.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
+				if (title != null)
+					return title;
+
+				return FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
+					.Where(x => string.Equals((x.Model as LayoutAnchorable)?.ContentId, contentId, StringComparison.Ordinal))
+					.FirstOrDefault(x => x.ActualWidth > 0 && x.ActualHeight > 0);
+			}
+
+			private LayoutFloatingWindowControl FindVisibleFloatingWindow(string contentId)
 		{
 			return dockManager.FloatingWindows
 				.Where(fw => fw.IsLoaded && fw.IsVisible &&

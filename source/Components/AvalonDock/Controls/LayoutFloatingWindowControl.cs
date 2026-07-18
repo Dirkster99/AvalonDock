@@ -44,6 +44,7 @@ namespace AvalonDock.Controls
 		/// <summary>The live OS cursor position, in screen coordinates. Test-only surface used to verify
 		/// that this window's position tracks the pointer during a portable caption drag.</summary>
 		internal Point CurrentPointerScreenPosition => PlatformHelper.GetCursorPosition();
+		internal Point PortableDragOffsetForDiagnostics => _portableDragOffset;
 		private bool _internalCloseFlag = false;
 		private bool _isClosing = false;
 
@@ -953,6 +954,7 @@ namespace AvalonDock.Controls
 			_portableNativeDragging = true;
 			_portableDragStartUtc = DateTime.UtcNow;
 			_portableLastPointer = PlatformHelper.GetCursorPosition();
+			_portableDragOffset = new Point(_portableLastPointer.X - Left, _portableLastPointer.Y - Top);
 			var dragService = new DragService(this);
 			_dragService = dragService;
 			dragService.UpdateMouseLocation(_portableLastPointer);
@@ -996,11 +998,8 @@ namespace AvalonDock.Controls
 			}
 
 			_portableLastPointer = PlatformHelper.GetCursorPosition();
-			if (!_portableNativeDragging)
-			{
-				Left = _portableLastPointer.X - _portableDragOffset.X;
-				Top = _portableLastPointer.Y - _portableDragOffset.Y;
-			}
+			Left = _portableLastPointer.X - _portableDragOffset.X;
+			Top = _portableLastPointer.Y - _portableDragOffset.Y;
 			_dragService?.UpdateMouseLocation(_portableLastPointer);
 		}
 

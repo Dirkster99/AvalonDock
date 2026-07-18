@@ -356,26 +356,33 @@ namespace AvalonDock.Controls
 
 							var parentPaneModel = dropAreaAnchorablePane.AreaElement.Model as LayoutAnchorablePane;
 							LayoutAnchorableTabItem lastAreaTabItem = null;
-							foreach (var dropAreaTabItem in dropAreaAnchorablePane.AreaElement.FindVisualChildren<LayoutAnchorableTabItem>())
-							{
-								var tabItemModel = dropAreaTabItem.Model as LayoutAnchorable;
-								lastAreaTabItem = lastAreaTabItem == null || lastAreaTabItem.GetScreenArea().Right < dropAreaTabItem.GetScreenArea().Right ?
-									dropAreaTabItem : lastAreaTabItem;
-								int tabIndex = parentPaneModel.Children.IndexOf(tabItemModel);
-								yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, dropAreaTabItem.GetScreenArea(), DropTargetType.AnchorablePaneDockInside, tabIndex);
-							}
+								foreach (var dropAreaTabItem in dropAreaAnchorablePane.AreaElement.FindVisualChildren<LayoutAnchorableTabItem>())
+								{
+									var tabItemModel = dropAreaTabItem.Model as LayoutAnchorable;
+									lastAreaTabItem = lastAreaTabItem == null || lastAreaTabItem.GetScreenArea().Right < dropAreaTabItem.GetScreenArea().Right ?
+										dropAreaTabItem : lastAreaTabItem;
+									int tabIndex = parentPaneModel.Children.IndexOf(tabItemModel);
+									var tabScreenArea = ClipToOverlayBounds(dropAreaTabItem.GetScreenArea());
+									if (!tabScreenArea.IsEmpty)
+										yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, tabScreenArea, DropTargetType.AnchorablePaneDockInside, tabIndex);
+								}
 
-							if (lastAreaTabItem != null)
-							{
-								var lastAreaTabItemScreenArea = lastAreaTabItem.GetScreenArea();
-								var newAreaTabItemScreenArea = new Rect(lastAreaTabItemScreenArea.TopRight, new Point(lastAreaTabItemScreenArea.Right + lastAreaTabItemScreenArea.Width, lastAreaTabItemScreenArea.Bottom));
-								if (newAreaTabItemScreenArea.Right < dropAreaAnchorablePane.AreaElement.GetScreenArea().Right)
-									yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, newAreaTabItemScreenArea, DropTargetType.AnchorablePaneDockInside, parentPaneModel.Children.Count);
-							}
+								if (lastAreaTabItem != null)
+								{
+									var lastAreaTabItemScreenArea = lastAreaTabItem.GetScreenArea();
+									var newAreaTabItemScreenArea = new Rect(lastAreaTabItemScreenArea.TopRight, new Point(lastAreaTabItemScreenArea.Right + lastAreaTabItemScreenArea.Width, lastAreaTabItemScreenArea.Bottom));
+									newAreaTabItemScreenArea = ClipToOverlayBounds(newAreaTabItemScreenArea);
+									if (!newAreaTabItemScreenArea.IsEmpty && newAreaTabItemScreenArea.Right < dropAreaAnchorablePane.AreaElement.GetScreenArea().Right)
+										yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, newAreaTabItemScreenArea, DropTargetType.AnchorablePaneDockInside, parentPaneModel.Children.Count);
+								}
 
-							var dropAreaTitle = dropAreaAnchorablePane.AreaElement.FindVisualChildren<AnchorablePaneTitle>().FirstOrDefault();
-							if (dropAreaTitle != null)
-								yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, dropAreaTitle.GetScreenArea(), DropTargetType.AnchorablePaneDockInside);
+								var dropAreaTitle = dropAreaAnchorablePane.AreaElement.FindVisualChildren<AnchorablePaneTitle>().FirstOrDefault();
+								if (dropAreaTitle != null)
+								{
+									var titleScreenArea = ClipToOverlayBounds(dropAreaTitle.GetScreenArea());
+									if (!titleScreenArea.IsEmpty)
+										yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, titleScreenArea, DropTargetType.AnchorablePaneDockInside);
+								}
 						}
 
 						break;
@@ -402,22 +409,25 @@ namespace AvalonDock.Controls
 
 								var parentPaneModel = dropAreaDocumentPane.AreaElement.Model as LayoutDocumentPane;
 								LayoutDocumentTabItem lastAreaTabItem = null;
-								foreach (var dropAreaTabItem in dropAreaDocumentPane.AreaElement.FindVisualChildren<LayoutDocumentTabItem>())
-								{
-									var tabItemModel = dropAreaTabItem.Model;
-									lastAreaTabItem = lastAreaTabItem == null || lastAreaTabItem.GetScreenArea().Right < dropAreaTabItem.GetScreenArea().Right ?
-										dropAreaTabItem : lastAreaTabItem;
-									int tabIndex = parentPaneModel.Children.IndexOf(tabItemModel);
-									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, dropAreaTabItem.GetScreenArea(), DropTargetType.DocumentPaneDockInside, tabIndex);
-								}
+									foreach (var dropAreaTabItem in dropAreaDocumentPane.AreaElement.FindVisualChildren<LayoutDocumentTabItem>())
+									{
+										var tabItemModel = dropAreaTabItem.Model;
+										lastAreaTabItem = lastAreaTabItem == null || lastAreaTabItem.GetScreenArea().Right < dropAreaTabItem.GetScreenArea().Right ?
+											dropAreaTabItem : lastAreaTabItem;
+										int tabIndex = parentPaneModel.Children.IndexOf(tabItemModel);
+										var tabScreenArea = ClipToOverlayBounds(dropAreaTabItem.GetScreenArea());
+										if (!tabScreenArea.IsEmpty)
+											yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, tabScreenArea, DropTargetType.DocumentPaneDockInside, tabIndex);
+									}
 
 								if (lastAreaTabItem != null)
-								{
-									var lastAreaTabItemScreenArea = lastAreaTabItem.GetScreenArea();
-									var newAreaTabItemScreenArea = new Rect(lastAreaTabItemScreenArea.TopRight, new Point(lastAreaTabItemScreenArea.Right + lastAreaTabItemScreenArea.Width, lastAreaTabItemScreenArea.Bottom));
-									if (newAreaTabItemScreenArea.Right < dropAreaDocumentPane.AreaElement.GetScreenArea().Right)
-										yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, newAreaTabItemScreenArea, DropTargetType.DocumentPaneDockInside, parentPaneModel.Children.Count);
-								}
+									{
+										var lastAreaTabItemScreenArea = lastAreaTabItem.GetScreenArea();
+										var newAreaTabItemScreenArea = new Rect(lastAreaTabItemScreenArea.TopRight, new Point(lastAreaTabItemScreenArea.Right + lastAreaTabItemScreenArea.Width, lastAreaTabItemScreenArea.Bottom));
+										newAreaTabItemScreenArea = ClipToOverlayBounds(newAreaTabItemScreenArea);
+										if (!newAreaTabItemScreenArea.IsEmpty && newAreaTabItemScreenArea.Right < dropAreaDocumentPane.AreaElement.GetScreenArea().Right)
+											yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, newAreaTabItemScreenArea, DropTargetType.DocumentPaneDockInside, parentPaneModel.Children.Count);
+									}
 
 								if (_documentPaneDropTargetLeftAsAnchorablePane.IsVisible)
 									yield return new DocumentPaneDropAsAnchorableTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetLeftAsAnchorablePane.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockAsAnchorableLeft);
@@ -446,22 +456,25 @@ namespace AvalonDock.Controls
 
 								var parentPaneModel = dropAreaDocumentPane.AreaElement.Model as LayoutDocumentPane;
 								LayoutDocumentTabItem lastAreaTabItem = null;
-								foreach (var dropAreaTabItem in dropAreaDocumentPane.AreaElement.FindVisualChildren<LayoutDocumentTabItem>())
-								{
-									var tabItemModel = dropAreaTabItem.Model;
-									lastAreaTabItem = lastAreaTabItem == null || lastAreaTabItem.GetScreenArea().Right < dropAreaTabItem.GetScreenArea().Right ?
-										dropAreaTabItem : lastAreaTabItem;
-									int tabIndex = parentPaneModel.Children.IndexOf(tabItemModel);
-									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, dropAreaTabItem.GetScreenArea(), DropTargetType.DocumentPaneDockInside, tabIndex);
-								}
+									foreach (var dropAreaTabItem in dropAreaDocumentPane.AreaElement.FindVisualChildren<LayoutDocumentTabItem>())
+									{
+										var tabItemModel = dropAreaTabItem.Model;
+										lastAreaTabItem = lastAreaTabItem == null || lastAreaTabItem.GetScreenArea().Right < dropAreaTabItem.GetScreenArea().Right ?
+											dropAreaTabItem : lastAreaTabItem;
+										int tabIndex = parentPaneModel.Children.IndexOf(tabItemModel);
+										var tabScreenArea = ClipToOverlayBounds(dropAreaTabItem.GetScreenArea());
+										if (!tabScreenArea.IsEmpty)
+											yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, tabScreenArea, DropTargetType.DocumentPaneDockInside, tabIndex);
+									}
 
 								if (lastAreaTabItem != null)
-								{
-									var lastAreaTabItemScreenArea = lastAreaTabItem.GetScreenArea();
-									var newAreaTabItemScreenArea = new Rect(lastAreaTabItemScreenArea.TopRight, new Point(lastAreaTabItemScreenArea.Right + lastAreaTabItemScreenArea.Width, lastAreaTabItemScreenArea.Bottom));
-									if (newAreaTabItemScreenArea.Right < dropAreaDocumentPane.AreaElement.GetScreenArea().Right)
-										yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, newAreaTabItemScreenArea, DropTargetType.DocumentPaneDockInside, parentPaneModel.Children.Count);
-								}
+									{
+										var lastAreaTabItemScreenArea = lastAreaTabItem.GetScreenArea();
+										var newAreaTabItemScreenArea = new Rect(lastAreaTabItemScreenArea.TopRight, new Point(lastAreaTabItemScreenArea.Right + lastAreaTabItemScreenArea.Width, lastAreaTabItemScreenArea.Bottom));
+										newAreaTabItemScreenArea = ClipToOverlayBounds(newAreaTabItemScreenArea);
+										if (!newAreaTabItemScreenArea.IsEmpty && newAreaTabItemScreenArea.Right < dropAreaDocumentPane.AreaElement.GetScreenArea().Right)
+											yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, newAreaTabItemScreenArea, DropTargetType.DocumentPaneDockInside, parentPaneModel.Children.Count);
+									}
 							}
 						}
 
@@ -790,6 +803,16 @@ namespace AvalonDock.Controls
 		void IOverlayWindow.DragDrop(IDropTarget target)
 		{
 			target.Drop(_floatingWindow.Model as LayoutFloatingWindow);
+		}
+
+		private Rect ClipToOverlayBounds(Rect screenArea)
+		{
+			if (screenArea.IsEmpty)
+				return Rect.Empty;
+
+			var overlayBounds = new Rect(Left, Top, ActualWidth, ActualHeight);
+			screenArea.Intersect(overlayBounds);
+			return screenArea;
 		}
 	}
 }

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media;
 
@@ -22,6 +23,9 @@ namespace AvalonDock.Controls
 			}
 
 			Point resultPt = visual.PointToScreen(pt);
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				return resultPt;
+
 			return TransformToDeviceDPI(visual, resultPt);
 		}
 

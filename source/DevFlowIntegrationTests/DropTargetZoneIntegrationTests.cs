@@ -85,7 +85,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 					TestContext.Current.CancellationToken);
 
 				var mainArea = await client.QueryBoundsAsync("manager");
-				await client.InvokeAsync("avd.position-floating", "dragTestTool", mainArea.Right + 40, mainArea.Y + 40);
+				await client.InvokeAsync("avd.position-floating", "dragTestTool", mainArea.CenterX, mainArea.Y + 40);
 				await Task.Delay(500, TestContext.Current.CancellationToken);
 				await client.AssertFloatingWindowAboveMainAsync("dragTestTool");
 
@@ -113,11 +113,12 @@ namespace AvalonDock.DevFlowIntegrationTests
 			ElementBounds pathTargetBounds,
 			CancellationToken ct)
 		{
-			var floatingTitle = await client.QueryBoundsAsync("anchorable-title", "dragTestTool");
+			var floatingTitle = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
 			var dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
 			var dragStartY = floatingTitle.CenterY;
 			var discoveryX = pathTargetBounds.Right - 20;
 			var discoveryY = pathTargetBounds.Bottom - 20;
+			await NativeInputIntegrationTests.AssertSafeFloatingDragStartAsync(client, "dragTestTool", dragStartX, dragStartY, "DropDownControlArea", ct);
 			await using var discoveryGesture = await NativeInputIntegrationTests.CliclickHeldDrag.StartAsync(
 				dragStartX,
 				dragStartY,
@@ -130,8 +131,8 @@ namespace AvalonDock.DevFlowIntegrationTests
 			try
 			{
 				target = await client.WaitForActiveDropTargetAsync(zoneType, ct, TimeSpan.FromSeconds(4));
-				await NativeInputIntegrationTests.AssertFloatingWindowIsUnderPointerAsync(
-					client, "dragTestTool", await client.InvokeAsync("avd.query.drag-state"), ct);
+					NativeInputIntegrationTests.AssertFloatingWindowIsFollowingPointer(
+						await client.InvokeAsync("avd.query.drag-state"));
 			}
 			catch (TimeoutException ex)
 			{
@@ -155,11 +156,12 @@ namespace AvalonDock.DevFlowIntegrationTests
 			}
 
 			var managerBounds = await client.QueryBoundsAsync("manager");
-			await client.InvokeAsync("avd.position-floating", "dragTestTool", managerBounds.Right + 40, managerBounds.Y + 40);
+			await client.InvokeAsync("avd.position-floating", "dragTestTool", managerBounds.CenterX, managerBounds.Y + 40);
 			await Task.Delay(400, ct);
-			floatingTitle = await client.QueryBoundsAsync("anchorable-title", "dragTestTool");
+			floatingTitle = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
 			dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
 			dragStartY = floatingTitle.CenterY;
+			await NativeInputIntegrationTests.AssertSafeFloatingDragStartAsync(client, "dragTestTool", dragStartX, dragStartY, "DropDownControlArea", ct);
 
 			await using var dropGesture = await NativeInputIntegrationTests.CliclickHeldDrag.StartAsync(
 				dragStartX,
@@ -168,7 +170,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 				target.CenterY,
 				ct);
 			var (preReleaseDragState, preReleaseTargets) = await WaitForCurrentDropTargetAsync(client, zoneType, target, ct);
-			await NativeInputIntegrationTests.AssertFloatingWindowIsUnderPointerAsync(client, "dragTestTool", preReleaseDragState, ct);
+			NativeInputIntegrationTests.AssertFloatingWindowIsFollowingPointer(preReleaseDragState);
 			await dropGesture.ReleaseAsync(ct);
 
 			try

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
@@ -23,19 +24,22 @@ namespace AvalonDock.DevFlowIntegrationTests
 			NativeInputEnvironment.EnsureNativeDragAvailable();
 			await IsolateDesktopForNativeInputAsync();
 
-			using var client = await TryConnectAsync();
-			if (client == null)
-				return;
+				using var client = await TryConnectAsync();
+				if (client == null)
+				{
+					return;
+				}
 
 			// Don't depend on the app's pristine default layout (document1/toolWindow1): other tests
 			// in this run mutate the live layout via avd.test-layout.reset, and restoring it back to
 			// the exact pre-test state isn't guaranteed to fully re-materialize the original content
 			// (AvalonDock's XML layout serializer round-trips STRUCTURE, not content instances). Reset
 			// to the deterministic test layout instead, matching every other native-input test here.
-			await client.InvokeAsync("avd.test-layout.reset");
-			await client.WaitForAvalonDockTestLayoutReadyAsync(TestContext.Current.CancellationToken);
-			var manager = await client.QueryBoundsAsync("manager");
-			var result = await client.DragAsync(new DragRequest
+				await client.InvokeAsync("avd.test-layout.reset");
+				await client.WaitForAvalonDockTestLayoutReadyAsync(TestContext.Current.CancellationToken);
+				var manager = await client.QueryBoundsAsync("manager");
+				await AssertSafeDragStartAsync(client, manager.CenterX, manager.CenterY, "DockingManager", TestContext.Current.CancellationToken);
+				var result = await client.DragAsync(new DragRequest
 			{
 				Global = true,
 				FromX = manager.CenterX,
@@ -76,12 +80,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 					s => s.Documents.Any(d => d.ContentId == "dragTestDocument")
 						&& s.Anchorables.Any(a => a.ContentId == "dragTestTool"),
 					TestContext.Current.CancellationToken);
-				var title = await WaitForBoundsAsync(
-					client,
-					"anchorable-title",
-					"dragTestTool",
-					_ => true,
-					TestContext.Current.CancellationToken);
+					var title = await client.QueryDragHandleAsync("docked-anchorable", "dragTestTool");
 				var manager = await client.QueryBoundsAsync("manager");
 
 				// See DragFloatingToolWindow_ToDocumentPane_DocksBackIntoLayout for why this retries:
@@ -91,10 +90,11 @@ namespace AvalonDock.DevFlowIntegrationTests
 				// (not just that our poll raced) is safe against re-issuing a drag from wrong/stale
 				// coordinates.
 				DockLayoutSnapshot floated = null;
-				const int maxAttempts = 3;
-				for (var attempt = 1; attempt <= maxAttempts && floated == null; attempt++)
-				{
-					await client.DragAndAssertOkAsync(new DragRequest
+					const int maxAttempts = 3;
+					for (var attempt = 1; attempt <= maxAttempts && floated == null; attempt++)
+					{
+							await AssertSafeDragStartAsync(client, title.CenterX, title.CenterY, "Anchorable", TestContext.Current.CancellationToken);
+						await client.DragAndAssertOkAsync(new DragRequest
 					{
 						Global = true,
 						FromX = title.CenterX,
@@ -160,13 +160,9 @@ namespace AvalonDock.DevFlowIntegrationTests
 					"dragTestTool",
 					_ => true,
 					TestContext.Current.CancellationToken);
-				var resizer = await WaitForBoundsAsync(
-					client,
-					"anchorable-resizer",
-					"dragTestTool",
-					_ => true,
-					TestContext.Current.CancellationToken);
-				await client.DragAndAssertOkAsync(new DragRequest
+						var resizer = await client.QueryDragHandleAsync("anchorable-resizer", "dragTestTool");
+					await AssertSafeDragStartAsync(client, resizer.CenterX, resizer.CenterY, "LayoutGridResizerControl", TestContext.Current.CancellationToken);
+					await client.DragAndAssertOkAsync(new DragRequest
 				{
 					Global = true,
 					FromX = resizer.CenterX,
@@ -184,6 +180,51 @@ namespace AvalonDock.DevFlowIntegrationTests
 					TestContext.Current.CancellationToken);
 
 				Assert.True(after.Width > before.Width + 30, $"Expected tool pane width to grow from {before} to {after}.");
+			}
+			finally
+			{
+				await client.InvokeAsync("avd.layout.restore", originalXml);
+			}
+		}
+
+		[Fact]
+		public async Task DragDocumentPaneBody_DoesNotFloatDocumentTab()
+		{
+			NativeInputEnvironment.EnsureDecomposedInputAvailable();
+			await IsolateDesktopForNativeInputAsync();
+
+			using var client = await TryConnectAsync();
+			if (client == null)
+				return;
+
+			var originalXml = await client.InvokeAsync("avd.layout.serialize");
+			try
+			{
+				await client.InvokeAsync("avd.test-layout.reset");
+				await WaitForLayoutAsync(
+					client,
+					s => s.Documents.Any(d => d.ContentId == "dragTestDocument")
+						&& s.Anchorables.Any(a => a.ContentId == "dragTestTool"),
+					TestContext.Current.CancellationToken);
+
+					var documentPane = await client.QueryDragHandleAsync("document-body");
+				var documentTab = await client.QueryBoundsAsync("document-tab", "dragTestDocument");
+				Assert.True(documentPane.CenterY > documentTab.Bottom + 20, $"Document pane body is not below its tab. Pane={documentPane}; Tab={documentTab}");
+				var bodyDragY = Math.Max(documentPane.CenterY, documentTab.Bottom + 80);
+				await AssertSafeDragStartAsync(client, documentPane.CenterX, bodyDragY, "LayoutDocumentPaneControl", TestContext.Current.CancellationToken);
+
+				await client.InvokeAsync("avd.input.reset");
+				await using var gesture = await CliclickHeldDrag.StartAsync(
+					documentPane.CenterX,
+					bodyDragY,
+					documentPane.CenterX + 180,
+					bodyDragY,
+					TestContext.Current.CancellationToken);
+				await gesture.ReleaseAsync(TestContext.Current.CancellationToken);
+
+				var after = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));
+				Assert.False(after.Documents.Single(d => d.ContentId == "dragTestDocument").IsFloat);
+				Assert.DoesNotContain(after.FloatingWindows, f => f.Contents.Contains("dragTestDocument"));
 			}
 			finally
 			{
@@ -228,16 +269,12 @@ namespace AvalonDock.DevFlowIntegrationTests
 
 				var documentPane = await client.QueryBoundsAsync("document-pane");
 
-				var floatingTitle = await WaitForBoundsAsync(
-						client,
-						"anchorable-title",
-						"dragTestTool",
-						_ => true,
-						TestContext.Current.CancellationToken);
-				var dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
-				var dragStartY = floatingTitle.CenterY;
+					var floatingTitle = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
+						var dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
+						var dragStartY = floatingTitle.CenterY;
+						await AssertSafeFloatingDragStartAsync(client, "dragTestTool", dragStartX, dragStartY, "DropDownControlArea", TestContext.Current.CancellationToken);
 
-				await using var discoveryGesture = await CliclickHeldDrag.StartAsync(
+					await using var discoveryGesture = await CliclickHeldDrag.StartAsync(
 					dragStartX,
 					dragStartY,
 					documentPane.Right - 20,
@@ -247,11 +284,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 					"DocumentPaneDockInside",
 					TestContext.Current.CancellationToken,
 					TimeSpan.FromSeconds(4));
-				await AssertFloatingWindowIsUnderPointerAsync(
-					client,
-					"dragTestTool",
-					await client.InvokeAsync("avd.query.drag-state"),
-					TestContext.Current.CancellationToken);
+					AssertFloatingWindowIsFollowingPointer(await client.InvokeAsync("avd.query.drag-state"));
 				await discoveryGesture.ReleaseAsync(TestContext.Current.CancellationToken);
 
 				var afterDiscovery = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));
@@ -259,16 +292,12 @@ namespace AvalonDock.DevFlowIntegrationTests
 
 				await client.InvokeAsync("avd.position-floating", "dragTestTool", mainArea.CenterX, mainArea.Y + 40);
 				await Task.Delay(400, TestContext.Current.CancellationToken);
-				floatingTitle = await WaitForBoundsAsync(
-					client,
-					"anchorable-title",
-					"dragTestTool",
-					_ => true,
-					TestContext.Current.CancellationToken);
-				dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
-				dragStartY = floatingTitle.CenterY;
+					floatingTitle = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
+						dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
+						dragStartY = floatingTitle.CenterY;
+						await AssertSafeFloatingDragStartAsync(client, "dragTestTool", dragStartX, dragStartY, "DropDownControlArea", TestContext.Current.CancellationToken);
 
-				await using var gesture = await CliclickHeldDrag.StartAsync(
+					await using var gesture = await CliclickHeldDrag.StartAsync(
 					dragStartX,
 					dragStartY,
 					insideTarget.CenterX,
@@ -288,7 +317,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 					&& DateTime.UtcNow < hitDeadline);
 				var liveTargets = await client.InvokeAsync("avd.query.active-drop-targets");
 				Assert.Contains("\"currentDropTarget\":\"DocumentPaneDockInside\"", liveDragState);
-				await AssertFloatingWindowIsUnderPointerAsync(client, "dragTestTool", liveDragState, TestContext.Current.CancellationToken);
+					AssertFloatingWindowIsFollowingPointer(liveDragState);
 
 				var compassOutlinesVisible = liveTargets != "[]";
 				await gesture.ReleaseAsync(TestContext.Current.CancellationToken);
@@ -370,20 +399,76 @@ namespace AvalonDock.DevFlowIntegrationTests
 		/// following the drag at all. Call this at the moments that matter (drag-to-float discovery,
 		/// just before drop-to-dock release), not on every polling tick - a window that's merely a frame
 		/// or two behind the cursor is not the bug being guarded against here.</summary>
-		internal static async Task AssertFloatingWindowIsUnderPointerAsync(
-			DevFlowClient client, string contentId, string liveDragState, CancellationToken ct)
+		internal static void AssertFloatingWindowIsFollowingPointer(string liveDragState)
 		{
-			var title = await client.QueryBoundsAsync("anchorable-title", contentId);
-			var pointer = ReadCurrentPointer(liveDragState);
+			using var dragDoc = JsonDocument.Parse(liveDragState);
+			var dragRoot = dragDoc.RootElement.EnumerateArray().FirstOrDefault();
+			Assert.Equal(JsonValueKind.Object, dragRoot.ValueKind);
+			var pointer = dragRoot.GetProperty("currentPointer");
+			var offset = dragRoot.GetProperty("dragOffset");
+			var expectedLeft = pointer.GetProperty("X").GetDouble() - offset.GetProperty("X").GetDouble();
+			var expectedTop = pointer.GetProperty("Y").GetDouble() - offset.GetProperty("Y").GetDouble();
+			var left = dragRoot.GetProperty("left").GetDouble();
+			var top = dragRoot.GetProperty("top").GetDouble();
 
-			// Margin accounts for the offset between where the drag grabbed the title bar and the title
-			// bar's own edges (see dragStartX/dragStartY in the callers) - it is not a tolerance for drift.
-			const double margin = 40;
+			const double margin = 24;
 			Assert.True(
-				pointer.X >= title.X - margin && pointer.X <= title.Right + margin &&
-					pointer.Y >= title.Y - margin && pointer.Y <= title.Bottom + margin,
-				$"Floating window '{contentId}' title is not under the pointer - it may have stayed at its " +
-					$"original position instead of following the drag. Title={title}; Pointer={pointer}.");
+				Math.Abs(left - expectedLeft) <= margin && Math.Abs(top - expectedTop) <= margin,
+				$"Floating window is not following the pointer. Expected left/top near " +
+					$"{expectedLeft},{expectedTop}; actual={left},{top}; DragState={liveDragState}");
+		}
+
+		internal static async Task AssertSafeDragStartAsync(
+			DevFlowClient client,
+			double screenX,
+			double screenY,
+			string expectedAncestorTypeFragment,
+			CancellationToken ct)
+		{
+			var manager = await client.QueryBoundsAsync("manager").ConfigureAwait(false);
+			Assert.True(
+				manager.Contains(screenX, screenY),
+				$"Refusing to start a real mouse drag outside DockingManager. Point={screenX},{screenY}; Manager={manager}");
+
+			await AssertDragStartHitAsync(client, screenX, screenY, expectedAncestorTypeFragment, ct).ConfigureAwait(false);
+		}
+
+		internal static async Task AssertSafeFloatingDragStartAsync(
+			DevFlowClient client,
+			string contentId,
+			double screenX,
+			double screenY,
+			string expectedAncestorTypeFragment,
+			CancellationToken ct)
+		{
+			var window = await client.QueryBoundsAsync("floating-window", contentId).ConfigureAwait(false);
+			Assert.True(
+				window.Contains(screenX, screenY),
+				$"Refusing to start a real mouse drag outside the floating window. Point={screenX},{screenY}; Window={window}; ContentId={contentId}");
+
+			await AssertDragStartHitAsync(client, screenX, screenY, expectedAncestorTypeFragment, ct).ConfigureAwait(false);
+		}
+
+		private static async Task AssertDragStartHitAsync(
+			DevFlowClient client,
+			double screenX,
+			double screenY,
+			string expectedAncestorTypeFragment,
+			CancellationToken ct)
+		{
+			var hitJson = await client.InvokeAsync("avd.hit-test", screenX, screenY).ConfigureAwait(false);
+			using var doc = JsonDocument.Parse(hitJson);
+			var root = doc.RootElement;
+			Assert.True(root.TryGetProperty("ancestors", out var ancestors) && ancestors.ValueKind == JsonValueKind.Array,
+				$"Hit-test payload missing ancestors for real mouse drag start. HitTest={hitJson}");
+			var ancestorTypes = ancestors.EnumerateArray().Select(a => a.GetString()).ToArray();
+			if (ancestorTypes.Any(a => a?.Contains(expectedAncestorTypeFragment, StringComparison.Ordinal) == true))
+				return;
+
+			await File.AppendAllTextAsync(
+				"/tmp/avalondock-safe-drag-hit-test.log",
+				$"{DateTimeOffset.Now:O} point={screenX},{screenY} expected={expectedAncestorTypeFragment} hit={hitJson}{Environment.NewLine}",
+				ct).ConfigureAwait(false);
 		}
 
 		private static (double X, double Y) ReadCurrentPointer(string liveDragState)
@@ -505,23 +590,31 @@ namespace AvalonDock.DevFlowIntegrationTests
 			CancellationToken ct)
 		{
 			var deadline = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(10);
+			string lastBoundsJson = null;
+			Exception lastException = null;
 			while (DateTimeOffset.UtcNow < deadline)
 			{
 				ct.ThrowIfCancellationRequested();
 				try
 				{
+					lastBoundsJson = await client.InvokeAsync("avd.query.bounds", target, contentId).ConfigureAwait(false);
 					var bounds = await client.QueryBoundsAsync(target, contentId);
 					if (predicate(bounds))
 						return bounds;
 				}
-				catch (InvalidOperationException)
+				catch (InvalidOperationException ex)
 				{
+					lastException = ex;
 				}
 
 				await Task.Delay(250, ct);
 			}
 
-			throw new TimeoutException($"Timed out waiting for expected bounds for '{target}'/'{contentId}'.");
+			var layoutJson = await client.InvokeAsync("avd.query.layout").ConfigureAwait(false);
+			var tabsJson = await client.InvokeAsync("avd.query.tabs").ConfigureAwait(false);
+			throw new TimeoutException(
+				$"Timed out waiting for expected bounds for '{target}'/'{contentId}'. " +
+				$"LastBounds={lastBoundsJson}; LastError={lastException?.Message}; Layout={layoutJson}; Tabs={tabsJson}");
 		}
 	}
 }
