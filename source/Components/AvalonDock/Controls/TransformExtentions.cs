@@ -75,6 +75,30 @@ namespace AvalonDock.Controls
 				element.TransformActualSizeToAncestor());
 		}
 
+		internal static Rect GetVisibleScreenArea(this FrameworkElement element)
+		{
+			var localBounds = new Rect(0, 0, element.ActualWidth, element.ActualHeight);
+			var descendantBounds = VisualTreeHelper.GetDescendantBounds(element);
+			if (!descendantBounds.IsEmpty)
+				localBounds.Union(descendantBounds);
+
+			var topLeft = element.PointToScreenDPI(localBounds.TopLeft);
+			var bottomRight = element.PointToScreenDPI(localBounds.BottomRight);
+			var bounds = new Rect(topLeft, bottomRight);
+			var window = Window.GetWindow(element);
+			if (window is { ActualWidth: > 0, ActualHeight: > 0 })
+			{
+				var windowBounds = window is OverlayWindow
+					? new Rect(window.Left, window.Top, window.ActualWidth, window.ActualHeight)
+					: new Rect(
+						window.PointToScreenDPI(new Point()),
+						window.PointToScreenDPI(new Point(window.ActualWidth, window.ActualHeight)));
+				bounds.Intersect(windowBounds);
+			}
+
+			return bounds;
+		}
+
 		/// <summary>
 		/// Transform to device dpi.
 		/// </summary>

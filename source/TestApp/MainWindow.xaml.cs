@@ -485,9 +485,7 @@ namespace TestApp
 			              "app windows commonly sit and can steal synthetic clicks aimed at the tester).")]
 		public string PositionFloatingWindow(string contentId, double left = 900, double top = 200)
 		{
-			var floating = dockManager.FloatingWindows
-				.FirstOrDefault(fw => fw.Model?.Descendents().OfType<LayoutAnchorable>()
-					.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true);
+			var floating = FindVisibleFloatingWindow(contentId);
 			if (floating == null)
 				return $"No floating window found for '{contentId}'";
 
@@ -500,9 +498,7 @@ namespace TestApp
 		[DevFlowAction("avd.query.floating-zorder", Description = "Compare a floating window's OS z-order against the main window")]
 		public string QueryFloatingZOrder(string contentId)
 		{
-			var floating = dockManager.FloatingWindows
-				.FirstOrDefault(fw => fw.Model?.Descendents().OfType<LayoutAnchorable>()
-					.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true);
+			var floating = FindVisibleFloatingWindow(contentId);
 			if (floating == null)
 			{
 				return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
@@ -815,27 +811,12 @@ namespace TestApp
 		[DevFlowAction("avd.query.bounds", Description = "Query screen bounds for a dock test target")]
 		public string QueryBounds(string target, string contentId = null)
 		{
-			FrameworkElement element = target switch
-			{
-				"manager" => dockManager,
-				"anchorable-title" => GetAvalonDockVisualRoots()
-					.SelectMany(FindVisualDescendants<AnchorablePaneTitle>)
-					.Where(x => string.Equals(x.Model?.ContentId, contentId, StringComparison.Ordinal) ||
-						x.FindVisualAncestor<LayoutAnchorablePaneControl>()?.Model?.Descendents().OfType<LayoutAnchorable>()
-							.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true)
-					.Where(x => x.FindVisualAncestor<LayoutAnchorablePaneControl>() != null)
-					.FirstOrDefault(IsHitTestableAtCenter) ??
-					// A single-content floating anchorable window has no AnchorablePaneTitle at all -
-					// that control belongs to a multi-tab LayoutAnchorablePaneControl. Its caption is
-					// the floating window's own DropDownControlArea (see
-					// LayoutAnchorableFloatingWindowControl's template). Fall back to that so a drag
-					// handle can still be resolved for a floated tool window's title/caption.
-					FindFloatingWindowCaption(contentId) ??
-					(contentId == "dragTestTool"
-						? GetAvalonDockVisualRoots()
-							.SelectMany(FindVisualDescendants<AnchorablePaneTitle>)
-							.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0)
-						: null),
+				FrameworkElement element = target switch
+				{
+					"main-window" => this,
+					"menu" => mainMenu,
+					"manager" => dockManager,
+				"anchorable-title" => FindFloatingWindowCaption(contentId),
 				"anchorable-tab" => FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
 					.Where(x => string.Equals((x.Model as LayoutAnchorable)?.ContentId, contentId, StringComparison.Ordinal))
 					.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0),
@@ -934,11 +915,19 @@ namespace TestApp
 		{
 			return System.Text.Json.JsonSerializer.Serialize(dockManager.FloatingWindows.Select(floating => new
 			{
+				overlayLeft = (floating.CurrentDragService?.CurrentOverlayWindow as Window)?.Left,
+				overlayTop = (floating.CurrentDragService?.CurrentOverlayWindow as Window)?.Top,
+				overlayWidth = (floating.CurrentDragService?.CurrentOverlayWindow as Window)?.ActualWidth,
+				overlayHeight = (floating.CurrentDragService?.CurrentOverlayWindow as Window)?.ActualHeight,
+				overlayBackground = (floating.CurrentDragService?.CurrentOverlayWindow as Window)?.Background?.ToString(),
+				overlayAllowsTransparency = (floating.CurrentDragService?.CurrentOverlayWindow as Window)?.AllowsTransparency,
+				menuBounds = CreateBoundsPayload("menu", null, mainMenu),
+				managerBounds = CreateBoundsPayload("manager", null, dockManager),
 				title = floating.Title,
-				isPortableDragging = floating.IsPortableDraggingForDiagnostics,
-				hasDragService = floating.CurrentDragService != null,
-				hasOverlay = floating.CurrentDragService?.CurrentOverlayWindow != null,
-				isMouseCaptured = floating.IsMouseCaptured,
+				currentDropTarget = floating.CurrentDragService?.CurrentDropTargetType,
+				left = floating.Left,
+				top = floating.Top,
+				currentPointer = floating.CurrentPointerScreenPosition,
 			}).ToArray());
 		}
 
@@ -1152,15 +1141,21 @@ namespace TestApp
 		// AnchorablePaneTitle (that control only exists for multi-tab docked panes).
 		private FrameworkElement FindFloatingWindowCaption(string contentId)
 		{
-			var floating = dockManager.FloatingWindows
-				.OfType<LayoutAnchorableFloatingWindowControl>()
-				.FirstOrDefault(fw => fw.Model?.Descendents().OfType<LayoutAnchorable>()
-					.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true);
+			var floating = FindVisibleFloatingWindow(contentId) as LayoutAnchorableFloatingWindowControl;
 			if (floating == null)
 				return null;
 
 			return FindVisualDescendants<DropDownControlArea>(floating)
 				.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
+		}
+
+		private LayoutFloatingWindowControl FindVisibleFloatingWindow(string contentId)
+		{
+			return dockManager.FloatingWindows
+				.Where(fw => fw.IsLoaded && fw.IsVisible &&
+					fw.Model?.Descendents().OfType<LayoutAnchorable>()
+						.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true)
+				.LastOrDefault();
 		}
 
 		[DevFlowAction("avd.new-floating", Description = "Create a new floating anchorable window")]

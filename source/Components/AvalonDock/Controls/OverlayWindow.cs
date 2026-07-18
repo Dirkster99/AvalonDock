@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Shapes;
 using AvalonDock.Layout;
 using AvalonDock.Themes;
@@ -76,6 +77,9 @@ namespace AvalonDock.Controls
 		internal OverlayWindow(IOverlayWindowHost host)
 		{
 			_host = host;
+			AllowsTransparency = true;
+			WindowStyle = WindowStyle.None;
+			Background = Brushes.Transparent;
 			UpdateThemeResources();
 		}
 
@@ -331,10 +335,10 @@ namespace AvalonDock.Controls
 						{
 							// Dragging over DockingManager -> Add DropTarget Area
 							var dropAreaDockingManager = visibleArea as DropArea<DockingManager>;
-							yield return new DockingManagerDropTarget(dropAreaDockingManager.AreaElement, _dockingManagerDropTargetLeft.GetScreenArea(), DropTargetType.DockingManagerDockLeft);
-							yield return new DockingManagerDropTarget(dropAreaDockingManager.AreaElement, _dockingManagerDropTargetTop.GetScreenArea(), DropTargetType.DockingManagerDockTop);
-							yield return new DockingManagerDropTarget(dropAreaDockingManager.AreaElement, _dockingManagerDropTargetBottom.GetScreenArea(), DropTargetType.DockingManagerDockBottom);
-							yield return new DockingManagerDropTarget(dropAreaDockingManager.AreaElement, _dockingManagerDropTargetRight.GetScreenArea(), DropTargetType.DockingManagerDockRight);
+							yield return new DockingManagerDropTarget(dropAreaDockingManager.AreaElement, _dockingManagerDropTargetLeft.GetVisibleScreenArea(), DropTargetType.DockingManagerDockLeft);
+							yield return new DockingManagerDropTarget(dropAreaDockingManager.AreaElement, _dockingManagerDropTargetTop.GetVisibleScreenArea(), DropTargetType.DockingManagerDockTop);
+							yield return new DockingManagerDropTarget(dropAreaDockingManager.AreaElement, _dockingManagerDropTargetBottom.GetVisibleScreenArea(), DropTargetType.DockingManagerDockBottom);
+							yield return new DockingManagerDropTarget(dropAreaDockingManager.AreaElement, _dockingManagerDropTargetRight.GetVisibleScreenArea(), DropTargetType.DockingManagerDockRight);
 						}
 
 						break;
@@ -343,12 +347,12 @@ namespace AvalonDock.Controls
 						{
 							// Dragging over AnchorablePane -> Add DropTarget Area
 							var dropAreaAnchorablePane = visibleArea as DropArea<LayoutAnchorablePaneControl>;
-							yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetLeft.GetScreenArea(), DropTargetType.AnchorablePaneDockLeft);
-							yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetTop.GetScreenArea(), DropTargetType.AnchorablePaneDockTop);
-							yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetRight.GetScreenArea(), DropTargetType.AnchorablePaneDockRight);
-							yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetBottom.GetScreenArea(), DropTargetType.AnchorablePaneDockBottom);
+							yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetLeft.GetVisibleScreenArea(), DropTargetType.AnchorablePaneDockLeft);
+							yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetTop.GetVisibleScreenArea(), DropTargetType.AnchorablePaneDockTop);
+							yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetRight.GetVisibleScreenArea(), DropTargetType.AnchorablePaneDockRight);
+							yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetBottom.GetVisibleScreenArea(), DropTargetType.AnchorablePaneDockBottom);
 							if (_anchorablePaneDropTargetInto.IsVisible)
-								yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetInto.GetScreenArea(), DropTargetType.AnchorablePaneDockInside);
+								yield return new AnchorablePaneDropTarget(dropAreaAnchorablePane.AreaElement, _anchorablePaneDropTargetInto.GetVisibleScreenArea(), DropTargetType.AnchorablePaneDockInside);
 
 							var parentPaneModel = dropAreaAnchorablePane.AreaElement.Model as LayoutAnchorablePane;
 							LayoutAnchorableTabItem lastAreaTabItem = null;
@@ -386,15 +390,15 @@ namespace AvalonDock.Controls
 								// -> Yield a drop target structure with 9 buttons
 								var dropAreaDocumentPane = visibleArea as DropArea<LayoutDocumentPaneControl>;
 								if (_documentPaneFullDropTargetLeft.IsVisible)
-									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneFullDropTargetLeft.GetScreenArea(), DropTargetType.DocumentPaneDockLeft);
+									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneFullDropTargetLeft.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockLeft);
 								if (_documentPaneFullDropTargetTop.IsVisible)
-									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneFullDropTargetTop.GetScreenArea(), DropTargetType.DocumentPaneDockTop);
+									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneFullDropTargetTop.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockTop);
 								if (_documentPaneFullDropTargetRight.IsVisible)
-									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneFullDropTargetRight.GetScreenArea(), DropTargetType.DocumentPaneDockRight);
+									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneFullDropTargetRight.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockRight);
 								if (_documentPaneFullDropTargetBottom.IsVisible)
-									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneFullDropTargetBottom.GetScreenArea(), DropTargetType.DocumentPaneDockBottom);
+									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneFullDropTargetBottom.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockBottom);
 								if (_documentPaneFullDropTargetInto.IsVisible)
-									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneFullDropTargetInto.GetScreenArea(), DropTargetType.DocumentPaneDockInside);
+									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneFullDropTargetInto.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockInside);
 
 								var parentPaneModel = dropAreaDocumentPane.AreaElement.Model as LayoutDocumentPane;
 								LayoutDocumentTabItem lastAreaTabItem = null;
@@ -416,13 +420,13 @@ namespace AvalonDock.Controls
 								}
 
 								if (_documentPaneDropTargetLeftAsAnchorablePane.IsVisible)
-									yield return new DocumentPaneDropAsAnchorableTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetLeftAsAnchorablePane.GetScreenArea(), DropTargetType.DocumentPaneDockAsAnchorableLeft);
+									yield return new DocumentPaneDropAsAnchorableTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetLeftAsAnchorablePane.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockAsAnchorableLeft);
 								if (_documentPaneDropTargetTopAsAnchorablePane.IsVisible)
-									yield return new DocumentPaneDropAsAnchorableTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetTopAsAnchorablePane.GetScreenArea(), DropTargetType.DocumentPaneDockAsAnchorableTop);
+									yield return new DocumentPaneDropAsAnchorableTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetTopAsAnchorablePane.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockAsAnchorableTop);
 								if (_documentPaneDropTargetRightAsAnchorablePane.IsVisible)
-									yield return new DocumentPaneDropAsAnchorableTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetRightAsAnchorablePane.GetScreenArea(), DropTargetType.DocumentPaneDockAsAnchorableRight);
+									yield return new DocumentPaneDropAsAnchorableTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetRightAsAnchorablePane.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockAsAnchorableRight);
 								if (_documentPaneDropTargetBottomAsAnchorablePane.IsVisible)
-									yield return new DocumentPaneDropAsAnchorableTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetBottomAsAnchorablePane.GetScreenArea(), DropTargetType.DocumentPaneDockAsAnchorableBottom);
+									yield return new DocumentPaneDropAsAnchorableTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetBottomAsAnchorablePane.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockAsAnchorableBottom);
 							}
 							else
 							{
@@ -430,15 +434,15 @@ namespace AvalonDock.Controls
 								// -> Yield a drop target structure with 5 center buttons over the document
 								var dropAreaDocumentPane = visibleArea as DropArea<LayoutDocumentPaneControl>;
 								if (_documentPaneDropTargetLeft.IsVisible)
-									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetLeft.GetScreenArea(), DropTargetType.DocumentPaneDockLeft);
+									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetLeft.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockLeft);
 								if (_documentPaneDropTargetTop.IsVisible)
-									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetTop.GetScreenArea(), DropTargetType.DocumentPaneDockTop);
+									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetTop.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockTop);
 								if (_documentPaneDropTargetRight.IsVisible)
-									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetRight.GetScreenArea(), DropTargetType.DocumentPaneDockRight);
+									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetRight.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockRight);
 								if (_documentPaneDropTargetBottom.IsVisible)
-									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetBottom.GetScreenArea(), DropTargetType.DocumentPaneDockBottom);
+									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetBottom.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockBottom);
 								if (_documentPaneDropTargetInto.IsVisible)
-									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetInto.GetScreenArea(), DropTargetType.DocumentPaneDockInside);
+									yield return new DocumentPaneDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetInto.GetVisibleScreenArea(), DropTargetType.DocumentPaneDockInside);
 
 								var parentPaneModel = dropAreaDocumentPane.AreaElement.Model as LayoutDocumentPane;
 								LayoutDocumentTabItem lastAreaTabItem = null;
@@ -468,7 +472,7 @@ namespace AvalonDock.Controls
 							// Dragging over DocumentPaneGroup -> Add DropTarget Area
 							var dropAreaDocumentPane = visibleArea as DropArea<LayoutDocumentPaneGroupControl>;
 							if (_documentPaneDropTargetInto.IsVisible)
-								yield return new DocumentPaneGroupDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetInto.GetScreenArea(), DropTargetType.DocumentPaneGroupDockInside);
+								yield return new DocumentPaneGroupDropTarget(dropAreaDocumentPane.AreaElement, _documentPaneDropTargetInto.GetVisibleScreenArea(), DropTargetType.DocumentPaneGroupDockInside);
 						}
 
 						break;
@@ -497,6 +501,13 @@ namespace AvalonDock.Controls
 		void IOverlayWindow.DragEnter(IDropArea area)
 #pragma warning restore CA1502
 		{
+			// Final backstop: several distinct races upstream (a drag whose end was missed, a model
+			// detached mid-drag by a concurrent dock/re-float, or this overlay instance being reused
+			// across a host-exit/re-entry cycle without a fresh DragEnter(floatingWindow)) can all leave
+			// this overlay holding a dead/never-set floating-window reference. None of them are this
+			// overlay's problem to solve - it just needs to not crash the whole process when it happens.
+			if (_floatingWindow?.Model?.Root == null)
+				return;
 			var floatingWindowManager = _floatingWindow.Model.Root.Manager;
 
 			_visibleAreas.Add(area);

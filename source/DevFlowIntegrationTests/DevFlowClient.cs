@@ -120,6 +120,9 @@ namespace AvalonDock.DevFlowIntegrationTests
 		public Task ReleaseAsync(double x, double y, CancellationToken ct = default)
 			=> PostPointActionAndAssertOkAsync("/api/v1/ui/actions/release", x, y, "release", ct);
 
+		public Task ClickAsync(double x, double y, CancellationToken ct = default)
+			=> PostPointActionAndAssertOkAsync("/api/v1/ui/actions/click", x, y, "click", ct);
+
 		private async Task PostPointActionAndAssertOkAsync(string path, double x, double y, string label, CancellationToken ct)
 		{
 			var body = JsonSerializer.Serialize(new { x, y });
@@ -146,6 +149,10 @@ namespace AvalonDock.DevFlowIntegrationTests
 			{
 				result.Add(new DropTargetInfo(
 					element.GetProperty("type").GetString(),
+					element.GetProperty("x").GetDouble(),
+					element.GetProperty("y").GetDouble(),
+					element.GetProperty("width").GetDouble(),
+					element.GetProperty("height").GetDouble(),
 					element.GetProperty("centerX").GetDouble(),
 					element.GetProperty("centerY").GetDouble()));
 			}
@@ -463,21 +470,29 @@ namespace AvalonDock.DevFlowIntegrationTests
 		public bool Global { get; set; }
 	}
 
-	/// <summary>A live drop-target compass indicator: its DropTargetType name and screen center.</summary>
+	/// <summary>A live drop-target compass indicator: its DropTargetType name and screen bounds.</summary>
 	public sealed class DropTargetInfo
 	{
-		public DropTargetInfo(string type, double centerX, double centerY)
+		public DropTargetInfo(string type, double x, double y, double width, double height, double centerX, double centerY)
 		{
 			Type = type;
+			X = x;
+			Y = y;
+			Width = width;
+			Height = height;
 			CenterX = centerX;
 			CenterY = centerY;
 		}
 
 		public string Type { get; }
+		public double X { get; }
+		public double Y { get; }
+		public double Width { get; }
+		public double Height { get; }
 		public double CenterX { get; }
 		public double CenterY { get; }
 
-		public override string ToString() => $"{Type} @ {CenterX},{CenterY}";
+		public override string ToString() => $"{Type} [{X},{Y},{Width},{Height}] @ {CenterX},{CenterY}";
 	}
 
 	public readonly struct ElementBounds

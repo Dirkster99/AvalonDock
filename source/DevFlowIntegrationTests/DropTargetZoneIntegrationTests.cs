@@ -60,7 +60,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 		[MemberData(nameof(ZoneCases))]
 		public async Task DragFloatingTool_OntoSpecificZone_DocksThere(string zoneType, string pathTarget)
 		{
-			NativeInputEnvironment.EnsureDecomposedInputAvailable();
+			NativeInputEnvironment.EnsureNativeDragAvailable();
 			await IsolateDesktopForNativeInputAsync();
 
 			using var client = await TryConnectAsync();
@@ -113,64 +113,123 @@ namespace AvalonDock.DevFlowIntegrationTests
 			ElementBounds pathTargetBounds,
 			CancellationToken ct)
 		{
-			const int maxAttempts = 3;
-			TimeoutException lastCompassFailure = null;
-			for (var attempt = 1; attempt <= maxAttempts; attempt++)
+			var floatingTitle = await client.QueryBoundsAsync("anchorable-title", "dragTestTool");
+			var dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
+			var dragStartY = floatingTitle.CenterY;
+			var discoveryX = pathTargetBounds.Right - 20;
+			var discoveryY = pathTargetBounds.Bottom - 20;
+			await using var discoveryGesture = await NativeInputIntegrationTests.CliclickHeldDrag.StartAsync(
+				dragStartX,
+				dragStartY,
+				discoveryX,
+				discoveryY,
+				ct);
+			await Task.Delay(1000, ct);
+
+			DropTargetInfo target;
+			try
 			{
-				var title = await client.QueryBoundsAsync("anchorable-title", "dragTestTool");
-				await client.PressAsync(title.CenterX, title.CenterY, ct);
-				await Task.Delay(500, ct);
-
-				for (var i = 1; i <= 3; i++)
-				{
-					var t = i / 3d;
-					var x = title.CenterX + (pathTargetBounds.CenterX - title.CenterX) * t;
-					var y = title.CenterY + (pathTargetBounds.CenterY - title.CenterY) * t;
-					await client.DragMoveAsync(x, y, ct);
-					await Task.Delay(300, ct);
+				target = await client.WaitForActiveDropTargetAsync(zoneType, ct, TimeSpan.FromSeconds(4));
+				await NativeInputIntegrationTests.AssertFloatingWindowIsUnderPointerAsync(
+					client, "dragTestTool", await client.InvokeAsync("avd.query.drag-state"), ct);
+			}
+			catch (TimeoutException ex)
+			{
+				await discoveryGesture.ReleaseAsync(ct);
+					await NativeInputIntegrationTests.FailCompassMissingAsync(
+						client,
+						zoneType,
+						discoveryX,
+						discoveryY,
+						ex);
+					throw;
 				}
 
-				DropTargetInfo target = null;
-				try
-				{
-					target = await client.WaitForActiveDropTargetAsync(zoneType, ct, TimeSpan.FromSeconds(4));
-				}
-				catch (TimeoutException ex)
-				{
-					lastCompassFailure = ex;
-					await client.ReleaseAsync(title.CenterX, title.CenterY, ct);
-					await Task.Delay(500, ct);
-					continue;
-				}
+			await discoveryGesture.ReleaseAsync(ct);
 
-				await client.DragMoveAsync(target.CenterX, target.CenterY, ct);
-				await Task.Delay(300, ct);
-				await client.ReleaseAsync(target.CenterX, target.CenterY, ct);
-				await Task.Delay(700, ct);
-
-				var snapshot = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));
-				var stillFloating = snapshot.Anchorables.Single(a => a.ContentId == "dragTestTool").IsFloat
-					|| snapshot.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool"));
-				if (!stillFloating)
-					return true;
+			var afterDiscovery = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));
+			if (!afterDiscovery.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool")))
+			{
+				await client.InvokeAsync("avd.float", "dragTestTool");
+				await WaitForLayoutAsync(client, s => s.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool")), ct);
 			}
 
-			if (lastCompassFailure != null)
+			var managerBounds = await client.QueryBoundsAsync("manager");
+			await client.InvokeAsync("avd.position-floating", "dragTestTool", managerBounds.Right + 40, managerBounds.Y + 40);
+			await Task.Delay(400, ct);
+			floatingTitle = await client.QueryBoundsAsync("anchorable-title", "dragTestTool");
+			dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
+			dragStartY = floatingTitle.CenterY;
+
+			await using var dropGesture = await NativeInputIntegrationTests.CliclickHeldDrag.StartAsync(
+				dragStartX,
+				dragStartY,
+				target.CenterX,
+				target.CenterY,
+				ct);
+			var (preReleaseDragState, preReleaseTargets) = await WaitForCurrentDropTargetAsync(client, zoneType, target, ct);
+			await NativeInputIntegrationTests.AssertFloatingWindowIsUnderPointerAsync(client, "dragTestTool", preReleaseDragState, ct);
+			await dropGesture.ReleaseAsync(ct);
+
+			try
 			{
-				throw new Xunit.Sdk.XunitException(
-					$"AvalonDock compass overlay did not show drop target '{zoneType}' while dragging over its host.",
-					lastCompassFailure);
+				await WaitForLayoutAsync(
+					client,
+					s => !s.Anchorables.Single(a => a.ContentId == "dragTestTool").IsFloat
+						&& !s.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool")),
+					ct,
+					TimeSpan.FromSeconds(6));
+				return true;
+			}
+			catch (TimeoutException)
+			{
+				var layout = await client.InvokeAsync("avd.query.layout");
+				var input = await client.InvokeAsync("avd.input.query");
+				System.Diagnostics.Debug.WriteLine(
+					$"Zone={zoneType}; TargetCenter={target.CenterX},{target.CenterY}; PreReleaseDragState={preReleaseDragState}; " +
+					$"PreReleaseTargets={preReleaseTargets}; Input={input}; Layout={layout}");
+				return false;
+			}
+		}
+
+		/// <summary>Polls live drag state until the given zone is the current drop target. Returns the
+		/// drag-state/active-targets pair captured once the zone became current, for the caller to
+		/// additionally verify overlay placement and window-under-pointer before releasing.</summary>
+		private static async Task<(string DragState, string Targets)> WaitForCurrentDropTargetAsync(
+			DevFlowClient client,
+			string zoneType,
+			DropTargetInfo target,
+			CancellationToken ct)
+		{
+			var liveDragState = string.Empty;
+			var deadline = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(5);
+			while (DateTimeOffset.UtcNow < deadline)
+			{
+				ct.ThrowIfCancellationRequested();
+				liveDragState = await client.InvokeAsync("avd.query.drag-state");
+				var liveTargets = await client.InvokeAsync("avd.query.active-drop-targets");
+				// Checked on every tick, not just the final one - overlay/menu overlap is a defect the
+				// instant it happens, not only in whichever frame we happen to sample last.
+				NativeInputIntegrationTests.AssertOverlayIsConstrainedToDockingManager(liveDragState, liveTargets);
+				if (liveDragState.Contains($"\"currentDropTarget\":\"{zoneType}\"", StringComparison.Ordinal))
+					return (liveDragState, liveTargets);
+
+				await Task.Delay(200, ct);
 			}
 
-			return false;
+			var timedOutTargets = await client.InvokeAsync("avd.query.active-drop-targets");
+			throw new Xunit.Sdk.XunitException(
+				$"Expected live drop target '{zoneType}' before releasing real mouse drag, but it was not current. " +
+				$"Target center={target.CenterX},{target.CenterY}. DragState={liveDragState}; Targets={timedOutTargets}");
 		}
 
 		private static async Task<DockLayoutSnapshot> WaitForLayoutAsync(
 			DevFlowClient client,
 			Func<DockLayoutSnapshot, bool> predicate,
-			CancellationToken ct)
+			CancellationToken ct,
+			TimeSpan? timeout = null)
 		{
-			var deadline = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(10);
+			var deadline = DateTimeOffset.UtcNow + (timeout ?? TimeSpan.FromSeconds(10));
 			while (DateTimeOffset.UtcNow < deadline)
 			{
 				ct.ThrowIfCancellationRequested();

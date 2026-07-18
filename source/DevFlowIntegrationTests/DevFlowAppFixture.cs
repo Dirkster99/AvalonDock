@@ -19,9 +19,14 @@ public class DevFlowAppFixture : IAsyncLifetime
 {
     private Process _process;
     private const int Port = 9223;
+    private static readonly string TestAppLogPath = Path.Combine(
+        OperatingSystem.IsWindows() ? Path.GetTempPath() : "/tmp",
+        $"avalondock-devflow-testapp-{Port}.log");
+    private readonly object _logSync = new();
     private List<string> _hiddenAppNames = new();
 
     public int AgentPort => Port;
+    public string LogPath => TestAppLogPath;
 
     private static string ResolveDotnetPath()
     {
@@ -66,13 +71,26 @@ public class DevFlowAppFixture : IAsyncLifetime
         var dotnetPath = ResolveDotnetPath();
         var outputBuilder = new StringBuilder();
         var errorBuilder = new StringBuilder();
+        var noBuild = string.Equals(
+            Environment.GetEnvironmentVariable("DEVFLOW_TESTAPP_NO_BUILD"),
+            "1",
+            StringComparison.Ordinal);
+        File.WriteAllText(TestAppLogPath, $"TestApp log started {DateTimeOffset.Now:O}{Environment.NewLine}");
+
+        void AppendLog(string stream, string line)
+        {
+            lock (_logSync)
+            {
+                File.AppendAllText(TestAppLogPath, $"[{stream}] {line}{Environment.NewLine}");
+            }
+        }
 
         _process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = dotnetPath,
-                Arguments = $"run --project \"{testAppDir}\"",
+                Arguments = $"run {(noBuild ? "--no-build " : string.Empty)}--project \"{testAppDir}\"",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
@@ -86,12 +104,18 @@ public class DevFlowAppFixture : IAsyncLifetime
         _process.OutputDataReceived += (_, e) =>
         {
             if (e.Data != null)
+            {
                 outputBuilder.AppendLine(e.Data);
+                AppendLog("stdout", e.Data);
+            }
         };
         _process.ErrorDataReceived += (_, e) =>
         {
             if (e.Data != null)
+            {
                 errorBuilder.AppendLine(e.Data);
+                AppendLog("stderr", e.Data);
+            }
         };
 
         try
@@ -118,7 +142,7 @@ public class DevFlowAppFixture : IAsyncLifetime
                     ? $"\nStderr:\n{errorBuilder}"
                     : "";
                 throw new InvalidOperationException(
-                    $"TestApp exited prematurely (exit code: {_process.ExitCode}).{error}");
+                    $"TestApp exited prematurely (exit code: {_process.ExitCode}). Log: {TestAppLogPath}.{error}");
             }
 
             try
@@ -142,7 +166,7 @@ public class DevFlowAppFixture : IAsyncLifetime
             : "";
 
         throw new TimeoutException(
-            $"TestApp did not start within 120 seconds on port {Port}.{stderr}");
+            $"TestApp did not start within 120 seconds on port {Port}. Log: {TestAppLogPath}.{stderr}");
     }
 
     public async ValueTask DisposeAsync()
