@@ -646,10 +646,11 @@ namespace TestApp
 					}
 				}
 			};
-			var toolPane = new LayoutAnchorablePane(tool)
-			{
-				DockWidth = new GridLength(260)
-			};
+				var toolPane = new LayoutAnchorablePane(tool)
+				{
+					DockWidth = new GridLength(260)
+				};
+				toolPane.SelectedContentIndex = 0;
 			var documentPane = new LayoutDocumentPane();
 			documentPane.Children.Add(new LayoutDocument
 			{
@@ -678,10 +679,11 @@ namespace TestApp
 					}
 				}
 			};
-			var toolPane2 = new LayoutAnchorablePane(tool2)
-			{
-				DockWidth = new GridLength(260)
-			};
+				var toolPane2 = new LayoutAnchorablePane(tool2)
+				{
+					DockWidth = new GridLength(260)
+				};
+				toolPane2.SelectedContentIndex = 0;
 			var root = new LayoutRoot
 			{
 				RootPanel = new LayoutPanel
@@ -696,8 +698,9 @@ namespace TestApp
 				}
 			};
 
-			dockManager.Layout = root;
-			dockManager.UpdateLayout();
+				dockManager.Layout = root;
+				tool.IsSelected = true;
+				dockManager.UpdateLayout();
 			RefreshInputDiagnostics();
 			return QueryLayout();
 		}
@@ -820,8 +823,8 @@ namespace TestApp
 				"manager" => dockManager,
 					"anchorable-title" => FindAnchorableTitle(contentId),
 					"anchorable-tab" => FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
-						.Where(x => string.Equals((x.Model as LayoutAnchorable)?.ContentId, contentId, StringComparison.Ordinal))
-						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0),
+							.Where(x => MatchesAnchorableContent(x, contentId))
+							.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0),
 					"document-tab" => FindVisualDescendants<LayoutDocumentTabItem>(dockManager)
 						.Where(x => string.Equals(x.Model?.ContentId, contentId, StringComparison.Ordinal))
 						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0),
@@ -888,17 +891,19 @@ namespace TestApp
 				var topInset = 6d;
 				var width = Math.Max(24d, Math.Min(180d, floating.ActualWidth - leftInset * 2d));
 				var height = Math.Max(12d, captionHeight - topInset);
+				var topLeft = PointToScreenPortable(floating, new Point(leftInset, topInset));
+				var center = PointToScreenPortable(floating, new Point(leftInset + width / 2d, topInset + height / 2d));
 				var result = new Dictionary<string, object>
 				{
 					["target"] = "floating-caption",
 					["contentId"] = contentId,
 					["found"] = true,
-					["x"] = floating.Left + leftInset,
-					["y"] = floating.Top + topInset,
+					["x"] = topLeft.X,
+					["y"] = topLeft.Y,
 					["width"] = width,
 					["height"] = height,
-					["centerX"] = floating.Left + leftInset + width / 2d,
-					["centerY"] = floating.Top + topInset + height / 2d,
+					["centerX"] = center.X,
+					["centerY"] = center.Y,
 					["hitTestPoint"] = false,
 					["handleKind"] = "floating-caption",
 					["windowBounds"] = CreateBoundsPayload("floating-window", contentId, floating),
@@ -945,11 +950,13 @@ namespace TestApp
 			}
 
 			[DevFlowAction("avd.input.reset", Description = "Reset AvalonDock routed input diagnostics")]
-		public string ResetInputDiagnostics()
-		{
-			_inputEventCounts.Clear();
-			_lastDockManagerMousePosition = default;
-			_lastDockManagerLeftButton = Mouse.LeftButton;
+			public string ResetInputDiagnostics()
+			{
+				if (Mouse.Captured is Menu || Mouse.Captured is MenuItem)
+					Mouse.Capture(null);
+				_inputEventCounts.Clear();
+				_lastDockManagerMousePosition = default;
+				_lastDockManagerLeftButton = Mouse.LeftButton;
 			_lastInputOriginalSource = null;
 			return "reset";
 		}
@@ -969,6 +976,68 @@ namespace TestApp
 			};
 
 			return System.Text.Json.JsonSerializer.Serialize(result);
+		}
+
+		[DevFlowAction("avd.query.platform", Description = "Query LibreWPF platform coordinate diagnostics")]
+		public string QueryPlatformDiagnostics()
+		{
+			var source = PresentationSource.FromVisual(this);
+			var windowOrigin = PointToScreen(new Point(0, 0));
+			var managerOrigin = dockManager.PointToScreen(new Point(0, 0));
+			var clientOrigin = TryReadPortableClientOrigin(source);
+			var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+				.Where(a => a.GetName().Name is "ProGPU.Wpf" or "PresentationCore" or "PresentationFramework")
+				.Select(a => new Dictionary<string, object>
+				{
+					["name"] = a.GetName().Name,
+					["version"] = a.GetName().Version?.ToString(),
+					["location"] = a.Location,
+				})
+				.ToArray();
+
+			var result = new Dictionary<string, object>
+			{
+				["windowLeft"] = Left,
+				["windowTop"] = Top,
+				["actualWidth"] = ActualWidth,
+				["actualHeight"] = ActualHeight,
+				["windowPointToScreenX"] = windowOrigin.X,
+				["windowPointToScreenY"] = windowOrigin.Y,
+				["managerPointToScreenX"] = managerOrigin.X,
+				["managerPointToScreenY"] = managerOrigin.Y,
+				["sourceType"] = source?.GetType().FullName,
+				["clientOrigin"] = clientOrigin,
+				["assemblies"] = assemblies,
+			};
+
+			return System.Text.Json.JsonSerializer.Serialize(result);
+		}
+
+		private static object TryReadPortableClientOrigin(PresentationSource source)
+		{
+			if (source == null)
+				return null;
+
+			try
+			{
+				var portableSource = source;
+				var portableOwnerProperty = source.GetType().GetProperty(
+					"PortableOwner",
+					System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+				if (portableOwnerProperty?.GetValue(source) is PresentationSource portableOwner)
+					portableSource = portableOwner;
+
+				var property = portableSource.GetType().GetProperty(
+					"ClientOrigin",
+					System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+				if (property?.GetValue(portableSource) is Point point)
+					return new Dictionary<string, object> { ["x"] = point.X, ["y"] = point.Y };
+			}
+			catch
+			{
+			}
+
+			return null;
 		}
 
 		[DevFlowAction("avd.query.active-drop-targets",
@@ -1077,9 +1146,9 @@ namespace TestApp
 		}
 
 		[DevFlowAction("avd.query.tabs", Description = "Query visible anchorable tabs and diagnostic bounds")]
-		public string QueryAnchorableTabs()
-		{
-			var tabs = FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
+			public string QueryAnchorableTabs()
+			{
+				var tabs = FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
 				.Select(tab => new Dictionary<string, object>
 				{
 					["contentId"] = tab.Model?.ContentId,
@@ -1092,10 +1161,45 @@ namespace TestApp
 				})
 				.ToArray();
 
-			return System.Text.Json.JsonSerializer.Serialize(tabs);
-		}
+				return System.Text.Json.JsonSerializer.Serialize(tabs);
+			}
 
-		private FrameworkElement FindAnchorablePaneResizer(string contentId)
+			[DevFlowAction("avd.query.anchorable-drag-surfaces", Description = "Query visible anchorable title/control drag surface diagnostics")]
+			public string QueryAnchorableDragSurfaces()
+			{
+				var roots = GetAvalonDockVisualRoots().ToArray();
+				var titles = roots.SelectMany(FindVisualDescendants<AnchorablePaneTitle>)
+					.Select(title => new Dictionary<string, object>
+					{
+						["contentId"] = title.Model?.ContentId,
+						["title"] = title.Model?.Title,
+						["isVisible"] = title.IsVisible,
+						["isHitTestVisible"] = title.IsHitTestVisible,
+						["actualWidth"] = title.ActualWidth,
+						["actualHeight"] = title.ActualHeight,
+						["isHitTestableAtCenter"] = IsHitTestableAtCenter(title),
+						["bounds"] = CreateBoundsPayload("anchorable-title", title.Model?.ContentId, title),
+					})
+					.ToArray();
+				var controls = roots.SelectMany(FindVisualDescendants<LayoutAnchorableControl>)
+					.Select(control => new Dictionary<string, object>
+					{
+						["contentId"] = control.Model?.ContentId,
+						["title"] = control.Model?.Title,
+						["isVisible"] = control.IsVisible,
+						["actualWidth"] = control.ActualWidth,
+						["actualHeight"] = control.ActualHeight,
+						["bounds"] = CreateBoundsPayload("anchorable-control", control.Model?.ContentId, control),
+					})
+					.ToArray();
+				return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+				{
+					["titles"] = titles,
+					["controls"] = controls,
+				});
+			}
+
+			private FrameworkElement FindAnchorablePaneResizer(string contentId)
 		{
 			var pane = FindVisualDescendant<LayoutAnchorablePaneControl>(
 				dockManager,
@@ -1221,8 +1325,13 @@ namespace TestApp
 
 			private static Point PointToScreenPortable(FrameworkElement element, Point point)
 			{
-				if (element is Window directWindow)
-					return new Point(directWindow.Left + point.X, directWindow.Top + point.Y);
+				try
+				{
+					return element.PointToScreen(point);
+				}
+				catch (InvalidOperationException)
+				{
+				}
 
 				var window = Window.GetWindow(element);
 				if (window is LayoutFloatingWindowControl && !ReferenceEquals(window, element))
@@ -1230,20 +1339,28 @@ namespace TestApp
 					try
 					{
 						var pointInWindow = element.TransformToAncestor(window).Transform(point);
-						return new Point(window.Left + pointInWindow.X, window.Top + pointInWindow.Y);
+						return window.PointToScreen(pointInWindow);
 					}
 					catch (InvalidOperationException)
 					{
 					}
 				}
 
-				return element.PointToScreen(point);
+				if (element is Window directWindow)
+					return new Point(directWindow.Left + point.X, directWindow.Top + point.Y);
+
+				throw new InvalidOperationException("Could not convert element point to screen coordinates.");
 			}
 
 			private static Point PointFromScreenPortable(UIElement element, Point point)
 			{
-				if (element is Window directWindow)
-					return new Point(point.X - directWindow.Left, point.Y - directWindow.Top);
+				try
+				{
+					return element.PointFromScreen(point);
+				}
+				catch (InvalidOperationException)
+				{
+				}
 
 				if (element is FrameworkElement frameworkElement)
 				{
@@ -1252,7 +1369,7 @@ namespace TestApp
 					{
 						try
 						{
-							var pointInWindow = new Point(point.X - window.Left, point.Y - window.Top);
+							var pointInWindow = window.PointFromScreen(point);
 							return window.TransformToDescendant(frameworkElement).Transform(pointInWindow);
 						}
 						catch (InvalidOperationException)
@@ -1261,7 +1378,10 @@ namespace TestApp
 					}
 				}
 
-				return element.PointFromScreen(point);
+				if (element is Window directWindow)
+					return new Point(point.X - directWindow.Left, point.Y - directWindow.Top);
+
+				throw new InvalidOperationException("Could not convert screen point to element coordinates.");
 			}
 
 		private static T FindVisualDescendant<T>(DependencyObject root, Func<T, bool> predicate)
@@ -1326,20 +1446,33 @@ namespace TestApp
 						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
 			}
 
-			private FrameworkElement FindDockedAnchorableDragHandle(string contentId)
-			{
-				var title = FindVisualDescendants<AnchorablePaneTitle>(dockManager)
-					.Where(x => string.Equals(x.Model?.ContentId, contentId, StringComparison.Ordinal) ||
-						x.FindVisualAncestor<LayoutAnchorablePaneControl>()?.Model?.Descendents().OfType<LayoutAnchorable>()
-							.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true)
-					.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
-				if (title != null)
-					return title;
+				private FrameworkElement FindDockedAnchorableDragHandle(string contentId)
+				{
+					var tab = FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
+						.Where(x => MatchesAnchorableContent(x, contentId))
+						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
+					if (tab != null)
+						return tab;
 
-				return FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
-					.Where(x => string.Equals((x.Model as LayoutAnchorable)?.ContentId, contentId, StringComparison.Ordinal))
-					.FirstOrDefault(x => x.ActualWidth > 0 && x.ActualHeight > 0);
-			}
+					var title = FindVisualDescendants<AnchorablePaneTitle>(dockManager)
+						.Where(x => string.Equals(x.Model?.ContentId, contentId, StringComparison.Ordinal) ||
+							x.FindVisualAncestor<LayoutAnchorablePaneControl>()?.Model?.Descendents().OfType<LayoutAnchorable>()
+								.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true)
+						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
+					if (title != null)
+						return title;
+
+					return FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
+						.Where(x => MatchesAnchorableContent(x, contentId))
+						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
+				}
+
+				private static bool MatchesAnchorableContent(LayoutAnchorableTabItem tab, string contentId)
+				{
+					return string.Equals((tab.Model as LayoutAnchorable)?.ContentId, contentId, StringComparison.Ordinal) ||
+						tab.FindVisualAncestor<LayoutAnchorablePaneControl>()?.Model?.Descendents().OfType<LayoutAnchorable>()
+							.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true;
+				}
 
 			private LayoutFloatingWindowControl FindVisibleFloatingWindow(string contentId)
 		{

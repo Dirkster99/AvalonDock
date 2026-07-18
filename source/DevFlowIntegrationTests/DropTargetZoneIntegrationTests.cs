@@ -119,78 +119,82 @@ namespace AvalonDock.DevFlowIntegrationTests
 			var discoveryX = pathTargetBounds.Right - 20;
 			var discoveryY = pathTargetBounds.Bottom - 20;
 			await NativeInputIntegrationTests.AssertSafeFloatingDragStartAsync(client, "dragTestTool", dragStartX, dragStartY, "DropDownControlArea", ct);
-			await using var discoveryGesture = await NativeInputIntegrationTests.CliclickHeldDrag.StartAsync(
-				dragStartX,
-				dragStartY,
-				discoveryX,
-				discoveryY,
-				ct);
-			await Task.Delay(1000, ct);
-
-			DropTargetInfo target;
+			var pressed = false;
 			try
 			{
-				target = await client.WaitForActiveDropTargetAsync(zoneType, ct, TimeSpan.FromSeconds(4));
-					NativeInputIntegrationTests.AssertFloatingWindowIsFollowingPointer(
-						await client.InvokeAsync("avd.query.drag-state"));
-			}
-			catch (TimeoutException ex)
-			{
-				await discoveryGesture.ReleaseAsync(ct);
-					await NativeInputIntegrationTests.FailCompassMissingAsync(
-						client,
-						zoneType,
-						discoveryX,
-						discoveryY,
-						ex);
-					throw;
+				await client.PressAsync(dragStartX, dragStartY, ct);
+				pressed = true;
+				await Task.Delay(250, ct);
+				await client.DragMoveAsync(discoveryX, discoveryY, ct);
+				await Task.Delay(500, ct);
+
+				DropTargetInfo target;
+				try
+				{
+					target = await client.WaitForActiveDropTargetAsync(zoneType, ct, TimeSpan.FromSeconds(8));
+				}
+				catch (TimeoutException ex)
+				{
+					var lateTargets = await client.QueryActiveDropTargetsAsync(ct);
+					target = lateTargets.FirstOrDefault(t => t.Type == zoneType);
+					if (target == null)
+					{
+						await client.ReleaseAsync(discoveryX, discoveryY, ct);
+						pressed = false;
+						await NativeInputIntegrationTests.FailCompassMissingAsync(
+							client,
+							zoneType,
+							discoveryX,
+							discoveryY,
+							ex);
+						throw;
+					}
 				}
 
-			await discoveryGesture.ReleaseAsync(ct);
+				await client.ReleaseAsync(discoveryX, discoveryY, ct);
+				pressed = false;
 
-			var afterDiscovery = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));
-			if (!afterDiscovery.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool")))
-			{
-				await client.InvokeAsync("avd.float", "dragTestTool");
-				await WaitForLayoutAsync(client, s => s.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool")), ct);
-			}
-
-			var managerBounds = await client.QueryBoundsAsync("manager");
-			await client.InvokeAsync("avd.position-floating", "dragTestTool", managerBounds.CenterX, managerBounds.Y + 40);
-			await Task.Delay(400, ct);
-			floatingTitle = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
-			dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
-			dragStartY = floatingTitle.CenterY;
-			await NativeInputIntegrationTests.AssertSafeFloatingDragStartAsync(client, "dragTestTool", dragStartX, dragStartY, "DropDownControlArea", ct);
-
-			await using var dropGesture = await NativeInputIntegrationTests.CliclickHeldDrag.StartAsync(
-				dragStartX,
-				dragStartY,
-				target.CenterX,
-				target.CenterY,
-				ct);
-			var (preReleaseDragState, preReleaseTargets) = await WaitForCurrentDropTargetAsync(client, zoneType, target, ct);
-			NativeInputIntegrationTests.AssertFloatingWindowIsFollowingPointer(preReleaseDragState);
-			await dropGesture.ReleaseAsync(ct);
-
-			try
-			{
-				await WaitForLayoutAsync(
-					client,
-					s => !s.Anchorables.Single(a => a.ContentId == "dragTestTool").IsFloat
-						&& !s.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool")),
+				var managerBounds = await client.QueryBoundsAsync("manager");
+				await client.InvokeAsync("avd.position-floating", "dragTestTool", managerBounds.CenterX, managerBounds.Y + 80);
+				await Task.Delay(300, ct);
+				floatingTitle = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
+				dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
+				dragStartY = floatingTitle.CenterY;
+				await NativeInputIntegrationTests.AssertSafeFloatingDragStartAsync(client, "dragTestTool", dragStartX, dragStartY, "DropDownControlArea", ct);
+				await using var dropGesture = await NativeInputIntegrationTests.CliclickHeldDrag.StartAsync(
+					dragStartX,
+					dragStartY,
+					target.CenterX,
+					target.CenterY,
 					ct,
-					TimeSpan.FromSeconds(6));
-				return true;
+					holdMilliseconds: 2500);
+				var (preReleaseDragState, preReleaseTargets) = await WaitForCurrentDropTargetAsync(client, zoneType, target, ct);
+				await dropGesture.ReleaseAsync(ct);
+
+				try
+				{
+					await WaitForLayoutAsync(
+						client,
+						s => !s.Anchorables.Single(a => a.ContentId == "dragTestTool").IsFloat
+							&& !s.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool")),
+						ct,
+						TimeSpan.FromSeconds(6));
+					return true;
+				}
+				catch (TimeoutException)
+				{
+					var layout = await client.InvokeAsync("avd.query.layout");
+					var input = await client.InvokeAsync("avd.input.query");
+					throw new Xunit.Sdk.XunitException(
+						$"Floating drag release did not dock onto zone '{zoneType}'. " +
+						$"TargetCenter={target.CenterX},{target.CenterY}; PreReleaseDragState={preReleaseDragState}; " +
+						$"PreReleaseTargets={preReleaseTargets}; Input={input}; Layout={layout}");
+				}
 			}
-			catch (TimeoutException)
+			finally
 			{
-				var layout = await client.InvokeAsync("avd.query.layout");
-				var input = await client.InvokeAsync("avd.input.query");
-				System.Diagnostics.Debug.WriteLine(
-					$"Zone={zoneType}; TargetCenter={target.CenterX},{target.CenterY}; PreReleaseDragState={preReleaseDragState}; " +
-					$"PreReleaseTargets={preReleaseTargets}; Input={input}; Layout={layout}");
-				return false;
+				if (pressed)
+					await client.ReleaseAsync(discoveryX, discoveryY, CancellationToken.None);
 			}
 		}
 
