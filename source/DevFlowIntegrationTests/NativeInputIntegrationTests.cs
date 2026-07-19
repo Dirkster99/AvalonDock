@@ -301,7 +301,14 @@ namespace AvalonDock.DevFlowIntegrationTests
 					"DocumentPaneDockInside",
 					TestContext.Current.CancellationToken,
 					TimeSpan.FromSeconds(4));
-					AssertFloatingWindowIsFollowingPointer(await client.InvokeAsync("avd.query.drag-state"));
+					// The compass overlay is now on screen for the first time. Verify here - before the
+					// drop-to-dock gesture even begins - that it is constrained to the DockingManager and
+					// is not sitting too high over the main menu. The overlay-too-high regression shows up
+					// the instant the overlay appears (i.e. during this discovery drag), so checking it
+					// only during the later drop gesture would miss it.
+					var discoveryDragState = await client.InvokeAsync("avd.query.drag-state");
+					AssertOverlayIsConstrainedToDockingManager(discoveryDragState, await client.InvokeAsync("avd.query.active-drop-targets"));
+					AssertFloatingWindowIsFollowingPointer(discoveryDragState);
 				await discoveryGesture.ReleaseAsync(TestContext.Current.CancellationToken);
 
 				var afterDiscovery = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));

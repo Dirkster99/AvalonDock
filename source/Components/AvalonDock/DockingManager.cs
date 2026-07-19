@@ -2579,10 +2579,19 @@ namespace AvalonDock
 				_overlayWindow.Owner = null;
 
 			var rectWindow = this.GetScreenArea();
+			var tl = this.PointToScreenDPI(new Point(0, 0));
+			var br = this.PointToScreenDPI(new Point(this.ActualWidth, this.ActualHeight));
+			System.Console.Error.WriteLine(
+				$"[OVL-TRACE] CreateOverlayWindow manager.ActualSize=({this.ActualWidth}x{this.ActualHeight}) " +
+				$"PointToScreen TL=({tl.X},{tl.Y}) BR=({br.X},{br.Y}) => GetScreenArea=({rectWindow.Left},{rectWindow.Top},{rectWindow.Width},{rectWindow.Height}) " +
+				$"bottom={rectWindow.Top + rectWindow.Height}");
 			_overlayWindow.Left = rectWindow.Left;
 			_overlayWindow.Top = rectWindow.Top;
 			_overlayWindow.Width = rectWindow.Width;
 			_overlayWindow.Height = rectWindow.Height;
+			System.Console.Error.WriteLine(
+				$"[OVL-TRACE] CreateOverlayWindow set overlay Left/Top/Width/Height = " +
+				$"{_overlayWindow.Left}/{_overlayWindow.Top}/{_overlayWindow.Width}/{_overlayWindow.Height}");
 		}
 
 		private void DestroyOverlayWindow()

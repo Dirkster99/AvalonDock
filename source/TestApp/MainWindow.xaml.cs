@@ -913,6 +913,79 @@ namespace TestApp
 				return System.Text.Json.JsonSerializer.Serialize(result);
 			}
 
+			[DevFlowAction("avd.debug-show-overlay", Description = "Force-show the DockingManager compass overlay (with a visible debug border) without a drag; optionally enter a drop-target zone to also render its blue preview box, for inspecting overlay/preview alignment vs the manager")]
+			public string DebugShowOverlay(string previewZone = null)
+			{
+				OverlayWindow.DebugBorderEnabled = true;
+
+				var floating = dockManager.FloatingWindows.FirstOrDefault(fw => fw.IsLoaded && fw.IsVisible);
+				if (floating == null)
+				{
+					var anchorable = dockManager.Layout.Descendents().OfType<LayoutAnchorable>()
+						.FirstOrDefault(a => !a.IsFloating && a.IsVisible);
+					if (anchorable == null)
+						return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object> { ["shown"] = false, ["reason"] = "no anchorable to float" });
+					anchorable.Float();
+					floating = dockManager.FloatingWindows.FirstOrDefault(fw => fw.IsLoaded && fw.IsVisible);
+				}
+
+				if (floating == null)
+					return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object> { ["shown"] = false, ["reason"] = "no floating window available" });
+
+				var host = (IOverlayWindowHost)dockManager;
+				var overlay = host.ShowOverlayWindow(floating);
+				overlay.DragEnter(floating);
+				foreach (var area in host.GetDropAreas(floating))
+					overlay.DragEnter(area);
+
+				object previewInfo = null;
+				if (!string.IsNullOrWhiteSpace(previewZone))
+				{
+					var target = overlay.GetTargets().FirstOrDefault(t => t.Type.ToString() == previewZone);
+					if (target != null)
+					{
+						overlay.DragEnter(target);
+						previewInfo = new Dictionary<string, object>
+						{
+							["zone"] = previewZone,
+							["targetScreenBounds"] = RectToPayload(target.GetScreenBounds()),
+						};
+					}
+					else
+					{
+						previewInfo = new Dictionary<string, object> { ["zone"] = previewZone, ["found"] = false };
+					}
+				}
+
+				var payload = new Dictionary<string, object>
+				{
+					["shown"] = true,
+					["overlay"] = (overlay is Window w)
+						? new Dictionary<string, object> { ["left"] = w.Left, ["top"] = w.Top, ["width"] = w.ActualWidth, ["height"] = w.ActualHeight, ["bottom"] = w.Top + w.ActualHeight }
+						: null,
+					["menuBounds"] = CreateBoundsPayload("menu", null, mainMenu),
+					["managerBounds"] = CreateBoundsPayload("manager", null, dockManager),
+					["preview"] = previewInfo,
+				};
+				return System.Text.Json.JsonSerializer.Serialize(payload);
+			}
+
+			private static Dictionary<string, object> RectToPayload(Rect r) => new Dictionary<string, object>
+			{
+				["x"] = r.X,
+				["y"] = r.Y,
+				["width"] = r.Width,
+				["height"] = r.Height,
+			};
+
+			[DevFlowAction("avd.debug-hide-overlay", Description = "Hide the debug compass overlay shown by avd.debug-show-overlay")]
+			public string DebugHideOverlay()
+			{
+				((IOverlayWindowHost)dockManager).HideOverlayWindow();
+				OverlayWindow.DebugBorderEnabled = false;
+				return "Hidden debug overlay";
+			}
+
 			[DevFlowAction("avd.activate", Description = "Activate and foreground the AvalonDock test window")]
 			public string ActivateTestWindow()
 			{
@@ -1107,22 +1180,34 @@ namespace TestApp
 			DependencyObject hitRoot = null;
 			foreach (var root in GetAvalonDockVisualRoots())
 			{
-				if (root is not UIElement rootElement || root is not Visual rootVisual)
+				if (root is not FrameworkElement rootElement || root is not Visual rootVisual)
 					continue;
 
-				if (root is FrameworkElement frameworkElement)
+				Point rootPoint;
+				try
 				{
-					var topLeft = PointToScreenPortable(frameworkElement, new Point(0, 0));
-					var bottomRight = PointToScreenPortable(frameworkElement, new Point(frameworkElement.ActualWidth, frameworkElement.ActualHeight));
-					if (!new Rect(topLeft, bottomRight).Contains(screenPoint))
-						continue;
+					rootPoint = PointFromScreenPortable(rootElement, screenPoint);
+				}
+				catch (InvalidOperationException)
+				{
+					continue;
 				}
 
-				var rootPoint = PointFromScreenPortable(rootElement, screenPoint);
-				hit = rootElement.InputHitTest(rootPoint) as DependencyObject;
+				if (rootPoint.X < 0 || rootPoint.Y < 0 || rootPoint.X > rootElement.ActualWidth || rootPoint.Y > rootElement.ActualHeight)
+					continue;
+
+				// InputHitTest does not descend past the DockingManager template's ContentPresenter in
+				// this portable (LibreWPF/ProGPU) rendering backend - it returns the same shallow
+				// ContentPresenter for every point, even pane centers. Resolve the hit geometrically
+				// instead, using each element's own PointToScreen bounds (the same transform path
+				// avd.query.bounds uses and which is reliable here, unlike TransformToDescendant): find
+				// the deepest visible visual descendant whose screen rect contains the point. This
+				// mirrors how drag handles are computed (from real element bounds), so a caller can
+				// reliably verify a computed drag-start point actually lands on the intended AvalonDock
+				// element (resizer, pane, caption) rather than a random position.
+				hit = FindDeepestVisualContaining(rootElement, screenPoint) ?? rootElement;
 				hitRoot = root;
-				if (hit != null)
-					break;
+				break;
 			}
 
 			var ancestors = new List<string>();
@@ -1383,6 +1468,50 @@ namespace TestApp
 
 				throw new InvalidOperationException("Could not convert screen point to element coordinates.");
 			}
+
+		// Deepest FrameworkElement whose own on-screen rect contains the screen point, across the whole
+		// subtree. Uses each element's own PointToScreen (the transform path that is reliable in this
+		// rendering backend) rather than TransformToDescendant. Preferring the DEEPEST match (rather
+		// than the topmost z-order sibling) is deliberate: full-size but content-empty overlays such as
+		// LayoutAutoHideWindowControl sit on top of the real panes and contain every point shallowly,
+		// so a topmost-first walk would always resolve to the overlay and never the pane/resizer the
+		// caller is actually verifying. Returns null when nothing qualifies.
+		private static FrameworkElement FindDeepestVisualContaining(DependencyObject node, Point screenPoint)
+		{
+			return FindDeepestVisualContaining(node, screenPoint, 0).Element;
+		}
+
+		private static (FrameworkElement Element, int Depth) FindDeepestVisualContaining(
+			DependencyObject node, Point screenPoint, int depth)
+		{
+			(FrameworkElement Element, int Depth) best = (null, -1);
+			var count = VisualTreeHelper.GetChildrenCount(node);
+			for (var i = 0; i < count; i++)
+			{
+				var childBest = FindDeepestVisualContaining(VisualTreeHelper.GetChild(node, i), screenPoint, depth + 1);
+				if (childBest.Element != null && childBest.Depth > best.Depth)
+					best = childBest;
+			}
+
+			if (best.Element != null)
+				return best;
+
+			if (node is FrameworkElement fe && fe.ActualWidth > 0 && fe.ActualHeight > 0)
+			{
+				try
+				{
+					var topLeft = PointToScreenPortable(fe, new Point(0, 0));
+					var bottomRight = PointToScreenPortable(fe, new Point(fe.ActualWidth, fe.ActualHeight));
+					if (new Rect(topLeft, bottomRight).Contains(screenPoint))
+						return (fe, depth);
+				}
+				catch (InvalidOperationException)
+				{
+				}
+			}
+
+			return (null, -1);
+		}
 
 		private static T FindVisualDescendant<T>(DependencyObject root, Func<T, bool> predicate)
 			where T : DependencyObject

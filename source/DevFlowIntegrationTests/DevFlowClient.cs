@@ -172,7 +172,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 			{
 				ct.ThrowIfCancellationRequested();
 				var targets = await QueryActiveDropTargetsAsync(ct).ConfigureAwait(false);
-				var match = targets.Find(t => t.Type == dropTargetType);
+				var match = PickPrimaryDropTarget(targets, dropTargetType);
 				if (match != null)
 					return match;
 
@@ -180,6 +180,22 @@ namespace AvalonDock.DevFlowIntegrationTests
 			}
 
 			throw new TimeoutException($"Timed out waiting for drop target '{dropTargetType}' to appear in the active compass.");
+		}
+
+		/// <summary>Selects the primary compass indicator for a DropTargetType from the active set.
+		/// Several indicators can share one type name - notably the *DockInside types, where the same
+		/// name is used by the central ~40x40 "dock inside" button AND by the wide/short tab-header and
+		/// thin tab-strip "dock as a new tab" targets. A plain first-match can capture one of those tab
+		/// slivers (whose position/order varies frame to frame), so a later drag to its centre never
+		/// re-registers as that zone. The primary direction/inside buttons are all roughly square, so
+		/// prefer the most-square match; ties break toward the larger button.</summary>
+		public static DropTargetInfo PickPrimaryDropTarget(IReadOnlyList<DropTargetInfo> targets, string dropTargetType)
+		{
+			return targets
+				.Where(t => t.Type == dropTargetType)
+				.OrderBy(t => Math.Abs(t.Width - t.Height))
+				.ThenByDescending(t => t.Width * t.Height)
+				.FirstOrDefault();
 		}
 
 		public async Task<ElementBounds> QueryBoundsAsync(string target, string contentId = null)

@@ -56,6 +56,13 @@ namespace AvalonDock.Controls
 		private LayoutFloatingWindowControl _floatingWindow = null;
 		private readonly List<IDropArea> _visibleAreas = new List<IDropArea>();
 
+		/// <summary>Debug/diagnostic only: when true, every overlay window paints a bright outline at
+		/// its own edges so its exact on-screen bounds are visible against the otherwise fully
+		/// transparent background. Lets a test (or a human) see at a glance whether the overlay window
+		/// coincides with the DockingManager or bleeds over other chrome such as the main menu.</summary>
+		internal static bool DebugBorderEnabled { get; set; }
+		private System.Windows.Shapes.Rectangle _debugBorder;
+
 		/// <summary>
 		/// Initializes static members of the <see cref="OverlayWindow"/> class.
 		/// </summary>
@@ -137,6 +144,34 @@ namespace AvalonDock.Controls
 			_documentPaneFullDropTargetInto = GetTemplateChild("PART_DocumentPaneFullDropTargetInto") as FrameworkElement;
 
 			_previewBox = GetTemplateChild("PART_PreviewBox") as Path;
+
+			if (DebugBorderEnabled && _mainCanvasPanel != null)
+			{
+				_debugBorder = new System.Windows.Shapes.Rectangle
+				{
+					Stroke = new SolidColorBrush(Colors.Red),
+					StrokeThickness = 3,
+					Fill = Brushes.Transparent,
+					IsHitTestVisible = false,
+				};
+				Panel.SetZIndex(_debugBorder, int.MaxValue);
+				_mainCanvasPanel.Children.Add(_debugBorder);
+				UpdateDebugBorder();
+				SizeChanged += (_, __) => UpdateDebugBorder();
+			}
+		}
+
+		private void UpdateDebugBorder()
+		{
+			if (_debugBorder == null)
+				return;
+
+			// Draw exactly on the overlay edges (no inset) so the border marks the true window bounds.
+			const double inset = 0d;
+			Canvas.SetLeft(_debugBorder, inset);
+			Canvas.SetTop(_debugBorder, inset);
+			_debugBorder.Width = System.Math.Max(0d, ActualWidth - inset * 2d);
+			_debugBorder.Height = System.Math.Max(0d, ActualHeight - inset * 2d);
 		}
 
 		/// <inheritdoc/>
