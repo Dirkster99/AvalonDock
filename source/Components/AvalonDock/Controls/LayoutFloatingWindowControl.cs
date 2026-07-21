@@ -829,8 +829,20 @@ namespace AvalonDock.Controls
 
 			_attachDrag = false;
 			Show();
-			var lParam = new IntPtr(((int)mousePosition.X & 0xFFFF) | ((int)mousePosition.Y << 16));
-			Win32Helper.SendMessage(windowHandle, Win32Helper.WM_NCLBUTTONDOWN, new IntPtr(Win32Helper.HT_CAPTION), lParam);
+
+			// On real Windows HWNDs the caption drag runs through the Win32 modal move loop
+			// (WM_NCLBUTTONDOWN -> WM_MOVING -> WM_EXITSIZEMOVE). Portable backends (LibreWPF) have no
+			// such loop, so the message below is inert there; start the managed caption drag instead,
+			// otherwise a torn-off window would freeze at the tear-off point and never follow the pointer.
+			if (UsePortableCaptionDrag)
+			{
+				BeginPortableCaptionDrag();
+			}
+			else
+			{
+				var lParam = new IntPtr(((int)mousePosition.X & 0xFFFF) | ((int)mousePosition.Y << 16));
+				Win32Helper.SendMessage(windowHandle, Win32Helper.WM_NCLBUTTONDOWN, new IntPtr(Win32Helper.HT_CAPTION), lParam);
+			}
 		}
 
 		private void UpdatePositionAndSizeOfPanes()
@@ -918,6 +930,54 @@ namespace AvalonDock.Controls
 				_dragService = new DragService(this);
 			SetIsDragging(true);
 			CaptureMouse();
+		}
+
+		// Starts the managed caption drag for a freshly torn-off floating window on portable backends.
+		// Unlike OnPortableCaptionMouseDown there is no originating mouse event - the drag is kicked off
+		// from InternalOnActivated right after the window is shown at the tear-off point - so the grab
+		// offset is recovered from the current pointer relative to the window origin that was just set.
+		private void BeginPortableCaptionDrag()
+		{
+			if (_portableDragging) return;
+			if (Model?.Root?.Manager == null) return;
+			if (Mouse.LeftButton != MouseButtonState.Pressed) return;
+			if (PresentationSource.FromVisual(this) == null) return;
+
+			Point pointer;
+			try
+			{
+				pointer = PointToScreen(Mouse.GetPosition(this));
+			}
+			catch
+			{
+				// The window can lose its PresentationSource between the guard above and here while
+				// tearing off across DPI boundaries; abandon the drag rather than throw out of Activated.
+				return;
+			}
+
+			_portableDragOffset = new Point(pointer.X - Left, pointer.Y - Top);
+			_portableLastPointer = pointer;
+			_portableDragging = true;
+			if (_dragService == null)
+				_dragService = new DragService(this);
+			SetIsDragging(true);
+
+			if (!CaptureMouse())
+			{
+				// A window is not always ready to capture the instant it is shown. Retry once the input
+				// system has caught up; if the button was released by then, end the drag cleanly so the
+				// window simply settles at the tear-off point instead of being stuck mid-drag.
+				Dispatcher.BeginInvoke(new Action(() =>
+				{
+					if (!_portableDragging) return;
+					if (Mouse.LeftButton != MouseButtonState.Pressed)
+					{
+						EndPortableDrag(drop: true);
+						return;
+					}
+					CaptureMouse();
+				}), System.Windows.Threading.DispatcherPriority.Input);
+			}
 		}
 
 		private static DependencyObject VisualTreeHelperGetParent(DependencyObject d)
