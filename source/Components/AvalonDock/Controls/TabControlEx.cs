@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace AvalonDock.Controls
 {
@@ -16,15 +17,18 @@ namespace AvalonDock.Controls
 	{
 		private Panel ItemsHolderPanel = null;
 		private readonly bool _IsVirtualizing;
+		private readonly bool _IgnoreTabControlKeyBindings;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TabControlEx"/> class.
 		/// </summary>
-		/// <param name="isVirtualizing">The is Virtualizing.</param>
-		public TabControlEx(bool isVirtualizing)
+		/// <param name="isVirtualizing">Whether tabbed items are virtualized or not.</param>
+		/// <param name="ignoreTabControlKeyBindingBindings">whether the TabControl keybindings are ignored or not.</param>
+		public TabControlEx(bool isVirtualizing, bool ignoreTabControlKeyBindingBindings)
 			: this()
 		{
 			_IsVirtualizing = isVirtualizing;
+			_IgnoreTabControlKeyBindings = ignoreTabControlKeyBindingBindings;
 		}
 
 		/// <summary>
@@ -46,6 +50,14 @@ namespace AvalonDock.Controls
 		[Description("Gets whether the control and its inheriting classes are virtualizing their items or not.")]
 		[Category("Other")]
 		public bool IsVirtualiting => _IsVirtualizing;
+
+		/// <summary>
+		/// Gets a value indicating whether the TabControl keybindings are ignored or not.
+		/// </summary>
+		[Bindable(false)]
+		[Description("Gets whether the TabControl keybindings are ignored or not.")]
+		[Category("Document")]
+		public bool IgnoreTabControlKeyBindings => _IgnoreTabControlKeyBindings;
 
 		/// <inheritdoc/>
 		public override void OnApplyTemplate()
@@ -237,6 +249,16 @@ namespace AvalonDock.Controls
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Override of the OnKeyDown event, used to ignore the TabControl keybindings (if enabled)
+		/// </summary>
+		/// <param name="e">The key event args.</param>
+		protected override void OnKeyDown(KeyEventArgs e)
+		{
+			if (!IgnoreTabControlKeyBindings) base.OnKeyDown(e); 
+			// Else: bypass all TabControl key processing
 		}
 	}
 }

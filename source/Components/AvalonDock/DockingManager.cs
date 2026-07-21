@@ -1602,6 +1602,20 @@ namespace AvalonDock
 		[Category("Anchorable")]
 		public bool IsVirtualizingAnchorable { get; set; }
 
+		/// <summary><see cref="IgnoreTabControlKeyBindings"/> dependency property.</summary>
+		public static readonly DependencyProperty IgnoreTabControlKeyBindingsProperty = DependencyProperty.Register(nameof(IgnoreTabControlKeyBindings), typeof(bool), typeof(DockingManager),
+					new FrameworkPropertyMetadata(null));
+
+		/// <summary>Gets or sets a value indicating whether the standard tab control key bindings are ignored or not.</summary>
+		[Bindable(true)]
+		[Description("Gets or sets a value indicating whether the standard tab control key bindings are ignored or not.")]
+		[Category("Document")]
+		public bool IgnoreTabControlKeyBindings
+		{
+			get => (bool)GetValue(IgnoreTabControlKeyBindingsProperty);
+			set => SetValue(IgnoreTabControlKeyBindingsProperty, value);
+		}
+
 		/// <summary>
 		/// Gets or sets a value indicating whether the floating window size of a <see cref="LayoutFloatingWindowControl"/> is determined automatically when the window is opened.
 		/// If true, the minimum size of the content and its margins determine the initial floating window size.
@@ -1886,7 +1900,7 @@ namespace AvalonDock
 
 			if (model is LayoutDocumentPane)
 			{
-				var templateModelView = new LayoutDocumentPaneControl(model as LayoutDocumentPane, IsVirtualizingDocument);
+				var templateModelView = new LayoutDocumentPaneControl(model as LayoutDocumentPane, IsVirtualizingDocument, IgnoreTabControlKeyBindings);
 				templateModelView.SetBinding(StyleProperty, new Binding(DocumentPaneControlStyleProperty.Name) { Source = this });
 				return templateModelView;
 			}
