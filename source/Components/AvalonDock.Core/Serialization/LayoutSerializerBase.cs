@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using AvalonDock.Core.Serialization;
 using AvalonDock.Core.Serialization.Dto;
 
@@ -84,6 +85,38 @@ namespace AvalonDock.Core
 			{
 				EndDeserialization();
 			}
+		}
+
+		/// <summary>Serializes the current docking layout to a <see cref="TextWriter"/>.</summary>
+		/// <param name="writer">The text writer to write to.</param>
+		public virtual void Serialize(TextWriter writer)
+		{
+			using var stream = new MemoryStream();
+			Serialize(stream);
+			writer.Write(Encoding.UTF8.GetString(stream.ToArray()));
+		}
+
+		/// <summary>Serializes the current docking layout to a <see cref="StreamWriter"/>.</summary>
+		/// <param name="writer">The stream writer to write to.</param>
+		public virtual void Serialize(StreamWriter writer)
+		{
+			Serialize((TextWriter)writer);
+		}
+
+		/// <summary>Deserializes a docking layout from a <see cref="TextReader"/> and applies fixup.</summary>
+		/// <param name="reader">The text reader to read from.</param>
+		public virtual void Deserialize(TextReader reader)
+		{
+			var bytes = Encoding.UTF8.GetBytes(reader.ReadToEnd());
+			using var stream = new MemoryStream(bytes);
+			Deserialize(stream);
+		}
+
+		/// <summary>Deserializes a docking layout from a <see cref="StreamReader"/> and applies fixup.</summary>
+		/// <param name="reader">The stream reader to read from.</param>
+		public virtual void Deserialize(StreamReader reader)
+		{
+			Deserialize((TextReader)reader);
 		}
 
 		/// <inheritdoc/>
