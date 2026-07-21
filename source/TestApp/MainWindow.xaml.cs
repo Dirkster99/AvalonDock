@@ -29,6 +29,7 @@ using AvalonDock.Themes;
 using AvalonDock.Themes.VS;
 using System.Diagnostics.CodeAnalysis;
 using LeXtudio.DevFlow.Agent.Core;
+using DevFlowActionAttribute = Microsoft.Maui.DevFlow.Agent.Core.DevFlowActionAttribute;
 
 namespace TestApp
 {

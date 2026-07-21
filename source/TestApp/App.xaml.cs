@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using LeXtudio.DevFlow.Agent.Core;
-using LeXtudio.DevFlow.Agent.WPF;
-using Microsoft.Maui.DevFlow.Agent.Core;
+using LeXtudio.DevFlow.Agent.Wpf;
+using AgentOptions = Microsoft.Maui.DevFlow.Agent.Core.AgentOptions;
 
 namespace TestApp
 {
