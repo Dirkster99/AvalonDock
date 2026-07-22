@@ -89,7 +89,7 @@ namespace AvalonDock.Core
 
 		/// <summary>Serializes the current docking layout to a <see cref="TextWriter"/>.</summary>
 		/// <param name="writer">The text writer to write to.</param>
-		public virtual void Serialize(TextWriter writer)
+		public void Serialize(TextWriter writer)
 		{
 			using var stream = new MemoryStream();
 			Serialize(stream);
@@ -98,14 +98,14 @@ namespace AvalonDock.Core
 
 		/// <summary>Serializes the current docking layout to a <see cref="StreamWriter"/>.</summary>
 		/// <param name="writer">The stream writer to write to.</param>
-		public virtual void Serialize(StreamWriter writer)
+		public void Serialize(StreamWriter writer)
 		{
 			Serialize((TextWriter)writer);
 		}
 
 		/// <summary>Deserializes a docking layout from a <see cref="TextReader"/> and applies fixup.</summary>
 		/// <param name="reader">The text reader to read from.</param>
-		public virtual void Deserialize(TextReader reader)
+		public void Deserialize(TextReader reader)
 		{
 			var bytes = Encoding.UTF8.GetBytes(reader.ReadToEnd());
 			using var stream = new MemoryStream(bytes);
@@ -114,20 +114,20 @@ namespace AvalonDock.Core
 
 		/// <summary>Deserializes a docking layout from a <see cref="StreamReader"/> and applies fixup.</summary>
 		/// <param name="reader">The stream reader to read from.</param>
-		public virtual void Deserialize(StreamReader reader)
+		public void Deserialize(StreamReader reader)
 		{
 			Deserialize((TextReader)reader);
 		}
 
 		/// <inheritdoc/>
-		public virtual void Serialize(string filepath)
+		public void Serialize(string filepath)
 		{
 			using var stream = File.Create(filepath);
 			Serialize(stream);
 		}
 
 		/// <inheritdoc/>
-		public virtual void Deserialize(string filepath)
+		public void Deserialize(string filepath)
 		{
 			using var stream = File.OpenRead(filepath);
 			Deserialize(stream);
