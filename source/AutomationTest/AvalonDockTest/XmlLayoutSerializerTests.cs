@@ -925,6 +925,40 @@ namespace AvalonDockTest
 		#region Extension method tests (TextWriter/TextReader)
 
 		[Test]
+		public void Serialize_ToStreamWriter_ProducesValidXml()
+		{
+			var manager = new FakeDockingManager();
+			manager.Layout = new FakeLayoutRoot(CreateRichDto());
+			var serializer = new XmlLayoutSerializer(manager);
+
+			using var stream = new MemoryStream();
+			using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, leaveOpen: true);
+			serializer.Serialize(writer);
+			writer.Flush();
+
+			var xml = Encoding.UTF8.GetString(stream.ToArray());
+			Assert.That(xml, Does.Contain("<LayoutRoot"));
+			Assert.That(xml, Does.Contain("Document1"));
+		}
+
+		[Test]
+		public void Deserialize_FromStreamReader_Works()
+		{
+			var manager = new FakeDockingManager();
+			var xml = SerializeToXml(CreateRichDto(), manager);
+
+			var bytes = Encoding.UTF8.GetBytes(xml);
+			using var stream = new MemoryStream(bytes);
+			using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, 1024, leaveOpen: true);
+			var serializer = new XmlLayoutSerializer(manager);
+			serializer.Deserialize(reader);
+
+			Assert.That(manager.Layout, Is.Not.Null);
+			var resultDto = ((FakeDtoMapper)manager.DtoMapper).LastFromDtoInput;
+			Assert.That(resultDto.RootPanel.Children.Count, Is.EqualTo(2));
+		}
+
+		[Test]
 		public void Serialize_ToTextWriter_ProducesValidXml()
 		{
 			var manager = new FakeDockingManager();

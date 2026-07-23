@@ -286,6 +286,14 @@ public class ToggleDockingManager : DockingManager
 		if (IsLoaded)
 		{
 			SetupToggleDockButtonBars();
+			Dispatcher.BeginInvoke(
+				System.Windows.Threading.DispatcherPriority.Loaded,
+				new System.Action(() =>
+				{
+					OpenDefaultToolboxes();
+					RefreshButtonStates();
+					UpdatePinButtonsToMinimize();
+				}));
 		}
 	}
 
