@@ -1,6 +1,8 @@
 ﻿namespace AvalonDockTest
 {
 	using System;
+	using System.Windows;
+	using System.Windows.Documents;
 	using System.Windows.Media;
 	using System.Windows.Threading;
 
@@ -42,9 +44,9 @@
 				window.FontSize = ExpectedFontSize;
 				window.UpdateLayout();
 
-				Assert.That(documentView.FontSize, Is.EqualTo(ExpectedFontSize),
+				Assert.That(GetInheritedFontSize(documentView), Is.EqualTo(ExpectedFontSize),
 					"The view of a LayoutDocument has to inherit the FontSize of the window hosting the DockingManager (Issue #614).");
-				Assert.That(anchorableView.FontSize, Is.EqualTo(ExpectedFontSize),
+				Assert.That(GetInheritedFontSize(anchorableView), Is.EqualTo(ExpectedFontSize),
 					"The view of a LayoutAnchorable has to inherit the FontSize of the window hosting the DockingManager (Issue #614).");
 				Assert.That(window.DocumentContent.FontSize, Is.EqualTo(ExpectedFontSize),
 					"The content of a LayoutDocument has to inherit the FontSize of the window hosting the DockingManager.");
@@ -56,6 +58,16 @@
 				window.Close();
 			}
 		}
+
+		/// <summary>
+		/// Reads the inherited font size of an element. A <see cref="System.Windows.Controls.ContentPresenter"/>
+		/// derives from <see cref="FrameworkElement"/> and therefore has no FontSize property of its own, but it
+		/// does take part in the inheritance of <see cref="TextElement.FontSizeProperty"/>.
+		/// </summary>
+		/// <param name="element">The element to read the font size from.</param>
+		/// <returns>The inherited font size of <paramref name="element"/>.</returns>
+		private static double GetInheritedFontSize(DependencyObject element) =>
+			(double)element.GetValue(TextElement.FontSizeProperty);
 
 		/// <summary>Creates the test window and waits until it is loaded and its layout is up to date.</summary>
 		/// <returns>The fully loaded test window.</returns>
