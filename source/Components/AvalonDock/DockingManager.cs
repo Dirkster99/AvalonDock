@@ -2410,6 +2410,25 @@ namespace AvalonDock
 		}
 
 		/// <inheritdoc/>
+		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			base.OnPropertyChanged(e);
+
+			// Floating windows are top level windows and can never become part of the logical tree of this
+			// DockingManager, because WPF requires a Window to be the root of its own tree. Inheritable
+			// dependency properties therefore never flow into a floating window and its chrome (its title in
+			// particular) and have to be mirrored onto the floating windows explicitly.
+			if (_fwList.Count == 0 && _fwHiddenList.Count == 0)
+				return;
+
+			if (!(e.Property.GetMetadata(this) is FrameworkPropertyMetadata metadata) || !metadata.Inherits)
+				return;
+
+			foreach (var floatingWindow in _fwList.Concat(_fwHiddenList).ToArray())
+				floatingWindow.SyncInheritedProperty(e.Property);
+		}
+
+		/// <inheritdoc/>
 		protected override void OnPreviewKeyDown(KeyEventArgs e)
 		{
 			if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
