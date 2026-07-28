@@ -1667,10 +1667,72 @@ namespace AvalonDock
 		private readonly List<WeakReference> _logicalChildren = new List<WeakReference>();
 
 		/// <inheritdoc/>
-		protected override IEnumerator LogicalChildren => _logicalChildren.Select(ch => ch.GetValueOrDefault<object>()).GetEnumerator();
+		protected override IEnumerator LogicalChildren => GetOrderedLogicalChildren().GetEnumerator();
 
 		/// <summary>Gets the logical children enumerator for external access.</summary>
 		public IEnumerator LogicalChildrenPublic => LogicalChildren;
+
+		/// <summary>
+		/// Returns the live logical children of this <see cref="DockingManager"/> ordered by descending
+		/// visual tree depth, so that a logical child which is nested inside the visual tree of another
+		/// logical child is always enumerated first.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Most logical children of the <see cref="DockingManager"/> (the <c>Layout*Control</c> instances,
+		/// every <see cref="LayoutItem.View"/> and the content of every <see cref="LayoutContent"/>) have a
+		/// visual parent that differs from their logical parent, and several of them are reachable from the
+		/// <see cref="DockingManager"/> through two different paths: once as a direct logical child and once
+		/// through the visual tree of another logical child.
+		/// </para>
+		/// <para>
+		/// WPF walks the logical children of a node before its visual children and visits any node at most
+		/// once (see <c>System.Windows.DescendentsWalker</c>). A node that is reached through the visual tree
+		/// first is skipped by <c>System.Windows.TreeWalkHelper.OnInheritablePropertyChanged</c>, because its
+		/// visual parent differs from its logical parent, and is then ignored on the second - logical - visit
+		/// because it has already been seen. Both chances to propagate the value are lost and inheritable
+		/// dependency properties (<c>FontSize</c>, <c>DataContext</c>, ...) never reach that node.
+		/// </para>
+		/// <para>
+		/// Enumerating the deepest elements first guarantees that such a node is always reached through the
+		/// logical tree first - a visual ancestor always has a smaller visual tree depth than its descendants -
+		/// which is the path that actually applies the new value.
+		/// </para>
+		/// </remarks>
+		/// <returns>The ordered, non <c>null</c> logical children of this docking manager.</returns>
+		private IReadOnlyList<object> GetOrderedLogicalChildren()
+		{
+			var children = new List<object>(_logicalChildren.Count);
+			foreach (var weakReference in _logicalChildren)
+			{
+				var child = weakReference.GetValueOrDefault<object>();
+				if (child != null)
+					children.Add(child);
+			}
+
+			if (children.Count < 2)
+				return children;
+
+			// OrderByDescending is a stable sort, so children of equal depth keep their insertion order.
+			return children.OrderByDescending(GetVisualTreeDepth).ToList();
+		}
+
+		/// <summary>Gets the number of visual ancestors of <paramref name="element"/>.</summary>
+		/// <param name="element">The element to measure. May be any object, including non visual ones.</param>
+		/// <returns>The visual tree depth of <paramref name="element"/>, or <c>0</c> when it is not a visual or has no visual parent.</returns>
+		private static int GetVisualTreeDepth(object element)
+		{
+			var depth = 0;
+			var current = element as DependencyObject;
+			while (current is System.Windows.Media.Visual || current is System.Windows.Media.Media3D.Visual3D)
+			{
+				current = System.Windows.Media.VisualTreeHelper.GetParent(current);
+				if (current != null)
+					depth++;
+			}
+
+			return depth;
+		}
 
 		/// <summary>Adds an element to the logical children collection maintained by the docking manager.</summary>
 		/// <param name="element">The element to add.</param>
