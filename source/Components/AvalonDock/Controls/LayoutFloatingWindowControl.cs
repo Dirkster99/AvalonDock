@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -41,6 +42,18 @@ namespace AvalonDock.Controls
 		internal DragService CurrentDragService => _dragService;
 		private bool _internalCloseFlag = false;
 		private bool _isClosing = false;
+
+		/// <summary>
+		/// Caches the inheritable dependency properties that are mirrored from the <see cref="DockingManager"/>
+		/// onto every floating window.
+		/// </summary>
+		private static readonly Lazy<DependencyProperty[]> InheritableProperties = new Lazy<DependencyProperty[]>(GetInheritableProperties);
+
+		/// <summary>
+		/// Stores the inheritable dependency properties whose value is currently mirrored from the
+		/// <see cref="DockingManager"/> onto this floating window.
+		/// </summary>
+		private readonly HashSet<DependencyProperty> _mirroredInheritedProperties = new HashSet<DependencyProperty>();
 
 		/// <summary>
 		/// Is false until the margins have been found once.
@@ -664,6 +677,7 @@ namespace AvalonDock.Controls
 			Loaded -= OnLoaded;
 
 			this.UpdateOwnership();
+			SyncInheritedProperties();
 			ApplyResizeBorderThickness();
 
 			_hwndSrc = PresentationSource.FromDependencyObject(this) as HwndSource;
@@ -684,6 +698,92 @@ namespace AvalonDock.Controls
 			// Restore maximize state
 			var maximized = Model.Descendents().OfType<ILayoutElementForFloatingWindow>().Any(l => l.IsMaximized);
 			UpdateMaximizedState(maximized);
+		}
+
+		/// <summary>
+		/// Mirrors the current value of every inheritable dependency property of the owning
+		/// <see cref="DockingManager"/> onto this floating window.
+		/// </summary>
+		/// <remarks>
+		/// A <see cref="Window"/> is always the root of its own tree - WPF throws
+		/// <see cref="InvalidOperationException"/> ("Window must be the root of the tree") as soon as a
+		/// <see cref="Window"/> is given a logical parent. A floating window can therefore never be part of the
+		/// logical tree of its <see cref="DockingManager"/> and inheritable dependency properties such as
+		/// <see cref="Control.FontSize"/> never reach the window chrome, even though the hosted content does
+		/// receive them (the content root is a logical child of the <see cref="DockingManager"/>).
+		/// The values are mirrored explicitly instead.
+		/// </remarks>
+		internal void SyncInheritedProperties()
+		{
+			foreach (var property in InheritableProperties.Value)
+				SyncInheritedProperty(property);
+		}
+
+		/// <summary>
+		/// Mirrors the current value of a single inheritable dependency property of the owning
+		/// <see cref="DockingManager"/> onto this floating window.
+		/// </summary>
+		/// <param name="property">The inheritable dependency property to mirror.</param>
+		/// <remarks>
+		/// A value that has been assigned to the floating window itself - by a style, a trigger, a binding or by
+		/// application code - always wins over the mirrored value and is never overwritten.
+		/// </remarks>
+		internal void SyncInheritedProperty(DependencyProperty property)
+		{
+			if (property == null || _isClosing)
+				return;
+
+			var manager = Model?.Root?.Manager;
+			if (manager == null)
+				return;
+
+			if (DependencyPropertyHelper.GetValueSource(manager, property).BaseValueSource == BaseValueSource.Default)
+			{
+				// The docking manager fell back to the default value, so there is nothing left to mirror.
+				if (_mirroredInheritedProperties.Remove(property))
+					ClearValue(property);
+				return;
+			}
+
+			if (!_mirroredInheritedProperties.Contains(property) &&
+				DependencyPropertyHelper.GetValueSource(this, property).BaseValueSource > BaseValueSource.Inherited)
+			{
+				return;
+			}
+
+			_mirroredInheritedProperties.Add(property);
+			SetValue(property, manager.GetValue(property));
+		}
+
+		/// <summary>
+		/// Determines the inheritable dependency properties that are mirrored from the
+		/// <see cref="DockingManager"/> onto a floating window.
+		/// </summary>
+		/// <returns>The inheritable dependency properties of a <see cref="LayoutFloatingWindowControl"/>.</returns>
+		private static DependencyProperty[] GetInheritableProperties()
+		{
+			// Attached inheritable properties are not exposed as CLR properties and have to be listed explicitly.
+			var properties = new List<DependencyProperty>
+			{
+				TextOptions.TextFormattingModeProperty,
+				TextOptions.TextRenderingModeProperty,
+				TextOptions.TextHintingModeProperty,
+			};
+
+			foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(typeof(LayoutFloatingWindowControl)))
+			{
+				if (descriptor.IsReadOnly)
+					continue;
+
+				var dependencyProperty = DependencyPropertyDescriptor.FromProperty(descriptor)?.DependencyProperty;
+				if (dependencyProperty == null || properties.Contains(dependencyProperty))
+					continue;
+
+				if (dependencyProperty.GetMetadata(typeof(LayoutFloatingWindowControl)) is FrameworkPropertyMetadata metadata && metadata.Inherits)
+					properties.Add(dependencyProperty);
+			}
+
+			return properties.ToArray();
 		}
 
 		/// <summary>

@@ -61,17 +61,14 @@ namespace AvalonDockTest.TestHelpers
         [OneTimeTearDown]
         public void ApplicationCleanup()
         {
-            ThreadExecutor.RunCodeAsSTA(
-                _are,
-                () =>
-                {
-                    GC.Collect();
-                    Dispatcher.ExitAllFrames();
-                    Application.Current.Dispatcher.Invoke(Application.Current.Shutdown);
-                    Debug.WriteLine("OneTimeTearDown");
-                });
-
-            _are.WaitOne();
+            // Never call Application.Current.Shutdown() here: the TestApp hosted by
+            // TestHost is a process-wide singleton that cannot be recreated, and WPF's
+            // Application.IsShuttingDown is a one-way latch. Shutting the app down in a
+            // per-fixture OneTimeTearDown permanently breaks pack://application resource
+            // loading (e.g. loading Themes/generic.xaml) for every fixture that runs
+            // afterwards. The TestApp thread is a background thread, so the test runner
+            // exits without an explicit shutdown.
+            Debug.WriteLine("OneTimeTearDown");
             _are.Dispose();
         }
     }

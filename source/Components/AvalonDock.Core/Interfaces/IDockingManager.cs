@@ -37,6 +37,14 @@ namespace AvalonDock.Core
 		/// <summary>Gets or sets the delay in milliseconds before auto-hiding a tool window.</summary>
 		int AutoHideDelay { get; set; }
 
+		/// <summary>
+		/// Gets a value indicating whether auto-hidden anchorables are presented in the classic
+		/// auto-hide flyout that slides out of the side anchor panels. Managers that present
+		/// auto-hidden content differently (e.g. the toggle docking system with its sidebar
+		/// toggle buttons) return <see langword="false"/>, and the flyout is never shown.
+		/// </summary>
+		bool SupportsAutoHideFlyout { get; }
+
 		/// <summary>Gets or sets a value indicating whether mixed orientation (horizontal + vertical splits) is allowed.</summary>
 		bool AllowMixedOrientation { get; set; }
 

@@ -1102,6 +1102,17 @@ namespace AvalonDock
 			set => SetValue(AutoHideDelayProperty, value);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether auto-hidden anchorables are presented in the classic
+		/// auto-hide flyout that slides out of the side anchor panels.
+		/// Derived managers that present auto-hidden content differently override this
+		/// with <see langword="false"/> to prevent the flyout from being shown.
+		/// </summary>
+		[Bindable(false)]
+		[Description("Gets whether auto-hidden anchorables are presented in the classic auto-hide flyout.")]
+		[Category("AutoHideWindow")]
+		public bool SupportsAutoHideFlyout { get; protected set; } = true;
+
 		/// <summary>Gets all <see cref="LayoutFloatingWindowControl"/> instances managed by this framework.</summary>
 		[Bindable(false)]
 		[Description("Enumerates all LayoutFloatingWindowControls managed by this framework.")]
@@ -1591,6 +1602,20 @@ namespace AvalonDock
 		[Category("Anchorable")]
 		public bool IsVirtualizingAnchorable { get; set; }
 
+		/// <summary><see cref="IgnoreTabControlKeyBindings"/> dependency property.</summary>
+		public static readonly DependencyProperty IgnoreTabControlKeyBindingsProperty = DependencyProperty.Register(nameof(IgnoreTabControlKeyBindings), typeof(bool), typeof(DockingManager),
+					new FrameworkPropertyMetadata(null));
+
+		/// <summary>Gets or sets a value indicating whether the standard tab control key bindings are ignored or not.</summary>
+		[Bindable(true)]
+		[Description("Gets or sets a value indicating whether the standard tab control key bindings are ignored or not.")]
+		[Category("Document")]
+		public bool IgnoreTabControlKeyBindings
+		{
+			get => (bool)GetValue(IgnoreTabControlKeyBindingsProperty);
+			set => SetValue(IgnoreTabControlKeyBindingsProperty, value);
+		}
+
 		/// <summary>
 		/// Gets or sets a value indicating whether the floating window size of a <see cref="LayoutFloatingWindowControl"/> is determined automatically when the window is opened.
 		/// If true, the minimum size of the content and its margins determine the initial floating window size.
@@ -1642,10 +1667,72 @@ namespace AvalonDock
 		private readonly List<WeakReference> _logicalChildren = new List<WeakReference>();
 
 		/// <inheritdoc/>
-		protected override IEnumerator LogicalChildren => _logicalChildren.Select(ch => ch.GetValueOrDefault<object>()).GetEnumerator();
+		protected override IEnumerator LogicalChildren => GetOrderedLogicalChildren().GetEnumerator();
 
 		/// <summary>Gets the logical children enumerator for external access.</summary>
 		public IEnumerator LogicalChildrenPublic => LogicalChildren;
+
+		/// <summary>
+		/// Returns the live logical children of this <see cref="DockingManager"/> ordered by descending
+		/// visual tree depth, so that a logical child which is nested inside the visual tree of another
+		/// logical child is always enumerated first.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Most logical children of the <see cref="DockingManager"/> (the <c>Layout*Control</c> instances,
+		/// every <see cref="LayoutItem.View"/> and the content of every <see cref="LayoutContent"/>) have a
+		/// visual parent that differs from their logical parent, and several of them are reachable from the
+		/// <see cref="DockingManager"/> through two different paths: once as a direct logical child and once
+		/// through the visual tree of another logical child.
+		/// </para>
+		/// <para>
+		/// WPF walks the logical children of a node before its visual children and visits any node at most
+		/// once (see <c>System.Windows.DescendentsWalker</c>). A node that is reached through the visual tree
+		/// first is skipped by <c>System.Windows.TreeWalkHelper.OnInheritablePropertyChanged</c>, because its
+		/// visual parent differs from its logical parent, and is then ignored on the second - logical - visit
+		/// because it has already been seen. Both chances to propagate the value are lost and inheritable
+		/// dependency properties (<c>FontSize</c>, <c>DataContext</c>, ...) never reach that node.
+		/// </para>
+		/// <para>
+		/// Enumerating the deepest elements first guarantees that such a node is always reached through the
+		/// logical tree first - a visual ancestor always has a smaller visual tree depth than its descendants -
+		/// which is the path that actually applies the new value.
+		/// </para>
+		/// </remarks>
+		/// <returns>The ordered, non <c>null</c> logical children of this docking manager.</returns>
+		private IReadOnlyList<object> GetOrderedLogicalChildren()
+		{
+			var children = new List<object>(_logicalChildren.Count);
+			foreach (var weakReference in _logicalChildren)
+			{
+				var child = weakReference.GetValueOrDefault<object>();
+				if (child != null)
+					children.Add(child);
+			}
+
+			if (children.Count < 2)
+				return children;
+
+			// OrderByDescending is a stable sort, so children of equal depth keep their insertion order.
+			return children.OrderByDescending(GetVisualTreeDepth).ToList();
+		}
+
+		/// <summary>Gets the number of visual ancestors of <paramref name="element"/>.</summary>
+		/// <param name="element">The element to measure. May be any object, including non visual ones.</param>
+		/// <returns>The visual tree depth of <paramref name="element"/>, or <c>0</c> when it is not a visual or has no visual parent.</returns>
+		private static int GetVisualTreeDepth(object element)
+		{
+			var depth = 0;
+			var current = element as DependencyObject;
+			while (current is System.Windows.Media.Visual || current is System.Windows.Media.Media3D.Visual3D)
+			{
+				current = System.Windows.Media.VisualTreeHelper.GetParent(current);
+				if (current != null)
+					depth++;
+			}
+
+			return depth;
+		}
 
 		/// <summary>Adds an element to the logical children collection maintained by the docking manager.</summary>
 		/// <param name="element">The element to add.</param>
@@ -1875,7 +1962,7 @@ namespace AvalonDock
 
 			if (model is LayoutDocumentPane)
 			{
-				var templateModelView = new LayoutDocumentPaneControl(model as LayoutDocumentPane, IsVirtualizingDocument);
+				var templateModelView = new LayoutDocumentPaneControl(model as LayoutDocumentPane, IsVirtualizingDocument, IgnoreTabControlKeyBindings);
 				templateModelView.SetBinding(StyleProperty, new Binding(DocumentPaneControlStyleProperty.Name) { Source = this });
 				return templateModelView;
 			}
@@ -2385,6 +2472,25 @@ namespace AvalonDock
 		}
 
 		/// <inheritdoc/>
+		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			base.OnPropertyChanged(e);
+
+			// Floating windows are top level windows and can never become part of the logical tree of this
+			// DockingManager, because WPF requires a Window to be the root of its own tree. Inheritable
+			// dependency properties therefore never flow into a floating window and its chrome (its title in
+			// particular) and have to be mirrored onto the floating windows explicitly.
+			if (_fwList.Count == 0 && _fwHiddenList.Count == 0)
+				return;
+
+			if (!(e.Property.GetMetadata(this) is FrameworkPropertyMetadata metadata) || !metadata.Inherits)
+				return;
+
+			foreach (var floatingWindow in _fwList.Concat(_fwHiddenList).ToArray())
+				floatingWindow.SyncInheritedProperty(e.Property);
+		}
+
+		/// <inheritdoc/>
 		protected override void OnPreviewKeyDown(KeyEventArgs e)
 		{
 			if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
@@ -2475,6 +2581,7 @@ namespace AvalonDock
 				fwc.EnableBindings();
 				if (fwc.KeepContentVisibleOnClose)
 				{
+					fwc.UpdateOwnership();
 					fwc.Show();
 					fwc.KeepContentVisibleOnClose = false;
 				}

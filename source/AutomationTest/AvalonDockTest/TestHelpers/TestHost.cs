@@ -38,6 +38,9 @@
 			try
 			{
 				appThread = new Thread(StartDispatcher);
+				// Background thread: the TestApp is never shut down (see AutomationTestBase),
+				// so the test runner process must be able to exit without it.
+				appThread.IsBackground = true;
 				appThread.SetApartmentState(ApartmentState.STA);
 				appThread.Start();
 

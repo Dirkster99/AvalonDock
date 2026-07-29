@@ -127,10 +127,18 @@ namespace AvalonDock.Controls
 		{
 			if (_model != null) throw new InvalidOperationException();
 
+			// The anchorable can be selected while the layout is being restructured and its
+			// parent chain is not (or no longer) attached to an anchor side; showing the
+			// flyout is not possible then.
+			var anchorSide = anchor.Model?.Parent?.Parent as LayoutAnchorSide;
+			var manager = anchor.Model?.Root?.Manager;
+			if (anchorSide == null || manager == null)
+				return;
+
 			_anchor = anchor;
 			_model = anchor.Model as LayoutAnchorable;
-			_side = (anchor.Model.Parent.Parent as LayoutAnchorSide).Side;
-			_manager = _model.Root.Manager;
+			_side = anchorSide.Side;
+			_manager = manager;
 			CreateInternalGrid();
 			_model.PropertyChanged += _model_PropertyChanged;
 			SetLayoutTransform();
