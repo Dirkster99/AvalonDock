@@ -61,6 +61,26 @@ namespace AvalonDockTest
 		}
 
 		[Test]
+		public void FloatBeforeTheHostingWindowIsShownDoesNotShowTheFloatingWindow_Issue618()
+		{
+			var window = CreateHostingWindow(out var dockingManager, out var anchorable);
+			try
+			{
+				anchorable.Float();
+				DoEvents();
+
+				var floatingWindow = dockingManager.FloatingWindows.FirstOrDefault();
+				Assert.That(floatingWindow, Is.Not.Null, "The anchorable should be hosted in a floating window.");
+				Assert.That(floatingWindow.IsVisible, Is.False,
+					"A floating window must not be put on screen while the window hosting the DockingManager is still invisible (Issue #618).");
+			}
+			finally
+			{
+				window.Close();
+			}
+		}
+
+		[Test]
 		public void OwnershipIsEstablishedOnceTheHostingWindowIsShown_Issue618()
 		{
 			var window = CreateHostingWindow(out var dockingManager, out var anchorable);
@@ -79,6 +99,33 @@ namespace AvalonDockTest
 
 				Assert.That(floatingWindow.Owner, Is.SameAs(window),
 					"The deferred ownership has to be established as soon as the hosting window is shown (Issue #618).");
+				Assert.That(floatingWindow.IsVisible, Is.True,
+					"The deferred floating window has to be shown as soon as the hosting window is shown (Issue #618).");
+			}
+			finally
+			{
+				window.Close();
+			}
+		}
+
+		[Test]
+		public void FloatAfterTheHostingWindowIsShownShowsTheFloatingWindowImmediately_Issue618()
+		{
+			var window = CreateHostingWindow(out var dockingManager, out var anchorable);
+			try
+			{
+				window.Show();
+				DoEvents();
+
+				anchorable.Float();
+				DoEvents();
+
+				var floatingWindow = dockingManager.FloatingWindows.FirstOrDefault();
+				Assert.That(floatingWindow, Is.Not.Null, "The anchorable should be hosted in a floating window.");
+				Assert.That(floatingWindow.IsVisible, Is.True,
+					"Floating an anchorable of a window that is already shown has to show the floating window right away.");
+				Assert.That(floatingWindow.Owner, Is.SameAs(window),
+					"A floating window created while the hosting window is shown is owned by it.");
 			}
 			finally
 			{
