@@ -35,6 +35,18 @@ namespace AvalonDock.Controls
 		private bool _isClosing = false;
 
 		/// <summary>
+		/// The window hosting the <see cref="DockingManager"/> that has not been shown yet and whose
+		/// <see cref="Window.SourceInitialized"/> event is awaited to establish the ownership (issue #618).
+		/// </summary>
+		private Window _deferredOwnerWindow;
+
+		/// <summary>
+		/// The <see cref="DockingManager"/> whose <see cref="FrameworkElement.Loaded"/> event is awaited
+		/// before this floating window is shown (issue #618).
+		/// </summary>
+		private DockingManager _deferredShowManager;
+
+		/// <summary>
 		/// Caches the inheritable dependency properties that are mirrored from the <see cref="DockingManager"/>
 		/// onto every floating window.
 		/// </summary>
@@ -602,6 +614,8 @@ namespace AvalonDock.Controls
 		protected override void OnClosed(EventArgs e)
 		{
 			SizeChanged -= OnSizeChanged;
+			DetachDeferredOwnershipUpdate();
+			CancelDeferredShow();
 			if (Content != null)
 			{
 				(Content as FloatingWindowContentHost)?.Dispose();
@@ -775,12 +789,128 @@ namespace AvalonDock.Controls
 			var manager = Model?.Root?.Manager;
 			if (OwnedByDockingManagerWindow && manager != null)
 			{
-				this.SetParentToMainWindowOf(manager);
+				if (this.SetParentToMainWindowOf(manager))
+				{
+					DetachDeferredOwnershipUpdate();
+				}
+				else
+				{
+					// The window hosting the DockingManager has not been shown yet, so it cannot own this
+					// floating window before it has created its native window handle (issue #618).
+					DeferOwnershipUpdate(Window.GetWindow(manager));
+				}
 			}
 			else
 			{
+				DetachDeferredOwnershipUpdate();
 				this.SetParentWindowToNull();
 			}
+		}
+
+		/// <summary>
+		/// Retries <see cref="UpdateOwnership"/> as soon as <paramref name="ownerWindow"/> has created its
+		/// native window handle, because WPF cannot own a window by a window that has never been shown.
+		/// </summary>
+		/// <param name="ownerWindow">The window hosting the <see cref="DockingManager"/> of this floating window.</param>
+		private void DeferOwnershipUpdate(Window ownerWindow)
+		{
+			if (ownerWindow == null || ReferenceEquals(ownerWindow, _deferredOwnerWindow))
+				return;
+
+			DetachDeferredOwnershipUpdate();
+			_deferredOwnerWindow = ownerWindow;
+			ownerWindow.SourceInitialized += OnDeferredOwnerWindowSourceInitialized;
+		}
+
+		/// <summary>
+		/// Stops waiting for the window hosting the <see cref="DockingManager"/> to be shown.
+		/// </summary>
+		private void DetachDeferredOwnershipUpdate()
+		{
+			if (_deferredOwnerWindow == null)
+				return;
+
+			_deferredOwnerWindow.SourceInitialized -= OnDeferredOwnerWindowSourceInitialized;
+			_deferredOwnerWindow = null;
+		}
+
+		private void OnDeferredOwnerWindowSourceInitialized(object sender, EventArgs e)
+		{
+			DetachDeferredOwnershipUpdate();
+			if (_isClosing)
+				return;
+
+			UpdateOwnership();
+		}
+
+		/// <summary>
+		/// Shows this floating window, or postpones the operation until the <see cref="DockingManager"/> is
+		/// loaded when the window hosting it has not been shown yet.
+		/// </summary>
+		/// <remarks>
+		/// Showing a floating window while the window hosting the <see cref="DockingManager"/> is still
+		/// invisible puts a window on screen that has no visible owner, so the operation is postponed until
+		/// the <see cref="DockingManager"/> is loaded - the same point in time at which
+		/// <see cref="DockingManager"/> creates the floating windows of a layout that was assigned before the
+		/// hosting window was shown (issue #618).
+		/// </remarks>
+		internal void ShowWhenHostWindowIsShown()
+		{
+			var manager = Model?.Root?.Manager;
+			if (manager == null)
+			{
+				Show();
+				return;
+			}
+
+			// A DockingManager that is not hosted in a WPF Window - inside a WindowsFormsHost, for example -
+			// never gets a hosting window to wait for, so the floating window is shown right away.
+			var hostWindow = Window.GetWindow(manager);
+			if (hostWindow == null || hostWindow.IsWindowHandleCreated())
+			{
+				Show();
+				return;
+			}
+
+			// Establishes the ownership as soon as the hosting window has created its window handle, which
+			// happens before the DockingManager is loaded.
+			UpdateOwnership();
+			DeferShow(manager);
+		}
+
+		/// <summary>
+		/// Shows this floating window as soon as <paramref name="manager"/> is loaded.
+		/// </summary>
+		/// <param name="manager">The docking manager owning this floating window.</param>
+		private void DeferShow(DockingManager manager)
+		{
+			if (ReferenceEquals(manager, _deferredShowManager))
+				return;
+
+			CancelDeferredShow();
+			_deferredShowManager = manager;
+			manager.Loaded += OnDeferredShowManagerLoaded;
+		}
+
+		/// <summary>
+		/// Stops waiting for the <see cref="DockingManager"/> to be loaded.
+		/// </summary>
+		private void CancelDeferredShow()
+		{
+			if (_deferredShowManager == null)
+				return;
+
+			_deferredShowManager.Loaded -= OnDeferredShowManagerLoaded;
+			_deferredShowManager = null;
+		}
+
+		private void OnDeferredShowManagerLoaded(object sender, RoutedEventArgs e)
+		{
+			CancelDeferredShow();
+			if (_isClosing)
+				return;
+
+			Show();
 		}
 
 		private const double KeyboardMoveStep = 10.0;

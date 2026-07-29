@@ -2131,7 +2131,10 @@ namespace AvalonDock
 				{
 					// Activate only inactive document
 					if (startDrag) fwc.AttachDrag();
-					fwc.Show();
+
+					// Content can be floated before the window hosting this DockingManager has been shown,
+					// in which case the floating window is only shown once the hosting window is (issue #618).
+					fwc.ShowWhenHostWindowIsShown();
 					ContentFloated?.Invoke(this, new ContentFloatedEventArgs(content));
 					_coreContentFloated?.Invoke(this, new Core.Events.ContentEventArgs(content));
 				}), DispatcherPriority.Send);
