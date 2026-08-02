@@ -133,7 +133,7 @@
     <value>Esconder</value>
   </data>
   <data name="Anchorable_CxMenu_Hint" xml:space="preserve">
-    <value>Posición de la ventana </value>
+    <value>Posición de la ventana</value>
   </data>
   <data name="Anchorable_Dock" xml:space="preserve">
     <value>Anclar</value>
@@ -172,7 +172,7 @@
     <value>Mover al siguiente grupo de fichas</value>
   </data>
   <data name="Document_MoveToPreviousTabGroup" xml:space="preserve">
-    <value>Mover al anterior grupo de fichas </value>
+    <value>Mover al anterior grupo de fichas</value>
   </data>
   <data name="Document_NewHorizontalTabGroup" xml:space="preserve">
     <value>Nuevo grupo de fichas horizontal</value>
