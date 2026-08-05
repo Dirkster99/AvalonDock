@@ -100,7 +100,7 @@ namespace AvalonDock.Serializer.Json
 		/// A converter that writes it has to serialize the object itself, and the only way to do that
 		/// without re-entering the converter is to hand the work to a serializer the converter was
 		/// removed from - which then writes the entire subtree without discriminators. Adding the
-		/// property to the contract keeps every value on the normal pipeline, so nested panes, panes
+		/// property to the contract keeps every value on the normal pipeline, so nested panes, pane
 		/// groups and contents all carry their own discriminator.
 		/// </remarks>
 		private sealed class DiscriminatorContractResolver : DefaultContractResolver
@@ -235,7 +235,6 @@ namespace AvalonDock.Serializer.Json
 							$"Unknown DTO type discriminator '{typeName}' for base type '{baseType.Name}'.");
 				}
 			}
-
 		}
 	}
 }
