@@ -164,8 +164,8 @@ namespace AvalonDockTest.FlaUITests
 			DetachToolWindow();
 			WaitForDetachedWindow();
 
-			// The tool window title is now in the standalone window, so the menu is opened from there.
-			OpenViewModeSubmenuFromDetachedWindow();
+			// The three dot button is gone with the title bar, so the stripe button carries the menu.
+			OpenViewModeSubmenuFromStripeButton();
 			ClickMenuItem(WindowModeHeader);
 			Wait.UntilInputIsProcessed();
 			System.Threading.Thread.Sleep(800);
@@ -232,22 +232,25 @@ namespace AvalonDockTest.FlaUITests
 		}
 
 		/// <summary>
-		/// Opens the View Mode submenu from the title of the detached window.
+		/// Opens the View Mode submenu while the content is detached.
 		/// </summary>
 		/// <remarks>
-		/// Falls back to the main window when the standalone window carries no options button, so the
-		/// test reports a menu assertion rather than a null reference.
+		/// The standalone window hosts only the content presenter of the anchorable, not its
+		/// <see cref="AvalonDock.Controls.ToggleAnchorablePaneTitle"/>, so it carries no three dot button.
+		/// The remaining route to the same menu is a right click on the stripe button, which
+		/// <c>ToggleDockButton.OnMouseRightButtonUp</c> wires to the very same context menu.
 		/// </remarks>
-		private void OpenViewModeSubmenuFromDetachedWindow()
+		private void OpenViewModeSubmenuFromStripeButton()
 		{
-			var detached = FindDetachedWindow();
-			var optionsButton = detached?.FindFirstDescendant(CF.ByAutomationId("PART_OptionsButton"))
-				?? FindByAutomationId("PART_OptionsButton");
+			var stripeButton = Retry.WhileNull(
+				() => FindToggleButton(ToolWindowName),
+				timeout: TimeSpan.FromSeconds(8),
+				interval: TimeSpan.FromMilliseconds(300)).Result;
 
-			Assert.That(optionsButton, Is.Not.Null,
-				"An options button should be reachable while the content is detached.");
+			Assert.That(stripeButton, Is.Not.Null,
+				$"The stripe button for '{ToolWindowName}' should remain available while detached.");
 
-			optionsButton.Click();
+			stripeButton.RightClick();
 			Wait.UntilInputIsProcessed();
 			System.Threading.Thread.Sleep(500);
 
@@ -407,9 +410,12 @@ namespace AvalonDockTest.FlaUITests
 		}
 
 		/// <summary>Waits until the standalone window is on screen and returns it.</summary>
-		/// <param name="timeoutSeconds">How long to wait.</param>
+		/// <param name="timeoutSeconds">
+		/// How long to wait. The default is generous because the very first detach in a run pays for
+		/// jitting the window, creating its handle and merging the theme resources.
+		/// </param>
 		/// <returns>The standalone window.</returns>
-		private AutomationElement WaitForDetachedWindow(int timeoutSeconds = 10)
+		private AutomationElement WaitForDetachedWindow(int timeoutSeconds = 25)
 		{
 			var result = Retry.WhileNull(
 				FindDetachedWindow,
