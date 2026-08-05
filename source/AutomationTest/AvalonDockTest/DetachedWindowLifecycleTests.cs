@@ -9,6 +9,7 @@ using AvalonDock.Controls;
 using AvalonDock.Layout;
 using AvalonDockTest.TestHelpers;
 using NUnit.Framework;
+using UnitTests;
 
 namespace AvalonDockTest;
 
