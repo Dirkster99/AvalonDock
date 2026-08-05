@@ -145,10 +145,19 @@ namespace AvalonDockTest.FlaUITests
 				var found = Retry.WhileNull(
 					() =>
 					{
+						// Top level entries are looked for inside the menu first, so a tool window
+						// that carries the same title is never mistaken for one. WPF publishes its
+						// Menu as ControlType.Menu rather than MenuBar, so both are tried, and the
+						// search falls through to the whole window when neither is present.
 						if (isTopLevel)
 						{
-							var menuBar = MainWindow.FindFirstDescendant(CF.ByControlType(ControlType.MenuBar));
-							return menuBar?.FindFirstDescendant(CF.ByName(header));
+							foreach (var barType in new[] { ControlType.MenuBar, ControlType.Menu })
+							{
+								var bar = MainWindow.FindFirstDescendant(CF.ByControlType(barType));
+								var inBar = bar?.FindFirstDescendant(
+									CF.ByControlType(ControlType.MenuItem).And(CF.ByName(header)));
+								if (inBar != null) return inBar;
+							}
 						}
 
 						return MainWindow.FindFirstDescendant(

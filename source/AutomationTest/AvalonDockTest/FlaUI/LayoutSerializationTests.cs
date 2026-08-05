@@ -227,6 +227,10 @@ namespace AvalonDockTest.FlaUITests
             {
                 foreach (var target in GetContextMenuTargets(toolWindowName))
                 {
+                    // The menu bar is always on screen, so the context menu is recognised as the menu
+                    // that was not there before the right click.
+                    var before = GetMenuElements();
+
                     try
                     {
                         target.RightClick();
@@ -239,12 +243,12 @@ namespace AvalonDockTest.FlaUITests
 
                     // Wait for the popup itself, so a menu that is merely slow is not mistaken for a
                     // menu that never opened.
-                    var opened = Retry.WhileFalse(
-                        () => GetContextMenuRoots().Any(),
+                    var contextMenu = Retry.WhileNull(
+                        () => FindMenuOpenedSince(before),
                         timeout: TimeSpan.FromSeconds(5),
-                        interval: TimeSpan.FromMilliseconds(200));
+                        interval: TimeSpan.FromMilliseconds(200)).Result;
 
-                    if (!opened.Result)
+                    if (contextMenu == null)
                     {
                         continue;
                     }
@@ -252,7 +256,7 @@ namespace AvalonDockTest.FlaUITests
                     menuOpened = true;
 
                     var windowItem = Retry.WhileNull(
-                        () => FindLiveMenuItem("Window"),
+                        () => FindLiveMenuItem(contextMenu, "Window"),
                         timeout: TimeSpan.FromSeconds(3),
                         interval: TimeSpan.FromMilliseconds(200)).Result;
 
@@ -264,7 +268,7 @@ namespace AvalonDockTest.FlaUITests
                         return;
                     }
 
-                    seen.AddRange(ListLiveMenuItems());
+                    seen.AddRange(ListLiveMenuItems(contextMenu));
                     Keyboard.Press(VirtualKeyShort.ESCAPE);
                     Wait.UntilInputIsProcessed();
                     System.Threading.Thread.Sleep(200);
@@ -304,36 +308,34 @@ namespace AvalonDockTest.FlaUITests
             return candidates;
         }
 
-        /// <summary>Lists the headers of every menu item currently on screen, for diagnostics.</summary>
+        /// <summary>Lists the headers of the given menu, for diagnostics.</summary>
+        /// <param name="menu">The menu to describe.</param>
         /// <returns>The headers found.</returns>
-        private System.Collections.Generic.IEnumerable<string> ListLiveMenuItems()
+        private System.Collections.Generic.IEnumerable<string> ListLiveMenuItems(AutomationElement menu)
         {
             var names = new System.Collections.Generic.List<string>();
 
-            foreach (var root in GetContextMenuRoots())
+            try
             {
-                try
-                {
-                    // Deliberately unfiltered: an item with an empty header, or one that is present but
-                    // collapsed, is exactly the kind of thing this diagnostic needs to surface.
-                    names.AddRange(root.FindAllDescendants(CF.ByControlType(ControlType.MenuItem))
-                        .Select(i =>
+                // Deliberately unfiltered: an item with an empty header, or one that is present but
+                // collapsed, is exactly the kind of thing this diagnostic needs to surface.
+                names.AddRange(menu.FindAllDescendants(CF.ByControlType(ControlType.MenuItem))
+                    .Select(i =>
+                    {
+                        try
                         {
-                            try
-                            {
-                                var label = string.IsNullOrEmpty(i.Name) ? "(empty)" : i.Name;
-                                return $"{label}[enabled={i.IsEnabled},offscreen={i.IsOffscreen}]";
-                            }
-                            catch
-                            {
-                                return "(unreadable)";
-                            }
-                        }));
-                }
-                catch
-                {
-                    // Popup vanished.
-                }
+                            var label = string.IsNullOrEmpty(i.Name) ? "(empty)" : i.Name;
+                            return $"{label}[enabled={i.IsEnabled},offscreen={i.IsOffscreen}]";
+                        }
+                        catch
+                        {
+                            return "(unreadable)";
+                        }
+                    }));
+            }
+            catch
+            {
+                // Popup vanished.
             }
 
             return names;
@@ -343,43 +345,38 @@ namespace AvalonDockTest.FlaUITests
         /// Finds a menu item by header, ignoring the offscreen leftovers that dismissed WPF context
         /// menus leave behind in the automation tree.
         /// </summary>
+        /// <param name="menu">The menu to search.</param>
         /// <param name="header">Header text of the wanted item.</param>
         /// <returns>The menu item, or <see langword="null"/> when it is not on screen.</returns>
-        private AutomationElement FindLiveMenuItem(string header)
+        private AutomationElement FindLiveMenuItem(AutomationElement menu, string header)
         {
-            foreach (var root in GetContextMenuRoots())
+            try
             {
-                try
-                {
-                    var match = root.FindAllDescendants(CF.ByControlType(ControlType.MenuItem))
-                        .FirstOrDefault(item =>
-                        {
-                            try { return item.Name == header && !item.IsOffscreen && item.IsEnabled; }
-                            catch { return false; }
-                        });
-
-                    if (match != null) return match;
-                }
-                catch
-                {
-                    // A popup can vanish between enumeration and inspection.
-                }
+                return menu.FindAllDescendants(CF.ByControlType(ControlType.MenuItem))
+                    .FirstOrDefault(item =>
+                    {
+                        try { return item.Name == header && !item.IsOffscreen && item.IsEnabled; }
+                        catch { return false; }
+                    });
             }
-
-            return null;
+            catch
+            {
+                // A popup can vanish between enumeration and inspection.
+                return null;
+            }
         }
 
-        /// <summary>Gets the open context menus, excluding the menu bar of the application.</summary>
-        /// <returns>The context menu elements currently on screen.</returns>
+        /// <summary>Gets every menu currently on screen, the menu bar of the window included.</summary>
+        /// <returns>The menu elements.</returns>
         /// <remarks>
-        /// A WPF <c>ContextMenu</c> surfaces as <see cref="ControlType.Menu"/> while the main menu of
-        /// the window is a <see cref="ControlType.MenuBar"/>, so restricting the search to Menu
-        /// elements keeps the two apart. Searching the whole window instead picks up the menu bar
-        /// items - System, Edit, Layout, Tools, Theme - which are always present and always enabled.
-        /// A context menu that failed to open then looks like a context menu with the wrong entries,
-        /// and an entry of the menu bar could be clicked in place of the wanted one.
+        /// WPF publishes both its <c>Menu</c> and its <c>ContextMenu</c> as
+        /// <see cref="ControlType.Menu"/>, so the control type alone cannot tell the menu bar from a
+        /// context menu. Callers identify the context menu by comparing against a snapshot taken
+        /// before the right click; see <see cref="DetachToolWindowViaContextMenu"/>. Getting this
+        /// wrong is what made an unopened context menu look like a context menu holding the entries
+        /// of the menu bar - System, Edit, Layout, Tools, Theme.
         /// </remarks>
-        private System.Collections.Generic.IEnumerable<AutomationElement> GetContextMenuRoots()
+        private System.Collections.Generic.List<AutomationElement> GetMenuElements()
         {
             var menus = new System.Collections.Generic.List<AutomationElement>();
 
@@ -401,6 +398,26 @@ namespace AvalonDockTest.FlaUITests
             }
 
             return menus;
+        }
+
+        /// <summary>Finds a menu that was not on screen when the snapshot was taken.</summary>
+        /// <param name="before">The menus present before the right click.</param>
+        /// <returns>The newly opened menu, or <see langword="null"/>.</returns>
+        private AutomationElement FindMenuOpenedSince(System.Collections.Generic.List<AutomationElement> before)
+        {
+            foreach (var menu in GetMenuElements())
+            {
+                try
+                {
+                    if (!before.Any(b => b.Equals(menu))) return menu;
+                }
+                catch
+                {
+                    // Comparing against an element that has gone away.
+                }
+            }
+
+            return null;
         }
 
         /// <summary>Gets the elements that can hold menu popups.</summary>
