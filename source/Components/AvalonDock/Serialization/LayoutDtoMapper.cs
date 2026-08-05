@@ -194,6 +194,7 @@ namespace AvalonDock.Serialization
 				AutoHideMinHeight = anch.AutoHideMinHeight,
 				CanDockAsTabbedDocument = anch.CanDockAsTabbedDocument,
 				CanMove = anch.CanMove,
+				IsDetached = anch.IsDetached,
 			};
 			CopyContentToDto(anch, dto);
 			return dto;
@@ -496,6 +497,7 @@ namespace AvalonDock.Serialization
 				AutoHideMinHeight = dto.AutoHideMinHeight,
 				CanDockAsTabbedDocument = dto.CanDockAsTabbedDocument,
 				CanMove = dto.CanMove,
+				IsDetached = dto.IsDetached,
 			};
 			ApplyContentFromDto(dto, anch);
 			return anch;

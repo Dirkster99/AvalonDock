@@ -95,6 +95,10 @@ public class ToggleDockingManager : DockingManager
 	private readonly Dictionary<IToolbox, LayoutAnchorable> _toolboxToAnchorable =
 		new Dictionary<IToolbox, LayoutAnchorable>();
 
+	/// <summary>Remembers the zone each detached anchorable returns to.</summary>
+	private readonly Dictionary<LayoutAnchorable, DockZone> _detachedZones =
+		new Dictionary<LayoutAnchorable, DockZone>();
+
 	/// <summary>
 	/// Key bindings registered on the host window for toolbox shortcuts.
 	/// Tracked so they can be removed and rebuilt when toolboxes change.
@@ -348,6 +352,14 @@ public class ToggleDockingManager : DockingManager
 	/// <param name="zone">The zone.</param>
 	public void ToggleAnchorable(LayoutAnchorable anchorable, DockZone zone)
 	{
+		// While the content lives in a standalone window there is nothing to dock or auto hide;
+		// the stripe button acts as a way to bring that window forward instead.
+		if (IsDetached(anchorable))
+		{
+			ActivateDetachedWindow(anchorable);
+			return;
+		}
+
 		if (anchorable.IsAutoHidden)
 		{
 			// Hide any currently docked anchorable in the SAME bar only
@@ -395,6 +407,13 @@ public class ToggleDockingManager : DockingManager
 	{
 		if (anchorable == null)
 		{
+			return;
+		}
+
+		// A detached anchorable is not in the dock area, so only the zone it will return to changes.
+		if (IsDetached(anchorable))
+		{
+			_detachedZones[anchorable] = targetZone;
 			return;
 		}
 
@@ -448,6 +467,53 @@ public class ToggleDockingManager : DockingManager
 
 		// Toggle it on
 		ToggleAnchorable(anchorable, targetZone);
+	}
+
+	/// <inheritdoc/>
+	/// <remarks>
+	/// Collapses the anchorable onto its side stripe rather than hiding it, so its toggle button stays
+	/// available and layout serialization keeps seeing an ordinary auto hidden entry.
+	/// </remarks>
+	protected override object DetachFromLayout(LayoutAnchorable anchorable)
+	{
+		var zone = GetAnchorableZone(anchorable);
+		_detachedZones[anchorable] = zone;
+
+		// Collapsing a docked anchorable makes the dock area reflow and tears down the control that
+		// currently shows the content.
+		if (!anchorable.IsAutoHidden)
+		{
+			AutoHideFromDock(anchorable, zone);
+		}
+
+		return zone;
+	}
+
+	/// <inheritdoc/>
+	protected override void ReturnToLayout(LayoutAnchorable anchorable, object restoreState)
+	{
+		var zone = _detachedZones.TryGetValue(anchorable, out var remembered)
+			? remembered
+			: restoreState as DockZone? ?? GetAnchorableZone(anchorable);
+
+		_detachedZones.Remove(anchorable);
+
+		if (anchorable.IsAutoHidden)
+		{
+			ToggleAnchorable(anchorable, zone);
+		}
+	}
+
+	/// <inheritdoc/>
+	/// <remarks>Keeps the three dot options menu available while the content lives in its own window.</remarks>
+	protected override FrameworkElement CreateDetachedWindowHeader(LayoutAnchorable anchorable) =>
+		new ToggleAnchorablePaneTitle { Model = anchorable };
+
+	/// <inheritdoc/>
+	protected override void OnDetachedAnchorablesChanged(LayoutAnchorable anchorable)
+	{
+		SetToolboxIsOpen(anchorable);
+		RefreshButtonStates();
 	}
 
 	/// <inheritdoc/>
@@ -661,6 +727,8 @@ public class ToggleDockingManager : DockingManager
 		var floatItem = new MenuItem { Header = "Float" };
 		floatItem.Click += (s, e) =>
 		{
+			ReattachAnchorable(anchorable);
+
 			if (anchorable.IsAutoHidden)
 			{
 				anchorable.ToggleSingleAutoHide();
@@ -671,9 +739,35 @@ public class ToggleDockingManager : DockingManager
 		};
 		viewModeItem.Items.Add(floatItem);
 
+		// Detaches into an ordinary, independent top level window - the equivalent of the "Window"
+		// view mode of IDE tool windows. Selecting it again docks the content back.
+		var windowItem = new MenuItem
+		{
+			Header = "Window",
+			IsChecked = IsDetached(anchorable)
+		};
+		windowItem.Click += (s, e) =>
+		{
+			if (IsDetached(anchorable))
+			{
+				ReattachAnchorable(anchorable);
+			}
+			else
+			{
+				DetachAnchorableToWindow(anchorable);
+			}
+		};
+		viewModeItem.Items.Add(windowItem);
+
 		var dockedItem = new MenuItem { Header = "Docked" };
 		dockedItem.Click += (s, e) =>
 		{
+			if (IsDetached(anchorable))
+			{
+				ReattachAnchorable(anchorable);
+				return;
+			}
+
 			if (anchorable.IsAutoHidden)
 			{
 				var zone = GetAnchorableZone(anchorable);
@@ -685,6 +779,8 @@ public class ToggleDockingManager : DockingManager
 		var hiddenItem = new MenuItem { Header = "Hidden" };
 		hiddenItem.Click += (s, e) =>
 		{
+			ReattachAnchorable(anchorable);
+
 			var layoutItem = GetLayoutItemFromModel(anchorable) as LayoutAnchorableItem;
 			layoutItem?.HideCommand?.Execute(null);
 		};
@@ -1820,7 +1916,9 @@ public class ToggleDockingManager : DockingManager
 		_syncDepth++;
 		try
 		{
-			toolbox.IsOpen = !anchorable.IsAutoHidden;
+			// A detached anchorable is collapsed onto its stripe but its content is on screen in a
+			// standalone window, so it counts as open.
+			toolbox.IsOpen = !anchorable.IsAutoHidden || IsDetached(anchorable);
 		}
 		finally
 		{
