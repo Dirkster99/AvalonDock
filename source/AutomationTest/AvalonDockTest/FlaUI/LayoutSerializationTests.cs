@@ -290,13 +290,21 @@ namespace AvalonDockTest.FlaUITests
             {
                 try
                 {
+                    // Deliberately unfiltered: an item with an empty header, or one that is present but
+                    // collapsed, is exactly the kind of thing this diagnostic needs to surface.
                     names.AddRange(root.FindAllDescendants(CF.ByControlType(ControlType.MenuItem))
-                        .Where(i =>
+                        .Select(i =>
                         {
-                            try { return !i.IsOffscreen && !string.IsNullOrEmpty(i.Name); }
-                            catch { return false; }
-                        })
-                        .Select(i => i.Name));
+                            try
+                            {
+                                var label = string.IsNullOrEmpty(i.Name) ? "(empty)" : i.Name;
+                                return $"{label}[enabled={i.IsEnabled},offscreen={i.IsOffscreen}]";
+                            }
+                            catch
+                            {
+                                return "(unreadable)";
+                            }
+                        }));
                 }
                 catch
                 {
