@@ -2756,7 +2756,6 @@ namespace AvalonDock
 			public object RestoreState { get; }
 		}
 
-
 		/// <inheritdoc/>
 		public override void OnApplyTemplate()
 		{
