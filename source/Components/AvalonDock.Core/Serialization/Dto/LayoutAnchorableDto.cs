@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using System.Xml.Serialization;
 
 namespace AvalonDock.Core.Serialization.Dto
