@@ -148,6 +148,14 @@ namespace AvalonDock.Core
 		/// restores anchorable/document content via callback or prior state.
 		/// </summary>
 		/// <param name="layout">The deserialized layout root to fix up.</param>
+		/// <remarks>
+		/// An item of the stored layout whose content cannot be resolved - typically a tool window that
+		/// the application does not offer any more - never stays in the visible layout. An anchorable is
+		/// hidden, so it remains listed in <c>LayoutRoot.Hidden</c> and can be brought back should the
+		/// application supply its content later; a document is closed. Leaving them in place would show
+		/// an empty pane or tab carrying nothing but the stored title, and every save/load cycle would
+		/// carry those ghosts forward.
+		/// </remarks>
 		protected virtual void FixupLayout(ISerializableLayoutRoot layout)
 		{
 			// Fix cached root references
@@ -188,7 +196,7 @@ namespace AvalonDock.Core
 						lcToFix.Close();
 					else if (args.Content != null)
 						lcToFix.Content = args.Content;
-					else if (args.Model.Content != null)
+					else if (args.Model.Content == null)
 						lcToFix.HideAnchorable(false);
 				}
 				else if (previous == null)
@@ -218,7 +226,7 @@ namespace AvalonDock.Core
 						lcToFix.Close();
 					else if (args.Content != null)
 						lcToFix.Content = args.Content;
-					else if (args.Model.Content != null)
+					else if (args.Model.Content == null)
 						lcToFix.Close();
 				}
 				else if (previous == null)

@@ -17,10 +17,14 @@ namespace AvalonDock.Serializer.Json
 	{
 		private readonly Formatting _formatting;
 
+		// DefaultValueHandling.Ignore is deliberately not used. It drops every member that holds the
+		// default of its CLR type, which for the layout DTOs is the opposite of what is wanted:
+		// properties such as CanHide, CanFloat or CanDockAsTabbedDocument default to true, so writing
+		// them only when they are true would silently turn every false back into true on load. The
+		// same applies to PreviousContainerIndex, whose default is -1 rather than 0.
 		private readonly JsonSerializerSettings _settings = new JsonSerializerSettings
 		{
 			NullValueHandling = NullValueHandling.Ignore,
-			DefaultValueHandling = DefaultValueHandling.Ignore,
 			Converters = { new LayoutDtoJsonConverter() },
 		};
 

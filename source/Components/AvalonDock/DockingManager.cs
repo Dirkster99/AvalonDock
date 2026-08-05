@@ -2569,10 +2569,13 @@ namespace AvalonDock
 			if (anchorable == null || IsDetached(anchorable)) return;
 			if (!(GetLayoutItemFromModel(anchorable) is LayoutAnchorableItem layoutItem)) return;
 
-			var restoreState = DetachFromLayout(anchorable);
-
+			// Resolved before the anchorable leaves the layout: without a presenter there is nothing to
+			// hand to a window, and taking it out of the layout first would leave it hidden with no
+			// window to bring it back from.
 			var view = layoutItem.View;
 			if (view == null) return;
+
+			var restoreState = DetachFromLayout(anchorable);
 
 			// The presenter is a logical child of this manager and may still be held by the visual tree of
 			// the pane it was shown in. Both links have to go before another window can take ownership.

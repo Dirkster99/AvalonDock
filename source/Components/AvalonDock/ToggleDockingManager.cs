@@ -302,6 +302,90 @@ public class ToggleDockingManager : DockingManager
 	}
 
 	/// <inheritdoc/>
+	/// <remarks>
+	/// <para>
+	/// Replacing the layout - deserializing a stored layout with an <c>XmlLayoutSerializer</c>, say -
+	/// swaps in a completely new set of <see cref="LayoutAnchorable"/> instances. The sidebar buttons
+	/// still reference the anchorables of the old tree, so without rebuilding them they linger as ghost
+	/// toolboxes: buttons whose model is no longer part of any layout, which cannot be toggled, and
+	/// which may well stand for a toolbox that does not exist any more at all. Rebuilding the bars from
+	/// the new layout removes them, and dropping the toolbox registrations releases the
+	/// <see cref="INotifyPropertyChanged"/> handlers and shortcut key bindings of the old tree.
+	/// </para>
+	/// <para>
+	/// The anchorables that were docked in the restored layout are re-opened afterwards, so a stored
+	/// layout keeps deciding which toolboxes are visible. <see cref="IToolbox.IsOpenByDefault"/> is
+	/// deliberately not applied here: it is the default for a fresh layout, not something that should
+	/// override what the user saved.
+	/// </para>
+	/// </remarks>
+	protected override void OnLayoutChanged(LayoutRoot oldLayout, LayoutRoot newLayout)
+	{
+		// The anchorables that the restored layout shows docked. Collected before the base call so a
+		// layout that arrives with docked anchorables can be reproduced after the bars were rebuilt
+		// (SetupToggleDockButtonBars collapses everything onto the stripes first).
+		var restoreDocked = CollectDockedAnchorables(newLayout);
+
+		base.OnLayoutChanged(oldLayout, newLayout);
+
+		// The base constructor assigns the initial layout before the field initializers of this class
+		// have run. There is nothing to tear down or rebuild for that first assignment, and the fields
+		// this method needs do not exist yet.
+		if (oldLayout == null || _detachedZones == null)
+		{
+			return;
+		}
+
+		// The entries reference anchorables of the replaced layout.
+		_detachedZones.Clear();
+
+		if (!IsLoaded)
+		{
+			// Without a template there is nowhere to inject the bars; drop the stale ones so nothing
+			// survives the swap. ToggleDockingManager_Loaded builds them from the new layout.
+			RemoveToggleDockButtonBars();
+			return;
+		}
+
+		SetupToggleDockButtonBars();
+
+		foreach (var anchorable in restoreDocked)
+		{
+			if (anchorable.Root == newLayout && anchorable.IsAutoHidden)
+			{
+				ToggleAnchorable(anchorable, GetAnchorableZone(anchorable));
+			}
+		}
+
+		Dispatcher.BeginInvoke(
+			System.Windows.Threading.DispatcherPriority.Loaded,
+			new System.Action(() =>
+			{
+				RefreshButtonStates();
+				UpdatePinButtonsToMinimize();
+			}));
+	}
+
+	/// <summary>
+	/// Collects the anchorables that the given layout shows docked (as opposed to collapsed onto a
+	/// side stripe, hidden or floating).
+	/// </summary>
+	/// <param name="layout">The layout to inspect, may be <see langword="null"/>.</param>
+	/// <returns>The docked anchorables.</returns>
+	private static List<LayoutAnchorable> CollectDockedAnchorables(LayoutRoot layout)
+	{
+		if (layout == null)
+		{
+			return new List<LayoutAnchorable>();
+		}
+
+		return layout.Descendents()
+			.OfType<LayoutAnchorable>()
+			.Where(a => a.Parent is LayoutAnchorablePane && !a.IsAutoHidden && !a.IsFloating && !a.IsHidden)
+			.ToList();
+	}
+
+	/// <inheritdoc/>
 	protected override void OnThemeChanged(DependencyPropertyChangedEventArgs e)
 	{
 		base.OnThemeChanged(e);
@@ -1547,18 +1631,25 @@ public class ToggleDockingManager : DockingManager
 	}
 
 	/// <summary>
-	/// Builds a context menu listing all hidden anchorables.
+	/// Builds a context menu listing the hidden anchorables that can be shown again.
 	/// </summary>
-	/// <returns>The context menu, or null if no anchorables are hidden.</returns>
+	/// <returns>The context menu, or null if there is nothing to list.</returns>
+	/// <remarks>
+	/// Anchorables without content are skipped. Deserializing a stored layout hides every anchorable
+	/// whose content could not be resolved - a toolbox that the application does not offer any more,
+	/// for instance - and restoring one of those would open a pane showing nothing but its stored
+	/// title.
+	/// </remarks>
 	private ContextMenu BuildShowHiddenContextMenu()
 	{
-		if (Layout?.Hidden == null || Layout.Hidden.Count == 0)
+		var hidden = Layout?.Hidden?.Where(a => a.Content != null).ToList();
+		if (hidden == null || hidden.Count == 0)
 		{
 			return null;
 		}
 
 		var menu = new ContextMenu();
-		foreach (var anchorable in Layout.Hidden.ToList())
+		foreach (var anchorable in hidden)
 		{
 			var mi = new MenuItem { Header = anchorable.Title };
 
