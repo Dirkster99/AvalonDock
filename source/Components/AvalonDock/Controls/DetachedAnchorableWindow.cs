@@ -36,6 +36,12 @@ namespace AvalonDock.Controls
 		/// <summary>The height used when the model does not carry a usable floating height.</summary>
 		private const double DefaultDetachedHeight = 500d;
 
+		/// <summary>The smallest size the user can shrink a detached window to.</summary>
+		private const double MinimumDetachedSize = 120d;
+
+		/// <summary>How much of a restored window must be on screen for its position to be honoured.</summary>
+		private const double MinimumOnScreenSize = 80d;
+
 		private readonly LayoutAnchorable _model;
 		private readonly Grid _root;
 		private ContentPresenter _hostedView;
@@ -189,12 +195,20 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>Applies the geometry remembered on the model, falling back to sensible defaults.</summary>
+		/// <remarks>
+		/// The stored position is only honoured when it still lands on a screen. A layout saved on a
+		/// multi monitor machine and restored on a single monitor would otherwise place the window where
+		/// the user cannot reach it, with no way to bring it back.
+		/// </remarks>
 		private void ApplyModelBounds()
 		{
 			Width = _model.FloatingWidth > 0d ? _model.FloatingWidth : DefaultDetachedWidth;
 			Height = _model.FloatingHeight > 0d ? _model.FloatingHeight : DefaultDetachedHeight;
+			MinWidth = MinimumDetachedSize;
+			MinHeight = MinimumDetachedSize;
 
-			if (_model.FloatingLeft != 0d || _model.FloatingTop != 0d)
+			if ((_model.FloatingLeft != 0d || _model.FloatingTop != 0d) &&
+				IsOnScreen(_model.FloatingLeft, _model.FloatingTop, Width, Height))
 			{
 				WindowStartupLocation = WindowStartupLocation.Manual;
 				Left = _model.FloatingLeft;
@@ -204,6 +218,32 @@ namespace AvalonDock.Controls
 			{
 				WindowStartupLocation = WindowStartupLocation.CenterScreen;
 			}
+		}
+
+		/// <summary>
+		/// Tests whether enough of the given rectangle overlaps the virtual screen for the user to grab
+		/// the window and move it.
+		/// </summary>
+		/// <param name="left">Left edge of the window.</param>
+		/// <param name="top">Top edge of the window.</param>
+		/// <param name="width">Width of the window.</param>
+		/// <param name="height">Height of the window.</param>
+		/// <returns><see langword="true"/> when the position is usable.</returns>
+		private static bool IsOnScreen(double left, double top, double width, double height)
+		{
+			var virtualScreen = new Rect(
+				SystemParameters.VirtualScreenLeft,
+				SystemParameters.VirtualScreenTop,
+				SystemParameters.VirtualScreenWidth,
+				SystemParameters.VirtualScreenHeight);
+
+			var candidate = new Rect(left, top, width, height);
+			candidate.Intersect(virtualScreen);
+
+			// A sliver is not enough: the caption has to be reachable with the mouse.
+			return !candidate.IsEmpty &&
+				candidate.Width >= MinimumOnScreenSize &&
+				candidate.Height >= MinimumOnScreenSize;
 		}
 
 		/// <summary>

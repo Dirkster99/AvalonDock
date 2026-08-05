@@ -437,6 +437,7 @@ namespace AvalonDock
 			{
 				oldLayout.PropertyChanged -= OnLayoutRootPropertyChanged;
 				oldLayout.Updated -= OnLayoutRootUpdated;
+				DiscardDetachedWindowsOfReplacedLayout();
 			}
 
 			foreach (var fwc in _fwList.ToArray())
@@ -517,6 +518,18 @@ namespace AvalonDock
 			CommandManager.InvalidateRequerySuggested();
 
 			RestoreDetachedAnchorables(newLayout);
+		}
+
+		/// <summary>
+		/// Closes the standalone windows that belong to a layout which is being replaced.
+		/// </summary>
+		/// <remarks>
+		/// Their anchorables are about to leave the manager, so a surviving window would host content
+		/// whose model is no longer part of any layout - unreachable, and impossible to dock back.
+		/// </remarks>
+		private void DiscardDetachedWindowsOfReplacedLayout()
+		{
+			CloseDetachedWindows(returnToLayout: true, keepDetachedFlag: true);
 		}
 
 		/// <summary>
@@ -2583,14 +2596,27 @@ namespace AvalonDock
 		/// Closes the standalone window of the given anchorable and returns its content to the layout.
 		/// </summary>
 		/// <param name="anchorable">The anchorable to return, may be <see langword="null"/>.</param>
-		public void ReattachAnchorable(LayoutAnchorable anchorable)
+		public void ReattachAnchorable(LayoutAnchorable anchorable) =>
+			ReattachAnchorableCore(anchorable, returnToLayout: true, keepDetachedFlag: false);
+
+		/// <summary>Closes the standalone window of an anchorable and optionally returns its content.</summary>
+		/// <param name="anchorable">The anchorable to return, may be <see langword="null"/>.</param>
+		/// <param name="returnToLayout">
+		/// Whether the anchorable should be put back into the layout. Skipped while the layout is being
+		/// torn down, where inserting into a dying tree achieves nothing.
+		/// </param>
+		/// <param name="keepDetachedFlag">
+		/// Whether <see cref="LayoutAnchorable.IsDetached"/> stays set. Keeping it lets a manager that is
+		/// only temporarily unloaded - a tab switch, say - recreate the window when it comes back.
+		/// </param>
+		private void ReattachAnchorableCore(LayoutAnchorable anchorable, bool returnToLayout, bool keepDetachedFlag)
 		{
 			if (anchorable == null || !_detachedAnchorables.TryGetValue(anchorable, out var entry)) return;
 
 			// Remove the bookkeeping first: ReturnToLayout below must not take the detached branch, and
 			// closing the window must not re-enter through OnDetachedWindowClosed.
 			_detachedAnchorables.Remove(anchorable);
-			anchorable.IsDetached = false;
+			if (!keepDetachedFlag) anchorable.IsDetached = false;
 			entry.Window.Closed -= OnDetachedWindowClosed;
 
 			var view = entry.Window.ReleaseView();
@@ -2602,7 +2628,7 @@ namespace AvalonDock
 
 			// Returning the anchorable rebuilds the control whose template binds to LayoutItem.View, so
 			// the presenter is picked up again automatically.
-			ReturnToLayout(anchorable, entry.RestoreState);
+			if (returnToLayout) ReturnToLayout(anchorable, entry.RestoreState);
 
 			OnDetachedAnchorablesChanged(anchorable);
 		}
@@ -2737,7 +2763,19 @@ namespace AvalonDock
 		{
 			if (sender is Window hostWindow) hostWindow.Closed -= OnHostWindowClosed;
 			_hostWindowHooked = false;
-			ReattachAllDetachedAnchorables();
+
+			// The layout is being destroyed, so putting anchorables back into it would achieve nothing.
+			// What matters is that no ownerless window survives to keep the process alive.
+			CloseDetachedWindows(returnToLayout: false, keepDetachedFlag: true);
+		}
+
+		/// <summary>Closes every standalone window, optionally returning its content to the layout.</summary>
+		/// <param name="returnToLayout">Whether each anchorable should be put back into the layout.</param>
+		/// <param name="keepDetachedFlag">Whether the anchorables stay marked as detached.</param>
+		private void CloseDetachedWindows(bool returnToLayout, bool keepDetachedFlag)
+		{
+			foreach (var anchorable in _detachedAnchorables.Keys.ToList())
+				ReattachAnchorableCore(anchorable, returnToLayout, keepDetachedFlag);
 		}
 
 		/// <summary>Tracks one anchorable that is currently hosted by a standalone window.</summary>
@@ -2927,6 +2965,12 @@ namespace AvalonDock
 			SizeChanged -= OnSizeChanged;
 
 			if (DesignerProperties.GetIsInDesignMode(this)) return;
+
+			// Unloading is not necessarily the end - it also happens when the manager is switched away
+			// from, e.g. between tabs. A standalone window left open would keep the presenter that the
+			// rebuilt layout needs, so hand the content back and close it. IsDetached is kept so that
+			// RestoreDetachedAnchorables recreates the window when the manager is loaded again.
+			CloseDetachedWindows(returnToLayout: true, keepDetachedFlag: true);
 			_autoHideWindowManager?.HideAutoWindow();
 
 			AutoHideWindow?.Dispose();
