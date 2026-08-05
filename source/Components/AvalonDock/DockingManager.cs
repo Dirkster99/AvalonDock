@@ -2511,8 +2511,6 @@ namespace AvalonDock
 		/// <param name="content">The content to activate.</param>
 		internal void ExecuteContentActivateCommand(LayoutContent content) => content.IsActive = true;
 
-		#region Detached windows
-
 		/// <summary>
 		/// The anchorables that are currently detached into a standalone <see cref="DetachedAnchorableWindow"/>,
 		/// mapped to the state needed to return them to the layout.
@@ -2758,7 +2756,6 @@ namespace AvalonDock
 			public object RestoreState { get; }
 		}
 
-		#endregion Detached windows
 
 		/// <inheritdoc/>
 		public override void OnApplyTemplate()

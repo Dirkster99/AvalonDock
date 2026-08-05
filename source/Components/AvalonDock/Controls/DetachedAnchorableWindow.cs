@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -25,7 +25,7 @@ namespace AvalonDock.Controls
 	/// the single owner of the user supplied content, so it is moved into this window rather than being
 	/// duplicated. The caller must disconnect the presenter from its previous visual and logical parent
 	/// before constructing the window; see
-	/// <see cref="ToggleDockingManager.DetachAnchorableToWindow(LayoutAnchorable)"/>, which performs the
+	/// <see cref="DockingManager.DetachAnchorableToWindow(LayoutAnchorable)"/>, which performs the
 	/// whole sequence.
 	/// </para>
 	/// </remarks>

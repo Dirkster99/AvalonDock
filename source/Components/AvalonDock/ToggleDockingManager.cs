@@ -1925,5 +1925,4 @@ public class ToggleDockingManager : DockingManager
 			_syncDepth--;
 		}
 	}
-
 }
