@@ -99,6 +99,77 @@ namespace AvalonDockTest.FlaUITests
 			System.Threading.Thread.Sleep(100);
 		}
 
+		// ===== Menu =====
+
+		/// <summary>
+		/// Walks a menu path and clicks its last entry, e.g. <c>ClickMenuPath("Layout", "Save Layout")</c>.
+		/// </summary>
+		/// <param name="menuPath">Headers to click in order, top level first.</param>
+		/// <remarks>
+		/// Top level entries are looked up inside the menu bar, so a tool window that happens to carry
+		/// the same title is never mistaken for one. The whole path is retried a few times because a
+		/// menu that is still closing swallows the next click.
+		/// </remarks>
+		protected void ClickMenuPath(params string[] menuPath)
+		{
+			const int maxAttempts = 3;
+
+			for (var attempt = 1; attempt <= maxAttempts; attempt++)
+			{
+				if (TryClickMenuPath(menuPath))
+				{
+					return;
+				}
+
+				Keyboard.Press(VirtualKeyShort.ESCAPE);
+				Wait.UntilInputIsProcessed();
+				Keyboard.Press(VirtualKeyShort.ESCAPE);
+				Wait.UntilInputIsProcessed();
+				System.Threading.Thread.Sleep(200);
+
+				MainWindow.SetForeground();
+				Wait.UntilInputIsProcessed();
+				System.Threading.Thread.Sleep(300);
+			}
+
+			Assert.Fail($"Menu path [{string.Join(" > ", menuPath)}] not reachable after {maxAttempts} attempts.");
+		}
+
+		private bool TryClickMenuPath(string[] menuPath)
+		{
+			for (var i = 0; i < menuPath.Length; i++)
+			{
+				var header = menuPath[i];
+				var isTopLevel = i == 0;
+
+				var found = Retry.WhileNull(
+					() =>
+					{
+						if (isTopLevel)
+						{
+							var menuBar = MainWindow.FindFirstDescendant(CF.ByControlType(ControlType.MenuBar));
+							return menuBar?.FindFirstDescendant(CF.ByName(header));
+						}
+
+						return MainWindow.FindFirstDescendant(
+							CF.ByControlType(ControlType.MenuItem).And(CF.ByName(header)));
+					},
+					timeout: TimeSpan.FromSeconds(5),
+					interval: TimeSpan.FromMilliseconds(200));
+
+				if (found.Result == null)
+				{
+					return false;
+				}
+
+				found.Result.Click();
+				Wait.UntilInputIsProcessed();
+				System.Threading.Thread.Sleep(250);
+			}
+
+			return true;
+		}
+
 		// ===== Element Finders =====
 
 		protected AutomationElement FindByAutomationId(string automationId)
@@ -119,6 +190,50 @@ namespace AvalonDockTest.FlaUITests
 			Assert.That(result.Result, Is.Not.Null,
 				$"Element '{name}' not found within {timeoutSeconds}s.");
 			return result.Result;
+		}
+
+		/// <summary>Automation ids of the six sidebar button bars, in zone order.</summary>
+		private static readonly string[] ToggleDockBarIds =
+		{
+			"ToggleDockBar_LeftTop", "ToggleDockBar_LeftBottom",
+			"ToggleDockBar_RightTop", "ToggleDockBar_RightBottom",
+			"ToggleDockBar_BottomLeft", "ToggleDockBar_BottomRight"
+		};
+
+		/// <summary>
+		/// Reads the tool window titles the sidebar currently shows a button for.
+		/// </summary>
+		/// <returns>The titles, in the order the bars are laid out.</returns>
+		/// <remarks>
+		/// The titles are read from the DataItem wrappers rather than from the inner ToggleButton,
+		/// because a button rendered icon-only does not necessarily publish the title as its name.
+		/// </remarks>
+		protected string[] FindAllToggleButtonNames()
+		{
+			var names = new System.Collections.Generic.List<string>();
+
+			foreach (var barId in ToggleDockBarIds)
+			{
+				var bar = MainWindow.FindFirstDescendant(CF.ByAutomationId(barId));
+				if (bar == null) continue;
+
+				foreach (var item in bar.FindAllDescendants())
+				{
+					try
+					{
+						if (item.ControlType == ControlType.DataItem && !string.IsNullOrEmpty(item.Name))
+						{
+							names.Add(item.Name);
+						}
+					}
+					catch
+					{
+						// The tree can change while it is being walked.
+					}
+				}
+			}
+
+			return names.ToArray();
 		}
 
 		/// <summary>
