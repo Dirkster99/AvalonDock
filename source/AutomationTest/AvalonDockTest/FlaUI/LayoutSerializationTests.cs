@@ -3,6 +3,7 @@ using System.Linq;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.Input;
+using FlaUI.Core.WindowsAPI;
 using FlaUI.Core.Tools;
 using NUnit.Framework;
 
@@ -208,26 +209,102 @@ namespace AvalonDockTest.FlaUITests
         /// window.
         /// </summary>
         /// <param name="toolWindowName">Title of the tool window to detach.</param>
+        /// <remarks>
+        /// The context menu hangs off the pane title, which is not necessarily the element that
+        /// <c>FindToolWindowTab</c> returns, so a few plausible targets are tried. When none of them
+        /// produces the entry the failure lists what the menu actually offered, which distinguishes a
+        /// missing menu from a missing entry.
+        /// </remarks>
         private void DetachToolWindowViaContextMenu(string toolWindowName)
         {
+            var seen = new System.Collections.Generic.List<string>();
+
+            foreach (var target in GetContextMenuTargets(toolWindowName))
+            {
+                try
+                {
+                    target.RightClick();
+                    Wait.UntilInputIsProcessed();
+                    System.Threading.Thread.Sleep(500);
+                }
+                catch
+                {
+                    continue;
+                }
+
+                var windowItem = FindLiveMenuItem("Window");
+                if (windowItem != null)
+                {
+                    windowItem.Click();
+                    Wait.UntilInputIsProcessed();
+                    System.Threading.Thread.Sleep(800);
+                    return;
+                }
+
+                seen.AddRange(ListLiveMenuItems());
+                Keyboard.Press(VirtualKeyShort.ESCAPE);
+                Wait.UntilInputIsProcessed();
+                System.Threading.Thread.Sleep(200);
+            }
+
+            Assert.Fail(seen.Count == 0
+                ? $"Right clicking '{toolWindowName}' opened no context menu."
+                : $"The context menu of '{toolWindowName}' offered no 'Window' entry. Items seen: {string.Join(", ", seen.Distinct())}.");
+        }
+
+        /// <summary>Gets the elements worth right clicking to raise the anchorable context menu.</summary>
+        /// <param name="toolWindowName">Title of the tool window.</param>
+        /// <returns>Candidate elements, most likely first.</returns>
+        private System.Collections.Generic.IEnumerable<AutomationElement> GetContextMenuTargets(string toolWindowName)
+        {
+            var candidates = new System.Collections.Generic.List<AutomationElement>();
+
+            // The title bar of the pane, which is what actually carries the context menu.
+            try
+            {
+                candidates.AddRange(MainWindow.FindAllDescendants(CF.ByText(toolWindowName))
+                    .Where(e =>
+                    {
+                        try { return !e.IsOffscreen; }
+                        catch { return false; }
+                    }));
+            }
+            catch
+            {
+                // Tree can change under us.
+            }
+
             var tab = FindToolWindowTab(toolWindowName);
-            Assert.That(tab, Is.Not.Null, $"'{toolWindowName}' should be present before detaching.");
+            if (tab != null && !candidates.Contains(tab)) candidates.Add(tab);
 
-            tab.RightClick();
-            Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(400);
+            return candidates;
+        }
 
-            var windowItem = Retry.WhileNull(
-                () => FindLiveMenuItem("Window"),
-                timeout: TimeSpan.FromSeconds(8),
-                interval: TimeSpan.FromMilliseconds(300)).Result;
+        /// <summary>Lists the headers of every menu item currently on screen, for diagnostics.</summary>
+        /// <returns>The headers found.</returns>
+        private System.Collections.Generic.IEnumerable<string> ListLiveMenuItems()
+        {
+            var names = new System.Collections.Generic.List<string>();
 
-            Assert.That(windowItem, Is.Not.Null,
-                "The anchorable context menu should offer the 'Window' entry.");
+            foreach (var root in GetPopupSearchRoots())
+            {
+                try
+                {
+                    names.AddRange(root.FindAllDescendants(CF.ByControlType(ControlType.MenuItem))
+                        .Where(i =>
+                        {
+                            try { return !i.IsOffscreen && !string.IsNullOrEmpty(i.Name); }
+                            catch { return false; }
+                        })
+                        .Select(i => i.Name));
+                }
+                catch
+                {
+                    // Popup vanished.
+                }
+            }
 
-            windowItem.Click();
-            Wait.UntilInputIsProcessed();
-            System.Threading.Thread.Sleep(800);
+            return names;
         }
 
         /// <summary>
