@@ -1,4 +1,7 @@
-using System;
+﻿using System;
+using System.Linq;
+using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Definitions;
 using FlaUI.Core.Input;
 using FlaUI.Core.Tools;
 using NUnit.Framework;
@@ -148,6 +151,167 @@ namespace AvalonDockTest.FlaUITests
                 "Document 1 should be accessible after layout restore (Issue #443).");
             Assert.That(App.HasExited, Is.False,
                 "Application should remain responsive after layout restore (Issue #443).");
+        }
+
+        /// <summary>
+        /// Verifies that a tool window detached into a standalone window comes back detached after a
+        /// layout round trip. This is the end to end counterpart of the DTO level tests: it drives the
+        /// entry in the default anchorable context menu of a plain DockingManager, saves, puts the tool
+        /// window back, and expects the restore to recreate the window.
+        /// </summary>
+        [Test, Order(6)]
+        public void SaveAndLoadLayout_RestoresDetachedWindow()
+        {
+            const string toolWindow = "Tool Window 1";
+
+            DetachToolWindowViaContextMenu(toolWindow);
+
+            var detached = WaitForDetachedWindow(toolWindow);
+            Assert.That(detached, Is.Not.Null,
+                $"'{toolWindow}' should be hosted by a standalone window before saving.");
+
+            ClickMenuItemByName("Layout", "Save", "Layout_1");
+            System.Threading.Thread.Sleep(500);
+
+            // Put the tool window back, so a restore that ignored the detached state would be visible
+            // as the absence of the window rather than as a leftover from before the save.
+            detached.AsWindow()?.Close();
+            var closed = Retry.WhileFalse(
+                () => FindDetachedWindow(toolWindow) == null,
+                timeout: TimeSpan.FromSeconds(10),
+                interval: TimeSpan.FromMilliseconds(300));
+            Assert.That(closed.Result, Is.True, "The standalone window should close before the restore.");
+
+            ClickMenuItemByName("Layout", "Load", "Layout_1");
+            WaitForLayoutSettled();
+
+            var restored = Retry.WhileNull(
+                () => FindDetachedWindow(toolWindow),
+                timeout: TimeSpan.FromSeconds(20),
+                interval: TimeSpan.FromMilliseconds(400)).Result;
+
+            Assert.That(restored, Is.Not.Null,
+                $"'{toolWindow}' was detached when the layout was saved, so restoring it should recreate the standalone window.");
+            Assert.That(App.HasExited, Is.False,
+                "The application should survive restoring a layout that contains a detached tool window.");
+
+            // Leave the app docked again for any test that follows.
+            restored.AsWindow()?.Close();
+            Retry.WhileFalse(
+                () => FindDetachedWindow(toolWindow) == null,
+                timeout: TimeSpan.FromSeconds(10),
+                interval: TimeSpan.FromMilliseconds(300));
+        }
+
+        /// <summary>
+        /// Opens the context menu of a tool window and picks the entry that moves it into a standalone
+        /// window.
+        /// </summary>
+        /// <param name="toolWindowName">Title of the tool window to detach.</param>
+        private void DetachToolWindowViaContextMenu(string toolWindowName)
+        {
+            var tab = FindToolWindowTab(toolWindowName);
+            Assert.That(tab, Is.Not.Null, $"'{toolWindowName}' should be present before detaching.");
+
+            tab.RightClick();
+            Wait.UntilInputIsProcessed();
+            System.Threading.Thread.Sleep(400);
+
+            var windowItem = Retry.WhileNull(
+                () => FindLiveMenuItem("Window"),
+                timeout: TimeSpan.FromSeconds(8),
+                interval: TimeSpan.FromMilliseconds(300)).Result;
+
+            Assert.That(windowItem, Is.Not.Null,
+                "The anchorable context menu should offer the 'Window' entry.");
+
+            windowItem.Click();
+            Wait.UntilInputIsProcessed();
+            System.Threading.Thread.Sleep(800);
+        }
+
+        /// <summary>
+        /// Finds a menu item by header, ignoring the offscreen leftovers that dismissed WPF context
+        /// menus leave behind in the automation tree.
+        /// </summary>
+        /// <param name="header">Header text of the wanted item.</param>
+        /// <returns>The menu item, or <see langword="null"/> when it is not on screen.</returns>
+        private AutomationElement FindLiveMenuItem(string header)
+        {
+            foreach (var root in GetPopupSearchRoots())
+            {
+                try
+                {
+                    var match = root.FindAllDescendants(CF.ByControlType(ControlType.MenuItem))
+                        .FirstOrDefault(item =>
+                        {
+                            try { return item.Name == header && !item.IsOffscreen && item.IsEnabled; }
+                            catch { return false; }
+                        });
+
+                    if (match != null) return match;
+                }
+                catch
+                {
+                    // A popup can vanish between enumeration and inspection.
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>Gets the elements that can hold menu popups.</summary>
+        /// <returns>The roots to search.</returns>
+        private System.Collections.Generic.IEnumerable<AutomationElement> GetPopupSearchRoots()
+        {
+            var roots = new System.Collections.Generic.List<AutomationElement>();
+            if (MainWindow != null) roots.Add(MainWindow);
+
+            try { roots.AddRange(App.GetAllTopLevelWindows(Automation)); }
+            catch { }
+
+            return roots;
+        }
+
+        /// <summary>Finds the standalone window hosting the given tool window.</summary>
+        /// <param name="toolWindowName">Title of the tool window.</param>
+        /// <returns>The window, or <see langword="null"/> when nothing is detached.</returns>
+        private AutomationElement FindDetachedWindow(string toolWindowName)
+        {
+            var mainHandle = MainWindow?.Properties.NativeWindowHandle.ValueOrDefault ?? IntPtr.Zero;
+
+            try
+            {
+                foreach (var window in App.GetAllTopLevelWindows(Automation))
+                {
+                    try
+                    {
+                        if (window.Properties.NativeWindowHandle.ValueOrDefault == mainHandle) continue;
+                        if (window.Title == toolWindowName) return window;
+                    }
+                    catch
+                    {
+                        // Window closed while being inspected.
+                    }
+                }
+            }
+            catch
+            {
+                // The application may be shutting down.
+            }
+
+            return null;
+        }
+
+        /// <summary>Waits until the standalone window is on screen.</summary>
+        /// <param name="toolWindowName">Title of the tool window.</param>
+        /// <returns>The window.</returns>
+        private AutomationElement WaitForDetachedWindow(string toolWindowName)
+        {
+            return Retry.WhileNull(
+                () => FindDetachedWindow(toolWindowName),
+                timeout: TimeSpan.FromSeconds(25),
+                interval: TimeSpan.FromMilliseconds(400)).Result;
         }
     }
 }
