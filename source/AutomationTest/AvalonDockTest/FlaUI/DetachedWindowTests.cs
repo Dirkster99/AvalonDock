@@ -214,6 +214,8 @@ namespace AvalonDockTest.FlaUITests
 		/// </summary>
 		private void OpenViewModeSubmenu()
 		{
+			// Leftovers from an earlier menu would otherwise shadow the live items.
+			CloseAnyOpenMenu();
 			EnsureToolWindowDocked();
 
 			var optionsButton = Retry.WhileNull(
@@ -273,14 +275,31 @@ namespace AvalonDockTest.FlaUITests
 		}
 
 		/// <summary>Runs the whole detach gesture and leaves the menu closed.</summary>
+		/// <remarks>
+		/// Retried once: a menu gesture that lands on a popup which is on its way out is silent, and a
+		/// second attempt against a freshly opened menu is cheaper than a false failure.
+		/// </remarks>
 		private void DetachToolWindow()
 		{
-			if (FindDetachedWindow() != null) return;
+			for (var attempt = 0; attempt < 2; attempt++)
+			{
+				if (FindDetachedWindow() != null) return;
 
-			OpenViewModeSubmenu();
-			ClickMenuItem(WindowModeHeader);
-			Wait.UntilInputIsProcessed();
-			System.Threading.Thread.Sleep(800);
+				OpenViewModeSubmenu();
+				ClickMenuItem(WindowModeHeader);
+				Wait.UntilInputIsProcessed();
+				System.Threading.Thread.Sleep(800);
+
+				var appeared = Retry.WhileFalse(
+					() => FindDetachedWindow() != null,
+					timeout: TimeSpan.FromSeconds(8),
+					interval: TimeSpan.FromMilliseconds(300));
+
+				if (appeared.Result) return;
+
+				TestContext.Out.WriteLine($"[DetachedWindowTests] Detach attempt {attempt + 1} produced no window, retrying.");
+				CloseAnyOpenMenu();
+			}
 		}
 
 		/// <summary>Docks the tool window so that its title bar, and with it the menu, exists.</summary>
@@ -301,6 +320,11 @@ namespace AvalonDockTest.FlaUITests
 		/// </summary>
 		/// <param name="header">The header text of the wanted item.</param>
 		/// <returns>The menu item, or <see langword="null"/> when it is not on screen.</returns>
+		/// <remarks>
+		/// Dismissed WPF context menus linger in the automation tree as offscreen elements, so a match
+		/// has to be filtered on <see cref="AutomationElement.IsOffscreen"/>. Clicking a stale item is
+		/// silent: the gesture appears to succeed while nothing happens.
+		/// </remarks>
 		private AutomationElement FindMenuItem(string header)
 		{
 			foreach (var root in GetMenuSearchRoots())
@@ -308,11 +332,7 @@ namespace AvalonDockTest.FlaUITests
 				try
 				{
 					var match = root.FindAllDescendants(CF.ByControlType(ControlType.MenuItem))
-						.FirstOrDefault(item =>
-						{
-							try { return item.Name == header; }
-							catch { return false; }
-						});
+						.FirstOrDefault(item => IsLiveMenuItem(item, header));
 
 					if (match != null) return match;
 				}
@@ -323,6 +343,22 @@ namespace AvalonDockTest.FlaUITests
 			}
 
 			return null;
+		}
+
+		/// <summary>Tests whether a menu item carries the wanted header and is actually on screen.</summary>
+		/// <param name="item">The candidate element.</param>
+		/// <param name="header">The header text of the wanted item.</param>
+		/// <returns><see langword="true"/> when the item is a live match.</returns>
+		private static bool IsLiveMenuItem(AutomationElement item, string header)
+		{
+			try
+			{
+				return item.Name == header && !item.IsOffscreen && item.IsEnabled;
+			}
+			catch
+			{
+				return false;
+			}
 		}
 
 		/// <summary>Clicks a menu item by header and fails the test when it is missing.</summary>
