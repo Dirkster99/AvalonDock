@@ -38,6 +38,7 @@ namespace AvalonDock.Controls
 		private const double DefaultDetachedHeight = 500d;
 
 		private readonly LayoutAnchorable _model;
+		private readonly Grid _root;
 		private ContentPresenter _hostedView;
 		private ResourceDictionary _currentThemeResourceDictionary;
 
@@ -49,10 +50,14 @@ namespace AvalonDock.Controls
 		/// The presenter that holds the content of <paramref name="model"/>. It must already be
 		/// disconnected from any previous visual and logical parent.
 		/// </param>
+		/// <param name="header">
+		/// The title control shown above the content, so the window keeps the caption and menu the
+		/// anchorable had while docked. May be <see langword="null"/> for a bare window.
+		/// </param>
 		/// <exception cref="ArgumentNullException">
 		/// Thrown when <paramref name="model"/> or <paramref name="hostedView"/> is <see langword="null"/>.
 		/// </exception>
-		public DetachedAnchorableWindow(LayoutAnchorable model, ContentPresenter hostedView)
+		public DetachedAnchorableWindow(LayoutAnchorable model, ContentPresenter hostedView, FrameworkElement header = null)
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));
 			_hostedView = hostedView ?? throw new ArgumentNullException(nameof(hostedView));
@@ -64,7 +69,19 @@ namespace AvalonDock.Controls
 			WindowStyle = WindowStyle.SingleBorderWindow;
 			ResizeMode = ResizeMode.CanResize;
 
-			Content = _hostedView;
+			_root = new Grid();
+			_root.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+			_root.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+
+			if (header != null)
+			{
+				Grid.SetRow(header, 0);
+				_root.Children.Add(header);
+			}
+
+			Grid.SetRow(_hostedView, 1);
+			_root.Children.Add(_hostedView);
+			Content = _root;
 
 			ApplyModelBounds();
 			UpdateTitle();
@@ -104,9 +121,9 @@ namespace AvalonDock.Controls
 			var view = _hostedView;
 			_hostedView = null;
 
-			if (view != null && ReferenceEquals(Content, view))
+			if (view != null && _root.Children.Contains(view))
 			{
-				Content = null;
+				_root.Children.Remove(view);
 			}
 
 			return view;

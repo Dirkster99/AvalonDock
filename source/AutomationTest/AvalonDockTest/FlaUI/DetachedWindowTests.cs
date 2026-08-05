@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using FlaUI.Core.AutomationElements;
@@ -205,6 +205,39 @@ namespace AvalonDockTest.FlaUITests
 				Assert.That(FindDetachedWindow(), Is.Not.Null,
 					"The standalone window should survive a click on the stripe button.");
 			}
+		}
+
+		/// <summary>
+		/// The standalone window must carry the same three dot menu the tool window had while docked, so
+		/// the view mode can be changed without going back to the main window.
+		/// </summary>
+		[Test, Order(7)]
+		public void DetachedWindow_CarriesOptionsMenu()
+		{
+			DetachToolWindow();
+			var detached = WaitForDetachedWindow();
+
+			var optionsButton = Retry.WhileNull(
+				() => detached.FindFirstDescendant(CF.ByAutomationId("PART_OptionsButton")),
+				timeout: TimeSpan.FromSeconds(8),
+				interval: TimeSpan.FromMilliseconds(300)).Result;
+
+			Assert.That(optionsButton, Is.Not.Null,
+				"The standalone window should host the tool window title with its options button.");
+
+			optionsButton.Click();
+			Wait.UntilInputIsProcessed();
+			System.Threading.Thread.Sleep(500);
+
+			var viewMode = Retry.WhileNull(
+				() => FindMenuItem(ViewModeHeader),
+				timeout: TimeSpan.FromSeconds(8),
+				interval: TimeSpan.FromMilliseconds(300)).Result;
+
+			Assert.That(viewMode, Is.Not.Null,
+				"The menu opened from the standalone window should offer the view modes.");
+
+			CloseAnyOpenMenu();
 		}
 
 		// ===== Helpers =====

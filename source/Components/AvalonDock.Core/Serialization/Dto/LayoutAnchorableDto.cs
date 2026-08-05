@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 using System.Xml.Serialization;
 
 namespace AvalonDock.Core.Serialization.Dto
@@ -51,6 +51,13 @@ namespace AvalonDock.Core.Serialization.Dto
 		[XmlAttribute]
 		public bool CanMove { get; set; } = true;
 
+		/// <summary>
+		/// Gets or sets a value indicating whether the content of this anchorable was hosted by a
+		/// standalone window when the layout was saved.
+		/// </summary>
+		[XmlAttribute]
+		public bool IsDetached { get; set; }
+
 		/// <summary>Determines whether the CanHide property should be serialized.</summary>
 		/// <returns>True if the value differs from default.</returns>
 		public bool ShouldSerializeCanHide() => !CanHide;
@@ -82,5 +89,9 @@ namespace AvalonDock.Core.Serialization.Dto
 		/// <summary>Determines whether the CanMove property should be serialized.</summary>
 		/// <returns>True if the value differs from default.</returns>
 		public bool ShouldSerializeCanMove() => !CanMove;
+
+		/// <summary>Determines whether the IsDetached property should be serialized.</summary>
+		/// <returns>True if the value differs from default.</returns>
+		public bool ShouldSerializeIsDetached() => IsDetached;
 	}
-}
+}

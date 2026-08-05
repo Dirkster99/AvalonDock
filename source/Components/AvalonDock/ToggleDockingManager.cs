@@ -1,16 +1,14 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using AvalonDock.Controls;
 using AvalonDock.Core;
 using AvalonDock.Layout;
-using AvalonDock.Themes;
 
 namespace AvalonDock;
 
@@ -97,17 +95,9 @@ public class ToggleDockingManager : DockingManager
 	private readonly Dictionary<IToolbox, LayoutAnchorable> _toolboxToAnchorable =
 		new Dictionary<IToolbox, LayoutAnchorable>();
 
-	/// <summary>
-	/// The anchorables that are currently detached into a standalone <see cref="DetachedAnchorableWindow"/>,
-	/// mapped to the state needed to dock them back where they came from.
-	/// </summary>
-	private readonly Dictionary<LayoutAnchorable, DetachedEntry> _detachedAnchorables =
-		new Dictionary<LayoutAnchorable, DetachedEntry>();
-
-	/// <summary>
-	/// Set once the host window has been hooked, so detached windows can be closed on shutdown.
-	/// </summary>
-	private bool _hostWindowHooked;
+	/// <summary>Remembers the zone each detached anchorable returns to.</summary>
+	private readonly Dictionary<LayoutAnchorable, DockZone> _detachedZones =
+		new Dictionary<LayoutAnchorable, DockZone>();
 
 	/// <summary>
 	/// Key bindings registered on the host window for toolbox shortcuts.
@@ -316,12 +306,6 @@ public class ToggleDockingManager : DockingManager
 	{
 		base.OnThemeChanged(e);
 
-		// Detached windows are roots of their own visual tree and do not pick the theme up implicitly.
-		foreach (var entry in _detachedAnchorables.Values)
-		{
-			entry.Window.UpdateThemeResources(e.OldValue as Theme, e.NewValue as Theme);
-		}
-
 		if (IsLoaded)
 		{
 			// Schedule re-setup after the new theme resources are fully available.
@@ -427,9 +411,9 @@ public class ToggleDockingManager : DockingManager
 		}
 
 		// A detached anchorable is not in the dock area, so only the zone it will return to changes.
-		if (_detachedAnchorables.TryGetValue(anchorable, out var detachedEntry))
+		if (IsDetached(anchorable))
 		{
-			detachedEntry.Zone = targetZone;
+			_detachedZones[anchorable] = targetZone;
 			return;
 		}
 
@@ -485,155 +469,51 @@ public class ToggleDockingManager : DockingManager
 		ToggleAnchorable(anchorable, targetZone);
 	}
 
-	/// <summary>
-	/// Gets the anchorables that are currently detached into a standalone window.
-	/// </summary>
-	public IEnumerable<LayoutAnchorable> DetachedAnchorables => _detachedAnchorables.Keys.ToList();
-
-	/// <summary>
-	/// Gets a value indicating whether the given anchorable is currently hosted by a standalone window.
-	/// </summary>
-	/// <param name="anchorable">The anchorable to test, may be <see langword="null"/>.</param>
-	/// <returns><see langword="true"/> when the anchorable is detached; otherwise <see langword="false"/>.</returns>
-	public bool IsDetached(LayoutAnchorable anchorable) =>
-		anchorable != null && _detachedAnchorables.ContainsKey(anchorable);
-
-	/// <summary>
-	/// Moves the content of the given anchorable out of the docking layout and into a standalone,
-	/// independent top level window.
-	/// </summary>
-	/// <param name="anchorable">The anchorable to detach.</param>
+	/// <inheritdoc/>
 	/// <remarks>
-	/// <para>
-	/// The anchorable itself stays in the layout tree, collapsed to its side stripe, so its toggle
-	/// button remains available and layout serialization keeps working unchanged. Only the presenter
-	/// that owns the user supplied content is moved into the new window, because a WPF element can
-	/// only ever have one parent.
-	/// </para>
-	/// <para>
-	/// Closing the window docks the anchorable back into the zone it came from, as does
-	/// <see cref="ReattachAnchorable(LayoutAnchorable)"/>.
-	/// </para>
+	/// Collapses the anchorable onto its side stripe rather than hiding it, so its toggle button stays
+	/// available and layout serialization keeps seeing an ordinary auto hidden entry.
 	/// </remarks>
-	public void DetachAnchorableToWindow(LayoutAnchorable anchorable)
+	protected override object DetachFromLayout(LayoutAnchorable anchorable)
 	{
-		if (anchorable == null || IsDetached(anchorable))
-		{
-			return;
-		}
-
 		var zone = GetAnchorableZone(anchorable);
+		_detachedZones[anchorable] = zone;
 
-		// Collapse a docked anchorable back onto its side stripe first, so the dock area reflows and
-		// the LayoutAnchorableControl that currently shows the content is torn down.
+		// Collapsing a docked anchorable makes the dock area reflow and tears down the control that
+		// currently shows the content.
 		if (!anchorable.IsAutoHidden)
 		{
 			AutoHideFromDock(anchorable, zone);
 		}
 
-		if (!(GetLayoutItemFromModel(anchorable) is LayoutAnchorableItem layoutItem))
-		{
-			return;
-		}
-
-		var view = layoutItem.View;
-		if (view == null)
-		{
-			return;
-		}
-
-		// The presenter is a logical child of this manager and may still be held by the visual tree of
-		// the pane it was shown in. Both links have to go before another window can take ownership.
-		DisconnectFromVisualParent(view);
-		InternalRemoveLogicalChild(view);
-
-		var window = new DetachedAnchorableWindow(anchorable, view);
-		window.UpdateThemeResources(null, Theme);
-		window.Closed += OnDetachedWindowClosed;
-
-		_detachedAnchorables[anchorable] = new DetachedEntry(window, zone);
-
-		HookHostWindow();
-		window.Show();
-
-		SetToolboxIsOpen(anchorable);
-		RefreshButtonStates();
+		return zone;
 	}
 
-	/// <summary>
-	/// Closes the standalone window of the given anchorable and docks its content back into the zone
-	/// it was detached from.
-	/// </summary>
-	/// <param name="anchorable">The anchorable to dock back, may be <see langword="null"/>.</param>
-	public void ReattachAnchorable(LayoutAnchorable anchorable)
+	/// <inheritdoc/>
+	protected override void ReturnToLayout(LayoutAnchorable anchorable, object restoreState)
 	{
-		if (anchorable == null || !_detachedAnchorables.TryGetValue(anchorable, out var entry))
-		{
-			return;
-		}
+		var zone = _detachedZones.TryGetValue(anchorable, out var remembered)
+			? remembered
+			: restoreState as DockZone? ?? GetAnchorableZone(anchorable);
 
-		// Remove the bookkeeping first: ToggleAnchorable below must not take the detached branch, and
-		// closing the window must not re-enter through OnDetachedWindowClosed.
-		_detachedAnchorables.Remove(anchorable);
-		entry.Window.Closed -= OnDetachedWindowClosed;
+		_detachedZones.Remove(anchorable);
 
-		var view = entry.Window.ReleaseView();
-		if (view != null)
-		{
-			InternalAddLogicalChild(view);
-		}
-
-		// Guarded because this method also runs from the Closed event of that very window, and WPF
-		// rejects Close on a window that is already closing.
-		if (!entry.Window.IsClosed)
-		{
-			entry.Window.Close();
-		}
-
-		// Docking the anchorable rebuilds its LayoutAnchorableControl, whose template binds to
-		// LayoutItem.View and therefore picks the presenter up again.
 		if (anchorable.IsAutoHidden)
 		{
-			ToggleAnchorable(anchorable, entry.Zone);
-		}
-		else
-		{
-			SetToolboxIsOpen(anchorable);
-			RefreshButtonStates();
-		}
-	}
-
-	/// <summary>
-	/// Docks every detached anchorable back into the layout.
-	/// </summary>
-	/// <remarks>
-	/// Call this before serializing the layout when detached content should be persisted in its docked
-	/// position rather than as a collapsed side stripe entry.
-	/// </remarks>
-	public void ReattachAllDetachedAnchorables()
-	{
-		foreach (var anchorable in _detachedAnchorables.Keys.ToList())
-		{
-			ReattachAnchorable(anchorable);
+			ToggleAnchorable(anchorable, zone);
 		}
 	}
 
 	/// <inheritdoc/>
-	internal override void ExecuteCloseCommand(LayoutAnchorable anchorable)
-	{
-		// Closing removes the anchorable from the layout altogether; its content must be back in the
-		// layout first, otherwise the standalone window would keep the only reference to it.
-		ReattachAnchorable(anchorable);
-		base.ExecuteCloseCommand(anchorable);
-	}
+	/// <remarks>Keeps the three dot options menu available while the content lives in its own window.</remarks>
+	protected override FrameworkElement CreateDetachedWindowHeader(LayoutAnchorable anchorable) =>
+		new ToggleAnchorablePaneTitle { Model = anchorable };
 
 	/// <inheritdoc/>
-	internal override void ExecuteHideCommand(LayoutAnchorable anchorable)
+	protected override void OnDetachedAnchorablesChanged(LayoutAnchorable anchorable)
 	{
-		// Hiding moves the anchorable into the hidden collection, which would strand its content in a
-		// standalone window. Dock it back first so the model and its view stay together.
-		ReattachAnchorable(anchorable);
-		base.ExecuteHideCommand(anchorable);
+		SetToolboxIsOpen(anchorable);
+		RefreshButtonStates();
 	}
 
 	/// <inheritdoc/>
@@ -2046,128 +1926,4 @@ public class ToggleDockingManager : DockingManager
 		}
 	}
 
-	/// <summary>
-	/// Detaches the given presenter from whatever currently parents it in the visual tree, so that it
-	/// can be handed to another window.
-	/// </summary>
-	/// <param name="view">The presenter to disconnect.</param>
-	/// <remarks>
-	/// Removing an anchorable from a pane leaves the template presenter that showed it orphaned but
-	/// still holding the view as its visual child, so the link has to be cut explicitly. The binding is
-	/// cleared as well, because a plain assignment would otherwise be overwritten by the binding.
-	/// </remarks>
-	private static void DisconnectFromVisualParent(ContentPresenter view)
-	{
-		var parent = VisualTreeHelper.GetParent(view);
-
-		switch (parent)
-		{
-			case ContentPresenter presenter when ReferenceEquals(presenter.Content, view):
-				BindingOperations.ClearBinding(presenter, ContentPresenter.ContentProperty);
-				presenter.Content = null;
-				break;
-
-			case ContentControl control when ReferenceEquals(control.Content, view):
-				BindingOperations.ClearBinding(control, ContentControl.ContentProperty);
-				control.Content = null;
-				break;
-
-			case Decorator decorator when ReferenceEquals(decorator.Child, view):
-				decorator.Child = null;
-				break;
-
-			case Panel panel:
-				panel.Children.Remove(view);
-				break;
-		}
-	}
-
-	/// <summary>Docks the anchorable back when the user closes its standalone window.</summary>
-	/// <param name="sender">The window that was closed.</param>
-	/// <param name="e">The event arguments.</param>
-	private void OnDetachedWindowClosed(object sender, EventArgs e)
-	{
-		if (sender is DetachedAnchorableWindow window)
-		{
-			ReattachAnchorable(window.Model);
-		}
-	}
-
-	/// <summary>Brings the standalone window of the given anchorable to the front.</summary>
-	/// <param name="anchorable">The detached anchorable.</param>
-	private void ActivateDetachedWindow(LayoutAnchorable anchorable)
-	{
-		if (!_detachedAnchorables.TryGetValue(anchorable, out var entry))
-		{
-			return;
-		}
-
-		if (entry.Window.WindowState == WindowState.Minimized)
-		{
-			entry.Window.WindowState = WindowState.Normal;
-		}
-
-		entry.Window.Activate();
-	}
-
-	/// <summary>
-	/// Makes sure detached windows are docked back when the host window closes.
-	/// </summary>
-	/// <remarks>
-	/// A detached window has no owner, so it would otherwise stay alive - and keep the process alive
-	/// under <see cref="System.Windows.ShutdownMode.OnLastWindowClose"/> - after the main window is gone.
-	/// </remarks>
-	private void HookHostWindow()
-	{
-		if (_hostWindowHooked)
-		{
-			return;
-		}
-
-		var hostWindow = Window.GetWindow(this);
-		if (hostWindow == null)
-		{
-			return;
-		}
-
-		hostWindow.Closed += OnHostWindowClosed;
-		_hostWindowHooked = true;
-	}
-
-	/// <summary>Closes every standalone window when the host window goes away.</summary>
-	/// <param name="sender">The host window.</param>
-	/// <param name="e">The event arguments.</param>
-	private void OnHostWindowClosed(object sender, EventArgs e)
-	{
-		if (sender is Window hostWindow)
-		{
-			hostWindow.Closed -= OnHostWindowClosed;
-		}
-
-		_hostWindowHooked = false;
-		ReattachAllDetachedAnchorables();
-	}
-
-	/// <summary>
-	/// Tracks one anchorable that is currently hosted by a standalone window.
-	/// </summary>
-	private sealed class DetachedEntry
-	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DetachedEntry"/> class.
-		/// </summary>
-		/// <param name="window">The window hosting the content.</param>
-		/// <param name="zone">The zone the anchorable is docked back into.</param>
-		public DetachedEntry(DetachedAnchorableWindow window, DockZone zone)
-		{
-			Window = window;
-			Zone = zone;
-		}
-
-		/// <summary>Gets the window that hosts the content of the anchorable.</summary>
-		public DetachedAnchorableWindow Window { get; }
-
-		/// <summary>Gets or sets the zone the anchorable returns to when it is docked back.</summary>
-		public DockZone Zone { get; set; }
-	}
 }

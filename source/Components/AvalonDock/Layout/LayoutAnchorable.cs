@@ -19,6 +19,7 @@ namespace AvalonDock.Layout
 		private double _autohideMinHeight = 100.0;
 		private bool _canHide = true;
 		private bool _canAutoHide = true;
+		private bool _isDetached;
 		private bool _canDockAsTabbedDocument = true;
 		// BD: 17.08.2020 Remove that bodge and handle CanClose=false && CanHide=true in XAML
 		// private bool _canCloseValueBeforeInternalSet;
@@ -176,6 +177,28 @@ namespace AvalonDock.Layout
 		/// </summary>
 		[XmlIgnore]
 		public bool IsHidden => Parent is LayoutRoot;
+
+		/// <summary>
+		/// Gets or sets a value indicating whether the content of this anchorable is currently hosted by
+		/// a standalone window outside of the docking layout.
+		/// </summary>
+		/// <remarks>
+		/// Maintained by <see cref="DockingManager.DetachAnchorableToWindow"/> and
+		/// <see cref="DockingManager.ReattachAnchorable"/>. It takes part in layout serialization so that
+		/// a restored layout can recreate the window; setting it by hand does not detach anything.
+		/// The window geometry rides on the <see cref="LayoutContent.FloatingLeft"/> family of properties.
+		/// </remarks>
+		public bool IsDetached
+		{
+			get => _isDetached;
+			set
+			{
+				if (_isDetached == value) return;
+				RaisePropertyChanging(nameof(IsDetached));
+				_isDetached = value;
+				RaisePropertyChanged(nameof(IsDetached));
+			}
+		}
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this instance is visible.
