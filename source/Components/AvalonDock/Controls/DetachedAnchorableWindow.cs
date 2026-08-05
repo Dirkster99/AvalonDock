@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -17,8 +17,7 @@ namespace AvalonDock.Controls
 	/// Unlike <see cref="LayoutFloatingWindowControl"/>, which is a borderless window owned by the
 	/// main window and which takes part in drag docking, this is an ordinary WPF window. It uses the
 	/// operating system chrome, owns a taskbar entry, minimizes and restores independently of the main
-	/// window and may be moved behind it. This corresponds to the "Window" view mode that IDEs such as
-	/// IntelliJ offer for their tool windows.
+	/// window and may be moved behind it. This corresponds to the "Window" view mode that IDEs offer for their tool windows.
 	/// </para>
 	/// <para>
 	/// The window hosts the <see cref="LayoutItem.View"/> presenter of the anchorable. That presenter is
