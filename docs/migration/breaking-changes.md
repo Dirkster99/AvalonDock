@@ -144,6 +144,44 @@ var serializer = new XmlLayoutSerializer(dockManager)
 };
 ```
 
+Prefer deciding per item where you can. Only the application can tell a tool window that will never
+come back from one whose plugin simply has not loaded yet, and parking only the latter keeps the
+stored layout free of entries nothing will ever claim:
+
+```csharp
+serializer.LayoutSerializationCallback += (s, args) =>
+{
+    var content = FindContent(args.Model.ContentId);
+    if (content != null)
+    {
+        args.Content = content;
+        return;
+    }
+
+    // A plugin we know about but have not loaded yet: keep the entry so the tool window can
+    // return to its stored position once the plugin supplies its content.
+    if (_knownPluginContentIds.Contains(args.Model.ContentId))
+        args.UnresolvedContentHandling = UnresolvedContentHandling.Hide;
+};
+```
+
+Restoring a parked item once its content arrives:
+
+```csharp
+var parked = dockManager.Layout.Hidden.FirstOrDefault(a => a.ContentId == contentId);
+if (parked != null)
+{
+    parked.Content = pluginViewModel;
+    parked.Show();
+}
+```
+
+`Show()` puts the anchorable back into the pane and at the index it was stored at, provided that pane
+still exists in the restored layout. A pane that held nothing but unresolved items is collected as
+empty, in which case add the tool window through `AddToLayout` instead. Under `ToggleDockingManager`
+use `RestoreHiddenAnchorable`, which places the tool window on the sidebar of its zone and does not
+depend on the stored pane.
+
 Note that `args.Cancel = true` always drops the item, under either setting.
 
 ---

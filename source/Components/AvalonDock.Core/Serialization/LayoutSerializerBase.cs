@@ -20,11 +20,18 @@ namespace AvalonDock.Core
 		/// </summary>
 		/// <param name="model">The model of the view being deserialized.</param>
 		/// <param name="previousContent">The content from the previous layout, if available.</param>
-		public LayoutSerializationCallbackEventArgs(ISerializableLayoutContent model, object previousContent)
+		/// <param name="handling">
+		/// What happens to the item when the handler supplies no content, taken from the serializer.
+		/// </param>
+		public LayoutSerializationCallbackEventArgs(
+			ISerializableLayoutContent model,
+			object previousContent,
+			UnresolvedContentHandling handling = UnresolvedContentHandling.Remove)
 		{
 			Cancel = false;
 			Model = model;
 			Content = previousContent;
+			UnresolvedContentHandling = handling;
 		}
 
 		/// <summary>Gets the model of the layout item being deserialized.</summary>
@@ -32,6 +39,19 @@ namespace AvalonDock.Core
 
 		/// <summary>Gets or sets the content to assign to the deserialized item.</summary>
 		public object Content { get; set; }
+
+		/// <summary>
+		/// Gets or sets what happens to this item when the handler supplies no content.
+		/// </summary>
+		/// <remarks>
+		/// Starts out at the serializer wide setting and can be changed for this one item. Only the
+		/// application can tell a stored tool window that will never come back from one whose plugin
+		/// simply has not loaded yet, so this is where that knowledge belongs: park the ones whose
+		/// content is still expected with <see cref="UnresolvedContentHandling.Hide"/> and let the
+		/// rest be removed. Ignored for documents, which have no hidden state, and when
+		/// <see cref="CancelEventArgs.Cancel"/> is set.
+		/// </remarks>
+		public UnresolvedContentHandling UnresolvedContentHandling { get; set; }
 	}
 
 	/// <summary>
@@ -221,7 +241,8 @@ namespace AvalonDock.Core
 
 				if (LayoutSerializationCallback != null)
 				{
-					var args = new LayoutSerializationCallbackEventArgs(lcToFix, previous?.Content);
+					var args = new LayoutSerializationCallbackEventArgs(
+						lcToFix, previous?.Content, UnresolvedContentHandling);
 					LayoutSerializationCallback(this, args);
 
 					// A cancelled anchorable is dropped rather than closed. Closing an auto hidden
@@ -232,11 +253,11 @@ namespace AvalonDock.Core
 					else if (args.Content != null)
 						lcToFix.Content = args.Content;
 					else if (args.Model.Content == null)
-						DiscardUnresolved(lcToFix);
+						DiscardUnresolved(lcToFix, args.UnresolvedContentHandling);
 				}
 				else if (previous == null)
 				{
-					DiscardUnresolved(lcToFix);
+					DiscardUnresolved(lcToFix, UnresolvedContentHandling);
 				}
 				else
 				{
@@ -279,13 +300,15 @@ namespace AvalonDock.Core
 		}
 
 		/// <summary>
-		/// Disposes of an anchorable of the stored layout whose content could not be resolved,
-		/// according to <see cref="UnresolvedContentHandling"/>.
+		/// Disposes of an anchorable of the stored layout whose content could not be resolved.
 		/// </summary>
 		/// <param name="anchorable">The unresolved anchorable.</param>
-		private void DiscardUnresolved(ISerializableLayoutAnchorable anchorable)
+		/// <param name="handling">What to do with it.</param>
+		private static void DiscardUnresolved(
+			ISerializableLayoutAnchorable anchorable,
+			UnresolvedContentHandling handling)
 		{
-			if (UnresolvedContentHandling == UnresolvedContentHandling.Hide)
+			if (handling == UnresolvedContentHandling.Hide)
 				anchorable.HideAnchorable(false);
 			else
 				anchorable.RemoveFromLayout();

@@ -202,6 +202,56 @@ namespace AvalonDockTest
 		}
 
 		/// <summary>
+		/// The plugin case: a tool window whose plugin has not loaded yet is parked per item, while
+		/// everything else the application does not recognise is still dropped.
+		/// </summary>
+		[Test]
+		public void Deserialize_WithPerItemHideHandling_ParksOnlyTheItemTheCallbackAsksFor()
+		{
+			var manager = Restore(StoredLayout(), e =>
+			{
+				// "tool1" belongs to a plugin this application knows about but has not loaded yet.
+				if (e.Model.ContentId == "tool1")
+					e.UnresolvedContentHandling = UnresolvedContentHandling.Hide;
+
+				// "tool2" is genuinely unknown and falls through to the serializer default.
+			});
+
+			Assert.That(manager.Layout.Hidden.Select(a => a.ContentId), Is.EqualTo(new[] { "tool1" }),
+				"Only the item the callback asked to park may stay in the hidden list.");
+			Assert.That(LayoutContains(manager, "tool2"), Is.False);
+		}
+
+		/// <summary>
+		/// The full plugin round trip: park the stored entry, load the plugin afterwards, attach its
+		/// content and show the tool window again.
+		/// </summary>
+		[Test]
+		public void ParkedAnchorable_CanBeRestoredOnceThePluginSuppliesItsContent()
+		{
+			var manager = Restore(StoredLayout(), e =>
+			{
+				if (e.Model.ContentId == "tool1")
+					e.UnresolvedContentHandling = UnresolvedContentHandling.Hide;
+				else
+					e.Content = new object();
+			});
+
+			// The plugin loads and hands over its view model.
+			var parked = manager.Layout.Hidden.Single(a => a.ContentId == "tool1");
+			var pluginContent = new object();
+			parked.Content = pluginContent;
+			parked.Show();
+
+			var restored = VisibleAnchorable(manager, "tool1");
+			Assert.That(restored, Is.Not.Null,
+				"A parked anchorable must come back into the visible layout once it has content.");
+			Assert.That(restored.Content, Is.SameAs(pluginContent));
+			Assert.That(manager.Layout.Hidden.Any(a => a.ContentId == "tool1"), Is.False,
+				"It must no longer be listed as hidden.");
+		}
+
+		/// <summary>
 		/// Cancelling drops the anchorable outright, regardless of the handling setting: the
 		/// application said no, which is a stronger statement than "I cannot resolve this".
 		/// </summary>

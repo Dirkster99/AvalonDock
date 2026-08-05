@@ -115,5 +115,66 @@ namespace AvalonDockTest
 			Assert.That(restored.Title, Is.EqualTo("Tool 1"));
 			Assert.That(restored.ContentId, Is.EqualTo("tool1"));
 		}
+
+		/// <summary>
+		/// The panes and pane groups of the layout are stored in collections declared with their
+		/// abstract base type, so each entry has to carry a type discriminator to come back as the
+		/// class it was. Without it the tree is unreadable.
+		/// </summary>
+		[Test]
+		public void RoundTrip_PreservesThePaneTreeStructure()
+		{
+			var documentPane = new LayoutDocumentPane();
+			documentPane.Children.Add(new LayoutDocument { Title = "Doc 1", ContentId = "doc1" });
+
+			var toolPane = new LayoutAnchorablePane { Name = "ToolsPane" };
+			toolPane.Children.Add(new LayoutAnchorable { Title = "Tool 1", ContentId = "tool1" });
+
+			var panel = new LayoutPanel(new LayoutDocumentPaneGroup(documentPane))
+			{
+				Orientation = System.Windows.Controls.Orientation.Horizontal,
+			};
+			panel.Children.Add(new LayoutAnchorablePaneGroup(toolPane));
+
+			var restored = RoundTrip(new LayoutRoot { RootPanel = panel });
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(restored.RootPanel.Children.OfType<LayoutDocumentPaneGroup>().Count(), Is.EqualTo(1),
+					"The document pane group must come back as a document pane group.");
+				Assert.That(restored.RootPanel.Children.OfType<LayoutAnchorablePaneGroup>().Count(), Is.EqualTo(1),
+					"The anchorable pane group must come back as an anchorable pane group.");
+				Assert.That(restored.Descendents().OfType<LayoutAnchorablePane>().Single().Name,
+					Is.EqualTo("ToolsPane"));
+				Assert.That(restored.Descendents().OfType<LayoutDocument>().Single().ContentId,
+					Is.EqualTo("doc1"));
+			});
+		}
+
+		/// <summary>
+		/// A floating window is stored in a list declared with the abstract floating-window base, so
+		/// it needs the same discriminator treatment as the pane tree.
+		/// </summary>
+		[Test]
+		public void RoundTrip_PreservesAnchorableFloatingWindows()
+		{
+			var floatingPane = new LayoutAnchorablePane();
+			floatingPane.Children.Add(new LayoutAnchorable { Title = "Watch", ContentId = "tool1" });
+
+			var layout = new LayoutRoot
+			{
+				RootPanel = new LayoutPanel(new LayoutDocumentPaneGroup(new LayoutDocumentPane())),
+			};
+			layout.FloatingWindows.Add(new LayoutAnchorableFloatingWindow
+			{
+				RootPanel = new LayoutAnchorablePaneGroup(floatingPane),
+			});
+
+			var restored = RoundTrip(layout);
+
+			Assert.That(restored.FloatingWindows.OfType<LayoutAnchorableFloatingWindow>().Count(),
+				Is.EqualTo(1),
+				"The floating window must come back as an anchorable floating window.");
+		}
 	}
 }
