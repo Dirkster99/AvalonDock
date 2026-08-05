@@ -2259,7 +2259,7 @@ namespace AvalonDock
 
 		/// <summary>Closes the specified anchorable.</summary>
 		/// <param name="anchorable">The anchorable to close.</param>
-		internal void ExecuteCloseCommand(LayoutAnchorable anchorable)
+		internal virtual void ExecuteCloseCommand(LayoutAnchorable anchorable)
 		{
 			if (!(anchorable is LayoutAnchorable model)) return;
 
@@ -2344,7 +2344,7 @@ namespace AvalonDock
 
 		/// <summary>Hides the specified anchorable.</summary>
 		/// <param name="anchorable">The anchorable to hide.</param>
-		internal void ExecuteHideCommand(LayoutAnchorable anchorable)
+		internal virtual void ExecuteHideCommand(LayoutAnchorable anchorable)
 		{
 			if (!(anchorable is LayoutAnchorable model)) return;
 
