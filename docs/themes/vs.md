@@ -8,7 +8,7 @@ description: "The Visual Studio theme for AvalonDock."
 
 # VS Theme (.vstheme)
 
-Visual Studio styling based on `.vstheme` files. Includes built-in VS2015 and VS2022 variants and supports loading custom `.vstheme` or `.vstheme.gz` (gzip-compressed) files.
+Visual Studio styling based on `.vstheme` files. Includes built-in VS2015, VS2022 and VS2026 variants and supports loading custom `.vstheme` or `.vstheme.gz` (gzip-compressed) files, as well as the JSON override format introduced with VS2026.
 
 ---
 

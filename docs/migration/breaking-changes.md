@@ -102,7 +102,10 @@ These additions are new in v5.0.0 and do not break existing code:
 | Feature | Package | Description |
 |:--------|:--------|:------------|
 | ToggleDockingManager | `AvalonDock` | VS Code / Rider-style sidebar with toggle buttons. |
+| Standalone Windows | `AvalonDock` | `DetachAnchorableToWindow` moves a tool window into an ordinary top level window with its own taskbar entry ("Window" view mode). Survives layout serialization. |
+| Toolbox Shortcuts | `AvalonDock` | `IToolbox.Shortcut` registers a key binding that toggles the toolbox and shows up in its tooltip. |
 | Arc Theme | `AvalonDock.Themes.Arc` | Modern theme with dark/light variants. |
+| VS Themes | `AvalonDock.Themes.VS` | `.vstheme` based Visual Studio themes with VS2015, VS2022 and VS2026 variants, plus loading of custom theme files. |
 | JSON Serializer | `AvalonDock.Serializer.Json` | JSON-based layout serialization. |
 | MVVM Base Classes | `AvalonDock.Mvvm` | `DockableBase`, `ToolboxBase`, `DockLayoutService`, etc. |
 | MVVM CommunityToolkit | `AvalonDock.Mvvm.CommunityToolkit` | `ObservableDockableBase`, `ObservableToolboxBase` with source generators. |
