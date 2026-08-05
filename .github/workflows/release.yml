@@ -20,10 +20,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup .NET 9
+      # Both SDKs are required: the components target net9.0-windows and net10.0-windows,
+      # and the FlaUI test step below runs against net10.0-windows. Keep in sync with ci.yml.
+      - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: |
+            9.0.x
+            10.0.x
 
       - name: Determine version
         id: version
