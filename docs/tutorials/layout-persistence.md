@@ -99,7 +99,9 @@ private void DockManager_Loaded(object sender, RoutedEventArgs e)
 ```
 
 {: .important }
-The `LayoutSerializationCallback` is called for **every** content item in the saved layout. You must provide the actual UI content (or view model) for each item, matched by `ContentId`. If you set `args.Content = null` or `args.Cancel = true`, that item is removed from the restored layout.
+The `LayoutSerializationCallback` is called for **every** content item in the saved layout. You must provide the actual UI content (or view model) for each item, matched by `ContentId`. If you leave `args.Content` at `null` or set `args.Cancel = true`, that item is removed from the restored layout.
+
+Set `serializer.UnresolvedContentHandling = UnresolvedContentHandling.Hide` if you would rather keep unresolved anchorables in `LayoutRoot.Hidden`, with the pane and index they were stored at, so that content supplied later can still restore them in place. `args.Cancel = true` removes the item either way.
 
 ### Step 4: Wire the Loaded Event
 

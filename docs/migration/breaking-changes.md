@@ -120,6 +120,32 @@ A bug fix in v5.0.0 corrects the restacking behavior for bottom-docked panels. I
 
 **Fix:** Test your layouts and adjust panel placement if needed.
 
+### Unresolved Items Are Dropped on Deserialization
+
+**Impact:** Low — affects applications that read `LayoutRoot.Hidden` after restoring a layout.
+
+When a stored layout contains an item whose content cannot be resolved — a tool window the
+application no longer offers, or one the `LayoutSerializationCallback` supplies no content for —
+that item is now removed from the layout entirely.
+
+In v4 an unresolved *anchorable* was hidden instead: it stayed in `LayoutRoot.Hidden` with the pane
+and index it was stored at, and was written back into every layout saved afterwards. Unresolved
+*documents* were already removed, so anchorables were the exception rather than the rule. The v4
+source described both cases as "skip this".
+
+**Fix:** Nothing to do in most applications. If yours attaches content after the layout was restored
+— a plugin that loads late, or a tool window created on first use that expects to find itself in the
+hidden list — request the old behavior explicitly:
+
+```csharp
+var serializer = new XmlLayoutSerializer(dockManager)
+{
+    UnresolvedContentHandling = UnresolvedContentHandling.Hide
+};
+```
+
+Note that `args.Cancel = true` always drops the item, under either setting.
+
 ---
 
 ## Summary Table
@@ -134,3 +160,4 @@ A bug fix in v5.0.0 corrects the restacking behavior for bottom-docked panels. I
 | Themes | Arc theme added | None | Optional adoption |
 | Serialization | JSON serializer added | None | Optional adoption |
 | Behavior | Bottom restack fix | Low | Test and verify layouts |
+| Behavior | Unresolved layout items dropped | Low | Set `UnresolvedContentHandling.Hide` if you relied on `LayoutRoot.Hidden` |

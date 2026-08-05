@@ -35,6 +35,27 @@ namespace AvalonDock.Core
 	}
 
 	/// <summary>
+	/// Decides what happens to an item of a stored layout whose content cannot be resolved -
+	/// typically a tool window that the application does not offer any more.
+	/// </summary>
+	public enum UnresolvedContentHandling
+	{
+		/// <summary>
+		/// Drop the item from the layout. Nothing is left behind: no empty pane, no entry in the
+		/// hidden list, and nothing to carry into the next saved layout.
+		/// </summary>
+		Remove,
+
+		/// <summary>
+		/// Hide the item, keeping it in <c>LayoutRoot.Hidden</c> together with the pane and index it
+		/// was stored at. An application that supplies the content later - a plugin that loads after
+		/// the layout was restored, say - can then show it again in its remembered position, at the
+		/// price of carrying the entry through every save.
+		/// </summary>
+		Hide,
+	}
+
+	/// <summary>
 	/// UI-independent base class for layout serialization/deserialization.
 	/// Implements <see cref="ILayoutSerializer"/> with a template-method pattern:
 	/// subclasses provide format-specific <see cref="SerializeCore"/> and
@@ -61,6 +82,17 @@ namespace AvalonDock.Core
 
 		/// <summary>Gets the docking manager whose layout is being serialized.</summary>
 		public IDockingManager Manager { get; }
+
+		/// <summary>
+		/// Gets or sets what happens to a stored anchorable whose content cannot be resolved.
+		/// Defaults to <see cref="UnresolvedContentHandling.Remove"/>.
+		/// </summary>
+		/// <remarks>
+		/// Documents are always removed: a document has no hidden state to be parked in. Set this to
+		/// <see cref="UnresolvedContentHandling.Hide"/> to get the AvalonDock v4 behaviour for
+		/// anchorables, where an unresolved tool window stayed in <c>LayoutRoot.Hidden</c>.
+		/// </remarks>
+		public UnresolvedContentHandling UnresolvedContentHandling { get; set; } = UnresolvedContentHandling.Remove;
 
 		/// <inheritdoc/>
 		public void Serialize(Stream stream)
@@ -150,11 +182,10 @@ namespace AvalonDock.Core
 		/// <param name="layout">The deserialized layout root to fix up.</param>
 		/// <remarks>
 		/// An item of the stored layout whose content cannot be resolved - typically a tool window that
-		/// the application does not offer any more - never stays in the visible layout. An anchorable is
-		/// hidden, so it remains listed in <c>LayoutRoot.Hidden</c> and can be brought back should the
-		/// application supply its content later; a document is closed. Leaving them in place would show
-		/// an empty pane or tab carrying nothing but the stored title, and every save/load cycle would
-		/// carry those ghosts forward.
+		/// the application does not offer any more - is dropped from the layout. Leaving it in place
+		/// would show an empty pane or tab carrying nothing but the stored title, and every save/load
+		/// cycle would carry that ghost forward. See <see cref="UnresolvedContentHandling"/> to keep
+		/// unresolved anchorables in the hidden list instead.
 		/// </remarks>
 		protected virtual void FixupLayout(ISerializableLayoutRoot layout)
 		{
@@ -192,16 +223,20 @@ namespace AvalonDock.Core
 				{
 					var args = new LayoutSerializationCallbackEventArgs(lcToFix, previous?.Content);
 					LayoutSerializationCallback(this, args);
+
+					// A cancelled anchorable is dropped rather than closed. Closing an auto hidden
+					// anchorable restores its whole anchor group - siblings included - to the docked
+					// area on the way out, which is not what refusing a stored item should do.
 					if (args.Cancel)
-						lcToFix.Close();
+						lcToFix.RemoveFromLayout();
 					else if (args.Content != null)
 						lcToFix.Content = args.Content;
 					else if (args.Model.Content == null)
-						lcToFix.HideAnchorable(false);
+						DiscardUnresolved(lcToFix);
 				}
 				else if (previous == null)
 				{
-					lcToFix.HideAnchorable(false);
+					DiscardUnresolved(lcToFix);
 				}
 				else
 				{
@@ -241,6 +276,19 @@ namespace AvalonDock.Core
 			}
 
 			layout.CollectGarbage();
+		}
+
+		/// <summary>
+		/// Disposes of an anchorable of the stored layout whose content could not be resolved,
+		/// according to <see cref="UnresolvedContentHandling"/>.
+		/// </summary>
+		/// <param name="anchorable">The unresolved anchorable.</param>
+		private void DiscardUnresolved(ISerializableLayoutAnchorable anchorable)
+		{
+			if (UnresolvedContentHandling == UnresolvedContentHandling.Hide)
+				anchorable.HideAnchorable(false);
+			else
+				anchorable.RemoveFromLayout();
 		}
 
 		private void CaptureCurrentState()
