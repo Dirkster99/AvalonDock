@@ -179,13 +179,25 @@ if (parked != null)
 }
 ```
 
-`Show()` puts the anchorable back into the pane and at the index it was stored at, provided that pane
-still exists in the restored layout. A pane that held nothing but unresolved items is collected as
-empty, in which case add the tool window through `AddToLayout` instead. Under `ToggleDockingManager`
-use `RestoreHiddenAnchorable`, which places the tool window on the sidebar of its zone and does not
-depend on the stored pane.
+`Show()` puts the anchorable back into the pane and at the index it was stored at. If that pane is no
+longer part of the layout — a restored layout rebuilds the docked area from scratch — it docks to an
+existing tool window pane instead, creating one if the layout has none, so the call never silently
+does nothing. Under `ToggleDockingManager` use `RestoreHiddenAnchorable`, which places the tool
+window on the sidebar of its zone.
 
 Note that `args.Cancel = true` always drops the item, under either setting.
+
+### ToolTip Is No Longer Stored in the Layout
+
+**Impact:** Low — affects applications that set `LayoutContent.ToolTip` and never set it again.
+
+A tool tip belongs to the content, not to the layout. `LayoutItem` pushes it down from the view every
+time the view is attached, and it is routinely a control or a binding, neither of which a layout file
+can describe. v4 wrote the text form of it into the file and read it back; v5 leaves it out.
+
+**Fix:** Set the tool tip where you set the rest of the content — in the view, or on the view model
+the `LayoutSerializationCallback` supplies. A `ToolTip` attribute in a file written by v4 is ignored
+on read, so existing layout files still load.
 
 ---
 
@@ -202,3 +214,4 @@ Note that `args.Cancel = true` always drops the item, under either setting.
 | Serialization | JSON serializer added | None | Optional adoption |
 | Behavior | Bottom restack fix | Low | Test and verify layouts |
 | Behavior | Unresolved layout items dropped | Low | Set `UnresolvedContentHandling.Hide` if you relied on `LayoutRoot.Hidden` |
+| Behavior | `ToolTip` no longer stored in the layout | Low | Set it in the view or on the view model |
