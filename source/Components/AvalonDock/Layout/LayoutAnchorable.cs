@@ -366,14 +366,25 @@ namespace AvalonDock.Layout
 			if (root?.Manager?.LayoutUpdateStrategy != null)
 				added = root.Manager.LayoutUpdateStrategy.BeforeInsertAnchorable(root as LayoutRoot, this, PreviousContainer);
 
-			if (!added && PreviousContainer is ILayoutGroup previousContainerAsLayoutGroup)
-			{
-				if (PreviousContainerIndex >= 0 && PreviousContainerIndex < previousContainerAsLayoutGroup.ChildrenCount)
-					previousContainerAsLayoutGroup.InsertChildAt(PreviousContainerIndex, this);
-				else
-					previousContainerAsLayoutGroup.InsertChildAt(previousContainerAsLayoutGroup.ChildrenCount, this);
+			// The pane an anchorable was hidden from is not guaranteed to be there when it comes back.
+			// A layout restored from file replaces the docked area wholesale, which leaves the
+			// reference pointing off the tree, and CollectGarbage nulls it outright once that has
+			// happened. Without a fallback Show() then walked past the branch below and returned
+			// having done nothing - no move, no exception - leaving the anchorable invisible.
+			var container = PreviousContainer as ILayoutGroup;
+			var restoresToPreviousContainer = container != null && container.Root == root;
+			if (!added && !restoresToPreviousContainer)
+				container = FindContainerForShow(root as LayoutRoot);
 
-				Parent = previousContainerAsLayoutGroup;
+			if (!added && container != null)
+			{
+				// The remembered index belongs to the remembered pane; in any other one it means nothing.
+				if (restoresToPreviousContainer && PreviousContainerIndex >= 0 && PreviousContainerIndex < container.ChildrenCount)
+					container.InsertChildAt(PreviousContainerIndex, this);
+				else
+					container.InsertChildAt(container.ChildrenCount, this);
+
+				Parent = container;
 				IsSelected = true;
 				IsActive = true;
 			}
@@ -384,6 +395,32 @@ namespace AvalonDock.Layout
 			RaisePropertyChanged(nameof(IsVisible));
 			RaisePropertyChanged(nameof(IsHidden));
 			NotifyIsVisibleChanged();
+		}
+
+		/// <summary>
+		/// Finds the pane to show an anchorable in when the one it remembers is gone.
+		/// </summary>
+		/// <param name="root">The layout root the anchorable belongs to.</param>
+		/// <returns>
+		/// A pane of the docked area, creating one if the layout holds none, or <c>null</c> if there is
+		/// no layout to add to.
+		/// </returns>
+		/// <remarks>
+		/// Only the docked area is searched. A pane inside a floating window or parked on an auto hide
+		/// side would take the anchorable somewhere the user never asked for, which is worse than the
+		/// fresh pane created here.
+		/// </remarks>
+		private static ILayoutGroup FindContainerForShow(LayoutRoot root)
+		{
+			var panel = root?.RootPanel;
+			if (panel == null) return null;
+
+			var pane = panel.Descendents().OfType<LayoutAnchorablePane>().FirstOrDefault();
+			if (pane != null) return pane;
+
+			pane = new LayoutAnchorablePane();
+			panel.Children.Add(pane);
+			return pane;
 		}
 
 		/// <summary>
