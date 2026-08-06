@@ -15,9 +15,9 @@ namespace AvalonDockTest
 	/// <remarks>
 	/// The layout DTOs carry properties whose default is <see langword="true"/> (CanHide, CanFloat,
 	/// CanAutoHide, CanDockAsTabbedDocument, CanMove, CanShowOnHover) or -1
-	/// (PreviousContainerIndex). Serializer settings that skip members holding the default of their
-	/// CLR type therefore have to stay off, or every <see langword="false"/> comes back as
-	/// <see langword="true"/>.
+	/// (PreviousContainerIndex), so every value has to be written out. A setting that skips members
+	/// holding the default of their CLR type would turn each <see langword="false"/> back into
+	/// <see langword="true"/> on load.
 	/// </remarks>
 	[TestFixture]
 	[Apartment(ApartmentState.STA)]
