@@ -240,6 +240,41 @@ namespace AvalonDockTest
 			});
 		}
 
+		/// <summary>
+		/// The auto hide minimums are the one pair whose "skip the default" rule was comparing against
+		/// a value neither the model nor the DTO uses any more. Both formats have to restore the
+		/// default and a changed value alike.
+		/// </summary>
+		/// <param name="stored">The value stored on the anchorable.</param>
+		[TestCase(100.0)]
+		[TestCase(240.0)]
+		public void XmlAndJson_RestoreTheSameAutoHideMinimums(double stored)
+		{
+			LayoutRoot Build()
+			{
+				var layout = BuildLayout();
+				var anchorable = layout.Descendents().OfType<LayoutAnchorable>().Single(a => a.ContentId == "explorer");
+				anchorable.AutoHideMinWidth = stored;
+				anchorable.AutoHideMinHeight = stored;
+				return layout;
+			}
+
+			double[] Minimums(LayoutRoot layout)
+			{
+				var restored = layout.Descendents().OfType<LayoutAnchorable>().Single(a => a.ContentId == "explorer");
+				return new[] { restored.AutoHideMinWidth, restored.AutoHideMinHeight };
+			}
+
+			var viaXml = Minimums(RoundTripXml(Build()));
+			var viaJson = Minimums(RoundTripJson(Build()));
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(viaJson, Is.EqualTo(viaXml), "The two formats disagree about the minimums.");
+				Assert.That(viaXml, Is.EqualTo(new[] { stored, stored }));
+			});
+		}
+
 		/// <summary>Reads the flags of an anchorable in a fixed order.</summary>
 		/// <param name="anchorable">The anchorable to read.</param>
 		/// <returns>The flag values.</returns>
