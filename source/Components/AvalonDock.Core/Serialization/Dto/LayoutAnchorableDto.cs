@@ -76,11 +76,11 @@ namespace AvalonDock.Core.Serialization.Dto
 
 		/// <summary>Determines whether the AutoHideMinWidth property should be serialized.</summary>
 		/// <returns>True if the value differs from default.</returns>
-		public bool ShouldSerializeAutoHideMinWidth() => AutoHideMinWidth != 25.0;
+		public bool ShouldSerializeAutoHideMinWidth() => AutoHideMinWidth != 100.0;
 
 		/// <summary>Determines whether the AutoHideMinHeight property should be serialized.</summary>
 		/// <returns>True if the value differs from default.</returns>
-		public bool ShouldSerializeAutoHideMinHeight() => AutoHideMinHeight != 25.0;
+		public bool ShouldSerializeAutoHideMinHeight() => AutoHideMinHeight != 100.0;
 
 		/// <summary>Determines whether the CanDockAsTabbedDocument property should be serialized.</summary>
 		/// <returns>True if the value differs from default.</returns>

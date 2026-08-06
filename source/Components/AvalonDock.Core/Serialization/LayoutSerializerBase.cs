@@ -3,7 +3,6 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using AvalonDock.Core.Serialization;
 using AvalonDock.Core.Serialization.Dto;
 
@@ -141,12 +140,13 @@ namespace AvalonDock.Core
 
 		/// <summary>Serializes the current docking layout to a <see cref="TextWriter"/>.</summary>
 		/// <param name="writer">The text writer to write to.</param>
-		public void Serialize(TextWriter writer)
-		{
-			using var stream = new MemoryStream();
-			Serialize(stream);
-			writer.Write(Encoding.UTF8.GetString(stream.ToArray()));
-		}
+		/// <remarks>
+		/// Forwards to <see cref="LayoutSerializerExtensions"/>, which carries the one implementation.
+		/// The method exists here as well because an instance method wins overload resolution over an
+		/// extension method, so without it a caller holding a concrete serializer would not see the
+		/// extension at all.
+		/// </remarks>
+		public void Serialize(TextWriter writer) => LayoutSerializerExtensions.Serialize(this, writer);
 
 		/// <summary>Serializes the current docking layout to a <see cref="StreamWriter"/>.</summary>
 		/// <param name="writer">The stream writer to write to.</param>
@@ -157,12 +157,11 @@ namespace AvalonDock.Core
 
 		/// <summary>Deserializes a docking layout from a <see cref="TextReader"/> and applies fixup.</summary>
 		/// <param name="reader">The text reader to read from.</param>
-		public void Deserialize(TextReader reader)
-		{
-			var bytes = Encoding.UTF8.GetBytes(reader.ReadToEnd());
-			using var stream = new MemoryStream(bytes);
-			Deserialize(stream);
-		}
+		/// <remarks>
+		/// Forwards to <see cref="LayoutSerializerExtensions"/> for the same reason as
+		/// <see cref="Serialize(TextWriter)"/>.
+		/// </remarks>
+		public void Deserialize(TextReader reader) => LayoutSerializerExtensions.Deserialize(this, reader);
 
 		/// <summary>Deserializes a docking layout from a <see cref="StreamReader"/> and applies fixup.</summary>
 		/// <param name="reader">The stream reader to read from.</param>
