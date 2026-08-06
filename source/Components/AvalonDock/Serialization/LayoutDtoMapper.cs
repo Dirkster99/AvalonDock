@@ -206,7 +206,6 @@ namespace AvalonDock.Serialization
 			dto.ContentId = content.ContentId;
 			dto.IsSelected = content.IsSelected;
 			dto.IsLastFocusedDocument = content.IsLastFocusedDocument;
-			dto.ToolTip = content.ToolTip is string s ? s : null;
 			dto.FloatingLeft = content.FloatingLeft;
 			dto.FloatingTop = content.FloatingTop;
 			dto.FloatingWidth = content.FloatingWidth;
