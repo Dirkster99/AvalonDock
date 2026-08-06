@@ -290,21 +290,18 @@ namespace AvalonDockTest
 			});
 		}
 
-		/// <summary>The selection flags of a content item survive.</summary>
+		/// <summary>
+		/// The selected flag survives, so the tab that was in front comes back in front.
+		/// </summary>
+		/// <remarks>
+		/// Its companion IsLastFocusedDocument is not covered here: the setter is internal, driven by
+		/// the layout root when the active content changes, so a test cannot put a content item into
+		/// that state without going through a docking manager.
+		/// </remarks>
 		[Test]
-		public void RoundTrip_PreservesSelectionFlags()
+		public void RoundTrip_PreservesTheSelectedFlag()
 		{
-			var restored = RoundTripAnchorable(a =>
-			{
-				a.IsSelected = true;
-				a.IsLastFocusedDocument = true;
-			});
-
-			Assert.Multiple(() =>
-			{
-				Assert.That(restored.IsSelected, Is.True);
-				Assert.That(restored.IsLastFocusedDocument, Is.True);
-			});
+			Assert.That(RoundTripAnchorable(a => a.IsSelected = true).IsSelected, Is.True);
 		}
 
 		#endregion
