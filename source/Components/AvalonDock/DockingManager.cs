@@ -101,14 +101,14 @@ namespace AvalonDock
 		public virtual ILayoutEngine LayoutEngine => _layoutEngine;
 		
 		/// <summary>
-		/// Indicates whether document source binding is suspended during deserialization.
+		/// Gets or sets a value indicating whether document source binding is suspended during deserialization.
 		/// </summary>
-		public bool SuspendDocumentsSourceBinding = false;
+		public bool SuspendDocumentsSourceBinding { get; set; }
 
 		/// <summary>
-		/// Indicates whether anchorable source binding is suspended during deserialization.
+		/// Gets or sets a value indicating whether anchorable source binding is suspended during deserialization.
 		/// </summary>
-		public bool SuspendAnchorablesSourceBinding = false;
+		public bool SuspendAnchorablesSourceBinding { get; set; }
 
 		/// <summary>Gets or sets the serializable layout root.</summary>
 		Core.Serialization.ISerializableLayoutRoot Core.Serialization.ISerializableDockingManager.Layout
