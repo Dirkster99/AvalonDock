@@ -109,9 +109,10 @@ The callback receives a `LayoutSerializationCallbackEventArgs` with:
 
 | Property | Type | Description |
 |:---------|:-----|:------------|
-| `Model` | `LayoutContent` | The layout model being deserialized. Use `ContentId` to identify it. |
-| `Content` | `object` | Set this to the UI content or view model. Set to `null` to skip. |
-| `Cancel` | `bool` | Set to `true` to skip this item entirely. |
+| `Model` | `ISerializableLayoutContent` | The layout model being deserialized. Use `ContentId` to identify it. |
+| `Content` | `object` | Set this to the UI content or view model. Leave it `null` to skip the item. |
+| `Cancel` | `bool` | Set to `true` to drop this item entirely. |
+| `UnresolvedContentHandling` | `UnresolvedContentHandling` | What happens to this item when no content is supplied: `Remove` (default) drops it, `Hide` parks it in `LayoutRoot.Hidden` so content supplied later can restore it in place. |
 
 ---
 

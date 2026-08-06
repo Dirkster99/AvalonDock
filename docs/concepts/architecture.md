@@ -57,7 +57,7 @@ AvalonDock v5.0.0 is distributed as multiple NuGet packages with clear dependenc
 
 | Package | Purpose |
 |:--------|:--------|
-| `AvalonDock.Mvvm` | MVVM base classes: `DockableBase`, `ToolboxBase`, `DockLayoutService`, `DockViewModels`, and `Factory`. No external dependencies. |
+| `AvalonDock.Mvvm` | MVVM base classes: `DockableBase`, `ToolboxBase`, `DockBase`, the `RootDock`/`DocumentDock`/`ToolDock` view models, `DockLayoutService`, `SideToggleManager` and `Factory`. No external dependencies. |
 | `AvalonDock.Mvvm.CommunityToolkit` | `ObservableObject`-based equivalents (`ObservableDockableBase`, `ObservableToolboxBase`, `ObservableDocument`, `ObservableTool`) with `[ObservableProperty]` and `[RelayCommand]` source generator support. Depends on `CommunityToolkit.Mvvm`. |
 | `AvalonDock.DependencyInjection` | `IServiceCollection` extension methods for registering AvalonDock services. |
 | `AvalonDock.Serializer.Xml` | XML-based layout serialization via `XmlLayoutSerializer`. |

@@ -334,6 +334,24 @@ namespace AvalonDock.Layout
 			return true;
 		}
 
+		/// <inheritdoc/>
+		/// <remarks>
+		/// Hiding detaches the anchorable from whatever pane or anchor group holds it, through the same
+		/// path the rest of the layout uses; dropping it from the hidden list afterwards leaves it
+		/// attached to nothing. <see cref="Close"/> is deliberately not used: for an auto hidden
+		/// anchorable it first calls <see cref="ToggleAutoHide"/>, which would drag the whole anchor
+		/// group - siblings included - back into the docked area on the way out.
+		/// </remarks>
+		public void RemoveFromLayout()
+		{
+			if (!IsHidden)
+			{
+				HideAnchorable(false);
+			}
+
+			Root?.Hidden?.Remove(this);
+		}
+
 		/// <summary>
 		/// Executes the show operation.
 		/// </summary>

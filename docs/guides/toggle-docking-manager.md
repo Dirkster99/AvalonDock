@@ -86,7 +86,7 @@ The `DockZone` enum:
 
 | Property | Type | Default | Description |
 |:---------|:-----|:--------|:------------|
-| `LayoutPriority` | `DockLayoutPriority` | `Default` | Controls layout restructuring mode |
+| `LayoutPriority` | `DockLayoutPriority` | `BottomFullWidth` | Controls layout restructuring mode |
 | `ButtonSize` | `double` | `25.0` | Size of sidebar toggle buttons |
 | `DefaultDockWidth` | `double` | `250.0` | Default width for side panels |
 | `DefaultDockHeight` | `double` | `200.0` | Default height for bottom panels |
@@ -124,11 +124,25 @@ public class ExplorerToolbox : ToolboxBase
         Title = "Explorer";
         Zone = DockZone.LeftTop;
         IsOpenByDefault = true;
-        ToolTipText = "Explorer (Ctrl+Shift+E)";
+        ToolTipText = "Explorer";
+        Shortcut = "Ctrl+Shift+E";
         Icon = myExplorerIcon;  // ImageSource, UIElement, or DrawingImage
     }
 }
 ```
+
+### Keyboard Shortcuts
+
+Setting `IToolbox.Shortcut` to a WPF gesture string registers a `KeyBinding` on the host window that
+toggles the toolbox, exactly as clicking its sidebar button would. The gesture is also appended to
+the button's tooltip, so there is no need to write it into `ToolTipText` yourself:
+
+```csharp
+Shortcut = "Ctrl+Shift+E";   // tooltip becomes "Explorer (Ctrl+Shift+E)"
+```
+
+An unparsable gesture is ignored rather than throwing, and the bindings are rebuilt whenever the set
+of registered toolboxes changes.
 
 Register toolboxes with DI:
 
