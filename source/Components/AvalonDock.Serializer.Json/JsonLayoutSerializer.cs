@@ -1,67 +1,55 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using AvalonDock.Core;
 using AvalonDock.Core.Serialization.Dto;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 
 namespace AvalonDock.Serializer.Json
 {
 	/// <summary>
 	/// JSON implementation of <see cref="ILayoutSerializer"/>.
 	/// Extends <see cref="LayoutSerializerBase"/> for layout-aware deserialization
-	/// with fixup. Serializes DTOs directly with Newtonsoft.Json.
+	/// with fixup. Serializes DTOs directly with System.Text.Json.
 	/// </summary>
 	public class JsonLayoutSerializer : LayoutSerializerBase
 	{
-		/// <summary>Name of the property carrying the concrete DTO type of a polymorphic value.</summary>
+		/// <summary>Name of the property carrying the concrete type of a polymorphic value.</summary>
 		private const string DiscriminatorName = "_type";
 
-		private readonly Formatting _formatting;
-
-		private readonly JsonSerializerSettings _settings;
+		private readonly JsonSerializerOptions _options;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="JsonLayoutSerializer"/> class.
 		/// </summary>
 		/// <param name="manager">The docking manager whose layout is serialized.</param>
-		/// <param name="settings">
-		/// Optional serializer settings. They are honoured except for the two pieces the layout DTOs
-		/// cannot round trip without, which are added when missing: the contract resolver that writes
-		/// the type discriminator and the converter that reads it.
+		/// <param name="options">
+		/// Optional serializer options. They are honoured except for the type resolver, which is
+		/// replaced by the one declaring how the layout DTOs are told apart; the layout cannot round
+		/// trip without it.
 		/// </param>
-		public JsonLayoutSerializer(IDockingManager manager, JsonSerializerSettings settings = null)
+		public JsonLayoutSerializer(IDockingManager manager, JsonSerializerOptions options = null)
 			: base(manager)
 		{
-			// DefaultValueHandling.Ignore is deliberately not used. It drops every member that holds
-			// the default of its CLR type, which for the layout DTOs is the opposite of what is
-			// wanted: properties such as CanHide, CanFloat or CanDockAsTabbedDocument default to true,
-			// so writing them only when they are true would silently turn every false back into true
-			// on load. The same applies to PreviousContainerIndex, whose default is -1 rather than 0.
-			_settings = settings != null
-				? new JsonSerializerSettings(settings)
-				: new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+			_options = options != null
+				? new JsonSerializerOptions(options)
+				: new JsonSerializerOptions
+				{
+					WriteIndented = true,
+					DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+				};
 
-			if (!(_settings.ContractResolver is DiscriminatorContractResolver))
-			{
-				_settings.ContractResolver = new DiscriminatorContractResolver();
-			}
-
-			if (!_settings.Converters.OfType<LayoutDtoJsonConverter>().Any())
-			{
-				_settings.Converters.Add(new LayoutDtoJsonConverter());
-			}
-
-			_formatting = Formatting.Indented;
+			var resolver = new DefaultJsonTypeInfoResolver();
+			resolver.Modifiers.Add(DeclarePolymorphicDtos);
+			_options.TypeInfoResolver = resolver;
 		}
 
 		/// <inheritdoc/>
 		protected override void SerializeCore(Stream stream, LayoutRootDto dto)
 		{
-			var json = JsonConvert.SerializeObject(dto, _formatting, _settings);
+			var json = JsonSerializer.Serialize(dto, _options);
 			var bytes = Encoding.UTF8.GetBytes(json);
 			stream.Write(bytes, 0, bytes.Length);
 		}
@@ -75,166 +63,64 @@ namespace AvalonDock.Serializer.Json
 				json = reader.ReadToEnd();
 			}
 
-			return JsonConvert.DeserializeObject<LayoutRootDto>(json, _settings);
+			return JsonSerializer.Deserialize<LayoutRootDto>(json, _options);
 		}
 
 		/// <summary>
-		/// Determines whether values of the given type are stored in properties or lists declared with
-		/// an abstract base, and therefore need a type discriminator to be rebuilt.
+		/// Declares the concrete types that can appear where the layout DTOs are stored under an
+		/// abstract base, so that each one is written with a discriminator and rebuilt as itself.
 		/// </summary>
-		/// <param name="objectType">The type to test.</param>
-		/// <returns><see langword="true"/> when the type takes part in a polymorphic DTO hierarchy.</returns>
-		private static bool IsPolymorphicDto(Type objectType)
-		{
-			return objectType != null
-				&& (typeof(LayoutFloatingWindowDto).IsAssignableFrom(objectType)
-					|| typeof(LayoutContentDto).IsAssignableFrom(objectType)
-					|| typeof(LayoutPositionableGroupDto).IsAssignableFrom(objectType));
-		}
-
-		/// <summary>
-		/// Writes the type discriminator as an ordinary property of every polymorphic DTO.
-		/// </summary>
+		/// <param name="typeInfo">The contract being built.</param>
 		/// <remarks>
-		/// The discriminator has to come from the contract rather than from a <see cref="JsonConverter"/>.
-		/// A converter that writes it has to serialize the object itself, and the only way to do that
-		/// without re-entering the converter is to hand the work to a serializer the converter was
-		/// removed from - which then writes the entire subtree without discriminators. Adding the
-		/// property to the contract keeps every value on the normal pipeline, so nested panes, pane
-		/// groups and contents all carry their own discriminator.
+		/// Configured here rather than through attributes on the DTOs, which keeps AvalonDock.Core
+		/// free of a dependency on a JSON library. Only the three bases that actually appear as a
+		/// declared type need this; a property or list declared with a concrete DTO carries no
+		/// ambiguity and is written without a discriminator.
 		/// </remarks>
-		private sealed class DiscriminatorContractResolver : DefaultContractResolver
+		private static void DeclarePolymorphicDtos(JsonTypeInfo typeInfo)
 		{
-			/// <inheritdoc/>
-			protected override JsonObjectContract CreateObjectContract(Type objectType)
+			if (typeInfo.Type == typeof(LayoutPositionableGroupDto))
 			{
-				var contract = base.CreateObjectContract(objectType);
-
-				// Abstract bases are never instantiated, so only concrete types carry the value.
-				if (!IsPolymorphicDto(objectType) || objectType.IsAbstract)
-				{
-					return contract;
-				}
-
-				contract.Properties.Insert(0, new JsonProperty
-				{
-					PropertyName = DiscriminatorName,
-					UnderlyingName = DiscriminatorName,
-					PropertyType = typeof(string),
-					DeclaringType = objectType,
-					ValueProvider = new ConstantValueProvider(objectType.Name),
-					Readable = true,
-
-					// Read back by the converter, which needs it before the instance exists.
-					Writable = false,
-					Order = -2,
-				});
-
-				return contract;
+				// The children of LayoutPanel, LayoutDocumentPaneGroup and LayoutAnchorablePaneGroup.
+				typeInfo.PolymorphismOptions = Polymorphism(
+					(typeof(LayoutPanelDto), nameof(LayoutPanelDto)),
+					(typeof(LayoutDocumentPaneDto), nameof(LayoutDocumentPaneDto)),
+					(typeof(LayoutDocumentPaneGroupDto), nameof(LayoutDocumentPaneGroupDto)),
+					(typeof(LayoutAnchorablePaneDto), nameof(LayoutAnchorablePaneDto)),
+					(typeof(LayoutAnchorablePaneGroupDto), nameof(LayoutAnchorablePaneGroupDto)));
+			}
+			else if (typeInfo.Type == typeof(LayoutContentDto))
+			{
+				// The children of LayoutDocumentPane, which holds documents and anchorables alike.
+				typeInfo.PolymorphismOptions = Polymorphism(
+					(typeof(LayoutDocumentDto), nameof(LayoutDocumentDto)),
+					(typeof(LayoutAnchorableDto), nameof(LayoutAnchorableDto)));
+			}
+			else if (typeInfo.Type == typeof(LayoutFloatingWindowDto))
+			{
+				// The floating windows of the layout root.
+				typeInfo.PolymorphismOptions = Polymorphism(
+					(typeof(LayoutDocumentFloatingWindowDto), nameof(LayoutDocumentFloatingWindowDto)),
+					(typeof(LayoutAnchorableFloatingWindowDto), nameof(LayoutAnchorableFloatingWindowDto)));
 			}
 		}
 
-		/// <summary>Supplies a fixed value for a synthesized JSON property.</summary>
-		private sealed class ConstantValueProvider : IValueProvider
+		/// <summary>Builds the polymorphism options for one abstract base.</summary>
+		/// <param name="derivedTypes">The concrete types and the names they are stored under.</param>
+		/// <returns>The options.</returns>
+		private static JsonPolymorphismOptions Polymorphism(params (Type Type, string Discriminator)[] derivedTypes)
 		{
-			private readonly object _value;
-
-			/// <summary>Initializes a new instance of the <see cref="ConstantValueProvider"/> class.</summary>
-			/// <param name="value">The value to report for every target.</param>
-			public ConstantValueProvider(object value)
+			var options = new JsonPolymorphismOptions
 			{
-				_value = value;
+				TypeDiscriminatorPropertyName = DiscriminatorName,
+			};
+
+			foreach (var derived in derivedTypes)
+			{
+				options.DerivedTypes.Add(new JsonDerivedType(derived.Type, derived.Discriminator));
 			}
 
-			/// <inheritdoc/>
-			public object GetValue(object target) => _value;
-
-			/// <inheritdoc/>
-			public void SetValue(object target, object value)
-			{
-			}
-		}
-
-		/// <summary>
-		/// Rebuilds a polymorphic DTO as the concrete class named by its "_type" discriminator.
-		/// </summary>
-		private sealed class LayoutDtoJsonConverter : JsonConverter
-		{
-			/// <inheritdoc/>
-			/// <remarks>The discriminator is written by <see cref="DiscriminatorContractResolver"/>.</remarks>
-			public override bool CanWrite => false;
-
-			/// <inheritdoc/>
-			/// <remarks>
-			/// Every type of the three hierarchies matches, not just their abstract bases: Newtonsoft
-			/// resolves the converter from the type declared at the reading site, which for a nested
-			/// value can be either the abstract base or the concrete class.
-			/// </remarks>
-			public override bool CanConvert(Type objectType) => IsPolymorphicDto(objectType);
-
-			/// <inheritdoc/>
-			public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-			{
-				throw new NotSupportedException(
-					"Writing is handled by the normal contract, see CanWrite.");
-			}
-
-			/// <inheritdoc/>
-			public override object ReadJson(
-				JsonReader reader,
-				Type objectType,
-				object existingValue,
-				JsonSerializer serializer)
-			{
-				if (reader.TokenType == JsonToken.Null)
-				{
-					return null;
-				}
-
-				var jo = JObject.Load(reader);
-				var typeName = jo[DiscriminatorName]?.Value<string>();
-
-				var concreteType = ResolveType(typeName, objectType);
-				var result = Activator.CreateInstance(concreteType);
-
-				using var jr = jo.CreateReader();
-
-				// The serializer is passed on unchanged so that the children of this value are read
-				// through this converter as well.
-				serializer.Populate(jr, result);
-
-				return result;
-			}
-
-			private static Type ResolveType(string typeName, Type baseType)
-			{
-				// A property or list declared with a concrete DTO type carries no ambiguity, so JSON
-				// written without a discriminator - by hand, or by a version that did not emit one -
-				// still reads as long as the declared type says what to build.
-				if (string.IsNullOrEmpty(typeName))
-				{
-					return baseType != null && !baseType.IsAbstract
-						? baseType
-						: throw new JsonSerializationException(
-							$"Missing DTO type discriminator for abstract base type '{baseType?.Name}'.");
-				}
-
-				switch (typeName)
-				{
-					case nameof(LayoutDocumentFloatingWindowDto): return typeof(LayoutDocumentFloatingWindowDto);
-					case nameof(LayoutAnchorableFloatingWindowDto): return typeof(LayoutAnchorableFloatingWindowDto);
-					case nameof(LayoutDocumentDto): return typeof(LayoutDocumentDto);
-					case nameof(LayoutAnchorableDto): return typeof(LayoutAnchorableDto);
-					case nameof(LayoutPanelDto): return typeof(LayoutPanelDto);
-					case nameof(LayoutDocumentPaneDto): return typeof(LayoutDocumentPaneDto);
-					case nameof(LayoutDocumentPaneGroupDto): return typeof(LayoutDocumentPaneGroupDto);
-					case nameof(LayoutAnchorablePaneDto): return typeof(LayoutAnchorablePaneDto);
-					case nameof(LayoutAnchorablePaneGroupDto): return typeof(LayoutAnchorablePaneGroupDto);
-					default:
-						throw new JsonSerializationException(
-							$"Unknown DTO type discriminator '{typeName}' for base type '{baseType.Name}'.");
-				}
-			}
+			return options;
 		}
 	}
 }
