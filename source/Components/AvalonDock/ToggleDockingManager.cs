@@ -124,6 +124,19 @@ public class ToggleDockingManager : DockingManager
 	/// </summary>
 	private Button _showHiddenButton;
 
+	/// <summary>
+	/// The toggle style, cached per thread rather than process wide.
+	/// </summary>
+	/// <remarks>
+	/// A <see cref="Style"/> is a <see cref="System.Windows.Threading.DispatcherObject"/> and keeps the
+	/// affinity of the thread that created it until it is sealed, which WPF only does once it is first
+	/// applied. Handing one instance to managers on several UI threads therefore lets the layout pass
+	/// of the second thread throw "The calling thread cannot access this object because a different
+	/// thread owns it" out of <c>Style.CheckTargetType</c>, from where nothing catches it. Caching per
+	/// thread keeps the saving this field is here for - the pack URI is parsed once per UI thread
+	/// rather than once per manager - without sharing an object that cannot be shared.
+	/// </remarks>
+	[ThreadStatic]
 	private static Style _staticToggleStyle;
 
 	private static Style LoadToggleStyle()
@@ -294,7 +307,7 @@ public class ToggleDockingManager : DockingManager
 				System.Windows.Threading.DispatcherPriority.Loaded,
 				new System.Action(() =>
 				{
-					OpenDefaultToolboxes();
+					ApplyInitialToolboxState();
 					RefreshButtonStates();
 					UpdatePinButtonsToMinimize();
 				}));
@@ -357,6 +370,8 @@ public class ToggleDockingManager : DockingManager
 			}
 		}
 
+		SyncToolboxStateToLayout();
+
 		Dispatcher.BeginInvoke(
 			System.Windows.Threading.DispatcherPriority.Loaded,
 			new System.Action(() =>
@@ -417,6 +432,11 @@ public class ToggleDockingManager : DockingManager
 	{
 		ApplyToggleAnchorableStyle();
 		SetupToggleDockButtonBars();
+
+		// Rebuilding the bars collapses every docked anchorable onto its stripe. The toolboxes still
+		// carry the state they were in, so re-applying it brings the open ones back instead of
+		// leaving a theme switch to close them.
+		ApplyInitialToolboxState();
 		RefreshButtonStates();
 		Dispatcher.BeginInvoke(
 			System.Windows.Threading.DispatcherPriority.Loaded,
@@ -441,6 +461,12 @@ public class ToggleDockingManager : DockingManager
 		if (IsDetached(anchorable))
 		{
 			ActivateDetachedWindow(anchorable);
+
+			// The content stays on screen, so the toolbox stays open. Writing that back keeps a view
+			// model that asked for the opposite from holding a value this manager never applied -
+			// which, because change notifications are raised on change only, would leave it unable to
+			// ask again.
+			SetToolboxIsOpen(anchorable);
 			return;
 		}
 
@@ -646,26 +672,78 @@ public class ToggleDockingManager : DockingManager
 	{
 		ApplyToggleAnchorableStyle();
 		SetupToggleDockButtonBars();
-		OpenDefaultToolboxes();
+		ApplyInitialToolboxState();
 		RefreshShortcuts();
 		Dispatcher.BeginInvoke(
 			System.Windows.Threading.DispatcherPriority.Loaded,
 			new System.Action(UpdatePinButtonsToMinimize));
 	}
 
-	private void OpenDefaultToolboxes()
+	/// <summary>
+	/// Docks the toolboxes that ask to be showing, and reconciles the state of the ones that do not.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// <see cref="IToolbox.IsOpenByDefault"/> is the declarative default and seeds
+	/// <see cref="IToolbox.IsOpen"/>, which from then on is the single answer to whether a toolbox is
+	/// showing. Reading <see cref="IToolbox.IsOpen"/> here is what lets a value the application set
+	/// before this manager was loaded take effect - a view model built by a dependency injection
+	/// container is constructed long before <see cref="RegisterToolbox"/> subscribes to it, so an
+	/// assignment made back then raised a change notification no one was listening for.
+	/// </para>
+	/// <para>
+	/// Anchorables that already show are left where they are, so running this again - the manager is
+	/// re-attached to the visual tree, a new dock layout arrives, the theme changes - never collapses
+	/// what is open.
+	/// </para>
+	/// </remarks>
+	private void ApplyInitialToolboxState()
 	{
 		if (Layout == null)
 		{
 			return;
 		}
 
-		foreach (var anc in Layout.Descendents().OfType<LayoutAnchorable>().ToList())
+		foreach (var anchorable in Layout.Descendents().OfType<LayoutAnchorable>().ToList())
 		{
-			if (anc.Content is IToolbox toolbox && toolbox.IsOpenByDefault)
+			if (!(anchorable.Content is IToolbox toolbox))
 			{
-				ToggleAnchorable(anc, toolbox.Zone);
+				continue;
 			}
+
+			if (!toolbox.IsOpen && !toolbox.IsOpenByDefault)
+			{
+				continue;
+			}
+
+			if (anchorable.IsAutoHidden && !IsDetached(anchorable))
+			{
+				ToggleAnchorable(anchorable, toolbox.Zone);
+			}
+			else
+			{
+				// Already on screen - only the toolbox still has to be told, which is what turns
+				// IsOpenByDefault into an IsOpen the application can read back.
+				SetToolboxIsOpen(anchorable);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Writes the state every registered anchorable is actually in back onto its toolbox.
+	/// </summary>
+	/// <remarks>
+	/// Rebuilding the bars collapses the anchorables onto their stripes and a restored layout decides
+	/// on its own which of them are docked again, neither of which passes through the toggle path
+	/// that maintains <see cref="IToolbox.IsOpen"/>. Without this the toolboxes of the replaced layout
+	/// keep reporting the state they were left in, and since a property that does not change raises no
+	/// notification, asking for that state again would do nothing.
+	/// </remarks>
+	private void SyncToolboxStateToLayout()
+	{
+		foreach (var anchorable in _toolboxToAnchorable.Values.ToList())
+		{
+			SetToolboxIsOpen(anchorable);
 		}
 	}
 
@@ -1429,6 +1507,12 @@ public class ToggleDockingManager : DockingManager
 			if (item is ToggleDockButton btn && btn.Anchorable != null && !btn.Anchorable.IsAutoHidden)
 			{
 				AutoHideFromDock(btn.Anchorable, bar.Zone);
+
+				// This collapse is a side effect of opening a sibling, so nothing else writes it back.
+				// Leaving it out is what used to strand a toolbox at IsOpen == true while it sat on
+				// its stripe, after which setting IsOpen = true again raised no change and the
+				// toolbox could not be reopened from the view model at all.
+				SetToolboxIsOpen(btn.Anchorable);
 			}
 		}
 	}
@@ -1844,51 +1928,23 @@ public class ToggleDockingManager : DockingManager
 			return;
 		}
 
-		bool wantOpen = toolbox.IsOpen;
-		bool isOpen = !anchorable.IsAutoHidden;
+		// A detached anchorable sits collapsed on its stripe while its content is on screen in a
+		// standalone window, so IsAutoHidden on its own does not say whether the toolbox is showing.
+		bool isOpen = !anchorable.IsAutoHidden || IsDetached(anchorable);
 
-		if (wantOpen == isOpen)
+		if (toolbox.IsOpen == isOpen)
 		{
 			return;
 		}
 
+		// ToggleAnchorable is the one implementation of this transition: it carries the zone
+		// bookkeeping, the layout priority handling and the detached window case, and it writes the
+		// resulting state back onto the toolbox. Duplicating it here is what let the two paths drift
+		// apart. The _syncDepth guard keeps that write-back from re-entering this handler.
 		_syncDepth++;
 		try
 		{
-			if (wantOpen)
-			{
-				var zone = GetAnchorableZone(anchorable);
-				HideDockedInBar(GetBarForZone(zone));
-				DockFromAutoHide(anchorable, zone);
-				FixSplitOrientation(anchorable, zone);
-
-				if (ToggleLayoutEngine.IsBottomZone(zone))
-				{
-					EnsureBottomZoneOrder();
-				}
-
-				switch (LayoutPriority)
-				{
-					case DockLayoutPriority.BottomFullWidth:
-						EnsureBottomFullWidth();
-						break;
-					case DockLayoutPriority.SidesFullHeight:
-						EnsureSidesFullHeight();
-						break;
-				}
-
-				ActiveContent = anchorable.Content;
-			}
-			else
-			{
-				var zone = GetAnchorableZone(anchorable);
-				AutoHideFromDock(anchorable, zone);
-			}
-
-			RefreshButtonStates();
-			Dispatcher.BeginInvoke(
-				System.Windows.Threading.DispatcherPriority.Loaded,
-				new System.Action(UpdatePinButtonsToMinimize));
+			ToggleAnchorable(anchorable, GetAnchorableZone(anchorable));
 		}
 		finally
 		{
