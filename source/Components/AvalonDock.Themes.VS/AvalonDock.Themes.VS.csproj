@@ -20,7 +20,7 @@
 
 	<!-- System.Text.Json ships in the shared framework on net9/net10; only net48 needs the package. -->
 	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-		<PackageReference Include="System.Text.Json" Version="9.0.0" />
+		<PackageReference Include="System.Text.Json" Version="10.0.10" />
 	</ItemGroup>
 
 	<ItemGroup>

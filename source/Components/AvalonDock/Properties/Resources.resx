@@ -141,6 +141,9 @@
   <data name="Anchorable_DockAsDocument" xml:space="preserve">
     <value>Dock as Tabbed Document</value>
   </data>
+  <data name="Anchorable_DetachToWindow" xml:space="preserve">
+    <value>Window</value>
+  </data>
   <data name="Anchorable_Float" xml:space="preserve">
     <value>Float</value>
   </data>
