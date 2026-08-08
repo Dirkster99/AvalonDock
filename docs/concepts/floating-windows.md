@@ -73,6 +73,21 @@ When a user drags a floating window over the main docking area, **docking indica
 
 The docking indicators are [defined in XAML](https://github.com/Dirkster99/AvalonDock/wiki/OverlayWindow), ensuring crisp rendering on all resolutions including 4K and 8K displays.
 
+### Overlay Window Lifetime
+
+The indicators live in an `OverlayWindow`: a borderless, transparent window that every drop target
+host — the `DockingManager` itself and each floating window — puts over its own area while a drag is
+in progress.
+
+Each host keeps one overlay window and shows and hides it again for every drag, rather than creating
+a new one per drag. A drag ends through a window message of the window being dragged, and that
+message does not always arrive — moving a window between monitors with different DPI scaling can end
+the modal move loop of Windows without one. Recreating the overlay window per drag turned every such
+drag into an empty window that stayed on screen for the rest of the session, so the count grew with
+every float. Reusing one window per host, and clearing the overlay windows of all hosts whenever a
+drag starts or ends, removes that possibility: an overlay window is only ever destroyed together with
+the host it belongs to.
+
 ---
 
 ## Events

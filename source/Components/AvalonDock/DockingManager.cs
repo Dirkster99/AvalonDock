@@ -1858,10 +1858,28 @@ namespace AvalonDock
 		void IOverlayWindowHost.HideOverlayWindow()
 		{
 			_areas = null;
-			_overlayWindow.Owner = null;
-			_overlayWindow.HideDropTargets();
-			_overlayWindow.Close();
-			_overlayWindow = null;
+
+			// The overlay window is hidden and kept for the next drag instead of being closed, so that a
+			// drag which never reports its end cannot leave a growing number of empty windows behind
+			// (issue #587). It is closed together with this manager in DestroyOverlayWindow.
+			_overlayWindow?.HideOverlay();
+		}
+
+		/// <summary>
+		/// Takes every overlay window of this manager and of its floating windows off the screen.
+		/// </summary>
+		/// <remarks>
+		/// A drag ends by a message of the window being dragged, and that message does not always arrive -
+		/// a drag across monitors of different DPI can end the modal move loop of Windows without one.
+		/// Every start and every end of a drag therefore clears the overlay windows of all hosts, and not
+		/// only the one of the host the drag happens to know about (issue #587).
+		/// </remarks>
+		internal void HideAllOverlayWindows()
+		{
+			((IOverlayWindowHost)this).HideOverlayWindow();
+
+			foreach (var host in _fwList.OfType<IOverlayWindowHost>().ToArray())
+				host.HideOverlayWindow();
 		}
 
 		/// <inheritdoc/>
