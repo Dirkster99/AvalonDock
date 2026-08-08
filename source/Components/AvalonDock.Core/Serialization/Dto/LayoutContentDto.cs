@@ -26,10 +26,6 @@ namespace AvalonDock.Core.Serialization.Dto
 		[XmlAttribute]
 		public bool IsLastFocusedDocument { get; set; }
 
-		/// <summary>Gets or sets the tooltip text.</summary>
-		[XmlAttribute]
-		public string ToolTip { get; set; }
-
 		/// <summary>Gets or sets the floating left position.</summary>
 		[XmlAttribute]
 		public double FloatingLeft { get; set; }

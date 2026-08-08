@@ -280,5 +280,183 @@ namespace AvalonDockTest
 			Assert.That(list, Is.InstanceOf<ObservableCollection<string>>());
 			Assert.That(list.Count, Is.EqualTo(3));
 		}
+
+		// Builds root -> dock -> dockable, the smallest layout the factory can actually move things in.
+		private static (TestRootDock Root, TestDock Dock, TestDockable Dockable) BuildLayout()
+		{
+			var root = new TestRootDock();
+			var dock = new TestDock { Owner = root };
+			var dockable = new TestDockable { Owner = dock };
+
+			root.VisibleDockables!.Add(dock);
+			dock.VisibleDockables!.Add(dockable);
+
+			return (root, dock, dockable);
+		}
+
+		[Test]
+		public void PinDockable_MovesTheDockableToTheSidebarOfTheRoot()
+		{
+			var factory = new TestFactory();
+			var (root, dock, dockable) = BuildLayout();
+
+			factory.PinDockable(dockable);
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(root.PinnedDockables, Does.Contain(dockable));
+				Assert.That(dock.VisibleDockables, Does.Not.Contain(dockable));
+				Assert.That(dockable.DockState, Is.EqualTo(DockState.AutoHidden));
+				Assert.That(dockable.Owner, Is.SameAs(dock), "The way back must be remembered.");
+			});
+		}
+
+		[Test]
+		public void PinDockable_PutsAPinnedDockableBackIntoItsDock()
+		{
+			var factory = new TestFactory();
+			var (root, dock, dockable) = BuildLayout();
+
+			factory.PinDockable(dockable);
+			factory.PinDockable(dockable);
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(root.PinnedDockables, Does.Not.Contain(dockable));
+				Assert.That(dock.VisibleDockables, Does.Contain(dockable));
+				Assert.That(dock.ActiveDockable, Is.SameAs(dockable));
+				Assert.That(dockable.DockState, Is.EqualTo(DockState.Docked));
+			});
+		}
+
+		[Test]
+		public void PinDockable_LeavesADockableThatCannotBePinned()
+		{
+			var factory = new TestFactory();
+			var (root, dock, dockable) = BuildLayout();
+			dockable.CanPin = false;
+
+			factory.PinDockable(dockable);
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(dock.VisibleDockables, Does.Contain(dockable));
+				Assert.That(root.PinnedDockables, Is.Null);
+				Assert.That(dockable.DockState, Is.EqualTo(DockState.Docked));
+				Assert.That(factory.PinnedItems, Is.Empty);
+			});
+		}
+
+		[Test]
+		public void FloatDockable_MovesTheDockableIntoTheFloatingWindowsOfTheRoot()
+		{
+			var factory = new TestFactory();
+			var (root, dock, dockable) = BuildLayout();
+
+			factory.FloatDockable(dockable);
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(root.FloatingDockables, Does.Contain(dockable));
+				Assert.That(dock.VisibleDockables, Does.Not.Contain(dockable));
+				Assert.That(dockable.DockState, Is.EqualTo(DockState.Float));
+			});
+		}
+
+		[Test]
+		public void FloatDockable_TakesAPinnedDockableOffTheSidebar()
+		{
+			var factory = new TestFactory();
+			var (root, _, dockable) = BuildLayout();
+
+			factory.PinDockable(dockable);
+			factory.FloatDockable(dockable);
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(root.PinnedDockables, Does.Not.Contain(dockable));
+				Assert.That(root.FloatingDockables, Does.Contain(dockable));
+				Assert.That(dockable.DockState, Is.EqualTo(DockState.Float));
+			});
+		}
+
+		[Test]
+		public void FloatDockable_DoesNotFloatTheSameDockableTwice()
+		{
+			var factory = new TestFactory();
+			var (root, _, dockable) = BuildLayout();
+
+			factory.FloatDockable(dockable);
+			factory.FloatDockable(dockable);
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(root.FloatingDockables, Has.Count.EqualTo(1));
+				Assert.That(factory.FloatedItems, Has.Count.EqualTo(1));
+			});
+		}
+
+		[Test]
+		public void FloatDockable_LeavesADockableThatCannotBeFloated()
+		{
+			var factory = new TestFactory();
+			var (root, dock, dockable) = BuildLayout();
+			dockable.CanFloat = false;
+
+			factory.FloatDockable(dockable);
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(dock.VisibleDockables, Does.Contain(dockable));
+				Assert.That(root.FloatingDockables, Is.Null);
+				Assert.That(factory.FloatedItems, Is.Empty);
+			});
+		}
+
+		[Test]
+		public void CloseDockable_TakesAFloatingDockableOutOfTheRoot()
+		{
+			var factory = new TestFactory();
+			var (root, _, dockable) = BuildLayout();
+
+			factory.FloatDockable(dockable);
+			factory.CloseDockable(dockable);
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(root.FloatingDockables, Does.Not.Contain(dockable));
+				Assert.That(dockable.DockState, Is.EqualTo(DockState.Hidden));
+			});
+		}
+
+		[Test]
+		public void CloseDockable_TakesAPinnedDockableOffTheSidebar()
+		{
+			var factory = new TestFactory();
+			var (root, _, dockable) = BuildLayout();
+
+			factory.PinDockable(dockable);
+			factory.CloseDockable(dockable);
+
+			Assert.That(root.PinnedDockables, Does.Not.Contain(dockable));
+		}
+
+		[Test]
+		public void Factory_RejectsNullArguments()
+		{
+			var factory = new TestFactory();
+			var dock = new TestDock();
+			var dockable = new TestDockable();
+
+			Assert.Multiple(() =>
+			{
+				Assert.Throws<ArgumentNullException>(() => factory.MoveDockable(null!, dock, dockable));
+				Assert.Throws<ArgumentNullException>(() => factory.MoveDockable(dock, null!, dockable));
+				Assert.Throws<ArgumentNullException>(() => factory.MoveDockable(dock, dock, null!));
+				Assert.Throws<ArgumentNullException>(() => factory.PinDockable(null!));
+				Assert.Throws<ArgumentNullException>(() => factory.FloatDockable(null!));
+				Assert.Throws<ArgumentNullException>(() => factory.CloseDockable(null!));
+			});
+		}
 	}
 }

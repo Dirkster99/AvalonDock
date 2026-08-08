@@ -86,7 +86,7 @@ The `DockZone` enum:
 
 | Property | Type | Default | Description |
 |:---------|:-----|:--------|:------------|
-| `LayoutPriority` | `DockLayoutPriority` | `Default` | Controls layout restructuring mode |
+| `LayoutPriority` | `DockLayoutPriority` | `BottomFullWidth` | Controls layout restructuring mode |
 | `ButtonSize` | `double` | `25.0` | Size of sidebar toggle buttons |
 | `DefaultDockWidth` | `double` | `250.0` | Default width for side panels |
 | `DefaultDockHeight` | `double` | `200.0` | Default height for bottom panels |
@@ -124,11 +124,45 @@ public class ExplorerToolbox : ToolboxBase
         Title = "Explorer";
         Zone = DockZone.LeftTop;
         IsOpenByDefault = true;
-        ToolTipText = "Explorer (Ctrl+Shift+E)";
+        ToolTipText = "Explorer";
+        Shortcut = "Ctrl+Shift+E";
         Icon = myExplorerIcon;  // ImageSource, UIElement, or DrawingImage
     }
 }
 ```
+
+### Visibility on startup
+
+`IsOpenByDefault` is the declarative default and seeds `IsOpen`; from then on `IsOpen` is the single
+answer to whether a toolbox is showing. Both are read when the manager applies a layout, so a view
+model built by a DI container may set `IsOpen` in its constructor — long before the manager exists —
+and the toolbox still comes up docked:
+
+```csharp
+services.AddDockLayoutService(dock => dock.AddToolbox<ExplorerToolbox>());
+// ExplorerToolbox sets IsOpen = true in its constructor: it is showing once the window loads.
+```
+
+A zone shows one toolbox at a time, so giving two toolboxes in the same zone `IsOpenByDefault = true`
+docks only the last of them; the other is collapsed onto its stripe and reports `IsOpen == false`.
+`IsOpen` always reports what the layout actually shows, whether the state was changed by a sidebar
+button, a keyboard shortcut, or a sibling toolbox taking the zone.
+
+An anchorable detached into its own window counts as open: setting `IsOpen = false` on it brings that
+window forward rather than closing it. Dock it back first if you want it collapsed.
+
+### Keyboard Shortcuts
+
+Setting `IToolbox.Shortcut` to a WPF gesture string registers a `KeyBinding` on the host window that
+toggles the toolbox, exactly as clicking its sidebar button would. The gesture is also appended to
+the button's tooltip, so there is no need to write it into `ToolTipText` yourself:
+
+```csharp
+Shortcut = "Ctrl+Shift+E";   // tooltip becomes "Explorer (Ctrl+Shift+E)"
+```
+
+An unparsable gesture is ignored rather than throwing, and the bindings are rebuilt whenever the set
+of registered toolboxes changes.
 
 Register toolboxes with DI:
 

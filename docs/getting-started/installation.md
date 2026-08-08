@@ -42,6 +42,9 @@ AvalonDock ships with a default generic theme, but you'll likely want one of the
 # Modern Arc theme (recommended)
 dotnet add package Dirkster.AvalonDock.Themes.Arc
 
+# Visual Studio themes built from .vstheme files (VS2015, VS2022 and VS2026 variants)
+dotnet add package Dirkster.AvalonDock.Themes.VS
+
 # Visual Studio 2013 theme
 dotnet add package Dirkster.AvalonDock.Themes.VS2013
 

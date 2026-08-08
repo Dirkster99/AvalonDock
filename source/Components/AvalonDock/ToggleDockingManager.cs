@@ -95,6 +95,10 @@ public class ToggleDockingManager : DockingManager
 	private readonly Dictionary<IToolbox, LayoutAnchorable> _toolboxToAnchorable =
 		new Dictionary<IToolbox, LayoutAnchorable>();
 
+	/// <summary>Remembers the zone each detached anchorable returns to.</summary>
+	private readonly Dictionary<LayoutAnchorable, DockZone> _detachedZones =
+		new Dictionary<LayoutAnchorable, DockZone>();
+
 	/// <summary>
 	/// Key bindings registered on the host window for toolbox shortcuts.
 	/// Tracked so they can be removed and rebuilt when toolboxes change.
@@ -120,6 +124,19 @@ public class ToggleDockingManager : DockingManager
 	/// </summary>
 	private Button _showHiddenButton;
 
+	/// <summary>
+	/// The toggle style, cached per thread rather than process wide.
+	/// </summary>
+	/// <remarks>
+	/// A <see cref="Style"/> is a <see cref="System.Windows.Threading.DispatcherObject"/> and keeps the
+	/// affinity of the thread that created it until it is sealed, which WPF only does once it is first
+	/// applied. Handing one instance to managers on several UI threads therefore lets the layout pass
+	/// of the second thread throw "The calling thread cannot access this object because a different
+	/// thread owns it" out of <c>Style.CheckTargetType</c>, from where nothing catches it. Caching per
+	/// thread keeps the saving this field is here for - the pack URI is parsed once per UI thread
+	/// rather than once per manager - without sharing an object that cannot be shared.
+	/// </remarks>
+	[ThreadStatic]
 	private static Style _staticToggleStyle;
 
 	private static Style LoadToggleStyle()
@@ -290,11 +307,97 @@ public class ToggleDockingManager : DockingManager
 				System.Windows.Threading.DispatcherPriority.Loaded,
 				new System.Action(() =>
 				{
-					OpenDefaultToolboxes();
+					ApplyInitialToolboxState();
 					RefreshButtonStates();
 					UpdatePinButtonsToMinimize();
 				}));
 		}
+	}
+
+	/// <inheritdoc/>
+	/// <remarks>
+	/// <para>
+	/// Replacing the layout - deserializing a stored layout with an <c>XmlLayoutSerializer</c>, say -
+	/// swaps in a completely new set of <see cref="LayoutAnchorable"/> instances. The sidebar buttons
+	/// still reference the anchorables of the old tree, so without rebuilding them they linger as ghost
+	/// toolboxes: buttons whose model is no longer part of any layout, which cannot be toggled, and
+	/// which may well stand for a toolbox that does not exist any more at all. Rebuilding the bars from
+	/// the new layout removes them, and dropping the toolbox registrations releases the
+	/// <see cref="INotifyPropertyChanged"/> handlers and shortcut key bindings of the old tree.
+	/// </para>
+	/// <para>
+	/// The anchorables that were docked in the restored layout are re-opened afterwards, so a stored
+	/// layout keeps deciding which toolboxes are visible. <see cref="IToolbox.IsOpenByDefault"/> is
+	/// deliberately not applied here: it is the default for a fresh layout, not something that should
+	/// override what the user saved.
+	/// </para>
+	/// </remarks>
+	protected override void OnLayoutChanged(LayoutRoot oldLayout, LayoutRoot newLayout)
+	{
+		// The anchorables that the restored layout shows docked. Collected before the base call so a
+		// layout that arrives with docked anchorables can be reproduced after the bars were rebuilt
+		// (SetupToggleDockButtonBars collapses everything onto the stripes first).
+		var restoreDocked = CollectDockedAnchorables(newLayout);
+
+		base.OnLayoutChanged(oldLayout, newLayout);
+
+		// The base constructor assigns the initial layout before the field initializers of this class
+		// have run. There is nothing to tear down or rebuild for that first assignment, and the fields
+		// this method needs do not exist yet.
+		if (oldLayout == null || _detachedZones == null)
+		{
+			return;
+		}
+
+		// The entries reference anchorables of the replaced layout.
+		_detachedZones.Clear();
+
+		if (!IsLoaded)
+		{
+			// Without a template there is nowhere to inject the bars; drop the stale ones so nothing
+			// survives the swap. ToggleDockingManager_Loaded builds them from the new layout.
+			RemoveToggleDockButtonBars();
+			return;
+		}
+
+		SetupToggleDockButtonBars();
+
+		foreach (var anchorable in restoreDocked)
+		{
+			if (anchorable.Root == newLayout && anchorable.IsAutoHidden)
+			{
+				ToggleAnchorable(anchorable, GetAnchorableZone(anchorable));
+			}
+		}
+
+		SyncToolboxStateToLayout();
+
+		Dispatcher.BeginInvoke(
+			System.Windows.Threading.DispatcherPriority.Loaded,
+			new System.Action(() =>
+			{
+				RefreshButtonStates();
+				UpdatePinButtonsToMinimize();
+			}));
+	}
+
+	/// <summary>
+	/// Collects the anchorables that the given layout shows docked (as opposed to collapsed onto a
+	/// side stripe, hidden or floating).
+	/// </summary>
+	/// <param name="layout">The layout to inspect, may be <see langword="null"/>.</param>
+	/// <returns>The docked anchorables.</returns>
+	private static List<LayoutAnchorable> CollectDockedAnchorables(LayoutRoot layout)
+	{
+		if (layout == null)
+		{
+			return new List<LayoutAnchorable>();
+		}
+
+		return layout.Descendents()
+			.OfType<LayoutAnchorable>()
+			.Where(a => a.Parent is LayoutAnchorablePane && !a.IsAutoHidden && !a.IsFloating && !a.IsHidden)
+			.ToList();
 	}
 
 	/// <inheritdoc/>
@@ -329,6 +432,11 @@ public class ToggleDockingManager : DockingManager
 	{
 		ApplyToggleAnchorableStyle();
 		SetupToggleDockButtonBars();
+
+		// Rebuilding the bars collapses every docked anchorable onto its stripe. The toolboxes still
+		// carry the state they were in, so re-applying it brings the open ones back instead of
+		// leaving a theme switch to close them.
+		ApplyInitialToolboxState();
 		RefreshButtonStates();
 		Dispatcher.BeginInvoke(
 			System.Windows.Threading.DispatcherPriority.Loaded,
@@ -348,6 +456,20 @@ public class ToggleDockingManager : DockingManager
 	/// <param name="zone">The zone.</param>
 	public void ToggleAnchorable(LayoutAnchorable anchorable, DockZone zone)
 	{
+		// While the content lives in a standalone window there is nothing to dock or auto hide;
+		// the stripe button acts as a way to bring that window forward instead.
+		if (IsDetached(anchorable))
+		{
+			ActivateDetachedWindow(anchorable);
+
+			// The content stays on screen, so the toolbox stays open. Writing that back keeps a view
+			// model that asked for the opposite from holding a value this manager never applied -
+			// which, because change notifications are raised on change only, would leave it unable to
+			// ask again.
+			SetToolboxIsOpen(anchorable);
+			return;
+		}
+
 		if (anchorable.IsAutoHidden)
 		{
 			// Hide any currently docked anchorable in the SAME bar only
@@ -395,6 +517,13 @@ public class ToggleDockingManager : DockingManager
 	{
 		if (anchorable == null)
 		{
+			return;
+		}
+
+		// A detached anchorable is not in the dock area, so only the zone it will return to changes.
+		if (IsDetached(anchorable))
+		{
+			_detachedZones[anchorable] = targetZone;
 			return;
 		}
 
@@ -451,6 +580,53 @@ public class ToggleDockingManager : DockingManager
 	}
 
 	/// <inheritdoc/>
+	/// <remarks>
+	/// Collapses the anchorable onto its side stripe rather than hiding it, so its toggle button stays
+	/// available and layout serialization keeps seeing an ordinary auto hidden entry.
+	/// </remarks>
+	protected override object DetachFromLayout(LayoutAnchorable anchorable)
+	{
+		var zone = GetAnchorableZone(anchorable);
+		_detachedZones[anchorable] = zone;
+
+		// Collapsing a docked anchorable makes the dock area reflow and tears down the control that
+		// currently shows the content.
+		if (!anchorable.IsAutoHidden)
+		{
+			AutoHideFromDock(anchorable, zone);
+		}
+
+		return zone;
+	}
+
+	/// <inheritdoc/>
+	protected override void ReturnToLayout(LayoutAnchorable anchorable, object restoreState)
+	{
+		var zone = _detachedZones.TryGetValue(anchorable, out var remembered)
+			? remembered
+			: restoreState as DockZone? ?? GetAnchorableZone(anchorable);
+
+		_detachedZones.Remove(anchorable);
+
+		if (anchorable.IsAutoHidden)
+		{
+			ToggleAnchorable(anchorable, zone);
+		}
+	}
+
+	/// <inheritdoc/>
+	/// <remarks>Keeps the three dot options menu available while the content lives in its own window.</remarks>
+	protected override FrameworkElement CreateDetachedWindowHeader(LayoutAnchorable anchorable) =>
+		new ToggleAnchorablePaneTitle { Model = anchorable };
+
+	/// <inheritdoc/>
+	protected override void OnDetachedAnchorablesChanged(LayoutAnchorable anchorable)
+	{
+		SetToolboxIsOpen(anchorable);
+		RefreshButtonStates();
+	}
+
+	/// <inheritdoc/>
 	internal override void ExecuteAutoHideCommand(LayoutAnchorable anchorable)
 	{
 		if (anchorable == null)
@@ -496,26 +672,78 @@ public class ToggleDockingManager : DockingManager
 	{
 		ApplyToggleAnchorableStyle();
 		SetupToggleDockButtonBars();
-		OpenDefaultToolboxes();
+		ApplyInitialToolboxState();
 		RefreshShortcuts();
 		Dispatcher.BeginInvoke(
 			System.Windows.Threading.DispatcherPriority.Loaded,
 			new System.Action(UpdatePinButtonsToMinimize));
 	}
 
-	private void OpenDefaultToolboxes()
+	/// <summary>
+	/// Docks the toolboxes that ask to be showing, and reconciles the state of the ones that do not.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// <see cref="IToolbox.IsOpenByDefault"/> is the declarative default and seeds
+	/// <see cref="IToolbox.IsOpen"/>, which from then on is the single answer to whether a toolbox is
+	/// showing. Reading <see cref="IToolbox.IsOpen"/> here is what lets a value the application set
+	/// before this manager was loaded take effect - a view model built by a dependency injection
+	/// container is constructed long before <see cref="RegisterToolbox"/> subscribes to it, so an
+	/// assignment made back then raised a change notification no one was listening for.
+	/// </para>
+	/// <para>
+	/// Anchorables that already show are left where they are, so running this again - the manager is
+	/// re-attached to the visual tree, a new dock layout arrives, the theme changes - never collapses
+	/// what is open.
+	/// </para>
+	/// </remarks>
+	private void ApplyInitialToolboxState()
 	{
 		if (Layout == null)
 		{
 			return;
 		}
 
-		foreach (var anc in Layout.Descendents().OfType<LayoutAnchorable>().ToList())
+		foreach (var anchorable in Layout.Descendents().OfType<LayoutAnchorable>().ToList())
 		{
-			if (anc.Content is IToolbox toolbox && toolbox.IsOpenByDefault)
+			if (!(anchorable.Content is IToolbox toolbox))
 			{
-				ToggleAnchorable(anc, toolbox.Zone);
+				continue;
 			}
+
+			if (!toolbox.IsOpen && !toolbox.IsOpenByDefault)
+			{
+				continue;
+			}
+
+			if (anchorable.IsAutoHidden && !IsDetached(anchorable))
+			{
+				ToggleAnchorable(anchorable, toolbox.Zone);
+			}
+			else
+			{
+				// Already on screen - only the toolbox still has to be told, which is what turns
+				// IsOpenByDefault into an IsOpen the application can read back.
+				SetToolboxIsOpen(anchorable);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Writes the state every registered anchorable is actually in back onto its toolbox.
+	/// </summary>
+	/// <remarks>
+	/// Rebuilding the bars collapses the anchorables onto their stripes and a restored layout decides
+	/// on its own which of them are docked again, neither of which passes through the toggle path
+	/// that maintains <see cref="IToolbox.IsOpen"/>. Without this the toolboxes of the replaced layout
+	/// keep reporting the state they were left in, and since a property that does not change raises no
+	/// notification, asking for that state again would do nothing.
+	/// </remarks>
+	private void SyncToolboxStateToLayout()
+	{
+		foreach (var anchorable in _toolboxToAnchorable.Values.ToList())
+		{
+			SetToolboxIsOpen(anchorable);
 		}
 	}
 
@@ -661,6 +889,8 @@ public class ToggleDockingManager : DockingManager
 		var floatItem = new MenuItem { Header = "Float" };
 		floatItem.Click += (s, e) =>
 		{
+			ReattachAnchorable(anchorable);
+
 			if (anchorable.IsAutoHidden)
 			{
 				anchorable.ToggleSingleAutoHide();
@@ -671,9 +901,35 @@ public class ToggleDockingManager : DockingManager
 		};
 		viewModeItem.Items.Add(floatItem);
 
+		// Detaches into an ordinary, independent top level window - the equivalent of the "Window"
+		// view mode of IDE tool windows. Selecting it again docks the content back.
+		var windowItem = new MenuItem
+		{
+			Header = "Window",
+			IsChecked = IsDetached(anchorable)
+		};
+		windowItem.Click += (s, e) =>
+		{
+			if (IsDetached(anchorable))
+			{
+				ReattachAnchorable(anchorable);
+			}
+			else
+			{
+				DetachAnchorableToWindow(anchorable);
+			}
+		};
+		viewModeItem.Items.Add(windowItem);
+
 		var dockedItem = new MenuItem { Header = "Docked" };
 		dockedItem.Click += (s, e) =>
 		{
+			if (IsDetached(anchorable))
+			{
+				ReattachAnchorable(anchorable);
+				return;
+			}
+
 			if (anchorable.IsAutoHidden)
 			{
 				var zone = GetAnchorableZone(anchorable);
@@ -685,6 +941,8 @@ public class ToggleDockingManager : DockingManager
 		var hiddenItem = new MenuItem { Header = "Hidden" };
 		hiddenItem.Click += (s, e) =>
 		{
+			ReattachAnchorable(anchorable);
+
 			var layoutItem = GetLayoutItemFromModel(anchorable) as LayoutAnchorableItem;
 			layoutItem?.HideCommand?.Execute(null);
 		};
@@ -1249,6 +1507,12 @@ public class ToggleDockingManager : DockingManager
 			if (item is ToggleDockButton btn && btn.Anchorable != null && !btn.Anchorable.IsAutoHidden)
 			{
 				AutoHideFromDock(btn.Anchorable, bar.Zone);
+
+				// This collapse is a side effect of opening a sibling, so nothing else writes it back.
+				// Leaving it out is what used to strand a toolbox at IsOpen == true while it sat on
+				// its stripe, after which setting IsOpen = true again raised no change and the
+				// toolbox could not be reopened from the view model at all.
+				SetToolboxIsOpen(btn.Anchorable);
 			}
 		}
 	}
@@ -1451,18 +1715,25 @@ public class ToggleDockingManager : DockingManager
 	}
 
 	/// <summary>
-	/// Builds a context menu listing all hidden anchorables.
+	/// Builds a context menu listing the hidden anchorables that can be shown again.
 	/// </summary>
-	/// <returns>The context menu, or null if no anchorables are hidden.</returns>
+	/// <returns>The context menu, or null if there is nothing to list.</returns>
+	/// <remarks>
+	/// Anchorables without content are skipped. Deserializing a stored layout hides every anchorable
+	/// whose content could not be resolved - a toolbox that the application does not offer any more,
+	/// for instance - and restoring one of those would open a pane showing nothing but its stored
+	/// title.
+	/// </remarks>
 	private ContextMenu BuildShowHiddenContextMenu()
 	{
-		if (Layout?.Hidden == null || Layout.Hidden.Count == 0)
+		var hidden = Layout?.Hidden?.Where(a => a.Content != null).ToList();
+		if (hidden == null || hidden.Count == 0)
 		{
 			return null;
 		}
 
 		var menu = new ContextMenu();
-		foreach (var anchorable in Layout.Hidden.ToList())
+		foreach (var anchorable in hidden)
 		{
 			var mi = new MenuItem { Header = anchorable.Title };
 
@@ -1657,51 +1928,23 @@ public class ToggleDockingManager : DockingManager
 			return;
 		}
 
-		bool wantOpen = toolbox.IsOpen;
-		bool isOpen = !anchorable.IsAutoHidden;
+		// A detached anchorable sits collapsed on its stripe while its content is on screen in a
+		// standalone window, so IsAutoHidden on its own does not say whether the toolbox is showing.
+		bool isOpen = !anchorable.IsAutoHidden || IsDetached(anchorable);
 
-		if (wantOpen == isOpen)
+		if (toolbox.IsOpen == isOpen)
 		{
 			return;
 		}
 
+		// ToggleAnchorable is the one implementation of this transition: it carries the zone
+		// bookkeeping, the layout priority handling and the detached window case, and it writes the
+		// resulting state back onto the toolbox. Duplicating it here is what let the two paths drift
+		// apart. The _syncDepth guard keeps that write-back from re-entering this handler.
 		_syncDepth++;
 		try
 		{
-			if (wantOpen)
-			{
-				var zone = GetAnchorableZone(anchorable);
-				HideDockedInBar(GetBarForZone(zone));
-				DockFromAutoHide(anchorable, zone);
-				FixSplitOrientation(anchorable, zone);
-
-				if (ToggleLayoutEngine.IsBottomZone(zone))
-				{
-					EnsureBottomZoneOrder();
-				}
-
-				switch (LayoutPriority)
-				{
-					case DockLayoutPriority.BottomFullWidth:
-						EnsureBottomFullWidth();
-						break;
-					case DockLayoutPriority.SidesFullHeight:
-						EnsureSidesFullHeight();
-						break;
-				}
-
-				ActiveContent = anchorable.Content;
-			}
-			else
-			{
-				var zone = GetAnchorableZone(anchorable);
-				AutoHideFromDock(anchorable, zone);
-			}
-
-			RefreshButtonStates();
-			Dispatcher.BeginInvoke(
-				System.Windows.Threading.DispatcherPriority.Loaded,
-				new System.Action(UpdatePinButtonsToMinimize));
+			ToggleAnchorable(anchorable, GetAnchorableZone(anchorable));
 		}
 		finally
 		{
@@ -1820,7 +2063,9 @@ public class ToggleDockingManager : DockingManager
 		_syncDepth++;
 		try
 		{
-			toolbox.IsOpen = !anchorable.IsAutoHidden;
+			// A detached anchorable is collapsed onto its stripe but its content is on screen in a
+			// standalone window, so it counts as open.
+			toolbox.IsOpen = !anchorable.IsAutoHidden || IsDetached(anchorable);
 		}
 		finally
 		{
