@@ -830,7 +830,13 @@ namespace AvalonDock.Controls
 
 			IsSelected = LayoutElement.IsSelected;
 			IsActive = LayoutElement.IsActive;
-			CanClose = LayoutElement.CanClose;
+
+			// Seed CanClose from the model with SetCurrentValue rather than a local value. A local value outranks
+			// a Style setter, so the plain assignment used to defeat a <Setter Property="CanClose" Value="False"/>
+			// whenever the style arrived after the item had already been created - which is what happens when the
+			// DataContext is declared in XAML and DocumentsSource is therefore resolved before
+			// LayoutItemContainerStyle(Selector) is assigned.
+			SetCurrentValue(CanCloseProperty, LayoutElement.CanClose);
 		}
 
 		/// <summary>
