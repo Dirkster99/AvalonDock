@@ -73,6 +73,21 @@ When a user drags a floating window over the main docking area, **docking indica
 
 The docking indicators are [defined in XAML](https://github.com/Dirkster99/AvalonDock/wiki/OverlayWindow), ensuring crisp rendering on all resolutions including 4K and 8K displays.
 
+### Overlay Window Lifetime
+
+The indicators live in an `OverlayWindow`: a borderless, transparent window that every drop target
+host — the `DockingManager` itself and each floating window — puts over its own area while a drag is
+in progress.
+
+Each host keeps one overlay window and shows and hides it again for every drag, rather than creating
+a new one per drag. A drag ends through a window message of the window being dragged, and that
+message does not always arrive — moving a window between monitors with different DPI scaling can end
+the modal move loop of Windows without one. Recreating the overlay window per drag turned every such
+drag into an empty window that stayed on screen for the rest of the session, so the count grew with
+every float. Reusing one window per host, and clearing the overlay windows of all hosts whenever a
+drag starts or ends, removes that possibility: an overlay window is only ever destroyed together with
+the host it belongs to.
+
 ---
 
 ## Events
@@ -108,3 +123,59 @@ Floating windows are standard WPF windows and fully support multi-monitor setups
 - Arrange multiple floating windows side by side
 
 Layout serialization preserves floating window positions, so the user's multi-monitor arrangement is restored when the layout is loaded.
+
+---
+
+## Standalone Windows ("Window" View Mode)
+
+{: .new }
+> New in v5.0.0
+
+A floating window is owned by the main window: it stays on top of it, has no taskbar entry, and takes
+part in drag docking. That is the right behaviour for moving a tool window around, but not for
+parking one on a second monitor and leaving it there.
+
+`DetachAnchorableToWindow` moves the content of an anchorable into an ordinary top level window
+instead — the equivalent of the "Window" view mode that IDEs offer for their tool windows. It has the
+operating system chrome, owns a taskbar entry, minimizes and restores independently of the main
+window, and may be moved behind it.
+
+```csharp
+dockManager.DetachAnchorableToWindow(anchorable);   // move it out
+dockManager.ReattachAnchorable(anchorable);         // bring it back
+dockManager.ReattachAllDetachedAnchorables();       // bring all of them back
+```
+
+Users reach the same thing through **View Mode → Window** in the options menu of the anchorable, or
+through the `DetachToWindowCommand` of `LayoutAnchorableItem`. Closing the standalone window returns
+the content to the layout.
+
+| Member | Type | Description |
+|:-------|:-----|:------------|
+| `DetachAnchorableToWindow(anchorable)` | `void` | Moves the content into a standalone window. |
+| `ReattachAnchorable(anchorable)` | `void` | Closes the window and returns the content to the layout. |
+| `ReattachAllDetachedAnchorables()` | `void` | Returns every detached anchorable. |
+| `IsDetached(anchorable)` | `bool` | Whether that anchorable is currently in a standalone window. |
+| `DetachedAnchorables` | `IEnumerable<LayoutAnchorable>` | The anchorables currently in standalone windows. |
+
+### What Happens to the Layout
+
+Only the presenter holding the content moves, because a WPF element can have one parent. Where the
+anchorable itself goes is decided by the manager: the default hides it, so `Show()` puts it back in
+the pane and index it came from. `ToggleDockingManager` collapses it onto its side stripe instead, so
+the toggle button stays available and clicking it brings the standalone window forward.
+
+### Serialization
+
+`LayoutAnchorable.IsDetached` takes part in layout serialization, so a saved layout remembers which
+tool windows were in standalone windows, and restoring it recreates them at their stored position and
+size. A position that no longer lands on any screen — a layout saved on a multi-monitor machine and
+restored on a single monitor — is discarded in favour of centring the window, so it can never open
+where the user cannot reach it.
+
+### Lifetime
+
+A standalone window has no owner, so it would otherwise keep the process alive under
+`ShutdownMode.OnLastWindowClose`. AvalonDock hooks the host window and closes the detached windows
+when it goes away. Replacing `DockingManager.Layout` also closes them, because their anchorables are
+about to leave the manager.

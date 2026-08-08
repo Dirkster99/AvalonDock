@@ -45,7 +45,8 @@ dotnet test source/AvalonDock.sln --configuration Release --no-restore --filter 
 - `source/Components/AvalonDock.DependencyInjection` — DI registration extensions
 - `source/Components/AvalonDock.Mvvm` — MVVM base classes (DockableBase, ToolboxBase)
 - `source/AutomationTest/` — Unit and FlaUI test projects
-- `source/TestApp`, `source/MVVMTestApp`, `source/ToggleTestApp` — Sample applications
+- `source/TestApp`, `source/MVVMTestApp` — Classic sample applications
+- `source/AvalonDockCodeApp` — ToggleDockingManager sample, driven by the FlaUI toggle-dock tests
 
 ## Code Style
 

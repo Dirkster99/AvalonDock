@@ -142,6 +142,15 @@
                     <Separator />
                     <MenuItem Header="E_xit" Click="OnExit" />
                 </MenuItem>
+                <MenuItem Header="_Layout">
+                    <MenuItem Header="Save Layout" Click="OnSaveLayout" />
+                    <MenuItem Header="Load Layout" Click="OnLoadLayout" />
+                    <Separator />
+                    <!-- Loads a copy of the saved layout carrying one extra tool window that no
+                         toolbox answers to, which is what a layout stored by an older version of an
+                         application looks like once a toolbox has been dropped from it. -->
+                    <MenuItem Header="Load Layout With Unknown Toolbox" Click="OnLoadLayoutWithUnknownToolbox" />
+                </MenuItem>
                 <MenuItem Header="_View">
                     <MenuItem Header="Layout Priority">
                         <MenuItem x:Name="menuBottomFullWidth" Header="Bottom Full Width (Rider)"

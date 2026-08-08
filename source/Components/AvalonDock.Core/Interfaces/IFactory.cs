@@ -45,18 +45,31 @@ namespace AvalonDock.Core
 		/// <param name="source">The source dock.</param>
 		/// <param name="target">The target dock.</param>
 		/// <param name="dockable">The dockable to move.</param>
+		/// <exception cref="ArgumentNullException">Any of the arguments is <c>null</c>.</exception>
 		void MoveDockable(IDock source, IDock target, IDockable dockable);
 
-		/// <summary>Pins a dockable to prevent auto-hiding.</summary>
-		/// <param name="dockable">The dockable to pin.</param>
+		/// <summary>
+		/// Moves a dockable to the sidebar of the root, or back into the dock it came from when it is
+		/// already there. Leaves a dockable whose <see cref="IDockable.CanPin"/> is <c>false</c> alone.
+		/// </summary>
+		/// <param name="dockable">The dockable to pin or unpin.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="dockable"/> is <c>null</c>.</exception>
 		void PinDockable(IDockable dockable);
 
-		/// <summary>Floats a dockable into an independent window.</summary>
+		/// <summary>
+		/// Moves a dockable out of its dock and into the floating windows of the root. Leaves a
+		/// dockable whose <see cref="IDockable.CanFloat"/> is <c>false</c> alone.
+		/// </summary>
 		/// <param name="dockable">The dockable to float.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="dockable"/> is <c>null</c>.</exception>
 		void FloatDockable(IDockable dockable);
 
-		/// <summary>Closes a dockable, removing it from the layout.</summary>
+		/// <summary>
+		/// Closes a dockable, removing it from the layout. Leaves it alone when
+		/// <see cref="IDockable.OnClose"/> vetoes.
+		/// </summary>
 		/// <param name="dockable">The dockable to close.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="dockable"/> is <c>null</c>.</exception>
 		void CloseDockable(IDockable dockable);
 	}
 }
