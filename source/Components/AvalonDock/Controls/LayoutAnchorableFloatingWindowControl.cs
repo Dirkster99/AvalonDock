@@ -185,8 +185,18 @@ namespace AvalonDock.Controls
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
-			var manager = _model.Root.Manager;
-			Content = manager.CreateUIElementForModel(_model.RootPanel);
+
+			// The window reaches the screen through a deferred dispatcher operation, so its model can
+			// have left the layout tree before this runs - the window hosting the docking manager was
+			// closed in the meantime, say. There is no manager to build the content from then, and a
+			// window with no content is what an already detached model should produce. OnClosed and
+			// OnRootUpdated expect a model without a root for the same reason.
+			var manager = _model.Root?.Manager;
+			if (manager != null)
+			{
+				Content = manager.CreateUIElementForModel(_model.RootPanel);
+			}
+
 			// SetBinding(VisibilityProperty, new Binding("IsVisible") { Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden });
 
 			// Issue: http://avalondock.codeplex.com/workitem/15036
