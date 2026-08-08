@@ -899,7 +899,12 @@ namespace TestApp
 					"document-tab" => FindVisualDescendants<LayoutDocumentTabItem>(dockManager)
 						.Where(x => string.Equals(x.Model?.ContentId, contentId, StringComparison.Ordinal))
 						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0),
-					"document-pane" => FindVisualDescendant<LayoutDocumentPaneControl>(dockManager, _ => true),
+					"document-pane" => string.IsNullOrEmpty(contentId)
+						? FindVisualDescendant<LayoutDocumentPaneControl>(dockManager, _ => true)
+						: FindVisualDescendant<LayoutDocumentPaneControl>(
+							dockManager,
+							x => x.Model?.Descendents().OfType<LayoutContent>()
+							.Any(c => string.Equals(c.ContentId, contentId, StringComparison.Ordinal)) == true),
 					"anchorable-pane" => FindVisualDescendant<LayoutAnchorablePaneControl>(
 						dockManager,
 						x => x.Model?.Descendents().OfType<LayoutAnchorable>()
@@ -1016,10 +1021,26 @@ namespace TestApp
 					if (target != null)
 					{
 						overlay.DragEnter(target);
+						var previewPath = target.GetPreviewPath((OverlayWindow)overlay, floating.Model as LayoutFloatingWindow);
+						var previewBounds = previewPath.Bounds;
+						var overlayPosition = (overlay as Window) is { } overlayWindow
+							? new Point(overlayWindow.Left, overlayWindow.Top)
+							: new Point(0, 0);
+						// GetPreviewPath returns geometry in overlay-local coordinates; translate to
+						// screen coordinates so tests can compare against docked pane bounds directly.
 						previewInfo = new Dictionary<string, object>
 						{
 							["zone"] = previewZone,
 							["targetScreenBounds"] = RectToPayload(target.GetScreenBounds()),
+							["previewGeometryBounds"] = new Dictionary<string, object>
+							{
+								["x"] = previewBounds.X + overlayPosition.X,
+								["y"] = previewBounds.Y + overlayPosition.Y,
+								["width"] = previewBounds.Width,
+								["height"] = previewBounds.Height,
+							},
+							["overlayPosition"] = RectToPayload(new Rect(overlayPosition, new Size(0, 0))),
+							["previewIsEmpty"] = previewBounds.IsEmpty,
 						};
 					}
 					else

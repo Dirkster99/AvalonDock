@@ -196,10 +196,48 @@ namespace AvalonDock.Controls
 
 			var targetScreenRect = TargetElement.GetScreenArea();
 
+			// The docked content does not necessarily start at the DockingManager's own origin: some
+			// backends render the template's empty side-panel slots with a nonzero size (LibreWPF
+			// gives the empty Auto columns/rows a 6px minimum), so the pane after a drop is inset
+			// from the manager's edge. Measure the actual rendered content area and preview against
+			// it, so the preview rectangle lands exactly where the docked pane will be. The offset
+			// is guarded so a backend that does not support this measurement simply keeps the
+			// unadjusted manager area.
+			if (TargetElement.LayoutRootPanel is FrameworkElement rootPanel && rootPanel.IsVisible)
+			{
+				try
+				{
+					var contentScreenOrigin = rootPanel.PointToScreen(new Point(0, 0));
+					var managerScreenOrigin = TargetElement.PointToScreen(new Point(0, 0));
+					var dx = contentScreenOrigin.X - managerScreenOrigin.X;
+					var dy = contentScreenOrigin.Y - managerScreenOrigin.Y;
+					if (dx > 0 || dy > 0)
+					{
+						targetScreenRect.X += dx;
+						targetScreenRect.Y += dy;
+						targetScreenRect.Width -= dx * 2;
+						targetScreenRect.Height -= dy * 2;
+					}
+				}
+				catch
+				{
+					// Measurement unavailable - fall back to the unadjusted manager area.
+				}
+			}
+
 			// Preferred dock size used by the outer-edge rules: width for Left/Right, height for Top/Bottom.
-			var preferredSize = Type == DropTargetType.DockingManagerDockTop || Type == DropTargetType.DockingManagerDockBottom
-				? (layoutAnchorablePane.DockHeight.IsAbsolute ? layoutAnchorablePane.DockHeight.Value : layoutAnchorablePaneWithActualSize.ActualHeight)
-				: (layoutAnchorablePane.DockWidth.IsAbsolute ? layoutAnchorablePane.DockWidth.Value : layoutAnchorablePaneWithActualSize.ActualWidth);
+			// The rendered actual size is preferred, but on backends where a Star pane is not yet laid
+			// out (LibreWPF collapses it to its minimum while a floating window is being dragged) it is
+			// unusable, so fall back to the floating window's size kept on the model - otherwise the
+			// preview box collapses to a sliver that never matches the pane after the drop.
+			var forVertical = Type == DropTargetType.DockingManagerDockTop || Type == DropTargetType.DockingManagerDockBottom;
+			var dockSize = forVertical ? layoutAnchorablePane.DockHeight : layoutAnchorablePane.DockWidth;
+			var actualSize = forVertical ? layoutAnchorablePaneWithActualSize.ActualHeight : layoutAnchorablePaneWithActualSize.ActualWidth;
+			var minSize = forVertical ? layoutAnchorablePane.CalculatedDockMinHeight() : layoutAnchorablePane.CalculatedDockMinWidth();
+			var floatingSize = forVertical ? layoutAnchorablePaneWithActualSize.FloatingHeight : layoutAnchorablePaneWithActualSize.FloatingWidth;
+			var preferredSize = dockSize.IsAbsolute
+				? dockSize.Value
+				: (actualSize > minSize ? actualSize : floatingSize);
 
 			if (OverlayPreviewRules.TryComputeManagerPreviewRect(
 				Type,

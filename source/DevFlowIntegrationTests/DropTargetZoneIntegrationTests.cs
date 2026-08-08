@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -106,6 +107,8 @@ namespace AvalonDock.DevFlowIntegrationTests
 				var final = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));
 				Assert.Single(final.Anchorables, a => a.ContentId == "dragTestTool");
 				Assert.False(final.Anchorables.Single(a => a.ContentId == "dragTestTool").IsFloat);
+
+				await AssertDockedPaneRendersSensiblyAsync(client, final);
 			}
 			finally
 			{
@@ -293,6 +296,142 @@ namespace AvalonDock.DevFlowIntegrationTests
 				var confirmState = await client.InvokeAsync("avd.query.drag-state");
 				var confirmTargets = await client.InvokeAsync("avd.query.active-drop-targets");
 				NativeInputIntegrationTests.AssertOverlayIsConstrainedToDockingManager(confirmState, confirmTargets);
+			}
+		}
+
+		/// <summary>Verifies the pane that actually hosts the dragged tool after a drop has real,
+		/// in-window geometry - not just that the layout model says the tool docked (which is all
+		/// the other assertions check). A broken drop can still "dock" at the model level while the
+		/// pane is a collapsed 0-size sliver or renders outside the DockingManager, which would mean
+		/// the content is not being shown at all. The pane's exact size is not predictable (it is
+		/// derived from the floating window's size at drop time), so the thresholds are deliberately
+		/// loose: they only fail on genuine collapse or escape, never on a merely small-but-valid pane.
+		/// The tool's landing pane type depends on the zone: DockingManagerDock*/AnchorablePaneDock*/
+		/// DocumentPaneDockAsAnchorable* land it in an anchorable pane, while DocumentPaneDock*/
+		/// DocumentPaneDockInside host the (still-LayoutAnchorable) tool inside a document pane, so
+		/// both pane kinds must be tried.</summary>
+		private static async Task AssertDockedPaneRendersSensiblyAsync(DevFlowClient client, DockLayoutSnapshot final)
+		{
+			var manager = await client.QueryBoundsAsync("manager");
+
+			ElementBounds pane;
+			string anchorablePaneError = null;
+			try
+			{
+				pane = await client.QueryBoundsAsync("anchorable-pane", "dragTestTool");
+			}
+			catch (InvalidOperationException ex)
+			{
+				anchorablePaneError = ex.Message;
+				pane = await client.QueryBoundsAsync("document-pane", "dragTestTool");
+			}
+
+			// A collapsed row/column (0 or negative size) still satisfies the model-level assertions.
+			Assert.True(pane.Width >= 40, $"Pane hosting dragTestTool collapsed horizontally after dock: {pane}" + FailureContext());
+			Assert.True(pane.Height >= 40, $"Pane hosting dragTestTool collapsed vertically after dock: {pane}" + FailureContext());
+
+			// The pane must stay inside the DockingManager; escaping it means the content renders
+			// outside the dock area (overlapping chrome or off-window). 2px tolerance absorbs
+			// rounding in the screen-coordinate transform.
+			Assert.True(
+				pane.X >= manager.X - 2 && pane.Y >= manager.Y - 2
+					&& pane.Right <= manager.Right + 2 && pane.Bottom <= manager.Bottom + 2,
+				$"Pane hosting dragTestTool escapes the DockingManager after dock: pane={pane}, manager={manager}" + FailureContext());
+
+			string FailureContext() => anchorablePaneError == null
+				? string.Empty
+				: $" (anchorable-pane lookup failed first: {anchorablePaneError})";
+		}
+
+		/// <summary>Verifies the blue drop-preview rectangle shown while dragging over a docking
+		/// manager edge lands exactly where the pane does after the drop: same screen position and
+		/// same size. A preview that does not match the resulting pane (collapsed to a sliver, or
+		/// offset from where the pane actually docks) misleads the user about the drop outcome, so
+		/// any difference in position or size fails the test.</summary>
+		[Theory]
+		[InlineData("DockingManagerDockLeft", "document")]
+		[InlineData("DockingManagerDockRight", "document")]
+		[InlineData("DockingManagerDockTop", "document")]
+		[InlineData("DockingManagerDockBottom", "document")]
+		public async Task DockPreview_MatchesDockedPaneGeometry(string zoneType, string pathTarget)
+		{
+			NativeInputEnvironment.EnsureNativeDragAvailable();
+			await IsolateDesktopForNativeInputAsync();
+
+			using var client = await TryConnectAsync();
+			if (client == null)
+				return;
+
+			var originalXml = await client.InvokeAsync("avd.layout.serialize");
+			try
+			{
+				await client.InvokeAsync("avd.test-layout.reset");
+				await WaitForLayoutAsync(
+					client,
+					s => s.Documents.Any(d => d.ContentId == "dragTestDocument")
+						&& s.Anchorables.Any(a => a.ContentId == "dragTestTool"),
+					TestContext.Current.CancellationToken);
+
+				var mainArea = await client.QueryBoundsAsync("manager");
+				await EnsureFloatingClearOfHostAsync(client, mainArea, TestContext.Current.CancellationToken);
+
+				// Capture the preview the user sees for this zone while the tool is floating.
+				var previewResult = await client.InvokeAsync("avd.debug-show-overlay", zoneType);
+				using (var doc = JsonDocument.Parse(previewResult))
+				{
+					var preview = doc.RootElement.GetProperty("preview");
+					Assert.True(preview.TryGetProperty("previewGeometryBounds", out var geom), $"Preview for '{zoneType}' missing geometry: {previewResult}");
+					var previewX = geom.GetProperty("x").GetDouble();
+					var previewY = geom.GetProperty("y").GetDouble();
+					var previewWidth = geom.GetProperty("width").GetDouble();
+					var previewHeight = geom.GetProperty("height").GetDouble();
+					Assert.True(previewWidth > 0 && previewHeight > 0,
+						$"Preview for '{zoneType}' has no area ({previewWidth}x{previewHeight}): {previewResult}");
+
+					await client.InvokeAsync("avd.debug-hide-overlay");
+					var pathTargetBounds = pathTarget == "anchorable2"
+						? await client.QueryBoundsAsync("anchorable-pane", "dragTestTool2")
+						: await client.QueryBoundsAsync("document-pane");
+
+					const int maxAttempts = 3;
+					string lastFailure = null;
+					var docked = false;
+					for (var attempt = 1; attempt <= maxAttempts && !docked; attempt++)
+					{
+						await EnsureFloatingClearOfHostAsync(client, mainArea, TestContext.Current.CancellationToken);
+						(docked, lastFailure) = await TryDragOntoZoneAsync(client, zoneType, pathTargetBounds, TestContext.Current.CancellationToken);
+					}
+
+					Assert.True(docked, $"Failed to dock onto zone '{zoneType}' after {maxAttempts} attempts. LastFailure={lastFailure}");
+
+					var final = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));
+					var pane = await QueryHostingPaneAsync(client, final);
+
+					// Same screen position and same size as the preview, within rounding.
+					const double tolerance = 2.0;
+					Assert.True(Math.Abs(pane.X - previewX) <= tolerance && Math.Abs(pane.Y - previewY) <= tolerance,
+						$"Docked pane position does not match preview for '{zoneType}': preview=({previewX},{previewY}) pane={pane}");
+					Assert.True(Math.Abs(pane.Width - previewWidth) <= tolerance && Math.Abs(pane.Height - previewHeight) <= tolerance,
+						$"Docked pane size does not match preview for '{zoneType}': preview={previewWidth}x{previewHeight} pane={pane.Width}x{pane.Height}");
+				}
+			}
+			finally
+			{
+				await client.InvokeAsync("avd.layout.restore", originalXml);
+			}
+		}
+
+		/// <summary>Locates the screen bounds of the pane hosting dragTestTool after a drop
+		/// (anchorable pane or document pane, depending on where the zone landed it).</summary>
+		private static async Task<ElementBounds> QueryHostingPaneAsync(DevFlowClient client, DockLayoutSnapshot final)
+		{
+			try
+			{
+				return await client.QueryBoundsAsync("anchorable-pane", "dragTestTool");
+			}
+			catch (InvalidOperationException)
+			{
+				return await client.QueryBoundsAsync("document-pane", "dragTestTool");
 			}
 		}
 
