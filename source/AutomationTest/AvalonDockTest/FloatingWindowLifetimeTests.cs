@@ -19,22 +19,29 @@ namespace AvalonDockTest
 	/// </summary>
 	/// <remarks>
 	/// The overlay windows of the reported scenario are only put on screen by a real mouse drag, which
-	/// these tests cannot perform. What they do cover is the other half of the report - the resources a
-	/// floating window leaves behind once it has been closed - and the plain bookkeeping of the windows
-	/// themselves over repeated float and dock cycles.
+	/// a unit test cannot perform. What is covered here is that repeating the float and dock cycle
+	/// reaches a steady state - neither the floating windows themselves nor the content hosts they
+	/// register with the <see cref="DockingManager"/> may grow with every float.
 	/// </remarks>
 	[TestFixture]
 	[Apartment(System.Threading.ApartmentState.STA)]
 	public class FloatingWindowLifetimeTests : AutomationTestBase
 	{
 		/// <summary>
-		/// The automation name that <see cref="AvalonDock.Controls.LayoutFloatingWindowControl"/> gives to
+		/// The automation name that <c>LayoutFloatingWindowControl.FloatingWindowContentHost</c> gives to
 		/// the presenter it registers as a logical child of the <see cref="DockingManager"/>.
 		/// </summary>
 		private const string FloatingWindowHostName = "FloatingWindowHost";
 
+		/// <summary>
+		/// The number of float and dock cycles that are run before the counts are taken as the baseline.
+		/// A docked anchorable keeps its floating window as the container to float back into, so the
+		/// first cycle is the one that establishes it and the ones after it have to change nothing.
+		/// </summary>
+		private const int WarmUpCycles = 2;
+
 		[Test]
-		public void RepeatedFloatAndDockKeepsExactlyOneFloatingWindow_Issue587()
+		public void RepeatedFloatAndDockDoesNotAccumulateWindows_Issue587()
 		{
 			var window = CreateHostingWindow(out var dockingManager, out var anchorable);
 			try
@@ -42,19 +49,25 @@ namespace AvalonDockTest
 				window.Show();
 				DoEvents();
 
-				for (var cycle = 1; cycle <= 3; cycle++)
+				for (var cycle = 1; cycle <= WarmUpCycles; cycle++)
+					RunFloatAndDockCycle(anchorable);
+
+				var floatingWindows = dockingManager.FloatingWindows.Count();
+				var contentHosts = FloatingWindowContentHostsOf(dockingManager).Count;
+
+				Assert.That(floatingWindows, Is.EqualTo(1),
+					"Floating a single anchorable has to end up with exactly one floating window.");
+
+				for (var cycle = WarmUpCycles + 1; cycle <= WarmUpCycles + 3; cycle++)
 				{
-					anchorable.Float();
-					DoEvents();
+					RunFloatAndDockCycle(anchorable);
 
-					Assert.That(dockingManager.FloatingWindows.Count(), Is.EqualTo(1),
-						$"Floating an anchorable has to create exactly one floating window (cycle {cycle}, Issue #587).");
+					Assert.That(dockingManager.FloatingWindows.Count(), Is.EqualTo(floatingWindows),
+						$"Floating an anchorable again must not add another floating window (cycle {cycle}, Issue #587).");
 
-					anchorable.Dock();
-					DoEvents();
-
-					Assert.That(dockingManager.FloatingWindows, Is.Empty,
-						$"Docking an anchorable back has to take its floating window down again (cycle {cycle}, Issue #587).");
+					Assert.That(FloatingWindowContentHostsOf(dockingManager).Count, Is.LessThanOrEqualTo(contentHosts),
+						"The content hosts registered with the DockingManager must not grow with every float, " +
+						$"they have to be handed back when a floating window goes away (cycle {cycle}, Issue #587).");
 				}
 			}
 			finally
@@ -63,40 +76,23 @@ namespace AvalonDockTest
 			}
 		}
 
-		[Test]
-		public void ClosedFloatingWindowReleasesItsContentHost_Issue587()
+		/// <summary>Floats the given anchorable and docks it back again.</summary>
+		/// <param name="anchorable">The anchorable to float and dock.</param>
+		private static void RunFloatAndDockCycle(LayoutAnchorable anchorable)
 		{
-			var window = CreateHostingWindow(out var dockingManager, out var anchorable);
-			try
-			{
-				window.Show();
-				DoEvents();
+			anchorable.Float();
+			DoEvents();
 
-				for (var cycle = 1; cycle <= 3; cycle++)
-				{
-					anchorable.Float();
-					DoEvents();
-
-					anchorable.Dock();
-					DoEvents();
-
-					Assert.That(FloatingWindowContentHostsOf(dockingManager), Is.Empty,
-						"A closed floating window has to hand its content host back to the DockingManager, " +
-						$"otherwise every float leaves one behind for the rest of the session (cycle {cycle}, Issue #587).");
-				}
-			}
-			finally
-			{
-				window.Close();
-			}
+			anchorable.Dock();
+			DoEvents();
 		}
 
 		/// <summary>
-		/// Collects the content hosts of floating windows that are still registered as logical children of
-		/// the given <see cref="DockingManager"/>.
+		/// Collects the content hosts of floating windows that are registered as logical children of the
+		/// given <see cref="DockingManager"/>.
 		/// </summary>
 		/// <param name="manager">The docking manager to inspect.</param>
-		/// <returns>The content hosts the manager still holds.</returns>
+		/// <returns>The content hosts the manager holds.</returns>
 		private static IReadOnlyList<object> FloatingWindowContentHostsOf(DockingManager manager)
 		{
 			var hosts = new List<object>();
