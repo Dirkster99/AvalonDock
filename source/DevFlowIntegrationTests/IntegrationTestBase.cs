@@ -1,8 +1,11 @@
+using System;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace AvalonDock.DevFlowIntegrationTests
 {
-	public abstract class IntegrationTestBase
+	public abstract class IntegrationTestBase : IAsyncLifetime
 	{
 		private static int? _fixturePort;
 		private readonly DevFlowAppFixture _fixture;
@@ -42,7 +45,50 @@ namespace AvalonDock.DevFlowIntegrationTests
 
 		protected Task RestartTestAppAsync()
 		{
-			return _fixture?.RestartAsync() ?? Task.CompletedTask;
+			return RestartTestAppAndPositionGuardAsync();
+		}
+
+		public async ValueTask InitializeAsync()
+		{
+			await PositionAndArmMainWindowGuardAsync();
+		}
+
+		public async ValueTask DisposeAsync()
+		{
+			await AssertMainWindowDidNotMoveAsync();
+		}
+
+		private async Task RestartTestAppAndPositionGuardAsync()
+		{
+			await AssertMainWindowDidNotMoveAsync();
+			if (_fixture != null)
+				await _fixture.RestartAsync();
+			await PositionAndArmMainWindowGuardAsync();
+		}
+
+		private static async Task PositionAndArmMainWindowGuardAsync()
+		{
+			using var client = await TryConnectAsync();
+			if (client == null)
+				return;
+
+			await client.InvokeAsync("avd.position-main-window", 50, 40);
+			await client.InvokeAsync("avd.main-window-position-guard.start");
+		}
+
+		private static async Task AssertMainWindowDidNotMoveAsync()
+		{
+			using var client = await TryConnectAsync();
+			if (client == null)
+				return;
+
+			using var result = JsonDocument.Parse(
+				await client.InvokeAsync("avd.main-window-position-guard.query"));
+			var root = result.RootElement;
+			Assert.True(root.GetProperty("armed").GetBoolean(), "Main-window position guard was not armed.");
+			Assert.False(
+				root.GetProperty("moved").GetBoolean(),
+				$"Main window moved during the test. Guard state: {root.GetRawText()}");
 		}
 	}
 }

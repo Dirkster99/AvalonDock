@@ -265,12 +265,11 @@ view tree（只读、不截图），记录类名、对象地址、`hidden` 和 w
 对象”两种简单解释。`WindowStyle.None` 在 portable backend 下仍是带
 `NSWindowStyleMaskFullSizeContentView` 的 AppKit theme frame，而不是完全没有 theme/titlebar
 view tree 的纯 borderless window。不过 overlay 的 effect 有隐藏父节点，floating 则有一个
-未隐藏的 frame-level effect。后续 TestApp A/B 已实现：只从 custom-chrome/full-size floating
-window 的 AppKit frame 移除直属 `NSVisualEffectView`，main window 与 overlay 不变；在 float、
-重新定位和激活后都会确保移除。这样可以避开 Crash B 对应的
-`CUIThemeFacet updateLayer:effects:` 路径，最新完整真实 drag/drop 套件未再生成 Crash B 报告。
-这仍是 TestApp 级 A/B，不是 AvalonDock 产品默认行为；是否上升为产品修复仍需更长时间压力
-运行和外观回归证据。
+未隐藏的 frame-level effect。曾做过一个 TestApp A/B：只从 custom-chrome/full-size floating
+window 的 AppKit frame 移除直属 `NSVisualEffectView`。刷新 LibreWPF local feed 后，真实 drag
+多次出现 `EXC_BAD_ACCESS/SIGSEGV → objc_msgSend → 托管 P/Invoke`；即使先用
+`NSApplication.orderedWindows` 验证指针，检查与后续消息之间仍有生命周期竞态。因此该 A/B
+已完全停用，不能作为产品修复。Crash B 仍应在 LibreWPF/AppKit 窗口生命周期层继续调查。
 
 同一轮 native 坐标诊断还发现 overlay 的托管 `Left/Top` 与实际 Cocoa frame 会偶发分离；
 之前 drag-state 和 preview 转屏幕坐标混用了 overlay managed origin 与 manager native origin，
@@ -278,16 +277,25 @@ window 的 AppKit frame 移除直属 `NSVisualEffectView`，main window 与 over
 `Show()`、native handle 创建之后通过 `INativeWindowService.SetWindowPosition` 再校正一次位置。
 
 长序列进一步证明问题不只是刷新时机：ProGPU 的 `TryGetWindowHost(overlay)` 会偶发返回 floating
-window 的 native host，overlay 因而被移动到 floating 的位置。修复是在 overlay 的
-`SourceInitialized` 时固定当时正确的 `NSWindow*`，后续拖动对齐不再重复依赖可能漂移的 host
-映射；zone 理论用例也各自重启 TestApp，阻断透明原生窗口生命周期的跨用例污染。逐项恢复
+或 main window 的 native host。现在 main、floating、overlay 在 source 初始化时登记 native
+handle 所有权；重复 handle 会被拒绝，overlay 未取得独占 handle 时禁止调用原生移动。macOS
+floating 预定位和 portable caption drag 也直接使用固定 native handle，避免 LibreWPF
+`Window.Left/Top` setter 串窗并移动 main window。zone 理论用例各自重启 TestApp，阻断透明原生
+窗口生命周期的跨用例污染。逐项恢复
 XML layout 曾导致 floating native window 关闭期间 UI 线程卡死，现改为下一项开始时执行确定性
 layout reset，并由 20 秒 action watchdog 报出真正卡住的 action。
 
-测试还在 mouse-down 前验证 cursor、起点所属 window 和 z-order；点击间隔按系统双击判定时间
-避开 double-click；测试代码不调用任何截屏动作。最终结果：zone/preview 22/22（9m45s），完整
-套件 57/57（11m26s）。其中 4 个专门用例在 drop 前保存 live preview 屏幕矩形，drop 后读取实际
-承载 pane 的矩形，并以 2 px 容差比较位置和尺寸。
+所有测试都由 TestApp 内的 20ms native-origin guard 记录 main window 首次位移，结束时统一断言
+全过程未移动。所有 floating→dock 的 mouse-down 前，不仅验证请求点、窗口和 z-order，还会读取
+真实 native cursor；最多慢速重发 5 次纯 move，只有 cursor 位于最新 floating title-bar handle
+内才允许按下。额外 warm-up click 已删除，点击之间仍按系统双击判定时间隔离；测试代码不调用
+任何截屏动作。4 个专门用例在 drop 前保存 live preview 屏幕矩形，drop 后读取实际承载 pane
+矩形，并以 2 px 容差比较位置和尺寸。
+
+2026-08-08 最终刷新验证：local feed 的正式目录只保留 3 个有效包，历史包移到
+`artifacts/local-feed-backups`；LibreWPF Release、NuGet cache 和 TestApp 输出中的
+`ProGPU.Wpf.dll` SHA-256 均为 `9f0e7585470d07f145ac1d9812552db43174cb81f44f3f569263f3626a6be1b6`。
+完整集成测试 57/57 通过（8m42s）。
 
 ### 影响
 

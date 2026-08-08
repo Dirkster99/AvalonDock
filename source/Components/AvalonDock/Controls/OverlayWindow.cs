@@ -103,6 +103,7 @@ namespace AvalonDock.Controls
 			};
 			Loaded += (_, __) =>
 			{
+				PlatformHelper.CacheNativeWindowHandle(this);
 				AlignNativePosition();
 			};
 			UpdateThemeResources();
@@ -133,6 +134,7 @@ namespace AvalonDock.Controls
 
 		internal void EnsureNativePositionDuringDrag()
 		{
+			PlatformHelper.CacheNativeWindowHandle(this);
 			if (_dragAlignmentPending)
 				return;
 			_dragAlignmentPending = true;

@@ -70,7 +70,6 @@ namespace AvalonDock.DevFlowIntegrationTests
 			if (client == null)
 				return;
 
-			await client.InvokeAsync("avd.position-main-window", 50, 40);
 			var originalXml = await client.InvokeAsync("avd.layout.serialize");
 			try
 			{
@@ -260,7 +259,6 @@ namespace AvalonDock.DevFlowIntegrationTests
 			if (client == null)
 				return;
 
-			await client.InvokeAsync("avd.position-main-window", 50, 40);
 			var originalXml = await client.InvokeAsync("avd.layout.serialize");
 			try
 			{
@@ -550,7 +548,10 @@ namespace AvalonDock.DevFlowIntegrationTests
 				menu.Contains(screenX, screenY),
 				$"Refusing to start a real mouse drag on the main menu. Point={screenX},{screenY}; Menu={menu}; Window={window}; Handle={handle}");
 
-			await AssertNativeCursorInsideFloatingWindowAsync(client, contentId, window, screenX, screenY, ct).ConfigureAwait(false);
+			// This is the final gate immediately before mouse-down: re-read the native cursor after
+			// cliclick moved it and require the actual OS position (not just the requested point) to
+			// remain inside the floating title-bar drag handle.
+			await AssertNativeCursorInsideBoundsAsync(client, contentId, handle, screenX, screenY, ct).ConfigureAwait(false);
 		}
 
 		internal static async Task AssertSafeFloatingBodyPressAsync(
@@ -563,10 +564,10 @@ namespace AvalonDock.DevFlowIntegrationTests
 			var window = await client.QueryBoundsAsync("floating-window", contentId).ConfigureAwait(false);
 			Assert.True(window.Contains(screenX, screenY),
 				$"Refusing to press outside the floating window body. Point={screenX},{screenY}; Window={window}; ContentId={contentId}");
-			await AssertNativeCursorInsideFloatingWindowAsync(client, contentId, window, screenX, screenY, ct).ConfigureAwait(false);
+			await AssertNativeCursorInsideBoundsAsync(client, contentId, window, screenX, screenY, ct).ConfigureAwait(false);
 		}
 
-		private static async Task AssertNativeCursorInsideFloatingWindowAsync(
+		private static async Task AssertNativeCursorInsideBoundsAsync(
 			DevFlowClient client,
 			string contentId,
 			ElementBounds requiredBounds,
@@ -574,12 +575,20 @@ namespace AvalonDock.DevFlowIntegrationTests
 			double screenY,
 			CancellationToken ct)
 		{
-			await RunCliclickMoveAsync(screenX, screenY, ct).ConfigureAwait(false);
-			await Task.Delay(150, ct).ConfigureAwait(false);
-			var cursorJson = await client.InvokeAsync("avd.query.cursor").ConfigureAwait(false);
-			using var cursorDoc = JsonDocument.Parse(cursorJson);
-			var actualX = cursorDoc.RootElement.GetProperty("x").GetDouble();
-			var actualY = cursorDoc.RootElement.GetProperty("y").GetDouble();
+			double actualX = double.NaN;
+			double actualY = double.NaN;
+			for (var attempt = 0; attempt < 5; attempt++)
+			{
+				await RunCliclickMoveAsync(screenX, screenY, ct).ConfigureAwait(false);
+				await Task.Delay(200, ct).ConfigureAwait(false);
+				var cursorJson = await client.InvokeAsync("avd.query.cursor").ConfigureAwait(false);
+				using var cursorDoc = JsonDocument.Parse(cursorJson);
+				actualX = cursorDoc.RootElement.GetProperty("x").GetDouble();
+				actualY = cursorDoc.RootElement.GetProperty("y").GetDouble();
+				if (Math.Abs(actualX - screenX) <= 2 && Math.Abs(actualY - screenY) <= 2 &&
+					requiredBounds.Contains(actualX, actualY))
+					break;
+			}
 			Assert.True(Math.Abs(actualX - screenX) <= 2 && Math.Abs(actualY - screenY) <= 2,
 				$"Refusing to press because native cursor missed requested point. Requested={screenX},{screenY}; Actual={actualX},{actualY}; Bounds={requiredBounds}");
 			Assert.True(requiredBounds.Contains(actualX, actualY),

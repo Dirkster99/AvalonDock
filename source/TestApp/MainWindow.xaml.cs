@@ -45,6 +45,9 @@ namespace TestApp
 		private const string ObjC = "/usr/lib/libobjc.dylib";
 		private static MainWindow s_positionedMainWindow;
 		private static Point? s_positionedMainContentOrigin;
+		private DispatcherTimer _mainWindowPositionGuardTimer;
+		private Point _mainWindowPositionGuardOrigin;
+		private Point? _mainWindowPositionGuardViolation;
 
 		private enum GetWindowCmd : uint
 		{
@@ -502,7 +505,6 @@ namespace TestApp
 				return $"Anchorable '{contentId}' not found";
 			anchorable.Float();
 			Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
-			HideMacOSFloatingFrameVisualEffect(FindVisibleFloatingWindow(contentId));
 			return $"Floated '{contentId}'";
 		}
 
@@ -516,37 +518,17 @@ namespace TestApp
 			if (floating == null)
 				return $"No floating window found for '{contentId}'";
 
-			floating.Left = left;
-			floating.Top = top;
-			floating.UpdateLayout();
-			AdoptNativeWindowFramePosition(floating);
-			HideMacOSFloatingFrameVisualEffect(floating);
-			return $"Positioned floating window for '{contentId}' at {left},{top}";
-		}
-
-		private static void HideMacOSFloatingFrameVisualEffect(Window floating)
-		{
-			if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || floating == null)
-				return;
-
-			var nsWindow = GetNativeWindowHandle(floating);
-			var contentView = nsWindow == IntPtr.Zero ? IntPtr.Zero : ObjCMsgSend(nsWindow, _selContentView);
-			var frame = contentView == IntPtr.Zero ? IntPtr.Zero : ObjCMsgSend(contentView, _selSuperview);
-			var subviews = frame == IntPtr.Zero ? IntPtr.Zero : ObjCMsgSend(frame, _selSubviews);
-			if (subviews == IntPtr.Zero)
-				return;
-
-			var count = ObjCMsgSendRetNUInt(subviews, _selCount);
-			for (nuint i = 0; i < count; i++)
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				PlatformHelper.SetWindowPosition(floating, left, top);
+			else
 			{
-				var view = ObjCMsgSendNUInt(subviews, _selObjectAtIndex, i);
-				if (string.Equals(GetMacObjectClassName(view), "NSVisualEffectView", StringComparison.Ordinal))
-				{
-					ObjCMsgSendBool(view, _selSetHidden, 1);
-					ObjCMsgSend(view, _selRemoveFromSuperview);
-					break;
-				}
+				floating.Left = left;
+				floating.Top = top;
 			}
+			floating.UpdateLayout();
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				AdoptNativeWindowFramePosition(floating);
+			return $"Positioned floating window for '{contentId}' at {left},{top}";
 		}
 
 		[DevFlowAction("avd.query.floating-zorder", Description = "Compare a floating window's OS z-order against the main window")]
@@ -1229,7 +1211,6 @@ namespace TestApp
 				floating.Activate();
 				floating.Focus();
 				Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
-				HideMacOSFloatingFrameVisualEffect(floating);
 				return "Activated floating window";
 			}
 
@@ -1258,6 +1239,55 @@ namespace TestApp
 					["requestedLeft"] = left,
 					["requestedTop"] = top,
 				});
+			}
+
+			[DevFlowAction("avd.main-window-position-guard.start", Description = "Start recording any native main-window movement during the current test")]
+			public string StartMainWindowPositionGuard()
+			{
+				_mainWindowPositionGuardTimer?.Stop();
+				_mainWindowPositionGuardOrigin = PlatformHelper.GetWindowContentOrigin(this);
+				_mainWindowPositionGuardViolation = null;
+				_mainWindowPositionGuardTimer ??= new DispatcherTimer(
+					TimeSpan.FromMilliseconds(20),
+					DispatcherPriority.Send,
+					(_, __) => SampleMainWindowPositionGuard(),
+					Dispatcher);
+				_mainWindowPositionGuardTimer.Start();
+				return System.Text.Json.JsonSerializer.Serialize(new
+				{
+					x = _mainWindowPositionGuardOrigin.X,
+					y = _mainWindowPositionGuardOrigin.Y,
+				});
+			}
+
+			[DevFlowAction("avd.main-window-position-guard.query", Description = "Report whether the native main window moved since the guard was started")]
+			public string QueryMainWindowPositionGuard()
+			{
+				SampleMainWindowPositionGuard();
+				var current = PlatformHelper.GetWindowContentOrigin(this);
+				return System.Text.Json.JsonSerializer.Serialize(new
+				{
+					armed = _mainWindowPositionGuardTimer?.IsEnabled == true,
+					baselineX = _mainWindowPositionGuardOrigin.X,
+					baselineY = _mainWindowPositionGuardOrigin.Y,
+					currentX = current.X,
+					currentY = current.Y,
+					moved = _mainWindowPositionGuardViolation.HasValue,
+					violationX = _mainWindowPositionGuardViolation?.X,
+					violationY = _mainWindowPositionGuardViolation?.Y,
+				});
+			}
+
+			private void SampleMainWindowPositionGuard()
+			{
+				if (_mainWindowPositionGuardTimer?.IsEnabled != true || _mainWindowPositionGuardViolation.HasValue)
+					return;
+
+				var current = PlatformHelper.GetWindowContentOrigin(this);
+				const double tolerance = 0.5;
+				if (Math.Abs(current.X - _mainWindowPositionGuardOrigin.X) > tolerance ||
+					Math.Abs(current.Y - _mainWindowPositionGuardOrigin.Y) > tolerance)
+					_mainWindowPositionGuardViolation = current;
 			}
 
 			// The platform can refuse the requested frame: on macOS a window may not be placed with its
@@ -1511,6 +1541,7 @@ namespace TestApp
 			{
 				var overlayWindow = floating.CurrentDragService?.CurrentOverlayWindow as Window;
 				var overlayOrigin = overlayWindow == null ? (Point?)null : GetNativeWindowOrigin(overlayWindow);
+				var floatingOrigin = PlatformHelper.GetWindowContentOrigin(floating);
 				return new
 				{
 				overlayLeft = overlayOrigin?.X,
@@ -1525,8 +1556,8 @@ namespace TestApp
 					title = floating.Title,
 					currentDropTarget = floating.CurrentDragService?.CurrentDropTargetType,
 					previewGeometryBounds = GetLivePreviewScreenBounds(floating),
-					left = floating.Left,
-					top = floating.Top,
+					left = floatingOrigin.X,
+					top = floatingOrigin.Y,
 					dragOffset = floating.PortableDragOffsetForDiagnostics,
 					currentPointer = floating.CurrentPointerScreenPosition,
 				};
@@ -1583,7 +1614,7 @@ namespace TestApp
 		public string HitTest(double screenX, double screenY)
 		{
 			var screenPoint = new Point(screenX, screenY);
-			var managerPoint = dockManager.PointFromScreen(screenPoint);
+			var managerPoint = PointFromScreenPortable(dockManager, screenPoint);
 			DependencyObject hit = null;
 			DependencyObject hitRoot = null;
 			foreach (var root in GetAvalonDockVisualRoots())
@@ -1870,6 +1901,16 @@ namespace TestApp
 			{
 				if (element is FrameworkElement floatingElement)
 				{
+					var containingWindow = floatingElement as Window ?? Window.GetWindow(floatingElement);
+					if (ReferenceEquals(containingWindow, s_positionedMainWindow) &&
+						s_positionedMainContentOrigin is { } mainOrigin)
+					{
+						var pointInWindow = new Point(point.X - mainOrigin.X, point.Y - mainOrigin.Y);
+						return ReferenceEquals(floatingElement, containingWindow)
+							? pointInWindow
+							: containingWindow.TransformToDescendant(floatingElement).Transform(pointInWindow);
+					}
+
 					var floatingWindow = floatingElement as LayoutFloatingWindowControl
 						?? Window.GetWindow(floatingElement) as LayoutFloatingWindowControl;
 					if (floatingWindow != null)
@@ -2076,16 +2117,7 @@ namespace TestApp
 		private static IntPtr GetNativeWindowHandle(Window window)
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-			{
-				if (ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) &&
-					host?.SilkWindow?.Native is { } native &&
-					native.Cocoa is { } cocoa)
-				{
-					return cocoa;
-				}
-
-				return IntPtr.Zero;
-			}
+				return PlatformHelper.GetNativeWindowHandle(window);
 
 			return new WindowInteropHelper(window).Handle;
 		}

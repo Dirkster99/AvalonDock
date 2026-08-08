@@ -79,7 +79,6 @@ namespace AvalonDock.DevFlowIntegrationTests
 				// a floating-window activation can leave the
 				// portable backend reporting an off-screen owner origin even though the fixture placed
 				// the main window correctly at process startup.
-				await EnsureMainWindowInTestAreaAsync(client, TestContext.Current.CancellationToken);
 				await client.InvokeAsync("avd.test-layout.reset");
 				await WaitForLayoutAsync(
 					client,
@@ -165,21 +164,6 @@ namespace AvalonDock.DevFlowIntegrationTests
 					await Task.Delay(300, ct);
 				}
 			}
-		}
-
-		private static async Task EnsureMainWindowInTestAreaAsync(DevFlowClient client, CancellationToken ct)
-		{
-			ElementBounds manager = default;
-			for (var attempt = 0; attempt < 6; attempt++)
-			{
-				await client.InvokeAsync("avd.position-main-window", 50, 40);
-				await Task.Delay(200, ct);
-				manager = await client.QueryBoundsAsync("manager");
-				if (Math.Abs(manager.X - 50) <= 2 && manager.Y >= 55 && manager.Y <= 110)
-					return;
-			}
-
-			throw new Xunit.Sdk.XunitException($"Main native window did not settle in the safe test area: {manager}");
 		}
 
 		/// <summary>Runs one float -> discover -> drag -> drop attempt. Returns (true, null) when the
@@ -291,10 +275,9 @@ namespace AvalonDock.DevFlowIntegrationTests
 		}
 
 		/// <summary>
-		/// On macOS, the first synthetic mouse-down sent to a non-key floating window can be consumed
-		/// solely to activate that window. Give activation its own complete caption click, isolated
-		/// from both neighboring clicks by the platform's configured double-click interval, then
-		/// re-read the caption because activation may change the native window position.
+		/// Wait beyond the platform's configured double-click interval after explicitly activating the
+		/// floating window, then re-read its caption. Do not add a separate warm-up click: it creates an
+		/// extra AppKit activation transition and can itself enter LibreWPF's unstable native path.
 		/// </summary>
 		private static async Task<(double X, double Y)> WarmFloatingWindowBeforeDragAsync(
 			DevFlowClient client,
@@ -302,17 +285,6 @@ namespace AvalonDock.DevFlowIntegrationTests
 		{
 			var doubleClickTime = GetSystemDoubleClickTimeMilliseconds();
 			var isolationDelay = TimeSpan.FromMilliseconds(Math.Max(250, doubleClickTime + 100));
-			await Task.Delay(isolationDelay, ct);
-			var floatingWindow = await client.QueryBoundsAsync("floating-window", "dragTestTool");
-			await NativeInputIntegrationTests.AssertSafeFloatingBodyPressAsync(
-				client,
-				"dragTestTool",
-				floatingWindow.CenterX,
-				floatingWindow.CenterY,
-				ct);
-			await client.PressAsync(floatingWindow.CenterX, floatingWindow.CenterY, ct);
-			await Task.Delay(150, ct);
-			await client.ReleaseAsync(floatingWindow.CenterX, floatingWindow.CenterY, ct);
 			await Task.Delay(isolationDelay, ct);
 			var caption = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
 			return (caption.X + Math.Min(20, caption.Width / 3d), caption.CenterY);
@@ -484,7 +456,6 @@ namespace AvalonDock.DevFlowIntegrationTests
 
 			try
 			{
-				await EnsureMainWindowInTestAreaAsync(client, TestContext.Current.CancellationToken);
 				await client.InvokeAsync("avd.test-layout.reset");
 				await WaitForLayoutAsync(
 					client,

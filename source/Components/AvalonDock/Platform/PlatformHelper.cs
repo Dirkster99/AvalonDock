@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Windows;
 
@@ -17,17 +18,28 @@ namespace AvalonDock.Platform
 		}
 
 		private static readonly ConditionalWeakTable<Window, NativeWindowHandle> NativeWindowHandles = new();
+		private static readonly Dictionary<IntPtr, WeakReference<Window>> NativeWindowOwners = new();
 
-		internal static void CacheNativeWindowHandle(Window window)
+		internal static bool CacheNativeWindowHandle(Window window)
 		{
 			if (window == null || !System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
 				System.Runtime.InteropServices.OSPlatform.OSX))
-				return;
+				return false;
+			if (NativeWindowHandles.TryGetValue(window, out _))
+				return true;
 			if (!System.Windows.Media.ProGPU.ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) ||
 				host?.SilkWindow?.Native is not { } native || native.Cocoa is not { } cocoa || cocoa == IntPtr.Zero)
-				return;
+				return false;
+			lock (NativeWindowOwners)
+			{
+				if (NativeWindowOwners.TryGetValue(cocoa, out var existing) &&
+					existing.TryGetTarget(out var owner) && !ReferenceEquals(owner, window) && owner.IsLoaded)
+					return false;
+				NativeWindowOwners[cocoa] = new WeakReference<Window>(window);
+			}
 			NativeWindowHandles.Remove(window);
 			NativeWindowHandles.Add(window, new NativeWindowHandle(cocoa));
+			return true;
 		}
 
 		/// <summary>
@@ -104,6 +116,8 @@ namespace AvalonDock.Platform
 					and not global::AvalonDock.Controls.LayoutFloatingWindowControl;
 				if (NativeWindowHandles.TryGetValue(window, out var cached))
 					return cached.Value;
+				if (window is global::AvalonDock.Controls.OverlayWindow)
+					return IntPtr.Zero;
 
 				var handle = System.Windows.Media.ProGPU.ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) &&
 					host?.SilkWindow?.Native is { } native &&
@@ -112,8 +126,7 @@ namespace AvalonDock.Platform
 					: IntPtr.Zero;
 				if (cacheHandle && handle != IntPtr.Zero)
 				{
-					NativeWindowHandles.Remove(window);
-					NativeWindowHandles.Add(window, new NativeWindowHandle(handle));
+					return CacheNativeWindowHandle(window) ? handle : IntPtr.Zero;
 				}
 				return handle;
 			}

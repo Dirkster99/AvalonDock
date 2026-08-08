@@ -197,7 +197,9 @@ public class DevFlowAppFixture : IAsyncLifetime
 	}
 
     // Native-input tests (see NativeInputEnvironment) drive REAL OS-level mouse events via cliclick,
-    // at absolute screen coordinates. Keep this limited to positioning and activating TestApp; hiding
+    // at absolute screen coordinates. The per-test base has already positioned and guarded the main
+    // window, so this must only activate it. Repositioning after the guard is armed can transiently
+    // send the LibreWPF NSWindow off-screen. Hiding
     // other apps can mask bad drag-start coordinates by making an invalid screen point appear safe.
     internal async Task IsolateDesktopForNativeInputAsync()
     {
@@ -207,10 +209,6 @@ public class DevFlowAppFixture : IAsyncLifetime
         try
         {
             using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
-            using var positionResp = await httpClient.PostAsync(
-                $"http://localhost:{Port}/api/v1/invoke/actions/avd.position-main-window",
-                new StringContent("{\"args\":[50,40]}", Encoding.UTF8, "application/json"));
-
             using var resp = await httpClient.PostAsync(
                 $"http://localhost:{Port}/api/v1/invoke/actions/avd.activate",
                 new StringContent("{\"args\":[]}", Encoding.UTF8, "application/json"));

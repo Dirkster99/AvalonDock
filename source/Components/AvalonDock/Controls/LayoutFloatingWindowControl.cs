@@ -70,6 +70,7 @@ namespace AvalonDock.Controls
 			if (UsePortableCaptionDrag)
 				WindowChrome.SetIsHitTestVisibleInChrome(this, true);
 			Loaded += OnLoaded;
+			SourceInitialized += (_, __) => PlatformHelper.CacheNativeWindowHandle(this);
 			Unloaded += OnUnloaded;
 			Closing += OnClosing;
 			SizeChanged += OnSizeChanged;
@@ -959,7 +960,8 @@ namespace AvalonDock.Controls
 			_portableNativeDragging = true;
 			_portableDragStartUtc = DateTime.UtcNow;
 			_portableLastPointer = PlatformHelper.GetCursorPosition();
-			_portableDragOffset = new Point(_portableLastPointer.X - Left, _portableLastPointer.Y - Top);
+			var nativeOrigin = PlatformHelper.GetWindowContentOrigin(this);
+			_portableDragOffset = new Point(_portableLastPointer.X - nativeOrigin.X, _portableLastPointer.Y - nativeOrigin.Y);
 			var dragService = new DragService(this);
 			_dragService = dragService;
 			dragService.UpdateMouseLocation(_portableLastPointer);
@@ -1013,8 +1015,10 @@ namespace AvalonDock.Controls
 			}
 
 			_portableLastPointer = PlatformHelper.GetCursorPosition();
-			Left = _portableLastPointer.X - _portableDragOffset.X;
-			Top = _portableLastPointer.Y - _portableDragOffset.Y;
+			PlatformHelper.SetWindowPosition(
+				this,
+				_portableLastPointer.X - _portableDragOffset.X,
+				_portableLastPointer.Y - _portableDragOffset.Y);
 			_dragService?.UpdateMouseLocation(_portableLastPointer);
 		}
 
@@ -1042,7 +1046,8 @@ namespace AvalonDock.Controls
 			}
 
 			var pointer = PointToScreen(e.GetPosition(this));
-			_portableDragOffset = new Point(pointer.X - Left, pointer.Y - Top);
+			var nativeOrigin = PlatformHelper.GetWindowContentOrigin(this);
+			_portableDragOffset = new Point(pointer.X - nativeOrigin.X, pointer.Y - nativeOrigin.Y);
 			_portableLastPointer = pointer;
 			_portableDragging = true;
 			_portableDragStartUtc = DateTime.UtcNow;
