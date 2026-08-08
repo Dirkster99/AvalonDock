@@ -5,7 +5,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using AvalonDock.Layout;
+using AvalonDock.Platform;
 using AvalonDock.Themes;
 
 namespace AvalonDock.Controls
@@ -22,6 +24,7 @@ namespace AvalonDock.Controls
 		private Grid _gridAnchorablePaneDropTargets;    // Showing and activating 5 inner drop target buttons over layout anchorable pane
 		private Grid _gridDocumentPaneDropTargets;      // Showing and activating 5 inner drop target buttons over document pane
 		private Grid _gridDocumentPaneFullDropTargets;  // Showing and activating 9 inner drop target buttons over document pane
+		private bool _dragAlignmentPending;
 
 		private FrameworkElement _dockingManagerDropTargetBottom; // 4 outer drop taget buttons over DockingManager
 		private FrameworkElement _dockingManagerDropTargetTop;
@@ -87,7 +90,57 @@ namespace AvalonDock.Controls
 			AllowsTransparency = true;
 			WindowStyle = WindowStyle.None;
 			Background = Brushes.Transparent;
+			// Show() may return before the portable backend exposes the real NSWindow handle, so
+			// the immediate host-side alignment can be a no-op. Repeat as soon as the native source
+			// exists; Left/Top were already assigned by the overlay host before Show().
+			SourceInitialized += (_, __) =>
+			{
+				// Capture this overlay's NSWindow while the source-to-host association is fresh.
+				// ProGPU may later return another transient window's host after several transparent
+				// windows have been created and closed during native drag tests.
+				PlatformHelper.CacheNativeWindowHandle(this);
+				AlignNativePosition();
+			};
+			Loaded += (_, __) =>
+			{
+				AlignNativePosition();
+			};
 			UpdateThemeResources();
+		}
+
+		internal void AlignNativePosition()
+		{
+			PlatformHelper.SetWindowPosition(this, Left, Top);
+			// A reused OverlayWindow can receive a newly-created native window when Show() is
+			// called again. Immediately after Show the portable host mapping may still point at
+			// the previous NSWindow, so repeat once layout and the dispatcher have settled.
+			Dispatcher.BeginInvoke(DispatcherPriority.Loaded,
+				new System.Action(NudgeManagedPosition));
+			Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle,
+				new System.Action(NudgeManagedPosition));
+		}
+
+		private void NudgeManagedPosition()
+		{
+			var left = Left;
+			var top = Top;
+			Left = left + 0.25;
+			Top = top + 0.25;
+			Left = left;
+			Top = top;
+			PlatformHelper.SetWindowPosition(this, left, top);
+		}
+
+		internal void EnsureNativePositionDuringDrag()
+		{
+			if (_dragAlignmentPending)
+				return;
+			_dragAlignmentPending = true;
+			Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new System.Action(() =>
+			{
+				_dragAlignmentPending = false;
+				NudgeManagedPosition();
+			}));
 		}
 
 		/// <summary>
@@ -362,6 +415,11 @@ namespace AvalonDock.Controls
 		/// <inheritdoc/>
 		IEnumerable<IDropTarget> IOverlayWindow.GetTargets()
 		{
+			// Closing/docking detaches the floating model before the drag service releases its
+			// overlay reference. Pollers may legitimately enumerate during that dispatcher gap.
+			if (_floatingWindow?.Model == null)
+				yield break;
+
 			foreach (var visibleArea in _visibleAreas)
 			{
 				switch (visibleArea.Type)

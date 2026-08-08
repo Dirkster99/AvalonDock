@@ -34,6 +34,7 @@ namespace AvalonDock.Controls
 		/// by <see cref="DropTargetType"/> and get each indicator's real screen bounds during a live drag.
 		/// </summary>
 		internal IOverlayWindow CurrentOverlayWindow => _currentWindow;
+		internal IDropTarget CurrentDropTarget => _currentDropTarget;
 		internal string CurrentDropTargetType => _currentDropTarget?.Type.ToString();
 
 		/// <summary>
@@ -148,6 +149,8 @@ namespace AvalonDock.Controls
 			// explicitly here rather than assuming it holds for every _currentWindow access below.
 			if (_currentHost == null || _currentWindow == null)
 				return;
+			if (_currentWindow is OverlayWindow overlay)
+				overlay.EnsureNativePositionDuringDrag();
 
 			if (_currentDropTarget != null &&
 				!_currentDropTarget.HitTestScreen(dragPosition))

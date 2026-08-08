@@ -182,6 +182,20 @@ public class DevFlowAppFixture : IAsyncLifetime
         }
     }
 
+	internal async Task RestartAsync()
+	{
+		if (_process != null && !_process.HasExited)
+		{
+			try { _process.Kill(entireProcessTree: true); }
+			catch { }
+			await _process.WaitForExitAsync();
+			_process.Dispose();
+			_process = null;
+		}
+
+		await InitializeAsync();
+	}
+
     // Native-input tests (see NativeInputEnvironment) drive REAL OS-level mouse events via cliclick,
     // at absolute screen coordinates. Keep this limited to positioning and activating TestApp; hiding
     // other apps can mask bad drag-start coordinates by making an invalid screen point appear safe.

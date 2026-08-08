@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Windows;
 
 namespace AvalonDock.Platform
@@ -9,6 +10,26 @@ namespace AvalonDock.Platform
 	/// </summary>
 	internal static class PlatformHelper
 	{
+		private sealed class NativeWindowHandle
+		{
+			internal NativeWindowHandle(IntPtr value) => Value = value;
+			internal IntPtr Value { get; }
+		}
+
+		private static readonly ConditionalWeakTable<Window, NativeWindowHandle> NativeWindowHandles = new();
+
+		internal static void CacheNativeWindowHandle(Window window)
+		{
+			if (window == null || !System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
+				System.Runtime.InteropServices.OSPlatform.OSX))
+				return;
+			if (!System.Windows.Media.ProGPU.ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) ||
+				host?.SilkWindow?.Native is not { } native || native.Cocoa is not { } cocoa || cocoa == IntPtr.Zero)
+				return;
+			NativeWindowHandles.Remove(window);
+			NativeWindowHandles.Add(window, new NativeWindowHandle(cocoa));
+		}
+
 		/// <summary>
 		/// Gets the current cursor position in screen coordinates.
 		/// </summary>
@@ -33,6 +54,22 @@ namespace AvalonDock.Platform
 		internal static Point GetWindowPosition(IntPtr windowHandle)
 		{
 			var (x, y) = PlatformManager.NativeWindowService.GetWindowPosition(windowHandle);
+			return new Point(x, y);
+		}
+
+		internal static void SetWindowPosition(Window window, double x, double y)
+		{
+			var windowHandle = GetNativeWindowHandle(window);
+			if (windowHandle != IntPtr.Zero)
+				PlatformManager.NativeWindowService.SetWindowPosition(windowHandle, x, y);
+		}
+
+		internal static Point GetWindowContentOrigin(Window window)
+		{
+			var windowHandle = GetNativeWindowHandle(window);
+			if (windowHandle == IntPtr.Zero)
+				return new Point(window.Left, window.Top);
+			var (x, y) = PlatformManager.NativeWindowService.GetWindowContentOrigin(windowHandle);
 			return new Point(x, y);
 		}
 
@@ -63,11 +100,22 @@ namespace AvalonDock.Platform
 			if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
 				System.Runtime.InteropServices.OSPlatform.OSX))
 			{
-				return System.Windows.Media.ProGPU.ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) &&
+				var cacheHandle = window is not global::AvalonDock.Controls.OverlayWindow
+					and not global::AvalonDock.Controls.LayoutFloatingWindowControl;
+				if (NativeWindowHandles.TryGetValue(window, out var cached))
+					return cached.Value;
+
+				var handle = System.Windows.Media.ProGPU.ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) &&
 					host?.SilkWindow?.Native is { } native &&
 					native.Cocoa is { } cocoa
 					? cocoa
 					: IntPtr.Zero;
+				if (cacheHandle && handle != IntPtr.Zero)
+				{
+					NativeWindowHandles.Remove(window);
+					NativeWindowHandles.Add(window, new NativeWindowHandle(handle));
+				}
+				return handle;
 			}
 
 			return new System.Windows.Interop.WindowInteropHelper(window).Handle;

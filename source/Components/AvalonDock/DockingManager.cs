@@ -1728,6 +1728,7 @@ namespace AvalonDock
 			var overlayWindow = _overlayWindow;
 			overlayWindow.EnableDropTargets();
 			overlayWindow.Show();
+			overlayWindow.AlignNativePosition();
 			return overlayWindow;
 		}
 
@@ -2133,28 +2134,43 @@ namespace AvalonDock
 
 			var parentWindow = Window.GetWindow(this);
 			var windowParentHandle = parentWindow != null ? new WindowInteropHelper(parentWindow).Handle : Process.GetCurrentProcess().MainWindowHandle;
-			var b = Win32Helper.GetWindowZOrder(windowParentHandle, out var mainWindow_z);
-			var currentHandle = Win32Helper.GetWindow(windowParentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDFIRST);
-			while (currentHandle != IntPtr.Zero)
+			try
 			{
-				for (int i = 0; i < _fwList.Count; i++)
+				var b = Win32Helper.GetWindowZOrder(windowParentHandle, out var mainWindow_z);
+				var currentHandle = Win32Helper.GetWindow(windowParentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDFIRST);
+				while (currentHandle != IntPtr.Zero)
 				{
-					var fw = _fwList[i];
-					if (fw is IOverlayWindowHost host && fw != dragFloatingWindow && fw.IsVisible)
+					for (int i = 0; i < _fwList.Count; i++)
 					{
-						var fw_hwnd = new WindowInteropHelper(fw).Handle;
-						if (currentHandle == fw_hwnd && fw.Model.Root != null && fw.Model.Root.Manager == this)
+						var fw = _fwList[i];
+						if (fw is IOverlayWindowHost host && fw != dragFloatingWindow && fw.IsVisible)
 						{
-							if (fw.OwnedByDockingManagerWindow || (Win32Helper.GetWindowZOrder(fw_hwnd, out var fw_z) && fw_z > mainWindow_z))
-								topFloatingWindows.Add(host);
-							else
-								bottomFloatingWindows.Add(host);
-							break;
+							var fw_hwnd = new WindowInteropHelper(fw).Handle;
+							if (currentHandle == fw_hwnd && fw.Model.Root != null && fw.Model.Root.Manager == this)
+							{
+								if (fw.OwnedByDockingManagerWindow || (Win32Helper.GetWindowZOrder(fw_hwnd, out var fw_z) && fw_z > mainWindow_z))
+									topFloatingWindows.Add(host);
+								else
+									bottomFloatingWindows.Add(host);
+								break;
+							}
 						}
 					}
-				}
 
-				currentHandle = Win32Helper.GetWindow(currentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDNEXT);
+					currentHandle = Win32Helper.GetWindow(currentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDNEXT);
+				}
+			}
+			catch
+			{
+				// The Win32 z-order walk (shimmed by the portable windowing backend) can fail or
+				// silently come up empty; falling back to a plain enumeration keeps drags usable.
+				topFloatingWindows.Clear();
+				bottomFloatingWindows.Clear();
+				foreach (var fw in _fwList)
+				{
+					if (fw is IOverlayWindowHost host && fw != dragFloatingWindow && fw.IsVisible && fw.Model.Root != null && fw.Model.Root.Manager == this)
+						topFloatingWindows.Add(host);
+				}
 			}
 
 			overlayWindowHosts.AddRange(topFloatingWindows);

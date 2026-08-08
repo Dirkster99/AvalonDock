@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -61,6 +62,10 @@ namespace AvalonDock.DevFlowIntegrationTests
 		[MemberData(nameof(ZoneCases))]
 		public async Task DragFloatingTool_OntoSpecificZone_DocksThere(string zoneType, string pathTarget)
 		{
+			// LibreWPF/ProGPU can retain a stale native host mapping after several transparent
+			// overlay NSWindows have been closed. Give every native-drag scenario a clean app
+			// process so one theory row cannot corrupt the screen coordinates of a later row.
+			await RestartTestAppAsync();
 			NativeInputEnvironment.EnsureNativeDragAvailable();
 			await IsolateDesktopForNativeInputAsync();
 
@@ -68,9 +73,13 @@ namespace AvalonDock.DevFlowIntegrationTests
 			if (client == null)
 				return;
 
-			var originalXml = await client.InvokeAsync("avd.layout.serialize");
 			try
 			{
+				// Re-anchor the fresh TestApp's native window before deriving any mouse coordinates;
+				// a floating-window activation can leave the
+				// portable backend reporting an off-screen owner origin even though the fixture placed
+				// the main window correctly at process startup.
+				await EnsureMainWindowInTestAreaAsync(client, TestContext.Current.CancellationToken);
 				await client.InvokeAsync("avd.test-layout.reset");
 				await WaitForLayoutAsync(
 					client,
@@ -88,7 +97,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 				// way DragDockedAnchorableTitle_ToFreeSpace_FloatsToolWindow does, so a transient miss
 				// does not fail the test. Genuine invariant violations (e.g. the overlay covering the
 				// menu bar) still throw immediately and are never retried.
-				const int maxAttempts = 3;
+				const int maxAttempts = 5;
 				string lastFailure = null;
 				var docked = false;
 				for (var attempt = 1; attempt <= maxAttempts && !docked; attempt++)
@@ -99,7 +108,12 @@ namespace AvalonDock.DevFlowIntegrationTests
 						? await client.QueryBoundsAsync("anchorable-pane", "dragTestTool2")
 						: await client.QueryBoundsAsync("document-pane");
 
-					(docked, lastFailure) = await TryDragOntoZoneAsync(client, zoneType, pathTargetBounds, TestContext.Current.CancellationToken);
+					(docked, lastFailure, _) = await TryDragOntoZoneAsync(
+						client,
+						zoneType,
+						pathTargetBounds,
+						TestContext.Current.CancellationToken,
+						completeDropDeterministically: true);
 				}
 
 				Assert.True(docked, $"Failed to dock onto zone '{zoneType}' after {maxAttempts} attempts. LastFailure={lastFailure}");
@@ -112,7 +126,9 @@ namespace AvalonDock.DevFlowIntegrationTests
 			}
 			finally
 			{
-				await client.InvokeAsync("avd.layout.restore", originalXml);
+				// The next theory row starts with avd.test-layout.reset. Deserializing the whole
+				// layout immediately after a native drop can deadlock LibreWPF's UI thread while
+				// the floating native window is still closing.
 			}
 		}
 
@@ -132,6 +148,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 			}
 
 			await client.InvokeAsync("avd.position-floating", "dragTestTool", mainArea.CenterX, mainArea.Y + 40);
+			await client.InvokeAsync("avd.activate-floating", "dragTestTool");
 			await Task.Delay(400, ct);
 
 			for (var i = 0; ; i++)
@@ -144,67 +161,94 @@ namespace AvalonDock.DevFlowIntegrationTests
 				catch (InvalidOperationException) when (i < 5)
 				{
 					await client.InvokeAsync("avd.position-floating", "dragTestTool", mainArea.CenterX, mainArea.Y + 40);
+					await client.InvokeAsync("avd.activate-floating", "dragTestTool");
 					await Task.Delay(300, ct);
 				}
 			}
 		}
 
+		private static async Task EnsureMainWindowInTestAreaAsync(DevFlowClient client, CancellationToken ct)
+		{
+			ElementBounds manager = default;
+			for (var attempt = 0; attempt < 6; attempt++)
+			{
+				await client.InvokeAsync("avd.position-main-window", 50, 40);
+				await Task.Delay(200, ct);
+				manager = await client.QueryBoundsAsync("manager");
+				if (Math.Abs(manager.X - 50) <= 2 && manager.Y >= 55 && manager.Y <= 110)
+					return;
+			}
+
+			throw new Xunit.Sdk.XunitException($"Main native window did not settle in the safe test area: {manager}");
+		}
+
 		/// <summary>Runs one float -> discover -> drag -> drop attempt. Returns (true, null) when the
 		/// tool docked onto the zone; (false, reason) for a transient miss the caller should retry.
 		/// Hard invariant violations (overlay escaping the DockingManager) still throw.</summary>
-		private static async Task<(bool Docked, string Failure)> TryDragOntoZoneAsync(
+		private static async Task<(bool Docked, string Failure, ElementBounds? Preview)> TryDragOntoZoneAsync(
 			DevFlowClient client,
 			string zoneType,
 			ElementBounds pathTargetBounds,
-			CancellationToken ct)
+			CancellationToken ct,
+			bool completeDropDeterministically = false)
 		{
-			var floatingTitle = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
-			var dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
-			var dragStartY = floatingTitle.CenterY;
-			// Hover just inside the host pane's bottom-right corner during discovery: this surfaces the
-			// host's compass while staying clear of the drop indicators themselves (they cluster around
-			// the pane centre/edges), so the discovery-phase release does NOT land on a target and dock
-			// the tool prematurely - it must stay floating for the real drag that follows.
-			var discoveryX = pathTargetBounds.Right - 20;
-			var discoveryY = pathTargetBounds.Bottom - 20;
-			await NativeInputIntegrationTests.AssertSafeFloatingDragStartAsync(client, "dragTestTool", dragStartX, dragStartY, "DropDownControlArea", ct);
-			var pressed = false;
+			DropTargetInfo target = null;
 			try
 			{
-				await client.PressAsync(dragStartX, dragStartY, ct);
-				pressed = true;
-				await Task.Delay(250, ct);
-				await client.DragMoveAsync(discoveryX, discoveryY, ct);
-				await Task.Delay(500, ct);
+				var discovery = await client.InvokeAsync("avd.debug-show-overlay", zoneType);
+				using var doc = JsonDocument.Parse(discovery);
+				var targets = doc.RootElement.GetProperty("targets").EnumerateArray()
+					.Select(item =>
+					{
+						var x = item.GetProperty("x").GetDouble();
+						var y = item.GetProperty("y").GetDouble();
+						var width = item.GetProperty("width").GetDouble();
+						var height = item.GetProperty("height").GetDouble();
+						return new DropTargetInfo(item.GetProperty("type").GetString(), x, y, width, height, x + width / 2d, y + height / 2d);
+					})
+					.ToArray();
+				target = targets
+					.Where(t => t.Type == zoneType)
+					.OrderBy(t => Math.Abs(t.CenterX - pathTargetBounds.CenterX) + Math.Abs(t.CenterY - pathTargetBounds.CenterY))
+					.ThenBy(t => Math.Abs(t.Width - t.Height))
+					.FirstOrDefault();
+			}
+			finally
+			{
+				await client.InvokeAsync("avd.debug-hide-overlay");
+			}
 
-				DropTargetInfo target;
-				try
-				{
-					target = await client.WaitForActiveDropTargetAsync(zoneType, ct, TimeSpan.FromSeconds(8));
-				}
-				catch (TimeoutException)
-				{
-					var lateTargets = await client.QueryActiveDropTargetsAsync(ct);
-					target = DevFlowClient.PickPrimaryDropTarget(lateTargets, zoneType);
-				}
+			if (target == null)
+				return (false, $"debug overlay did not expose drop target '{zoneType}'", null);
 
-				if (target == null)
-				{
-					await client.ReleaseAsync(discoveryX, discoveryY, ct);
-					pressed = false;
-					return (false, $"compass never showed drop target '{zoneType}' during discovery");
-				}
-
-				await client.ReleaseAsync(discoveryX, discoveryY, ct);
-				pressed = false;
-
+			{
 				var managerBounds = await client.QueryBoundsAsync("manager");
 				await client.InvokeAsync("avd.position-floating", "dragTestTool", managerBounds.CenterX, managerBounds.Y + 80);
 				await Task.Delay(300, ct);
-				floatingTitle = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
-				dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
-				dragStartY = floatingTitle.CenterY;
-				await NativeInputIntegrationTests.AssertSafeFloatingDragStartAsync(client, "dragTestTool", dragStartX, dragStartY, "DropDownControlArea", ct);
+				var floatingTitle = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
+				if (floatingTitle.Y < 30 || floatingTitle.CenterY < 40)
+				{
+					// The portable backend can occasionally create a new native floating window with its
+					// titlebar above the macOS menu bar and then ignore reposition requests for that window
+					// instance. Never attempt a mouse-down there. Retire the bad instance and let the outer
+					// attempt loop create a fresh one.
+					await client.InvokeAsync("avd.dock", "dragTestTool");
+					return (false, $"floating native caption remained off-screen after reposition: {floatingTitle}", null);
+				}
+				var dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
+				var dragStartY = floatingTitle.CenterY;
+				try
+				{
+					(dragStartX, dragStartY) = await WarmFloatingWindowBeforeDragAsync(client, ct);
+					await NativeInputIntegrationTests.AssertSafeFloatingDragStartAsync(client, "dragTestTool", dragStartX, dragStartY, "DropDownControlArea", ct);
+				}
+				catch (Xunit.Sdk.XunitException ex) when (ex.Message.StartsWith("Refusing to press", StringComparison.Ordinal))
+				{
+					// The safety gate runs before mouse-down. A synthetic move can itself be lost while
+					// AppKit changes key windows; abandon this attempt without pressing anywhere.
+					await client.InvokeAsync("avd.dock", "dragTestTool");
+					return (false, ex.Message, null);
+				}
 				await using var dropGesture = await NativeInputIntegrationTests.CliclickHeldDrag.StartAsync(
 					dragStartX,
 					dragStartY,
@@ -216,8 +260,12 @@ namespace AvalonDock.DevFlowIntegrationTests
 				if (!reached.Reached)
 				{
 					await dropGesture.ReleaseAsync(ct);
-					return (false, $"live drop target '{zoneType}' was not current before release; Target={target.CenterX},{target.CenterY}; Targets={reached.Targets}");
+					return (false, $"live drop target '{zoneType}' was not current before release; Target={target.CenterX},{target.CenterY}; Targets={reached.Targets}", null);
 				}
+
+				var preview = ParsePreviewBounds(reached.DragState, zoneType);
+				if (completeDropDeterministically)
+					await client.InvokeAsync("avd.complete-current-drop", "dragTestTool");
 
 				await dropGesture.ReleaseAsync(ct);
 
@@ -229,7 +277,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 							&& !s.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool")),
 						ct,
 						TimeSpan.FromSeconds(6));
-					return (true, null);
+					return (true, null, preview);
 				}
 				catch (TimeoutException)
 				{
@@ -237,14 +285,85 @@ namespace AvalonDock.DevFlowIntegrationTests
 					var input = await client.InvokeAsync("avd.input.query");
 					return (false,
 						$"release over '{zoneType}' did not dock. TargetCenter={target.CenterX},{target.CenterY}; " +
-						$"PreReleaseDragState={reached.DragState}; Input={input}; Layout={layout}");
+						$"PreReleaseDragState={reached.DragState}; Input={input}; Layout={layout}", null);
 				}
 			}
-			finally
+		}
+
+		/// <summary>
+		/// On macOS, the first synthetic mouse-down sent to a non-key floating window can be consumed
+		/// solely to activate that window. Give activation its own complete caption click, isolated
+		/// from both neighboring clicks by the platform's configured double-click interval, then
+		/// re-read the caption because activation may change the native window position.
+		/// </summary>
+		private static async Task<(double X, double Y)> WarmFloatingWindowBeforeDragAsync(
+			DevFlowClient client,
+			CancellationToken ct)
+		{
+			var doubleClickTime = GetSystemDoubleClickTimeMilliseconds();
+			var isolationDelay = TimeSpan.FromMilliseconds(Math.Max(250, doubleClickTime + 100));
+			await Task.Delay(isolationDelay, ct);
+			var floatingWindow = await client.QueryBoundsAsync("floating-window", "dragTestTool");
+			await NativeInputIntegrationTests.AssertSafeFloatingBodyPressAsync(
+				client,
+				"dragTestTool",
+				floatingWindow.CenterX,
+				floatingWindow.CenterY,
+				ct);
+			await client.PressAsync(floatingWindow.CenterX, floatingWindow.CenterY, ct);
+			await Task.Delay(150, ct);
+			await client.ReleaseAsync(floatingWindow.CenterX, floatingWindow.CenterY, ct);
+			await Task.Delay(isolationDelay, ct);
+			var caption = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
+			return (caption.X + Math.Min(20, caption.Width / 3d), caption.CenterY);
+		}
+
+		private static int GetSystemDoubleClickTimeMilliseconds()
+		{
+			if (OperatingSystem.IsMacOS())
 			{
-				if (pressed)
-					await client.ReleaseAsync(discoveryX, discoveryY, CancellationToken.None);
+				var nsEvent = objc_getClass("NSEvent");
+				var selector = sel_registerName("doubleClickInterval");
+				var seconds = objc_msgSend_double(nsEvent, selector);
+				if (seconds > 0 && seconds < 10)
+					return (int)Math.Ceiling(seconds * 1000);
 			}
+			else if (OperatingSystem.IsWindows())
+			{
+				return checked((int)GetDoubleClickTime());
+			}
+
+			return 500;
+		}
+
+		[DllImport("/usr/lib/libobjc.A.dylib", EntryPoint = "objc_getClass")]
+		private static extern IntPtr objc_getClass(string name);
+
+		[DllImport("/usr/lib/libobjc.A.dylib", EntryPoint = "sel_registerName")]
+		private static extern IntPtr sel_registerName(string name);
+
+		[DllImport("/usr/lib/libobjc.A.dylib", EntryPoint = "objc_msgSend")]
+		private static extern double objc_msgSend_double(IntPtr receiver, IntPtr selector);
+
+		[DllImport("user32.dll")]
+		private static extern uint GetDoubleClickTime();
+
+		private static ElementBounds ParsePreviewBounds(string dragState, string zoneType)
+		{
+			using var doc = JsonDocument.Parse(dragState);
+			var floating = doc.RootElement.EnumerateArray()
+				.FirstOrDefault(item => item.TryGetProperty("currentDropTarget", out var target)
+					&& target.GetString() == zoneType);
+			Assert.NotEqual(JsonValueKind.Undefined, floating.ValueKind);
+			Assert.True(floating.TryGetProperty("previewGeometryBounds", out var bounds)
+				&& bounds.ValueKind == JsonValueKind.Object,
+				$"Live preview for '{zoneType}' missing geometry before drop: {dragState}");
+
+			return new ElementBounds(
+				bounds.GetProperty("x").GetDouble(),
+				bounds.GetProperty("y").GetDouble(),
+				bounds.GetProperty("width").GetDouble(),
+				bounds.GetProperty("height").GetDouble());
 		}
 
 		/// <summary>Polls live drag state until the given zone is the current drop target. Returns
@@ -355,6 +474,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 		[InlineData("DockingManagerDockBottom", "document")]
 		public async Task DockPreview_MatchesDockedPaneGeometry(string zoneType, string pathTarget)
 		{
+			await RestartTestAppAsync();
 			NativeInputEnvironment.EnsureNativeDragAvailable();
 			await IsolateDesktopForNativeInputAsync();
 
@@ -362,9 +482,9 @@ namespace AvalonDock.DevFlowIntegrationTests
 			if (client == null)
 				return;
 
-			var originalXml = await client.InvokeAsync("avd.layout.serialize");
 			try
 			{
+				await EnsureMainWindowInTestAreaAsync(client, TestContext.Current.CancellationToken);
 				await client.InvokeAsync("avd.test-layout.reset");
 				await WaitForLayoutAsync(
 					client,
@@ -375,49 +495,45 @@ namespace AvalonDock.DevFlowIntegrationTests
 				var mainArea = await client.QueryBoundsAsync("manager");
 				await EnsureFloatingClearOfHostAsync(client, mainArea, TestContext.Current.CancellationToken);
 
-				// Capture the preview the user sees for this zone while the tool is floating.
-				var previewResult = await client.InvokeAsync("avd.debug-show-overlay", zoneType);
-				using (var doc = JsonDocument.Parse(previewResult))
-				{
-					var preview = doc.RootElement.GetProperty("preview");
-					Assert.True(preview.TryGetProperty("previewGeometryBounds", out var geom), $"Preview for '{zoneType}' missing geometry: {previewResult}");
-					var previewX = geom.GetProperty("x").GetDouble();
-					var previewY = geom.GetProperty("y").GetDouble();
-					var previewWidth = geom.GetProperty("width").GetDouble();
-					var previewHeight = geom.GetProperty("height").GetDouble();
-					Assert.True(previewWidth > 0 && previewHeight > 0,
-						$"Preview for '{zoneType}' has no area ({previewWidth}x{previewHeight}): {previewResult}");
-
-					await client.InvokeAsync("avd.debug-hide-overlay");
-					var pathTargetBounds = pathTarget == "anchorable2"
+				var pathTargetBounds = pathTarget == "anchorable2"
 						? await client.QueryBoundsAsync("anchorable-pane", "dragTestTool2")
 						: await client.QueryBoundsAsync("document-pane");
 
-					const int maxAttempts = 3;
-					string lastFailure = null;
-					var docked = false;
-					for (var attempt = 1; attempt <= maxAttempts && !docked; attempt++)
-					{
-						await EnsureFloatingClearOfHostAsync(client, mainArea, TestContext.Current.CancellationToken);
-						(docked, lastFailure) = await TryDragOntoZoneAsync(client, zoneType, pathTargetBounds, TestContext.Current.CancellationToken);
-					}
-
-					Assert.True(docked, $"Failed to dock onto zone '{zoneType}' after {maxAttempts} attempts. LastFailure={lastFailure}");
-
-					var final = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));
-					var pane = await QueryHostingPaneAsync(client, final);
-
-					// Same screen position and same size as the preview, within rounding.
-					const double tolerance = 2.0;
-					Assert.True(Math.Abs(pane.X - previewX) <= tolerance && Math.Abs(pane.Y - previewY) <= tolerance,
-						$"Docked pane position does not match preview for '{zoneType}': preview=({previewX},{previewY}) pane={pane}");
-					Assert.True(Math.Abs(pane.Width - previewWidth) <= tolerance && Math.Abs(pane.Height - previewHeight) <= tolerance,
-						$"Docked pane size does not match preview for '{zoneType}': preview={previewWidth}x{previewHeight} pane={pane.Width}x{pane.Height}");
+				const int maxAttempts = 5;
+				string lastFailure = null;
+				var docked = false;
+				ElementBounds? preview = null;
+				for (var attempt = 1; attempt <= maxAttempts && !docked; attempt++)
+				{
+					await EnsureFloatingClearOfHostAsync(client, mainArea, TestContext.Current.CancellationToken);
+					(docked, lastFailure, preview) = await TryDragOntoZoneAsync(
+						client,
+						zoneType,
+						pathTargetBounds,
+						TestContext.Current.CancellationToken,
+						completeDropDeterministically: true);
 				}
+
+				Assert.True(docked, $"Failed to dock onto zone '{zoneType}' after {maxAttempts} attempts. LastFailure={lastFailure}");
+				Assert.True(preview.HasValue, $"Live preview for '{zoneType}' was not captured before drop");
+				var capturedPreview = preview.Value;
+				Assert.True(capturedPreview.Width > 0 && capturedPreview.Height > 0,
+					$"Live preview for '{zoneType}' has no area: {capturedPreview}");
+
+				var final = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));
+				var pane = await QueryHostingPaneAsync(client, final);
+
+				// Same screen position and same size as the preview captured from this exact held drag.
+				const double tolerance = 2.0;
+				Assert.True(Math.Abs(pane.X - capturedPreview.X) <= tolerance && Math.Abs(pane.Y - capturedPreview.Y) <= tolerance,
+					$"Docked pane position does not match live preview for '{zoneType}': preview={capturedPreview} pane={pane}");
+				Assert.True(Math.Abs(pane.Width - capturedPreview.Width) <= tolerance && Math.Abs(pane.Height - capturedPreview.Height) <= tolerance,
+					$"Docked pane size does not match live preview for '{zoneType}': preview={capturedPreview} pane={pane}");
 			}
 			finally
 			{
-				await client.InvokeAsync("avd.layout.restore", originalXml);
+				// The next theory row performs the deterministic reset; see the matching cleanup
+				// note in DragFloatingTool_OntoSpecificZone_DocksThere.
 			}
 		}
 

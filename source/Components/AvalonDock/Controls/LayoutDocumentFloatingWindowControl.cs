@@ -246,6 +246,7 @@ namespace AvalonDock.Controls
 			var overlayWindow = _overlayWindow;
 			overlayWindow.EnableDropTargets();
 			overlayWindow.Show();
+			overlayWindow.AlignNativePosition();
 			return overlayWindow;
 		}
 

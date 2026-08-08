@@ -26,7 +26,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 		public DevFlowClient(int port)
 		{
 			_http = new HttpClient { BaseAddress = new Uri($"http://localhost:{port}") };
-			_http.Timeout = TimeSpan.FromSeconds(60);
+			_http.Timeout = TimeSpan.FromSeconds(20);
 		}
 
 		/// <summary>Port from DEVFLOW_TEST_PORT, or null when integration tests should be skipped.</summary>
@@ -79,12 +79,19 @@ namespace AvalonDock.DevFlowIntegrationTests
 		{
 			var body = JsonSerializer.Serialize(new { args = args ?? Array.Empty<object>() });
 			using var content = new StringContent(body, Encoding.UTF8, "application/json");
-			using var resp = await _http.PostAsync($"/api/v1/invoke/actions/{action}", content).ConfigureAwait(false);
-			var raw = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
-			if (!resp.IsSuccessStatusCode)
-				throw new HttpRequestException(
-					$"DevFlow action '{action}' returned {(int)resp.StatusCode}: {raw}");
-			return ExtractResult(raw);
+			try
+			{
+				using var resp = await _http.PostAsync($"/api/v1/invoke/actions/{action}", content).ConfigureAwait(false);
+				var raw = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
+				if (!resp.IsSuccessStatusCode)
+					throw new HttpRequestException(
+						$"DevFlow action '{action}' returned {(int)resp.StatusCode}: {raw}");
+				return ExtractResult(raw);
+			}
+			catch (TaskCanceledException ex)
+			{
+				throw new TimeoutException($"DevFlow action '{action}' did not complete within {_http.Timeout}.", ex);
+			}
 		}
 
 		public async Task<JsonElement> DragAsync(DragRequest request, CancellationToken ct = default)

@@ -921,6 +921,11 @@ namespace AvalonDock.Controls
 		// against a drag whose end was missed (see OnPortableNativeDragTick), so it can be generous.
 		private static readonly TimeSpan MaxPortableDragDuration = TimeSpan.FromSeconds(15);
 
+		// See OnPortableNativeDragTick: synthetic (injected) mouse-downs are not reflected in the
+		// physical HID button state immediately, so the button-state watchdog must not run before
+		// the injected down has had a chance to reach the WPF input pipeline.
+		private static readonly TimeSpan PortableNativeDragGracePeriod = TimeSpan.FromMilliseconds(500);
+
 		// The Win32 caption-drag path (WM_NCLBUTTONDOWN + WM_MOVING/WM_EXITSIZEMOVE) only works on real
 		// Windows HWNDs. Everywhere else (LibreWPF on macOS/Linux) use the managed caption drag.
 		internal static bool UsePortableCaptionDrag { get; } = !RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -977,7 +982,17 @@ namespace AvalonDock.Controls
 			// this window's model) and the next tick crashes. Poll the real button state directly and
 			// tear the drag down as soon as it's no longer held, regardless of what WPF's routed events
 			// did or didn't deliver.
-			if (Mouse.LeftButton != MouseButtonState.Pressed && !PlatformHelper.IsLeftButtonDown())
+			//
+			// Synthetic input (OS-level automation, e.g. cliclick CGEventPost) posts a mouse-down that
+			// does NOT update the physical HID button state, so PlatformHelper.IsLeftButtonDown() stays
+			// false for the whole drag while WPF's Mouse.LeftButton only becomes Pressed once the
+			// injected event has actually been routed. A tick that runs before that routing completes
+			// would read "button not down" and kill a perfectly good drag - hence the grace period:
+			// give the injected down a moment to reach the WPF input pipeline before trusting the
+			// button-state check.
+			var dragAge = DateTime.UtcNow - _portableDragStartUtc;
+			if (dragAge > PortableNativeDragGracePeriod
+				&& Mouse.LeftButton != MouseButtonState.Pressed && !PlatformHelper.IsLeftButtonDown())
 			{
 				EndPortableDrag(drop: true);
 				return;
@@ -987,7 +1002,7 @@ namespace AvalonDock.Controls
 			// later drag's real mouse-down happens to be down at the exact tick this checks (observed in
 			// practice with back-to-back synthetic drags in tests). No legitimate drag runs this long, so
 			// once exceeded, abort unconditionally rather than trusting button state at all.
-			if (DateTime.UtcNow - _portableDragStartUtc > MaxPortableDragDuration)
+			if (dragAge > MaxPortableDragDuration)
 			{
 				// The button-state check above just confirmed the button still reads as down - ending
 				// the drag here must not let OnPortableNativeLocationChanged treat that same still-down
@@ -1111,6 +1126,11 @@ namespace AvalonDock.Controls
 			SetIsDragging(false);
 			if (dropHandled)
 				Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() => InternalClose()));
+		}
+
+		internal void CompletePortableDragForDiagnostics()
+		{
+			EndPortableDrag(drop: true);
 		}
 
 		#endregion Portable (non-HWND) caption drag

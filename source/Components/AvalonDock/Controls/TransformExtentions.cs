@@ -1,6 +1,8 @@
+using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media;
+using AvalonDock.Platform;
 
 namespace AvalonDock.Controls
 {
@@ -20,6 +22,25 @@ namespace AvalonDock.Controls
 			if (PresentationSource.FromVisual(visual) == null)
 			{
 				return pt;
+			}
+
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && visual is DependencyObject dependencyObject)
+			{
+				var window = Window.GetWindow(dependencyObject);
+				if (window != null)
+				{
+					try
+					{
+						var inWindow = ReferenceEquals(visual, window)
+							? pt
+							: visual.TransformToAncestor(window).Transform(pt);
+						var contentOrigin = PlatformHelper.GetWindowContentOrigin(window);
+						return new Point(contentOrigin.X + inWindow.X, contentOrigin.Y + inWindow.Y);
+					}
+					catch (InvalidOperationException)
+					{
+					}
+				}
 			}
 
 			Point resultPt = visual.PointToScreen(pt);

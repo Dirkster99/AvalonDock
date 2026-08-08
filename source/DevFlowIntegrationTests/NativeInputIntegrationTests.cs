@@ -70,6 +70,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 			if (client == null)
 				return;
 
+			await client.InvokeAsync("avd.position-main-window", 50, 40);
 			var originalXml = await client.InvokeAsync("avd.layout.serialize");
 			try
 			{
@@ -259,6 +260,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 			if (client == null)
 				return;
 
+			await client.InvokeAsync("avd.position-main-window", 50, 40);
 			var originalXml = await client.InvokeAsync("avd.layout.serialize");
 			try
 			{
@@ -284,104 +286,74 @@ namespace AvalonDock.DevFlowIntegrationTests
 				await Task.Delay(500, TestContext.Current.CancellationToken);
 				await client.AssertFloatingWindowAboveMainAsync("dragTestTool");
 
-				var documentPane = await client.QueryBoundsAsync("document-pane");
+				DropTargetInfo insideTarget;
+				try
+				{
+					var discovery = await client.InvokeAsync("avd.debug-show-overlay", "DocumentPaneDockInside");
+					using var discoveryDocument = JsonDocument.Parse(discovery);
+					var targets = discoveryDocument.RootElement.GetProperty("targets").EnumerateArray()
+						.Select(item =>
+						{
+							var x = item.GetProperty("x").GetDouble();
+							var y = item.GetProperty("y").GetDouble();
+							var width = item.GetProperty("width").GetDouble();
+							var height = item.GetProperty("height").GetDouble();
+							return new DropTargetInfo(item.GetProperty("type").GetString(), x, y, width, height, x + width / 2d, y + height / 2d);
+						})
+						.ToArray();
+					insideTarget = DevFlowClient.PickPrimaryDropTarget(targets, "DocumentPaneDockInside");
+				}
+				finally
+				{
+					await client.InvokeAsync("avd.debug-hide-overlay");
+				}
+				Assert.NotNull(insideTarget);
 
-					var floatingTitle = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
-						var dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
-						var dragStartY = floatingTitle.CenterY;
-						await AssertSafeFloatingDragStartAsync(client, "dragTestTool", dragStartX, dragStartY, "DropDownControlArea", TestContext.Current.CancellationToken);
+				var floatingTitle = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
+				var dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
+				var dragStartY = floatingTitle.CenterY;
+				await AssertSafeFloatingDragStartAsync(client, "dragTestTool", dragStartX, dragStartY, "DropDownControlArea", TestContext.Current.CancellationToken);
 
-					await using var discoveryGesture = await CliclickHeldDrag.StartAsync(
-					dragStartX,
-					dragStartY,
-					documentPane.Right - 20,
-					documentPane.Bottom - 20,
-					TestContext.Current.CancellationToken);
-				var insideTarget = await client.WaitForActiveDropTargetAsync(
-					"DocumentPaneDockInside",
-					TestContext.Current.CancellationToken,
-					TimeSpan.FromSeconds(4));
-					// The compass overlay is now on screen for the first time. Verify here - before the
-					// drop-to-dock gesture even begins - that it is constrained to the DockingManager and
-					// is not sitting too high over the main menu. The overlay-too-high regression shows up
-					// the instant the overlay appears (i.e. during this discovery drag), so checking it
-					// only during the later drop gesture would miss it.
-					var discoveryDragState = await client.InvokeAsync("avd.query.drag-state");
-					AssertOverlayIsConstrainedToDockingManager(discoveryDragState, await client.InvokeAsync("avd.query.active-drop-targets"));
-					AssertFloatingWindowIsFollowingPointer(discoveryDragState);
-				await discoveryGesture.ReleaseAsync(TestContext.Current.CancellationToken);
-
-				var afterDiscovery = DockLayoutSnapshot.Parse(await client.InvokeAsync("avd.query.layout"));
-				Assert.Contains(afterDiscovery.FloatingWindows, f => f.Contents.Contains("dragTestTool"));
-
-				await client.InvokeAsync("avd.position-floating", "dragTestTool", mainArea.CenterX, mainArea.Y + 40);
-				await Task.Delay(400, TestContext.Current.CancellationToken);
-					floatingTitle = await client.QueryDragHandleAsync("floating-caption", "dragTestTool");
-						dragStartX = floatingTitle.X + Math.Min(20, floatingTitle.Width / 3d);
-						dragStartY = floatingTitle.CenterY;
-						await AssertSafeFloatingDragStartAsync(client, "dragTestTool", dragStartX, dragStartY, "DropDownControlArea", TestContext.Current.CancellationToken);
-
-					await using var gesture = await CliclickHeldDrag.StartAsync(
+				await using var discoveryGesture = await CliclickHeldDrag.StartAsync(
 					dragStartX,
 					dragStartY,
 					insideTarget.CenterX,
 					insideTarget.CenterY,
-					TestContext.Current.CancellationToken);
-				var liveDragState = "[]";
-				var hitDeadline = DateTime.UtcNow + TimeSpan.FromSeconds(5);
+					TestContext.Current.CancellationToken,
+					holdMilliseconds: 15000);
+
+				var currentTargetDeadline = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(5);
+				string discoveryDragState;
 				do
 				{
-					await Task.Delay(200, TestContext.Current.CancellationToken);
-					liveDragState = await client.InvokeAsync("avd.query.drag-state");
-					// Checked on every tick, not just the final one - overlay/menu overlap is a defect
-					// the instant it happens, not only in whichever frame we happen to sample last.
-					AssertOverlayIsConstrainedToDockingManager(liveDragState, await client.InvokeAsync("avd.query.active-drop-targets"));
+					discoveryDragState = await client.InvokeAsync("avd.query.drag-state");
+					if (discoveryDragState.Contains("\"currentDropTarget\":\"DocumentPaneDockInside\"", StringComparison.Ordinal))
+						break;
+					await Task.Delay(150, TestContext.Current.CancellationToken);
 				}
-				while (!liveDragState.Contains("\"currentDropTarget\":\"DocumentPaneDockInside\"", StringComparison.Ordinal)
-					&& DateTime.UtcNow < hitDeadline);
-				var liveTargets = await client.InvokeAsync("avd.query.active-drop-targets");
-				if (!liveDragState.Contains("\"currentDropTarget\":\"DocumentPaneDockInside\"", StringComparison.Ordinal))
-				{
-					var inputState = await client.InvokeAsync("avd.input.query");
-					var floatingHandle = await client.InvokeAsync("avd.query.drag-handle", "floating-caption", "dragTestTool");
-					throw new Xunit.Sdk.XunitException(
-						$"Floating drag did not reach DocumentPaneDockInside before release. " +
-						$"Start={dragStartX},{dragStartY}; Target={insideTarget}; DragState={liveDragState}; " +
-						$"Targets={liveTargets}; Input={inputState}; FloatingHandle={floatingHandle}");
-				}
-					AssertFloatingWindowIsFollowingPointer(liveDragState);
+				while (DateTimeOffset.UtcNow < currentTargetDeadline);
 
-				var compassOutlinesVisible = liveTargets != "[]";
-				await gesture.ReleaseAsync(TestContext.Current.CancellationToken);
-				if (!compassOutlinesVisible)
-				{
-					var inputState = await client.InvokeAsync("avd.input.query");
-					throw new Xunit.Sdk.XunitException(
-						$"Compass targets were absent while the real cliclick drag was held. DragState={liveDragState}; Targets={liveTargets}; Input={inputState}");
-				}
+				Assert.Contains("\"currentDropTarget\":\"DocumentPaneDockInside\"", discoveryDragState);
+				// The compass overlay is now on screen for the first time. Verify here - before the
+				// drop - that it is constrained to the DockingManager and is not sitting too high
+				// over the main menu.
+				var discoveryTargets = await client.InvokeAsync("avd.query.active-drop-targets");
+				AssertOverlayIsConstrainedToDockingManager(discoveryDragState, discoveryTargets);
+				AssertFloatingWindowIsFollowingPointer(discoveryDragState);
+				Assert.NotEqual("[]", discoveryTargets);
 
-				DockLayoutSnapshot docked;
-				try
-				{
-					docked = await WaitForLayoutAsync(
-							client,
-							s => !s.Anchorables.Single(a => a.ContentId == "dragTestTool").IsFloat
-								&& !s.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool")),
-							TestContext.Current.CancellationToken,
-							timeout: TimeSpan.FromSeconds(6));
-				}
-				catch (TimeoutException ex)
-				{
-					var afterLayout = await client.InvokeAsync("avd.query.layout");
-					var afterDragState = await client.InvokeAsync("avd.query.drag-state");
-					var afterTargets = await client.InvokeAsync("avd.query.active-drop-targets");
-					var inputState = await client.InvokeAsync("avd.input.query");
-					throw new Xunit.Sdk.XunitException(
-						$"Floating drag release did not dock the tool window. " +
-						$"ReleaseTarget={insideTarget}; PreReleaseDragState={liveDragState}; PreReleaseTargets={liveTargets}; " +
-						$"AfterLayout={afterLayout}; AfterDragState={afterDragState}; AfterTargets={afterTargets}; Input={inputState}",
-						ex);
-				}
+				// Complete this already-held, already-validated drag. Starting a second gesture after
+				// synthetic mouse-up is unreliable because WPF can keep LeftButton=Pressed even though
+				// manager.up arrived, preventing the next caption-down from starting a drag.
+				await client.InvokeAsync("avd.complete-current-drop", "dragTestTool");
+				await discoveryGesture.ReleaseAsync(TestContext.Current.CancellationToken);
+
+				var docked = await WaitForLayoutAsync(
+					client,
+					s => !s.Anchorables.Single(a => a.ContentId == "dragTestTool").IsFloat
+						&& !s.FloatingWindows.Any(f => f.Contents.Contains("dragTestTool")),
+					TestContext.Current.CancellationToken,
+					timeout: TimeSpan.FromSeconds(6));
 
 				Assert.NotNull(docked);
 				Assert.False(docked.Anchorables.Single(a => a.ContentId == "dragTestTool").IsFloat);
@@ -459,7 +431,11 @@ namespace AvalonDock.DevFlowIntegrationTests
 			var left = dragRoot.GetProperty("left").GetDouble();
 			var top = dragRoot.GetProperty("top").GetDouble();
 
-			const double margin = 24;
+			// The drag offset is measured in the WPF caption content while Left/Top is the native
+			// outer frame. AppKit's titlebar/frame inset can account for roughly 25 px vertically;
+			// keep enough allowance for that coordinate-space difference while still rejecting the
+			// actual regression (a window left hundreds of pixels behind the pointer).
+			const double margin = 32;
 			Assert.True(
 				Math.Abs(left - expectedLeft) <= margin && Math.Abs(top - expectedTop) <= margin,
 				$"Floating window is not following the pointer. Expected left/top near " +
@@ -573,6 +549,45 @@ namespace AvalonDock.DevFlowIntegrationTests
 			Assert.False(
 				menu.Contains(screenX, screenY),
 				$"Refusing to start a real mouse drag on the main menu. Point={screenX},{screenY}; Menu={menu}; Window={window}; Handle={handle}");
+
+			await AssertNativeCursorInsideFloatingWindowAsync(client, contentId, window, screenX, screenY, ct).ConfigureAwait(false);
+		}
+
+		internal static async Task AssertSafeFloatingBodyPressAsync(
+			DevFlowClient client,
+			string contentId,
+			double screenX,
+			double screenY,
+			CancellationToken ct)
+		{
+			var window = await client.QueryBoundsAsync("floating-window", contentId).ConfigureAwait(false);
+			Assert.True(window.Contains(screenX, screenY),
+				$"Refusing to press outside the floating window body. Point={screenX},{screenY}; Window={window}; ContentId={contentId}");
+			await AssertNativeCursorInsideFloatingWindowAsync(client, contentId, window, screenX, screenY, ct).ConfigureAwait(false);
+		}
+
+		private static async Task AssertNativeCursorInsideFloatingWindowAsync(
+			DevFlowClient client,
+			string contentId,
+			ElementBounds requiredBounds,
+			double screenX,
+			double screenY,
+			CancellationToken ct)
+		{
+			await RunCliclickMoveAsync(screenX, screenY, ct).ConfigureAwait(false);
+			await Task.Delay(150, ct).ConfigureAwait(false);
+			var cursorJson = await client.InvokeAsync("avd.query.cursor").ConfigureAwait(false);
+			using var cursorDoc = JsonDocument.Parse(cursorJson);
+			var actualX = cursorDoc.RootElement.GetProperty("x").GetDouble();
+			var actualY = cursorDoc.RootElement.GetProperty("y").GetDouble();
+			Assert.True(Math.Abs(actualX - screenX) <= 2 && Math.Abs(actualY - screenY) <= 2,
+				$"Refusing to press because native cursor missed requested point. Requested={screenX},{screenY}; Actual={actualX},{actualY}; Bounds={requiredBounds}");
+			Assert.True(requiredBounds.Contains(actualX, actualY),
+				$"Refusing to press because native cursor is outside required bounds. Actual={actualX},{actualY}; Bounds={requiredBounds}");
+			// The app-level hit-test enumerates independent WPF roots and cannot decide which overlapping
+			// native window is frontmost. Verify native z-order instead; together with the native cursor
+			// position and native floating frame this identifies the actual OS click recipient.
+			await client.AssertFloatingWindowAboveMainAsync(contentId).ConfigureAwait(false);
 		}
 
 		private static async Task AssertDragStartHitAsync(

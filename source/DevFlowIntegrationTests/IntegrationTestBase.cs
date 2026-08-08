@@ -39,5 +39,10 @@ namespace AvalonDock.DevFlowIntegrationTests
 
 			return _fixture.IsolateDesktopForNativeInputAsync();
 		}
+
+		protected Task RestartTestAppAsync()
+		{
+			return _fixture?.RestartAsync() ?? Task.CompletedTask;
+		}
 	}
 }
