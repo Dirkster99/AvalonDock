@@ -67,7 +67,12 @@ namespace TestApp
 		[DllImport(ObjC, EntryPoint = "objc_msgSend")]
 		private static extern IntPtr ObjCMsgSendNUInt(IntPtr receiver, IntPtr selector, nuint arg);
 
-		private static readonly IntPtr _nsApplicationClass = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+		// NOT cached like the selectors below: objc_getClass("NSApplication") only succeeds once
+		// AppKit.framework has actually been dlopen'd into this process, which GLFW does lazily when
+		// it creates the first native window - well after this type's static fields would otherwise
+		// be initialized. Caching the lookup result here previously froze it at IntPtr.Zero forever
+		// (queried before AppKit was loaded), which silently broke every OS z-order check on macOS.
+		private static IntPtr NsApplicationClass => RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
 			? ObjCGetClass("NSApplication")
 			: IntPtr.Zero;
 		private static readonly IntPtr _selSharedApplication = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
@@ -510,16 +515,14 @@ namespace TestApp
 				});
 			}
 
-			var mainHandle = new WindowInteropHelper(this).Handle;
-			var floatingHandle = new WindowInteropHelper(floating).Handle;
+			var mainHandle = GetNativeWindowHandle(this);
+			var floatingHandle = GetNativeWindowHandle(floating);
 			var floatingContentTitle = floating.Model?.Descendents()
 				.OfType<LayoutAnchorable>()
 				.FirstOrDefault(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal))
 				?.Title;
-			var mainFound = ProGpuWpfDiagnostics.TryGetWindowZOrder(this, out var mainZ) ||
-				TryGetPlatformWindowZOrder(mainHandle, out mainZ);
-			var floatingFound = ProGpuWpfDiagnostics.TryGetWindowZOrder(floating, out var floatingZ) ||
-				TryGetPlatformWindowZOrder(floatingHandle, out floatingZ);
+			var mainFound = TryGetPlatformWindowZOrder(mainHandle, out var mainZ);
+			var floatingFound = TryGetPlatformWindowZOrder(floatingHandle, out var floatingZ);
 			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
 			{
 				["found"] = true,
@@ -599,6 +602,74 @@ namespace TestApp
 			firstPane.Children.Add(new LayoutDocument { Title = "TestDoc1", ContentId = id1 });
 			firstPane.Children.Add(new LayoutDocument { Title = "TestDoc2", ContentId = id2 });
 			return $"Added documents '{id1}', '{id2}'";
+		}
+
+		// The drop-target compass buttons are Borders with a deliberately lopsided BorderThickness
+		// ("20,5,5,5") scaled down by a Viewbox, and they render as solid blobs with overshooting
+		// edges instead of hollow frames. This shows the same Border three ways - raw, raw with a
+		// uniform thickness, and Viewbox-scaled - so the culprit (non-uniform thickness vs. the
+		// Viewbox scale) can be told apart from a screenshot.
+		private Window _borderReproWindow;
+
+		[DevFlowAction("avd.debug.border-repro", Description = "Show a window reproducing the compass Border rendering")]
+		public string ShowBorderRepro(double left = 60, double top = 700)
+		{
+			_borderReproWindow?.Close();
+
+			Border MakeBorder(Thickness thickness) => new Border
+			{
+				Width = 50,
+				Height = 80,
+				Margin = new Thickness(10),
+				BorderBrush = new SolidColorBrush(Color.FromRgb(0x41, 0x7F, 0xE8)),
+				BorderThickness = thickness,
+			};
+
+			var raw = MakeBorder(new Thickness(20, 5, 5, 5));
+			var uniform = MakeBorder(new Thickness(5));
+			var scaled = new Viewbox
+			{
+				Stretch = Stretch.Uniform,
+				Width = 40,
+				Height = 40,
+				Margin = new Thickness(10),
+				Child = MakeBorder(new Thickness(20, 5, 5, 5)),
+			};
+
+			// Same border under a plain RenderTransform rather than a Viewbox: tells apart "Viewbox
+			// mis-measures its child" from "any scale transform loses the border thickness".
+			var renderScaled = MakeBorder(new Thickness(20, 5, 5, 5));
+			renderScaled.RenderTransform = new ScaleTransform(0.5, 0.5);
+
+			var row = new StackPanel { Orientation = Orientation.Horizontal };
+			row.Children.Add(raw);
+			row.Children.Add(uniform);
+			row.Children.Add(scaled);
+			row.Children.Add(renderScaled);
+
+			_borderReproWindow = new Window
+			{
+				Title = "BorderRepro",
+				Width = 340,
+				Height = 140,
+				Left = left,
+				Top = top,
+				WindowStartupLocation = WindowStartupLocation.Manual,
+				ShowInTaskbar = false,
+				Background = new SolidColorBrush(Color.FromRgb(0x1E, 0x1E, 0x1E)),
+				Content = row,
+			};
+			_borderReproWindow.Show();
+			_borderReproWindow.UpdateLayout();
+
+			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			{
+				["left"] = _borderReproWindow.Left,
+				["top"] = _borderReproWindow.Top,
+				["width"] = _borderReproWindow.ActualWidth,
+				["height"] = _borderReproWindow.ActualHeight,
+				["order"] = "raw(20,5,5,5) | uniform(5) | viewbox-scaled(20,5,5,5)",
+			});
 		}
 
 		[DevFlowAction("avd.add-anchorable", Description = "Add a new anchorable to the layout")]
@@ -1012,6 +1083,7 @@ namespace TestApp
 				Height = 700;
 				UpdateLayout();
 				Activate();
+				AdoptNativeWindowFramePosition();
 				return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
 				{
 					["left"] = Left,
@@ -1019,7 +1091,44 @@ namespace TestApp
 					["width"] = ActualWidth,
 					["height"] = ActualHeight,
 					["isActive"] = IsActive,
+					["requestedLeft"] = left,
+					["requestedTop"] = top,
 				});
+			}
+
+			// The platform can refuse the requested frame: on macOS a window may not be placed with its
+			// title bar underneath the system menu bar, so a small Top is silently clamped downward (a
+			// requested Top of 40 lands at ~61 here, and the exact clamp varies with menu-bar height and
+			// notched displays). LibreWPF never pushes that clamp back into the managed Left/Top, so
+			// PointToScreen - which is derived from those managed values - keeps reporting the REQUESTED
+			// position while synthetic OS-level mouse input is aimed at the REAL one. Every screen
+			// coordinate computed from a managed query is then off by the clamp distance, which is what
+			// made native drag tests land on the wrong element. Read the true native frame back and
+			// adopt it so the managed and native sides agree again.
+			private void AdoptNativeWindowFramePosition()
+			{
+				if (!ProGpuWpfDiagnostics.TryGetWindowHost(this, out var host) || host?.SilkWindow is not { } silk)
+					return;
+
+				// The native move runs on the native windowing loop, so an immediate read can still
+				// return the pre-move frame. Wait for the position to stop changing before adopting it.
+				var deadline = DateTime.UtcNow + TimeSpan.FromMilliseconds(1500);
+				var last = silk.Position;
+				var stableReads = 0;
+				while (DateTime.UtcNow < deadline && stableReads < 3)
+				{
+					Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
+					System.Threading.Thread.Sleep(30);
+					var current = silk.Position;
+					stableReads = current.X == last.X && current.Y == last.Y ? stableReads + 1 : 0;
+					last = current;
+				}
+
+				if (Math.Abs(last.X - Left) > 0.5)
+					Left = last.X;
+				if (Math.Abs(last.Y - Top) > 0.5)
+					Top = last.Y;
+				UpdateLayout();
 			}
 
 			[DevFlowAction("avd.input.reset", Description = "Reset AvalonDock routed input diagnostics")]
@@ -1083,8 +1192,30 @@ namespace TestApp
 				["assemblies"] = assemblies,
 			};
 
-			return System.Text.Json.JsonSerializer.Serialize(result);
+			// Managed Left/Top and PointToScreen are all derived from the same managed window state,
+			// so they agree with each other even when the real native window never moved. Report the
+			// actual native (Silk.NET/GLFW) frame separately - that is what synthetic OS-level mouse
+			// input is actually aimed at, so any divergence here is the root cause of "the click
+			// landed somewhere else" failures.
+			if (ProGpuWpfDiagnostics.TryGetWindowHost(this, out var diagHost) && diagHost?.SilkWindow is { } silk)
+			{
+				result["nativePositionX"] = silk.Position.X;
+				result["nativePositionY"] = silk.Position.Y;
+				result["nativeSizeX"] = silk.Size.X;
+				result["nativeSizeY"] = silk.Size.Y;
+			}
+
+			return System.Text.Json.JsonSerializer.Serialize(result, PlatformDiagnosticsJsonOptions);
 		}
+
+		// Early in the window lifecycle (before the first layout pass / native frame realization),
+		// PointToScreen and ActualWidth/Height can legitimately report NaN/Infinity. The default
+		// JsonSerializer throws on those, which crashes this diagnostics query exactly when it would
+		// be most useful (right after startup, mid-drag re-layout). Allow the named literals instead.
+		private static readonly System.Text.Json.JsonSerializerOptions PlatformDiagnosticsJsonOptions = new()
+		{
+			NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals,
+		};
 
 		private static object TryReadPortableClientOrigin(PresentationSource source)
 		{
@@ -1149,6 +1280,27 @@ namespace TestApp
 			return System.Text.Json.JsonSerializer.Serialize(results);
 		}
 
+		// The drop-target compass paints an opaque background on macOS even though the OverlayWindow
+		// is Background=Transparent/AllowsTransparency=true. Report how the overlay is actually
+		// hosted (its PresentationSource, and whether that source got a real native window) so the
+		// opaque fill can be traced to the layer that produces it.
+		private static string DescribeOverlaySource(Window overlay)
+		{
+			if (overlay == null)
+				return null;
+
+			var source = PresentationSource.FromVisual(overlay);
+			var hasHost = ProGpuWpfDiagnostics.TryGetWindowHost(overlay, out var host);
+			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			{
+				["sourceType"] = source?.GetType().FullName,
+				["rootVisual"] = source?.RootVisual?.GetType().FullName,
+				["hasProGpuHost"] = hasHost,
+				["hasSilkWindow"] = hasHost && host?.SilkWindow != null,
+				["silkWindowTitle"] = hasHost ? host?.SilkWindow?.Title : null,
+			});
+		}
+
 		[DevFlowAction("avd.query.drag-state", Description = "Query live floating-window drag state")]
 		public string QueryDragState()
 		{
@@ -1160,6 +1312,7 @@ namespace TestApp
 				overlayHeight = (floating.CurrentDragService?.CurrentOverlayWindow as Window)?.ActualHeight,
 				overlayBackground = (floating.CurrentDragService?.CurrentOverlayWindow as Window)?.Background?.ToString(),
 				overlayAllowsTransparency = (floating.CurrentDragService?.CurrentOverlayWindow as Window)?.AllowsTransparency,
+					overlaySourceType = DescribeOverlaySource(floating.CurrentDragService?.CurrentOverlayWindow as Window),
 				menuBounds = CreateBoundsPayload("menu", null, mainMenu),
 				managerBounds = CreateBoundsPayload("manager", null, dockManager),
 				title = floating.Title,
@@ -1626,6 +1779,27 @@ namespace TestApp
 			return $"Created floating '{anchorable.ContentId}'";
 		}
 
+		// WindowInteropHelper(window).Handle is a Win32-shaped HWND surrogate; it is never the real
+		// NSWindow* pointer on macOS, so comparing it against NSApplication.orderedWindows (an array
+		// of actual NSWindow* Objective-C objects) in TryGetMacWindowOrder could never match. Resolve
+		// the genuine Cocoa window pointer via the LibreWPF/Silk.NET native window instead.
+		private static IntPtr GetNativeWindowHandle(Window window)
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+			{
+				if (ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) &&
+					host?.SilkWindow?.Native is { } native &&
+					native.Cocoa is { } cocoa)
+				{
+					return cocoa;
+				}
+
+				return IntPtr.Zero;
+			}
+
+			return new WindowInteropHelper(window).Handle;
+		}
+
 		private static bool TryGetPlatformWindowZOrder(IntPtr hwnd, out int zOrder)
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -1646,7 +1820,7 @@ namespace TestApp
 		{
 			try
 			{
-				var app = ObjCMsgSend(_nsApplicationClass, _selSharedApplication);
+				var app = ObjCMsgSend(NsApplicationClass, _selSharedApplication);
 				var windows = ObjCMsgSend(app, _selOrderedWindows);
 				var count = ObjCMsgSendRetNUInt(windows, _selCount);
 				for (nuint i = 0; i < count; i++)

@@ -36,8 +36,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="/Users/lextm/uno-tools/wpf-labs/src/DevFlow/LeXtudio.DevFlow.Agent.LibreWpf/LeXtudio.DevFlow.Agent.LibreWpf.csproj" />
-    <ProjectReference Include="/Users/lextm/uno-tools/wpf-labs/src/DevFlow/LeXtudio.DevFlow.Agent.Core/LeXtudio.DevFlow.Agent.Core.csproj" />
+    <PackageReference Include="LeXtudio.DevFlow.Agent.LibreWpf" Version="0.2.2" />
+    <PackageReference Include="LeXtudio.DevFlow.Agent.Core" Version="0.2.2" />
   </ItemGroup>
 
   <ItemGroup>

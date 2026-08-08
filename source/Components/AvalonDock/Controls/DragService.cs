@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using AvalonDock.Layout;
+using AvalonDock.Platform;
 
 namespace AvalonDock.Controls
 {
@@ -270,9 +272,30 @@ namespace AvalonDock.Controls
 			_currentHost = null;
 		}
 
+		/// <summary>
+		/// Raises a window without activating it.
+		/// </summary>
+		/// <remarks>
+		/// The call order above is what puts the drop-target compass on top: the host is raised, then
+		/// the dragged floating window, then the overlay. That only worked on Windows, because
+		/// SetWindowPos is a user32 import and WindowInteropHelper.Handle is not a real handle off
+		/// Windows - the whole ordering became a silent no-op and the floating window ended up
+		/// covering the compass. Route non-Windows through the platform service instead, which maps
+		/// to [NSWindow orderFront:] on macOS - the same "raise but do not activate" semantics as the
+		/// DoNotActivate flag below.
+		/// </remarks>
+		/// <param name="window">The window to raise.</param>
 		private void BringWindowToTop2(Window window)
 		{
 			if (window == null) return;
+
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				var nativeHandle = PlatformHelper.GetNativeWindowHandle(window);
+				if (nativeHandle != IntPtr.Zero)
+					PlatformHelper.BringWindowToFront(nativeHandle);
+				return;
+			}
 
 			Win32Helper.SetWindowPos(
 				new WindowInteropHelper(window).Handle,

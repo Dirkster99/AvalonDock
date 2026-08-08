@@ -46,6 +46,34 @@ namespace AvalonDock.Platform
 		}
 
 		/// <summary>
+		/// Resolves the native window handle that <see cref="INativeWindowService"/> expects.
+		/// </summary>
+		/// <remarks>
+		/// WindowInteropHelper only yields a usable handle on Windows. Under LibreWPF on macOS it
+		/// returns an HWND-shaped surrogate rather than the NSWindow pointer the Cocoa service sends
+		/// Objective-C messages to, so the genuine handle has to come from the ProGPU window host.
+		/// Other platforms keep the WindowInteropHelper value, which is what they used before.
+		/// </remarks>
+		/// <param name="window">The window whose native handle is needed.</param>
+		internal static IntPtr GetNativeWindowHandle(Window window)
+		{
+			if (window == null)
+				return IntPtr.Zero;
+
+			if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
+				System.Runtime.InteropServices.OSPlatform.OSX))
+			{
+				return System.Windows.Media.ProGPU.ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) &&
+					host?.SilkWindow?.Native is { } native &&
+					native.Cocoa is { } cocoa
+					? cocoa
+					: IntPtr.Zero;
+			}
+
+			return new System.Windows.Interop.WindowInteropHelper(window).Handle;
+		}
+
+		/// <summary>
 		/// Disables window tabbing (macOS specific).
 		/// </summary>
 		/// <param name="windowHandle">The native window handle.</param>
