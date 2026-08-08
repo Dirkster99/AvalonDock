@@ -124,6 +124,19 @@ public class ToggleDockingManager : DockingManager
 	/// </summary>
 	private Button _showHiddenButton;
 
+	/// <summary>
+	/// The toggle style, cached per thread rather than process wide.
+	/// </summary>
+	/// <remarks>
+	/// A <see cref="Style"/> is a <see cref="System.Windows.Threading.DispatcherObject"/> and keeps the
+	/// affinity of the thread that created it until it is sealed, which WPF only does once it is first
+	/// applied. Handing one instance to managers on several UI threads therefore lets the layout pass
+	/// of the second thread throw "The calling thread cannot access this object because a different
+	/// thread owns it" out of <c>Style.CheckTargetType</c>, from where nothing catches it. Caching per
+	/// thread keeps the saving this field is here for - the pack URI is parsed once per UI thread
+	/// rather than once per manager - without sharing an object that cannot be shared.
+	/// </remarks>
+	[ThreadStatic]
 	private static Style _staticToggleStyle;
 
 	private static Style LoadToggleStyle()
