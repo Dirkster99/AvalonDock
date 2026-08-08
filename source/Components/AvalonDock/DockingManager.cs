@@ -1653,13 +1653,27 @@ namespace AvalonDock
 		{
 #if DEBUG
 			if (_logicalChildren.Select(ch => ch.GetValueOrDefault<object>()).Contains(element))
-				throw new InvalidOperationException();
+				throw new InvalidOperationException(DescribeDuplicateLogicalChild(element));
 #endif
 			if (_logicalChildren.Select(ch => ch.GetValueOrDefault<object>()).Contains(element))
 				return;
 
 			_logicalChildren.Add(new WeakReference(element));
 			AddLogicalChild(element);
+		}
+
+		/// <summary>Temporary diagnostic: describes why a logical child is being registered twice.</summary>
+		private string DescribeDuplicateLogicalChild(object element)
+		{
+			var owners = Layout?.Descendents().OfType<LayoutContent>()
+				.Where(c => ReferenceEquals(c.Content, element))
+				.Select(c => $"{c.GetType().Name}#{c.GetHashCode():x}(id={c.ContentId},root={(ReferenceEquals(c.Root, Layout) ? "same" : c.Root == null ? "null" : "other")},hasItem={_layoutItems.Any(i => i.LayoutElement == c)})")
+				.ToArray() ?? new string[0];
+			var itemContents = _layoutItems.Count(i => ReferenceEquals(i.LayoutElement?.Content, element));
+			return $"DUPLICATE logical child: element={element.GetType().Name}#{element.GetHashCode():x}; " +
+				$"logicalChildren={_logicalChildren.Count}; layoutItems={_layoutItems.Count}; " +
+				$"layoutItemsReferencingThisContent={itemContents}; " +
+				$"ownersInLayout=[{string.Join(" | ", owners)}]";
 		}
 
 		/// <summary>Removes an element from the logical children collection maintained by the docking manager.</summary>

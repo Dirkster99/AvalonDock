@@ -1301,6 +1301,29 @@ namespace TestApp
 			});
 		}
 
+		// DockingManager registers a LayoutContent's Content as a logical child when it creates the
+		// layout item, so a live count shows whether that registration is being released again when
+		// the item goes away. A count that climbs across repeated float/dock/restore cycles is the
+		// leak that also makes InternalAddLogicalChild's debug assertion fire on a later re-add.
+		[DevFlowAction("avd.query.logical-children", Description = "Count the DockingManager's live logical children")]
+		public string QueryLogicalChildren()
+		{
+			var live = 0;
+			var dead = 0;
+			var enumerator = dockManager.LogicalChildrenPublic;
+			while (enumerator.MoveNext())
+			{
+				if (enumerator.Current == null) dead++;
+				else live++;
+			}
+
+			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			{
+				["live"] = live,
+				["dead"] = dead,
+			});
+		}
+
 		[DevFlowAction("avd.query.drag-state", Description = "Query live floating-window drag state")]
 		public string QueryDragState()
 		{
