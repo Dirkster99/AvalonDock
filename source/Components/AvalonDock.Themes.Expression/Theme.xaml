@@ -809,7 +809,27 @@
 	</Style>
 
 	<DataTemplate x:Key="AvalonDock_Expression_DocumentHeaderTemplate">
-		<TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition />
+			</Grid.ColumnDefinitions>
+			<Image
+				x:Name="icon"
+				Source="{Binding IconSource, Converter={avalonDockConverters:NullToDoNothingConverter}}"
+				Stretch="Uniform" />
+			<TextBlock
+				x:Name="title"
+				Grid.Column="1"
+				Margin="4,0,0,0"
+				Text="{Binding Title}"
+				TextTrimming="CharacterEllipsis" />
+		</Grid>
+		<DataTemplate.Triggers>
+			<DataTrigger Binding="{Binding IconSource}" Value="{x:Null}">
+				<Setter TargetName="title" Property="Margin" Value="0" />
+			</DataTrigger>
+		</DataTemplate.Triggers>
 	</DataTemplate>
 
 	<DataTemplate x:Key="AvalonDock_Expression_AnchorableHeaderTemplate">
