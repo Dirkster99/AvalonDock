@@ -886,7 +886,9 @@ public class ToggleDockingManager : DockingManager
 		// "View Mode" submenu
 		var viewModeItem = new MenuItem { Header = "View Mode" };
 
-		var floatItem = new MenuItem { Header = "Float" };
+		// This menu is built by hand rather than from the commands, so the two manager wide switches
+		// have to be honoured here as well - see DockingManager.AllowFloatingWindows/AllowDetachedWindows.
+		var floatItem = new MenuItem { Header = "Float", IsEnabled = AllowFloatingWindows };
 		floatItem.Click += (s, e) =>
 		{
 			ReattachAnchorable(anchorable);
@@ -906,7 +908,8 @@ public class ToggleDockingManager : DockingManager
 		var windowItem = new MenuItem
 		{
 			Header = "Window",
-			IsChecked = IsDetached(anchorable)
+			IsChecked = IsDetached(anchorable),
+			IsEnabled = AllowDetachedWindows
 		};
 		windowItem.Click += (s, e) =>
 		{

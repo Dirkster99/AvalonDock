@@ -56,6 +56,20 @@ The layout calculation logic has been formalized behind the `ILayoutEngine` inte
 | **Affected** | Custom layout calculations using internal APIs |
 | **Fix** | Implement `ILayoutEngine` for custom layout behavior. |
 
+### Window Policy Members on Core Interfaces
+
+**Impact:** Low — only affects custom implementations of the core interfaces.
+
+`IDockingManager` and `IRootDock` each gained `AllowFloatingWindows` and `AllowDetachedWindows`. The
+shipped implementations (`DockingManager`, `AvalonDock.Mvvm.RootDock`) provide them; a hand-written
+implementation of either interface has to add them.
+
+| Change | Details |
+|:-------|:--------|
+| **Added** | `IDockingManager.AllowFloatingWindows`, `IDockingManager.AllowDetachedWindows` |
+| **Added** | `IRootDock.AllowFloatingWindows`, `IRootDock.AllowDetachedWindows` |
+| **Fix** | Add both `bool` properties, defaulting to `true` to keep the previous behavior. |
+
 ---
 
 ## Target Framework Changes
@@ -103,6 +117,7 @@ These additions are new in v5.0.0 and do not break existing code:
 |:--------|:--------|:------------|
 | ToggleDockingManager | `AvalonDock` | VS Code / Rider-style sidebar with toggle buttons. |
 | Standalone Windows | `AvalonDock` | `DetachAnchorableToWindow` moves a tool window into an ordinary top level window with its own taskbar entry ("Window" view mode). Survives layout serialization. |
+| Window Policy | `AvalonDock` | `DockingManager.AllowFloatingWindows` and `AllowDetachedWindows` turn floating windows and the standalone "Window" view mode off for the whole manager. Also on `IRootDock` (MVVM) and `DockingOptions` (DI). |
 | Toolbox Shortcuts | `AvalonDock` | `IToolbox.Shortcut` registers a key binding that toggles the toolbox and shows up in its tooltip. |
 | Arc Theme | `AvalonDock.Themes.Arc` | Modern theme with dark/light variants. |
 | VS Themes | `AvalonDock.Themes.VS` | `.vstheme` based Visual Studio themes with VS2015, VS2022 and VS2026 variants, plus loading of custom theme files. |
@@ -208,6 +223,7 @@ on read, so existing layout files still load.
 | Packages | Serializers separated | High | Install serializer package |
 | Namespaces | Serializer namespace moved | High | Update `using` statements |
 | Architecture | `ILayoutEngine` added | Low | No action for default behavior |
+| Architecture | Window policy members on `IDockingManager` / `IRootDock` | Low | Add both properties to custom implementations |
 | Frameworks | .NET < 4.8 dropped | High | Upgrade target framework |
 | Frameworks | .NET Core 3.x / 5 dropped | High | Upgrade target framework |
 | Themes | Arc theme added | None | Optional adoption |
