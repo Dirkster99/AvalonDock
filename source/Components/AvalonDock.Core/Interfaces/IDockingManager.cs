@@ -48,6 +48,37 @@ namespace AvalonDock.Core
 		/// <summary>Gets or sets a value indicating whether mixed orientation (horizontal + vertical splits) is allowed.</summary>
 		bool AllowMixedOrientation { get; set; }
 
+		/// <summary>
+		/// Gets or sets a value indicating whether content may be torn off into floating windows.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This is the global switch that turns the whole floating feature off, as opposed to
+		/// <see cref="IDockable.CanFloat"/>, which decides it for a single piece of content. When it is
+		/// <see langword="false"/> no floating window is ever created: dragging a tab out of its pane,
+		/// the Float command and a programmatic float all do nothing, and a layout that is loaded with
+		/// floating windows in it has their content docked back where it came from.
+		/// </para>
+		/// <para>Defaults to <see langword="true"/>.</para>
+		/// </remarks>
+		bool AllowFloatingWindows { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value indicating whether anchorables may be moved into standalone top level
+		/// windows - the "Window" view mode that IDEs offer for their tool windows.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Unlike a floating window, a standalone window is an ordinary operating system window: it owns
+		/// a taskbar entry, minimizes on its own and may be moved behind the main window. When this is
+		/// <see langword="false"/> no such window is ever created, the menu entry that offers the mode is
+		/// disabled, and any window that is already open is closed with its content returned to the
+		/// layout.
+		/// </para>
+		/// <para>Defaults to <see langword="true"/>.</para>
+		/// </remarks>
+		bool AllowDetachedWindows { get; set; }
+
 		/// <summary>Raised when the active content changes.</summary>
 		event EventHandler ActiveContentChanged;
 

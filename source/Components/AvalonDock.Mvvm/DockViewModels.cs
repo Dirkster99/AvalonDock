@@ -14,6 +14,8 @@ namespace AvalonDock.Mvvm
 		private IList<IDockable>? _floatingDockables;
 		private IList<IDockable>? _pinnedDockables;
 		private IDockable? _defaultLayout;
+		private bool _allowFloatingWindows = true;
+		private bool _allowDetachedWindows = true;
 
 		/// <summary>
 		/// Gets or sets the floating dockables owned by the root dock.
@@ -43,6 +45,44 @@ namespace AvalonDock.Mvvm
 		{
 			get => _defaultLayout;
 			set => SetProperty(ref _defaultLayout, value);
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether content of this layout may be torn off into
+		/// floating windows. Pushed to the docking manager this layout is bound to.
+		/// </summary>
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public bool AllowFloatingWindows
+		{
+			get => _allowFloatingWindows;
+			set => SetProperty(ref _allowFloatingWindows, value);
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether anchorables of this layout may be moved into
+		/// standalone top level windows. Pushed to the docking manager this layout is bound to.
+		/// </summary>
+		[DataMember(IsRequired = false, EmitDefaultValue = true)]
+		public bool AllowDetachedWindows
+		{
+			get => _allowDetachedWindows;
+			set => SetProperty(ref _allowDetachedWindows, value);
+		}
+
+		/// <summary>
+		/// Restores the defaults of the window policy before a stored layout is read back into it.
+		/// </summary>
+		/// <param name="context">The streaming context, unused.</param>
+		/// <remarks>
+		/// <c>DataContractSerializer</c> does not run field initializers, so a layout stored before these
+		/// two switches existed carries neither of them and would come back with both off - turning
+		/// floating and standalone windows off for an application that never asked for that.
+		/// </remarks>
+		[OnDeserializing]
+		protected void OnDeserializingWindowPolicy(StreamingContext context)
+		{
+			_allowFloatingWindows = true;
+			_allowDetachedWindows = true;
 		}
 
 		/// <summary>
