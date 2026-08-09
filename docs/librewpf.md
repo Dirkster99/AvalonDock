@@ -302,7 +302,39 @@ layout reset，并由 20 秒 action watchdog 报出真正卡住的 action。
 完整测试跑 22 个用例期间偶发触发 → TestApp 进程死亡 → 后续用例全部
 `DevFlow agent not reachable` 级联失败（一次实测：崩溃后 12 个用例级联失败）。
 
-## 5. LibreWPF 源码修改 → 本地 feed 替换流程
+## 5. 崩溃 C：关闭后的 native drag tick 移动已释放 NSWindow
+
+### 崩溃栈与实证
+
+OpenDevelop 在 Error List 与 Project Browser 处于同一个异常 floating container 时切换
+`Plain → Default` layout，进程在主线程崩溃：
+
+```
+EXC_BAD_ACCESS / SIGSEGV
+objc_msgSend
+selector: setFrameTopLeftPoint:
+```
+
+这个 selector 只由 AvalonDock 的 `MacOSNativeWindowService.SetWindowPosition` 使用。对应调用方
+`LayoutFloatingWindowControl.OnPortableNativeDragTick` 是 16ms `DispatcherTimer`。关闭路径此前
+既没有停止这个 timer，也没有解除 macOS `LocationChanged`，所以 layout restore 销毁 native
+NSWindow 后，排队中的 tick 仍可能解析/使用旧 handle。Objective-C 向已释放 receiver 发送消息
+是进程级 access violation，托管 `try/catch` 无法防护。
+
+### 修复
+
+`LayoutFloatingWindowControl` 现在在 `OnClosing`（必须早于 backend 销毁 native window）统一：
+
+- 停止 portable native drag timer；
+- 解除 `LocationChanged` 与全局 `PostProcessInput`；
+- 释放 mouse capture；
+- abort 并清空 `DragService`，复位 drag 状态。
+
+`OnClosed` 再幂等调用同一清理，覆盖非标准关闭路径。OpenDevelop 侧同时为 Error List 补上
+`PreferredDockSide.Bottom`，避免它在 layout XML 中缺席时落入 AvalonDock 的 floating fallback。
+Workbench 集成测试新增 Error List `isFloating == false`、`side == Bottom` 断言；完整 35/35 通过。
+
+## 6. LibreWPF 源码修改 → 本地 feed 替换流程
 
 TestApp 通过 `LibreWPF.Sdk` MSBuild SDK 消费包；本地源已在
 `OpenDevelop/NuGet.config` 配置：

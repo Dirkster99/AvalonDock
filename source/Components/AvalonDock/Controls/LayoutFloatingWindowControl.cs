@@ -608,6 +608,7 @@ namespace AvalonDock.Controls
 		/// <inheritdoc/>
 		protected override void OnClosed(EventArgs e)
 		{
+			CleanupPortableCaptionDrag();
 			SizeChanged -= OnSizeChanged;
 			if (UsePortableCaptionDrag)
 				InputManager.Current.PostProcessInput -= OnPortablePostProcessInput;
@@ -647,6 +648,10 @@ namespace AvalonDock.Controls
 		/// <inheritdoc/>
 		protected override void OnClosing(CancelEventArgs e)
 		{
+			// Stop every callback that can touch the native window before base.OnClosing
+			// allows the backend to destroy it.  On macOS an objc_msgSend to a stale
+			// NSWindow is a process-fatal access violation and cannot be caught here.
+			CleanupPortableCaptionDrag();
 			base.OnClosing(e);
 			AssureOwnerIsNotMinimized();
 		}
@@ -1131,6 +1136,25 @@ namespace AvalonDock.Controls
 			SetIsDragging(false);
 			if (dropHandled)
 				Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() => InternalClose()));
+		}
+
+		private void CleanupPortableCaptionDrag()
+		{
+			if (!UsePortableCaptionDrag)
+				return;
+
+			_portableNativeDragTimer?.Stop();
+			LocationChanged -= OnPortableNativeLocationChanged;
+			InputManager.Current.PostProcessInput -= OnPortablePostProcessInput;
+
+			_portableDragging = false;
+			_portableNativeDragging = false;
+			if (IsMouseCaptured)
+				ReleaseMouseCapture();
+
+			_dragService?.Abort();
+			_dragService = null;
+			SetIsDragging(false);
 		}
 
 		internal void CompletePortableDragForDiagnostics()
