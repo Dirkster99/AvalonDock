@@ -206,14 +206,23 @@ When using MVVM, set these via the `IToolbox.Icon` and `IToolbox.ToolTipText` pr
 
 ### Button Appearance
 
-Buttons display vertically rotated text by default. When an icon is set, the icon is shown alongside the title. Button visual states:
+A button shows **either** an icon **or** its title, never both:
+
+- **With an icon** (`ToggleDock.Icon`, `IToolbox.Icon`, or `LayoutAnchorable.IconSource`) the button is a square of `ButtonSize` showing the icon upright.
+- **Without an icon** the title is rendered vertically (rotated 90°) through the docking manager's `AnchorableHeaderTemplate` — the same `DataTemplate` the classic auto-hide tabs use, so an icon-less sidebar matches the rest of the theme. Overriding `AnchorableHeaderTemplate` changes both.
+
+Only the bar-width axis is pinned to `ButtonSize`; a title-only button grows along the bar so long titles are not clipped, with `ButtonSize` acting as its minimum. Note that a very long title therefore produces a very tall button.
+
+Button visual states are supplied by the active theme, mapped onto the brushes that theme already uses for its auto-hide tabs:
 
 | State | Appearance |
 |:------|:-----------|
-| Default | Light gray text (#C5C5C5) |
-| Hover | Light gray background |
-| Checked (docked) | Medium gray background |
-| Focused (active panel) | Blue background (#007ACC) with white text |
+| Default | Theme auto-hide tab text color |
+| Hover | Theme auto-hide tab hover background |
+| Checked (docked) | Theme auto-hide tab background with a 1px tab border |
+| Focused (active panel) | Theme accent background with white text |
+
+When no AvalonDock theme is applied, the fallback style in `generic.xaml` is used instead (light gray text on transparent, `#007ACC` focus). The foreground is exposed as `ToggleDockButton.ForegroundBrushKey` so the sidebar and the "hidden panels" button can be recolored from a single resource.
 
 ---
 

@@ -3085,7 +3085,8 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Foreground" Value="{DynamicResource {x:Static avalonDockControls:ToggleDockButton.ForegroundBrushKey}}" />
         <Setter Property="Width" Value="{Binding ButtonSize, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=25}" />
-        <Setter Property="Height" Value="{Binding ButtonSize, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=25}" />
+        <!--  Height is free so an icon-less button grows with its rotated title; MinHeight keeps icon buttons square.  -->
+        <Setter Property="MinHeight" Value="{Binding ButtonSize, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=25}" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="Margin" Value="2" />
         <Setter Property="FontSize" Value="10.5" />
@@ -3121,10 +3122,13 @@
                                 Margin="0,0,3,0"
                                 VerticalAlignment="Center"
                                 Visibility="Collapsed" />
+                            <!--  Same AnchorableHeaderTemplate the auto hide tabs render through.  -->
                             <ContentPresenter x:Name="PART_Text"
                                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                RecognizesAccessKey="True" />
+                                Content="{Binding Anchorable, RelativeSource={RelativeSource TemplatedParent}}"
+                                ContentTemplate="{Binding AnchorableHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
+                                ContentTemplateSelector="{Binding AnchorableHeaderTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}" />
                         </StackPanel>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -3148,11 +3152,15 @@
                                 </Setter.Value>
                             </Setter>
                         </DataTrigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="#30808080" />
-                        </Trigger>
+                        <!--  States reuse the auto hide tab palette so the sidebar matches the classic tabs.  -->
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="#25808080" />
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.AutoHideTabDefaultBackground}}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.AutoHideTabDefaultBorder}}" />
+                            <Setter TargetName="Bd" Property="BorderThickness" Value="1" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.AutoHideTabHoveredBackground}}" />
+                            <Setter Property="Foreground" Value="{DynamicResource {x:Static reskeys:ResourceKeys.AutoHideTabHoveredText}}" />
                         </Trigger>
                         <Trigger Property="IsAnchorableFocused" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ControlAccentBrushKey}}" />

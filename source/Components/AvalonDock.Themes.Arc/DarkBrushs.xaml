@@ -44,6 +44,12 @@
 		options:Freeze="true"
 		Color="#BBBBBB" />
 
+	<!--  Toggle sidebar foreground, kept in sync with AutoHideTabDefaultText above  -->
+	<SolidColorBrush
+		x:Key="{x:Static avalonDockControls:ToggleDockButton.ForegroundBrushKey}"
+		options:Freeze="true"
+		Color="#BBBBBB" />
+
 	<!--  Mouse Over Auto Hide Button  -->
 	<SolidColorBrush
 		x:Key="{x:Static reskeys:ResourceKeys.AutoHideTabHoveredBackground}"
