@@ -469,6 +469,10 @@ namespace AvalonDock
 			AttachDocumentsSource(newLayout, DocumentsSource);
 			AttachAnchorablesSource(newLayout, AnchorablesSource);
 
+			// A layout saved while floating was allowed still carries its floating windows. Dock them
+			// before any window is created for them, so loading a layout cannot bring the feature back.
+			if (!AllowFloatingWindows) DockAllFloatingWindows();
+
 			if (IsLoaded)
 			{
 				LayoutRootPanel = CreateUIElementForModel(Layout.RootPanel) as LayoutPanelControl;
@@ -551,6 +555,11 @@ namespace AvalonDock
 			// leave the model claiming to be detached without a window.
 			foreach (var anchorable in toDetach)
 				anchorable.IsDetached = false;
+
+			// A layout saved while standalone windows were allowed still asks for them. Leaving the
+			// anchorables docked is the whole point of the switch, and the flags cleared above already
+			// put the models back in agreement with that.
+			if (!AllowDetachedWindows) return;
 
 			Dispatcher.BeginInvoke(
 				DispatcherPriority.Loaded,
@@ -1165,6 +1174,169 @@ namespace AvalonDock
 		[Category("FloatingWindow")]
 		public IEnumerable<LayoutFloatingWindowControl> FloatingWindows => _fwList;
 
+		/// <summary>
+		/// Docks the content of every floating window back into the layout and closes the windows.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Each piece of content goes back to the pane it was floated from, the same way the Dock command
+		/// of a single floating window does. Content that no longer knows that pane - it was created
+		/// inside a floating window, or the pane it came from was collected when it left - is placed the
+		/// way a newly added anchorable or document is.
+		/// </para>
+		/// <para>
+		/// This runs automatically when <see cref="AllowFloatingWindows"/> is turned off, which is what
+		/// makes that switch retroactive; it is public because emptying the desktop of floating windows
+		/// is also useful on its own, for a "reset windows" menu entry, say.
+		/// </para>
+		/// </remarks>
+		public void DockAllFloatingWindows()
+		{
+			var layout = Layout;
+			if (layout == null) return;
+
+			// Materialised before anything moves: docking mutates both the floating window collection and
+			// the trees hanging off it.
+			var floatingContents = layout.FloatingWindows
+				.SelectMany(fw => fw.Descendents().OfType<LayoutContent>())
+				.ToArray();
+
+			foreach (var content in floatingContents)
+			{
+				// Docking one piece of content can carry others with it, so only what is still floating
+				// is worth moving - and only that still has a Root for Dock to work with.
+				if (content.Root != layout) continue;
+				if (content.FindParent<LayoutFloatingWindow>() == null) continue;
+
+				if (HasDockablePreviousContainer(content))
+					content.Dock();
+				else
+					DockOutsideFloatingWindows(content);
+			}
+
+			layout.CollectGarbage();
+			CloseEmptiedFloatingWindows(layout);
+
+			// Runs again because closing the windows disconnects the panes that content may still name as
+			// the one to float back into, and those references have to go with them.
+			layout.CollectGarbage();
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether <see cref="LayoutContent.Dock"/> can be trusted to take the
+		/// given content out of its floating window.
+		/// </summary>
+		/// <param name="content">The floating content to test.</param>
+		/// <returns><see langword="true"/> when the content still knows a pane to go back to.</returns>
+		/// <remarks>
+		/// <see cref="LayoutContent.Dock"/> returns content to the pane it was floated from when that
+		/// pane is still known. Without one it searches the layout instead, and that search does not
+		/// exclude the panes inside floating windows, so it can put the content straight back into the
+		/// window it is being taken out of. That happens whenever floating emptied the pane the content
+		/// came from and garbage collection then removed it - in a layout with a single pane, always.
+		/// </remarks>
+		private static bool HasDockablePreviousContainer(LayoutContent content) =>
+			((ILayoutPreviousContainer)content).PreviousContainer is ILayoutElement previous
+			&& previous.Root == content.Root
+			&& previous.FindParent<LayoutFloatingWindow>() == null;
+
+		/// <summary>
+		/// Moves content out of its floating window and into a pane of the main layout by hand.
+		/// </summary>
+		/// <param name="content">The content to place.</param>
+		/// <remarks>
+		/// Used by <see cref="DockAllFloatingWindows"/> for content that no longer knows where it was
+		/// floated from. The pane is chosen the way the layout chooses one for newly added content, only
+		/// with the panes inside floating windows barred, and one is created when the layout has none
+		/// left to offer.
+		/// </remarks>
+		private void DockOutsideFloatingWindows(LayoutContent content)
+		{
+			var layout = Layout;
+			if (layout == null) return;
+
+			var wasFloating = content.IsFloating;
+
+			if (content is LayoutAnchorable anchorable)
+			{
+				var anchorablePane = layout.Descendents().OfType<LayoutAnchorablePane>()
+					.FirstOrDefault(pane => pane.FindParent<LayoutFloatingWindow>() == null);
+
+				if (anchorablePane == null)
+				{
+					anchorablePane = new LayoutAnchorablePane { DockWidth = new GridLength(200.0, GridUnitType.Pixel) };
+					EnsureRootPanel(layout).Children.Add(anchorablePane);
+				}
+
+				content.Parent?.RemoveChild(content);
+				anchorablePane.Children.Add(anchorable);
+			}
+			else
+			{
+				var documentPane = layout.Descendents().OfType<LayoutDocumentPane>()
+					.FirstOrDefault(pane => pane.FindParent<LayoutFloatingWindow>() == null);
+
+				if (documentPane == null)
+				{
+					documentPane = new LayoutDocumentPane();
+					EnsureRootPanel(layout).Children.Add(new LayoutDocumentPaneGroup(documentPane));
+				}
+
+				content.Parent?.RemoveChild(content);
+				documentPane.Children.Add(content);
+			}
+
+			// The pane it came from is inside a window that is about to close, so it is no place to
+			// float back into.
+			((ILayoutPreviousContainer)content).PreviousContainer = null;
+			content.PreviousContainerIndex = -1;
+			content.IsSelected = true;
+
+			// Docking through LayoutContent.Dock raises this, and callers must not be able to tell which
+			// of the two routes a piece of content took.
+			if (wasFloating && !content.IsFloating) RaiseContentDocked(content);
+		}
+
+		/// <summary>Returns the root panel of the layout, creating it when the layout has none.</summary>
+		/// <param name="layout">The layout to inspect.</param>
+		/// <returns>The root panel.</returns>
+		/// <remarks>
+		/// A layout that was never given a root panel has none, and there is nothing to add a pane to.
+		/// </remarks>
+		private static LayoutPanel EnsureRootPanel(LayoutRoot layout)
+		{
+			if (layout.RootPanel != null) return layout.RootPanel;
+
+			var panel = new LayoutPanel { Orientation = Orientation.Horizontal };
+			layout.RootPanel = panel;
+			return panel;
+		}
+
+		/// <summary>Closes the floating windows that no longer hold any content.</summary>
+		/// <param name="layout">The layout the windows belong to.</param>
+		/// <remarks>
+		/// <see cref="LayoutRoot.CollectGarbage"/> deliberately keeps an emptied floating window when a
+		/// content still names its pane as the one to float back into - that is what lets a docked
+		/// anchorable be floated again into the same window. Here that would leave the caller with the
+		/// very windows it asked to be rid of, so they are closed explicitly.
+		/// </remarks>
+		private void CloseEmptiedFloatingWindows(LayoutRoot layout)
+		{
+			foreach (var fwc in _fwList.ToArray())
+			{
+				if (fwc.Model == null || fwc.Model.Descendents().OfType<LayoutContent>().Any()) continue;
+				fwc.InternalClose();
+			}
+
+			// Models without a control of their own - a layout can be loaded with floating windows while
+			// AllowFloatingWindows is off, in which case no control was ever created for them.
+			foreach (var fw in layout.FloatingWindows.ToArray())
+			{
+				if (fw.Descendents().OfType<LayoutContent>().Any()) continue;
+				layout.FloatingWindows.Remove(fw);
+			}
+		}
+
 		/// <summary><see cref="LayoutItemTemplate"/> dependency property.</summary>
 		public static readonly DependencyProperty LayoutItemTemplateProperty = DependencyProperty.Register(nameof(LayoutItemTemplate), typeof(DataTemplate), typeof(DockingManager),
 				new FrameworkPropertyMetadata((DataTemplate)null, OnLayoutItemTemplateChanged));
@@ -1698,6 +1870,96 @@ namespace AvalonDock
 			set { SetValue(AllowMovingFloatingWindowWithKeyboardProperty, value); }
 		}
 
+		/// <summary><see cref="AllowFloatingWindows"/> dependency property.</summary>
+		public static readonly DependencyProperty AllowFloatingWindowsProperty = DependencyProperty.Register(nameof(AllowFloatingWindows), typeof(bool), typeof(DockingManager),
+				new FrameworkPropertyMetadata(true, OnAllowFloatingWindowsChanged));
+
+		/// <summary>
+		/// Gets or sets a value indicating whether content may be torn off into floating windows.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// This is the global switch for the whole feature, as opposed to
+		/// <see cref="LayoutContent.CanFloat"/>, which decides it for a single piece of content. While it
+		/// is <see langword="false"/> no floating window is created at all: dragging a tab or a tool
+		/// window title out of its pane, the Float command and <see cref="LayoutContent.Float"/> all do
+		/// nothing, and the command is reported as unavailable so the menu entries offering it are
+		/// disabled.
+		/// </para>
+		/// <para>
+		/// Setting it to <see langword="false"/> while floating windows are open docks their content
+		/// back into the layout, and a layout that is loaded afterwards is treated the same way, so the
+		/// setting cannot be circumvented by restoring a layout that was saved with floating windows in
+		/// it. Turning it back on does not reopen them.
+		/// </para>
+		/// </remarks>
+		[Bindable(true)]
+		[Description("Gets or sets a value indicating whether content can be torn off into floating windows.")]
+		[Category("FloatingWindow")]
+		public bool AllowFloatingWindows
+		{
+			get => (bool)GetValue(AllowFloatingWindowsProperty);
+			set => SetValue(AllowFloatingWindowsProperty, value);
+		}
+
+		/// <summary>Handles changes to the <see cref="AllowFloatingWindows"/> property.</summary>
+		private static void OnAllowFloatingWindowsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((DockingManager)d).OnAllowFloatingWindowsChanged(e);
+
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="AllowFloatingWindows"/> property.</summary>
+		/// <param name="e">The event data for the property change.</param>
+		protected virtual void OnAllowFloatingWindowsChanged(DependencyPropertyChangedEventArgs e)
+		{
+			if (!(bool)e.NewValue) DockAllFloatingWindows();
+
+			// The Float command reports itself unavailable while this is off, so every menu that offers
+			// it has to be asked again.
+			CommandManager.InvalidateRequerySuggested();
+		}
+
+		/// <summary><see cref="AllowDetachedWindows"/> dependency property.</summary>
+		public static readonly DependencyProperty AllowDetachedWindowsProperty = DependencyProperty.Register(nameof(AllowDetachedWindows), typeof(bool), typeof(DockingManager),
+				new FrameworkPropertyMetadata(true, OnAllowDetachedWindowsChanged));
+
+		/// <summary>
+		/// Gets or sets a value indicating whether anchorables may be moved into standalone top level
+		/// windows - the "Window" view mode that IDEs offer for their tool windows.
+		/// </summary>
+		/// <remarks>
+		/// <para>
+		/// Unlike a floating window, a standalone <see cref="DetachedAnchorableWindow"/> is an ordinary
+		/// operating system window: it owns a taskbar entry, minimizes on its own and may be moved behind
+		/// the main window. While this is <see langword="false"/>,
+		/// <see cref="DetachAnchorableToWindow(LayoutAnchorable)"/> does nothing and
+		/// <see cref="LayoutAnchorableItem.DetachToWindowCommand"/> is reported as unavailable, so the
+		/// menu entry offering the mode is disabled.
+		/// </para>
+		/// <para>
+		/// Setting it to <see langword="false"/> returns every anchorable that is already in a standalone
+		/// window to the layout, and a layout that is loaded afterwards has its detached anchorables
+		/// restored docked rather than in windows.
+		/// </para>
+		/// </remarks>
+		[Bindable(true)]
+		[Description("Gets or sets a value indicating whether anchorables can be moved into standalone top level windows.")]
+		[Category("Anchorable")]
+		public bool AllowDetachedWindows
+		{
+			get => (bool)GetValue(AllowDetachedWindowsProperty);
+			set => SetValue(AllowDetachedWindowsProperty, value);
+		}
+
+		/// <summary>Handles changes to the <see cref="AllowDetachedWindows"/> property.</summary>
+		private static void OnAllowDetachedWindowsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((DockingManager)d).OnAllowDetachedWindowsChanged(e);
+
+		/// <summary>Provides derived classes an opportunity to handle changes to the <see cref="AllowDetachedWindows"/> property.</summary>
+		/// <param name="e">The event data for the property change.</param>
+		protected virtual void OnAllowDetachedWindowsChanged(DependencyPropertyChangedEventArgs e)
+		{
+			if (!(bool)e.NewValue) ReattachAllDetachedAnchorables();
+
+			CommandManager.InvalidateRequerySuggested();
+		}
+
 		/// <summary><see cref="ShowNavigator"/> dependency property.</summary>
 		public static readonly DependencyProperty ShowNavigatorProperty = DependencyProperty.Register(nameof(ShowNavigator), typeof(bool), typeof(DockingManager),
 				new FrameworkPropertyMetadata(true));
@@ -1976,8 +2238,11 @@ namespace AvalonDock
 		/// <param name="contentModel">The layout content to host in the floating window.</param>
 		/// <param name="isContentImmutable">if set to <c>true</c>, the content cannot be changed while floating.</param>
 		/// <returns>The created floating window control, or <see langword="null"/> if no floating window can be created.</returns>
+		/// <remarks>Returns <see langword="null"/> while <see cref="AllowFloatingWindows"/> is <see langword="false"/>.</remarks>
 		public LayoutFloatingWindowControl CreateFloatingWindow(LayoutContent contentModel, bool isContentImmutable)
 		{
+			if (!AllowFloatingWindows) return null;
+
 			if (contentModel is LayoutAnchorable anchorable)
 			{
 				if (!(contentModel.Parent is ILayoutPane))
@@ -2046,6 +2311,7 @@ namespace AvalonDock
 			if (model is LayoutAnchorableFloatingWindow)
 			{
 				if (DesignerProperties.GetIsInDesignMode(this)) return null;
+				if (!AllowFloatingWindows) return null;
 				var modelFW = model as LayoutAnchorableFloatingWindow;
 				var newFW = new LayoutAnchorableFloatingWindowControl(modelFW)
 				{
@@ -2092,6 +2358,7 @@ namespace AvalonDock
 			{
 				if (DesignerProperties.GetIsInDesignMode(this))
 					return null;
+				if (!AllowFloatingWindows) return null;
 				var modelFW = model as LayoutDocumentFloatingWindow;
 				var newFW = new LayoutDocumentFloatingWindowControl(modelFW)
 				{
@@ -2157,6 +2424,7 @@ namespace AvalonDock
 		{
 			// Ensure window can float only if corresponding property is set accordingly
 			if (contentModel == null) return;
+			if (!AllowFloatingWindows) return;
 			if (!contentModel.CanFloat) return;
 
 			var floatingArgs = new ContentFloatingEventArgs(contentModel);
@@ -2217,6 +2485,8 @@ namespace AvalonDock
 		/// <param name="paneModel">The pane to float.</param>
 		internal virtual void StartDraggingFloatingWindowForPane(LayoutAnchorablePane paneModel)
 		{
+			if (!AllowFloatingWindows) return;
+
 			var firstContent = paneModel.Children.FirstOrDefault();
 			if (firstContent != null)
 			{
@@ -2581,9 +2851,11 @@ namespace AvalonDock
 		/// Closing the window returns the anchorable to the layout, as does
 		/// <see cref="ReattachAnchorable(LayoutAnchorable)"/>.
 		/// </para>
+		/// <para>Does nothing while <see cref="AllowDetachedWindows"/> is <see langword="false"/>.</para>
 		/// </remarks>
 		public void DetachAnchorableToWindow(LayoutAnchorable anchorable)
 		{
+			if (!AllowDetachedWindows) return;
 			if (anchorable == null || IsDetached(anchorable)) return;
 			if (!(GetLayoutItemFromModel(anchorable) is LayoutAnchorableItem layoutItem)) return;
 
@@ -3613,6 +3885,8 @@ namespace AvalonDock
 
 		private LayoutFloatingWindowControl CreateFloatingWindowForLayoutAnchorableWithoutParent(LayoutAnchorablePane paneModel, bool isContentImmutable)
 		{
+			if (!AllowFloatingWindows)
+				return null;
 			if (paneModel.Children.Any(c => !c.CanFloat))
 				return null;
 			var paneAsPositionableElement = paneModel as ILayoutPositionableElement;
@@ -3689,6 +3963,7 @@ namespace AvalonDock
 
 		private LayoutFloatingWindowControl CreateFloatingWindowCore(LayoutContent contentModel, bool isContentImmutable)
 		{
+			if (!AllowFloatingWindows) return null;
 			if (!contentModel.CanFloat) return null;
 			if (contentModel is LayoutAnchorable contentModelAsAnchorable && contentModelAsAnchorable.IsAutoHidden)
 				contentModelAsAnchorable.ToggleAutoHide();
