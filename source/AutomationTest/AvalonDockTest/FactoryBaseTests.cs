@@ -71,6 +71,8 @@ namespace AvalonDockTest
 		public IList<IDockable>? FloatingDockables { get; set; }
 		public IList<IDockable>? PinnedDockables { get; set; }
 		public IDockable? DefaultLayout { get; set; }
+		public bool AllowFloatingWindows { get; set; } = true;
+		public bool AllowDetachedWindows { get; set; } = true;
 		public void ShowWindows() { }
 		public void HideWindows() { }
 	}

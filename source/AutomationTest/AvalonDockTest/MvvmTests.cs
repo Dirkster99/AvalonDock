@@ -276,6 +276,33 @@ namespace AvalonDockTest
 		}
 
 		[Test]
+		public void RootDock_AllowsBothWindowKinds_ByDefault()
+		{
+			var root = new RootDock();
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(root.AllowFloatingWindows, Is.True);
+				Assert.That(root.AllowDetachedWindows, Is.True);
+			});
+		}
+
+		[Test]
+		public void RootDock_WindowPolicy_RaisesPropertyChanged()
+		{
+			var root = new RootDock();
+			var changed = new List<string?>();
+			root.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+			root.AllowFloatingWindows = false;
+			root.AllowDetachedWindows = false;
+
+			// The docking manager listens for these to follow the layout while it stays bound.
+			Assert.That(changed, Does.Contain(nameof(RootDock.AllowFloatingWindows)));
+			Assert.That(changed, Does.Contain(nameof(RootDock.AllowDetachedWindows)));
+		}
+
+		[Test]
 		public void Factory_CreateRootDock_ReturnsRootDock()
 		{
 			var factory = new Factory();

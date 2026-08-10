@@ -47,6 +47,8 @@ namespace AvalonDockTest
 			public int AutoHideDelay { get; set; }
 			public bool SupportsAutoHideFlyout => true;
 			public bool AllowMixedOrientation { get; set; }
+			public bool AllowFloatingWindows { get; set; } = true;
+			public bool AllowDetachedWindows { get; set; } = true;
 
 			public event EventHandler ActiveContentChanged;
 			public event EventHandler LayoutChanged;
