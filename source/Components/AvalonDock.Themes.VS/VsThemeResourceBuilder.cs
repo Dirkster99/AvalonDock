@@ -83,10 +83,6 @@ namespace AvalonDock.Themes.VS
 			SetBrush(dict, ResourceKeys.AutoHideTabHoveredBorder, palette.GetBackgroundOrDefault("AutoHideTabMouseOverBorder", accent));
 			SetBrush(dict, ResourceKeys.AutoHideTabHoveredText, palette.GetBackgroundOrDefault("AutoHideTabMouseOverText", accent));
 
-			// Toggle sidebar: same text color as the classic auto hide tabs, so the sidebar
-			// buttons and the "hidden panels" button match the rest of the theme.
-			SetBrush(dict, AvalonDock.Controls.ToggleDockButton.ForegroundBrushKey, palette.GetBackgroundOrDefault("AutoHideTabText", inactiveText));
-
 			// Document Well : Overflow Button
 			SetBrush(dict, ResourceKeys.DocumentWellOverflowButtonDefaultGlyph, palette.GetBackgroundOrDefault("DocWellOverflowButtonGlyph", inactiveText));
 			SetBrush(dict, ResourceKeys.DocumentWellOverflowButtonHoveredBackground, palette.GetBackgroundOrDefault("DocWellOverflowButtonMouseOverBackground", panelBorder));
