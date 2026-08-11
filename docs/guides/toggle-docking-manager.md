@@ -218,9 +218,11 @@ Button visual states are supplied by the active theme, mapped onto the brushes t
 | State | Appearance |
 |:------|:-----------|
 | Default | Theme auto-hide tab text color |
-| Hover | Theme auto-hide tab hover background |
+| Hover | Theme auto-hide tab hover background, plus a 2px accent stroke under the title |
 | Checked (docked) | Theme auto-hide tab background with a 1px tab border |
 | Focused (active panel) | Theme accent background with white text |
+
+Because the title is rotated 90°, the hover stroke sits on the button's right edge — visually beneath the text, the same relationship the auto-hide tab's accent border has to its own label. Title-only buttons also carry 4px of padding at each end so the text is not flush against the button edges; icon buttons reset that to keep their square.
 
 When no AvalonDock theme is applied, the fallback style in `generic.xaml` is used instead (light gray text on transparent, `#007ACC` focus). The foreground is exposed as `ToggleDockButton.ForegroundBrushKey` so the sidebar and the "hidden panels" button can be recolored from a single resource.
 

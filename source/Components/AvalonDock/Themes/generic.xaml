@@ -1489,7 +1489,8 @@
 			icon buttons square.
 		-->
 		<Setter Property="MinHeight" Value="{Binding ButtonSize, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=25}" />
-		<Setter Property="Padding" Value="0" />
+		<!--  Top/bottom breathing room for the rotated title; icon buttons reset it to 0.  -->
+		<Setter Property="Padding" Value="0,4" />
 		<Setter Property="Margin" Value="2" />
 		<Setter Property="FontSize" Value="10.5" />
 		<Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -1545,6 +1546,7 @@
 							<Setter TargetName="PART_Icon" Property="Visibility" Value="Visible" />
 							<Setter TargetName="PART_Text" Property="Visibility" Value="Collapsed" />
 							<Setter TargetName="PART_Icon" Property="Margin" Value="0" />
+							<Setter Property="Padding" Value="0" />
 							<Setter TargetName="ContentPanel" Property="LayoutTransform">
 								<Setter.Value>
 									<RotateTransform Angle="0" />
@@ -1556,6 +1558,7 @@
 							<Setter TargetName="PART_IconContent" Property="Visibility" Value="Visible" />
 							<Setter TargetName="PART_Text" Property="Visibility" Value="Collapsed" />
 							<Setter TargetName="PART_IconContent" Property="Margin" Value="0" />
+							<Setter Property="Padding" Value="0" />
 							<Setter TargetName="ContentPanel" Property="LayoutTransform">
 								<Setter.Value>
 									<RotateTransform Angle="0" />
@@ -1569,6 +1572,8 @@
 						</Trigger>
 						<Trigger Property="IsMouseOver" Value="True">
 							<Setter TargetName="Bd" Property="Background" Value="#30808080" />
+							<Setter TargetName="Bd" Property="BorderBrush" Value="#007ACC" />
+							<Setter TargetName="Bd" Property="BorderThickness" Value="0,0,2,0" />
 						</Trigger>
 						<Trigger Property="IsAnchorableFocused" Value="True">
 							<Setter TargetName="Bd" Property="Background" Value="#007ACC" />
