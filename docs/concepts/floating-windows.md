@@ -50,6 +50,89 @@ Set `CanFloat` to `false` on any content to prevent it from being floated:
 </avalonDock:LayoutAnchorable>
 ```
 
+### Turn Floating Off Entirely
+
+{: .new }
+> New in v5.0.0
+
+`CanFloat` is a decision per piece of content. `DockingManager.AllowFloatingWindows` is the switch for
+the whole feature — an application that wants a fixed layout, or one that manages its own windows,
+turns it off once:
+
+```xml
+<avalonDock:DockingManager AllowFloatingWindows="False" />
+```
+
+While it is `False`:
+
+- dragging a tab or a tool window title out of its pane does nothing,
+- the **Float** menu entry and `LayoutItem.FloatCommand` report themselves as unavailable, so the
+  entry is greyed out rather than silently doing nothing,
+- `LayoutContent.Float()` and `DockingManager.CreateFloatingWindow(...)` create no window — the latter
+  returns `null`,
+- a layout that is loaded with floating windows in it has that content docked back, so restoring a
+  layout saved while floating was allowed is not a way around the setting.
+
+Setting it to `False` while floating windows are open docks their content back where it came from.
+Turning it on again does not reopen them.
+
+`DockAllFloatingWindows()` performs that dock-back on its own, which is useful for a "reset windows"
+menu entry even when floating stays allowed.
+
+### Turn Standalone Windows Off
+
+`DockingManager.AllowDetachedWindows` does the same for the standalone "Window" view mode described
+[below](#standalone-windows-window-view-mode):
+
+```xml
+<avalonDock:DockingManager AllowDetachedWindows="False" />
+```
+
+While it is `False`, `DetachAnchorableToWindow` does nothing, `DetachToWindowCommand` is unavailable
+so the **View Mode → Window** entry is disabled, and a layout that was saved with a detached tool
+window is restored with that window docked. Setting it to `False` returns anchorables that are
+already in standalone windows.
+
+The two switches are independent: floating windows can be allowed while standalone windows are not,
+and the other way round.
+
+### MVVM and Dependency Injection
+
+Both switches are also on the MVVM layout, so an application that builds its layout from view models
+never has to reach into the view:
+
+```csharp
+dockService.Layout.AllowFloatingWindows = false;
+dockService.Layout.AllowDetachedWindows = false;
+```
+
+`IRootDock` carries them and the `DockingManager` follows the layout it is bound to through
+`DockLayout`, including later changes.
+
+{: .warning }
+> The layout wins. Binding `DockLayout` applies the layout's values to the manager, so a
+> `DockingManager` that sets `AllowFloatingWindows="False"` in XAML *and* binds a `DockLayout` whose
+> root dock leaves it at the default has floating switched back on. Set the switches in one place —
+> either on the manager or on the layout, not both.
+
+With `AvalonDock.DependencyInjection` they are part of the registration, and are applied to the layout
+for you:
+
+```csharp
+services.AddDockLayoutService(dock =>
+{
+    dock.AddToolbox<ExplorerViewModel>();
+    dock.ConfigureDocking(o =>
+    {
+        o.AllowFloatingWindows = false;
+        o.AllowDetachedWindows = false;
+    });
+});
+```
+
+`ToggleDockOptions` derives from `DockingOptions`, so an application configuring the toggle docking
+manager sets them on that same options object via `ConfigureToggleDock`.
+
 ### Float Programmatically
 
 ```csharp
@@ -157,6 +240,7 @@ the content to the layout.
 | `ReattachAllDetachedAnchorables()` | `void` | Returns every detached anchorable. |
 | `IsDetached(anchorable)` | `bool` | Whether that anchorable is currently in a standalone window. |
 | `DetachedAnchorables` | `IEnumerable<LayoutAnchorable>` | The anchorables currently in standalone windows. |
+| `AllowDetachedWindows` | `bool` | Whether the mode is available at all. See [Turn Standalone Windows Off](#turn-standalone-windows-off). |
 
 ### What Happens to the Layout
 

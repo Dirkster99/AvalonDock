@@ -362,7 +362,11 @@ namespace AvalonDock.Controls
 		/// <summary>Coerces the <see cref="FloatCommand"/> value.</summary>
 		private static object CoerceFloatCommandValue(DependencyObject d, object value) => value;
 
-		private bool CanExecuteFloatCommand(object anchorable) => LayoutElement != null && LayoutElement.CanFloat && LayoutElement.FindParent<LayoutFloatingWindow>() == null;
+		private bool CanExecuteFloatCommand(object anchorable) =>
+			LayoutElement != null
+			&& LayoutElement.CanFloat
+			&& LayoutElement.Root?.Manager?.AllowFloatingWindows != false
+			&& LayoutElement.FindParent<LayoutFloatingWindow>() == null;
 
 		/// <summary>Executes to float the content of this LayoutItem in a separate <see cref="LayoutFloatingWindowControl"/>.</summary>
 		/// <param name="parameter">The command parameter.</param>

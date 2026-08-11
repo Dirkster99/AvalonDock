@@ -208,6 +208,24 @@ public partial class MainViewModel : ObservableObject
 
 See [ToggleDockingManager]({% link guides/toggle-docking-manager.md %}) for the full guide on zones, button customization, and layout priority.
 
+### Window Policy from the Layout
+
+{: .new }
+> New in v5.0.0
+
+`IRootDock` carries the two manager-wide window switches, so an application decides them in the view
+model rather than in the view:
+
+```csharp
+dockService.Layout.AllowFloatingWindows = false;   // No tear-off into floating windows
+dockService.Layout.AllowDetachedWindows = false;   // No standalone "Window" view mode
+```
+
+A `DockingManager` bound through `DockLayout` applies them when the layout is bound and follows any
+later change. With `AvalonDock.DependencyInjection` you can set them at registration instead — see
+[Dependency Injection]({% link guides/dependency-injection.md %}). For what each switch turns off, see
+[Floating Windows]({% link concepts/floating-windows.md %}).
+
 ---
 
 ## Classic Approach: DocumentsSource + AnchorablesSource

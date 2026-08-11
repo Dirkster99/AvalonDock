@@ -161,6 +161,120 @@ namespace AvalonDockTest
 			Assert.That(options.DefaultDockHeight, Is.EqualTo(200));
 		}
 
+		/// <summary>
+		/// Configuring a builder registers the options, even when the builder is driven directly rather
+		/// than through <c>AddDockLayoutService</c>.
+		/// </summary>
+		/// <remarks>
+		/// <see cref="DockLayoutBuilder"/> is public and has a public constructor, so this has to keep
+		/// working the way it did before the options object was shared between the configure methods.
+		/// </remarks>
+		[Test]
+		public void DockLayoutBuilder_UsedDirectly_ConfigureToggleDock_RegistersOptions()
+		{
+			var services = new ServiceCollection();
+			var builder = new DockLayoutBuilder(services);
+
+			builder.ConfigureToggleDock(opts => opts.ButtonSize = 42);
+
+			var provider = services.BuildServiceProvider();
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(provider.GetRequiredService<ToggleDockOptions>().ButtonSize, Is.EqualTo(42));
+				Assert.That(provider.GetRequiredService<DockingOptions>(), Is.SameAs(provider.GetRequiredService<ToggleDockOptions>()));
+			});
+		}
+
+		[Test]
+		public void AddDockLayoutService_Builder_ConfigureToggleDock_RegistersOptionsOnlyOnce()
+		{
+			var services = new ServiceCollection();
+			services.AddDockLayoutService(dock =>
+			{
+				dock.ConfigureToggleDock(opts => opts.ButtonSize = 32);
+				dock.ConfigureDocking(o => o.AllowFloatingWindows = false);
+			});
+
+			var provider = services.BuildServiceProvider();
+
+			// Both configure calls plus AddDockLayoutService feed one instance, so resolving the whole
+			// set has to come back with exactly that one.
+			Assert.That(provider.GetServices<ToggleDockOptions>().Count(), Is.EqualTo(1));
+		}
+
+		[Test]
+		public void AddDockLayoutService_Builder_ConfigureDocking_AppliesWindowPolicyToLayout()
+		{
+			var services = new ServiceCollection();
+			services.AddDockLayoutService(dock =>
+			{
+				dock.AddToolbox<DiTestToolbox>();
+				dock.ConfigureDocking(o =>
+				{
+					o.AllowFloatingWindows = false;
+					o.AllowDetachedWindows = false;
+				});
+			});
+
+			var provider = services.BuildServiceProvider();
+			var options = provider.GetRequiredService<DockingOptions>();
+			var layout = provider.GetRequiredService<IDockLayoutService>().Layout;
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(options.AllowFloatingWindows, Is.False);
+				Assert.That(options.AllowDetachedWindows, Is.False);
+
+				// The layout is what a DockingManager binds to, so this is what makes the options take
+				// effect without any code in the window.
+				Assert.That(layout.AllowFloatingWindows, Is.False);
+				Assert.That(layout.AllowDetachedWindows, Is.False);
+			});
+		}
+
+		[Test]
+		public void AddDockLayoutService_Builder_ConfigureToggleDock_SharesTheDockingOptions()
+		{
+			var services = new ServiceCollection();
+			services.AddDockLayoutService(dock =>
+			{
+				dock.ConfigureToggleDock(opts =>
+				{
+					opts.ButtonSize = 32;
+					opts.AllowFloatingWindows = false;
+				});
+			});
+
+			var provider = services.BuildServiceProvider();
+			var toggleOptions = provider.GetRequiredService<ToggleDockOptions>();
+			var dockingOptions = provider.GetRequiredService<DockingOptions>();
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(dockingOptions, Is.SameAs(toggleOptions),
+					"Both types have to resolve to one object, or the two configure calls would disagree.");
+				Assert.That(toggleOptions.AllowFloatingWindows, Is.False);
+				Assert.That(toggleOptions.AllowDetachedWindows, Is.True);
+			});
+		}
+
+		[Test]
+		public void AddDockLayoutService_Builder_WithoutConfiguring_LeavesBothWindowKindsAvailable()
+		{
+			var services = new ServiceCollection();
+			services.AddDockLayoutService(dock => dock.AddToolbox<DiTestToolbox>());
+
+			var provider = services.BuildServiceProvider();
+			var layout = provider.GetRequiredService<IDockLayoutService>().Layout;
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(layout.AllowFloatingWindows, Is.True);
+				Assert.That(layout.AllowDetachedWindows, Is.True);
+			});
+		}
+
 		[Test]
 		public void AddDockLayoutService_Builder_ReturnsSameServiceCollection_ForChaining()
 		{
@@ -600,6 +714,8 @@ namespace AvalonDockTest
 		public int AutoHideDelay { get; set; }
 		public bool SupportsAutoHideFlyout => true;
 		public bool AllowMixedOrientation { get; set; }
+		public bool AllowFloatingWindows { get; set; } = true;
+		public bool AllowDetachedWindows { get; set; } = true;
 		public ISerializableLayoutRoot? Layout
 		{
 			get => null;
