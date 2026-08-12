@@ -8,7 +8,7 @@ description: "Build a modern AvalonDock application using the v5 DI architecture
 
 # Tutorial: Dependency Injection Deep Dive
 
-This tutorial builds on the [MVVM IDE tutorial]({% link tutorials/mvvm-ide.md %}) and provides a detailed walkthrough of every DI extension method, registration pattern, and configuration option available in AvalonDock v5. Use this as a reference when scaling your application.
+This tutorial builds on the [MVVM IDE tutorial]({{ site.baseurl }}{% link tutorials/mvvm-ide.md %}) and provides a detailed walkthrough of every DI extension method, registration pattern, and configuration option available in AvalonDock v5. Use this as a reference when scaling your application.
 
 {: .tip }
 This tutorial covers the same DI patterns used in the `AvalonDockCodeApp` sample project — the reference implementation for AvalonDock v5.
@@ -354,8 +354,8 @@ public void OpenFile_CreatesDocument()
 
 ## Next Steps
 
-- Follow the [MVVM IDE tutorial]({% link tutorials/mvvm-ide.md %}) for a complete step-by-step walkthrough
-- Add [Layout Persistence]({% link tutorials/layout-persistence.md %}) to save and restore layouts
-- Apply [Custom Themes]({% link tutorials/styling-and-theming.md %}) to match your brand
+- Follow the [MVVM IDE tutorial]({{ site.baseurl }}{% link tutorials/mvvm-ide.md %}) for a complete step-by-step walkthrough
+- Add [Layout Persistence]({{ site.baseurl }}{% link tutorials/layout-persistence.md %}) to save and restore layouts
+- Apply [Custom Themes]({{ site.baseurl }}{% link tutorials/styling-and-theming.md %}) to match your brand
 - See the `AvalonDockCodeApp` project in the repository for the complete reference implementation
-- Review all [DI extension methods]({% link guides/dependency-injection.md %}) in the reference guide
+- Review all [DI extension methods]({{ site.baseurl }}{% link guides/dependency-injection.md %}) in the reference guide

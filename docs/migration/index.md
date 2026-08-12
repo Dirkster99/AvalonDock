@@ -183,7 +183,7 @@ After making all changes:
 
 ## Breaking Changes Summary
 
-See the detailed [Breaking Changes]({% link migration/breaking-changes.md %}) page for a complete list.
+See the detailed [Breaking Changes]({{ site.baseurl }}{% link migration/breaking-changes.md %}) page for a complete list.
 
 ---
 

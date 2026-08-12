@@ -11,7 +11,7 @@ description: "How to use AvalonDock with the MVVM pattern."
 AvalonDock v5 provides first-class support for the MVVM pattern through the `AvalonDock.Mvvm` and `AvalonDock.Core` packages. This guide covers both the **v5 recommended approach** (using `IDockLayoutService` + DI) and the **classic approach** (using `DocumentsSource`/`AnchorablesSource`).
 
 {: .tip }
-For a full step-by-step tutorial, see [Tutorial: MVVM IDE Application]({% link tutorials/mvvm-ide.md %}). The `AvalonDockCodeApp` sample project in the repository is the reference implementation.
+For a full step-by-step tutorial, see [Tutorial: MVVM IDE Application]({{ site.baseurl }}{% link tutorials/mvvm-ide.md %}). The `AvalonDockCodeApp` sample project in the repository is the reference implementation.
 
 ---
 
@@ -206,7 +206,7 @@ public partial class MainViewModel : ObservableObject
 </avalonDock:ToggleDockingManager>
 ```
 
-See [ToggleDockingManager]({% link guides/toggle-docking-manager.md %}) for the full guide on zones, button customization, and layout priority.
+See [ToggleDockingManager]({{ site.baseurl }}{% link guides/toggle-docking-manager.md %}) for the full guide on zones, button customization, and layout priority.
 
 ### Window Policy from the Layout
 
@@ -223,8 +223,8 @@ dockService.Layout.AllowDetachedWindows = false;   // No standalone "Window" vie
 
 A `DockingManager` bound through `DockLayout` applies them when the layout is bound and follows any
 later change. With `AvalonDock.DependencyInjection` you can set them at registration instead — see
-[Dependency Injection]({% link guides/dependency-injection.md %}). For what each switch turns off, see
-[Floating Windows]({% link concepts/floating-windows.md %}).
+[Dependency Injection]({{ site.baseurl }}{% link guides/dependency-injection.md %}). For what each switch turns off, see
+[Floating Windows]({{ site.baseurl }}{% link concepts/floating-windows.md %}).
 
 ---
 

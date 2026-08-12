@@ -55,7 +55,7 @@ System.Windows.Controls.Control
 | Property | Type | Description |
 |:---------|:-----|:------------|
 | `AllowMixedOrientation` | `bool` | Allow panels with mixed horizontal/vertical orientation. |
-| `AllowFloatingWindows` | `bool` | Whether content can be torn off into floating windows at all. Default `true`. See [Floating Windows]({% link concepts/floating-windows.md %}). |
+| `AllowFloatingWindows` | `bool` | Whether content can be torn off into floating windows at all. Default `true`. See [Floating Windows]({{ site.baseurl }}{% link concepts/floating-windows.md %}). |
 | `AllowDetachedWindows` | `bool` | Whether anchorables can be moved into standalone top level windows ("Window" view mode). Default `true`. |
 | `ShowSystemMenu` | `bool` | Show system menu on floating windows. |
 | `AllowDrop` | `bool` | Enable drag-and-drop docking (inherited from WPF). |
@@ -76,7 +76,7 @@ System.Windows.Controls.Control
 |:-------|:--------|:------------|
 | `GetFloatingWindows()` | `IEnumerable<LayoutFloatingWindowControl>` | Get all active floating windows. |
 | `DockAllFloatingWindows()` | `void` | Dock the content of every floating window back into the layout and close the windows. |
-| `DetachAnchorableToWindow(anchorable)` | `void` | Move the content of an anchorable into a standalone top level window. See [Floating Windows]({% link concepts/floating-windows.md %}). |
+| `DetachAnchorableToWindow(anchorable)` | `void` | Move the content of an anchorable into a standalone top level window. See [Floating Windows]({{ site.baseurl }}{% link concepts/floating-windows.md %}). |
 | `ReattachAnchorable(anchorable)` | `void` | Close that window and return the content to the layout. |
 | `ReattachAllDetachedAnchorables()` | `void` | Return every detached anchorable to the layout. |
 | `IsDetached(anchorable)` | `bool` | Whether the anchorable is currently hosted by a standalone window. |

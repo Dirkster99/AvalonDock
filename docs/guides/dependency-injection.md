@@ -11,7 +11,7 @@ description: "Register AvalonDock services with dependency injection."
 AvalonDock v5 provides built-in support for `Microsoft.Extensions.DependencyInjection` through the `AvalonDock.DependencyInjection` package.
 
 {: .tip }
-For a full walkthrough, see [Tutorial: Dependency Injection Deep Dive]({% link tutorials/dependency-injection-app.md %}). The `AvalonDockCodeApp` sample project demonstrates all DI patterns.
+For a full walkthrough, see [Tutorial: Dependency Injection Deep Dive]({{ site.baseurl }}{% link tutorials/dependency-injection-app.md %}). The `AvalonDockCodeApp` sample project demonstrates all DI patterns.
 
 ---
 
@@ -145,7 +145,7 @@ These are applied to the layout of `IDockLayoutService`, so a `DockingManager` b
 through `DockLayout` picks them up on its own — nothing has to be copied over in the code-behind of
 the window. Both `DockingOptions` and `ToggleDockOptions` resolve to the same registered instance.
 
-See [Floating Windows]({% link concepts/floating-windows.md %}) for what each switch turns off.
+See [Floating Windows]({{ site.baseurl }}{% link concepts/floating-windows.md %}) for what each switch turns off.
 
 ### Layout Priority Modes
 
