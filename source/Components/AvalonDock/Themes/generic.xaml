@@ -1469,15 +1469,28 @@
 
 	</Style>
 
+	<!--
+		Fallback foreground for the toggle sidebar, used when no AvalonDock theme is applied.
+		Every theme dictionary redefines this key from its own auto hide tab text brush so that
+		the sidebar buttons and the "hidden panels" button match the rest of the theme.
+	-->
+	<SolidColorBrush x:Key="{x:Static avalonDockControls:ToggleDockButton.ForegroundBrushKey}" Color="#C5C5C5" />
+
 	<!--  ToggleDockButton - modern square borderless styling  -->
 	<Style x:Key="{x:Type avalonDockControls:ToggleDockButton}" TargetType="{x:Type avalonDockControls:ToggleDockButton}">
 		<Setter Property="Background" Value="Transparent" />
 		<Setter Property="BorderBrush" Value="Transparent" />
 		<Setter Property="BorderThickness" Value="0" />
-		<Setter Property="Foreground" Value="#C5C5C5" />
+		<Setter Property="Foreground" Value="{DynamicResource {x:Static avalonDockControls:ToggleDockButton.ForegroundBrushKey}}" />
 		<Setter Property="Width" Value="{Binding ButtonSize, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=25}" />
-		<Setter Property="Height" Value="{Binding ButtonSize, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=25}" />
-		<Setter Property="Padding" Value="0" />
+		<!--
+			Only the bar-width axis is pinned to ButtonSize. The height is free so that a button
+			without an icon grows with its (rotated) title instead of clipping it; MinHeight keeps
+			icon buttons square.
+		-->
+		<Setter Property="MinHeight" Value="{Binding ButtonSize, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=25}" />
+		<!--  Top/bottom breathing room for the rotated title; icon buttons reset it to 0.  -->
+		<Setter Property="Padding" Value="0,4" />
 		<Setter Property="Margin" Value="2" />
 		<Setter Property="FontSize" Value="10.5" />
 		<Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -1514,11 +1527,17 @@
 								Margin="0,0,3,0"
 								VerticalAlignment="Center"
 								Visibility="Collapsed" />
-							<!-- Title text -->
+							<!--
+								Title text. Rendered through the DockingManager's AnchorableHeaderTemplate,
+								the same DataTemplate the classic auto hide tabs use, so an icon-less button
+								matches the rest of the theme (and honours a custom header template).
+							-->
 							<ContentPresenter x:Name="PART_Text"
 								HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
 								VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-								RecognizesAccessKey="True" />
+								Content="{Binding Anchorable, RelativeSource={RelativeSource TemplatedParent}}"
+								ContentTemplate="{Binding AnchorableHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
+								ContentTemplateSelector="{Binding AnchorableHeaderTemplateSelector, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}" />
 						</StackPanel>
 					</Border>
 					<ControlTemplate.Triggers>
@@ -1527,6 +1546,7 @@
 							<Setter TargetName="PART_Icon" Property="Visibility" Value="Visible" />
 							<Setter TargetName="PART_Text" Property="Visibility" Value="Collapsed" />
 							<Setter TargetName="PART_Icon" Property="Margin" Value="0" />
+							<Setter Property="Padding" Value="0" />
 							<Setter TargetName="ContentPanel" Property="LayoutTransform">
 								<Setter.Value>
 									<RotateTransform Angle="0" />
@@ -1538,23 +1558,27 @@
 							<Setter TargetName="PART_IconContent" Property="Visibility" Value="Visible" />
 							<Setter TargetName="PART_Text" Property="Visibility" Value="Collapsed" />
 							<Setter TargetName="PART_IconContent" Property="Margin" Value="0" />
+							<Setter Property="Padding" Value="0" />
 							<Setter TargetName="ContentPanel" Property="LayoutTransform">
 								<Setter.Value>
 									<RotateTransform Angle="0" />
 								</Setter.Value>
 							</Setter>
 						</DataTrigger>
-						<Trigger Property="IsMouseOver" Value="True">
-								<Setter TargetName="Bd" Property="Background" Value="#30808080" />
-						</Trigger>
+						<!--  Ordered so that hover wins over checked and focus wins over both.  -->
 						<Trigger Property="IsChecked" Value="True">
-								<Setter TargetName="Bd" Property="Background" Value="#25808080" />
-								<Setter Property="Foreground" Value="#6B6B6B" />
-							</Trigger>
-							<Trigger Property="IsAnchorableFocused" Value="True">
-									<Setter TargetName="Bd" Property="Background" Value="#007ACC" />
-									<Setter Property="Foreground" Value="White" />
-							</Trigger>
+							<Setter TargetName="Bd" Property="Background" Value="#25808080" />
+							<Setter Property="Foreground" Value="#6B6B6B" />
+						</Trigger>
+						<Trigger Property="IsMouseOver" Value="True">
+							<Setter TargetName="Bd" Property="Background" Value="#30808080" />
+							<Setter TargetName="Bd" Property="BorderBrush" Value="#007ACC" />
+							<Setter TargetName="Bd" Property="BorderThickness" Value="0,0,2,0" />
+						</Trigger>
+						<Trigger Property="IsAnchorableFocused" Value="True">
+							<Setter TargetName="Bd" Property="Background" Value="#007ACC" />
+							<Setter Property="Foreground" Value="White" />
+						</Trigger>
 					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
