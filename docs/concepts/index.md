@@ -15,7 +15,7 @@ Understand the fundamental concepts behind AvalonDock's architecture, layout mod
 
 | Topic | Description |
 |:------|:------------|
-| [Architecture]({% link concepts/architecture.md %}) | High-level architecture and component layers. |
-| [Layout Model]({% link concepts/layout-model.md %}) | The tree-based layout model that drives docking. |
-| [Documents & Anchorables]({% link concepts/documents-and-anchorables.md %}) | The two content types and when to use each. |
-| [Floating Windows]({% link concepts/floating-windows.md %}) | How floating windows work and are managed. |
+| [Architecture]({{ site.baseurl }}{% link concepts/architecture.md %}) | High-level architecture and component layers. |
+| [Layout Model]({{ site.baseurl }}{% link concepts/layout-model.md %}) | The tree-based layout model that drives docking. |
+| [Documents & Anchorables]({{ site.baseurl }}{% link concepts/documents-and-anchorables.md %}) | The two content types and when to use each. |
+| [Floating Windows]({{ site.baseurl }}{% link concepts/floating-windows.md %}) | How floating windows work and are managed. |

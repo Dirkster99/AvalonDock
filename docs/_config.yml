@@ -5,6 +5,18 @@ description: >-
 url: "https://dirkster99.github.io"
 baseurl: "/AvalonDock"
 
+# This is a GitHub Pages *project* site, so every internal URL must carry the
+# "/AvalonDock" baseurl above. The site is built by actions/jekyll-build-pages
+# (the github-pages gem => Jekyll 3.x), where {% link %} expands to the page's
+# bare url *without* the baseurl. In-page links must therefore be written as:
+#
+#     [Text]({{ site.baseurl }}{% link some/page.md %})
+#
+# NOTE: Jekyll 4 changed {% link %} to apply the relative_url filter itself, so
+# it already includes the baseurl. If .github/workflows/docs.yml is ever moved
+# to Jekyll 4, drop the {{ site.baseurl }} prefixes or every link will resolve
+# to "/AvalonDock/AvalonDock/...".
+
 remote_theme: just-the-docs/just-the-docs@v0.10.0
 
 permalink: pretty

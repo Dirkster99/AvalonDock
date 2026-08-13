@@ -175,7 +175,7 @@ services.AddDockLayoutService(dock =>
 });
 ```
 
-See [MVVM Integration]({% link guides/mvvm.md %}) for the full pattern.
+See [MVVM Integration]({{ site.baseurl }}{% link guides/mvvm.md %}) for the full pattern.
 
 ---
 
