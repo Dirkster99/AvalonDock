@@ -1402,9 +1402,25 @@
 								Grid.Column="1"
 								HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
 								VerticalAlignment="{TemplateBinding VerticalAlignment}"
-								Content="{TemplateBinding AutoHideWindow}" />
+								Content="{TemplateBinding AutoHideWindow}"
+								IsHitTestVisible="False" />
 						</Grid>
 					</Border>
+					<ControlTemplate.Triggers>
+						<!-- PART_AutoHideArea is stretched over the same cell as LayoutRootPanel (the whole
+						     document/tool area) so a flyout can render on top of it while a pane is
+						     auto-hidden, but its AutoHideWindow content exists for the DockingManager's
+						     whole lifetime (SetupAutoHideWindow assigns it unconditionally) and only
+						     toggles Visibility - it is never actually removed. On the portable (non-Windows)
+						     hit-testing path this ContentPresenter itself was found to be hit even while
+						     its content is Hidden, silently swallowing every drag-drop (e.g. a toolbox item
+						     dropped onto a WpfDesign canvas underneath) that lands anywhere over the central
+						     docking area. Keep it hit-test-inert except while an auto-hide flyout is
+						     actually showing. -->
+						<DataTrigger Binding="{Binding AutoHideWindow.Visibility, RelativeSource={RelativeSource TemplatedParent}}" Value="Visible">
+							<Setter TargetName="PART_AutoHideArea" Property="IsHitTestVisible" Value="True" />
+						</DataTrigger>
+					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
