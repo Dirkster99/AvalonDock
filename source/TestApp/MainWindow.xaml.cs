@@ -82,6 +82,24 @@ namespace TestApp
 		private void RefreshInputDiagnostics()
 		{
 			AddInputDiagnostics(dockManager, "manager");
+
+			// The main menu is instrumented too: menus not opening on click needs to distinguish
+			// "the click never arrives" from "it arrives but menu mode does not engage".
+			if (mainMenu != null)
+			{
+				AddInputDiagnostics(mainMenu, "menu");
+				foreach (var item in mainMenu.Items.OfType<MenuItem>())
+				{
+					AddInputDiagnostics(item, $"menuitem:{item.Header}");
+					InstallMenuTrace(item);
+				}
+
+				// Menus close when their owner window deactivates; if opening a popup deactivates the
+				// main window we would see open-then-immediate-close here.
+				Activated += (s, e) => TraceMenu("window.Activated");
+				Deactivated += (s, e) => TraceMenu("window.Deactivated");
+			}
+
 			foreach (var root in GetAvalonDockVisualRoots())
 			{
 				foreach (var title in FindVisualDescendants<AnchorablePaneTitle>(root))
@@ -90,6 +108,46 @@ namespace TestApp
 					AddInputDiagnostics(tab, $"anchorable-tab:{tab.Model?.ContentId}");
 				foreach (var resizer in FindVisualDescendants<LayoutGridResizerControl>(root))
 					AddInputDiagnostics(resizer, "anchorable-resizer");
+			}
+		}
+
+		private readonly List<string> _menuTrace = new List<string>();
+
+		private void TraceMenu(string message)
+		{
+			lock (_menuTrace)
+			{
+				if (_menuTrace.Count < 400)
+					_menuTrace.Add(DateTime.Now.ToString("HH:mm:ss.fff ") + message);
+			}
+		}
+
+		/// <summary>
+		/// Records what a click actually does to a top-level menu item: whether Click fires, whether
+		/// IsSubmenuOpen is set at all, and whether it is immediately cleared again (which would mean
+		/// something dismisses the menu rather than it never opening).
+		/// </summary>
+		private void InstallMenuTrace(MenuItem item)
+		{
+			var header = item.Header?.ToString();
+			item.Click += (s, e) => TraceMenu($"{header}.Click");
+			item.SubmenuOpened += (s, e) => TraceMenu($"{header}.SubmenuOpened");
+			item.SubmenuClosed += (s, e) => TraceMenu($"{header}.SubmenuClosed");
+
+			var descriptor = System.ComponentModel.DependencyPropertyDescriptor.FromProperty(
+				MenuItem.IsSubmenuOpenProperty, typeof(MenuItem));
+			descriptor?.AddValueChanged(item, (s, e) =>
+				TraceMenu($"{header}.IsSubmenuOpen={item.IsSubmenuOpen} captured={Mouse.Captured?.GetType().Name ?? "null"} active={IsActive}"));
+		}
+
+		[DevFlowAction("avd.menu.trace", Description = "Returns (and clears) the recorded menu open/close trace")]
+		public string MenuTrace()
+		{
+			lock (_menuTrace)
+			{
+				var text = _menuTrace.Count == 0 ? "(no menu events recorded)" : string.Join("\n", _menuTrace);
+				_menuTrace.Clear();
+				return text;
 			}
 		}
 
@@ -825,6 +883,99 @@ namespace TestApp
 			return System.Text.Json.JsonSerializer.Serialize(result);
 		}
 
+		[DevFlowAction("avd.menu.capture-test",
+			Description = "Diagnostic: attempts the subtree mouse capture that WPF's menu mode requires " +
+			              "(Mouse.Capture(menu, CaptureMode.SubTree)) and reports whether it succeeds. " +
+			              "Menus open on click only if this capture takes; run it with and without a " +
+			              "floating window present to see whether extra windows break it.")]
+		public string MenuCaptureTest()
+		{
+			var report = new Dictionary<string, object>
+			{
+				["capturedBefore"] = Mouse.Captured?.GetType().FullName,
+				["windowCount"] = Application.Current.Windows.Count,
+				["floatingWindowCount"] = dockManager.FloatingWindows.Count(),
+				["mainWindowIsActive"] = IsActive,
+				["menuSource"] = PresentationSource.FromVisual(mainMenu)?.GetType().Name,
+			};
+
+			bool captured;
+			try
+			{
+				captured = Mouse.Capture(mainMenu, CaptureMode.SubTree);
+				report["captureResult"] = captured;
+				report["capturedAfter"] = Mouse.Captured?.GetType().FullName;
+			}
+			catch (Exception ex)
+			{
+				report["captureResult"] = ex.GetType().Name + ": " + ex.Message;
+				captured = false;
+			}
+
+			if (captured) Mouse.Capture(null);
+
+			// Which source does the mouse device consider active? If it is not the main window's,
+			// a capture request targeting an element in the main window is refused.
+			try
+			{
+				var pi = typeof(MouseDevice).GetProperty("CriticalActiveSource",
+					System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+				report["mouseActiveSource"] = (pi?.GetValue(Mouse.PrimaryDevice) as PresentationSource)?.RootVisual?.GetType().Name;
+			}
+			catch (Exception ex) { report["mouseActiveSource"] = "err: " + ex.Message; }
+
+			return System.Text.Json.JsonSerializer.Serialize(report);
+		}
+
+		[DevFlowAction("avd.menu.probe",
+			Description = "Diagnostic: reports the main menu's items and tries to open one submenu " +
+			              "programmatically (IsSubmenuOpen=true), capturing any exception. Separates " +
+			              "'menu mode / popup cannot open at all' from 'the click never reaches it'.")]
+		public string MenuProbe(string header = "Layout")
+		{
+			var items = mainMenu.Items.OfType<MenuItem>().ToList();
+			var report = new Dictionary<string, object>
+			{
+				["menuIsEnabled"] = mainMenu.IsEnabled,
+				["menuIsVisible"] = mainMenu.IsVisible,
+				["items"] = items.Select(i => new Dictionary<string, object>
+				{
+					["header"] = i.Header?.ToString(),
+					["isEnabled"] = i.IsEnabled,
+					["role"] = i.Role.ToString(),
+					["itemCount"] = i.Items.Count,
+				}).ToList(),
+			};
+
+			var target = items.FirstOrDefault(i => string.Equals(i.Header?.ToString(), header, StringComparison.OrdinalIgnoreCase));
+			if (target == null)
+			{
+				report["error"] = $"no top-level menu item with header '{header}'";
+				return System.Text.Json.JsonSerializer.Serialize(report);
+			}
+
+			try
+			{
+				target.IsSubmenuOpen = true;
+				report["setIsSubmenuOpen"] = "ok";
+			}
+			catch (Exception ex)
+			{
+				report["setIsSubmenuOpen"] = ex.GetType().FullName + ": " + ex.Message;
+			}
+
+			report["isSubmenuOpenAfter"] = target.IsSubmenuOpen;
+
+			// If the submenu really opened, its popup child should now have a presentation source.
+			var popup = target.Template?.FindName("PART_Popup", target) as System.Windows.Controls.Primitives.Popup;
+			report["popupFound"] = popup != null;
+			report["popupIsOpen"] = popup?.IsOpen;
+			if (popup?.Child != null)
+				report["popupChildSource"] = PresentationSource.FromVisual(popup.Child)?.GetType().Name;
+
+			return System.Text.Json.JsonSerializer.Serialize(report);
+		}
+
 		[DevFlowAction("avd.transparency.probe",
 			Description = "Diagnostic A/B: opens two plain top-level windows next to each other - one " +
 			              "with AllowsTransparency=true/WindowStyle=None, one opaque - each containing a " +
@@ -897,13 +1048,23 @@ namespace TestApp
 			              "overlay-window RENDERING be judged independently of drag/hit-test logic. " +
 			              "Requires a floating window to exist (call avd.float first). Returns the " +
 			              "overlay's geometry and visibility state.")]
-		public string ShowOverlayDiagnostics()
+		public string ShowOverlayDiagnostics(bool show = true)
 		{
 			var fwc = dockManager.FloatingWindows.FirstOrDefault();
 			if (fwc == null)
 				return "no floating window - call avd.float first";
 
 			var host = (IOverlayWindowHost)dockManager;
+
+			// The overlay is a full-size window sitting over the docking manager; leaving it up after a
+			// diagnostic run swallows clicks aimed at the app underneath (it looked like "menus stopped
+			// working"). Always offer an explicit way to take it back down.
+			if (!show)
+			{
+				host.HideOverlayWindow();
+				return "overlay hidden";
+			}
+
 			var overlay = host.ShowOverlayWindow(fwc);
 			if (overlay == null)
 				return "ShowOverlayWindow returned null";
