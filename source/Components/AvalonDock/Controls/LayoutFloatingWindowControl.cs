@@ -1145,6 +1145,22 @@ namespace AvalonDock.Controls
 					return;
 			}
 
+			// Taking mouse capture below suppresses the activation a press would normally perform, so
+			// clicking the caption left the window inactive (grey header) while clicking its content -
+			// which takes no capture - activated it as expected. Activate explicitly to restore the
+			// behaviour the native caption provides.
+			if (!IsActive)
+			{
+				try
+				{
+					Activate();
+				}
+				catch (InvalidOperationException)
+				{
+					// Activation can throw if the window is being torn down; never break the drag for it.
+				}
+			}
+
 			var grabRelative = e.GetPosition(this);
 			var pointer = PointToScreen(grabRelative);
 			_portableGrabRelative = grabRelative;
