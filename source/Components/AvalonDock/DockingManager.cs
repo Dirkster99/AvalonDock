@@ -2164,14 +2164,25 @@ namespace AvalonDock
 
 			LayoutFloatingWindowControlCreated?.Invoke(this, new LayoutFloatingWindowControlCreatedEventArgs(fwc));
 
-			fwc.AttachDrag();
-			fwc.Show();
-
-			if (firstContent != null)
+			// Defer AttachDrag/Show onto a fresh dispatcher frame instead of calling them synchronously
+			// here. This method runs re-entrantly inside input dispatch (AnchorablePaneTitle.OnMouseLeave
+			// -> here while the mouse button is held), and Window.Show() during input processing reaches an
+			// unshimmed user32 GetWindowLong path on non-Windows backends (LibreWPF) which throws
+			// DllNotFoundException 'PresentationNative_cor3.dll'. StartDraggingFloatingWindowForContent
+			// already shows on a BeginInvoke(Send) frame for exactly this reason - mirror it here.
+			var contentToFloat = firstContent;
+			Dispatcher.BeginInvoke(
+				new Action(() =>
 			{
-				ContentFloated?.Invoke(this, new ContentFloatedEventArgs(firstContent));
-				_coreContentFloated?.Invoke(this, new Core.Events.ContentEventArgs(firstContent));
-			}
+				fwc.AttachDrag();
+				fwc.Show();
+
+				if (contentToFloat != null)
+				{
+					ContentFloated?.Invoke(this, new ContentFloatedEventArgs(contentToFloat));
+					_coreContentFloated?.Invoke(this, new Core.Events.ContentEventArgs(contentToFloat));
+				}
+			}), DispatcherPriority.Send);
 		}
 
 		/// <summary>Enumerates floating windows in z-order.</summary>

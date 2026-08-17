@@ -825,6 +825,159 @@ namespace TestApp
 			return System.Text.Json.JsonSerializer.Serialize(result);
 		}
 
+		[DevFlowAction("avd.transparency.probe",
+			Description = "Diagnostic A/B: opens two plain top-level windows next to each other - one " +
+			              "with AllowsTransparency=true/WindowStyle=None, one opaque - each containing a " +
+			              "solid red block. Isolates 'does the backend render transparent windows at all' " +
+			              "from anything AvalonDock-specific. Pass false to close them again.")]
+		public string TransparencyProbe(bool show = true)
+		{
+			foreach (var w in Application.Current.Windows.OfType<Window>()
+						.Where(w => (w.Tag as string) == "transparency-probe").ToArray())
+			{
+				w.Close();
+			}
+
+			if (!show) return "probe windows closed";
+
+			Window Make(bool transparent, double left)
+			{
+				var w = new Window
+				{
+					Tag = "transparency-probe",
+					Title = transparent ? "transparent probe" : "opaque probe",
+					Width = 220,
+					Height = 160,
+					Left = left,
+					Top = 120,
+					ShowInTaskbar = false,
+					WindowStartupLocation = WindowStartupLocation.Manual,
+					Content = new Border
+					{
+						Background = System.Windows.Media.Brushes.Red,
+						Width = 120,
+						Height = 60,
+						Child = new TextBlock
+						{
+							Text = transparent ? "TRANSPARENT" : "OPAQUE",
+							Foreground = System.Windows.Media.Brushes.White,
+							HorizontalAlignment = HorizontalAlignment.Center,
+							VerticalAlignment = VerticalAlignment.Center,
+						},
+					},
+				};
+
+				// AllowsTransparency must be set before the window is shown.
+				if (transparent)
+				{
+					w.WindowStyle = WindowStyle.None;
+					w.AllowsTransparency = true;
+					w.Background = System.Windows.Media.Brushes.Transparent;
+				}
+
+				w.Show();
+				return w;
+			}
+
+			var t = Make(transparent: true, left: 900);
+			var o = Make(transparent: false, left: 1140);
+			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			{
+				["transparentVisible"] = t.IsVisible,
+				["transparentActual"] = $"{t.ActualWidth}x{t.ActualHeight}",
+				["opaqueVisible"] = o.IsVisible,
+				["opaqueActual"] = $"{o.ActualWidth}x{o.ActualHeight}",
+				["note"] = "Look at the screen: both should show a red block. If only OPAQUE is visible, transparent windows still do not render.",
+			});
+		}
+
+		[DevFlowAction("avd.overlay.diagnostics",
+			Description = "Diagnostic: show the drop-target compass persistently WITHOUT a drag, by " +
+			              "driving IOverlayWindowHost.ShowOverlayWindow + DragEnter directly. Lets " +
+			              "overlay-window RENDERING be judged independently of drag/hit-test logic. " +
+			              "Requires a floating window to exist (call avd.float first). Returns the " +
+			              "overlay's geometry and visibility state.")]
+		public string ShowOverlayDiagnostics()
+		{
+			var fwc = dockManager.FloatingWindows.FirstOrDefault();
+			if (fwc == null)
+				return "no floating window - call avd.float first";
+
+			var host = (IOverlayWindowHost)dockManager;
+			var overlay = host.ShowOverlayWindow(fwc);
+			if (overlay == null)
+				return "ShowOverlayWindow returned null";
+
+			// A drop area must be entered for the compass grids to become visible; DragEnter(area)
+			// also requires the floating window to have been entered first.
+			overlay.DragEnter(fwc);
+			overlay.DragEnter(new DropArea<DockingManager>(dockManager, DropAreaType.DockingManager));
+
+			var win = overlay as Window;
+			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			{
+				["overlayType"] = overlay.GetType().Name,
+				["isWindow"] = win != null,
+				["isVisible"] = win?.IsVisible,
+				["allowsTransparency"] = win?.AllowsTransparency,
+				["windowStyle"] = win?.WindowStyle.ToString(),
+				["left"] = win?.Left,
+				["top"] = win?.Top,
+				["width"] = win?.Width,
+				["height"] = win?.Height,
+				["actualWidth"] = win?.ActualWidth,
+				["actualHeight"] = win?.ActualHeight,
+				["hasPresentationSource"] = win != null && PresentationSource.FromVisual(win) != null,
+				["presentationSourceType"] = win == null ? null : PresentationSource.FromVisual(win)?.GetType().FullName,
+				["visibleTargets"] = overlay.GetTargets().Count(),
+				["windows"] = DescribeWindowHosting(),
+			});
+		}
+
+		/// <summary>
+		/// Diagnostic: for every open window, report how LibreWPF is hosting it. A portable window
+		/// either gets its own native ProGPU window or is composited into the owner's; the latter has
+		/// no transparent framebuffer of its own, which is the suspected reason a transparent overlay
+		/// renders nothing.
+		/// </summary>
+		private static List<Dictionary<string, object>> DescribeWindowHosting()
+		{
+			var list = new List<Dictionary<string, object>>();
+			foreach (Window w in Application.Current.Windows)
+			{
+				var src = PresentationSource.FromVisual(w);
+				var info = new Dictionary<string, object>
+				{
+					["type"] = w.GetType().Name,
+					["isVisible"] = w.IsVisible,
+					["allowsTransparency"] = w.AllowsTransparency,
+					["windowStyle"] = w.WindowStyle.ToString(),
+					["hasOwner"] = w.Owner != null,
+					["sourceType"] = src?.GetType().Name,
+					["compositionTargetType"] = src?.CompositionTarget?.GetType().Name,
+				};
+
+				// HwndSource.IsPortable / PortableOwner are LibreWPF additions; read reflectively so
+				// this compiles against classic WPF too.
+				if (src != null)
+				{
+					foreach (var prop in new[] { "IsPortable", "PortableOwner" })
+					{
+						var pi = src.GetType().GetProperty(prop);
+						if (pi != null)
+						{
+							var val = pi.GetValue(src);
+							info[prop] = prop == "PortableOwner" ? val?.GetType().Name : val;
+						}
+					}
+				}
+
+				list.Add(info);
+			}
+
+			return list;
+		}
+
 		[DevFlowAction("avd.query.active-drop-targets",
 			Description = "During an active drag (a floating window whose caption is currently being " +
 			              "dragged), returns every currently-visible compass drop-target indicator as " +

@@ -613,7 +613,7 @@ namespace AvalonDock.Controls
 			SizeChanged -= OnSizeChanged;
 			if (Content != null)
 			{
-				(Content as FloatingWindowContentHost)?.Dispose();
+				(Content as FloatingWindowContentHost)?.Detach();
 				if (_hwndSrc != null)
 				{
 					_hwndSrc.RemoveHook(_hwndSrcHook);
@@ -1159,14 +1159,27 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Represents the floating window content host.
+		/// Hosts the floating window's content.
 		/// </summary>
-		protected internal class FloatingWindowContentHost : HwndHost
+		/// <remarks>
+		/// Previously derived from <see cref="HwndHost"/> and parented the content into a native Win32
+		/// child window (<see cref="HwndSource"/> with WS_CHILD). That child window does not compose
+		/// into cross-platform WPF surfaces (LibreWPF on Linux/macOS), so the content rendered nothing;
+		/// worse, the child <see cref="HwndSource"/> is a *native, non-portable* presentation source, so
+		/// any coordinate translation against it took the Win32 branch of
+		/// <c>PointUtil.ScreenToClient</c> and called user32 <c>GetWindowLong</c>, throwing
+		/// DllNotFoundException for <c>PresentationNative_cor3.dll</c>. That fired during a drag,
+		/// because showing the floating window flushes the dispatcher and runs a queued hit-test
+		/// invalidation (<c>MouseDevice.Synchronize</c>).
+		///
+		/// It is now a pure-WPF <see cref="Border"/> hosting the content directly, matching the
+		/// AvaloniaXPF AvalonDock fork. This is unconditional rather than portable-only: a base class
+		/// cannot be swapped per-runtime, and the pure-WPF host works on every backend.
+		/// </remarks>
+		public class FloatingWindowContentHost : Border
 		{
 			private readonly LayoutFloatingWindowControl _owner;
-			private HwndSource _wpfContentHost = null;
-			private Border _rootPresenter = null;
-			private DockingManager _manager = null;
+			private AdornerDecorator _rootPresenter = null;
 
 			/// <summary>
 			/// Initializes a new instance of the <see cref="FloatingWindowContentHost"/> class.
@@ -1177,6 +1190,8 @@ namespace AvalonDock.Controls
 				_owner = owner;
 				var binding = new Binding(nameof(SizeToContent)) { Source = _owner };
 				BindingOperations.SetBinding(this, SizeToContentProperty, binding);
+				SetBinding(BackgroundProperty, new Binding(nameof(Background)) { Source = _owner });
+				AutomationProperties.SetName(this, "FloatingWindowHost");
 			}
 
 			/// <summary>
@@ -1209,9 +1224,21 @@ namespace AvalonDock.Controls
 			/// <param name="newValue">The new value.</param>
 			protected virtual void OnContentChanged(UIElement oldValue, UIElement newValue)
 			{
-				if (_rootPresenter != null) _rootPresenter.Child = Content;
+				EnsurePresenter();
+				_rootPresenter.Child = newValue;
 				if (oldValue is FrameworkElement oldContent) oldContent.SizeChanged -= Content_SizeChanged;
 				if (newValue is FrameworkElement newContent) newContent.SizeChanged += Content_SizeChanged;
+			}
+
+			/// <summary>
+			/// Creates the adorner-hosting presenter on first use. An <see cref="AdornerDecorator"/> is
+			/// kept because AvalonDock's own drag/resize adorners are added inside the floating window.
+			/// </summary>
+			private void EnsurePresenter()
+			{
+				if (_rootPresenter != null) return;
+				_rootPresenter = new AdornerDecorator();
+				Child = _rootPresenter;
 			}
 
 			/// <summary>
@@ -1239,45 +1266,28 @@ namespace AvalonDock.Controls
 			/// <param name="newValue">The new value.</param>
 			protected virtual void OnSizeToContentChanged(SizeToContent oldValue, SizeToContent newValue)
 			{
-				if (_wpfContentHost != null) _wpfContentHost.SizeToContent = newValue;
+				// The owning Window applies SizeToContent itself; there is no separate child window to
+				// forward it to now that the content is hosted as an ordinary WPF visual.
 			}
 
-			/// <inheritdoc/>
-			protected override HandleRef BuildWindowCore(HandleRef hwndParent)
+			/// <summary>
+			/// Tears the hosted content out of the visual tree when the floating window closes. Replaces
+			/// <see cref="HwndHost"/>'s Dispose, which destroyed the native child window.
+			/// </summary>
+			internal void Detach()
 			{
-				_wpfContentHost = new HwndSource(new HwndSourceParameters
-				{
-					ParentWindow = hwndParent.Handle,
-					WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_VISIBLE | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
-					Width = 1,
-					Height = 1,
-					UsesPerPixelOpacity = true,
-				});
-
-				_rootPresenter = new Border { Child = new AdornerDecorator { Child = Content }, Focusable = true };
-				AutomationProperties.SetName(_rootPresenter, "FloatingWindowHost");
-				_rootPresenter.SetBinding(Border.BackgroundProperty, new Binding(nameof(Background)) { Source = _owner });
-				_wpfContentHost.RootVisual = _rootPresenter;
-				_manager = _owner.Model.Root.Manager;
-				_manager.InternalAddLogicalChild(_rootPresenter);
-				return new HandleRef(this, _wpfContentHost.Handle);
-			}
-
-			/// <inheritdoc/>
-			protected override void DestroyWindowCore(HandleRef hwnd)
-			{
-				_manager.InternalRemoveLogicalChild(_rootPresenter);
-				if (_wpfContentHost == null) return;
-				_wpfContentHost.Dispose();
-				_wpfContentHost = null;
+				if (Content is FrameworkElement content) content.SizeChanged -= Content_SizeChanged;
+				if (_rootPresenter != null) _rootPresenter.Child = null;
+				Child = null;
+				_rootPresenter = null;
 			}
 
 			/// <inheritdoc/>
 			protected override Size MeasureOverride(Size constraint)
 			{
-				if (Content == null) return base.MeasureOverride(constraint);
-				Content.Measure(constraint);
-				return Content.DesiredSize;
+				if (_rootPresenter == null) return base.MeasureOverride(constraint);
+				_rootPresenter.Measure(constraint);
+				return _rootPresenter.DesiredSize;
 			}
 
 			/// <summary>
