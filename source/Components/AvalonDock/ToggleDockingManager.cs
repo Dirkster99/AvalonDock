@@ -632,10 +632,12 @@ public class ToggleDockingManager : DockingManager
 		var moveToItem = new MenuItem { Header = "Move To" };
 		foreach (DockZone zone in Enum.GetValues(typeof(DockZone)))
 		{
+#pragma warning disable S6444
 			var zoneLabel = System.Text.RegularExpressions.Regex.Replace(zone.ToString(), "(\\B[A-Z])", " $1");
 			var z = zone;
 			var mi = new MenuItem { Header = zoneLabel };
-			mi.Click += (s, e) => MoveAnchorableToZone(anchorable, z);
+			mi.Click += (s, e) => MoveAnchorableToZone(anchorable, zone);
+#pragma warning restore S6444
 			moveToItem.Items.Add(mi);
 		}
 
