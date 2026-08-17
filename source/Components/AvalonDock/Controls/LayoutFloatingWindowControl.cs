@@ -649,7 +649,17 @@ namespace AvalonDock.Controls
 			// a "hidden resizable" border, so the window stays resizable, and the managed caption drag
 			// (UsePortableCaptionDrag) supplies the move.
 			if (UsePortableCaptionDrag)
+			{
 				WindowStyle = WindowStyle.None;
+
+				// Also detach WindowChrome. The theme style attaches it for the custom caption, which
+				// spins up a WindowChromeWorker that hooks the HwndSource and issues Win32 window
+				// operations (regions, frame metrics, NC hit-testing). None of that is meaningful off
+				// Windows - the caption is already gone via WindowStyle.None - and leaving it hooked
+				// lets it interfere with the portable backend. Clearing it is what distinguishes this
+				// window from a plain WPF Window, which behaves correctly.
+				WindowChrome.SetWindowChrome(this, null);
+			}
 
 			// Debug.Assert(this.Owner != null);
 			base.OnInitialized(e);
