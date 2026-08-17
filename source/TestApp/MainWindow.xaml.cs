@@ -166,6 +166,11 @@ namespace TestApp
 			}
 		}
 
+		[DevFlowAction("avd.timer.query",
+			Description = "Returns the DispatcherTimer-driven counter. Auto-hide's close timer is a " +
+			              "DispatcherTimer, so whether this advances tells you if auto-close can work.")]
+		public string TimerQuery() => TestTimer.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
 		[DevFlowAction("avd.menu.trace", Description = "Returns (and clears) the recorded menu open/close trace")]
 		public string MenuTrace()
 		{
