@@ -120,6 +120,23 @@ namespace AvalonDock.Controls
 		internal bool IsResizing { get; private set; }
 
 		/// <summary>
+		/// On portable backends (LibreWPF) a Win32 child window does not compose into the rendering
+		/// surface, so the flyout hosted in <see cref="_internalHwndSource"/> renders nothing at all.
+		/// There the content is added as an ordinary WPF visual child of this element instead, which
+		/// draws in place inside the docking manager's PART_AutoHideArea.
+		/// <para>
+		/// Deliberately NOT applied on Windows: hosting the flyout in a native child window is an
+		/// airspace workaround. Native content elsewhere in the manager (WindowsFormsHost, HwndHost,
+		/// browser hosts) always renders above WPF content, so a pure-WPF flyout would be drawn behind
+		/// it. That trade-off does not exist on portable backends, where such native content cannot
+		/// render at all.
+		/// </para>
+		/// </summary>
+		private static bool HostsContentAsVisualChild { get; } = !RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+		private bool _presenterIsVisualChild;
+
+		/// <summary>
 		/// Shows the control.
 		/// </summary>
 		/// <param name="anchor">The anchor.</param>
@@ -172,11 +189,23 @@ namespace AvalonDock.Controls
 		{
 			get
 			{
-				var ptMouse = new Win32Helper.Win32Point();
-				if (!Win32Helper.GetCursorPos(ref ptMouse)) return false;
-				var location = this.PointToScreenDPI(new Point());
+				Point mouse;
+				if (HostsContentAsVisualChild)
+				{
+					// Win32Helper.GetCursorPos resolves through the platform shim off Windows, which
+					// does not track the real pointer. Use the platform cursor service, which reads
+					// the pointer from the windowing system itself.
+					mouse = AvalonDock.Platform.PlatformHelper.GetCursorPosition();
+				}
+				else
+				{
+					var ptMouse = new Win32Helper.Win32Point();
+					if (!Win32Helper.GetCursorPos(ref ptMouse)) return false;
+					mouse = new Point(ptMouse.X, ptMouse.Y);
+				}
+
 				var rectWindow = this.GetScreenArea();
-				if (rectWindow.Contains(new Point(ptMouse.X, ptMouse.Y))) return true;
+				if (rectWindow.Contains(mouse)) return true;
 
 				var manager = Model?.Root.Manager;
 				var anchor = manager?.FindVisualChildren<LayoutAnchorControl>().Where(c => c.Model == Model).FirstOrDefault();
@@ -196,9 +225,23 @@ namespace AvalonDock.Controls
 				WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_VISIBLE | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
 				Width = 0,
 				Height = 0,
-			})
-			{ RootVisual = _internalHostPresenter };
+			});
 			AutomationProperties.SetName(_internalHostPresenter, "InternalWindowHost");
+
+			if (HostsContentAsVisualChild)
+			{
+				// Leave the child window empty and render the content through the WPF visual tree.
+				if (!_presenterIsVisualChild)
+				{
+					AddVisualChild(_internalHostPresenter);
+					_presenterIsVisualChild = true;
+				}
+			}
+			else
+			{
+				_internalHwndSource.RootVisual = _internalHostPresenter;
+			}
+
 			AddLogicalChild(_internalHostPresenter);
 			Win32Helper.BringWindowToTop(_internalHwndSource.Handle);
 			return new HandleRef(this, _internalHwndSource.Handle);
@@ -211,6 +254,13 @@ namespace AvalonDock.Controls
 			_internalHwndSource.Dispose();
 			_internalHwndSource = null;
 		}
+
+		/// <inheritdoc/>
+		protected override int VisualChildrenCount => _presenterIsVisualChild ? 1 : base.VisualChildrenCount;
+
+		/// <inheritdoc/>
+		protected override Visual GetVisualChild(int index)
+			=> _presenterIsVisualChild && index == 0 ? _internalHostPresenter : base.GetVisualChild(index);
 
 		/// <inheritdoc/>
 		protected override bool HasFocusWithinCore() => false;
