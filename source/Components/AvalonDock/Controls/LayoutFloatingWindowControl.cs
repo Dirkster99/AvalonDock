@@ -648,9 +648,19 @@ namespace AvalonDock.Controls
 			// re-docking is impossible. WindowStyle.None removes it; LibreWPF maps None + CanResize to
 			// a "hidden resizable" border, so the window stays resizable, and the managed caption drag
 			// (UsePortableCaptionDrag) supplies the move.
-			if (UsePortableCaptionDrag)
+			// Escape hatch while the portable caption is being tuned: AVALONDOCK_KEEP_NATIVE_CAPTION=1
+			// restores the native title bar, to A/B whether suppressing it costs window activation
+			// (an unfocused floating window shows a grey header and does not route clicks to its tabs).
+			if (UsePortableCaptionDrag &&
+				Environment.GetEnvironmentVariable("AVALONDOCK_KEEP_NATIVE_CAPTION") != "1")
 			{
 				WindowStyle = WindowStyle.None;
+
+				// Remember the caption height the theme declared before detaching the chrome: it defines
+				// how tall the draggable caption strip is, and the managed caption drag must respect it.
+				var themeChrome = WindowChrome.GetWindowChrome(this);
+				if (themeChrome != null && themeChrome.CaptionHeight > 0)
+					_portableCaptionHeight = themeChrome.CaptionHeight;
 
 				// Also detach WindowChrome. The theme style attaches it for the custom caption, which
 				// spins up a WindowChromeWorker that hooks the HwndSource and issues Win32 window
@@ -1030,6 +1040,12 @@ namespace AvalonDock.Controls
 
 		private int _portableMoveCount;
 
+		/// <summary>
+		/// Height of the draggable caption strip, taken from the theme's WindowChrome. Only presses
+		/// inside this strip start a window drag; everything below it belongs to the content.
+		/// </summary>
+		private double _portableCaptionHeight = 20;
+
 		// Absolute-cursor drag state. The offset from the window origin to the grabbed point is fixed
 		// for the whole drag, so the window origin is simply (cursor - offset) - no feedback.
 		private bool _portableUseAbsoluteCursor;
@@ -1110,8 +1126,16 @@ namespace AvalonDock.Controls
 			if (_portableDragging || e.ChangedButton != MouseButton.Left) return;
 			if (Model?.Root?.Manager == null) return;
 
-			// Only the caption drags the window. Buttons/menus in the title bar opt out of caption
-			// treatment via WindowChrome.IsHitTestVisibleInChrome (the same flag the Win32 chrome uses),
+			// Only the caption strip drags the window. Without this bound, EVERY press inside the
+			// floating window started a window drag - so clicking a tab moved the window instead of
+			// selecting the tab, and the grab of mouse capture also stopped the window activating
+			// (its header stayed inactive). Win32 gets this bound for free from
+			// WindowChrome.CaptionHeight; the managed drag has to apply it explicitly.
+			if (e.GetPosition(this).Y > _portableCaptionHeight)
+				return;
+
+			// Buttons/menus in the title bar opt out of caption treatment via
+			// WindowChrome.IsHitTestVisibleInChrome (the same flag the Win32 chrome uses),
 			// so walk up from the hit element and bail if any ancestor is marked interactive.
 			for (var d = e.OriginalSource as DependencyObject; d != null; d = VisualTreeHelperGetParent(d))
 			{
