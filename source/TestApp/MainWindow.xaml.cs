@@ -98,6 +98,16 @@ namespace TestApp
 				// main window we would see open-then-immediate-close here.
 				Activated += (s, e) => TraceMenu("window.Activated");
 				Deactivated += (s, e) => TraceMenu("window.Deactivated");
+
+				// A menu also closes if something steals keyboard focus or exits menu mode. Trace both
+				// so the event that coincides with the self-close can be identified.
+				InputManager.Current.EnterMenuMode += (s, e) => TraceMenu("InputManager.EnterMenuMode");
+				InputManager.Current.LeaveMenuMode += (s, e) => TraceMenu("InputManager.LeaveMenuMode");
+
+				AddHandler(PreviewGotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler((s, e) =>
+					TraceMenu($"GotKeyboardFocus -> {e.NewFocus?.GetType().Name ?? "null"}")), true);
+				AddHandler(PreviewLostKeyboardFocusEvent, new KeyboardFocusChangedEventHandler((s, e) =>
+					TraceMenu($"LostKeyboardFocus {e.OldFocus?.GetType().Name ?? "null"} -> {e.NewFocus?.GetType().Name ?? "null"}")), true);
 			}
 
 			foreach (var root in GetAvalonDockVisualRoots())
@@ -138,6 +148,22 @@ namespace TestApp
 				MenuItem.IsSubmenuOpenProperty, typeof(MenuItem));
 			descriptor?.AddValueChanged(item, (s, e) =>
 				TraceMenu($"{header}.IsSubmenuOpen={item.IsSubmenuOpen} captured={Mouse.Captured?.GetType().Name ?? "null"} active={IsActive}"));
+		}
+
+		/// <summary>Screen-space rectangle of an element, or why it could not be determined.</summary>
+		private static string DescribeScreenRect(FrameworkElement element)
+		{
+			if (element == null) return "(null)";
+			try
+			{
+				if (PresentationSource.FromVisual(element) == null) return "(no presentation source)";
+				var origin = element.PointToScreen(new Point(0, 0));
+				return $"x={origin.X:F0} y={origin.Y:F0} w={element.ActualWidth:F0} h={element.ActualHeight:F0}";
+			}
+			catch (Exception ex)
+			{
+				return "(err: " + ex.GetType().Name + ")";
+			}
 		}
 
 		[DevFlowAction("avd.menu.trace", Description = "Returns (and clears) the recorded menu open/close trace")]
@@ -966,12 +992,26 @@ namespace TestApp
 
 			report["isSubmenuOpenAfter"] = target.IsSubmenuOpen;
 
+			// Where does the popup actually land on screen? A popup positioned off-screen, at the
+			// origin, or over another window looks identical to "not rendering" from the user's side.
+			report["headerScreenRect"] = DescribeScreenRect(target);
+
 			// If the submenu really opened, its popup child should now have a presentation source.
 			var popup = target.Template?.FindName("PART_Popup", target) as System.Windows.Controls.Primitives.Popup;
 			report["popupFound"] = popup != null;
 			report["popupIsOpen"] = popup?.IsOpen;
 			if (popup?.Child != null)
+			{
 				report["popupChildSource"] = PresentationSource.FromVisual(popup.Child)?.GetType().Name;
+				report["popupChildScreenRect"] = DescribeScreenRect(popup.Child as FrameworkElement);
+				report["popupChildVisible"] = (popup.Child as UIElement)?.IsVisible;
+
+				// The popup's own window, if it has one: its position is what actually decides
+				// whether the user sees anything.
+				var popupRootSource = PresentationSource.FromVisual(popup.Child);
+				if (popupRootSource?.RootVisual is FrameworkElement popupRoot)
+					report["popupRootScreenRect"] = DescribeScreenRect(popupRoot);
+			}
 
 			return System.Text.Json.JsonSerializer.Serialize(report);
 		}
