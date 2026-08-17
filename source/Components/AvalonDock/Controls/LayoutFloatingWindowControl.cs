@@ -640,6 +640,17 @@ namespace AvalonDock.Controls
 			CommandBindings.Add(new CommandBinding(
 				Microsoft.Windows.Shell.SystemCommands.RestoreWindowCommand,
 				(s, args) => Microsoft.Windows.Shell.SystemCommands.RestoreWindow((Window)args.Parameter)));
+
+			// On portable backends WindowChromeWorker is inert, so the custom borderless caption the
+			// template draws is never applied and the backend additionally draws its own native title
+			// bar - the window ends up with two captions. Worse, dragging the native one runs a native
+			// window-move that never reaches DragService, so no drop-target compass appears and
+			// re-docking is impossible. WindowStyle.None removes it; LibreWPF maps None + CanResize to
+			// a "hidden resizable" border, so the window stays resizable, and the managed caption drag
+			// (UsePortableCaptionDrag) supplies the move.
+			if (UsePortableCaptionDrag)
+				WindowStyle = WindowStyle.None;
+
 			// Debug.Assert(this.Owner != null);
 			base.OnInitialized(e);
 		}
@@ -1002,6 +1013,84 @@ namespace AvalonDock.Controls
 		private Point _portableDragOffset;   // pointer-to-window-origin offset, in screen coords
 		private Point _portableLastPointer;  // last pointer screen position seen during the drag
 
+		// The grabbed point expressed relative to this window, captured once when the drag starts.
+		// Positioning is driven by how far the pointer has moved away from it (see OnMouseMove) rather
+		// than by an absolute screen coordinate, which is what keeps the drag stable.
+		private Point _portableGrabRelative;
+
+		private int _portableMoveCount;
+
+		// Absolute-cursor drag state. The offset from the window origin to the grabbed point is fixed
+		// for the whole drag, so the window origin is simply (cursor - offset) - no feedback.
+		private bool _portableUseAbsoluteCursor;
+		private Point _portableGrabOffsetDevice;
+		private double _portableScaleX = 1.0;
+		private double _portableScaleY = 1.0;
+
+		/// <summary>
+		/// Captures the fixed cursor-to-window-origin offset in device pixels, plus the device/DIP
+		/// scale, so a drag can position the window purely from the absolute pointer position.
+		/// Returns false when no window-independent cursor is available, in which case the caller
+		/// falls back to the relative-delta path.
+		/// </summary>
+		/// <summary>
+		/// True when the platform reports the left button as still PHYSICALLY held. The portable
+		/// backend emits a spurious MouseUp when a window is shown during a press - which is exactly
+		/// what happens when the drop-target overlay appears mid-drag - and acting on it ends the drag
+		/// the moment the compass shows. The platform button state is not affected by that synthesized
+		/// event, so it can be used to tell a real release from the phantom one.
+		/// </summary>
+		private static bool IsPhysicalLeftButtonDown()
+		{
+			try
+			{
+				return PlatformManager.CursorService.IsLeftButtonDown();
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		private bool TryBeginAbsoluteCursorDrag()
+		{
+			var source = PresentationSource.FromVisual(this);
+			if (source?.CompositionTarget == null) return false;
+
+			var cursor = PlatformHelper.GetCursorPosition();
+			if (cursor.X == 0 && cursor.Y == 0) return false;
+
+			var toDevice = source.CompositionTarget.TransformToDevice;
+			_portableScaleX = toDevice.M11 != 0 ? Math.Abs(toDevice.M11) : 1.0;
+			_portableScaleY = toDevice.M22 != 0 ? Math.Abs(toDevice.M22) : 1.0;
+
+			// Window origin in device pixels; correct here because no move has been applied yet.
+			_portableGrabOffsetDevice = new Point(
+				cursor.X - (Left * _portableScaleX),
+				cursor.Y - (Top * _portableScaleY));
+			return true;
+		}
+
+		// Diagnostic trace for the portable caption drag; set AVALONDOCK_DRAG_TRACE=1 and read
+		// avalondock-drag-trace.log in the temp directory. Off (and free) otherwise.
+		private static readonly bool PortableDragTraceEnabled =
+			Environment.GetEnvironmentVariable("AVALONDOCK_DRAG_TRACE") == "1";
+
+		private static void TracePortableDrag(string message)
+		{
+			if (!PortableDragTraceEnabled) return;
+			try
+			{
+				System.IO.File.AppendAllText(
+					System.IO.Path.Combine(System.IO.Path.GetTempPath(), "avalondock-drag-trace.log"),
+					DateTime.Now.ToString("HH:mm:ss.fff ") + message + Environment.NewLine);
+			}
+			catch
+			{
+				// Tracing must never disturb the drag it is observing.
+			}
+		}
+
 		// The Win32 caption-drag path (WM_NCLBUTTONDOWN + WM_MOVING/WM_EXITSIZEMOVE) only works on real
 		// Windows HWNDs. Everywhere else (LibreWPF on macOS/Linux) use the managed caption drag.
 		internal static bool UsePortableCaptionDrag { get; } = !RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -1022,10 +1111,15 @@ namespace AvalonDock.Controls
 					return;
 			}
 
-			var pointer = PointToScreen(e.GetPosition(this));
+			var grabRelative = e.GetPosition(this);
+			var pointer = PointToScreen(grabRelative);
+			_portableGrabRelative = grabRelative;
 			_portableDragOffset = new Point(pointer.X - Left, pointer.Y - Top);
 			_portableLastPointer = pointer;
 			_portableDragging = true;
+			_portableMoveCount = 0;
+			_portableUseAbsoluteCursor = TryBeginAbsoluteCursorDrag();
+			TracePortableDrag($"START caption grab=({grabRelative.X:F1},{grabRelative.Y:F1}) leftTop=({Left:F1},{Top:F1}) absoluteCursor={_portableUseAbsoluteCursor} scale=({_portableScaleX},{_portableScaleY}) grabOff=({_portableGrabOffsetDevice.X:F1},{_portableGrabOffsetDevice.Y:F1})");
 			if (_dragService == null)
 				_dragService = new DragService(this);
 			SetIsDragging(true);
@@ -1055,6 +1149,10 @@ namespace AvalonDock.Controls
 				return;
 			}
 
+			_portableGrabRelative = Mouse.GetPosition(this);
+			_portableMoveCount = 0;
+			_portableUseAbsoluteCursor = TryBeginAbsoluteCursorDrag();
+			TracePortableDrag($"START tearoff leftTop=({Left:F1},{Top:F1}) absoluteCursor={_portableUseAbsoluteCursor}");
 			_portableDragOffset = new Point(pointer.X - Left, pointer.Y - Top);
 			_portableLastPointer = pointer;
 			_portableDragging = true;
@@ -1096,14 +1194,74 @@ namespace AvalonDock.Controls
 
 			if (e.LeftButton != MouseButtonState.Pressed)
 			{
-				EndPortableDrag(drop: true);
+				if (_portableUseAbsoluteCursor && IsPhysicalLeftButtonDown())
+				{
+					// Phantom release (overlay shown mid-drag): the button is still physically down.
+					TracePortableDrag("ignoring phantom button-release during move");
+				}
+				else
+				{
+					EndPortableDrag(drop: true);
+					return;
+				}
+			}
+
+			// Position from the pointer's ABSOLUTE screen position, never from a window-relative one.
+			// Both earlier attempts (assigning PointToScreen(relative), and moving by the change in
+			// relative position) are measured against this window's own origin while we are moving
+			// that origin, and the backend applies moves asynchronously - so the measurement and the
+			// window disagree and the result oscillates: the window jitters and fights the cursor.
+			// PlatformHelper.GetCursorPosition() is window-independent (XQueryPointer on Linux), so
+			// origin + fixed grab offset is stable no matter when moves land.
+			if (_portableUseAbsoluteCursor)
+			{
+				var cursor = PlatformHelper.GetCursorPosition();
+				var newLeft = (cursor.X - _portableGrabOffsetDevice.X) / _portableScaleX;
+				var newTop = (cursor.Y - _portableGrabOffsetDevice.Y) / _portableScaleY;
+
+				if (_portableMoveCount < 25)
+				{
+					TracePortableDrag(
+						$"move #{_portableMoveCount} cursor=({cursor.X:F1},{cursor.Y:F1}) grabOff=({_portableGrabOffsetDevice.X:F1},{_portableGrabOffsetDevice.Y:F1}) leftTop=({Left:F1},{Top:F1}) -> ({newLeft:F1},{newTop:F1}) captured={Mouse.Captured?.GetType().Name ?? "null"}");
+				}
+
+				_portableMoveCount++;
+				Left = newLeft;
+				Top = newTop;
+				_portableLastPointer = cursor;
+				_dragService?.UpdateMouseLocation(cursor);
 				return;
 			}
 
-			var pointer = PointToScreen(e.GetPosition(this));
+			var relative = e.GetPosition(this);
+
+			// Move by how far the pointer has drifted from the grabbed point, NOT by assigning an
+			// absolute screen position. The absolute form (Left = PointToScreen(relative).X - offset)
+			// converts window-relative -> screen using this window's own origin and then moves that
+			// origin, so the value feeds back into the next conversion. The backend applies the move
+			// asynchronously, so the origin used by PointToScreen and the one GetPosition was measured
+			// against disagree, and each event re-adds the previous delta - the window accelerates away
+			// from the cursor. Using the delta is self-correcting instead: moving the window shrinks
+			// the next delta toward zero, so a stationary pointer converges rather than running away.
+			var dx = relative.X - _portableGrabRelative.X;
+			var dy = relative.Y - _portableGrabRelative.Y;
+			if (_portableMoveCount < 25)
+			{
+				TracePortableDrag(
+					$"move #{_portableMoveCount} rel=({relative.X:F1},{relative.Y:F1}) grab=({_portableGrabRelative.X:F1},{_portableGrabRelative.Y:F1}) d=({dx:F1},{dy:F1}) leftTop=({Left:F1},{Top:F1}) captured={Mouse.Captured?.GetType().Name ?? "null"}");
+			}
+
+			_portableMoveCount++;
+			if (dx != 0 || dy != 0)
+			{
+				Left += dx;
+				Top += dy;
+			}
+
+			// Hit-testing still needs a screen position; derive it from the window origin we just set
+			// plus the (fixed) grab point, so it stays consistent with the placement above.
+			var pointer = PointToScreen(_portableGrabRelative);
 			_portableLastPointer = pointer;
-			Left = pointer.X - _portableDragOffset.X;
-			Top = pointer.Y - _portableDragOffset.Y;
 			_dragService?.UpdateMouseLocation(pointer);
 		}
 
@@ -1111,20 +1269,45 @@ namespace AvalonDock.Controls
 		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonUp(e);
-			if (_portableDragging) EndPortableDrag(drop: true);
+			if (!_portableDragging) return;
+
+			if (_portableUseAbsoluteCursor && IsPhysicalLeftButtonDown())
+			{
+				// Same phantom up as above, delivered as a routed MouseLeftButtonUp instead.
+				TracePortableDrag("ignoring phantom MouseLeftButtonUp");
+				if (!IsMouseCaptured) CaptureMouse();
+				return;
+			}
+
+			EndPortableDrag(drop: true);
 		}
 
 		/// <inheritdoc/>
 		protected override void OnLostMouseCapture(MouseEventArgs e)
 		{
 			base.OnLostMouseCapture(e);
+			if (!_portableDragging) return;
+
+			// On portable backends losing capture is NOT a reliable signal that the user ended the
+			// drag. Window.HandlePortableMove releases the capture (Mouse.Capture(null)) on every
+			// window move as its "dismiss popups when the owner moves" mechanism - and a caption drag
+			// moves the window on each mouse move, so the capture is torn down immediately and the
+			// drag aborts after a single step. While the button is still physically held this is that
+			// spurious release, not a gesture: re-acquire the capture and keep dragging. Only a real
+			// release (or a failed re-capture) ends it.
+			var recaptured = Mouse.LeftButton == MouseButtonState.Pressed && CaptureMouse();
+			TracePortableDrag($"LOSTCAPTURE button={Mouse.LeftButton} recaptured={recaptured} newCapture={Mouse.Captured?.GetType().Name ?? "null"}");
+			if (recaptured)
+				return;
+
 			// Lost capture without a normal release: abort rather than drop at a stale position.
-			if (_portableDragging) EndPortableDrag(drop: false);
+			EndPortableDrag(drop: false);
 		}
 
 		private void EndPortableDrag(bool drop)
 		{
 			if (!_portableDragging) return;
+			TracePortableDrag($"END drop={drop} afterMoves={_portableMoveCount}");
 			_portableDragging = false;
 			if (IsMouseCaptured) ReleaseMouseCapture();
 
