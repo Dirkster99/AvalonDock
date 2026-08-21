@@ -1247,11 +1247,32 @@ namespace AvalonDock.Controls
 			_dragService?.UpdateMouseLocation(pointer);
 		}
 
+		/// <summary>
+		/// True when a WPF mouse-up must not be treated as the end of a drag because the physical
+		/// button is still held down.
+		/// <para>
+		/// Portable backends deliver spurious mouse-up events mid-press - most visibly when a native
+		/// window or popup is shown while the button is down, which is precisely what a drag does when
+		/// the drop-target overlay appears. Acting on one ends a drag the user is still performing: the
+		/// window stops following the pointer and no drop ever happens. The watchdog in
+		/// <see cref="OnPortableNativeDragTick"/> already refuses to trust WPF's button state for this
+		/// reason, but it only runs after a grace period, and a phantom up routed through these two
+		/// paths kills the drag well before that.
+		/// </para>
+		/// <para>
+		/// The X server's physical button state cannot be fooled by a synthesized WPF event, so it is
+		/// the arbiter. A genuine release updates it before the resulting WPF event is routed, so real
+		/// mouse-ups still end the drag here; and if this ever misreads, the watchdog remains as a
+		/// backstop, so a drag can never be left running indefinitely.
+		/// </para>
+		/// </summary>
+		private static bool IsPhantomMouseUp() => UsePortableCaptionDrag && PlatformHelper.IsLeftButtonDown();
+
 		/// <inheritdoc/>
 		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonUp(e);
-			if (_portableDragging) EndPortableDrag(drop: true);
+			if (_portableDragging && !IsPhantomMouseUp()) EndPortableDrag(drop: true);
 		}
 
 		private void OnPortablePostProcessInput(object sender, ProcessInputEventArgs e)
@@ -1259,7 +1280,8 @@ namespace AvalonDock.Controls
 			if (_portableDragging &&
 				e.StagingItem.Input is MouseButtonEventArgs mouseButtonEvent &&
 				mouseButtonEvent.RoutedEvent == Mouse.MouseUpEvent &&
-				mouseButtonEvent.ChangedButton == MouseButton.Left)
+				mouseButtonEvent.ChangedButton == MouseButton.Left &&
+				!IsPhantomMouseUp())
 			{
 				_portableLastPointer = PlatformHelper.GetCursorPosition();
 				EndPortableDrag(drop: true);
