@@ -14,9 +14,24 @@ jobs:
     name: Build & Test
     runs-on: windows-latest
 
+    env:
+      DevFlowAgentPath: ${{ github.workspace }}/ui-labs/src/DevFlow
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      # TestApp and MVVMTestApp reference the DevFlow agent from source on this branch, so the
+      # solution does not build anywhere without it. See the Linux job for why it is a source
+      # reference rather than a package.
+      - name: Checkout DevFlow agent (ui-labs)
+        uses: actions/checkout@v7
+        with:
+          repository: sharpSteff/ui-labs
+          ref: feature/linux-native-mouse-input
+          path: ui-labs
+          fetch-depth: 0
+          submodules: recursive
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
@@ -97,6 +112,8 @@ jobs:
           # Its projects run GitVersion.MsBuild, which refuses to work on the shallow clone
           # actions/checkout produces by default ("Repository is a shallow clone").
           fetch-depth: 0
+          # Agent.Core compiles sources out of the external/maui-labs submodule.
+          submodules: recursive
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6

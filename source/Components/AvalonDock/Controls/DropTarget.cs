@@ -117,8 +117,8 @@ namespace AvalonDock.Controls
 			var compositionTarget = PresentationSource.FromVisual(_targetElement)?.CompositionTarget;
 			var scaleX = compositionTarget?.TransformToDevice.M11 ?? 1.0;
 			var scaleY = compositionTarget?.TransformToDevice.M22 ?? 1.0;
-			if (!double.IsFinite(scaleX) || scaleX <= 0.0) scaleX = 1.0;
-			if (!double.IsFinite(scaleY) || scaleY <= 0.0) scaleY = 1.0;
+			if (!IsFinite(scaleX) || scaleX <= 0.0) scaleX = 1.0;
+			if (!IsFinite(scaleY) || scaleY <= 0.0) scaleY = 1.0;
 
 			var union = Rect.Empty;
 			foreach (var rect in _detectionRect)
@@ -127,8 +127,8 @@ namespace AvalonDock.Controls
 				// available size is smaller than its insets. Such a target is not hittable in that frame;
 				// do not let its transient negative extent make diagnostics (or automation) throw while
 				// enumerating the other, valid targets.
-				if (!double.IsFinite(rect.X) || !double.IsFinite(rect.Y) ||
-					!double.IsFinite(rect.Width) || !double.IsFinite(rect.Height) ||
+				if (!IsFinite(rect.X) || !IsFinite(rect.Y) ||
+					!IsFinite(rect.Width) || !IsFinite(rect.Height) ||
 					rect.Width < 0.0 || rect.Height < 0.0)
 				{
 					continue;
@@ -234,5 +234,12 @@ namespace AvalonDock.Controls
 		{
 			SetIsDraggingOver(TargetElement, false);
 		}
+
+		/// <summary>
+		/// Equivalent of double.IsFinite, which does not exist on net48 - one of the frameworks this
+		/// assembly still targets on Windows.
+		/// </summary>
+		private static bool IsFinite(double value) => !double.IsNaN(value) && !double.IsInfinity(value);
+
 	}
 }

@@ -1,4 +1,9 @@
 <Project Sdk="LibreWPF.Sdk">
+  <PropertyGroup>
+    <!-- Where the DevFlow agent sources live. Defaults to a ui-labs checkout beside this repository;
+         override with -p:DevFlowAgentPath=<dir> (CI checks the fork out inside the workspace). -->
+    <DevFlowAgentPath Condition="'$(DevFlowAgentPath)' == ''">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../ui-labs/src/DevFlow'))</DevFlowAgentPath>
+  </PropertyGroup>
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -39,8 +44,8 @@
     <!-- Local checkout rather than the published package: see the matching comment in
          TestApp.csproj. Linux mouse injection (XTest) is only in that checkout for now
          (lextudio/ui-labs#3). -->
-    <ProjectReference Include="/home/aleu1c014278/ui-labs/src/DevFlow/LeXtudio.DevFlow.Agent.LibreWpf/LeXtudio.DevFlow.Agent.LibreWpf.csproj" />
-    <ProjectReference Include="/home/aleu1c014278/ui-labs/src/DevFlow/LeXtudio.DevFlow.Agent.Core/LeXtudio.DevFlow.Agent.Core.csproj" />
+    <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.LibreWpf/LeXtudio.DevFlow.Agent.LibreWpf.csproj" />
+    <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.Core/LeXtudio.DevFlow.Agent.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
