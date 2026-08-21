@@ -259,15 +259,17 @@ namespace AvalonDock.DevFlowIntegrationTests
 				if (systemEventsFailure != null)
 					throw new InvalidOperationException(systemEventsFailure + $" Raw z-order payload: {json}");
 
-				// On Linux the verb reports z-order through the Win32 GetWindow walk, which has no
-				// equivalent there, so this check cannot run yet - reading _NET_CLIENT_LIST_STACKING
-				// would be the way to implement it. Skip rather than fail: the drag itself is exercised
-				// by the surrounding test, and failing here would report a missing diagnostic as a
-				// product defect.
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+				// On Linux the verb answers from the X server's _NET_CLIENT_LIST_STACKING, which needs a
+				// reachable X display (X11, or XWayland under a Wayland session). Skip only when the
+				// verb reports it had no source at all - once z-order IS readable, a window missing
+				// from the stacking order is a real result and must fail rather than quietly skip,
+				// otherwise re-enabling this check would just trade one blind spot for another.
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+					&& !string.Equals(ReadZOrderSource(root), "x11", StringComparison.Ordinal))
 				{
 					Xunit.Assert.Skip(
-						$"OS z-order for floating windows is not readable on Linux yet: {json}");
+						$"OS z-order for floating windows needs an X display, which this session does " +
+						$"not have: {json}");
 					return;
 				}
 
@@ -277,6 +279,16 @@ namespace AvalonDock.DevFlowIntegrationTests
 			if (!root.TryGetProperty("isFloatingAboveMain", out var above) || above.ValueKind != JsonValueKind.True)
 				throw new InvalidOperationException($"Floating window '{contentId}' is not above the main window: {json}");
 		}
+
+		/// <summary>
+		/// Reports which OS facility the z-order verb answered from ("win32", "appkit", "x11", or
+		/// "none"), so a caller can tell "this platform cannot report z-order" apart from "z-order is
+		/// readable and the answer is no". Older TestApp builds omit the field entirely.
+		/// </summary>
+		private static string ReadZOrderSource(JsonElement zOrderPayload)
+			=> zOrderPayload.TryGetProperty("zOrderSource", out var source) && source.ValueKind == JsonValueKind.String
+				? source.GetString()
+				: null;
 
 		private static bool TryAssertFloatingWindowAboveMainWithSystemEvents(JsonElement zOrderPayload, out string failure)
 		{

@@ -740,7 +740,16 @@ namespace TestApp
 				["isFloatingAboveMain"] = mainFound && floatingFound && IsPlatformZOrderAbove(floatingZ, mainZ),
 				["zOrderConvention"] = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
 					? "lower index is frontmost in NSApplication.orderedWindows"
-					: "higher z-order is frontmost in Win32 GetWindow walk",
+					: RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+						? "higher index is frontmost in _NET_CLIENT_LIST_STACKING"
+						: "higher z-order is frontmost in Win32 GetWindow walk",
+				// Lets a caller tell "this platform cannot report z-order at all" (skip) apart from
+				// "z-order is readable and the answer is no" (a real failure).
+				["zOrderSource"] = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+					? "appkit"
+					: RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+						? (X11WindowStacking.IsAvailable ? "x11" : "none")
+						: "win32",
 				["floatingLeft"] = floating.Left,
 				["floatingTop"] = floating.Top,
 				["floatingWidth"] = floating.ActualWidth,
@@ -748,6 +757,33 @@ namespace TestApp
 				["mainIsActive"] = IsActive,
 				["floatingIsActive"] = floating.IsActive,
 				["floatingTopmost"] = floating.Topmost,
+			});
+		}
+
+		[DevFlowAction("avd.query.x11-stacking", Description = "Dump the X server's window stacking order and which entries belong to this app")]
+		public string QueryX11Stacking()
+		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+				return System.Text.Json.JsonSerializer.Serialize(new { supported = false });
+
+			var known = new Dictionary<IntPtr, string>();
+			foreach (var window in Application.Current.Windows.OfType<Window>())
+			{
+				var xid = X11WindowStacking.TryGetWindowId(window);
+				if (xid != IntPtr.Zero)
+					known[xid] = $"{window.GetType().Name}:{window.Title}";
+			}
+
+			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			{
+				["supported"] = true,
+				["displayAvailable"] = X11WindowStacking.IsAvailable,
+				["appWindows"] = known.Select(kv => new Dictionary<string, object>
+				{
+					["windowId"] = kv.Key.ToInt64(),
+					["owner"] = kv.Value,
+				}).ToArray(),
+				["stacking"] = X11WindowStacking.DescribeStacking(known),
 			});
 		}
 
@@ -2556,11 +2592,20 @@ namespace TestApp
 		// WindowInteropHelper(window).Handle is a Win32-shaped HWND surrogate; it is never the real
 		// NSWindow* pointer on macOS, so comparing it against NSApplication.orderedWindows (an array
 		// of actual NSWindow* Objective-C objects) in TryGetMacWindowOrder could never match. Resolve
-		// the genuine Cocoa window pointer via the LibreWPF/Silk.NET native window instead.
+		// the genuine Cocoa window pointer via the LibreWPF/Silk.NET native window instead. Linux has
+		// the same mismatch: the surrogate is a PortablePresentationSource counter value, so the X11
+		// window id has to come from the native window too (see X11WindowStacking).
 		private static IntPtr GetNativeWindowHandle(Window window)
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 				return PlatformHelper.GetNativeWindowHandle(window);
+
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+			{
+				var xid = X11WindowStacking.TryGetWindowId(window);
+				if (xid != IntPtr.Zero)
+					return xid;
+			}
 
 			return new WindowInteropHelper(window).Handle;
 		}
@@ -2570,6 +2615,9 @@ namespace TestApp
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 				return TryGetMacWindowOrder(hwnd, out zOrder);
 
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+				return X11WindowStacking.TryGetStackIndex(hwnd, out zOrder);
+
 			return TryGetWindowZOrder(hwnd, out zOrder);
 		}
 
@@ -2578,6 +2626,8 @@ namespace TestApp
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 				return candidateZOrder < referenceZOrder;
 
+			// Win32 (walked from GW_HWNDLAST upwards) and _NET_CLIENT_LIST_STACKING (published
+			// bottom-to-top) share the same convention: the larger index is nearer the front.
 			return candidateZOrder > referenceZOrder;
 		}
 
