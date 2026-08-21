@@ -152,12 +152,10 @@ namespace AvalonDock.Controls
 		void IOverlayWindowHost.HideOverlayWindow()
 		{
 			_dropAreas = null;
-			var overlayWindow = _overlayWindow;
-			_overlayWindow = null;
-			if (overlayWindow == null) return;
-			overlayWindow.Owner = null;
-			overlayWindow.HideDropTargets();
-			overlayWindow.Close();
+
+			// Hidden and kept for the next drag rather than closed, so that an interrupted drag cannot
+			// pile up empty windows (issue #587). It is closed together with this window in OnClosed.
+			_overlayWindow?.HideOverlay();
 		}
 
 		/// <inheritdoc/>
@@ -177,7 +175,11 @@ namespace AvalonDock.Controls
 			if (_dropAreas != null) return _dropAreas;
 			_dropAreas = new List<IDropArea>();
 			if (draggingWindow.Model is LayoutDocumentFloatingWindow) return _dropAreas;
-			var rootVisual = (Content as FloatingWindowContentHost).RootVisual;
+
+			// A window whose content has already been released offers nothing to drop onto (issue #587).
+			var rootVisual = (Content as FloatingWindowContentHost)?.RootVisual;
+			if (rootVisual == null) return _dropAreas;
+
 			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>())
 				_dropAreas.Add(new DropArea<LayoutAnchorablePaneControl>(areaHost, DropAreaType.AnchorablePane));
 			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutDocumentPaneControl>())
@@ -189,8 +191,18 @@ namespace AvalonDock.Controls
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
-			var manager = _model.Root.Manager;
-			Content = manager.CreateUIElementForModel(_model.RootPanel);
+
+			// The window reaches the screen through a deferred dispatcher operation, so its model can
+			// have left the layout tree before this runs - the window hosting the docking manager was
+			// closed in the meantime, say. There is no manager to build the content from then, and a
+			// window with no content is what an already detached model should produce. OnClosed and
+			// OnRootUpdated expect a model without a root for the same reason.
+			var manager = _model.Root?.Manager;
+			if (manager != null)
+			{
+				Content = manager.CreateUIElementForModel(_model.RootPanel);
+			}
+
 			// SetBinding(VisibilityProperty, new Binding("IsVisible") { Source = _model, Converter = new BoolToVisibilityConverter(), Mode = BindingMode.OneWay, ConverterParameter = Visibility.Hidden });
 
 			// Issue: http://avalondock.codeplex.com/workitem/15036

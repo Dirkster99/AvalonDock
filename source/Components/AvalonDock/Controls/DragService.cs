@@ -75,6 +75,11 @@ namespace AvalonDock.Controls
 			// TODO - pass in without DPI adjustment, screen co-ords, adjust inside the target window
 			if (!_isDrag)
 			{
+				// A previous drag that never reported its end - Windows can drop the modal move loop
+				// without a WM_EXITSIZEMOVE when a window crosses monitors of a different DPI - may still
+				// have an overlay window on screen. Clearing them here keeps them from accumulating into
+				// empty windows that only disappear with the application (issue #587).
+				_manager?.HideAllOverlayWindows();
 				GetOverlayWindowHosts();
 				_isDrag = true;
 			}
@@ -246,6 +251,10 @@ namespace AvalonDock.Controls
 			_currentWindow = null;
 			_currentHost = null;
 			_isDrag = false;
+
+			// The host tracked above is not necessarily the only one that has been asked to show an
+			// overlay window during this drag, so every host is cleared (issue #587).
+			_manager?.HideAllOverlayWindows();
 		}
 
 		/// <summary>
@@ -253,8 +262,8 @@ namespace AvalonDock.Controls
 		/// </summary>
 		internal void Abort()
 		{
-			var floatingWindowModel = _floatingWindow.Model as LayoutFloatingWindow;
-
+			// An abort also runs when the dragged window is closed while the drag is still in progress,
+			// where there may be no overlay window to leave any more (issue #587).
 			if (_currentWindow != null)
 			{
 				_currentWindowAreas.ForEach(a => _currentWindow.DragLeave(a));
@@ -273,6 +282,11 @@ namespace AvalonDock.Controls
 				_currentHost.HideOverlayWindow();
 
 			_currentHost = null;
+			_isDrag = false;
+
+			// The host tracked above is not necessarily the only one that has been asked to show an
+			// overlay window during this drag, so every host is cleared (issue #587).
+			_manager?.HideAllOverlayWindows();
 		}
 
 		/// <summary>

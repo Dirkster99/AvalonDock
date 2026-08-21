@@ -51,6 +51,7 @@ namespace AvalonDock
 			_manager.DocumentsSource = _documentModels;
 			_manager.AnchorablesSource = _anchorableModels;
 
+			SyncWindowPolicyToWpf();
 			SyncActiveContentToWpf();
 
 			SubscribeToMvvm();
@@ -242,6 +243,26 @@ namespace AvalonDock
 			{
 				SyncActiveContentToWpf();
 			}
+			else if (e.PropertyName == nameof(IRootDock.AllowFloatingWindows)
+				|| e.PropertyName == nameof(IRootDock.AllowDetachedWindows))
+			{
+				SyncWindowPolicyToWpf();
+			}
+		}
+
+		/// <summary>
+		/// Pushes the window policy declared by the view model layout onto the docking manager.
+		/// </summary>
+		/// <remarks>
+		/// One way by design: these are a decision the application makes about its layout, so the manager
+		/// follows the view model and never writes back. It lets an application built with
+		/// <c>AvalonDock.Mvvm</c> or the dependency injection package switch floating and standalone
+		/// windows off without touching the view.
+		/// </remarks>
+		private void SyncWindowPolicyToWpf()
+		{
+			_manager.AllowFloatingWindows = _rootDock.AllowFloatingWindows;
+			_manager.AllowDetachedWindows = _rootDock.AllowDetachedWindows;
 		}
 
 		private void OnWpfActiveContentChanged(object sender, EventArgs e)

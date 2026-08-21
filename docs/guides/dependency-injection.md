@@ -11,7 +11,7 @@ description: "Register AvalonDock services with dependency injection."
 AvalonDock v5 provides built-in support for `Microsoft.Extensions.DependencyInjection` through the `AvalonDock.DependencyInjection` package.
 
 {: .tip }
-For a full walkthrough, see [Tutorial: Dependency Injection Deep Dive]({% link tutorials/dependency-injection-app.md %}). The `AvalonDockCodeApp` sample project demonstrates all DI patterns.
+For a full walkthrough, see [Tutorial: Dependency Injection Deep Dive]({{ site.baseurl }}{% link tutorials/dependency-injection-app.md %}). The `AvalonDockCodeApp` sample project demonstrates all DI patterns.
 
 ---
 
@@ -38,6 +38,7 @@ Used inside the `AddDockLayoutService(dock => { ... })` builder:
 
 | Method | Purpose |
 |:-------|:--------|
+| `ConfigureDocking(configure)` | Configure manager-wide behavior: whether floating windows and standalone windows are available |
 | `ConfigureToggleDock(configure)` | Configure sidebar button size, dock dimensions, layout priority |
 | `AddToolbox<T>()` | Register a toolbox VM as singleton |
 | `AddToolbox<T>(factory)` | Register a toolbox VM with a custom factory |
@@ -114,6 +115,37 @@ services.AddDockLayoutService(dock =>
 ```
 
 If `ConfigureToggleDock` is not called, default `ToggleDockOptions` are registered automatically.
+
+### DockingOptions
+
+{: .new }
+> New in v5.0.0
+
+`ToggleDockOptions` derives from `DockingOptions`, which carries the switches that apply to any
+docking manager. Configure them with `ConfigureDocking` — or on the same options object through
+`ConfigureToggleDock`, since both configure methods share one instance:
+
+```csharp
+services.AddDockLayoutService(dock =>
+{
+    dock.ConfigureDocking(o =>
+    {
+        o.AllowFloatingWindows = false;   // No tear-off into floating windows
+        o.AllowDetachedWindows = false;   // No standalone "Window" view mode
+    });
+});
+```
+
+| Option | Type | Default | Description |
+|:-------|:-----|:--------|:------------|
+| `AllowFloatingWindows` | `bool` | `true` | Whether content can be torn off into floating windows. |
+| `AllowDetachedWindows` | `bool` | `true` | Whether anchorables can be moved into standalone top level windows. |
+
+These are applied to the layout of `IDockLayoutService`, so a `DockingManager` bound to that layout
+through `DockLayout` picks them up on its own — nothing has to be copied over in the code-behind of
+the window. Both `DockingOptions` and `ToggleDockOptions` resolve to the same registered instance.
+
+See [Floating Windows]({{ site.baseurl }}{% link concepts/floating-windows.md %}) for what each switch turns off.
 
 ### Layout Priority Modes
 

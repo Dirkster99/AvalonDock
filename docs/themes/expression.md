@@ -33,3 +33,10 @@ dockManager.Theme = new ExpressionDarkTheme();
 ```csharp
 dockManager.Theme = new ExpressionLightTheme();
 ```
+
+## Docking hints
+
+Both variants draw the drop-target hints shown while a pane is dragged, using the PNG glyphs
+shipped in the package (`Images/DockDocument*.png`, `Images/DockAnchorable*.png`). Earlier
+releases declared the `OverlayWindow` template without those glyphs, so the hints were invisible
+and the centre "dock into" target had no clickable area.

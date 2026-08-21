@@ -362,7 +362,11 @@ namespace AvalonDock.Controls
 		/// <summary>Coerces the <see cref="FloatCommand"/> value.</summary>
 		private static object CoerceFloatCommandValue(DependencyObject d, object value) => value;
 
-		private bool CanExecuteFloatCommand(object anchorable) => LayoutElement != null && LayoutElement.CanFloat && LayoutElement.FindParent<LayoutFloatingWindow>() == null;
+		private bool CanExecuteFloatCommand(object anchorable) =>
+			LayoutElement != null
+			&& LayoutElement.CanFloat
+			&& LayoutElement.Root?.Manager?.AllowFloatingWindows != false
+			&& LayoutElement.FindParent<LayoutFloatingWindow>() == null;
 
 		/// <summary>Executes to float the content of this LayoutItem in a separate <see cref="LayoutFloatingWindowControl"/>.</summary>
 		/// <param name="parameter">The command parameter.</param>
@@ -830,7 +834,13 @@ namespace AvalonDock.Controls
 
 			IsSelected = LayoutElement.IsSelected;
 			IsActive = LayoutElement.IsActive;
-			CanClose = LayoutElement.CanClose;
+
+			// Seed CanClose from the model with SetCurrentValue rather than a local value. A local value outranks
+			// a Style setter, so the plain assignment used to defeat a <Setter Property="CanClose" Value="False"/>
+			// whenever the style arrived after the item had already been created - which is what happens when the
+			// DataContext is declared in XAML and DocumentsSource is therefore resolved before
+			// LayoutItemContainerStyle(Selector) is assigned.
+			SetCurrentValue(CanCloseProperty, LayoutElement.CanClose);
 		}
 
 		/// <summary>

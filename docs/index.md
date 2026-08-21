@@ -12,7 +12,7 @@ permalink: /
 A powerful WPF Document and Tool Window layout container for building Visual Studio-like docking interfaces.
 {: .fs-6 .fw-300 }
 
-[Get Started]({% link getting-started/index.md %}){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[Get Started]({{ site.baseurl }}{% link getting-started/index.md %}){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
 [View on GitHub](https://github.com/Dirkster99/AvalonDock){: .btn .fs-5 .mb-4 .mb-md-0 }
 
 ---
@@ -104,7 +104,7 @@ AvalonDock is a WPF library and runs exclusively on Windows.
 
 ## Upgrading from v4?
 
-If you are migrating from AvalonDock v4.x, see the [Migration Guide]({% link migration/index.md %}) for a complete list of breaking changes and step-by-step upgrade instructions.
+If you are migrating from AvalonDock v4.x, see the [Migration Guide]({{ site.baseurl }}{% link migration/index.md %}) for a complete list of breaking changes and step-by-step upgrade instructions.
 
 ---
 

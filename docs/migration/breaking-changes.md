@@ -56,6 +56,20 @@ The layout calculation logic has been formalized behind the `ILayoutEngine` inte
 | **Affected** | Custom layout calculations using internal APIs |
 | **Fix** | Implement `ILayoutEngine` for custom layout behavior. |
 
+### Window Policy Members on Core Interfaces
+
+**Impact:** Low — only affects custom implementations of the core interfaces.
+
+`IDockingManager` and `IRootDock` each gained `AllowFloatingWindows` and `AllowDetachedWindows`. The
+shipped implementations (`DockingManager`, `AvalonDock.Mvvm.RootDock`) provide them; a hand-written
+implementation of either interface has to add them.
+
+| Change | Details |
+|:-------|:--------|
+| **Added** | `IDockingManager.AllowFloatingWindows`, `IDockingManager.AllowDetachedWindows` |
+| **Added** | `IRootDock.AllowFloatingWindows`, `IRootDock.AllowDetachedWindows` |
+| **Fix** | Add both `bool` properties, defaulting to `true` to keep the previous behavior. |
+
 ---
 
 ## Target Framework Changes
@@ -102,7 +116,11 @@ These additions are new in v5.0.0 and do not break existing code:
 | Feature | Package | Description |
 |:--------|:--------|:------------|
 | ToggleDockingManager | `AvalonDock` | VS Code / Rider-style sidebar with toggle buttons. |
+| Standalone Windows | `AvalonDock` | `DetachAnchorableToWindow` moves a tool window into an ordinary top level window with its own taskbar entry ("Window" view mode). Survives layout serialization. |
+| Window Policy | `AvalonDock` | `DockingManager.AllowFloatingWindows` and `AllowDetachedWindows` turn floating windows and the standalone "Window" view mode off for the whole manager. Also on `IRootDock` (MVVM) and `DockingOptions` (DI). |
+| Toolbox Shortcuts | `AvalonDock` | `IToolbox.Shortcut` registers a key binding that toggles the toolbox and shows up in its tooltip. |
 | Arc Theme | `AvalonDock.Themes.Arc` | Modern theme with dark/light variants. |
+| VS Themes | `AvalonDock.Themes.VS` | `.vstheme` based Visual Studio themes with VS2015, VS2022 and VS2026 variants, plus loading of custom theme files. |
 | JSON Serializer | `AvalonDock.Serializer.Json` | JSON-based layout serialization. |
 | MVVM Base Classes | `AvalonDock.Mvvm` | `DockableBase`, `ToolboxBase`, `DockLayoutService`, etc. |
 | MVVM CommunityToolkit | `AvalonDock.Mvvm.CommunityToolkit` | `ObservableDockableBase`, `ObservableToolboxBase` with source generators. |
@@ -120,6 +138,82 @@ A bug fix in v5.0.0 corrects the restacking behavior for bottom-docked panels. I
 
 **Fix:** Test your layouts and adjust panel placement if needed.
 
+### Unresolved Items Are Dropped on Deserialization
+
+**Impact:** Low — affects applications that read `LayoutRoot.Hidden` after restoring a layout.
+
+When a stored layout contains an item whose content cannot be resolved — a tool window the
+application no longer offers, or one the `LayoutSerializationCallback` supplies no content for —
+that item is now removed from the layout entirely.
+
+In v4 an unresolved *anchorable* was hidden instead: it stayed in `LayoutRoot.Hidden` with the pane
+and index it was stored at, and was written back into every layout saved afterwards. Unresolved
+*documents* were already removed, so anchorables were the exception rather than the rule. The v4
+source described both cases as "skip this".
+
+**Fix:** Nothing to do in most applications. If yours attaches content after the layout was restored
+— a plugin that loads late, or a tool window created on first use that expects to find itself in the
+hidden list — request the old behavior explicitly:
+
+```csharp
+var serializer = new XmlLayoutSerializer(dockManager)
+{
+    UnresolvedContentHandling = UnresolvedContentHandling.Hide
+};
+```
+
+Prefer deciding per item where you can. Only the application can tell a tool window that will never
+come back from one whose plugin simply has not loaded yet, and parking only the latter keeps the
+stored layout free of entries nothing will ever claim:
+
+```csharp
+serializer.LayoutSerializationCallback += (s, args) =>
+{
+    var content = FindContent(args.Model.ContentId);
+    if (content != null)
+    {
+        args.Content = content;
+        return;
+    }
+
+    // A plugin we know about but have not loaded yet: keep the entry so the tool window can
+    // return to its stored position once the plugin supplies its content.
+    if (_knownPluginContentIds.Contains(args.Model.ContentId))
+        args.UnresolvedContentHandling = UnresolvedContentHandling.Hide;
+};
+```
+
+Restoring a parked item once its content arrives:
+
+```csharp
+var parked = dockManager.Layout.Hidden.FirstOrDefault(a => a.ContentId == contentId);
+if (parked != null)
+{
+    parked.Content = pluginViewModel;
+    parked.Show();
+}
+```
+
+`Show()` puts the anchorable back into the pane and at the index it was stored at. If that pane is no
+longer part of the layout — a restored layout rebuilds the docked area from scratch — it docks to an
+existing tool window pane instead, creating one if the layout has none, so the call never silently
+does nothing. Under `ToggleDockingManager` use `RestoreHiddenAnchorable`, which places the tool
+window on the sidebar of its zone.
+
+Note that `args.Cancel = true` always drops the item, under either setting.
+
+### ToolTip Is No Longer Stored in the Layout
+
+**Impact:** Low — affects applications that set `LayoutContent.ToolTip` and never set it again.
+
+A tool tip belongs to the content, not to the layout. `LayoutItem` pushes it down from the view every
+time the view is attached, and it is routinely a control or a binding, neither of which a layout file
+can describe. v4 wrote the text form of it into the file and read it back; v5 leaves it out.
+
+**Fix:** Set the tool tip where you set the rest of the content — in the view, or on the view model
+the `LayoutSerializationCallback` supplies. A `ToolTip` attribute in a file written by v4 is ignored
+on read, so existing layout files still load.
+
 ---
 
 ## Summary Table
@@ -129,8 +223,11 @@ A bug fix in v5.0.0 corrects the restacking behavior for bottom-docked panels. I
 | Packages | Serializers separated | High | Install serializer package |
 | Namespaces | Serializer namespace moved | High | Update `using` statements |
 | Architecture | `ILayoutEngine` added | Low | No action for default behavior |
+| Architecture | Window policy members on `IDockingManager` / `IRootDock` | Low | Add both properties to custom implementations |
 | Frameworks | .NET < 4.8 dropped | High | Upgrade target framework |
 | Frameworks | .NET Core 3.x / 5 dropped | High | Upgrade target framework |
 | Themes | Arc theme added | None | Optional adoption |
 | Serialization | JSON serializer added | None | Optional adoption |
 | Behavior | Bottom restack fix | Low | Test and verify layouts |
+| Behavior | Unresolved layout items dropped | Low | Set `UnresolvedContentHandling.Hide` if you relied on `LayoutRoot.Hidden` |
+| Behavior | `ToolTip` no longer stored in the layout | Low | Set it in the view or on the view model |

@@ -296,6 +296,35 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
+		/// Takes this overlay window off the screen and discards the state of the drag operation it was
+		/// showing drop targets for.
+		/// </summary>
+		/// <remarks>
+		/// An overlay window is reused for every drag over its host instead of being closed and recreated,
+		/// so that an interrupted drag can never leave an ever growing number of empty, non interactive
+		/// windows behind (issue #587). Reuse requires the state of the previous drag to be dropped here.
+		/// </remarks>
+		internal void HideOverlay()
+		{
+			HideDropTargets();
+
+			if (_gridDockingManagerDropTargets != null)
+				_gridDockingManagerDropTargets.Visibility = System.Windows.Visibility.Hidden;
+			if (_gridAnchorablePaneDropTargets != null)
+				_gridAnchorablePaneDropTargets.Visibility = System.Windows.Visibility.Hidden;
+			if (_gridDocumentPaneDropTargets != null)
+				_gridDocumentPaneDropTargets.Visibility = System.Windows.Visibility.Hidden;
+			if (_gridDocumentPaneFullDropTargets != null)
+				_gridDocumentPaneFullDropTargets.Visibility = System.Windows.Visibility.Hidden;
+
+			// The reference to the dragged window is deliberately kept. The drag service hides this overlay
+			// window before it hands the drop over and before it leaves the drop areas again, and all of
+			// those steps still need to know which window is being dragged.
+			_visibleAreas.Clear();
+			Hide();
+		}
+
+		/// <summary>
 		/// Sets the set Drop Target Into Visibility.
 		/// </summary>
 		/// <param name="positionableElement">The positionable Element.</param>

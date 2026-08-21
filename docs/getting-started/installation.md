@@ -42,6 +42,9 @@ AvalonDock ships with a default generic theme, but you'll likely want one of the
 # Modern Arc theme (recommended)
 dotnet add package Dirkster.AvalonDock.Themes.Arc
 
+# Visual Studio themes built from .vstheme files (VS2015, VS2022 and VS2026 variants)
+dotnet add package Dirkster.AvalonDock.Themes.VS
+
 # Visual Studio 2013 theme
 dotnet add package Dirkster.AvalonDock.Themes.VS2013
 
@@ -84,7 +87,7 @@ After installing, add the AvalonDock namespace to your XAML:
 </Window>
 ```
 
-If the project builds without errors, you're ready to go. Head to the [Quick Start]({% link getting-started/quick-start.md %}) guide to build your first layout.
+If the project builds without errors, you're ready to go. Head to the [Quick Start]({{ site.baseurl }}{% link getting-started/quick-start.md %}) guide to build your first layout.
 
 ---
 

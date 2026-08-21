@@ -89,7 +89,6 @@ Extends `LayoutItem` for documents. Inherits all `LayoutItem` properties.
 | Control | Description |
 |:--------|:------------|
 | `OverlayWindow` | Transparent overlay showing docking indicators during drag. |
-| `OverlayArea` | Area within the overlay window for drop detection. |
 | `AnchorablePaneDropTarget` | Drop target for anchorable panes. |
 | `DocumentPaneDropTarget` | Drop target for document panes. |
 | `DockingManagerDropTarget` | Drop target at the edge of the docking manager. |

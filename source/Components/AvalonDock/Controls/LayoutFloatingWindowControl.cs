@@ -49,6 +49,18 @@ namespace AvalonDock.Controls
 		private bool _internalCloseFlag = false;
 
 		/// <summary>
+		/// The window hosting the <see cref="DockingManager"/> that has not been shown yet and whose
+		/// <see cref="Window.SourceInitialized"/> event is awaited to establish the ownership (issue #618).
+		/// </summary>
+		private Window _deferredOwnerWindow;
+
+		/// <summary>
+		/// The <see cref="DockingManager"/> whose <see cref="FrameworkElement.Loaded"/> event is awaited
+		/// before this floating window is shown (issue #618).
+		/// </summary>
+		private DockingManager _deferredShowManager;
+
+		/// <summary>
 		/// Caches the inheritable dependency properties that are mirrored from the <see cref="DockingManager"/>
 		/// onto every floating window.
 		/// </summary>
@@ -467,12 +479,7 @@ namespace AvalonDock.Controls
 					break;
 
 				case Win32Helper.WM_LBUTTONUP: // set as handled right button click on title area (after showing context menu)
-					if (_dragService != null && Mouse.LeftButton == MouseButtonState.Released)
-					{
-						_dragService.Abort();
-						_dragService = null;
-						SetIsDragging(false);
-					}
+					if (_dragService != null && Mouse.LeftButton == MouseButtonState.Released) AbortDrag();
 
 					break;
 
@@ -625,15 +632,28 @@ namespace AvalonDock.Controls
 			SizeChanged -= OnSizeChanged;
 			if (UsePortableCaptionDrag)
 				InputManager.Current.PostProcessInput -= OnPortablePostProcessInput;
-			if (Content != null)
+			DetachDeferredOwnershipUpdate();
+			CancelDeferredShow();
+
+			// A drag that is still running would keep the overlay window of its current host on screen
+			// for the rest of the session, because the window that drives the drag is gone (issue #587).
+			AbortDrag();
+
+			if (Content is FloatingWindowContentHost contentHost)
 			{
-				(Content as FloatingWindowContentHost)?.Dispose();
-				if (_hwndSrc != null)
-				{
-					_hwndSrc.RemoveHook(_hwndSrcHook);
-					_hwndSrc.Dispose();
-					_hwndSrc = null;
-				}
+				contentHost.Dispose();
+
+				// Closing this window has already destroyed the native window hosting the content, so
+				// HwndHost skips DestroyWindowCore and neither the HwndSource nor the logical child that
+				// the DockingManager holds would ever be released (issue #587).
+				contentHost.ReleaseHostedContent();
+			}
+
+			if (_hwndSrc != null)
+			{
+				_hwndSrc.RemoveHook(_hwndSrcHook);
+				_hwndSrc.Dispose();
+				_hwndSrc = null;
 			}
 
 			base.OnClosed(e);
@@ -830,12 +850,128 @@ namespace AvalonDock.Controls
 			var manager = Model?.Root?.Manager;
 			if (OwnedByDockingManagerWindow && manager != null)
 			{
-				this.SetParentToMainWindowOf(manager);
+				if (this.SetParentToMainWindowOf(manager))
+				{
+					DetachDeferredOwnershipUpdate();
+				}
+				else
+				{
+					// The window hosting the DockingManager has not been shown yet, so it cannot own this
+					// floating window before it has created its native window handle (issue #618).
+					DeferOwnershipUpdate(Window.GetWindow(manager));
+				}
 			}
 			else
 			{
+				DetachDeferredOwnershipUpdate();
 				this.SetParentWindowToNull();
 			}
+		}
+
+		/// <summary>
+		/// Retries <see cref="UpdateOwnership"/> as soon as <paramref name="ownerWindow"/> has created its
+		/// native window handle, because WPF cannot own a window by a window that has never been shown.
+		/// </summary>
+		/// <param name="ownerWindow">The window hosting the <see cref="DockingManager"/> of this floating window.</param>
+		private void DeferOwnershipUpdate(Window ownerWindow)
+		{
+			if (ownerWindow == null || ReferenceEquals(ownerWindow, _deferredOwnerWindow))
+				return;
+
+			DetachDeferredOwnershipUpdate();
+			_deferredOwnerWindow = ownerWindow;
+			ownerWindow.SourceInitialized += OnDeferredOwnerWindowSourceInitialized;
+		}
+
+		/// <summary>
+		/// Stops waiting for the window hosting the <see cref="DockingManager"/> to be shown.
+		/// </summary>
+		private void DetachDeferredOwnershipUpdate()
+		{
+			if (_deferredOwnerWindow == null)
+				return;
+
+			_deferredOwnerWindow.SourceInitialized -= OnDeferredOwnerWindowSourceInitialized;
+			_deferredOwnerWindow = null;
+		}
+
+		private void OnDeferredOwnerWindowSourceInitialized(object sender, EventArgs e)
+		{
+			DetachDeferredOwnershipUpdate();
+			if (_isClosing)
+				return;
+
+			UpdateOwnership();
+		}
+
+		/// <summary>
+		/// Shows this floating window, or postpones the operation until the <see cref="DockingManager"/> is
+		/// loaded when the window hosting it has not been shown yet.
+		/// </summary>
+		/// <remarks>
+		/// Showing a floating window while the window hosting the <see cref="DockingManager"/> is still
+		/// invisible puts a window on screen that has no visible owner, so the operation is postponed until
+		/// the <see cref="DockingManager"/> is loaded - the same point in time at which
+		/// <see cref="DockingManager"/> creates the floating windows of a layout that was assigned before the
+		/// hosting window was shown (issue #618).
+		/// </remarks>
+		internal void ShowWhenHostWindowIsShown()
+		{
+			var manager = Model?.Root?.Manager;
+			if (manager == null)
+			{
+				Show();
+				return;
+			}
+
+			// A DockingManager that is not hosted in a WPF Window - inside a WindowsFormsHost, for example -
+			// never gets a hosting window to wait for, so the floating window is shown right away.
+			var hostWindow = Window.GetWindow(manager);
+			if (hostWindow == null || hostWindow.IsWindowHandleCreated())
+			{
+				Show();
+				return;
+			}
+
+			// Establishes the ownership as soon as the hosting window has created its window handle, which
+			// happens before the DockingManager is loaded.
+			UpdateOwnership();
+			DeferShow(manager);
+		}
+
+		/// <summary>
+		/// Shows this floating window as soon as <paramref name="manager"/> is loaded.
+		/// </summary>
+		/// <param name="manager">The docking manager owning this floating window.</param>
+		private void DeferShow(DockingManager manager)
+		{
+			if (ReferenceEquals(manager, _deferredShowManager))
+				return;
+
+			CancelDeferredShow();
+			_deferredShowManager = manager;
+			manager.Loaded += OnDeferredShowManagerLoaded;
+		}
+
+		/// <summary>
+		/// Stops waiting for the <see cref="DockingManager"/> to be loaded.
+		/// </summary>
+		private void CancelDeferredShow()
+		{
+			if (_deferredShowManager == null)
+				return;
+
+			_deferredShowManager.Loaded -= OnDeferredShowManagerLoaded;
+			_deferredShowManager = null;
+		}
+
+		private void OnDeferredShowManagerLoaded(object sender, RoutedEventArgs e)
+		{
+			CancelDeferredShow();
+			if (_isClosing)
+				return;
+
+			Show();
 		}
 
 		private const double KeyboardMoveStep = 10.0;
@@ -1346,6 +1482,24 @@ namespace AvalonDock.Controls
 		#endregion Portable (non-HWND) caption drag
 
 		/// <summary>
+		/// Ends a drag operation that is still in progress without dropping anything.
+		/// </summary>
+		/// <remarks>
+		/// The overlay windows that the drag has put on screen belong to the drop target hosts, not to
+		/// this window, so they have to be taken down explicitly whenever a drag ends by any other means
+		/// than a regular drop (issue #587).
+		/// </remarks>
+		private void AbortDrag()
+		{
+			if (_dragService == null) return;
+
+			var dragService = _dragService;
+			_dragService = null;
+			dragService.Abort();
+			SetIsDragging(false);
+		}
+
+		/// <summary>
 		/// Enable bindings.
 		/// </summary>
 		public virtual void EnableBindings()
@@ -1446,6 +1600,10 @@ namespace AvalonDock.Controls
 			/// <inheritdoc/>
 			protected override HandleRef BuildWindowCore(HandleRef hwndParent)
 			{
+				// A rebuild must never orphan the native window of a previous build - its HWND would
+				// stay alive until the process ends (issue #587).
+				ReleaseHostedContent();
+
 				_wpfContentHost = new HwndSource(new HwndSourceParameters
 				{
 					ParentWindow = hwndParent.Handle,
@@ -1465,9 +1623,30 @@ namespace AvalonDock.Controls
 			}
 
 			/// <inheritdoc/>
-			protected override void DestroyWindowCore(HandleRef hwnd)
+			protected override void DestroyWindowCore(HandleRef hwnd) => ReleaseHostedContent();
+
+			/// <summary>
+			/// Releases the native window hosting the content of the floating window together with the
+			/// logical child that the <see cref="DockingManager"/> keeps on its behalf.
+			/// </summary>
+			/// <remarks>
+			/// <see cref="HwndHost"/> only calls <see cref="DestroyWindowCore"/> while the hosted window is
+			/// still alive. Closing a <see cref="Window"/> destroys its native window - and with it every
+			/// child window - before <see cref="Window.Closed"/> is raised, so that call is skipped and both
+			/// the <see cref="HwndSource"/> and the logical child would survive every floating window for
+			/// the rest of the session (issue #587). The clean up is therefore also driven explicitly by
+			/// the floating window when it has been closed, and is idempotent.
+			/// </remarks>
+			internal void ReleaseHostedContent()
 			{
-				_manager.InternalRemoveLogicalChild(_rootPresenter);
+				if (_rootPresenter != null)
+				{
+					_manager?.InternalRemoveLogicalChild(_rootPresenter);
+					_rootPresenter = null;
+				}
+
+				_manager = null;
+
 				if (_wpfContentHost == null) return;
 				_wpfContentHost.Dispose();
 				_wpfContentHost = null;

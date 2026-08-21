@@ -194,6 +194,7 @@ namespace AvalonDock.Serialization
 				AutoHideMinHeight = anch.AutoHideMinHeight,
 				CanDockAsTabbedDocument = anch.CanDockAsTabbedDocument,
 				CanMove = anch.CanMove,
+				IsDetached = anch.IsDetached,
 			};
 			CopyContentToDto(anch, dto);
 			return dto;
@@ -205,7 +206,6 @@ namespace AvalonDock.Serialization
 			dto.ContentId = content.ContentId;
 			dto.IsSelected = content.IsSelected;
 			dto.IsLastFocusedDocument = content.IsLastFocusedDocument;
-			dto.ToolTip = content.ToolTip is string s ? s : null;
 			dto.FloatingLeft = content.FloatingLeft;
 			dto.FloatingTop = content.FloatingTop;
 			dto.FloatingWidth = content.FloatingWidth;
@@ -496,6 +496,7 @@ namespace AvalonDock.Serialization
 				AutoHideMinHeight = dto.AutoHideMinHeight,
 				CanDockAsTabbedDocument = dto.CanDockAsTabbedDocument,
 				CanMove = dto.CanMove,
+				IsDetached = dto.IsDetached,
 			};
 			ApplyContentFromDto(dto, anch);
 			return anch;
@@ -518,8 +519,12 @@ namespace AvalonDock.Serialization
 			content.CanFloat = dto.CanFloat;
 			content.CanShowOnHover = dto.CanShowOnHover;
 
-			if (dto.LastActivationTimeStamp != null)
-				content.LastActivationTimeStamp = DateTime.Parse(dto.LastActivationTimeStamp, CultureInfo.InvariantCulture);
+			// A timestamp that cannot be read is dropped rather than thrown on. It only orders the
+			// document navigator, and losing the whole layout over one unreadable attribute - a file
+			// written by an older version under a different culture, or edited by hand - is not a
+			// trade the user would make.
+			if (dto.LastActivationTimeStamp != null && TryParseTimeStamp(dto.LastActivationTimeStamp, out var timeStamp))
+				content.LastActivationTimeStamp = timeStamp;
 
 			if (dto.PreviousContainerId != null)
 			{
@@ -531,10 +536,12 @@ namespace AvalonDock.Serialization
 		private void ApplyPositionableFromDto<T>(LayoutPositionableGroupDto dto, LayoutPositionableGroup<T> target)
 			where T : class, ILayoutElement
 		{
-			if (dto.DockWidth != null)
-				target.DockWidth = (GridLength)GridLengthConverter.ConvertFromInvariantString(dto.DockWidth);
-			if (dto.DockHeight != null)
-				target.DockHeight = (GridLength)GridLengthConverter.ConvertFromInvariantString(dto.DockHeight);
+			// An unreadable length falls back to the default of the target instead of aborting the
+			// restore of the whole layout.
+			if (TryParseGridLength(dto.DockWidth, out var dockWidth))
+				target.DockWidth = dockWidth;
+			if (TryParseGridLength(dto.DockHeight, out var dockHeight))
+				target.DockHeight = dockHeight;
 			target.DockMinWidth = dto.DockMinWidth;
 			target.DockMinHeight = dto.DockMinHeight;
 			target.FloatingWidth = dto.FloatingWidth;
@@ -594,11 +601,61 @@ namespace AvalonDock.Serialization
 			}
 		}
 
+		/// <summary>
+		/// Parses a stored orientation, falling back to <see cref="Orientation.Horizontal"/> for a
+		/// value that cannot be read rather than aborting the restore of the whole layout.
+		/// </summary>
+		/// <param name="value">The stored orientation.</param>
+		/// <returns>The orientation.</returns>
 		private static Orientation ParseOrientation(string value)
 		{
 			if (string.IsNullOrEmpty(value))
 				return Orientation.Horizontal;
-			return (Orientation)Enum.Parse(typeof(Orientation), value, true);
+
+			return Enum.TryParse<Orientation>(value, true, out var orientation)
+				&& Enum.IsDefined(typeof(Orientation), orientation)
+					? orientation
+					: Orientation.Horizontal;
+		}
+
+		/// <summary>Reads a stored activation timestamp, tolerating a non-invariant culture.</summary>
+		/// <param name="value">The stored timestamp.</param>
+		/// <param name="timeStamp">The parsed timestamp.</param>
+		/// <returns><see langword="true"/> when the value could be read.</returns>
+		private static bool TryParseTimeStamp(string value, out DateTime timeStamp) =>
+			DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out timeStamp)
+			|| DateTime.TryParse(value, CultureInfo.CurrentCulture, DateTimeStyles.None, out timeStamp);
+
+		/// <summary>Reads a stored dock length.</summary>
+		/// <param name="value">The stored length, e.g. "1*" or "200".</param>
+		/// <param name="length">The parsed length.</param>
+		/// <returns><see langword="true"/> when the value could be read.</returns>
+		private static bool TryParseGridLength(string value, out GridLength length)
+		{
+			length = default;
+			if (value == null)
+				return false;
+
+			try
+			{
+				if (!(GridLengthConverter.ConvertFromInvariantString(value) is GridLength converted))
+					return false;
+
+				length = converted;
+				return true;
+			}
+			catch (NotSupportedException)
+			{
+				return false;
+			}
+			catch (FormatException)
+			{
+				return false;
+			}
+			catch (ArgumentException)
+			{
+				return false;
+			}
 		}
 	}
 }
