@@ -2,6 +2,13 @@
     <PropertyGroup>
         <RootNamespace>TestApp</RootNamespace>
         <TargetFramework>net10.0-windows</TargetFramework>
+        <!-- LibreWPF.Sdk forces UseWPF and UseWindowsForms to false whenever its portable framework
+             references are in use, and that flag defaults to true on every OS - which is why simply
+             setting UseWindowsForms here had no effect. Windows has real WPF and WinForms, so opt out
+             of the portable references there and let the WinForms tool window actually work; every
+             other platform keeps the portable build. -->
+        <ProGpuWpfUsePortableFrameworkReferences Condition="'$(OS)' == 'Windows_NT'">false</ProGpuWpfUsePortableFrameworkReferences>
+        <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
         <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
         <ApplicationIcon />

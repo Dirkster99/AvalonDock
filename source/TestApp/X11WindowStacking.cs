@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows;
+#if LIBREWPF
 using System.Windows.Media.ProGPU;
+#endif
 
 namespace TestApp
 {
@@ -72,6 +74,10 @@ namespace TestApp
 			if (window == null)
 				return IntPtr.Zero;
 
+#if !LIBREWPF
+			// ProGPU types only exist in the LibreWPF build; this whole class is Linux-only anyway.
+			return IntPtr.Zero;
+#else
 			try
 			{
 				if (!ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) ||
@@ -88,6 +94,7 @@ namespace TestApp
 			}
 
 			return IntPtr.Zero;
+#endif
 		}
 
 		/// <summary>

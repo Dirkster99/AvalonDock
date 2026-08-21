@@ -17,7 +17,9 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+#if LIBREWPF
 using System.Windows.Media.ProGPU;
+#endif
 using System.Windows.Threading;
 using AvalonDock.Core;
 using AvalonDock.Controls;
@@ -1510,6 +1512,10 @@ namespace TestApp
 			// adopt it so the managed and native sides agree again.
 			private static void AdoptNativeWindowFramePosition(Window window)
 			{
+#if !LIBREWPF
+				// Real WPF: the managed frame is the native frame, so there is nothing to adopt.
+				return;
+#else
 				if (!ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) || host?.SilkWindow is not { } silk)
 					return;
 
@@ -1532,6 +1538,7 @@ namespace TestApp
 				if (Math.Abs(last.Y - window.Top) > 0.5)
 					window.Top = last.Y;
 				window.UpdateLayout();
+#endif
 			}
 
 			[DevFlowAction("avd.input.reset", Description = "Reset AvalonDock routed input diagnostics")]
@@ -1870,6 +1877,7 @@ namespace TestApp
 			// actual native (Silk.NET/GLFW) frame separately - that is what synthetic OS-level mouse
 			// input is actually aimed at, so any divergence here is the root cause of "the click
 			// landed somewhere else" failures.
+#if LIBREWPF
 			if (ProGpuWpfDiagnostics.TryGetWindowHost(this, out var diagHost) && diagHost?.SilkWindow is { } silk)
 			{
 				result["nativePositionX"] = silk.Position.X;
@@ -1877,6 +1885,7 @@ namespace TestApp
 				result["nativeSizeX"] = silk.Size.X;
 				result["nativeSizeY"] = silk.Size.Y;
 			}
+#endif
 
 			return System.Text.Json.JsonSerializer.Serialize(result, PlatformDiagnosticsJsonOptions);
 		}
@@ -1979,15 +1988,23 @@ namespace TestApp
 				return null;
 
 			var source = PresentationSource.FromVisual(overlay);
-			var hasHost = ProGpuWpfDiagnostics.TryGetWindowHost(overlay, out var host);
-			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			var payload = new Dictionary<string, object>
 			{
 				["sourceType"] = source?.GetType().FullName,
 				["rootVisual"] = source?.RootVisual?.GetType().FullName,
-				["hasProGpuHost"] = hasHost,
-				["hasSilkWindow"] = hasHost && host?.SilkWindow != null,
-				["silkWindowTitle"] = hasHost ? host?.SilkWindow?.Title : null,
-			});
+			};
+#if LIBREWPF
+			var hasHost = ProGpuWpfDiagnostics.TryGetWindowHost(overlay, out var host);
+			payload["hasProGpuHost"] = hasHost;
+			payload["hasSilkWindow"] = hasHost && host?.SilkWindow != null;
+			payload["silkWindowTitle"] = hasHost ? host?.SilkWindow?.Title : null;
+#else
+			// Real WPF has no ProGPU host; the source fields above still describe the overlay.
+			payload["hasProGpuHost"] = false;
+			payload["hasSilkWindow"] = false;
+			payload["silkWindowTitle"] = null;
+#endif
+			return System.Text.Json.JsonSerializer.Serialize(payload);
 		}
 
 		// DockingManager registers a LayoutContent's Content as a logical child when it creates the
@@ -2274,12 +2291,14 @@ namespace TestApp
 
 			Point topLeft;
 			Point bottomRight;
+#if LIBREWPF
 			if (element is Window window && ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) && host?.SilkWindow is { } silk)
 			{
 				topLeft = new Point(silk.Position.X, silk.Position.Y);
 				bottomRight = new Point(silk.Position.X + silk.Size.X, silk.Position.Y + silk.Size.Y);
 			}
 			else
+#endif
 			{
 				topLeft = PointToScreenPortable(element, new Point(0, 0));
 				bottomRight = PointToScreenPortable(element, new Point(element.ActualWidth, element.ActualHeight));
@@ -2305,8 +2324,10 @@ namespace TestApp
 
 		private static Point GetNativeWindowOrigin(Window window)
 		{
+#if LIBREWPF
 			if (ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) && host?.SilkWindow is { } silk)
 				return new Point(silk.Position.X, silk.Position.Y);
+#endif
 			return PointToScreenPortable(window, new Point(0, 0));
 		}
 
