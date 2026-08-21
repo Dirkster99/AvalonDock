@@ -1,4 +1,11 @@
-<Project Sdk="LibreWPF.Sdk">
+<Project>
+	<!-- The Sdk attribute cannot carry a Condition, so the SDK is imported explicitly instead:
+	     LibreWPF.Sdk (ProGPU) is what makes this build off Windows, but it is not needed on Windows
+	     and cannot produce the net48 target the rest of the solution still references. On Windows the
+	     project therefore builds exactly as upstream does. Keep the matching Sdk.targets import at the
+	     end of the file. -->
+	<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk.WindowsDesktop" Condition="'$(OS)' == 'Windows_NT'" />
+	<Import Project="Sdk.props" Sdk="LibreWPF.Sdk" Condition="'$(OS)' != 'Windows_NT'" />
 	<!-- Cross-platform (ProGPU/macOS) adaptation for OpenDevelop: single net10.0-windows target via
 	     ProGPU.Wpf.Sdk instead of the upstream Microsoft.NET.Sdk.WindowsDesktop multi-target
 	     ($(ComponentTargetFrameworks) = net9.0-windows;net10.0-windows;net48). Analyzers and
@@ -8,7 +15,7 @@
 	<PropertyGroup>
 		<RootNamespace>AvalonDock</RootNamespace>
 		<PackageId>Dirkster.AvalonDock</PackageId>
-		<TargetFramework>net10.0-windows</TargetFramework>
+		<TargetFrameworks>$(ComponentTargetFrameworks)</TargetFrameworks>
 		<UseWPF>true</UseWPF>
         <SignAssembly>true</SignAssembly>
         <AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
@@ -56,4 +63,6 @@
 	<!--PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 	  <DefineConstants>TRACE;DEBUG</DefineConstants>
 	</PropertyGroup>-->
+	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.WindowsDesktop" Condition="'$(OS)' == 'Windows_NT'" />
+	<Import Project="Sdk.targets" Sdk="LibreWPF.Sdk" Condition="'$(OS)' != 'Windows_NT'" />
 </Project>

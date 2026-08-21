@@ -22,6 +22,11 @@ namespace AvalonDock.Platform
 
 		internal static bool CacheNativeWindowHandle(Window window)
 		{
+#if !LIBREWPF
+			// ProGPU types only exist in the LibreWPF build. This path is macOS-only, so on the
+			// Windows build (upstream WPF) there is nothing to cache.
+			return false;
+#else
 			if (window == null || !System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
 				System.Runtime.InteropServices.OSPlatform.OSX))
 				return false;
@@ -40,6 +45,7 @@ namespace AvalonDock.Platform
 			NativeWindowHandles.Remove(window);
 			NativeWindowHandles.Add(window, new NativeWindowHandle(cocoa));
 			return true;
+#endif
 		}
 
 		/// <summary>
@@ -109,6 +115,7 @@ namespace AvalonDock.Platform
 			if (window == null)
 				return IntPtr.Zero;
 
+#if LIBREWPF
 			if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(
 				System.Runtime.InteropServices.OSPlatform.OSX))
 			{
@@ -130,6 +137,7 @@ namespace AvalonDock.Platform
 				}
 				return handle;
 			}
+#endif
 
 			return new System.Windows.Interop.WindowInteropHelper(window).Handle;
 		}

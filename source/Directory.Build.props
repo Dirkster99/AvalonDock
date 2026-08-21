@@ -1,10 +1,22 @@
 <Project>
 	<PropertyGroup>
-		<!-- Centralized Target Frameworks -->
-		<ComponentTargetFrameworks>net10.0-windows</ComponentTargetFrameworks>
-		<TestTargetFrameworks>net10.0-windows</TestTargetFrameworks>
+		<!-- Centralized Target Frameworks.
+		     On Windows the components keep upstream's full matrix, because projects in this solution
+		     still target those frameworks (WinFormsTestApp on net48, AvalonDockCodeApp on
+		     net9.0-windows) and referencing a net10.0-windows-only component from them is NU1201.
+		     Off Windows only net10.0-windows is buildable - net48 has no targeting pack there - and
+		     that is the single target the LibreWPF/ProGPU port needs. -->
+		<ComponentTargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net9.0-windows;net10.0-windows;net48</ComponentTargetFrameworks>
+		<ComponentTargetFrameworks Condition="'$(ComponentTargetFrameworks)' == ''">net10.0-windows</ComponentTargetFrameworks>
+		<TestTargetFrameworks Condition="'$(OS)' == 'Windows_NT'">net9.0-windows;net10.0-windows;net48</TestTargetFrameworks>
+		<TestTargetFrameworks Condition="'$(TestTargetFrameworks)' == ''">net10.0-windows</TestTargetFrameworks>
 		<LangVersion>13</LangVersion>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+		<!-- Set wherever LibreWPF.Sdk is the SDK in use (see the conditional Sdk imports in the
+		     component projects). Code that touches ProGPU-only API must sit behind this, because those
+		     types do not exist in the upstream WPF build. -->
+		<DefineConstants Condition="'$(OS)' != 'Windows_NT'">$(DefineConstants);LIBREWPF</DefineConstants>
 
 		<!-- Version Information -->
 		<VersionPrefix>5.0.0</VersionPrefix>
