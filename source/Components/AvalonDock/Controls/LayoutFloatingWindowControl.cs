@@ -12,6 +12,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 using AvalonDock.Layout;
 using AvalonDock.Platform;
@@ -40,8 +41,12 @@ namespace AvalonDock.Controls
 		/// <see cref="DropTargetType"/> during a real drag, instead of guessing screen offsets.
 		/// </summary>
 		internal DragService CurrentDragService => _dragService;
+
+		/// <summary>The live OS cursor position, in screen coordinates. Test-only surface used to verify
+		/// that this window's position tracks the pointer during a portable caption drag.</summary>
+		internal Point CurrentPointerScreenPosition => PlatformHelper.GetCursorPosition();
+		internal Point PortableDragOffsetForDiagnostics => _portableDragOffset;
 		private bool _internalCloseFlag = false;
-		private bool _isClosing = false;
 
 		/// <summary>
 		/// Caches the inheritable dependency properties that are mirrored from the <see cref="DockingManager"/>
@@ -54,6 +59,7 @@ namespace AvalonDock.Controls
 		/// <see cref="DockingManager"/> onto this floating window.
 		/// </summary>
 		private readonly HashSet<DependencyProperty> _mirroredInheritedProperties = new HashSet<DependencyProperty>();
+		private bool _isClosing = false;
 
 		/// <summary>
 		/// Is false until the margins have been found once.
@@ -74,10 +80,15 @@ namespace AvalonDock.Controls
 		/// <param name="model">The layout model.</param>
 		protected LayoutFloatingWindowControl(ILayoutElement model)
 		{
+			if (UsePortableCaptionDrag)
+				WindowChrome.SetIsHitTestVisibleInChrome(this, true);
 			Loaded += OnLoaded;
+			SourceInitialized += (_, __) => PlatformHelper.CacheNativeWindowHandle(this);
 			Unloaded += OnUnloaded;
 			Closing += OnClosing;
 			SizeChanged += OnSizeChanged;
+			if (UsePortableCaptionDrag)
+				InputManager.Current.PostProcessInput += OnPortablePostProcessInput;
 			_model = model;
 		}
 
@@ -610,10 +621,13 @@ namespace AvalonDock.Controls
 		/// <inheritdoc/>
 		protected override void OnClosed(EventArgs e)
 		{
+			CleanupPortableCaptionDrag();
 			SizeChanged -= OnSizeChanged;
+			if (UsePortableCaptionDrag)
+				InputManager.Current.PostProcessInput -= OnPortablePostProcessInput;
 			if (Content != null)
 			{
-				(Content as FloatingWindowContentHost)?.Detach();
+				(Content as FloatingWindowContentHost)?.Dispose();
 				if (_hwndSrc != null)
 				{
 					_hwndSrc.RemoveHook(_hwndSrcHook);
@@ -641,33 +655,27 @@ namespace AvalonDock.Controls
 				Microsoft.Windows.Shell.SystemCommands.RestoreWindowCommand,
 				(s, args) => Microsoft.Windows.Shell.SystemCommands.RestoreWindow((Window)args.Parameter)));
 
-			// On portable backends WindowChromeWorker is inert, so the custom borderless caption the
+			// On portable backends WindowChromeWorker is inert, so the borderless custom caption the
 			// template draws is never applied and the backend additionally draws its own native title
 			// bar - the window ends up with two captions. Worse, dragging the native one runs a native
-			// window-move that never reaches DragService, so no drop-target compass appears and
+			// window move that never reaches DragService, so no drop-target compass appears and
 			// re-docking is impossible. WindowStyle.None removes it; LibreWPF maps None + CanResize to
-			// a "hidden resizable" border, so the window stays resizable, and the managed caption drag
-			// (UsePortableCaptionDrag) supplies the move.
-			// Escape hatch while the portable caption is being tuned: AVALONDOCK_KEEP_NATIVE_CAPTION=1
-			// restores the native title bar, to A/B whether suppressing it costs window activation
-			// (an unfocused floating window shows a grey header and does not route clicks to its tabs).
+			// a hidden-but-resizable border, so the window stays resizable.
 			if (UsePortableCaptionDrag &&
 				Environment.GetEnvironmentVariable("AVALONDOCK_KEEP_NATIVE_CAPTION") != "1")
 			{
-				WindowStyle = WindowStyle.None;
-
-				// Remember the caption height the theme declared before detaching the chrome: it defines
-				// how tall the draggable caption strip is, and the managed caption drag must respect it.
+				// Remember the caption height the theme declared before detaching the chrome: it
+				// defines how tall the draggable caption strip is (see OnPortableCaptionMouseDown).
 				var themeChrome = WindowChrome.GetWindowChrome(this);
 				if (themeChrome != null && themeChrome.CaptionHeight > 0)
 					_portableCaptionHeight = themeChrome.CaptionHeight;
 
-				// Also detach WindowChrome. The theme style attaches it for the custom caption, which
-				// spins up a WindowChromeWorker that hooks the HwndSource and issues Win32 window
-				// operations (regions, frame metrics, NC hit-testing). None of that is meaningful off
-				// Windows - the caption is already gone via WindowStyle.None - and leaving it hooked
-				// lets it interfere with the portable backend. Clearing it is what distinguishes this
-				// window from a plain WPF Window, which behaves correctly.
+				WindowStyle = WindowStyle.None;
+
+				// WindowChrome spins up a WindowChromeWorker that hooks the HwndSource and issues Win32
+				// window operations (regions, frame metrics, NC hit-testing). None of that is meaningful
+				// off Windows - the caption is already gone - and leaving it hooked lets it interfere
+				// with the portable backend.
 				WindowChrome.SetWindowChrome(this, null);
 			}
 
@@ -675,75 +683,6 @@ namespace AvalonDock.Controls
 			base.OnInitialized(e);
 		}
 
-		/// <inheritdoc/>
-		protected override void OnClosing(CancelEventArgs e)
-		{
-			base.OnClosing(e);
-			AssureOwnerIsNotMinimized();
-		}
-
-		/// <summary>
-		/// Prevents a known bug in WPF, which wronlgy minimizes the parent window, when closing this control
-		/// </summary>
-		private void AssureOwnerIsNotMinimized()
-		{
-			try
-			{
-				Owner?.Activate();
-			}
-			catch (Exception)
-			{
-			}
-		}
-
-		private static object CoerceContentValue(DependencyObject sender, object content)
-		{
-			if (!(sender is LayoutFloatingWindowControl lfwc)) return null;
-			if (lfwc.IsLoaded && lfwc.IsContentImmutable) return lfwc.Content;
-			return new FloatingWindowContentHost((LayoutFloatingWindowControl)sender) { Content = content as UIElement };
-		}
-
-		private void OnLoaded(object sender, RoutedEventArgs e)
-		{
-			Loaded -= OnLoaded;
-
-			this.UpdateOwnership();
-			SyncInheritedProperties();
-			ApplyResizeBorderThickness();
-
-			_hwndSrc = PresentationSource.FromDependencyObject(this) as HwndSource;
-			if (UsePortableCaptionDrag)
-			{
-				// Portable backend (LibreWPF on macOS/Linux): the HwndSource is a shim that does not
-				// pump the WM_NCLBUTTONDOWN/WM_MOVING/WM_EXITSIZEMOVE modal-move messages the Win32
-				// caption drag relies on, and WindowChrome caption dragging is equally inert. Drive the
-				// drag engine from a managed caption drag instead (OnPortableCaptionMouseDown).
-				AddHandler(PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(OnPortableCaptionMouseDown), handledEventsToo: true);
-			}
-			else if (_hwndSrc != null)
-			{
-				// Win32 path: the modal move loop + WM_MOVING/WM_EXITSIZEMOVE drive the drag engine.
-				_hwndSrcHook = FilterMessage;
-				_hwndSrc.AddHook(_hwndSrcHook);
-			}
-			// Restore maximize state
-			var maximized = Model.Descendents().OfType<ILayoutElementForFloatingWindow>().Any(l => l.IsMaximized);
-			UpdateMaximizedState(maximized);
-		}
-
-		/// <summary>
-		/// Mirrors the current value of every inheritable dependency property of the owning
-		/// <see cref="DockingManager"/> onto this floating window.
-		/// </summary>
-		/// <remarks>
-		/// A <see cref="Window"/> is always the root of its own tree - WPF throws
-		/// <see cref="InvalidOperationException"/> ("Window must be the root of the tree") as soon as a
-		/// <see cref="Window"/> is given a logical parent. A floating window can therefore never be part of the
-		/// logical tree of its <see cref="DockingManager"/> and inheritable dependency properties such as
-		/// <see cref="Control.FontSize"/> never reach the window chrome, even though the hosted content does
-		/// receive them (the content root is a logical child of the <see cref="DockingManager"/>).
-		/// The values are mirrored explicitly instead.
-		/// </remarks>
 		internal void SyncInheritedProperties()
 		{
 			foreach (var property in InheritableProperties.Value)
@@ -815,6 +754,70 @@ namespace AvalonDock.Controls
 			}
 
 			return properties.ToArray();
+		}
+
+		/// <inheritdoc/>
+		protected override void OnClosing(CancelEventArgs e)
+		{
+			// Stop every callback that can touch the native window before base.OnClosing
+			// allows the backend to destroy it.  On macOS an objc_msgSend to a stale
+			// NSWindow is a process-fatal access violation and cannot be caught here.
+			CleanupPortableCaptionDrag();
+			base.OnClosing(e);
+			AssureOwnerIsNotMinimized();
+		}
+
+		/// <summary>
+		/// Prevents a known bug in WPF, which wronlgy minimizes the parent window, when closing this control
+		/// </summary>
+		private void AssureOwnerIsNotMinimized()
+		{
+			try
+			{
+				Owner?.Activate();
+			}
+			catch (Exception)
+			{
+			}
+		}
+
+		private static object CoerceContentValue(DependencyObject sender, object content)
+		{
+			if (!(sender is LayoutFloatingWindowControl lfwc)) return null;
+			if (lfwc.IsLoaded && lfwc.IsContentImmutable) return lfwc.Content;
+			return new FloatingWindowContentHost((LayoutFloatingWindowControl)sender) { Content = content as UIElement };
+		}
+
+		private void OnLoaded(object sender, RoutedEventArgs e)
+		{
+			Loaded -= OnLoaded;
+
+			this.UpdateOwnership();
+			ApplyResizeBorderThickness();
+
+			_hwndSrc = PresentationSource.FromDependencyObject(this) as HwndSource;
+			if (UsePortableCaptionDrag)
+			{
+				// Portable backend (LibreWPF on macOS/Linux): the HwndSource is a shim that does not
+				// pump the WM_NCLBUTTONDOWN/WM_MOVING/WM_EXITSIZEMOVE modal-move messages the Win32
+				// caption drag relies on, and WindowChrome caption dragging is equally inert. Drive the
+				// drag engine from a managed caption drag instead (OnPortableCaptionMouseDown).
+				AddHandler(PreviewMouseDownEvent, new MouseButtonEventHandler(OnPortableCaptionMouseDown), handledEventsToo: true);
+				AddHandler(PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(OnPortableCaptionMouseDown), handledEventsToo: true);
+				AddHandler(MouseDownEvent, new MouseButtonEventHandler(OnPortableCaptionMouseDown), handledEventsToo: true);
+				AddHandler(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnPortableCaptionMouseDown), handledEventsToo: true);
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+					LocationChanged += OnPortableNativeLocationChanged;
+			}
+			else if (_hwndSrc != null)
+			{
+				// Win32 path: the modal move loop + WM_MOVING/WM_EXITSIZEMOVE drive the drag engine.
+				_hwndSrcHook = FilterMessage;
+				_hwndSrc.AddHook(_hwndSrcHook);
+			}
+			// Restore maximize state
+			var maximized = Model.Descendents().OfType<ILayoutElementForFloatingWindow>().Any(l => l.IsMaximized);
+			UpdateMaximizedState(maximized);
 		}
 
 		/// <summary>
@@ -960,20 +963,8 @@ namespace AvalonDock.Controls
 
 			_attachDrag = false;
 			Show();
-
-			// On real Windows HWNDs the caption drag runs through the Win32 modal move loop
-			// (WM_NCLBUTTONDOWN -> WM_MOVING -> WM_EXITSIZEMOVE). Portable backends (LibreWPF) have no
-			// such loop, so the message below is inert there; start the managed caption drag instead,
-			// otherwise a torn-off window would freeze at the tear-off point and never follow the pointer.
-			if (UsePortableCaptionDrag)
-			{
-				BeginPortableCaptionDrag();
-			}
-			else
-			{
-				var lParam = new IntPtr(((int)mousePosition.X & 0xFFFF) | ((int)mousePosition.Y << 16));
-				Win32Helper.SendMessage(windowHandle, Win32Helper.WM_NCLBUTTONDOWN, new IntPtr(Win32Helper.HT_CAPTION), lParam);
-			}
+			var lParam = new IntPtr(((int)mousePosition.X & 0xFFFF) | ((int)mousePosition.Y << 16));
+			Win32Helper.SendMessage(windowHandle, Win32Helper.WM_NCLBUTTONDOWN, new IntPtr(Win32Helper.HT_CAPTION), lParam);
 		}
 
 		private void UpdatePositionAndSizeOfPanes()
@@ -1030,146 +1021,128 @@ namespace AvalonDock.Controls
 		// follow the pointer and feeds the DragService (which shows the OverlayWindow drop targets),
 		// and the release drops onto the current target - the same DragService the WM_MOVING path uses.
 		private bool _portableDragging;
+		private bool _portableNativeDragging;
+		private DispatcherTimer _portableNativeDragTimer;
 		private Point _portableDragOffset;   // pointer-to-window-origin offset, in screen coords
 		private Point _portableLastPointer;  // last pointer screen position seen during the drag
+		private DateTime _portableDragStartUtc;
 
-		// The grabbed point expressed relative to this window, captured once when the drag starts.
-		// Positioning is driven by how far the pointer has moved away from it (see OnMouseMove) rather
-		// than by an absolute screen coordinate, which is what keeps the drag stable.
-		private Point _portableGrabRelative;
+		// Set when a drag is forced to end (by either watchdog in OnPortableNativeDragTick) while the
+		// real mouse button is still physically down. Without this, OnPortableNativeLocationChanged's
+		// "button still held" check would immediately treat the still-down button as the start of a
+		// brand new native drag the instant this one ends, causing a rapid end/restart storm instead of
+		// actually stopping. Cleared only once the button is observed to have actually gone up.
+		private bool _suppressNativeDragUntilButtonReleased;
 
-		private int _portableMoveCount;
+		// No legitimate drag in this app runs anywhere near this long - it exists purely as a backstop
+		// against a drag whose end was missed (see OnPortableNativeDragTick), so it can be generous.
+		private static readonly TimeSpan MaxPortableDragDuration = TimeSpan.FromSeconds(15);
 
-		/// <summary>
-		/// Height of the draggable caption strip, taken from the theme's WindowChrome. Only presses
-		/// inside this strip start a window drag; everything below it belongs to the content.
-		/// </summary>
-		private double _portableCaptionHeight = 20;
-
-		// Absolute-cursor drag state. The offset from the window origin to the grabbed point is fixed
-		// for the whole drag, so the window origin is simply (cursor - offset) - no feedback.
-		private bool _portableUseAbsoluteCursor;
-		private Point _portableGrabOffsetDevice;
-		private double _portableScaleX = 1.0;
-		private double _portableScaleY = 1.0;
-
-		/// <summary>
-		/// Captures the fixed cursor-to-window-origin offset in device pixels, plus the device/DIP
-		/// scale, so a drag can position the window purely from the absolute pointer position.
-		/// Returns false when no window-independent cursor is available, in which case the caller
-		/// falls back to the relative-delta path.
-		/// </summary>
-		/// <summary>
-		/// True when the platform reports the left button as still PHYSICALLY held. The portable
-		/// backend emits a spurious MouseUp when a window is shown during a press - which is exactly
-		/// what happens when the drop-target overlay appears mid-drag - and acting on it ends the drag
-		/// the moment the compass shows. The platform button state is not affected by that synthesized
-		/// event, so it can be used to tell a real release from the phantom one.
-		/// </summary>
-		private static bool IsPhysicalLeftButtonDown()
-		{
-			try
-			{
-				return PlatformManager.CursorService.IsLeftButtonDown();
-			}
-			catch
-			{
-				return false;
-			}
-		}
-
-		private bool TryBeginAbsoluteCursorDrag()
-		{
-			var source = PresentationSource.FromVisual(this);
-			if (source?.CompositionTarget == null) return false;
-
-			var cursor = PlatformHelper.GetCursorPosition();
-			if (cursor.X == 0 && cursor.Y == 0) return false;
-
-			var toDevice = source.CompositionTarget.TransformToDevice;
-			_portableScaleX = toDevice.M11 != 0 ? Math.Abs(toDevice.M11) : 1.0;
-			_portableScaleY = toDevice.M22 != 0 ? Math.Abs(toDevice.M22) : 1.0;
-
-			// Window origin in device pixels; correct here because no move has been applied yet.
-			_portableGrabOffsetDevice = new Point(
-				cursor.X - (Left * _portableScaleX),
-				cursor.Y - (Top * _portableScaleY));
-			return true;
-		}
-
-		// Diagnostic trace for the portable caption drag; set AVALONDOCK_DRAG_TRACE=1 and read
-		// avalondock-drag-trace.log in the temp directory. Off (and free) otherwise.
-		private static readonly bool PortableDragTraceEnabled =
-			Environment.GetEnvironmentVariable("AVALONDOCK_DRAG_TRACE") == "1";
-
-		private static void TracePortableDrag(string message)
-		{
-			if (!PortableDragTraceEnabled) return;
-			try
-			{
-				System.IO.File.AppendAllText(
-					System.IO.Path.Combine(System.IO.Path.GetTempPath(), "avalondock-drag-trace.log"),
-					DateTime.Now.ToString("HH:mm:ss.fff ") + message + Environment.NewLine);
-			}
-			catch
-			{
-				// Tracing must never disturb the drag it is observing.
-			}
-		}
+		// See OnPortableNativeDragTick: synthetic (injected) mouse-downs are not reflected in the
+		// physical HID button state immediately, so the button-state watchdog must not run before
+		// the injected down has had a chance to reach the WPF input pipeline.
+		private static readonly TimeSpan PortableNativeDragGracePeriod = TimeSpan.FromMilliseconds(500);
 
 		// The Win32 caption-drag path (WM_NCLBUTTONDOWN + WM_MOVING/WM_EXITSIZEMOVE) only works on real
 		// Windows HWNDs. Everywhere else (LibreWPF on macOS/Linux) use the managed caption drag.
 		internal static bool UsePortableCaptionDrag { get; } = !RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-		private void OnPortableCaptionMouseDown(object sender, MouseButtonEventArgs e)
+		private void OnPortableNativeLocationChanged(object sender, EventArgs e)
 		{
-			if (_portableDragging || e.ChangedButton != MouseButton.Left) return;
-			if (Model?.Root?.Manager == null) return;
-
-			// Only the caption strip drags the window. Without this bound, EVERY press inside the
-			// floating window started a window drag - so clicking a tab moved the window instead of
-			// selecting the tab, and the grab of mouse capture also stopped the window activating
-			// (its header stayed inactive). Win32 gets this bound for free from
-			// WindowChrome.CaptionHeight; the managed drag has to apply it explicitly.
-			if (e.GetPosition(this).Y > _portableCaptionHeight)
-				return;
-
-			// Buttons/menus in the title bar opt out of caption treatment via
-			// WindowChrome.IsHitTestVisibleInChrome (the same flag the Win32 chrome uses),
-			// so walk up from the hit element and bail if any ancestor is marked interactive.
-			for (var d = e.OriginalSource as DependencyObject; d != null; d = VisualTreeHelperGetParent(d))
+			if (_portableNativeDragging)
 			{
-				if (d is UIElement ui && WindowChrome.GetIsHitTestVisibleInChrome(ui))
-					return;
-				if (d is System.Windows.Controls.Primitives.ButtonBase)
-					return;
+				_portableLastPointer = PlatformHelper.GetCursorPosition();
+				_dragService?.UpdateMouseLocation(_portableLastPointer);
+				return;
 			}
 
-			// Taking mouse capture below suppresses what a press would normally do, in two ways.
-			//
-			// The window never activates, because capture swallows the activating click.
-			ActivateWindowForCaptionPress();
+			if (_portableDragging || Model?.Root?.Manager == null)
+				return;
 
-			// More visibly, the pane header stays in its inactive (grey) state: that styling is driven
-			// by the layout content's IsActive (see the Model...SelectedContent.IsActive triggers in
-			// the themes), which AnchorablePaneTitle normally sets on mouse-up. With capture held by
-			// this window that mouse-up never reaches the title, so mark the content active here.
-			ActivateContentForCaptionPress();
+			// A native title-bar drag can begin before the managed caption receives MouseDown.
+			// Only promote native movement while the real left button is still held.
+			var buttonDown = Mouse.LeftButton == MouseButtonState.Pressed || PlatformHelper.IsLeftButtonDown();
+			if (_suppressNativeDragUntilButtonReleased)
+			{
+				if (buttonDown)
+					return;
+				_suppressNativeDragUntilButtonReleased = false;
+			}
 
-			var grabRelative = e.GetPosition(this);
-			var pointer = PointToScreen(grabRelative);
-			_portableGrabRelative = grabRelative;
-			_portableDragOffset = new Point(pointer.X - Left, pointer.Y - Top);
-			_portableLastPointer = pointer;
+			if (!buttonDown)
+				return;
+
 			_portableDragging = true;
-			_portableMoveCount = 0;
-			_portableUseAbsoluteCursor = TryBeginAbsoluteCursorDrag();
-			TracePortableDrag($"START caption grab=({grabRelative.X:F1},{grabRelative.Y:F1}) leftTop=({Left:F1},{Top:F1}) absoluteCursor={_portableUseAbsoluteCursor} scale=({_portableScaleX},{_portableScaleY}) grabOff=({_portableGrabOffsetDevice.X:F1},{_portableGrabOffsetDevice.Y:F1})");
-			if (_dragService == null)
-				_dragService = new DragService(this);
-			SetIsDragging(true);
-			CaptureMouse();
+			_portableNativeDragging = true;
+			_portableDragStartUtc = DateTime.UtcNow;
+			_portableLastPointer = PlatformHelper.GetCursorPosition();
+			var nativeOrigin = PlatformHelper.GetWindowContentOrigin(this);
+			_portableDragOffset = new Point(_portableLastPointer.X - nativeOrigin.X, _portableLastPointer.Y - nativeOrigin.Y);
+			var dragService = new DragService(this);
+			_dragService = dragService;
+			dragService.UpdateMouseLocation(_portableLastPointer);
+
+			_portableNativeDragTimer ??= new DispatcherTimer(
+				TimeSpan.FromMilliseconds(16),
+				DispatcherPriority.Input,
+				OnPortableNativeDragTick,
+				Dispatcher);
+			_portableNativeDragTimer.Start();
 		}
+
+		private void OnPortableNativeDragTick(object sender, EventArgs e)
+		{
+			// Watchdog: a native title-bar drag doesn't reliably route its eventual mouse-up back
+			// through OnMouseLeftButtonUp/OnPortablePostProcessInput (the OS drove the window move
+			// directly, not WPF's input pipeline), so this timer can otherwise keep polling forever
+			// after the real drag has ended, using an increasingly stale _floatingWindow/_dragService
+			// until something else invalidates them (e.g. a later, unrelated layout change detaches
+			// this window's model) and the next tick crashes. Poll the real button state directly and
+			// tear the drag down as soon as it's no longer held, regardless of what WPF's routed events
+			// did or didn't deliver.
+			//
+			// Synthetic input (OS-level automation, e.g. cliclick CGEventPost) posts a mouse-down that
+			// does NOT update the physical HID button state, so PlatformHelper.IsLeftButtonDown() stays
+			// false for the whole drag while WPF's Mouse.LeftButton only becomes Pressed once the
+			// injected event has actually been routed. A tick that runs before that routing completes
+			// would read "button not down" and kill a perfectly good drag - hence the grace period:
+			// give the injected down a moment to reach the WPF input pipeline before trusting the
+			// button-state check.
+			var dragAge = DateTime.UtcNow - _portableDragStartUtc;
+			if (dragAge > PortableNativeDragGracePeriod
+				&& Mouse.LeftButton != MouseButtonState.Pressed && !PlatformHelper.IsLeftButtonDown())
+			{
+				EndPortableDrag(drop: true);
+				return;
+			}
+
+			// Second, independent backstop: live button-state polling can be fooled if a *different*,
+			// later drag's real mouse-down happens to be down at the exact tick this checks (observed in
+			// practice with back-to-back synthetic drags in tests). No legitimate drag runs this long, so
+			// once exceeded, abort unconditionally rather than trusting button state at all.
+			if (dragAge > MaxPortableDragDuration)
+			{
+				// The button-state check above just confirmed the button still reads as down - ending
+				// the drag here must not let OnPortableNativeLocationChanged treat that same still-down
+				// button as a new drag starting on the very next call.
+				_suppressNativeDragUntilButtonReleased = true;
+				EndPortableDrag(drop: false);
+				return;
+			}
+
+			_portableLastPointer = PlatformHelper.GetCursorPosition();
+			PlatformHelper.SetWindowPosition(
+				this,
+				_portableLastPointer.X - _portableDragOffset.X,
+				_portableLastPointer.Y - _portableDragOffset.Y);
+			_dragService?.UpdateMouseLocation(_portableLastPointer);
+		}
+
+		/// <summary>
+		/// Height of the draggable caption strip, taken from the theme's WindowChrome before that
+		/// chrome is detached. Presses below it belong to the content, not to the window drag.
+		/// </summary>
+		private double _portableCaptionHeight = 20;
 
 		/// <summary>Activates the window, ignoring teardown races.</summary>
 		private void ActivateWindowForCaptionPress()
@@ -1199,56 +1172,60 @@ namespace AvalonDock.Controls
 				content.IsActive = true;
 		}
 
-		// Starts the managed caption drag for a freshly torn-off floating window on portable backends.
-		// Unlike OnPortableCaptionMouseDown there is no originating mouse event - the drag is kicked off
-		// from InternalOnActivated right after the window is shown at the tear-off point - so the grab
-		// offset is recovered from the current pointer relative to the window origin that was just set.
-		private void BeginPortableCaptionDrag()
+		private void OnPortableCaptionMouseDown(object sender, MouseButtonEventArgs e)
 		{
-			if (_portableDragging) return;
-			if (Model?.Root?.Manager == null) return;
-			if (Mouse.LeftButton != MouseButtonState.Pressed) return;
-			if (PresentationSource.FromVisual(this) == null) return;
-
-			Point pointer;
-			try
+			if (_portableDragging)
 			{
-				pointer = PointToScreen(Mouse.GetPosition(this));
-			}
-			catch
-			{
-				// The window can lose its PresentationSource between the guard above and here while
-				// tearing off across DPI boundaries; abandon the drag rather than throw out of Activated.
+				e.Handled = true;
 				return;
 			}
+			if (e.ChangedButton != MouseButton.Left) return;
+			if (Model?.Root?.Manager == null) return;
 
-			_portableGrabRelative = Mouse.GetPosition(this);
-			_portableMoveCount = 0;
-			_portableUseAbsoluteCursor = TryBeginAbsoluteCursorDrag();
-			TracePortableDrag($"START tearoff leftTop=({Left:F1},{Top:F1}) absoluteCursor={_portableUseAbsoluteCursor}");
-			_portableDragOffset = new Point(pointer.X - Left, pointer.Y - Top);
+			// Only the caption drags the window. Buttons/menus in the title bar opt out of caption
+			// treatment via WindowChrome.IsHitTestVisibleInChrome (the same flag the Win32 chrome uses),
+			// so walk up from the hit element and bail if any ancestor is marked interactive.
+			for (var d = e.OriginalSource as DependencyObject; d != null; d = VisualTreeHelperGetParent(d))
+			{
+				if (!ReferenceEquals(d, this) && d is UIElement ui &&
+					ui.ReadLocalValue(WindowChrome.IsHitTestVisibleInChromeProperty) is true &&
+					d is not DropDownControlArea)
+					return;
+				if (d is System.Windows.Controls.Primitives.ButtonBase)
+					return;
+			}
+
+			// Only the caption STRIP drags the window. Without this bound every press inside the
+			// floating window starts a window drag, so clicking a tab moved the window instead of
+			// selecting it, and grabbing mouse capture also stopped the window activating. Win32 gets
+			// this bound for free from WindowChrome.CaptionHeight; the managed drag applies it here.
+			if (UsePortableCaptionDrag && e.GetPosition(this).Y > _portableCaptionHeight)
+				return;
+
+			// Taking mouse capture below suppresses what a press would normally do, in two ways: the
+			// window never activates, and - more visibly - the pane header stays in its inactive (grey)
+			// state, since that styling is driven by the layout content's IsActive, which
+			// AnchorablePaneTitle sets on mouse-up and never sees while this window holds capture.
+			ActivateWindowForCaptionPress();
+			ActivateContentForCaptionPress();
+
+			var pointer = PointToScreen(e.GetPosition(this));
+			var nativeOrigin = PlatformHelper.GetWindowContentOrigin(this);
+			_portableDragOffset = new Point(pointer.X - nativeOrigin.X, pointer.Y - nativeOrigin.Y);
 			_portableLastPointer = pointer;
 			_portableDragging = true;
+			_portableDragStartUtc = DateTime.UtcNow;
 			if (_dragService == null)
 				_dragService = new DragService(this);
 			SetIsDragging(true);
-
-			if (!CaptureMouse())
-			{
-				// A window is not always ready to capture the instant it is shown. Retry once the input
-				// system has caught up; if the button was released by then, end the drag cleanly so the
-				// window simply settles at the tear-off point instead of being stuck mid-drag.
-				Dispatcher.BeginInvoke(new Action(() =>
-				{
-					if (!_portableDragging) return;
-					if (Mouse.LeftButton != MouseButtonState.Pressed)
-					{
-						EndPortableDrag(drop: true);
-						return;
-					}
-					CaptureMouse();
-				}), System.Windows.Threading.DispatcherPriority.Input);
-			}
+			_portableNativeDragTimer ??= new DispatcherTimer(
+				TimeSpan.FromMilliseconds(16),
+				DispatcherPriority.Input,
+				OnPortableNativeDragTick,
+				Dispatcher);
+			_portableNativeDragTimer.Start();
+			CaptureMouse();
+			e.Handled = true;
 		}
 
 		private static DependencyObject VisualTreeHelperGetParent(DependencyObject d)
@@ -1263,77 +1240,9 @@ namespace AvalonDock.Controls
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			base.OnMouseMove(e);
-			if (!_portableDragging) return;
+			if (!_portableDragging || _portableNativeDragging) return;
 
-			if (e.LeftButton != MouseButtonState.Pressed)
-			{
-				if (_portableUseAbsoluteCursor && IsPhysicalLeftButtonDown())
-				{
-					// Phantom release (overlay shown mid-drag): the button is still physically down.
-					TracePortableDrag("ignoring phantom button-release during move");
-				}
-				else
-				{
-					EndPortableDrag(drop: true);
-					return;
-				}
-			}
-
-			// Position from the pointer's ABSOLUTE screen position, never from a window-relative one.
-			// Both earlier attempts (assigning PointToScreen(relative), and moving by the change in
-			// relative position) are measured against this window's own origin while we are moving
-			// that origin, and the backend applies moves asynchronously - so the measurement and the
-			// window disagree and the result oscillates: the window jitters and fights the cursor.
-			// PlatformHelper.GetCursorPosition() is window-independent (XQueryPointer on Linux), so
-			// origin + fixed grab offset is stable no matter when moves land.
-			if (_portableUseAbsoluteCursor)
-			{
-				var cursor = PlatformHelper.GetCursorPosition();
-				var newLeft = (cursor.X - _portableGrabOffsetDevice.X) / _portableScaleX;
-				var newTop = (cursor.Y - _portableGrabOffsetDevice.Y) / _portableScaleY;
-
-				if (_portableMoveCount < 25)
-				{
-					TracePortableDrag(
-						$"move #{_portableMoveCount} cursor=({cursor.X:F1},{cursor.Y:F1}) grabOff=({_portableGrabOffsetDevice.X:F1},{_portableGrabOffsetDevice.Y:F1}) leftTop=({Left:F1},{Top:F1}) -> ({newLeft:F1},{newTop:F1}) captured={Mouse.Captured?.GetType().Name ?? "null"}");
-				}
-
-				_portableMoveCount++;
-				Left = newLeft;
-				Top = newTop;
-				_portableLastPointer = cursor;
-				_dragService?.UpdateMouseLocation(cursor);
-				return;
-			}
-
-			var relative = e.GetPosition(this);
-
-			// Move by how far the pointer has drifted from the grabbed point, NOT by assigning an
-			// absolute screen position. The absolute form (Left = PointToScreen(relative).X - offset)
-			// converts window-relative -> screen using this window's own origin and then moves that
-			// origin, so the value feeds back into the next conversion. The backend applies the move
-			// asynchronously, so the origin used by PointToScreen and the one GetPosition was measured
-			// against disagree, and each event re-adds the previous delta - the window accelerates away
-			// from the cursor. Using the delta is self-correcting instead: moving the window shrinks
-			// the next delta toward zero, so a stationary pointer converges rather than running away.
-			var dx = relative.X - _portableGrabRelative.X;
-			var dy = relative.Y - _portableGrabRelative.Y;
-			if (_portableMoveCount < 25)
-			{
-				TracePortableDrag(
-					$"move #{_portableMoveCount} rel=({relative.X:F1},{relative.Y:F1}) grab=({_portableGrabRelative.X:F1},{_portableGrabRelative.Y:F1}) d=({dx:F1},{dy:F1}) leftTop=({Left:F1},{Top:F1}) captured={Mouse.Captured?.GetType().Name ?? "null"}");
-			}
-
-			_portableMoveCount++;
-			if (dx != 0 || dy != 0)
-			{
-				Left += dx;
-				Top += dy;
-			}
-
-			// Hit-testing still needs a screen position; derive it from the window origin we just set
-			// plus the (fixed) grab point, so it stays consistent with the placement above.
-			var pointer = PointToScreen(_portableGrabRelative);
+			var pointer = PointToScreen(e.GetPosition(this));
 			_portableLastPointer = pointer;
 			_dragService?.UpdateMouseLocation(pointer);
 		}
@@ -1342,46 +1251,35 @@ namespace AvalonDock.Controls
 		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
 			base.OnMouseLeftButtonUp(e);
-			if (!_portableDragging) return;
+			if (_portableDragging) EndPortableDrag(drop: true);
+		}
 
-			if (_portableUseAbsoluteCursor && IsPhysicalLeftButtonDown())
+		private void OnPortablePostProcessInput(object sender, ProcessInputEventArgs e)
+		{
+			if (_portableDragging &&
+				e.StagingItem.Input is MouseButtonEventArgs mouseButtonEvent &&
+				mouseButtonEvent.RoutedEvent == Mouse.MouseUpEvent &&
+				mouseButtonEvent.ChangedButton == MouseButton.Left)
 			{
-				// Same phantom up as above, delivered as a routed MouseLeftButtonUp instead.
-				TracePortableDrag("ignoring phantom MouseLeftButtonUp");
-				if (!IsMouseCaptured) CaptureMouse();
-				return;
+				_portableLastPointer = PlatformHelper.GetCursorPosition();
+				EndPortableDrag(drop: true);
 			}
-
-			EndPortableDrag(drop: true);
 		}
 
 		/// <inheritdoc/>
 		protected override void OnLostMouseCapture(MouseEventArgs e)
 		{
 			base.OnLostMouseCapture(e);
-			if (!_portableDragging) return;
-
-			// On portable backends losing capture is NOT a reliable signal that the user ended the
-			// drag. Window.HandlePortableMove releases the capture (Mouse.Capture(null)) on every
-			// window move as its "dismiss popups when the owner moves" mechanism - and a caption drag
-			// moves the window on each mouse move, so the capture is torn down immediately and the
-			// drag aborts after a single step. While the button is still physically held this is that
-			// spurious release, not a gesture: re-acquire the capture and keep dragging. Only a real
-			// release (or a failed re-capture) ends it.
-			var recaptured = Mouse.LeftButton == MouseButtonState.Pressed && CaptureMouse();
-			TracePortableDrag($"LOSTCAPTURE button={Mouse.LeftButton} recaptured={recaptured} newCapture={Mouse.Captured?.GetType().Name ?? "null"}");
-			if (recaptured)
-				return;
-
-			// Lost capture without a normal release: abort rather than drop at a stale position.
-			EndPortableDrag(drop: false);
+			// Portable backends can lose capture as the pointer crosses native windows. The
+			// real button-up still completes the drag, while the timer keeps its position live.
 		}
 
 		private void EndPortableDrag(bool drop)
 		{
 			if (!_portableDragging) return;
-			TracePortableDrag($"END drop={drop} afterMoves={_portableMoveCount}");
 			_portableDragging = false;
+			_portableNativeDragging = false;
+			_portableNativeDragTimer?.Stop();
 			if (IsMouseCaptured) ReleaseMouseCapture();
 
 			var dropHandled = false;
@@ -1395,7 +1293,32 @@ namespace AvalonDock.Controls
 			}
 
 			SetIsDragging(false);
-			if (dropHandled) InternalClose();
+			if (dropHandled)
+				Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() => InternalClose()));
+		}
+
+		private void CleanupPortableCaptionDrag()
+		{
+			if (!UsePortableCaptionDrag)
+				return;
+
+			_portableNativeDragTimer?.Stop();
+			LocationChanged -= OnPortableNativeLocationChanged;
+			InputManager.Current.PostProcessInput -= OnPortablePostProcessInput;
+
+			_portableDragging = false;
+			_portableNativeDragging = false;
+			if (IsMouseCaptured)
+				ReleaseMouseCapture();
+
+			_dragService?.Abort();
+			_dragService = null;
+			SetIsDragging(false);
+		}
+
+		internal void CompletePortableDragForDiagnostics()
+		{
+			EndPortableDrag(drop: true);
 		}
 
 		#endregion Portable (non-HWND) caption drag
@@ -1415,27 +1338,14 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
-		/// Hosts the floating window's content.
+		/// Represents the floating window content host.
 		/// </summary>
-		/// <remarks>
-		/// Previously derived from <see cref="HwndHost"/> and parented the content into a native Win32
-		/// child window (<see cref="HwndSource"/> with WS_CHILD). That child window does not compose
-		/// into cross-platform WPF surfaces (LibreWPF on Linux/macOS), so the content rendered nothing;
-		/// worse, the child <see cref="HwndSource"/> is a *native, non-portable* presentation source, so
-		/// any coordinate translation against it took the Win32 branch of
-		/// <c>PointUtil.ScreenToClient</c> and called user32 <c>GetWindowLong</c>, throwing
-		/// DllNotFoundException for <c>PresentationNative_cor3.dll</c>. That fired during a drag,
-		/// because showing the floating window flushes the dispatcher and runs a queued hit-test
-		/// invalidation (<c>MouseDevice.Synchronize</c>).
-		///
-		/// It is now a pure-WPF <see cref="Border"/> hosting the content directly, matching the
-		/// AvaloniaXPF AvalonDock fork. This is unconditional rather than portable-only: a base class
-		/// cannot be swapped per-runtime, and the pure-WPF host works on every backend.
-		/// </remarks>
-		public class FloatingWindowContentHost : Border
+		protected internal class FloatingWindowContentHost : HwndHost
 		{
 			private readonly LayoutFloatingWindowControl _owner;
-			private AdornerDecorator _rootPresenter = null;
+			private HwndSource _wpfContentHost = null;
+			private Border _rootPresenter = null;
+			private DockingManager _manager = null;
 
 			/// <summary>
 			/// Initializes a new instance of the <see cref="FloatingWindowContentHost"/> class.
@@ -1446,8 +1356,6 @@ namespace AvalonDock.Controls
 				_owner = owner;
 				var binding = new Binding(nameof(SizeToContent)) { Source = _owner };
 				BindingOperations.SetBinding(this, SizeToContentProperty, binding);
-				SetBinding(BackgroundProperty, new Binding(nameof(Background)) { Source = _owner });
-				AutomationProperties.SetName(this, "FloatingWindowHost");
 			}
 
 			/// <summary>
@@ -1480,21 +1388,9 @@ namespace AvalonDock.Controls
 			/// <param name="newValue">The new value.</param>
 			protected virtual void OnContentChanged(UIElement oldValue, UIElement newValue)
 			{
-				EnsurePresenter();
-				_rootPresenter.Child = newValue;
+				if (_rootPresenter != null) _rootPresenter.Child = Content;
 				if (oldValue is FrameworkElement oldContent) oldContent.SizeChanged -= Content_SizeChanged;
 				if (newValue is FrameworkElement newContent) newContent.SizeChanged += Content_SizeChanged;
-			}
-
-			/// <summary>
-			/// Creates the adorner-hosting presenter on first use. An <see cref="AdornerDecorator"/> is
-			/// kept because AvalonDock's own drag/resize adorners are added inside the floating window.
-			/// </summary>
-			private void EnsurePresenter()
-			{
-				if (_rootPresenter != null) return;
-				_rootPresenter = new AdornerDecorator();
-				Child = _rootPresenter;
 			}
 
 			/// <summary>
@@ -1522,28 +1418,45 @@ namespace AvalonDock.Controls
 			/// <param name="newValue">The new value.</param>
 			protected virtual void OnSizeToContentChanged(SizeToContent oldValue, SizeToContent newValue)
 			{
-				// The owning Window applies SizeToContent itself; there is no separate child window to
-				// forward it to now that the content is hosted as an ordinary WPF visual.
+				if (_wpfContentHost != null) _wpfContentHost.SizeToContent = newValue;
 			}
 
-			/// <summary>
-			/// Tears the hosted content out of the visual tree when the floating window closes. Replaces
-			/// <see cref="HwndHost"/>'s Dispose, which destroyed the native child window.
-			/// </summary>
-			internal void Detach()
+			/// <inheritdoc/>
+			protected override HandleRef BuildWindowCore(HandleRef hwndParent)
 			{
-				if (Content is FrameworkElement content) content.SizeChanged -= Content_SizeChanged;
-				if (_rootPresenter != null) _rootPresenter.Child = null;
-				Child = null;
-				_rootPresenter = null;
+				_wpfContentHost = new HwndSource(new HwndSourceParameters
+				{
+					ParentWindow = hwndParent.Handle,
+					WindowStyle = Win32Helper.WS_CHILD | Win32Helper.WS_VISIBLE | Win32Helper.WS_CLIPSIBLINGS | Win32Helper.WS_CLIPCHILDREN,
+					Width = 1,
+					Height = 1,
+					UsesPerPixelOpacity = true,
+				});
+
+				_rootPresenter = new Border { Child = new AdornerDecorator { Child = Content }, Focusable = true };
+				AutomationProperties.SetName(_rootPresenter, "FloatingWindowHost");
+				_rootPresenter.SetBinding(Border.BackgroundProperty, new Binding(nameof(Background)) { Source = _owner });
+				_wpfContentHost.RootVisual = _rootPresenter;
+				_manager = _owner.Model.Root.Manager;
+				_manager.InternalAddLogicalChild(_rootPresenter);
+				return new HandleRef(this, _wpfContentHost.Handle);
+			}
+
+			/// <inheritdoc/>
+			protected override void DestroyWindowCore(HandleRef hwnd)
+			{
+				_manager.InternalRemoveLogicalChild(_rootPresenter);
+				if (_wpfContentHost == null) return;
+				_wpfContentHost.Dispose();
+				_wpfContentHost = null;
 			}
 
 			/// <inheritdoc/>
 			protected override Size MeasureOverride(Size constraint)
 			{
-				if (_rootPresenter == null) return base.MeasureOverride(constraint);
-				_rootPresenter.Measure(constraint);
-				return _rootPresenter.DesiredSize;
+				if (Content == null) return base.MeasureOverride(constraint);
+				Content.Measure(constraint);
+				return Content.DesiredSize;
 			}
 
 			/// <summary>

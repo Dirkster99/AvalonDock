@@ -36,9 +36,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- The published LeXtudio.DevFlow.Agent.LibreWpf 0.2.0 NuGet package ships an Aarch64-only DLL
-         (not AnyCPU), so it fails to load with FileLoadException on x64. Reference the local ui-labs
-         checkout instead until that's fixed upstream. -->
+    <!-- Local checkout rather than the published package: see the matching comment in
+         TestApp.csproj. Linux mouse injection (XTest) is only in that checkout for now
+         (lextudio/ui-labs#3). -->
     <ProjectReference Include="/home/aleu1c014278/ui-labs/src/DevFlow/LeXtudio.DevFlow.Agent.LibreWpf/LeXtudio.DevFlow.Agent.LibreWpf.csproj" />
     <ProjectReference Include="/home/aleu1c014278/ui-labs/src/DevFlow/LeXtudio.DevFlow.Agent.Core/LeXtudio.DevFlow.Agent.Core.csproj" />
   </ItemGroup>

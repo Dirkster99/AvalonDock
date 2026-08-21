@@ -26,6 +26,13 @@
 		<Resource Include="**\*.png"/>
 	</ItemGroup>
 
+	<ItemGroup Condition="'$(OS)' != 'Windows_NT'">
+		<Compile Remove="Controls\Shell\**\*.cs" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+		<Compile Remove="Controls\Shell.Portable\**\*.cs" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\AvalonDock.Core\AvalonDock.Core.csproj" />
 	</ItemGroup>

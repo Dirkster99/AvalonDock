@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -23,7 +26,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 		public DevFlowClient(int port)
 		{
 			_http = new HttpClient { BaseAddress = new Uri($"http://localhost:{port}") };
-			_http.Timeout = TimeSpan.FromSeconds(60);
+			_http.Timeout = TimeSpan.FromSeconds(20);
 		}
 
 		/// <summary>Port from DEVFLOW_TEST_PORT, or null when integration tests should be skipped.</summary>
@@ -76,12 +79,19 @@ namespace AvalonDock.DevFlowIntegrationTests
 		{
 			var body = JsonSerializer.Serialize(new { args = args ?? Array.Empty<object>() });
 			using var content = new StringContent(body, Encoding.UTF8, "application/json");
-			using var resp = await _http.PostAsync($"/api/v1/invoke/actions/{action}", content).ConfigureAwait(false);
-			var raw = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
-			if (!resp.IsSuccessStatusCode)
-				throw new HttpRequestException(
-					$"DevFlow action '{action}' returned {(int)resp.StatusCode}: {raw}");
-			return ExtractResult(raw);
+			try
+			{
+				using var resp = await _http.PostAsync($"/api/v1/invoke/actions/{action}", content).ConfigureAwait(false);
+				var raw = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
+				if (!resp.IsSuccessStatusCode)
+					throw new HttpRequestException(
+						$"DevFlow action '{action}' returned {(int)resp.StatusCode}: {raw}");
+				return ExtractResult(raw);
+			}
+			catch (TaskCanceledException ex)
+			{
+				throw new TimeoutException($"DevFlow action '{action}' did not complete within {_http.Timeout}.", ex);
+			}
 		}
 
 		public async Task<JsonElement> DragAsync(DragRequest request, CancellationToken ct = default)
@@ -117,6 +127,9 @@ namespace AvalonDock.DevFlowIntegrationTests
 		public Task ReleaseAsync(double x, double y, CancellationToken ct = default)
 			=> PostPointActionAndAssertOkAsync("/api/v1/ui/actions/release", x, y, "release", ct);
 
+		public Task ClickAsync(double x, double y, CancellationToken ct = default)
+			=> PostPointActionAndAssertOkAsync("/api/v1/ui/actions/click", x, y, "click", ct);
+
 		private async Task PostPointActionAndAssertOkAsync(string path, double x, double y, string label, CancellationToken ct)
 		{
 			var body = JsonSerializer.Serialize(new { x, y });
@@ -143,6 +156,10 @@ namespace AvalonDock.DevFlowIntegrationTests
 			{
 				result.Add(new DropTargetInfo(
 					element.GetProperty("type").GetString(),
+					element.GetProperty("x").GetDouble(),
+					element.GetProperty("y").GetDouble(),
+					element.GetProperty("width").GetDouble(),
+					element.GetProperty("height").GetDouble(),
 					element.GetProperty("centerX").GetDouble(),
 					element.GetProperty("centerY").GetDouble()));
 			}
@@ -162,7 +179,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 			{
 				ct.ThrowIfCancellationRequested();
 				var targets = await QueryActiveDropTargetsAsync(ct).ConfigureAwait(false);
-				var match = targets.Find(t => t.Type == dropTargetType);
+				var match = PickPrimaryDropTarget(targets, dropTargetType);
 				if (match != null)
 					return match;
 
@@ -172,11 +189,40 @@ namespace AvalonDock.DevFlowIntegrationTests
 			throw new TimeoutException($"Timed out waiting for drop target '{dropTargetType}' to appear in the active compass.");
 		}
 
+		/// <summary>Selects the primary compass indicator for a DropTargetType from the active set.
+		/// Several indicators can share one type name - notably the *DockInside types, where the same
+		/// name is used by the central ~40x40 "dock inside" button AND by the wide/short tab-header and
+		/// thin tab-strip "dock as a new tab" targets. A plain first-match can capture one of those tab
+		/// slivers (whose position/order varies frame to frame), so a later drag to its centre never
+		/// re-registers as that zone. The primary direction/inside buttons are all roughly square, so
+		/// prefer the most-square match; ties break toward the larger button.</summary>
+		public static DropTargetInfo PickPrimaryDropTarget(IReadOnlyList<DropTargetInfo> targets, string dropTargetType)
+		{
+			return targets
+				.Where(t => t.Type == dropTargetType)
+				.OrderBy(t => Math.Abs(t.Width - t.Height))
+				.ThenByDescending(t => t.Width * t.Height)
+				.FirstOrDefault();
+		}
+
 		public async Task<ElementBounds> QueryBoundsAsync(string target, string contentId = null)
 		{
 			var json = contentId == null
 				? await InvokeAsync("avd.query.bounds", target).ConfigureAwait(false)
 				: await InvokeAsync("avd.query.bounds", target, contentId).ConfigureAwait(false);
+			return ReadElementBounds(json);
+		}
+
+		public async Task<ElementBounds> QueryDragHandleAsync(string target, string contentId = null)
+		{
+			var json = contentId == null
+				? await InvokeAsync("avd.query.drag-handle", target).ConfigureAwait(false)
+				: await InvokeAsync("avd.query.drag-handle", target, contentId).ConfigureAwait(false);
+			return ReadElementBounds(json);
+		}
+
+		private static ElementBounds ReadElementBounds(string json)
+		{
 			using var doc = JsonDocument.Parse(json);
 			var root = doc.RootElement;
 			if (!root.TryGetProperty("found", out var found) || found.ValueKind != JsonValueKind.True)
@@ -189,6 +235,133 @@ namespace AvalonDock.DevFlowIntegrationTests
 			if (bounds.Width <= 0 || bounds.Height <= 0)
 				throw new InvalidOperationException($"AvalonDock target bounds are empty: {json}");
 			return bounds;
+		}
+
+		public async Task AssertFloatingWindowAboveMainAsync(string contentId)
+		{
+			var json = await InvokeAsync("avd.query.floating-zorder", contentId).ConfigureAwait(false);
+			using var doc = JsonDocument.Parse(json);
+			var root = doc.RootElement;
+			if (!root.TryGetProperty("found", out var found) || found.ValueKind != JsonValueKind.True)
+				throw new InvalidOperationException($"Floating window '{contentId}' was not found while checking z-order: {json}");
+
+			var hasMainZ = root.TryGetProperty("mainZOrderFound", out var mainFound) && mainFound.ValueKind == JsonValueKind.True;
+			var hasFloatingZ = root.TryGetProperty("floatingZOrderFound", out var floatingFound) && floatingFound.ValueKind == JsonValueKind.True;
+			if (!hasMainZ || !hasFloatingZ)
+			{
+				string systemEventsFailure = null;
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+					&& TryAssertFloatingWindowAboveMainWithSystemEvents(root, out systemEventsFailure))
+				{
+					return;
+				}
+
+				if (systemEventsFailure != null)
+					throw new InvalidOperationException(systemEventsFailure + $" Raw z-order payload: {json}");
+
+				// On Linux the verb reports z-order through the Win32 GetWindow walk, which has no
+				// equivalent there, so this check cannot run yet - reading _NET_CLIENT_LIST_STACKING
+				// would be the way to implement it. Skip rather than fail: the drag itself is exercised
+				// by the surrounding test, and failing here would report a missing diagnostic as a
+				// product defect.
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+				{
+					Xunit.Assert.Skip(
+						$"OS z-order for floating windows is not readable on Linux yet: {json}");
+					return;
+				}
+
+				throw new InvalidOperationException($"Could not read OS z-order for floating window '{contentId}': {json}");
+			}
+
+			if (!root.TryGetProperty("isFloatingAboveMain", out var above) || above.ValueKind != JsonValueKind.True)
+				throw new InvalidOperationException($"Floating window '{contentId}' is not above the main window: {json}");
+		}
+
+		private static bool TryAssertFloatingWindowAboveMainWithSystemEvents(JsonElement zOrderPayload, out string failure)
+		{
+			failure = null;
+			var mainTitle = zOrderPayload.TryGetProperty("mainTitle", out var mainTitleElement)
+				? mainTitleElement.GetString()
+				: "MainWindow";
+			var floatingTitle = zOrderPayload.TryGetProperty("floatingTitle", out var floatingTitleElement)
+				? floatingTitleElement.GetString()
+				: null;
+			if (string.IsNullOrWhiteSpace(floatingTitle))
+			{
+				failure = "Could not verify z-order with System Events because the floating window title was empty.";
+				return false;
+			}
+
+			var script =
+				"tell application \"System Events\"\n" +
+				"  tell process \"TestApp\"\n" +
+				"    set rows to {}\n" +
+				"    repeat with i from 1 to count of windows\n" +
+				"      try\n" +
+				"        set w to window i\n" +
+				"        set rows to rows & ((i as text) & tab & (name of w as text))\n" +
+				"      end try\n" +
+				"    end repeat\n" +
+				"  end tell\n" +
+				"end tell\n" +
+				"set AppleScript's text item delimiters to linefeed\n" +
+				"return rows as text";
+
+			string output;
+			try
+			{
+				output = RunOsaScript(script);
+			}
+			catch (Exception ex)
+			{
+				failure = $"Could not verify z-order with System Events: {ex.Message}";
+				return false;
+			}
+
+			var windows = output
+				.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+				.Select(line => line.Split('\t', 2))
+				.Where(parts => parts.Length == 2 && int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
+				.Select(parts => new
+				{
+					Index = int.Parse(parts[0], CultureInfo.InvariantCulture),
+					Title = parts[1],
+				})
+				.ToList();
+			var main = windows.FirstOrDefault(w => string.Equals(w.Title, mainTitle, StringComparison.Ordinal));
+			var floating = windows.FirstOrDefault(w => string.Equals(w.Title, floatingTitle, StringComparison.Ordinal));
+			if (main == null || floating == null)
+			{
+				failure = $"System Events could not find both windows. main='{mainTitle}', floating='{floatingTitle}', windows=[{string.Join(", ", windows.Select(w => $"{w.Index}:{w.Title}"))}]";
+				return false;
+			}
+
+			if (floating.Index < main.Index)
+				return true;
+
+			failure = $"Floating window '{floatingTitle}' is not above main window '{mainTitle}' according to System Events. " +
+				$"Lower index is frontmost; mainIndex={main.Index}, floatingIndex={floating.Index}, windows=[{string.Join(", ", windows.Select(w => $"{w.Index}:{w.Title}"))}]";
+			return false;
+		}
+
+		private static string RunOsaScript(string script)
+		{
+			var psi = new ProcessStartInfo("osascript")
+			{
+				UseShellExecute = false,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+			};
+			psi.ArgumentList.Add("-e");
+			psi.ArgumentList.Add(script);
+			using var process = Process.Start(psi) ?? throw new InvalidOperationException("Failed to start osascript.");
+			var stdout = process.StandardOutput.ReadToEnd();
+			var stderr = process.StandardError.ReadToEnd();
+			process.WaitForExit();
+			if (process.ExitCode != 0)
+				throw new InvalidOperationException(stderr.Trim());
+			return stdout.Trim();
 		}
 
 		public async Task<List<JsonElement>> QueryElementsAsync(string type, int maxResults = 20, int maxDepth = 96, CancellationToken ct = default)
@@ -345,21 +518,29 @@ namespace AvalonDock.DevFlowIntegrationTests
 		public bool Global { get; set; }
 	}
 
-	/// <summary>A live drop-target compass indicator: its DropTargetType name and screen center.</summary>
+	/// <summary>A live drop-target compass indicator: its DropTargetType name and screen bounds.</summary>
 	public sealed class DropTargetInfo
 	{
-		public DropTargetInfo(string type, double centerX, double centerY)
+		public DropTargetInfo(string type, double x, double y, double width, double height, double centerX, double centerY)
 		{
 			Type = type;
+			X = x;
+			Y = y;
+			Width = width;
+			Height = height;
 			CenterX = centerX;
 			CenterY = centerY;
 		}
 
 		public string Type { get; }
+		public double X { get; }
+		public double Y { get; }
+		public double Width { get; }
+		public double Height { get; }
 		public double CenterX { get; }
 		public double CenterY { get; }
 
-		public override string ToString() => $"{Type} @ {CenterX},{CenterY}";
+		public override string ToString() => $"{Type} [{X},{Y},{Width},{Height}] @ {CenterX},{CenterY}";
 	}
 
 	public readonly struct ElementBounds
@@ -377,11 +558,12 @@ namespace AvalonDock.DevFlowIntegrationTests
 		public double Width { get; }
 		public double Height { get; }
 		public double CenterX => X + Width / 2d;
-		public double CenterY => Y + Height / 2d;
-		public double Right => X + Width;
-		public double Bottom => Y + Height;
+			public double CenterY => Y + Height / 2d;
+			public double Right => X + Width;
+			public double Bottom => Y + Height;
+			public bool Contains(double x, double y) => x >= X && x <= Right && y >= Y && y <= Bottom;
 
-		public override string ToString()
+			public override string ToString()
 			=> string.Create(CultureInfo.InvariantCulture, $"{X},{Y} {Width}x{Height}");
 
 		public bool IsCloseTo(ElementBounds other)

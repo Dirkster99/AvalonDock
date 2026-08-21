@@ -17,10 +17,12 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.ProGPU;
 using System.Windows.Threading;
 using AvalonDock.Core;
 using AvalonDock.Controls;
 using AvalonDock.Layout;
+using AvalonDock.Platform;
 using System.Diagnostics;
 using System.IO;
 using AvalonDock.Serializer.Xml;
@@ -29,7 +31,7 @@ using AvalonDock.Themes;
 using AvalonDock.Themes.VS;
 using System.Diagnostics.CodeAnalysis;
 using LeXtudio.DevFlow.Agent.Core;
-using DevFlowActionAttribute = Microsoft.Maui.DevFlow.Agent.Core.DevFlowActionAttribute;
+using Microsoft.Maui.DevFlow.Agent.Core;
 
 namespace TestApp
 {
@@ -40,6 +42,73 @@ namespace TestApp
 	[DevFlowUIThread]
 	public partial class MainWindow : Window
 	{
+		private const string ObjC = "/usr/lib/libobjc.dylib";
+		private static MainWindow s_positionedMainWindow;
+		private static Point? s_positionedMainContentOrigin;
+		private DispatcherTimer _mainWindowPositionGuardTimer;
+		private Point _mainWindowPositionGuardOrigin;
+		private Point? _mainWindowPositionGuardViolation;
+
+		private enum GetWindowCmd : uint
+		{
+			GW_HWNDLAST = 1,
+			GW_HWNDPREV = 3,
+		}
+
+		[DllImport("user32.dll", SetLastError = true)]
+		private static extern IntPtr GetWindow(IntPtr hWnd, uint uCmd);
+
+		[DllImport(ObjC, EntryPoint = "objc_getClass")]
+		private static extern IntPtr ObjCGetClass(string name);
+
+		[DllImport(ObjC, EntryPoint = "sel_registerName")]
+		private static extern IntPtr Sel(string name);
+
+		[DllImport(ObjC, EntryPoint = "objc_msgSend")]
+		private static extern IntPtr ObjCMsgSend(IntPtr receiver, IntPtr selector);
+
+		[DllImport(ObjC, EntryPoint = "objc_msgSend")]
+		private static extern nuint ObjCMsgSendRetNUInt(IntPtr receiver, IntPtr selector);
+
+		[DllImport(ObjC, EntryPoint = "objc_msgSend")]
+		private static extern byte ObjCMsgSendRetBool(IntPtr receiver, IntPtr selector);
+
+		[DllImport(ObjC, EntryPoint = "objc_msgSend")]
+		private static extern void ObjCMsgSendBool(IntPtr receiver, IntPtr selector, byte value);
+
+		[DllImport(ObjC, EntryPoint = "objc_msgSend")]
+		private static extern IntPtr ObjCMsgSendNUInt(IntPtr receiver, IntPtr selector, nuint arg);
+
+		// NOT cached like the selectors below: objc_getClass("NSApplication") only succeeds once
+		// AppKit.framework has actually been dlopen'd into this process, which GLFW does lazily when
+		// it creates the first native window - well after this type's static fields would otherwise
+		// be initialized. Caching the lookup result here previously froze it at IntPtr.Zero forever
+		// (queried before AppKit was loaded), which silently broke every OS z-order check on macOS.
+		private static IntPtr NsApplicationClass => RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+			? ObjCGetClass("NSApplication")
+			: IntPtr.Zero;
+		private static readonly IntPtr _selSharedApplication = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+			? Sel("sharedApplication")
+			: IntPtr.Zero;
+		private static readonly IntPtr _selOrderedWindows = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+			? Sel("orderedWindows")
+			: IntPtr.Zero;
+		private static readonly IntPtr _selCount = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+			? Sel("count")
+			: IntPtr.Zero;
+		private static readonly IntPtr _selObjectAtIndex = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+			? Sel("objectAtIndex:")
+			: IntPtr.Zero;
+		private static readonly IntPtr _selContentView = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("contentView") : IntPtr.Zero;
+		private static readonly IntPtr _selSuperview = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("superview") : IntPtr.Zero;
+		private static readonly IntPtr _selSubviews = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("subviews") : IntPtr.Zero;
+		private static readonly IntPtr _selClassName = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("className") : IntPtr.Zero;
+		private static readonly IntPtr _selUtf8String = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("UTF8String") : IntPtr.Zero;
+		private static readonly IntPtr _selIsHidden = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("isHidden") : IntPtr.Zero;
+		private static readonly IntPtr _selSetHidden = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("setHidden:") : IntPtr.Zero;
+		private static readonly IntPtr _selRemoveFromSuperview = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("removeFromSuperview") : IntPtr.Zero;
+		private static readonly IntPtr _selStyleMask = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("styleMask") : IntPtr.Zero;
+
 		private readonly Dictionary<string, int> _inputEventCounts = new Dictionary<string, int>();
 		private readonly HashSet<UIElement> _inputDiagnosticElements = new HashSet<UIElement>();
 		private Point _lastDockManagerMousePosition;
@@ -110,7 +179,11 @@ namespace TestApp
 					TraceMenu($"LostKeyboardFocus {e.OldFocus?.GetType().Name ?? "null"} -> {e.NewFocus?.GetType().Name ?? "null"}")), true);
 			}
 
-			foreach (var root in GetAvalonDockVisualRoots())
+			// Enumerate floating windows as well as the docked manager, so panes that have been torn
+			// out are instrumented too.
+			var hitRoots = dockManager.FloatingWindows.Cast<DependencyObject>()
+				.Concat(new DependencyObject[] { dockManager });
+			foreach (var root in hitRoots)
 			{
 				foreach (var title in FindVisualDescendants<AnchorablePaneTitle>(root))
 					AddInputDiagnostics(title, $"anchorable-title:{title.Model?.ContentId}");
@@ -604,6 +677,7 @@ namespace TestApp
 			if (anchorable == null)
 				return $"Anchorable '{contentId}' not found";
 			anchorable.Float();
+			Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
 			return $"Floated '{contentId}'";
 		}
 
@@ -613,31 +687,135 @@ namespace TestApp
 			              "app windows commonly sit and can steal synthetic clicks aimed at the tester).")]
 		public string PositionFloatingWindow(string contentId, double left = 900, double top = 200)
 		{
-			var floating = dockManager.FloatingWindows
-				.FirstOrDefault(fw => fw.Model?.Descendents().OfType<LayoutAnchorable>()
-					.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true);
+			var floating = FindVisibleFloatingWindow(contentId);
 			if (floating == null)
 				return $"No floating window found for '{contentId}'";
 
-			floating.Left = left;
-			floating.Top = top;
-			// Bring THIS window in front of every other OS-level window (including other apps'), not
-			// just its sibling windows within the process - Topmost alone only affects Z-order among
-			// this app's own windows and does not reliably win over an unrelated app (terminal, IDE)
-			// that happens to be in front. Activate() is what actually raises it above other processes
-			// (mirrors avd.activate's proven pattern for the main window).
-			floating.Activate();
-			// Do NOT leave Topmost=true: AvalonDock's drop-zone compass is a separate OverlayWindow
-			// shown ABOVE the dragged floating window during a drag (IOverlayWindowHost.ShowOverlayWindow).
-			// A permanently-topmost floating window can sit above that overlay instead of below it, so
-			// the drop-target hit-test silently never resolves - the drag still "succeeds" (mouse events
-			// process, ok=true) but nothing ever docks. A one-shot true->false toggle still raises the
-			// window once (matching avd.activate's pattern) without leaving it pinned above everything.
-			floating.Topmost = true;
-			floating.Topmost = false;
-			floating.Focus();
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				PlatformHelper.SetWindowPosition(floating, left, top);
+			else
+			{
+				floating.Left = left;
+				floating.Top = top;
+			}
 			floating.UpdateLayout();
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				AdoptNativeWindowFramePosition(floating);
 			return $"Positioned floating window for '{contentId}' at {left},{top}";
+		}
+
+		[DevFlowAction("avd.query.floating-zorder", Description = "Compare a floating window's OS z-order against the main window")]
+		public string QueryFloatingZOrder(string contentId)
+		{
+			var floating = FindVisibleFloatingWindow(contentId);
+			if (floating == null)
+			{
+				return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+				{
+					["found"] = false,
+					["contentId"] = contentId,
+				});
+			}
+
+			var mainHandle = GetNativeWindowHandle(this);
+			var floatingHandle = GetNativeWindowHandle(floating);
+			var floatingContentTitle = floating.Model?.Descendents()
+				.OfType<LayoutAnchorable>()
+				.FirstOrDefault(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal))
+				?.Title;
+			var mainFound = TryGetPlatformWindowZOrder(mainHandle, out var mainZ);
+			var floatingFound = TryGetPlatformWindowZOrder(floatingHandle, out var floatingZ);
+			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			{
+				["found"] = true,
+				["contentId"] = contentId,
+				["mainTitle"] = Title,
+				["floatingTitle"] = string.IsNullOrWhiteSpace(floating.Title) ? floatingContentTitle : floating.Title,
+				["mainHandle"] = mainHandle.ToInt64(),
+				["floatingHandle"] = floatingHandle.ToInt64(),
+				["mainZOrderFound"] = mainFound,
+				["floatingZOrderFound"] = floatingFound,
+				["mainZOrder"] = mainZ,
+				["floatingZOrder"] = floatingZ,
+				["isFloatingAboveMain"] = mainFound && floatingFound && IsPlatformZOrderAbove(floatingZ, mainZ),
+				["zOrderConvention"] = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+					? "lower index is frontmost in NSApplication.orderedWindows"
+					: "higher z-order is frontmost in Win32 GetWindow walk",
+				["floatingLeft"] = floating.Left,
+				["floatingTop"] = floating.Top,
+				["floatingWidth"] = floating.ActualWidth,
+				["floatingHeight"] = floating.ActualHeight,
+				["mainIsActive"] = IsActive,
+				["floatingIsActive"] = floating.IsActive,
+				["floatingTopmost"] = floating.Topmost,
+			});
+		}
+
+		[DevFlowAction("avd.query.macos-view-tree", Description = "Return the native AppKit view class tree for main, floating, or overlay window diagnostics")]
+		public string QueryMacOSViewTree(string target = "main", string contentId = "dragTestTool")
+		{
+			if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				return System.Text.Json.JsonSerializer.Serialize(new { supported = false, target });
+
+			Window window = target switch
+			{
+				"main" => this,
+				"floating" => FindVisibleFloatingWindow(contentId),
+				"overlay" => Application.Current.Windows.OfType<OverlayWindow>().FirstOrDefault(w => w.IsVisible),
+				_ => null,
+			};
+			var nsWindow = window == null ? IntPtr.Zero : GetNativeWindowHandle(window);
+			var classes = new List<Dictionary<string, object>>();
+			if (nsWindow != IntPtr.Zero)
+			{
+				var contentView = ObjCMsgSend(nsWindow, _selContentView);
+				var root = contentView;
+				for (var i = 0; i < 8 && root != IntPtr.Zero; i++)
+				{
+					var parent = ObjCMsgSend(root, _selSuperview);
+					if (parent == IntPtr.Zero) break;
+					root = parent;
+				}
+				AppendMacViewTree(root, 0, classes, new HashSet<IntPtr>());
+			}
+
+			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			{
+				["supported"] = true,
+				["target"] = target,
+				["contentId"] = contentId,
+				["windowFound"] = window != null,
+				["nsWindow"] = nsWindow.ToInt64(),
+				["windowClass"] = GetMacObjectClassName(nsWindow),
+				["styleMask"] = nsWindow == IntPtr.Zero ? 0UL : (ulong)ObjCMsgSendRetNUInt(nsWindow, _selStyleMask),
+				["views"] = classes,
+				["visualEffectViews"] = classes.Where(v => ((string)v["class"]).Contains("VisualEffect", StringComparison.Ordinal)).ToArray(),
+			});
+		}
+
+		private static void AppendMacViewTree(IntPtr view, int depth, List<Dictionary<string, object>> output, HashSet<IntPtr> visited)
+		{
+			if (view == IntPtr.Zero || depth > 16 || !visited.Add(view)) return;
+			output.Add(new Dictionary<string, object>
+			{
+				["depth"] = depth,
+				["address"] = view.ToInt64(),
+				["class"] = GetMacObjectClassName(view),
+				["hidden"] = ObjCMsgSendRetBool(view, _selIsHidden) != 0,
+			});
+			var subviews = ObjCMsgSend(view, _selSubviews);
+			if (subviews == IntPtr.Zero) return;
+			var count = ObjCMsgSendRetNUInt(subviews, _selCount);
+			for (nuint i = 0; i < count; i++)
+				AppendMacViewTree(ObjCMsgSendNUInt(subviews, _selObjectAtIndex, i), depth + 1, output, visited);
+		}
+
+		private static string GetMacObjectClassName(IntPtr value)
+		{
+			if (value == IntPtr.Zero) return null;
+			var name = ObjCMsgSend(value, _selClassName);
+			var utf8 = name == IntPtr.Zero ? IntPtr.Zero : ObjCMsgSend(name, _selUtf8String);
+			return utf8 == IntPtr.Zero ? null : Marshal.PtrToStringUTF8(utf8);
 		}
 
 		[DevFlowAction("avd.dock", Description = "Dock a floating anchorable back to main layout")]
@@ -695,6 +873,74 @@ namespace TestApp
 			return $"Added documents '{id1}', '{id2}'";
 		}
 
+		// The drop-target compass buttons are Borders with a deliberately lopsided BorderThickness
+		// ("20,5,5,5") scaled down by a Viewbox, and they render as solid blobs with overshooting
+		// edges instead of hollow frames. This shows the same Border three ways - raw, raw with a
+		// uniform thickness, and Viewbox-scaled - so the culprit (non-uniform thickness vs. the
+		// Viewbox scale) can be told apart from a screenshot.
+		private Window _borderReproWindow;
+
+		[DevFlowAction("avd.debug.border-repro", Description = "Show a window reproducing the compass Border rendering")]
+		public string ShowBorderRepro(double left = 60, double top = 700)
+		{
+			_borderReproWindow?.Close();
+
+			Border MakeBorder(Thickness thickness) => new Border
+			{
+				Width = 50,
+				Height = 80,
+				Margin = new Thickness(10),
+				BorderBrush = new SolidColorBrush(Color.FromRgb(0x41, 0x7F, 0xE8)),
+				BorderThickness = thickness,
+			};
+
+			var raw = MakeBorder(new Thickness(20, 5, 5, 5));
+			var uniform = MakeBorder(new Thickness(5));
+			var scaled = new Viewbox
+			{
+				Stretch = Stretch.Uniform,
+				Width = 40,
+				Height = 40,
+				Margin = new Thickness(10),
+				Child = MakeBorder(new Thickness(20, 5, 5, 5)),
+			};
+
+			// Same border under a plain RenderTransform rather than a Viewbox: tells apart "Viewbox
+			// mis-measures its child" from "any scale transform loses the border thickness".
+			var renderScaled = MakeBorder(new Thickness(20, 5, 5, 5));
+			renderScaled.RenderTransform = new ScaleTransform(0.5, 0.5);
+
+			var row = new StackPanel { Orientation = Orientation.Horizontal };
+			row.Children.Add(raw);
+			row.Children.Add(uniform);
+			row.Children.Add(scaled);
+			row.Children.Add(renderScaled);
+
+			_borderReproWindow = new Window
+			{
+				Title = "BorderRepro",
+				Width = 340,
+				Height = 140,
+				Left = left,
+				Top = top,
+				WindowStartupLocation = WindowStartupLocation.Manual,
+				ShowInTaskbar = false,
+				Background = new SolidColorBrush(Color.FromRgb(0x1E, 0x1E, 0x1E)),
+				Content = row,
+			};
+			_borderReproWindow.Show();
+			_borderReproWindow.UpdateLayout();
+
+			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			{
+				["left"] = _borderReproWindow.Left,
+				["top"] = _borderReproWindow.Top,
+				["width"] = _borderReproWindow.ActualWidth,
+				["height"] = _borderReproWindow.ActualHeight,
+				["order"] = "raw(20,5,5,5) | uniform(5) | viewbox-scaled(20,5,5,5)",
+			});
+		}
+
 		[DevFlowAction("avd.add-anchorable", Description = "Add a new anchorable to the layout")]
 		public string AddAnchorable(string title = null)
 		{
@@ -740,10 +986,11 @@ namespace TestApp
 					}
 				}
 			};
-			var toolPane = new LayoutAnchorablePane(tool)
-			{
-				DockWidth = new GridLength(260)
-			};
+				var toolPane = new LayoutAnchorablePane(tool)
+				{
+					DockWidth = new GridLength(260)
+				};
+				toolPane.SelectedContentIndex = 0;
 			var documentPane = new LayoutDocumentPane();
 			documentPane.Children.Add(new LayoutDocument
 			{
@@ -772,10 +1019,11 @@ namespace TestApp
 					}
 				}
 			};
-			var toolPane2 = new LayoutAnchorablePane(tool2)
-			{
-				DockWidth = new GridLength(260)
-			};
+				var toolPane2 = new LayoutAnchorablePane(tool2)
+				{
+					DockWidth = new GridLength(260)
+				};
+				toolPane2.SelectedContentIndex = 0;
 			var root = new LayoutRoot
 			{
 				RootPanel = new LayoutPanel
@@ -790,8 +1038,9 @@ namespace TestApp
 				}
 			};
 
-			dockManager.Layout = root;
-			dockManager.UpdateLayout();
+				dockManager.Layout = root;
+				tool.IsSelected = true;
+				dockManager.UpdateLayout();
 			RefreshInputDiagnostics();
 			return QueryLayout();
 		}
@@ -904,68 +1153,359 @@ namespace TestApp
 			return System.Text.Json.JsonSerializer.Serialize(result);
 		}
 
-		[DevFlowAction("avd.query.bounds", Description = "Query screen bounds for a dock test target")]
-		public string QueryBounds(string target, string contentId = null)
-		{
-			FrameworkElement element = target switch
+			[DevFlowAction("avd.query.bounds", Description = "Query screen bounds for a dock test target")]
+			public string QueryBounds(string target, string contentId = null)
 			{
+				FrameworkElement element = target switch
+				{
+				"main-window" => this,
+				"menu" => mainMenu,
 				"manager" => dockManager,
-				"anchorable-title" => GetAvalonDockVisualRoots()
-					.SelectMany(FindVisualDescendants<AnchorablePaneTitle>)
-					.Where(x => string.Equals(x.Model?.ContentId, contentId, StringComparison.Ordinal) ||
-						x.FindVisualAncestor<LayoutAnchorablePaneControl>()?.Model?.Descendents().OfType<LayoutAnchorable>()
-							.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true)
-					.Where(x => x.FindVisualAncestor<LayoutAnchorablePaneControl>() != null)
-					.FirstOrDefault(IsHitTestableAtCenter) ??
-					// A single-content floating anchorable window has no AnchorablePaneTitle at all -
-					// that control belongs to a multi-tab LayoutAnchorablePaneControl. Its caption is
-					// the floating window's own DropDownControlArea (see
-					// LayoutAnchorableFloatingWindowControl's template). Fall back to that so a drag
-					// handle can still be resolved for a floated tool window's title/caption.
-					FindFloatingWindowCaption(contentId) ??
-					(contentId == "dragTestTool"
-						? GetAvalonDockVisualRoots()
-							.SelectMany(FindVisualDescendants<AnchorablePaneTitle>)
-							.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0)
-						: null),
-				"anchorable-tab" => FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
-					.Where(x => string.Equals((x.Model as LayoutAnchorable)?.ContentId, contentId, StringComparison.Ordinal))
-					.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0),
-				"document-pane" => FindVisualDescendant<LayoutDocumentPaneControl>(dockManager, _ => true),
-				"anchorable-pane" => FindVisualDescendant<LayoutAnchorablePaneControl>(
-					dockManager,
-					x => x.Model?.Descendents().OfType<LayoutAnchorable>()
+					"anchorable-title" => FindAnchorableTitle(contentId),
+					"anchorable-tab" => FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
+							.Where(x => MatchesAnchorableContent(x, contentId))
+							.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0),
+					"document-tab" => FindVisualDescendants<LayoutDocumentTabItem>(dockManager)
+						.Where(x => string.Equals(x.Model?.ContentId, contentId, StringComparison.Ordinal))
+						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0),
+					"document-pane" => string.IsNullOrEmpty(contentId)
+						? FindVisualDescendant<LayoutDocumentPaneControl>(dockManager, _ => true)
+						: FindVisualDescendant<LayoutDocumentPaneControl>(
+							dockManager,
+							x => x.Model?.Descendents().OfType<LayoutContent>()
+							.Any(c => string.Equals(c.ContentId, contentId, StringComparison.Ordinal)) == true),
+					"anchorable-pane" => FindVisualDescendant<LayoutAnchorablePaneControl>(
+						dockManager,
+						x => x.Model?.Descendents().OfType<LayoutAnchorable>()
 						.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true),
 				"anchorable-resizer" => FindAnchorablePaneResizer(contentId),
-				"floating-window" => dockManager.FloatingWindows.FirstOrDefault(),
+					"floating-window" => string.IsNullOrEmpty(contentId)
+						? dockManager.FloatingWindows.FirstOrDefault()
+						: FindVisibleFloatingWindow(contentId),
 				_ => null
 			};
 
-			return System.Text.Json.JsonSerializer.Serialize(CreateBoundsPayload(target, contentId, element));
-		}
+				return System.Text.Json.JsonSerializer.Serialize(CreateBoundsPayload(target, contentId, element));
+			}
 
-		[DevFlowAction("avd.activate", Description = "Activate and foreground the AvalonDock test window")]
-		public string ActivateTestWindow()
-		{
-			if (WindowState == WindowState.Minimized)
-				WindowState = WindowState.Normal;
+			[DevFlowAction("avd.query.drag-handle", Description = "Query a verified screen drag start point for an AvalonDock target")]
+			public string QueryDragHandle(string target, string contentId = null)
+			{
+				if (target == "floating-caption")
+					return QueryFloatingCaptionDragHandle(contentId);
+
+				FrameworkElement element = target switch
+				{
+					"docked-anchorable" => FindDockedAnchorableDragHandle(contentId),
+					"anchorable-resizer" => FindAnchorablePaneResizer(contentId),
+					"document-body" => FindVisualDescendant<LayoutDocumentPaneControl>(dockManager, _ => true),
+					"manager" => dockManager,
+					_ => null
+				};
+
+				var payload = CreateBoundsPayload(target, contentId, element);
+				if (element != null)
+				{
+					payload["handleKind"] = target;
+					payload["hitTest"] = HitTest((double)payload["centerX"], (double)payload["centerY"]);
+					payload["managerBounds"] = CreateBoundsPayload("manager", null, dockManager);
+					var window = Window.GetWindow(element);
+					if (window != null)
+						payload["windowBounds"] = CreateBoundsPayload("window", null, window);
+				}
+
+				return System.Text.Json.JsonSerializer.Serialize(payload);
+			}
+
+			private string QueryFloatingCaptionDragHandle(string contentId)
+			{
+				var floating = FindVisibleFloatingWindow(contentId);
+				if (floating == null)
+				{
+					return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+					{
+						["target"] = "floating-caption",
+						["contentId"] = contentId,
+						["found"] = false,
+						["reason"] = "floating window not found",
+					});
+				}
+
+				var captionHeight = Math.Min(28d, Math.Max(12d, floating.ActualHeight / 6d));
+				var leftInset = 8d;
+				var topInset = 6d;
+				var width = Math.Max(24d, Math.Min(180d, floating.ActualWidth - leftInset * 2d));
+				var height = Math.Max(12d, captionHeight - topInset);
+				var floatingOrigin = GetNativeWindowOrigin(floating);
+				var topLeft = new Point(floatingOrigin.X + leftInset, floatingOrigin.Y + topInset);
+				var center = new Point(floatingOrigin.X + leftInset + width / 2d, floatingOrigin.Y + topInset + height / 2d);
+				var result = new Dictionary<string, object>
+				{
+					["target"] = "floating-caption",
+					["contentId"] = contentId,
+					["found"] = true,
+					["x"] = topLeft.X,
+					["y"] = topLeft.Y,
+					["width"] = width,
+					["height"] = height,
+					["centerX"] = center.X,
+					["centerY"] = center.Y,
+					["hitTestPoint"] = false,
+					["handleKind"] = "floating-caption",
+					["windowBounds"] = CreateBoundsPayload("floating-window", contentId, floating),
+					["managerBounds"] = CreateBoundsPayload("manager", null, dockManager),
+				};
+				result["hitTest"] = HitTest((double)result["centerX"], (double)result["centerY"]);
+				return System.Text.Json.JsonSerializer.Serialize(result);
+			}
+
+			[DevFlowAction("avd.debug-show-overlay", Description = "Force-show the DockingManager compass overlay (with a visible debug border) without a drag; optionally enter a drop-target zone to also render its blue preview box, for inspecting overlay/preview alignment vs the manager")]
+			public string DebugShowOverlay(string previewZone = null)
+			{
+				OverlayWindow.DebugBorderEnabled = true;
+
+				var floating = dockManager.FloatingWindows.FirstOrDefault(fw => fw.IsLoaded && fw.IsVisible);
+				if (floating == null)
+				{
+					var anchorable = dockManager.Layout.Descendents().OfType<LayoutAnchorable>()
+						.FirstOrDefault(a => !a.IsFloating && a.IsVisible);
+					if (anchorable == null)
+						return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object> { ["shown"] = false, ["reason"] = "no anchorable to float" });
+					anchorable.Float();
+					floating = dockManager.FloatingWindows.FirstOrDefault(fw => fw.IsLoaded && fw.IsVisible);
+				}
+
+				if (floating == null)
+					return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object> { ["shown"] = false, ["reason"] = "no floating window available" });
+
+				var host = (IOverlayWindowHost)dockManager;
+				var overlay = host.ShowOverlayWindow(floating);
+				overlay.DragEnter(floating);
+				foreach (var area in host.GetDropAreas(floating))
+					overlay.DragEnter(area);
+				if (overlay is Window overlayWindowForLayout)
+					overlayWindowForLayout.UpdateLayout();
+
+				object previewInfo = null;
+				if (!string.IsNullOrWhiteSpace(previewZone))
+				{
+					var target = overlay.GetTargets().FirstOrDefault(t => t.Type.ToString() == previewZone);
+					if (target != null)
+					{
+						overlay.DragEnter(target);
+						var previewPath = target.GetPreviewPath((OverlayWindow)overlay, floating.Model as LayoutFloatingWindow);
+						var previewBounds = previewPath.Bounds;
+						var overlayPosition = (overlay as Window) is { } overlayWindow
+							? GetNativeWindowOrigin(overlayWindow)
+							: new Point(0, 0);
+						// GetPreviewPath returns geometry in overlay-local coordinates; translate to
+						// screen coordinates so tests can compare against docked pane bounds directly.
+						previewInfo = new Dictionary<string, object>
+						{
+							["zone"] = previewZone,
+							["targetScreenBounds"] = RectToPayload(target.GetScreenBounds()),
+							["previewGeometryBounds"] = new Dictionary<string, object>
+							{
+								["x"] = previewBounds.X + overlayPosition.X,
+								["y"] = previewBounds.Y + overlayPosition.Y,
+								["width"] = previewBounds.Width,
+								["height"] = previewBounds.Height,
+							},
+							["overlayPosition"] = RectToPayload(new Rect(overlayPosition, new Size(0, 0))),
+							["previewIsEmpty"] = previewBounds.IsEmpty,
+						};
+					}
+					else
+					{
+						previewInfo = new Dictionary<string, object> { ["zone"] = previewZone, ["found"] = false };
+					}
+				}
+
+				var payload = new Dictionary<string, object>
+				{
+					["shown"] = true,
+					["overlay"] = (overlay is Window w)
+						? CreateNativeWindowBoundsPayload(w)
+						: null,
+					["menuBounds"] = CreateBoundsPayload("menu", null, mainMenu),
+					["managerBounds"] = CreateBoundsPayload("manager", null, dockManager),
+					["targets"] = overlay.GetTargets().Select(target =>
+					{
+						var bounds = target.GetScreenBounds();
+						return new Dictionary<string, object>
+						{
+							["type"] = target.Type.ToString(),
+							["x"] = bounds.X,
+							["y"] = bounds.Y,
+							["width"] = bounds.Width,
+							["height"] = bounds.Height,
+						};
+					}).ToArray(),
+					["preview"] = previewInfo,
+				};
+				return System.Text.Json.JsonSerializer.Serialize(payload);
+			}
+
+		private static Dictionary<string, object> RectToPayload(Rect r) => new Dictionary<string, object>
+			{
+				["x"] = r.X,
+				["y"] = r.Y,
+				["width"] = r.Width,
+				["height"] = r.Height,
+			};
+
+			[DevFlowAction("avd.debug-hide-overlay", Description = "Hide the debug compass overlay shown by avd.debug-show-overlay")]
+			public string DebugHideOverlay()
+			{
+				((IOverlayWindowHost)dockManager).HideOverlayWindow();
+				OverlayWindow.DebugBorderEnabled = false;
+				return "Hidden debug overlay";
+			}
+
+			[DevFlowAction("avd.activate", Description = "Activate and foreground the AvalonDock test window")]
+			public string ActivateTestWindow()
+			{
+				if (WindowState == WindowState.Minimized)
+					WindowState = WindowState.Normal;
 			Activate();
-			Topmost = true;
-			Topmost = false;
 			Focus();
 			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
 			{
 				["isActive"] = IsActive,
-				["isKeyboardFocusWithin"] = IsKeyboardFocusWithin,
-			});
-		}
+					["isKeyboardFocusWithin"] = IsKeyboardFocusWithin,
+				});
+			}
 
-		[DevFlowAction("avd.input.reset", Description = "Reset AvalonDock routed input diagnostics")]
-		public string ResetInputDiagnostics()
-		{
-			_inputEventCounts.Clear();
-			_lastDockManagerMousePosition = default;
-			_lastDockManagerLeftButton = Mouse.LeftButton;
+			[DevFlowAction("avd.activate-floating", Description = "Raise a floating AvalonDock window before native input safety checks")]
+			public string ActivateFloatingWindow(string contentId)
+			{
+				var floating = FindVisibleFloatingWindow(contentId)
+					?? throw new InvalidOperationException($"Floating window not found for '{contentId}'.");
+				floating.Activate();
+				floating.Focus();
+				Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
+				return "Activated floating window";
+			}
+
+			[DevFlowAction("avd.position-main-window", Description = "Move the AvalonDock test window to the primary-screen test area")]
+			public string PositionMainWindow(double left = 50, double top = 40)
+			{
+				if (WindowState == WindowState.Minimized)
+					WindowState = WindowState.Normal;
+				WindowStartupLocation = WindowStartupLocation.Manual;
+				Left = left;
+				Top = top;
+				Width = 900;
+				Height = 700;
+				UpdateLayout();
+				Activate();
+				AdoptNativeWindowFramePosition(this);
+				s_positionedMainWindow = this;
+				s_positionedMainContentOrigin = GetNativeWindowOrigin(this);
+				return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+				{
+					["left"] = Left,
+					["top"] = Top,
+					["width"] = ActualWidth,
+					["height"] = ActualHeight,
+					["isActive"] = IsActive,
+					["requestedLeft"] = left,
+					["requestedTop"] = top,
+				});
+			}
+
+			[DevFlowAction("avd.main-window-position-guard.start", Description = "Start recording any native main-window movement during the current test")]
+			public string StartMainWindowPositionGuard()
+			{
+				_mainWindowPositionGuardTimer?.Stop();
+				_mainWindowPositionGuardOrigin = PlatformHelper.GetWindowContentOrigin(this);
+				_mainWindowPositionGuardViolation = null;
+				_mainWindowPositionGuardTimer ??= new DispatcherTimer(
+					TimeSpan.FromMilliseconds(20),
+					DispatcherPriority.Send,
+					(_, __) => SampleMainWindowPositionGuard(),
+					Dispatcher);
+				_mainWindowPositionGuardTimer.Start();
+				return System.Text.Json.JsonSerializer.Serialize(new
+				{
+					x = _mainWindowPositionGuardOrigin.X,
+					y = _mainWindowPositionGuardOrigin.Y,
+				});
+			}
+
+			[DevFlowAction("avd.main-window-position-guard.query", Description = "Report whether the native main window moved since the guard was started")]
+			public string QueryMainWindowPositionGuard()
+			{
+				SampleMainWindowPositionGuard();
+				var current = PlatformHelper.GetWindowContentOrigin(this);
+				return System.Text.Json.JsonSerializer.Serialize(new
+				{
+					armed = _mainWindowPositionGuardTimer?.IsEnabled == true,
+					baselineX = _mainWindowPositionGuardOrigin.X,
+					baselineY = _mainWindowPositionGuardOrigin.Y,
+					currentX = current.X,
+					currentY = current.Y,
+					moved = _mainWindowPositionGuardViolation.HasValue,
+					violationX = _mainWindowPositionGuardViolation?.X,
+					violationY = _mainWindowPositionGuardViolation?.Y,
+				});
+			}
+
+			private void SampleMainWindowPositionGuard()
+			{
+				if (_mainWindowPositionGuardTimer?.IsEnabled != true || _mainWindowPositionGuardViolation.HasValue)
+					return;
+
+				var current = PlatformHelper.GetWindowContentOrigin(this);
+				const double tolerance = 0.5;
+				if (Math.Abs(current.X - _mainWindowPositionGuardOrigin.X) > tolerance ||
+					Math.Abs(current.Y - _mainWindowPositionGuardOrigin.Y) > tolerance)
+					_mainWindowPositionGuardViolation = current;
+			}
+
+			// The platform can refuse the requested frame: on macOS a window may not be placed with its
+			// title bar underneath the system menu bar, so a small Top is silently clamped downward (a
+			// requested Top of 40 lands at ~61 here, and the exact clamp varies with menu-bar height and
+			// notched displays). LibreWPF never pushes that clamp back into the managed Left/Top, so
+			// PointToScreen - which is derived from those managed values - keeps reporting the REQUESTED
+			// position while synthetic OS-level mouse input is aimed at the REAL one. Every screen
+			// coordinate computed from a managed query is then off by the clamp distance, which is what
+			// made native drag tests land on the wrong element. Read the true native frame back and
+			// adopt it so the managed and native sides agree again.
+			private static void AdoptNativeWindowFramePosition(Window window)
+			{
+				if (!ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) || host?.SilkWindow is not { } silk)
+					return;
+
+				// The native move runs on the native windowing loop, so an immediate read can still
+				// return the pre-move frame. Wait for the position to stop changing before adopting it.
+				var deadline = DateTime.UtcNow + TimeSpan.FromMilliseconds(1500);
+				var last = silk.Position;
+				var stableReads = 0;
+				while (DateTime.UtcNow < deadline && stableReads < 3)
+				{
+					window.Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
+					System.Threading.Thread.Sleep(30);
+					var current = silk.Position;
+					stableReads = current.X == last.X && current.Y == last.Y ? stableReads + 1 : 0;
+					last = current;
+				}
+
+				if (Math.Abs(last.X - window.Left) > 0.5)
+					window.Left = last.X;
+				if (Math.Abs(last.Y - window.Top) > 0.5)
+					window.Top = last.Y;
+				window.UpdateLayout();
+			}
+
+			[DevFlowAction("avd.input.reset", Description = "Reset AvalonDock routed input diagnostics")]
+			public string ResetInputDiagnostics()
+			{
+				if (Mouse.Captured is Menu || Mouse.Captured is MenuItem)
+					Mouse.Capture(null);
+				_inputEventCounts.Clear();
+				_lastDockManagerMousePosition = default;
+				_lastDockManagerLeftButton = Mouse.LeftButton;
 			_lastInputOriginalSource = null;
 			return "reset";
 		}
@@ -1257,6 +1797,103 @@ namespace TestApp
 			return list;
 		}
 
+		[DevFlowAction("avd.query.platform", Description = "Query LibreWPF platform coordinate diagnostics")]
+		public string QueryPlatformDiagnostics()
+		{
+			var source = PresentationSource.FromVisual(this);
+			var windowOrigin = PointToScreen(new Point(0, 0));
+			var managerOrigin = dockManager.PointToScreen(new Point(0, 0));
+			var clientOrigin = TryReadPortableClientOrigin(source);
+			var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+				.Where(a => a.GetName().Name is "ProGPU.Wpf" or "PresentationCore" or "PresentationFramework")
+				.Select(a => new Dictionary<string, object>
+				{
+					["name"] = a.GetName().Name,
+					["version"] = a.GetName().Version?.ToString(),
+					["location"] = a.Location,
+				})
+				.ToArray();
+
+			var result = new Dictionary<string, object>
+			{
+				["windowLeft"] = Left,
+				["windowTop"] = Top,
+				["actualWidth"] = ActualWidth,
+				["actualHeight"] = ActualHeight,
+				["windowPointToScreenX"] = windowOrigin.X,
+				["windowPointToScreenY"] = windowOrigin.Y,
+				["managerPointToScreenX"] = managerOrigin.X,
+				["managerPointToScreenY"] = managerOrigin.Y,
+				["sourceType"] = source?.GetType().FullName,
+				["clientOrigin"] = clientOrigin,
+				["assemblies"] = assemblies,
+			};
+
+			// Managed Left/Top and PointToScreen are all derived from the same managed window state,
+			// so they agree with each other even when the real native window never moved. Report the
+			// actual native (Silk.NET/GLFW) frame separately - that is what synthetic OS-level mouse
+			// input is actually aimed at, so any divergence here is the root cause of "the click
+			// landed somewhere else" failures.
+			if (ProGpuWpfDiagnostics.TryGetWindowHost(this, out var diagHost) && diagHost?.SilkWindow is { } silk)
+			{
+				result["nativePositionX"] = silk.Position.X;
+				result["nativePositionY"] = silk.Position.Y;
+				result["nativeSizeX"] = silk.Size.X;
+				result["nativeSizeY"] = silk.Size.Y;
+			}
+
+			return System.Text.Json.JsonSerializer.Serialize(result, PlatformDiagnosticsJsonOptions);
+		}
+
+		// Early in the window lifecycle (before the first layout pass / native frame realization),
+		// PointToScreen and ActualWidth/Height can legitimately report NaN/Infinity. The default
+		// JsonSerializer throws on those, which crashes this diagnostics query exactly when it would
+		// be most useful (right after startup, mid-drag re-layout). Allow the named literals instead.
+		private static readonly System.Text.Json.JsonSerializerOptions PlatformDiagnosticsJsonOptions = new()
+		{
+			NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals,
+		};
+
+		private static Dictionary<string, object> CreateNativeWindowBoundsPayload(Window window)
+		{
+			var origin = GetNativeWindowOrigin(window);
+			return new Dictionary<string, object>
+			{
+				["left"] = origin.X,
+				["top"] = origin.Y,
+				["width"] = window.ActualWidth,
+				["height"] = window.ActualHeight,
+				["bottom"] = origin.Y + window.ActualHeight,
+			};
+		}
+
+		private static object TryReadPortableClientOrigin(PresentationSource source)
+		{
+			if (source == null)
+				return null;
+
+			try
+			{
+				var portableSource = source;
+				var portableOwnerProperty = source.GetType().GetProperty(
+					"PortableOwner",
+					System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+				if (portableOwnerProperty?.GetValue(source) is PresentationSource portableOwner)
+					portableSource = portableOwner;
+
+				var property = portableSource.GetType().GetProperty(
+					"ClientOrigin",
+					System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+				if (property?.GetValue(portableSource) is Point point)
+					return new Dictionary<string, object> { ["x"] = point.X, ["y"] = point.Y };
+			}
+			catch
+			{
+			}
+
+			return null;
+		}
+
 		[DevFlowAction("avd.query.active-drop-targets",
 			Description = "During an active drag (a floating window whose caption is currently being " +
 			              "dragged), returns every currently-visible compass drop-target indicator as " +
@@ -1277,6 +1914,9 @@ namespace TestApp
 				foreach (var target in overlay.GetTargets())
 				{
 					var bounds = target.GetScreenBounds();
+					if (bounds.IsEmpty || !double.IsFinite(bounds.X) || !double.IsFinite(bounds.Y) ||
+						!double.IsFinite(bounds.Width) || !double.IsFinite(bounds.Height))
+						continue;
 					results.Add(new Dictionary<string, object>
 					{
 						["type"] = target.Type.ToString(),
@@ -1293,16 +1933,170 @@ namespace TestApp
 			return System.Text.Json.JsonSerializer.Serialize(results);
 		}
 
+		// The drop-target compass paints an opaque background on macOS even though the OverlayWindow
+		// is Background=Transparent/AllowsTransparency=true. Report how the overlay is actually
+		// hosted (its PresentationSource, and whether that source got a real native window) so the
+		// opaque fill can be traced to the layer that produces it.
+		private static string DescribeOverlaySource(Window overlay)
+		{
+			if (overlay == null)
+				return null;
+
+			var source = PresentationSource.FromVisual(overlay);
+			var hasHost = ProGpuWpfDiagnostics.TryGetWindowHost(overlay, out var host);
+			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			{
+				["sourceType"] = source?.GetType().FullName,
+				["rootVisual"] = source?.RootVisual?.GetType().FullName,
+				["hasProGpuHost"] = hasHost,
+				["hasSilkWindow"] = hasHost && host?.SilkWindow != null,
+				["silkWindowTitle"] = hasHost ? host?.SilkWindow?.Title : null,
+			});
+		}
+
+		// DockingManager registers a LayoutContent's Content as a logical child when it creates the
+		// layout item, so a live count shows whether that registration is being released again when
+		// the item goes away. A count that climbs across repeated float/dock/restore cycles is the
+		// leak that also makes InternalAddLogicalChild's debug assertion fire on a later re-add.
+		[DevFlowAction("avd.query.logical-children", Description = "Count the DockingManager's live logical children")]
+		public string QueryLogicalChildren()
+		{
+			var live = 0;
+			var dead = 0;
+			var enumerator = dockManager.LogicalChildrenPublic;
+			while (enumerator.MoveNext())
+			{
+				if (enumerator.Current == null) dead++;
+				else live++;
+			}
+
+			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			{
+				["live"] = live,
+				["dead"] = dead,
+			});
+		}
+
+		[DevFlowAction("avd.query.drag-state", Description = "Query live floating-window drag state")]
+		public string QueryDragState()
+		{
+			return System.Text.Json.JsonSerializer.Serialize(dockManager.FloatingWindows.Select(floating =>
+			{
+				var overlayWindow = floating.CurrentDragService?.CurrentOverlayWindow as Window;
+				var overlayOrigin = overlayWindow == null ? (Point?)null : GetNativeWindowOrigin(overlayWindow);
+				var floatingOrigin = PlatformHelper.GetWindowContentOrigin(floating);
+				return new
+				{
+				overlayLeft = overlayOrigin?.X,
+				overlayTop = overlayOrigin?.Y,
+				overlayWidth = (floating.CurrentDragService?.CurrentOverlayWindow as Window)?.ActualWidth,
+				overlayHeight = (floating.CurrentDragService?.CurrentOverlayWindow as Window)?.ActualHeight,
+				overlayBackground = (floating.CurrentDragService?.CurrentOverlayWindow as Window)?.Background?.ToString(),
+				overlayAllowsTransparency = (floating.CurrentDragService?.CurrentOverlayWindow as Window)?.AllowsTransparency,
+					overlaySourceType = DescribeOverlaySource(floating.CurrentDragService?.CurrentOverlayWindow as Window),
+				menuBounds = CreateBoundsPayload("menu", null, mainMenu),
+				managerBounds = CreateBoundsPayload("manager", null, dockManager),
+					title = floating.Title,
+					currentDropTarget = floating.CurrentDragService?.CurrentDropTargetType,
+					previewGeometryBounds = GetLivePreviewScreenBounds(floating),
+					left = floatingOrigin.X,
+					top = floatingOrigin.Y,
+					dragOffset = floating.PortableDragOffsetForDiagnostics,
+					currentPointer = floating.CurrentPointerScreenPosition,
+				};
+			}).ToArray());
+		}
+
+		[DevFlowAction("avd.query.cursor", Description = "Query the native cursor position in screen coordinates")]
+		public string QueryNativeCursor()
+		{
+			var point = PlatformHelper.GetCursorPosition();
+			return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+			{
+				["x"] = point.X,
+				["y"] = point.Y,
+			});
+		}
+
+		[DevFlowAction("avd.complete-current-drop", Description = "Complete the current held AvalonDock drag after its preview has been inspected")]
+		public string CompleteCurrentDrop(string contentId)
+		{
+			var floating = FindVisibleFloatingWindow(contentId);
+			if (floating == null || floating.CurrentDragService?.CurrentDropTarget == null)
+				throw new InvalidOperationException($"No current drop target for floating content '{contentId}'.");
+
+			var target = floating.CurrentDragService.CurrentDropTargetType;
+			floating.CompletePortableDragForDiagnostics();
+			return target;
+		}
+
+		private static Dictionary<string, object> GetLivePreviewScreenBounds(LayoutFloatingWindowControl floating)
+		{
+			var dragService = floating.CurrentDragService;
+			if (dragService?.CurrentOverlayWindow is not OverlayWindow overlay || dragService.CurrentDropTarget == null)
+				return null;
+
+			var previewPath = dragService.CurrentDropTarget.GetPreviewPath(
+				overlay,
+				floating.Model as LayoutFloatingWindow);
+			if (previewPath == null || previewPath.Bounds.IsEmpty)
+				return null;
+
+			var bounds = previewPath.Bounds;
+			var overlayOrigin = GetNativeWindowOrigin(overlay);
+			return new Dictionary<string, object>
+			{
+				["x"] = bounds.X + overlayOrigin.X,
+				["y"] = bounds.Y + overlayOrigin.Y,
+				["width"] = bounds.Width,
+				["height"] = bounds.Height,
+			};
+		}
+
 		[DevFlowAction("avd.hit-test", Description = "Hit test a screen point against the AvalonDock manager")]
 		public string HitTest(double screenX, double screenY)
 		{
-			var point = dockManager.PointFromScreen(new Point(screenX, screenY));
-			var hit = dockManager.InputHitTest(point) as DependencyObject;
+			var screenPoint = new Point(screenX, screenY);
+			var managerPoint = PointFromScreenPortable(dockManager, screenPoint);
+			DependencyObject hit = null;
+			DependencyObject hitRoot = null;
+			foreach (var root in GetAvalonDockVisualRoots())
+			{
+				if (root is not FrameworkElement rootElement || root is not Visual rootVisual)
+					continue;
+
+				Point rootPoint;
+				try
+				{
+					rootPoint = PointFromScreenPortable(rootElement, screenPoint);
+				}
+				catch (InvalidOperationException)
+				{
+					continue;
+				}
+
+				if (rootPoint.X < 0 || rootPoint.Y < 0 || rootPoint.X > rootElement.ActualWidth || rootPoint.Y > rootElement.ActualHeight)
+					continue;
+
+				// InputHitTest does not descend past the DockingManager template's ContentPresenter in
+				// this portable (LibreWPF/ProGPU) rendering backend - it returns the same shallow
+				// ContentPresenter for every point, even pane centers. Resolve the hit geometrically
+				// instead, using each element's own PointToScreen bounds (the same transform path
+				// avd.query.bounds uses and which is reliable here, unlike TransformToDescendant): find
+				// the deepest visible visual descendant whose screen rect contains the point. This
+				// mirrors how drag handles are computed (from real element bounds), so a caller can
+				// reliably verify a computed drag-start point actually lands on the intended AvalonDock
+				// element (resizer, pane, caption) rather than a random position.
+				hit = FindDeepestVisualContaining(rootElement, screenPoint) ?? rootElement;
+				hitRoot = root;
+				break;
+			}
+
 			var ancestors = new List<string>();
 			for (var current = hit; current != null; current = VisualTreeHelper.GetParent(current))
 			{
 				ancestors.Add(current.GetType().FullName);
-				if (ReferenceEquals(current, dockManager))
+				if (ReferenceEquals(current, hitRoot))
 					break;
 			}
 
@@ -1310,17 +2104,18 @@ namespace TestApp
 			{
 				["screenX"] = screenX,
 				["screenY"] = screenY,
-				["managerX"] = point.X,
-				["managerY"] = point.Y,
+				["managerX"] = managerPoint.X,
+				["managerY"] = managerPoint.Y,
+				["root"] = hitRoot?.GetType().FullName,
 				["hit"] = hit?.GetType().FullName,
 				["ancestors"] = ancestors,
 			});
 		}
 
 		[DevFlowAction("avd.query.tabs", Description = "Query visible anchorable tabs and diagnostic bounds")]
-		public string QueryAnchorableTabs()
-		{
-			var tabs = FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
+			public string QueryAnchorableTabs()
+			{
+				var tabs = FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
 				.Select(tab => new Dictionary<string, object>
 				{
 					["contentId"] = tab.Model?.ContentId,
@@ -1333,10 +2128,45 @@ namespace TestApp
 				})
 				.ToArray();
 
-			return System.Text.Json.JsonSerializer.Serialize(tabs);
-		}
+				return System.Text.Json.JsonSerializer.Serialize(tabs);
+			}
 
-		private FrameworkElement FindAnchorablePaneResizer(string contentId)
+			[DevFlowAction("avd.query.anchorable-drag-surfaces", Description = "Query visible anchorable title/control drag surface diagnostics")]
+			public string QueryAnchorableDragSurfaces()
+			{
+				var roots = GetAvalonDockVisualRoots().ToArray();
+				var titles = roots.SelectMany(FindVisualDescendants<AnchorablePaneTitle>)
+					.Select(title => new Dictionary<string, object>
+					{
+						["contentId"] = title.Model?.ContentId,
+						["title"] = title.Model?.Title,
+						["isVisible"] = title.IsVisible,
+						["isHitTestVisible"] = title.IsHitTestVisible,
+						["actualWidth"] = title.ActualWidth,
+						["actualHeight"] = title.ActualHeight,
+						["isHitTestableAtCenter"] = IsHitTestableAtCenter(title),
+						["bounds"] = CreateBoundsPayload("anchorable-title", title.Model?.ContentId, title),
+					})
+					.ToArray();
+				var controls = roots.SelectMany(FindVisualDescendants<LayoutAnchorableControl>)
+					.Select(control => new Dictionary<string, object>
+					{
+						["contentId"] = control.Model?.ContentId,
+						["title"] = control.Model?.Title,
+						["isVisible"] = control.IsVisible,
+						["actualWidth"] = control.ActualWidth,
+						["actualHeight"] = control.ActualHeight,
+						["bounds"] = CreateBoundsPayload("anchorable-control", control.Model?.ContentId, control),
+					})
+					.ToArray();
+				return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+				{
+					["titles"] = titles,
+					["controls"] = controls,
+				});
+			}
+
+			private FrameworkElement FindAnchorablePaneResizer(string contentId)
 		{
 			var pane = FindVisualDescendant<LayoutAnchorablePaneControl>(
 				dockManager,
@@ -1406,8 +2236,18 @@ namespace TestApp
 			if (element == null)
 				return result;
 
-			var topLeft = element.PointToScreen(new Point(0, 0));
-			var bottomRight = element.PointToScreen(new Point(element.ActualWidth, element.ActualHeight));
+			Point topLeft;
+			Point bottomRight;
+			if (element is Window window && ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) && host?.SilkWindow is { } silk)
+			{
+				topLeft = new Point(silk.Position.X, silk.Position.Y);
+				bottomRight = new Point(silk.Position.X + silk.Size.X, silk.Position.Y + silk.Size.Y);
+			}
+			else
+			{
+				topLeft = PointToScreenPortable(element, new Point(0, 0));
+				bottomRight = PointToScreenPortable(element, new Point(element.ActualWidth, element.ActualHeight));
+			}
 			result["x"] = topLeft.X;
 			result["y"] = topLeft.Y;
 			result["width"] = bottomRight.X - topLeft.X;
@@ -1427,7 +2267,14 @@ namespace TestApp
 			return result;
 		}
 
-		private static bool TryFindHitTestableScreenPoint(FrameworkElement element, out Point screenPoint)
+		private static Point GetNativeWindowOrigin(Window window)
+		{
+			if (ProGpuWpfDiagnostics.TryGetWindowHost(window, out var host) && host?.SilkWindow is { } silk)
+				return new Point(silk.Position.X, silk.Position.Y);
+			return PointToScreenPortable(window, new Point(0, 0));
+		}
+
+			private static bool TryFindHitTestableScreenPoint(FrameworkElement element, out Point screenPoint)
 		{
 			screenPoint = default;
 			var root = FindVisualRoot(element);
@@ -1450,14 +2297,147 @@ namespace TestApp
 
 						if (rootElement is FrameworkElement rootFrameworkElement)
 						{
-							screenPoint = rootFrameworkElement.PointToScreen(pointInRoot);
+							screenPoint = PointToScreenPortable(rootFrameworkElement, pointInRoot);
 							return true;
 						}
 					}
 				}
 			}
 
-			return false;
+				return false;
+			}
+
+			private static Point PointToScreenPortable(FrameworkElement element, Point point)
+			{
+				var containingWindow = element as Window ?? Window.GetWindow(element);
+				if (ReferenceEquals(containingWindow, s_positionedMainWindow) && s_positionedMainContentOrigin is { } mainOrigin)
+				{
+					var pointInWindow = ReferenceEquals(element, containingWindow)
+						? point
+						: element.TransformToAncestor(containingWindow).Transform(point);
+					return new Point(mainOrigin.X + pointInWindow.X, mainOrigin.Y + pointInWindow.Y);
+				}
+				if (containingWindow is LayoutFloatingWindowControl floatingWindow)
+				{
+					var pointInWindow = ReferenceEquals(element, floatingWindow)
+						? point
+						: element.TransformToAncestor(floatingWindow).Transform(point);
+					var nativeOrigin = GetNativeWindowOrigin(floatingWindow);
+					return new Point(nativeOrigin.X + pointInWindow.X, nativeOrigin.Y + pointInWindow.Y);
+				}
+
+				try
+				{
+					return element.PointToScreen(point);
+				}
+				catch (InvalidOperationException)
+				{
+				}
+
+				if (element is Window directWindow)
+					return new Point(directWindow.Left + point.X, directWindow.Top + point.Y);
+
+				throw new InvalidOperationException("Could not convert element point to screen coordinates.");
+			}
+
+			private static Point PointFromScreenPortable(UIElement element, Point point)
+			{
+				if (element is FrameworkElement floatingElement)
+				{
+					var containingWindow = floatingElement as Window ?? Window.GetWindow(floatingElement);
+					if (ReferenceEquals(containingWindow, s_positionedMainWindow) &&
+						s_positionedMainContentOrigin is { } mainOrigin)
+					{
+						var pointInWindow = new Point(point.X - mainOrigin.X, point.Y - mainOrigin.Y);
+						return ReferenceEquals(floatingElement, containingWindow)
+							? pointInWindow
+							: containingWindow.TransformToDescendant(floatingElement).Transform(pointInWindow);
+					}
+
+					var floatingWindow = floatingElement as LayoutFloatingWindowControl
+						?? Window.GetWindow(floatingElement) as LayoutFloatingWindowControl;
+					if (floatingWindow != null)
+					{
+						var nativeOrigin = GetNativeWindowOrigin(floatingWindow);
+						var pointInWindow = new Point(point.X - nativeOrigin.X, point.Y - nativeOrigin.Y);
+						return ReferenceEquals(floatingElement, floatingWindow)
+							? pointInWindow
+							: floatingWindow.TransformToDescendant(floatingElement).Transform(pointInWindow);
+					}
+				}
+
+				try
+				{
+					return element.PointFromScreen(point);
+				}
+				catch (InvalidOperationException)
+				{
+				}
+
+				if (element is FrameworkElement frameworkElement)
+				{
+					var window = Window.GetWindow(frameworkElement);
+					if (window is LayoutFloatingWindowControl && !ReferenceEquals(window, frameworkElement))
+					{
+						try
+						{
+							var pointInWindow = window.PointFromScreen(point);
+							return window.TransformToDescendant(frameworkElement).Transform(pointInWindow);
+						}
+						catch (InvalidOperationException)
+						{
+						}
+					}
+				}
+
+				if (element is Window directWindow)
+					return new Point(point.X - directWindow.Left, point.Y - directWindow.Top);
+
+				throw new InvalidOperationException("Could not convert screen point to element coordinates.");
+			}
+
+		// Deepest FrameworkElement whose own on-screen rect contains the screen point, across the whole
+		// subtree. Uses each element's own PointToScreen (the transform path that is reliable in this
+		// rendering backend) rather than TransformToDescendant. Preferring the DEEPEST match (rather
+		// than the topmost z-order sibling) is deliberate: full-size but content-empty overlays such as
+		// LayoutAutoHideWindowControl sit on top of the real panes and contain every point shallowly,
+		// so a topmost-first walk would always resolve to the overlay and never the pane/resizer the
+		// caller is actually verifying. Returns null when nothing qualifies.
+		private static FrameworkElement FindDeepestVisualContaining(DependencyObject node, Point screenPoint)
+		{
+			return FindDeepestVisualContaining(node, screenPoint, 0).Element;
+		}
+
+		private static (FrameworkElement Element, int Depth) FindDeepestVisualContaining(
+			DependencyObject node, Point screenPoint, int depth)
+		{
+			(FrameworkElement Element, int Depth) best = (null, -1);
+			var count = VisualTreeHelper.GetChildrenCount(node);
+			for (var i = 0; i < count; i++)
+			{
+				var childBest = FindDeepestVisualContaining(VisualTreeHelper.GetChild(node, i), screenPoint, depth + 1);
+				if (childBest.Element != null && childBest.Depth > best.Depth)
+					best = childBest;
+			}
+
+			if (best.Element != null)
+				return best;
+
+			if (node is FrameworkElement fe && fe.ActualWidth > 0 && fe.ActualHeight > 0)
+			{
+				try
+				{
+					var topLeft = PointToScreenPortable(fe, new Point(0, 0));
+					var bottomRight = PointToScreenPortable(fe, new Point(fe.ActualWidth, fe.ActualHeight));
+					if (new Rect(topLeft, bottomRight).Contains(screenPoint))
+						return (fe, depth);
+				}
+				catch (InvalidOperationException)
+				{
+				}
+			}
+
+			return (null, -1);
 		}
 
 		private static T FindVisualDescendant<T>(DependencyObject root, Func<T, bool> predicate)
@@ -1503,15 +2483,60 @@ namespace TestApp
 		// AnchorablePaneTitle (that control only exists for multi-tab docked panes).
 		private FrameworkElement FindFloatingWindowCaption(string contentId)
 		{
-			var floating = dockManager.FloatingWindows
-				.OfType<LayoutAnchorableFloatingWindowControl>()
-				.FirstOrDefault(fw => fw.Model?.Descendents().OfType<LayoutAnchorable>()
-					.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true);
+			var floating = FindVisibleFloatingWindow(contentId) as LayoutAnchorableFloatingWindowControl;
 			if (floating == null)
 				return null;
 
 			return FindVisualDescendants<DropDownControlArea>(floating)
 				.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
+		}
+
+			private FrameworkElement FindAnchorableTitle(string contentId)
+			{
+				return FindFloatingWindowCaption(contentId) ??
+					GetAvalonDockVisualRoots()
+						.SelectMany(FindVisualDescendants<AnchorablePaneTitle>)
+					.Where(x => string.Equals(x.Model?.ContentId, contentId, StringComparison.Ordinal) ||
+						x.FindVisualAncestor<LayoutAnchorablePaneControl>()?.Model?.Descendents().OfType<LayoutAnchorable>()
+						.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true)
+						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
+			}
+
+				private FrameworkElement FindDockedAnchorableDragHandle(string contentId)
+				{
+					var tab = FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
+						.Where(x => MatchesAnchorableContent(x, contentId))
+						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
+					if (tab != null)
+						return tab;
+
+					var title = FindVisualDescendants<AnchorablePaneTitle>(dockManager)
+						.Where(x => string.Equals(x.Model?.ContentId, contentId, StringComparison.Ordinal) ||
+							x.FindVisualAncestor<LayoutAnchorablePaneControl>()?.Model?.Descendents().OfType<LayoutAnchorable>()
+								.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true)
+						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
+					if (title != null)
+						return title;
+
+					return FindVisualDescendants<LayoutAnchorableTabItem>(dockManager)
+						.Where(x => MatchesAnchorableContent(x, contentId))
+						.FirstOrDefault(x => x.IsVisible && x.ActualWidth > 0 && x.ActualHeight > 0);
+				}
+
+				private static bool MatchesAnchorableContent(LayoutAnchorableTabItem tab, string contentId)
+				{
+					return string.Equals((tab.Model as LayoutAnchorable)?.ContentId, contentId, StringComparison.Ordinal) ||
+						tab.FindVisualAncestor<LayoutAnchorablePaneControl>()?.Model?.Descendents().OfType<LayoutAnchorable>()
+							.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true;
+				}
+
+			private LayoutFloatingWindowControl FindVisibleFloatingWindow(string contentId)
+		{
+			return dockManager.FloatingWindows
+				.Where(fw => fw.IsLoaded && fw.IsVisible &&
+					fw.Model?.Descendents().OfType<LayoutAnchorable>()
+						.Any(a => string.Equals(a.ContentId, contentId, StringComparison.Ordinal)) == true)
+				.LastOrDefault();
 		}
 
 		[DevFlowAction("avd.new-floating", Description = "Create a new floating anchorable window")]
@@ -1526,6 +2551,79 @@ namespace TestApp
 			anchorable.AddToLayout(dockManager, AnchorableShowStrategy.Most);
 			anchorable.Float();
 			return $"Created floating '{anchorable.ContentId}'";
+		}
+
+		// WindowInteropHelper(window).Handle is a Win32-shaped HWND surrogate; it is never the real
+		// NSWindow* pointer on macOS, so comparing it against NSApplication.orderedWindows (an array
+		// of actual NSWindow* Objective-C objects) in TryGetMacWindowOrder could never match. Resolve
+		// the genuine Cocoa window pointer via the LibreWPF/Silk.NET native window instead.
+		private static IntPtr GetNativeWindowHandle(Window window)
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				return PlatformHelper.GetNativeWindowHandle(window);
+
+			return new WindowInteropHelper(window).Handle;
+		}
+
+		private static bool TryGetPlatformWindowZOrder(IntPtr hwnd, out int zOrder)
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				return TryGetMacWindowOrder(hwnd, out zOrder);
+
+			return TryGetWindowZOrder(hwnd, out zOrder);
+		}
+
+		private static bool IsPlatformZOrderAbove(int candidateZOrder, int referenceZOrder)
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				return candidateZOrder < referenceZOrder;
+
+			return candidateZOrder > referenceZOrder;
+		}
+
+		private static bool TryGetMacWindowOrder(IntPtr window, out int zOrder)
+		{
+			try
+			{
+				var app = ObjCMsgSend(NsApplicationClass, _selSharedApplication);
+				var windows = ObjCMsgSend(app, _selOrderedWindows);
+				var count = ObjCMsgSendRetNUInt(windows, _selCount);
+				for (nuint i = 0; i < count; i++)
+				{
+					if (ObjCMsgSendNUInt(windows, _selObjectAtIndex, i) == window)
+					{
+						zOrder = checked((int)i);
+						return true;
+					}
+				}
+			}
+			catch
+			{
+			}
+
+			zOrder = int.MinValue;
+			return false;
+		}
+
+		private static bool TryGetWindowZOrder(IntPtr hwnd, out int zOrder)
+		{
+			var lowestHwnd = GetWindow(hwnd, (uint)GetWindowCmd.GW_HWNDLAST);
+			var z = 0;
+			var current = lowestHwnd;
+			while (current != IntPtr.Zero)
+			{
+				if (current == hwnd)
+				{
+					zOrder = z;
+					return true;
+				}
+
+				current = GetWindow(current, (uint)GetWindowCmd.GW_HWNDPREV);
+				z++;
+			}
+
+			zOrder = int.MinValue;
+			return false;
 		}
 
 		[DevFlowAction("avd.close-document", Description = "Close a document by ContentId")]

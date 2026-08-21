@@ -123,6 +123,17 @@ namespace AvalonDock.Controls
 			var union = Rect.Empty;
 			foreach (var rect in _detectionRect)
 			{
+				// During a layout transition an indicator can briefly be measured against a host whose
+				// available size is smaller than its insets. Such a target is not hittable in that frame;
+				// do not let its transient negative extent make diagnostics (or automation) throw while
+				// enumerating the other, valid targets.
+				if (!double.IsFinite(rect.X) || !double.IsFinite(rect.Y) ||
+					!double.IsFinite(rect.Width) || !double.IsFinite(rect.Height) ||
+					rect.Width < 0.0 || rect.Height < 0.0)
+				{
+					continue;
+				}
+
 				var screenRect = new Rect(rect.X * scaleX, rect.Y * scaleY, rect.Width * scaleX, rect.Height * scaleY);
 				union.Union(screenRect);
 			}

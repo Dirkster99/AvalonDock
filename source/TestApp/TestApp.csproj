@@ -56,9 +56,11 @@
       <ProjectReference Include="..\Components\AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <!-- The published LeXtudio.DevFlow.Agent.LibreWpf 0.2.0 NuGet package ships an Aarch64-only DLL
-           (not AnyCPU), so it fails to load with FileLoadException on x64. Reference the local ui-labs
-           checkout instead until that's fixed upstream. -->
+      <!-- Referenced from the local ui-labs checkout rather than the published
+           LeXtudio.DevFlow.Agent.LibreWpf package for two reasons: the published 0.2.0 shipped an
+           Aarch64-only DLL that fails to load on x64, and Linux mouse injection (XTest) exists only
+           in that checkout so far - see lextudio/ui-labs#3. Switch back to a PackageReference once a
+           release contains the Linux input backend, otherwise the DevFlow drag tests cannot run here. -->
       <ProjectReference Include="/home/aleu1c014278/ui-labs/src/DevFlow/LeXtudio.DevFlow.Agent.LibreWpf/LeXtudio.DevFlow.Agent.LibreWpf.csproj" />
       <ProjectReference Include="/home/aleu1c014278/ui-labs/src/DevFlow/LeXtudio.DevFlow.Agent.Core/LeXtudio.DevFlow.Agent.Core.csproj" />
     </ItemGroup>

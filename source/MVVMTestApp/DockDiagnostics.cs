@@ -14,7 +14,7 @@ using System.Windows;
 using AvalonDock;
 using AvalonDock.Layout;
 using LeXtudio.DevFlow.Agent.Core;
-using DevFlowActionAttribute = Microsoft.Maui.DevFlow.Agent.Core.DevFlowActionAttribute;
+using Microsoft.Maui.DevFlow.Agent.Core;
 
 namespace AvalonDock.MVVMTestApp
 {
