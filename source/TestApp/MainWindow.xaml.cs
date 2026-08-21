@@ -105,8 +105,6 @@ namespace TestApp
 		private static readonly IntPtr _selClassName = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("className") : IntPtr.Zero;
 		private static readonly IntPtr _selUtf8String = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("UTF8String") : IntPtr.Zero;
 		private static readonly IntPtr _selIsHidden = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("isHidden") : IntPtr.Zero;
-		private static readonly IntPtr _selSetHidden = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("setHidden:") : IntPtr.Zero;
-		private static readonly IntPtr _selRemoveFromSuperview = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("removeFromSuperview") : IntPtr.Zero;
 		private static readonly IntPtr _selStyleMask = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Sel("styleMask") : IntPtr.Zero;
 
 		private readonly Dictionary<string, int> _inputEventCounts = new Dictionary<string, int>();

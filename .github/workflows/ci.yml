@@ -170,8 +170,14 @@ jobs:
           # A docking test opens floating windows and a drop-target overlay, so a second surface is
           # not optional. Force wgpu onto Vulkan and point it at Mesa's software rasteriser
           # (lavapipe), which supports multiple window surfaces.
+          # WGPU_BACKEND had no effect - the crash stayed in the GLES/EGL backend - so ProGPU
+          # selects it itself and the env var is not consulted. Left in place in case a later build
+          # honours it, but the load-bearing setting is EGL_PLATFORM: without it Mesa has no DRI
+          # device to infer a platform from on a headless runner and can resolve to something other
+          # than X11, which is a plausible source of the BadAccess when a window surface is created.
           WGPU_BACKEND: vulkan
           VK_ICD_FILENAMES: /usr/share/vulkan/icd.d/lvp_icd.x86_64.json
+          EGL_PLATFORM: x11
           LIBGL_ALWAYS_SOFTWARE: '1'
           GALLIUM_DRIVER: llvmpipe
           DEVFLOW_TESTAPP_NO_BUILD: '1'
