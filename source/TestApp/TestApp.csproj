@@ -55,13 +55,19 @@
       <ProjectReference Include="..\Components\AvalonDock.Themes.VS2010\AvalonDock.Themes.VS2010.csproj" />
       <ProjectReference Include="..\Components\AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj" />
     </ItemGroup>
+    <PropertyGroup>
+      <!-- Where the DevFlow agent sources live. Defaults to a ui-labs checkout sitting beside this
+           repository; override with -p:DevFlowAgentPath=<dir> (CI checks the fork out inside the
+           workspace, which is not a sibling of the repo root). -->
+      <DevFlowAgentPath Condition="'$(DevFlowAgentPath)' == ''">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../ui-labs/src/DevFlow'))</DevFlowAgentPath>
+    </PropertyGroup>
     <ItemGroup>
-      <!-- Referenced from the local ui-labs checkout rather than the published
+      <!-- Referenced from a ui-labs checkout rather than the published
            LeXtudio.DevFlow.Agent.LibreWpf package for two reasons: the published 0.2.0 shipped an
            Aarch64-only DLL that fails to load on x64, and Linux mouse injection (XTest) exists only
            in that checkout so far - see lextudio/ui-labs#3. Switch back to a PackageReference once a
            release contains the Linux input backend, otherwise the DevFlow drag tests cannot run here. -->
-      <ProjectReference Include="/home/aleu1c014278/ui-labs/src/DevFlow/LeXtudio.DevFlow.Agent.LibreWpf/LeXtudio.DevFlow.Agent.LibreWpf.csproj" />
-      <ProjectReference Include="/home/aleu1c014278/ui-labs/src/DevFlow/LeXtudio.DevFlow.Agent.Core/LeXtudio.DevFlow.Agent.Core.csproj" />
+      <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.LibreWpf/LeXtudio.DevFlow.Agent.LibreWpf.csproj" />
+      <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.Core/LeXtudio.DevFlow.Agent.Core.csproj" />
     </ItemGroup>
 </Project>
