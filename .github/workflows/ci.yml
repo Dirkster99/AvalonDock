@@ -94,6 +94,9 @@ jobs:
           repository: sharpSteff/ui-labs
           ref: feature/linux-native-mouse-input
           path: ui-labs
+          # Its projects run GitVersion.MsBuild, which refuses to work on the shallow clone
+          # actions/checkout produces by default ("Repository is a shallow clone").
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
