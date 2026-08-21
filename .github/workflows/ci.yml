@@ -18,6 +18,11 @@ jobs:
       DevFlowAgentPath: ${{ github.workspace }}/ui-labs/src/DevFlow
 
     steps:
+      # The maui-labs submodule contains generator snapshot files whose paths exceed MAX_PATH, so
+      # checking it out on Windows fails with "Filename too long" without this.
+      - name: Enable long paths
+        run: git config --global core.longpaths true
+
       - name: Checkout
         uses: actions/checkout@v7
 
@@ -132,7 +137,8 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             xvfb openbox x11-utils x11-xserver-utils \
             libx11-6 libxtst6 libxrandr2 libxi6 libxcursor1 libxinerama1 \
-            libgl1 libglx-mesa0 libegl1 libgbm1
+            libgl1 libglx-mesa0 libegl1 libgbm1 \
+            mesa-vulkan-drivers libvulkan1
 
       - name: Start X server and window manager
         run: |
@@ -158,6 +164,14 @@ jobs:
 
       - name: Test (DevFlow UI Tests)
         env:
+          # ProGPU renders through wgpu. Left to itself it picks the GLES/EGL backend, which on a
+          # headless runner dies creating the second window's surface:
+          #   wgpu-hal/src/gles/egl.rs unwrap() on Err(BadAccess) -> non-unwinding panic -> abort
+          # A docking test opens floating windows and a drop-target overlay, so a second surface is
+          # not optional. Force wgpu onto Vulkan and point it at Mesa's software rasteriser
+          # (lavapipe), which supports multiple window surfaces.
+          WGPU_BACKEND: vulkan
+          VK_ICD_FILENAMES: /usr/share/vulkan/icd.d/lvp_icd.x86_64.json
           LIBGL_ALWAYS_SOFTWARE: '1'
           GALLIUM_DRIVER: llvmpipe
           DEVFLOW_TESTAPP_NO_BUILD: '1'
