@@ -166,6 +166,79 @@ namespace TestApp
 			}
 		}
 
+		[DevFlowAction("avd.splitter.width",
+			Description = "Sets DockingManager.GridSplitterWidth/Height. The docked splitter is only 6px " +
+			              "wide; widening it tests whether the resize cursor simply never appears, or " +
+			              "appears but is too narrow a target to notice.")]
+		public string SetSplitterWidth(double width)
+		{
+			dockManager.GridSplitterWidth = width;
+			dockManager.GridSplitterHeight = width;
+
+			// Force the layout to rebuild its splitters with the new size.
+			var layout = dockManager.Layout;
+			dockManager.Layout = null;
+			dockManager.Layout = layout;
+			return $"GridSplitterWidth/Height = {width}";
+		}
+
+		[DevFlowAction("avd.query.splitters",
+			Description = "Reports every LayoutGridResizerControl in the docked layout: the Cursor it " +
+			              "carries, its size, and whether it is hit-test visible. Distinguishes 'the " +
+			              "cursor was never assigned' from 'assigned but never applied'.")]
+		public string QuerySplitters()
+		{
+			var list = new List<Dictionary<string, object>>();
+			foreach (var root in GetAvalonDockVisualRoots())
+			{
+				foreach (var splitter in FindVisualDescendants<LayoutGridResizerControl>(root))
+				{
+					list.Add(new Dictionary<string, object>
+					{
+						["cursor"] = splitter.Cursor?.ToString() ?? "(null)",
+						["forceCursor"] = splitter.ForceCursor,
+						["isHitTestVisible"] = splitter.IsHitTestVisible,
+						["isEnabled"] = splitter.IsEnabled,
+						["size"] = $"{splitter.ActualWidth:F0}x{splitter.ActualHeight:F0}",
+						["screen"] = DescribeScreenRect(splitter),
+						["styleSet"] = splitter.Style != null,
+						// What actually sits under the pointer when hovering the splitter centre.
+						["hitAtCentre"] = HitTestNameAtSplitterCentre(splitter),
+					});
+				}
+			}
+
+			return System.Text.Json.JsonSerializer.Serialize(list);
+		}
+
+		private static string HitTestNameAtSplitterCentre(LayoutGridResizerControl splitter)
+		{
+			try
+			{
+				var root = PresentationSource.FromVisual(splitter)?.RootVisual as Visual;
+				if (root == null) return "(no root)";
+				var centre = splitter.TransformToVisual(root).Transform(
+					new Point(splitter.ActualWidth / 2, splitter.ActualHeight / 2));
+				var hit = VisualTreeHelper.HitTest(root, centre);
+				var element = hit?.VisualHit;
+				if (element == null) return "(no hit)";
+
+				// Report the hit element and whether the splitter is on its ancestor chain, which is
+				// what QueryCursor bubbling depends on.
+				var onChain = false;
+				for (DependencyObject d = element; d != null; d = VisualTreeHelper.GetParent(d))
+				{
+					if (ReferenceEquals(d, splitter)) { onChain = true; break; }
+				}
+
+				return $"{element.GetType().Name} splitterOnAncestorChain={onChain}";
+			}
+			catch (Exception ex)
+			{
+				return "(err: " + ex.GetType().Name + ")";
+			}
+		}
+
 		[DevFlowAction("avd.timer.query",
 			Description = "Returns the DispatcherTimer-driven counter. Auto-hide's close timer is a " +
 			              "DispatcherTimer, so whether this advances tells you if auto-close can work.")]
