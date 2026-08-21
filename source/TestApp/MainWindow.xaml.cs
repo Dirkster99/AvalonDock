@@ -136,6 +136,8 @@ namespace TestApp
 
 			this.DataContext = this;
 
+			winFormsHost.Child = new UserControl1();
+
 			UpdateThemeColors();
 
 		}

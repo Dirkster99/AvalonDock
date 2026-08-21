@@ -2,7 +2,7 @@
     <PropertyGroup>
         <RootNamespace>TestApp</RootNamespace>
         <TargetFramework>net10.0-windows</TargetFramework>
-        <UseWindowsForms>false</UseWindowsForms>
+        <UseWindowsForms>true</UseWindowsForms>
         <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
         <ApplicationIcon />
         <OutputType>WinExe</OutputType>
@@ -22,11 +22,6 @@
        </PropertyGroup>
     <ItemGroup>
         <Resource Include="**\*.png" />
-    </ItemGroup>
-    <ItemGroup>
-        <Compile Remove="UserControl1.cs" />
-        <Compile Remove="UserControl1.Designer.cs" />
-        <EmbeddedResource Remove="UserControl1.resx" />
     </ItemGroup>
     <ItemGroup>
         <FrameworkReference Remove="Microsoft.WindowsDesktop.App" />
