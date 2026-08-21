@@ -234,7 +234,30 @@ namespace AvalonDockTest.FlaUITests
 				}
 			}
 
-			return FindByName(toolWindowName);
+			var byName = FindByName(toolWindowName);
+			if (byName == null)
+			{
+				// Nothing matched, and the assertion that follows only reports "was null", which says
+				// nothing about why. Record what the automation tree actually offers so a failure is
+				// diagnosable from a CI log rather than only on a Windows box.
+				try
+				{
+					var names = MainWindow.FindAllDescendants()
+						.Select(e => { try { return e.Name; } catch { return null; } })
+						.Where(n => !string.IsNullOrWhiteSpace(n))
+						.Distinct()
+						.OrderBy(n => n);
+					TestContext.Out.WriteLine(
+						$"[FindToolWindowTab] '{toolWindowName}' not found. Automation names present: " +
+						string.Join(" | ", names));
+				}
+				catch (Exception ex)
+				{
+					TestContext.Out.WriteLine($"[FindToolWindowTab] could not enumerate automation tree: {ex.Message}");
+				}
+			}
+
+			return byName;
 		}
 
 		protected bool IsToolWindowDocked(string toolWindowName)
