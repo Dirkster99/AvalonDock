@@ -15,11 +15,16 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <GitVersion_NoFetchEnabled>true</GitVersion_NoFetchEnabled>
     <GitVersionTaskEnabled>false</GitVersionTaskEnabled>
+    <NoWarn>$(NoWarn);NU1504</NoWarn>
   </PropertyGroup>
 
-  <!-- LeXtudio.DevFlow.Agent.WPF pulls newer preview transport packages than
-       ProGPU.Wpf.Sdk's own pin; pin explicitly to the higher versions to
-       resolve NU1605 downgrade-treated-as-error. -->
+  <!-- LeXtudio.DevFlow.Agent.WPF pulls newer preview transport packages than ProGPU.Wpf.Sdk's own
+       pin, so these are raised to the higher version to resolve NU1605 downgrade-treated-as-error.
+       The SDK contributes both packages itself at the lower version, so this pin is a second item
+       for the same package and NuGet reports NU1504. Update= cannot be used instead: the SDK adds
+       its items after the project body is evaluated, so an Update here matches nothing and the pin
+       silently reverts. Suppressing the warning keeps the higher version explicit and deliberate;
+       without the suppression the Windows job fails, since it builds with warnings as errors. -->
   <ItemGroup>
     <PackageReference Include="System.Windows.Extensions" Version="11.0.0-preview.5.26302.115" />
     <PackageReference Include="System.IO.Packaging" Version="11.0.0-preview.5.26302.115" />
