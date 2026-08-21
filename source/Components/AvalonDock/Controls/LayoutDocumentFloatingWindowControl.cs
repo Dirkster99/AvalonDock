@@ -232,7 +232,7 @@ namespace AvalonDock.Controls
 			else
 				_overlayWindow.Owner = null;
 
-			var rectWindow = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
+			var rectWindow = this.GetScreenArea();
 			_overlayWindow.Left = rectWindow.Left;
 			_overlayWindow.Top = rectWindow.Top;
 			_overlayWindow.Width = rectWindow.Width;
@@ -243,9 +243,11 @@ namespace AvalonDock.Controls
 		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
 		{
 			CreateOverlayWindow(draggingWindow);
-			_overlayWindow.EnableDropTargets();
-			_overlayWindow.Show();
-			return _overlayWindow;
+			var overlayWindow = _overlayWindow;
+			overlayWindow.EnableDropTargets();
+			overlayWindow.Show();
+			overlayWindow.AlignNativePosition();
+			return overlayWindow;
 		}
 
 		/// <summary>

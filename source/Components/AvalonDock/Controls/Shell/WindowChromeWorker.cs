@@ -685,9 +685,13 @@ namespace Microsoft.Windows.Shell
 
 			if (!_isGlassEnabled)
 			{
-				Assert.IsNotDefault(lParam);
-				var wp = (WINDOWPOS)Marshal.PtrToStructure(lParam, typeof(WINDOWPOS));
-				_SetRoundingRegion(wp);
+				// Portable presentation sources can report a position change without a Win32
+				// WINDOWPOS payload. There is no native region to update in that case.
+				if (lParam != IntPtr.Zero)
+				{
+					var wp = (WINDOWPOS)Marshal.PtrToStructure(lParam, typeof(WINDOWPOS));
+					_SetRoundingRegion(wp);
+				}
 			}
 
 			// Still want to pass this to DefWndProc

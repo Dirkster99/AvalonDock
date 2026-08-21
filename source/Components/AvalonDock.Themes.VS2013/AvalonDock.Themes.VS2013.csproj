@@ -1,4 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project>
+	<!-- The Sdk attribute cannot carry a Condition, so the SDK is imported explicitly instead:
+	     LibreWPF.Sdk (ProGPU) is what makes this build off Windows, but it is not needed on Windows
+	     and cannot produce the net48 target the rest of the solution still references. On Windows the
+	     project therefore builds exactly as upstream does. Keep the matching Sdk.targets import at the
+	     end of the file. -->
+	<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk.WindowsDesktop" Condition="'$(OS)' == 'Windows_NT'" />
+	<Import Project="Sdk.props" Sdk="LibreWPF.Sdk" Condition="'$(OS)' != 'Windows_NT'" />
 	<PropertyGroup>
 		<RootNamespace>AvalonDock.Themes</RootNamespace>
 		<PackageId>Dirkster.AvalonDock.Themes.VS2013</PackageId>
@@ -24,4 +31,6 @@
 		<ProjectReference Include="..\AvalonDock\AvalonDock.csproj"/>
 		<ProjectReference Include="..\AvalonDock.Themes.VS\AvalonDock.Themes.VS.csproj"/>
 	</ItemGroup>
+	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.WindowsDesktop" Condition="'$(OS)' == 'Windows_NT'" />
+	<Import Project="Sdk.targets" Sdk="LibreWPF.Sdk" Condition="'$(OS)' != 'Windows_NT'" />
 </Project>
