@@ -12,6 +12,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Markup;
+using System.Runtime.InteropServices;
 using System.Windows.Threading;
 using AvalonDock.Controls;
 using AvalonDock.Layout;
@@ -1828,7 +1829,18 @@ namespace AvalonDock
 			if (overlayWindow == null) return;
 			overlayWindow.Owner = null;
 			overlayWindow.HideDropTargets();
-			overlayWindow.Close();
+
+			// Closing destroys the native window, and on a portable backend this call can arrive from
+			// inside the windowing library's own event loop: the drag that hides the overlay is driven
+			// by a mouse-move that originates in a GLFW cursor callback, so Close() -> Dispose() ->
+			// Silk.NET Reset() throws "You cannot call `Reset` inside of the render loop!" and takes the
+			// process down. Queue the close instead so it runs between frames rather than inside one.
+			// _overlayWindow is already cleared above, so the next ShowOverlayWindow builds a fresh one
+			// regardless of when this actually completes.
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				overlayWindow.Close();
+			else
+				Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => overlayWindow.Close()));
 		}
 
 		/// <inheritdoc/>
