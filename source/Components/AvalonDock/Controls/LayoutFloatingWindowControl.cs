@@ -1145,21 +1145,16 @@ namespace AvalonDock.Controls
 					return;
 			}
 
-			// Taking mouse capture below suppresses the activation a press would normally perform, so
-			// clicking the caption left the window inactive (grey header) while clicking its content -
-			// which takes no capture - activated it as expected. Activate explicitly to restore the
-			// behaviour the native caption provides.
-			if (!IsActive)
-			{
-				try
-				{
-					Activate();
-				}
-				catch (InvalidOperationException)
-				{
-					// Activation can throw if the window is being torn down; never break the drag for it.
-				}
-			}
+			// Taking mouse capture below suppresses what a press would normally do, in two ways.
+			//
+			// The window never activates, because capture swallows the activating click.
+			ActivateWindowForCaptionPress();
+
+			// More visibly, the pane header stays in its inactive (grey) state: that styling is driven
+			// by the layout content's IsActive (see the Model...SelectedContent.IsActive triggers in
+			// the themes), which AnchorablePaneTitle normally sets on mouse-up. With capture held by
+			// this window that mouse-up never reaches the title, so mark the content active here.
+			ActivateContentForCaptionPress();
 
 			var grabRelative = e.GetPosition(this);
 			var pointer = PointToScreen(grabRelative);
@@ -1174,6 +1169,34 @@ namespace AvalonDock.Controls
 				_dragService = new DragService(this);
 			SetIsDragging(true);
 			CaptureMouse();
+		}
+
+		/// <summary>Activates the window, ignoring teardown races.</summary>
+		private void ActivateWindowForCaptionPress()
+		{
+			if (IsActive) return;
+			try
+			{
+				Activate();
+			}
+			catch (InvalidOperationException)
+			{
+				// Activation can throw while the window is being torn down; never break the drag for it.
+			}
+		}
+
+		/// <summary>
+		/// Marks the floating window's visible content active, which is what drives the pane header's
+		/// active styling. Mirrors what AnchorablePaneTitle does on mouse-up, which cannot run while
+		/// the caption drag holds mouse capture.
+		/// </summary>
+		private void ActivateContentForCaptionPress()
+		{
+			var content = Model?.Descendents().OfType<LayoutContent>().FirstOrDefault(c => c.IsSelected)
+				?? Model?.Descendents().OfType<LayoutContent>().FirstOrDefault();
+
+			if (content != null && !content.IsActive)
+				content.IsActive = true;
 		}
 
 		// Starts the managed caption drag for a freshly torn-off floating window on portable backends.
