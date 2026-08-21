@@ -57,16 +57,17 @@
     </ItemGroup>
     <PropertyGroup>
       <!-- Where the DevFlow agent sources live. Defaults to a ui-labs checkout sitting beside this
-           repository; override with -p:DevFlowAgentPath=<dir> (CI checks the fork out inside the
+           repository; override with -p:DevFlowAgentPath=<dir> (CI checks it out inside the
            workspace, which is not a sibling of the repo root). -->
       <DevFlowAgentPath Condition="'$(DevFlowAgentPath)' == ''">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../ui-labs/src/DevFlow'))</DevFlowAgentPath>
     </PropertyGroup>
     <ItemGroup>
       <!-- Referenced from a ui-labs checkout rather than the published
            LeXtudio.DevFlow.Agent.LibreWpf package for two reasons: the published 0.2.0 shipped an
-           Aarch64-only DLL that fails to load on x64, and Linux mouse injection (XTest) exists only
-           in that checkout so far - see lextudio/ui-labs#3. Switch back to a PackageReference once a
-           release contains the Linux input backend, otherwise the DevFlow drag tests cannot run here. -->
+           Aarch64-only DLL that fails to load on x64, and the Linux mouse injection (XTest) the
+           DevFlow drag tests need is on upstream master (lextudio/ui-labs#3, merged) but not in any
+           release yet - the newest, 0.2.2, predates the merge. Switch back to a PackageReference once
+           a release contains it. -->
       <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.LibreWpf/LeXtudio.DevFlow.Agent.LibreWpf.csproj" />
       <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.Core/LeXtudio.DevFlow.Agent.Core.csproj" />
     </ItemGroup>

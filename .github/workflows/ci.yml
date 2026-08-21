@@ -32,8 +32,8 @@ jobs:
       - name: Checkout DevFlow agent (ui-labs)
         uses: actions/checkout@v7
         with:
-          repository: sharpSteff/ui-labs
-          ref: feature/linux-native-mouse-input
+          repository: lextudio/ui-labs
+          ref: master
           path: ui-labs
           fetch-depth: 0
           submodules: recursive
@@ -104,15 +104,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      # The agent is referenced from source, not as a package: the published 0.2.0 ships an
-      # Aarch64-only DLL that fails to load on x64, and the Linux XTest input backend exists only in
-      # this fork so far (lextudio/ui-labs#3). Drop this step and restore the PackageReference in
-      # TestApp.csproj once a release contains it.
+      # The agent is referenced from source, not as a package: the Linux XTest input backend it needs
+      # is on upstream master (lextudio/ui-labs#3, merged) but is not in any release yet - the newest,
+      # 0.2.2, predates the merge, and 0.2.0 additionally shipped an Aarch64-only DLL that fails to
+      # load on x64. Drop this step and restore the PackageReference in TestApp.csproj/MVVMTestApp.csproj
+      # once a release contains it.
       - name: Checkout DevFlow agent (ui-labs)
         uses: actions/checkout@v7
         with:
-          repository: sharpSteff/ui-labs
-          ref: feature/linux-native-mouse-input
+          repository: lextudio/ui-labs
+          ref: master
           path: ui-labs
           # Its projects run GitVersion.MsBuild, which refuses to work on the shallow clone
           # actions/checkout produces by default ("Repository is a shallow clone").
