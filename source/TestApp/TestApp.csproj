@@ -23,7 +23,11 @@
     <ItemGroup>
         <Resource Include="**\*.png" />
     </ItemGroup>
-    <ItemGroup>
+    <!-- Gated the same way as the transitive removal below. These exist so the portable build does
+         not drag in the Windows desktop framework; applying them where the portable framework
+         references are NOT in use strips the real Microsoft.WindowsDesktop.App out from under the
+         app, which leaves WindowsFormsHost with nothing to host. -->
+    <ItemGroup Condition="'$(ProGpuWpfUsePortableFrameworkReferences)' == 'true'">
         <FrameworkReference Remove="Microsoft.WindowsDesktop.App" />
         <FrameworkReference Remove="Microsoft.WindowsDesktop.App.WPF" />
     </ItemGroup>
