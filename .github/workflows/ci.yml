@@ -48,8 +48,15 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore source/AvalonDock.sln
 
+      # No --warnaserror on the command line: it overrides every project in the graph, and the graph
+      # now reaches outside this repository. TestApp and MVVMTestApp reference the DevFlow agent from
+      # source, so the switch was escalating warnings in third-party ui-labs code (CS0649 on interop
+      # structs whose fields the native side assigns) into build failures here. It also overrode the
+      # six projects in this repo that deliberately opt out with TreatWarningsAsErrors=false. The
+      # zero-warnings policy is unaffected: source/Directory.Build.props sets
+      # TreatWarningsAsErrors=true for everything that has not opted out.
       - name: Build
-        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore --warnaserror
+        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore
 
       - name: Test (Unit Tests)
         run: >
