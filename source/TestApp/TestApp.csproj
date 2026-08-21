@@ -1,13 +1,13 @@
-<Project Sdk="LibreWPF.Sdk">
+<Project>
+    <!-- On Windows this is an ordinary WPF + WinForms app, exactly as it was before the
+         cross-platform work: stock SDK, real WPF, real WinForms. LibreWPF.Sdk is only used where
+         it is actually needed, off Windows. The Sdk attribute cannot carry a Condition, so the
+         SDK is imported explicitly; keep the matching Sdk.targets import at the end. -->
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk.WindowsDesktop" Condition="'$(OS)' == 'Windows_NT'" />
+    <Import Project="Sdk.props" Sdk="LibreWPF.Sdk" Condition="'$(OS)' != 'Windows_NT'" />
     <PropertyGroup>
         <RootNamespace>TestApp</RootNamespace>
         <TargetFramework>net10.0-windows</TargetFramework>
-        <!-- LibreWPF.Sdk forces UseWPF and UseWindowsForms to false whenever its portable framework
-             references are in use, and that flag defaults to true on every OS - which is why simply
-             setting UseWindowsForms here had no effect. Windows has real WPF and WinForms, so opt out
-             of the portable references there and let the WinForms tool window actually work; every
-             other platform keeps the portable build. -->
-        <ProGpuWpfUsePortableFrameworkReferences Condition="'$(OS)' == 'Windows_NT'">false</ProGpuWpfUsePortableFrameworkReferences>
         <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
         <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
@@ -74,7 +74,10 @@
            DevFlow drag tests need is on upstream master (lextudio/ui-labs#3, merged) but not in any
            release yet - the newest, 0.2.2, predates the merge. Switch back to a PackageReference once
            a release contains it. -->
-      <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.LibreWpf/LeXtudio.DevFlow.Agent.LibreWpf.csproj" />
+      <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.Wpf/LeXtudio.DevFlow.Agent.Wpf.csproj" Condition="'$(OS)' == 'Windows_NT'" />
+      <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.LibreWpf/LeXtudio.DevFlow.Agent.LibreWpf.csproj" Condition="'$(OS)' != 'Windows_NT'" />
       <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.Core/LeXtudio.DevFlow.Agent.Core.csproj" />
     </ItemGroup>
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.WindowsDesktop" Condition="'$(OS)' == 'Windows_NT'" />
+    <Import Project="Sdk.targets" Sdk="LibreWPF.Sdk" Condition="'$(OS)' != 'Windows_NT'" />
 </Project>
