@@ -584,7 +584,9 @@ namespace AvalonDockTest.FlaUITests
 
 			var testDir = TestContext.CurrentContext.TestDirectory;
 			var configs = new[] { "Debug", "Release" };
-			var tfms = new[] { "net48", "net9.0-windows" };
+			// net10.0-windows is what TestApp builds as on the LibreWPF/ProGPU branch, where it is
+			// single-target rather than upstream's net9.0-windows;net48.
+			var tfms = new[] { "net48", "net9.0-windows", "net10.0-windows" };
 
 			foreach (var config in configs)
 			foreach (var tfm in tfms)
