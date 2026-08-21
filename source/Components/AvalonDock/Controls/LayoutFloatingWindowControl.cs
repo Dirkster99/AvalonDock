@@ -813,6 +813,7 @@ namespace AvalonDock.Controls
 			Loaded -= OnLoaded;
 
 			this.UpdateOwnership();
+			SyncInheritedProperties();
 			ApplyResizeBorderThickness();
 
 			_hwndSrc = PresentationSource.FromDependencyObject(this) as HwndSource;
