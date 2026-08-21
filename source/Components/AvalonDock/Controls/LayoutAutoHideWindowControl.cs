@@ -204,8 +204,12 @@ namespace AvalonDock.Controls
 					mouse = new Point(ptMouse.X, ptMouse.Y);
 				}
 
+				// Both cursor sources above report DEVICE pixels (GetCursorPos on Windows, the X server
+				// on portable), while GetScreenArea is in DIP - PointToScreenDPI divides by the DPI
+				// scale. Convert before comparing, or the test is wrong on any display that is not at
+				// 100%. This was harmless while the portable backend always reported a scale of 1.0.
 				var rectWindow = this.GetScreenArea();
-				if (rectWindow.Contains(mouse)) return true;
+				if (rectWindow.Contains(this.TransformToDeviceDPI(mouse))) return true;
 
 				var manager = Model?.Root.Manager;
 				var anchor = manager?.FindVisualChildren<LayoutAnchorControl>().Where(c => c.Model == Model).FirstOrDefault();
