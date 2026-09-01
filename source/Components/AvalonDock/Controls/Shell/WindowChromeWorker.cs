@@ -109,6 +109,11 @@ namespace Microsoft.Windows.Shell
 		private bool _isGlassEnabled;
 
 		/// <summary>
+		/// Whether the window is currently being resized by the user, see _HandleNCCalcSize.
+		/// </summary>
+		private bool _isInSizingLoop = false;
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="WindowChromeWorker"/> class.
 		/// </summary>
 		public WindowChromeWorker()
@@ -119,9 +124,13 @@ namespace Microsoft.Windows.Shell
 				new HANDLE_MESSAGE(WM.SETICON,               _HandleSetTextOrIcon),
 				new HANDLE_MESSAGE(WM.NCACTIVATE,            _HandleNCActivate),
 				new HANDLE_MESSAGE(WM.NCCALCSIZE,            _HandleNCCalcSize),
+				new HANDLE_MESSAGE(WM.NCPAINT,               _HandleNCPaint),
 				new HANDLE_MESSAGE(WM.NCHITTEST,             _HandleNCHitTest),
 				new HANDLE_MESSAGE(WM.NCRBUTTONUP,           _HandleNCRButtonUp),
 				new HANDLE_MESSAGE(WM.SIZE,                  _HandleSize),
+				new HANDLE_MESSAGE(WM.SIZING,                _HandleSizingOrMoving),
+				new HANDLE_MESSAGE(WM.MOVING,                _HandleSizingOrMoving),
+				new HANDLE_MESSAGE(WM.CAPTURECHANGED,        _HandleSizingOrMoving),
 				new HANDLE_MESSAGE(WM.WINDOWPOSCHANGED,      _HandleWindowPosChanged),
 				new HANDLE_MESSAGE(WM.DWMCOMPOSITIONCHANGED, _HandleDwmCompositionChanged),
 			};
@@ -566,7 +575,54 @@ namespace Microsoft.Windows.Shell
 			// Since we always want the client size to equal the window size, we can unconditionally handle it
 			// without having to modify the parameters.
 			handled = true;
+
+			// WVR.REDRAW throws away the whole client area. That is what a move needs, because pixels clipped
+			// away by a screen border are never painted and would otherwise be treated as still valid, leaving
+			// the window corrupted once it is dragged back (issue #345). While the user drags a resize gripper
+			// it must be avoided: the window content lives in a child HWND that is repositioned one layout pass
+			// later, so the frame gets painted twice per mouse move and flashes (issue #647). The extra bottom
+			// pixel keeps the client rectangle different from the proposed window rectangle, without which
+			// Windows redraws the frame anyway.
+			if (_isInSizingLoop && wParam != IntPtr.Zero)
+			{
+				var client = (RECT)Marshal.PtrToStructure(lParam, typeof(RECT));
+				client.Bottom++;
+				Marshal.StructureToPtr(client, lParam, false);
+				return IntPtr.Zero;
+			}
+
 			return new IntPtr((int)WVR.REDRAW);
+		}
+
+		/// <summary>
+		/// Executes the handle Sizing Or Moving operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
+		private IntPtr _HandleSizingOrMoving(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
+		{
+			_isInSizingLoop = uMsg == WM.SIZING;
+			handled = false;
+			return IntPtr.Zero;
+		}
+
+		/// <summary>
+		/// Executes the handle NC Paint operation.
+		/// </summary>
+		/// <param name="uMsg">The u Msg.</param>
+		/// <param name="wParam">The w Param.</param>
+		/// <param name="lParam">The l Param.</param>
+		/// <param name="handled">The handled.</param>
+		/// <returns>The result of the operation.</returns>
+		private IntPtr _HandleNCPaint(WM uMsg, IntPtr wParam, IntPtr lParam, out bool handled)
+		{
+			// The client area covers the whole window, so the only thing DefWindowProc would draw here is the
+			// legacy frame, which briefly shows up in areas that just became visible again (issue #345).
+			handled = !_isGlassEnabled;
+			return IntPtr.Zero;
 		}
 
 		/// <summary>
