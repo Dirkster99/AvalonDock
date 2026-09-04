@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -22,8 +23,9 @@ namespace AvalonDock.Controls
 		private bool _initialized;
 		private ChildrenTreeChange? _asyncRefreshCalled;
 		private readonly ReentrantFlag _fixingChildrenDockLengths = new ReentrantFlag();
-		private Border _resizerGhost = null;
-		private Window _resizerWindowHost = null;
+		private LayoutGridResizerGhostAdorner _resizerGhost = null;
+		private AdornerLayer _resizerAdornerLayer = null;
+		private Size _resizerHostSize;
 		private Vector _initialStartPoint;
 
 		/// <summary>
@@ -309,13 +311,15 @@ namespace AvalonDock.Controls
 
 		private void OnSplitterDragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
 		{
+			var splitter = (LayoutGridResizerControl)sender;
 			var rootVisual = this.FindVisualTreeRoot() as Visual;
 			var trToWnd = TransformToAncestor(rootVisual);
 			var transformedDelta = trToWnd.Transform(new Point(e.HorizontalChange, e.VerticalChange)) - trToWnd.Transform(new Point());
 			if (Orientation == System.Windows.Controls.Orientation.Horizontal)
-				Canvas.SetLeft(_resizerGhost, MathHelper.MinMax(_initialStartPoint.X + transformedDelta.X, 0.0, _resizerWindowHost.Width - _resizerGhost.Width));
+				_resizerGhost.Position = new Point(MathHelper.MinMax(_initialStartPoint.X + transformedDelta.X, 0.0, _resizerHostSize.Width - splitter.ActualWidth) - _initialStartPoint.X, 0);
 			else
-				Canvas.SetTop(_resizerGhost, MathHelper.MinMax(_initialStartPoint.Y + transformedDelta.Y, 0.0, _resizerWindowHost.Height - _resizerGhost.Height));
+				_resizerGhost.Position = new Point(0, MathHelper.MinMax(_initialStartPoint.Y + transformedDelta.Y, 0.0, _resizerHostSize.Height - splitter.ActualHeight) - _initialStartPoint.Y);
+			_resizerGhost.InvalidateVisual();
 		}
 
 		private void OnSplitterDragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
@@ -328,9 +332,9 @@ namespace AvalonDock.Controls
 
 			double delta;
 			if (Orientation == System.Windows.Controls.Orientation.Horizontal)
-				delta = Canvas.GetLeft(_resizerGhost) - _initialStartPoint.X;
+				delta = _resizerGhost.Position.X;
 			else
-				delta = Canvas.GetTop(_resizerGhost) - _initialStartPoint.Y;
+				delta = _resizerGhost.Position.Y;
 
 			var indexOfResizer = InternalChildren.IndexOf(splitter);
 
@@ -571,8 +575,6 @@ namespace AvalonDock.Controls
 
 		private void ShowResizerOverlayWindow(LayoutGridResizerControl splitter)
 		{
-			_resizerGhost = new Border { Background = splitter.BackgroundWhileDragging, Opacity = splitter.OpacityWhileDragging };
-
 			var indexOfResizer = InternalChildren.IndexOf(splitter);
 
 			var prevChild = InternalChildren[indexOfResizer - 1] as FrameworkElement;
@@ -584,9 +586,8 @@ namespace AvalonDock.Controls
 			var prevChildModel = (ILayoutPositionableElement)(prevChild as ILayoutControl).Model;
 			var nextChildModel = (ILayoutPositionableElement)(nextChild as ILayoutControl).Model;
 
-			var ptTopLeftScreen = prevChild.PointToScreenDPIWithoutFlowDirection(new Point());
-
 			Size actualSize;
+			Size ghostSize;
 
 			if (Orientation == System.Windows.Controls.Orientation.Horizontal)
 			{
@@ -594,9 +595,8 @@ namespace AvalonDock.Controls
 					prevChildActualSize.Width - prevChildModel.CalculatedDockMinWidth() + splitter.ActualWidth + nextChildActualSize.Width - nextChildModel.CalculatedDockMinWidth(),
 					nextChildActualSize.Height);
 
-				_resizerGhost.Width = splitter.ActualWidth;
-				_resizerGhost.Height = actualSize.Height;
-				ptTopLeftScreen.Offset(prevChildModel.CalculatedDockMinWidth(), 0.0);
+				ghostSize = new Size(splitter.ActualWidth, actualSize.Height);
+				_initialStartPoint = new Vector(prevChildActualSize.Width - prevChildModel.CalculatedDockMinWidth(), 0);
 			}
 			else
 			{
@@ -604,47 +604,25 @@ namespace AvalonDock.Controls
 					prevChildActualSize.Width,
 					prevChildActualSize.Height - prevChildModel.CalculatedDockMinHeight() + splitter.ActualHeight + nextChildActualSize.Height - nextChildModel.CalculatedDockMinHeight());
 
-				_resizerGhost.Height = splitter.ActualHeight;
-				_resizerGhost.Width = actualSize.Width;
-
-				ptTopLeftScreen.Offset(0.0, prevChildModel.CalculatedDockMinHeight());
+				ghostSize = new Size(actualSize.Width, splitter.ActualHeight);
+				_initialStartPoint = new Vector(0, prevChildActualSize.Height - prevChildModel.CalculatedDockMinHeight());
 			}
 
-			_initialStartPoint = splitter.PointToScreenDPIWithoutFlowDirection(new Point()) - ptTopLeftScreen;
-
-			if (Orientation == System.Windows.Controls.Orientation.Horizontal)
-				Canvas.SetLeft(_resizerGhost, _initialStartPoint.X);
-			else
-				Canvas.SetTop(_resizerGhost, _initialStartPoint.Y);
-
-			var panelHostResizer = new Canvas { HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch, VerticalAlignment = System.Windows.VerticalAlignment.Stretch };
-			panelHostResizer.Children.Add(_resizerGhost);
-
-			_resizerWindowHost = new Window
-			{
-				Style = new Style(typeof(Window), null),
-				SizeToContent = System.Windows.SizeToContent.Manual,
-				ResizeMode = ResizeMode.NoResize,
-				WindowStyle = System.Windows.WindowStyle.None,
-				ShowInTaskbar = false,
-				AllowsTransparency = true,
-				Background = null,
-				Width = actualSize.Width,
-				Height = actualSize.Height,
-				Left = ptTopLeftScreen.X,
-				Top = ptTopLeftScreen.Y,
-				ShowActivated = false,
-				Owner = null,
-				Content = panelHostResizer
-			};
-			_resizerWindowHost.Show();
+			_resizerAdornerLayer = AdornerLayer.GetAdornerLayer(splitter);
+			if (_resizerAdornerLayer == null)
+				throw new InvalidOperationException("AvalonDock requires an AdornerLayer for splitter resize feedback.");
+			_resizerHostSize = actualSize;
+			_resizerGhost = new LayoutGridResizerGhostAdorner(splitter, splitter.BackgroundWhileDragging,
+				splitter.OpacityWhileDragging, ghostSize, new Point());
+			_resizerAdornerLayer.Add(_resizerGhost);
 		}
 
 		private void HideResizerOverlayWindow()
 		{
-			if (_resizerWindowHost == null) return;
-			_resizerWindowHost.Close();
-			_resizerWindowHost = null;
+			if (_resizerGhost == null) return;
+			_resizerAdornerLayer?.Remove(_resizerGhost);
+			_resizerGhost = null;
+			_resizerAdornerLayer = null;
 		}
 	}
 }
