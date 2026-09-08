@@ -1,7 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project>
+    <!-- On Windows this is an ordinary WPF + WinForms app, exactly as it was before the
+         cross-platform work: stock SDK, real WPF, real WinForms. LibreWPF.Sdk is only used where
+         it is actually needed, off Windows. The Sdk attribute cannot carry a Condition, so the
+         SDK is imported explicitly; keep the matching Sdk.targets import at the end. -->
+    <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk.WindowsDesktop" Condition="'$(OS)' == 'Windows_NT'" />
+    <Import Project="Sdk.props" Sdk="LibreWPF.Sdk" Condition="'$(OS)' != 'Windows_NT'" />
     <PropertyGroup>
         <RootNamespace>TestApp</RootNamespace>
-        <TargetFrameworks>net9.0-windows;net48</TargetFrameworks>
+        <TargetFramework>net10.0-windows</TargetFramework>
         <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
         <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
@@ -9,12 +15,38 @@
         <OutputType>WinExe</OutputType>
         <StartupObject />
         <AssemblyName>TestApp</AssemblyName>
+        <!-- Signed with the same key as AvalonDock so AvalonDock's InternalsVisibleTo("TestApp") can
+             list this assembly's public key (strong-name-signed assemblies require friend assemblies
+             to be identified by public key, not name alone). Test-only; not part of any shipped app. -->
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../Components/AvalonDock/sn.snk</AssemblyOriginatorKeyFile>
         <!-- Sample app: allow warnings -->
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
+        <GitVersion_NoFetchEnabled>true</GitVersion_NoFetchEnabled>
+        <GitVersionTaskEnabled>false</GitVersionTaskEnabled>
+        <ProGpuWpfRuntimeFrameworkVersion>11.0.0-preview.1.26104.118</ProGpuWpfRuntimeFrameworkVersion>
        </PropertyGroup>
     <ItemGroup>
         <Resource Include="**\*.png" />
     </ItemGroup>
+    <!-- Gated the same way as the transitive removal below. These exist so the portable build does
+         not drag in the Windows desktop framework; applying them where the portable framework
+         references are NOT in use strips the real Microsoft.WindowsDesktop.App out from under the
+         app, which leaves WindowsFormsHost with nothing to host. -->
+    <ItemGroup Condition="'$(ProGpuWpfUsePortableFrameworkReferences)' == 'true'">
+        <FrameworkReference Remove="Microsoft.WindowsDesktop.App" />
+        <FrameworkReference Remove="Microsoft.WindowsDesktop.App.WPF" />
+    </ItemGroup>
+    <Target Name="_TestAppRemoveWindowsDesktopTransitiveFrameworkReferences"
+            BeforeTargets="AddTransitiveFrameworkReferences"
+            Condition="'$(ProGpuWpfUsePortableFrameworkReferences)' == 'true'">
+        <ItemGroup>
+            <TransitiveFrameworkReference Remove="Microsoft.WindowsDesktop.App" />
+            <TransitiveFrameworkReference Remove="Microsoft.WindowsDesktop.App.WPF" />
+            <TransitiveFrameworkReference Remove="Microsoft.WindowsDesktop.App.WindowsForms" />
+        </ItemGroup>
+    </Target>
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>
@@ -29,4 +61,23 @@
       <ProjectReference Include="..\Components\AvalonDock.Themes.VS2010\AvalonDock.Themes.VS2010.csproj" />
       <ProjectReference Include="..\Components\AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj" />
     </ItemGroup>
+    <PropertyGroup>
+      <!-- Where the DevFlow agent sources live. Defaults to a ui-labs checkout sitting beside this
+           repository; override with -p:DevFlowAgentPath=<dir> (CI checks it out inside the
+           workspace, which is not a sibling of the repo root). -->
+      <DevFlowAgentPath Condition="'$(DevFlowAgentPath)' == ''">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../ui-labs/src/DevFlow'))</DevFlowAgentPath>
+    </PropertyGroup>
+    <ItemGroup>
+      <!-- Referenced from a ui-labs checkout rather than the published
+           LeXtudio.DevFlow.Agent.LibreWpf package for two reasons: the published 0.2.0 shipped an
+           Aarch64-only DLL that fails to load on x64, and the Linux mouse injection (XTest) the
+           DevFlow drag tests need is on upstream master (lextudio/ui-labs#3, merged) but not in any
+           release yet - the newest, 0.2.2, predates the merge. Switch back to a PackageReference once
+           a release contains it. -->
+      <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.Wpf/LeXtudio.DevFlow.Agent.Wpf.csproj" Condition="'$(OS)' == 'Windows_NT'" />
+      <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.LibreWpf/LeXtudio.DevFlow.Agent.LibreWpf.csproj" Condition="'$(OS)' != 'Windows_NT'" />
+      <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.Core/LeXtudio.DevFlow.Agent.Core.csproj" />
+    </ItemGroup>
+    <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.WindowsDesktop" Condition="'$(OS)' == 'Windows_NT'" />
+    <Import Project="Sdk.targets" Sdk="LibreWPF.Sdk" Condition="'$(OS)' != 'Windows_NT'" />
 </Project>

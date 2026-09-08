@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using Microsoft.Windows.Shell;
 
 namespace AvalonDock.Controls
 {
@@ -19,6 +20,9 @@ namespace AvalonDock.Controls
 			// Fixing issue with Keyboard up/down in textbox in floating anchorable focusing DropDownControlArea
 			// https://github.com/Dirkster99/AvalonDock/issues/225
 			FocusableProperty.OverrideMetadata(typeof(DropDownControlArea), new FrameworkPropertyMetadata(false));
+			WindowChrome.IsHitTestVisibleInChromeProperty.OverrideMetadata(
+				typeof(DropDownControlArea),
+				new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.Inherits));
 			
 			// See PreviewMouseRightButtonUpCallback for details.
 			EventManager.RegisterClassHandler(
