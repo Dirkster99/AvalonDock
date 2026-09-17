@@ -15,10 +15,10 @@ Reference documentation for AvalonDock's key classes, controls, and interfaces.
 
 | Section | Description |
 |:--------|:------------|
-| [DockingManager]({% link api-reference/docking-manager.md %}) | The root control and central entry point. |
-| [Layout Classes]({% link api-reference/layout-classes.md %}) | All layout model classes and interfaces. |
-| [Controls]({% link api-reference/controls.md %}) | WPF controls for rendering the docking UI. |
-| [Events]({% link api-reference/events.md %}) | Events raised during docking operations. |
+| [DockingManager]({{ site.baseurl }}{% link api-reference/docking-manager.md %}) | The root control and central entry point. |
+| [Layout Classes]({{ site.baseurl }}{% link api-reference/layout-classes.md %}) | All layout model classes and interfaces. |
+| [Controls]({{ site.baseurl }}{% link api-reference/controls.md %}) | WPF controls for rendering the docking UI. |
+| [Events]({{ site.baseurl }}{% link api-reference/events.md %}) | Events raised during docking operations. |
 
 ---
 

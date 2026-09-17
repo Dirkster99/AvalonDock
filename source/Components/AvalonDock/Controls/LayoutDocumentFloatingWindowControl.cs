@@ -254,10 +254,10 @@ namespace AvalonDock.Controls
 		public void HideOverlayWindow()
 		{
 			_dropAreas = null;
-			_overlayWindow.Owner = null;
-			_overlayWindow.HideDropTargets();
-			_overlayWindow.Close();
-			_overlayWindow = null;
+
+			// Hidden and kept for the next drag rather than closed, so that an interrupted drag cannot
+			// pile up empty windows (issue #587). It is closed together with this window in OnClosed.
+			_overlayWindow?.HideOverlay();
 		}
 
 		/// <summary>
@@ -286,7 +286,9 @@ namespace AvalonDock.Controls
 				}
 			}
 
-			var rootVisual = ((FloatingWindowContentHost)Content).RootVisual;
+			// A window whose content has already been released offers nothing to drop onto (issue #587).
+			var rootVisual = (Content as FloatingWindowContentHost)?.RootVisual;
+			if (rootVisual == null) return _dropAreas;
 
 			foreach (var areaHost in rootVisual.FindVisualChildren<LayoutAnchorablePaneControl>())
 				_dropAreas.Add(new DropArea<LayoutAnchorablePaneControl>(areaHost, DropAreaType.AnchorablePane));

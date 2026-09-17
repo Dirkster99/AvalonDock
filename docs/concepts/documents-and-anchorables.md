@@ -59,6 +59,12 @@ A `LayoutDocument` represents a piece of content that the user is actively worki
 | `IconSource` | `ImageSource` | Icon displayed on the tab. |
 | `ToolTip` | `object` | Tooltip shown when hovering the tab. |
 
+`IconSource` is rendered by the default document header template of the themes that also show
+icons on tool window tabs — the built-in default plus Aero, Metro, VS2010 and Expression. The
+VS2013, VS, VS2022 and Arc themes deliberately render title-only headers everywhere; to show an
+icon there, supply your own `DockingManager.DocumentHeaderTemplate`. Leaving `IconSource` unset
+costs nothing: the icon column collapses and the header looks exactly as it would without it.
+
 ### Events
 
 | Event | Description |

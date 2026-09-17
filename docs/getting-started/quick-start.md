@@ -137,6 +137,6 @@ Try dragging panels around, floating them, and docking them to different positio
 
 ## What's Next?
 
-- Learn about the [Layout Model]({% link concepts/layout-model.md %}) to understand how AvalonDock organizes content.
-- Explore [MVVM Integration]({% link guides/mvvm.md %}) to bind docking layouts to view models.
-- Browse the [Themes]({% link themes/index.md %}) to find the right look for your app.
+- Learn about the [Layout Model]({{ site.baseurl }}{% link concepts/layout-model.md %}) to understand how AvalonDock organizes content.
+- Explore [MVVM Integration]({{ site.baseurl }}{% link guides/mvvm.md %}) to bind docking layouts to view models.
+- Browse the [Themes]({{ site.baseurl }}{% link themes/index.md %}) to find the right look for your app.

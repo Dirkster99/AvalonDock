@@ -459,12 +459,7 @@ namespace AvalonDock.Controls
 					break;
 
 				case Win32Helper.WM_LBUTTONUP: // set as handled right button click on title area (after showing context menu)
-					if (_dragService != null && Mouse.LeftButton == MouseButtonState.Released)
-					{
-						_dragService.Abort();
-						_dragService = null;
-						SetIsDragging(false);
-					}
+					if (_dragService != null && Mouse.LeftButton == MouseButtonState.Released) AbortDrag();
 
 					break;
 
@@ -616,15 +611,26 @@ namespace AvalonDock.Controls
 			SizeChanged -= OnSizeChanged;
 			DetachDeferredOwnershipUpdate();
 			CancelDeferredShow();
-			if (Content != null)
+
+			// A drag that is still running would keep the overlay window of its current host on screen
+			// for the rest of the session, because the window that drives the drag is gone (issue #587).
+			AbortDrag();
+
+			if (Content is FloatingWindowContentHost contentHost)
 			{
-				(Content as FloatingWindowContentHost)?.Dispose();
-				if (_hwndSrc != null)
-				{
-					_hwndSrc.RemoveHook(_hwndSrcHook);
-					_hwndSrc.Dispose();
-					_hwndSrc = null;
-				}
+				contentHost.Dispose();
+
+				// Closing this window has already destroyed the native window hosting the content, so
+				// HwndHost skips DestroyWindowCore and neither the HwndSource nor the logical child that
+				// the DockingManager holds would ever be released (issue #587).
+				contentHost.ReleaseHostedContent();
+			}
+
+			if (_hwndSrc != null)
+			{
+				_hwndSrc.RemoveHook(_hwndSrcHook);
+				_hwndSrc.Dispose();
+				_hwndSrc = null;
 			}
 
 			base.OnClosed(e);
@@ -1090,6 +1096,24 @@ namespace AvalonDock.Controls
 		}
 
 		/// <summary>
+		/// Ends a drag operation that is still in progress without dropping anything.
+		/// </summary>
+		/// <remarks>
+		/// The overlay windows that the drag has put on screen belong to the drop target hosts, not to
+		/// this window, so they have to be taken down explicitly whenever a drag ends by any other means
+		/// than a regular drop (issue #587).
+		/// </remarks>
+		private void AbortDrag()
+		{
+			if (_dragService == null) return;
+
+			var dragService = _dragService;
+			_dragService = null;
+			dragService.Abort();
+			SetIsDragging(false);
+		}
+
+		/// <summary>
 		/// Enable bindings.
 		/// </summary>
 		public virtual void EnableBindings()
@@ -1190,6 +1214,10 @@ namespace AvalonDock.Controls
 			/// <inheritdoc/>
 			protected override HandleRef BuildWindowCore(HandleRef hwndParent)
 			{
+				// A rebuild must never orphan the native window of a previous build - its HWND would
+				// stay alive until the process ends (issue #587).
+				ReleaseHostedContent();
+
 				_wpfContentHost = new HwndSource(new HwndSourceParameters
 				{
 					ParentWindow = hwndParent.Handle,
@@ -1209,9 +1237,30 @@ namespace AvalonDock.Controls
 			}
 
 			/// <inheritdoc/>
-			protected override void DestroyWindowCore(HandleRef hwnd)
+			protected override void DestroyWindowCore(HandleRef hwnd) => ReleaseHostedContent();
+
+			/// <summary>
+			/// Releases the native window hosting the content of the floating window together with the
+			/// logical child that the <see cref="DockingManager"/> keeps on its behalf.
+			/// </summary>
+			/// <remarks>
+			/// <see cref="HwndHost"/> only calls <see cref="DestroyWindowCore"/> while the hosted window is
+			/// still alive. Closing a <see cref="Window"/> destroys its native window - and with it every
+			/// child window - before <see cref="Window.Closed"/> is raised, so that call is skipped and both
+			/// the <see cref="HwndSource"/> and the logical child would survive every floating window for
+			/// the rest of the session (issue #587). The clean up is therefore also driven explicitly by
+			/// the floating window when it has been closed, and is idempotent.
+			/// </remarks>
+			internal void ReleaseHostedContent()
 			{
-				_manager.InternalRemoveLogicalChild(_rootPresenter);
+				if (_rootPresenter != null)
+				{
+					_manager?.InternalRemoveLogicalChild(_rootPresenter);
+					_rootPresenter = null;
+				}
+
+				_manager = null;
+
 				if (_wpfContentHost == null) return;
 				_wpfContentHost.Dispose();
 				_wpfContentHost = null;

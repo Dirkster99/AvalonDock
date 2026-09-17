@@ -142,22 +142,38 @@ namespace AvalonDock.DependencyInjection
 			this IServiceCollection services,
 			Action<DockLayoutBuilder> configure)
 		{
+			if (configure == null) throw new ArgumentNullException(nameof(configure));
+
 			var builder = new DockLayoutBuilder(services);
 			configure(builder);
 
-			if (!builder.ToggleDockConfigured)
-			{
-				services.AddSingleton(new ToggleDockOptions());
-			}
+			// No-op when a configure method already did it; this covers a builder that was only used to
+			// add toolboxes, which still has to leave resolvable options behind.
+			builder.RegisterOptions();
 
 			services.AddSingleton<IDockLayoutService>(sp =>
 			{
 				var toolboxes = sp.GetService<IEnumerable<IToolbox>>()
 					?? System.Array.Empty<IToolbox>();
-				return new Mvvm.DockLayoutService(toolboxes);
+				var service = new Mvvm.DockLayoutService(toolboxes);
+				ApplyDockingOptions(service, sp.GetService<DockingOptions>());
+				return service;
 			});
 			services.AddSingleton<Mvvm.SideToggleManager>();
 			return services;
+		}
+
+		/// <summary>
+		/// Copies the manager wide switches onto the layout, from where the docking manager reads them.
+		/// </summary>
+		/// <param name="service">The layout service whose layout is configured.</param>
+		/// <param name="options">The options to apply, may be <see langword="null"/>.</param>
+		private static void ApplyDockingOptions(IDockLayoutService? service, DockingOptions? options)
+		{
+			if (options == null || service?.Layout == null) return;
+
+			service.Layout.AllowFloatingWindows = options.AllowFloatingWindows;
+			service.Layout.AllowDetachedWindows = options.AllowDetachedWindows;
 		}
 
 		/// <summary>
@@ -172,7 +188,11 @@ namespace AvalonDock.DependencyInjection
 			{
 				var toolboxes = sp.GetService<IEnumerable<IToolbox>>()
 					?? System.Array.Empty<IToolbox>();
-				return new Mvvm.DockLayoutService(toolboxes);
+				var service = new Mvvm.DockLayoutService(toolboxes);
+
+				// Honoured when the application registered them itself; this overload registers none.
+				ApplyDockingOptions(service, sp.GetService<DockingOptions>());
+				return service;
 			});
 			services.AddSingleton<Mvvm.SideToggleManager>();
 			return services;

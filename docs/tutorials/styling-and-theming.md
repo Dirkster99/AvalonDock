@@ -444,7 +444,7 @@ DockingManager
 
 ## Next Steps
 
-- See the [Custom Themes Guide]({% link guides/custom-themes.md %}) for a reference of all customization points
-- See the [Theming Guide]({% link guides/theming.md %}) for a complete list of themes and their variants
+- See the [Custom Themes Guide]({{ site.baseurl }}{% link guides/custom-themes.md %}) for a reference of all customization points
+- See the [Theming Guide]({{ site.baseurl }}{% link guides/theming.md %}) for a complete list of themes and their variants
 - Explore the `TestApp` sample for all 11 theme variants with runtime switching
 - Explore the `MLibTest` sample for MLib + AvalonDock unified theming

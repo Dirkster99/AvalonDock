@@ -87,7 +87,7 @@ After installing, add the AvalonDock namespace to your XAML:
 </Window>
 ```
 
-If the project builds without errors, you're ready to go. Head to the [Quick Start]({% link getting-started/quick-start.md %}) guide to build your first layout.
+If the project builds without errors, you're ready to go. Head to the [Quick Start]({{ site.baseurl }}{% link getting-started/quick-start.md %}) guide to build your first layout.
 
 ---
 

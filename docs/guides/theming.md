@@ -151,4 +151,4 @@ var resourceDict = new ResourceDictionary
 dockManager.Theme = new DictionaryTheme(resourceDict);
 ```
 
-See the [Custom Themes]({% link guides/custom-themes.md %}) guide for more details on creating your own theme from scratch.
+See the [Custom Themes]({{ site.baseurl }}{% link guides/custom-themes.md %}) guide for more details on creating your own theme from scratch.

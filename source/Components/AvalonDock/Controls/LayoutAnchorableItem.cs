@@ -108,7 +108,10 @@ namespace AvalonDock.Controls
 		private static object CoerceDetachToWindowCommandValue(DependencyObject d, object value) => value;
 
 		private bool CanExecuteDetachToWindowCommand(object parameter) =>
-			LayoutElement != null && _anchorable?.Root?.Manager != null && _anchorable.CanFloat;
+			LayoutElement != null
+			&& _anchorable?.Root?.Manager != null
+			&& _anchorable.Root.Manager.AllowDetachedWindows
+			&& _anchorable.CanFloat;
 
 		private void ExecuteDetachToWindowCommand(object parameter)
 		{

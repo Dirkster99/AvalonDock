@@ -407,7 +407,7 @@ The `ContentId` is the key that links serialized layout items to your applicatio
 
 ## Next Steps
 
-- See the [Layout Serialization Guide]({% link guides/serialization.md %}) for a complete API reference
-- Combine with [MVVM]({% link tutorials/mvvm-ide.md %}) for a full IDE experience
+- See the [Layout Serialization Guide]({{ site.baseurl }}{% link guides/serialization.md %}) for a complete API reference
+- Combine with [MVVM]({{ site.baseurl }}{% link tutorials/mvvm-ide.md %}) for a full IDE experience
 - Explore the `MVVMTestApp` sample for a working implementation with save/restore
 - Explore the `TestApp` sample for layout reload/unload patterns

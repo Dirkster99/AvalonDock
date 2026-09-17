@@ -19,9 +19,9 @@ Get up and running with AvalonDock in minutes. This section covers installation,
 
 | Guide | Description |
 |:------|:------------|
-| [Installation]({% link getting-started/installation.md %}) | Install AvalonDock via NuGet and configure your project. |
-| [Quick Start]({% link getting-started/quick-start.md %}) | Build your first docking layout in 5 minutes. |
-| [Building from Source]({% link getting-started/building-from-source.md %}) | Clone, build, and run the project from source code. |
+| [Installation]({{ site.baseurl }}{% link getting-started/installation.md %}) | Install AvalonDock via NuGet and configure your project. |
+| [Quick Start]({{ site.baseurl }}{% link getting-started/quick-start.md %}) | Build your first docking layout in 5 minutes. |
+| [Building from Source]({{ site.baseurl }}{% link getting-started/building-from-source.md %}) | Clone, build, and run the project from source code. |
 
 </div>
 
