@@ -1,11 +1,16 @@
 using System;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
+using System.Xml.Linq;
 using AvalonDock;
+using AvalonDock.Core;
 using AvalonDock.DependencyInjection;
+using AvalonDock.Serializer.Xml;
 using AvalonDock.Themes;
 using AvalonDock.Themes.VS;
 using ToggleTestApp.ViewModels;
@@ -181,5 +186,104 @@ namespace ToggleTestApp
 		}
 
 		private void OnExit(object sender, RoutedEventArgs e) => Close();
+
+		// ===== Layout persistence =====
+
+		/// <summary>Title of the tool window that the "unknown toolbox" layout carries.</summary>
+		public const string UnknownToolboxTitle = "Ghost Toolbox";
+
+		/// <summary>Content id of that tool window, which no toolbox of this application answers to.</summary>
+		private const string UnknownToolboxContentId = "ghostToolbox";
+
+		private static string LayoutFilePath =>
+			Path.Combine(AppContext.BaseDirectory, "ToggleDockLayout.config");
+
+		private static string UnknownToolboxLayoutFilePath =>
+			Path.Combine(AppContext.BaseDirectory, "ToggleDockLayout.Unknown.config");
+
+		private void OnSaveLayout(object sender, RoutedEventArgs e)
+		{
+			new XmlLayoutSerializer(dockManager).Serialize(LayoutFilePath);
+		}
+
+		private void OnLoadLayout(object sender, RoutedEventArgs e)
+		{
+			LoadLayout(LayoutFilePath);
+		}
+
+		/// <summary>
+		/// Writes a copy of the saved layout with one extra tool window whose content id no toolbox
+		/// answers to, then loads it. This is what a layout stored by an earlier version of an
+		/// application looks like after one of its toolboxes has been removed.
+		/// </summary>
+		/// <param name="sender">The menu item.</param>
+		/// <param name="e">The event arguments.</param>
+		private void OnLoadLayoutWithUnknownToolbox(object sender, RoutedEventArgs e)
+		{
+			if (!File.Exists(LayoutFilePath))
+			{
+				OnSaveLayout(sender, e);
+			}
+
+			var document = XDocument.Load(LayoutFilePath);
+			var root = document.Root;
+			if (root == null)
+			{
+				return;
+			}
+
+			var leftSide = root.Element("LeftSide");
+			if (leftSide == null)
+			{
+				leftSide = new XElement("LeftSide");
+				root.Add(leftSide);
+			}
+
+			var group = leftSide.Element("LayoutAnchorGroup");
+			if (group == null)
+			{
+				group = new XElement("LayoutAnchorGroup");
+				leftSide.Add(group);
+			}
+
+			group.Add(new XElement(
+				"LayoutAnchorable",
+				new XAttribute("Title", UnknownToolboxTitle),
+				new XAttribute("ContentId", UnknownToolboxContentId)));
+
+			document.Save(UnknownToolboxLayoutFilePath);
+			LoadLayout(UnknownToolboxLayoutFilePath);
+		}
+
+		/// <summary>
+		/// Restores a stored layout, reconnecting each tool window to the toolbox that carries its
+		/// content id. A stored item no toolbox answers to is left without content, which is the
+		/// signal the serializer uses to keep it out of the restored layout.
+		/// </summary>
+		/// <param name="path">The layout file to load.</param>
+		private void LoadLayout(string path)
+		{
+			if (!File.Exists(path) || DataContext is not MainViewModel viewModel)
+			{
+				return;
+			}
+
+			var serializer = new XmlLayoutSerializer(dockManager);
+			serializer.LayoutSerializationCallback += (_, args) =>
+			{
+				var toolbox = viewModel.LayoutService.Anchorables
+					.OfType<IToolbox>()
+					.FirstOrDefault(t => t.Id == args.Model.ContentId);
+
+				// Only overwrite when this application owns the content id. Leaving the value alone
+				// keeps the content the previous layout supplied, which is what restores documents.
+				if (toolbox != null)
+				{
+					args.Content = toolbox;
+				}
+			};
+
+			serializer.Deserialize(path);
+		}
 	}
 }

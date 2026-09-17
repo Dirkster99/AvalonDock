@@ -14,8 +14,9 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
+	<!-- netstandard2.0 has no inbox System.Text.Json, so the package supplies it. -->
 	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.Text.Json" Version="10.0.10" />
 	</ItemGroup>
 
 	<ItemGroup>

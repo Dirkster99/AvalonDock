@@ -25,18 +25,44 @@ namespace AvalonDock
 		/// </summary>
 		/// <param name="window">The window.</param>
 		/// <param name="element">The element.</param>
-		public static void SetParentToMainWindowOf(this Window window, Visual element)
+		/// <returns>
+		/// true if the ownership could be established; false if the window hosting <paramref name="element"/>
+		/// has not been shown yet and the ownership has to be established at a later point in time.
+		/// </returns>
+		public static bool SetParentToMainWindowOf(this Window window, Visual element)
 		{
 			var wndParent = Window.GetWindow(element);
 			if (wndParent != null)
 			{
+				// WPF refuses to own a window by a window that has never been shown and throws
+				// InvalidOperationException("Cannot set Owner property to a Window that has not been shown
+				// previously.") instead. This happens whenever a layout element is floated before the window
+				// hosting the DockingManager is shown for the first time (issue #618).
+				if (!wndParent.IsWindowHandleCreated())
+					return false;
+
 				window.Owner = wndParent;
+				return true;
 			}
-			else
+
+			if (GetParentWindowHandle(element, out IntPtr parentHwnd))
 			{
-				if (GetParentWindowHandle(element, out IntPtr parentHwnd))
-					Win32Helper.SetOwner(new WindowInteropHelper(window).Handle, parentHwnd);
+				Win32Helper.SetOwner(new WindowInteropHelper(window).Handle, parentHwnd);
+				return true;
 			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Determines whether the native window handle of <paramref name="window"/> has already been created,
+		/// which is the case as soon as the window has been shown once and until it is closed.
+		/// </summary>
+		/// <param name="window">The window.</param>
+		/// <returns>true if the window owns a native window handle; otherwise, false.</returns>
+		public static bool IsWindowHandleCreated(this Window window)
+		{
+			return window != null && new WindowInteropHelper(window).Handle != IntPtr.Zero;
 		}
 
 		/// <summary>

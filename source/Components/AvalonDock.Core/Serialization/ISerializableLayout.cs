@@ -75,6 +75,17 @@ namespace AvalonDock.Core.Serialization
 		/// <param name="cancelable">Whether the hide operation can be cancelled.</param>
 		/// <returns>True if the operation was cancelled.</returns>
 		bool HideAnchorable(bool cancelable);
+
+		/// <summary>
+		/// Detaches the anchorable from the layout completely, leaving it neither visible nor hidden.
+		/// </summary>
+		/// <remarks>
+		/// Unlike <see cref="ISerializableLayoutContent.Close"/> this performs no close ceremony: it
+		/// raises no closing event and never restores an auto hidden anchorable to the docked area
+		/// first. That makes it the operation to use for an item of a stored layout that is being
+		/// discarded, which was never shown to the user in the first place.
+		/// </remarks>
+		void RemoveFromLayout();
 	}
 
 	/// <summary>

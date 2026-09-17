@@ -667,5 +667,6 @@ namespace AvalonDockTest
 		public void Close() { }
 		public void FixCachedRootOnDeserialize() { }
 		public bool HideAnchorable(bool cancelable) => false;
+		public void RemoveFromLayout() { }
 	}
 }

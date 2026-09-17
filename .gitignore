@@ -29,3 +29,6 @@ TestResults/
 nupkg/
 .nuget/
 .idea/
+
+# WPF temporary project files generated during builds
+*_wpftmp.csproj

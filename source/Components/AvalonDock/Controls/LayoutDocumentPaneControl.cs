@@ -28,8 +28,9 @@ namespace AvalonDock.Controls
 		/// </summary>
 		/// <param name="model">The model.</param>
 		/// <param name="isVirtualizing">The is Virtualizing.</param>
-		internal LayoutDocumentPaneControl(LayoutDocumentPane model, bool isVirtualizing)
-			: base(isVirtualizing)
+		/// <param name="ignoreTabControlKeyBindingBindings">Whether TabControl keybindings are ignored or not.</param>
+		internal LayoutDocumentPaneControl(LayoutDocumentPane model, bool isVirtualizing, bool ignoreTabControlKeyBindingBindings = false)
+			: base(isVirtualizing, ignoreTabControlKeyBindingBindings)
 		{
 			_model = model ?? throw new ArgumentNullException(nameof(model));
 			SetBinding(ItemsSourceProperty, new Binding("Model.Children") { Source = this });

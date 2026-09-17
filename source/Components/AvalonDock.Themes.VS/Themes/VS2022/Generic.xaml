@@ -1380,6 +1380,7 @@
 
     <ContextMenu x:Key="AvalonDockThemeVS2022AnchorableContextMenu">
         <MenuItem Command="{Binding Path=FloatCommand}" Header="{x:Static avalonDockProperties:Resources.Anchorable_Float}" />
+        <MenuItem Command="{Binding Path=DetachToWindowCommand}" Header="{x:Static avalonDockProperties:Resources.Anchorable_DetachToWindow}" />
         <MenuItem Command="{Binding Path=DockCommand}" Header="{x:Static avalonDockProperties:Resources.Anchorable_Dock}" />
         <MenuItem Command="{Binding Path=DockAsDocumentCommand}" Header="{x:Static avalonDockProperties:Resources.Anchorable_DockAsDocument}" />
         <MenuItem Command="{Binding Path=AutoHideCommand}" Header="{x:Static avalonDockProperties:Resources.Anchorable_AutoHide}" />

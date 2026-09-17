@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -32,6 +33,30 @@ namespace AvalonDock.Controls
 		private DragService _dragService = null;
 		private bool _internalCloseFlag = false;
 		private bool _isClosing = false;
+
+		/// <summary>
+		/// The window hosting the <see cref="DockingManager"/> that has not been shown yet and whose
+		/// <see cref="Window.SourceInitialized"/> event is awaited to establish the ownership (issue #618).
+		/// </summary>
+		private Window _deferredOwnerWindow;
+
+		/// <summary>
+		/// The <see cref="DockingManager"/> whose <see cref="FrameworkElement.Loaded"/> event is awaited
+		/// before this floating window is shown (issue #618).
+		/// </summary>
+		private DockingManager _deferredShowManager;
+
+		/// <summary>
+		/// Caches the inheritable dependency properties that are mirrored from the <see cref="DockingManager"/>
+		/// onto every floating window.
+		/// </summary>
+		private static readonly Lazy<DependencyProperty[]> InheritableProperties = new Lazy<DependencyProperty[]>(GetInheritableProperties);
+
+		/// <summary>
+		/// Stores the inheritable dependency properties whose value is currently mirrored from the
+		/// <see cref="DockingManager"/> onto this floating window.
+		/// </summary>
+		private readonly HashSet<DependencyProperty> _mirroredInheritedProperties = new HashSet<DependencyProperty>();
 
 		/// <summary>
 		/// Is false until the margins have been found once.
@@ -589,6 +614,8 @@ namespace AvalonDock.Controls
 		protected override void OnClosed(EventArgs e)
 		{
 			SizeChanged -= OnSizeChanged;
+			DetachDeferredOwnershipUpdate();
+			CancelDeferredShow();
 			if (Content != null)
 			{
 				(Content as FloatingWindowContentHost)?.Dispose();
@@ -655,6 +682,7 @@ namespace AvalonDock.Controls
 			Loaded -= OnLoaded;
 
 			this.UpdateOwnership();
+			SyncInheritedProperties();
 			ApplyResizeBorderThickness();
 
 			_hwndSrc = PresentationSource.FromDependencyObject(this) as HwndSource;
@@ -663,6 +691,92 @@ namespace AvalonDock.Controls
 			// Restore maximize state
 			var maximized = Model.Descendents().OfType<ILayoutElementForFloatingWindow>().Any(l => l.IsMaximized);
 			UpdateMaximizedState(maximized);
+		}
+
+		/// <summary>
+		/// Mirrors the current value of every inheritable dependency property of the owning
+		/// <see cref="DockingManager"/> onto this floating window.
+		/// </summary>
+		/// <remarks>
+		/// A <see cref="Window"/> is always the root of its own tree - WPF throws
+		/// <see cref="InvalidOperationException"/> ("Window must be the root of the tree") as soon as a
+		/// <see cref="Window"/> is given a logical parent. A floating window can therefore never be part of the
+		/// logical tree of its <see cref="DockingManager"/> and inheritable dependency properties such as
+		/// <see cref="Control.FontSize"/> never reach the window chrome, even though the hosted content does
+		/// receive them (the content root is a logical child of the <see cref="DockingManager"/>).
+		/// The values are mirrored explicitly instead.
+		/// </remarks>
+		internal void SyncInheritedProperties()
+		{
+			foreach (var property in InheritableProperties.Value)
+				SyncInheritedProperty(property);
+		}
+
+		/// <summary>
+		/// Mirrors the current value of a single inheritable dependency property of the owning
+		/// <see cref="DockingManager"/> onto this floating window.
+		/// </summary>
+		/// <param name="property">The inheritable dependency property to mirror.</param>
+		/// <remarks>
+		/// A value that has been assigned to the floating window itself - by a style, a trigger, a binding or by
+		/// application code - always wins over the mirrored value and is never overwritten.
+		/// </remarks>
+		internal void SyncInheritedProperty(DependencyProperty property)
+		{
+			if (property == null || _isClosing)
+				return;
+
+			var manager = Model?.Root?.Manager;
+			if (manager == null)
+				return;
+
+			if (DependencyPropertyHelper.GetValueSource(manager, property).BaseValueSource == BaseValueSource.Default)
+			{
+				// The docking manager fell back to the default value, so there is nothing left to mirror.
+				if (_mirroredInheritedProperties.Remove(property))
+					ClearValue(property);
+				return;
+			}
+
+			if (!_mirroredInheritedProperties.Contains(property) &&
+				DependencyPropertyHelper.GetValueSource(this, property).BaseValueSource > BaseValueSource.Inherited)
+			{
+				return;
+			}
+
+			_mirroredInheritedProperties.Add(property);
+			SetValue(property, manager.GetValue(property));
+		}
+
+		/// <summary>
+		/// Determines the inheritable dependency properties that are mirrored from the
+		/// <see cref="DockingManager"/> onto a floating window.
+		/// </summary>
+		/// <returns>The inheritable dependency properties of a <see cref="LayoutFloatingWindowControl"/>.</returns>
+		private static DependencyProperty[] GetInheritableProperties()
+		{
+			// Attached inheritable properties are not exposed as CLR properties and have to be listed explicitly.
+			var properties = new List<DependencyProperty>
+			{
+				TextOptions.TextFormattingModeProperty,
+				TextOptions.TextRenderingModeProperty,
+				TextOptions.TextHintingModeProperty,
+			};
+
+			foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(typeof(LayoutFloatingWindowControl)))
+			{
+				if (descriptor.IsReadOnly)
+					continue;
+
+				var dependencyProperty = DependencyPropertyDescriptor.FromProperty(descriptor)?.DependencyProperty;
+				if (dependencyProperty == null || properties.Contains(dependencyProperty))
+					continue;
+
+				if (dependencyProperty.GetMetadata(typeof(LayoutFloatingWindowControl)) is FrameworkPropertyMetadata metadata && metadata.Inherits)
+					properties.Add(dependencyProperty);
+			}
+
+			return properties.ToArray();
 		}
 
 		/// <summary>
@@ -675,12 +789,128 @@ namespace AvalonDock.Controls
 			var manager = Model?.Root?.Manager;
 			if (OwnedByDockingManagerWindow && manager != null)
 			{
-				this.SetParentToMainWindowOf(manager);
+				if (this.SetParentToMainWindowOf(manager))
+				{
+					DetachDeferredOwnershipUpdate();
+				}
+				else
+				{
+					// The window hosting the DockingManager has not been shown yet, so it cannot own this
+					// floating window before it has created its native window handle (issue #618).
+					DeferOwnershipUpdate(Window.GetWindow(manager));
+				}
 			}
 			else
 			{
+				DetachDeferredOwnershipUpdate();
 				this.SetParentWindowToNull();
 			}
+		}
+
+		/// <summary>
+		/// Retries <see cref="UpdateOwnership"/> as soon as <paramref name="ownerWindow"/> has created its
+		/// native window handle, because WPF cannot own a window by a window that has never been shown.
+		/// </summary>
+		/// <param name="ownerWindow">The window hosting the <see cref="DockingManager"/> of this floating window.</param>
+		private void DeferOwnershipUpdate(Window ownerWindow)
+		{
+			if (ownerWindow == null || ReferenceEquals(ownerWindow, _deferredOwnerWindow))
+				return;
+
+			DetachDeferredOwnershipUpdate();
+			_deferredOwnerWindow = ownerWindow;
+			ownerWindow.SourceInitialized += OnDeferredOwnerWindowSourceInitialized;
+		}
+
+		/// <summary>
+		/// Stops waiting for the window hosting the <see cref="DockingManager"/> to be shown.
+		/// </summary>
+		private void DetachDeferredOwnershipUpdate()
+		{
+			if (_deferredOwnerWindow == null)
+				return;
+
+			_deferredOwnerWindow.SourceInitialized -= OnDeferredOwnerWindowSourceInitialized;
+			_deferredOwnerWindow = null;
+		}
+
+		private void OnDeferredOwnerWindowSourceInitialized(object sender, EventArgs e)
+		{
+			DetachDeferredOwnershipUpdate();
+			if (_isClosing)
+				return;
+
+			UpdateOwnership();
+		}
+
+		/// <summary>
+		/// Shows this floating window, or postpones the operation until the <see cref="DockingManager"/> is
+		/// loaded when the window hosting it has not been shown yet.
+		/// </summary>
+		/// <remarks>
+		/// Showing a floating window while the window hosting the <see cref="DockingManager"/> is still
+		/// invisible puts a window on screen that has no visible owner, so the operation is postponed until
+		/// the <see cref="DockingManager"/> is loaded - the same point in time at which
+		/// <see cref="DockingManager"/> creates the floating windows of a layout that was assigned before the
+		/// hosting window was shown (issue #618).
+		/// </remarks>
+		internal void ShowWhenHostWindowIsShown()
+		{
+			var manager = Model?.Root?.Manager;
+			if (manager == null)
+			{
+				Show();
+				return;
+			}
+
+			// A DockingManager that is not hosted in a WPF Window - inside a WindowsFormsHost, for example -
+			// never gets a hosting window to wait for, so the floating window is shown right away.
+			var hostWindow = Window.GetWindow(manager);
+			if (hostWindow == null || hostWindow.IsWindowHandleCreated())
+			{
+				Show();
+				return;
+			}
+
+			// Establishes the ownership as soon as the hosting window has created its window handle, which
+			// happens before the DockingManager is loaded.
+			UpdateOwnership();
+			DeferShow(manager);
+		}
+
+		/// <summary>
+		/// Shows this floating window as soon as <paramref name="manager"/> is loaded.
+		/// </summary>
+		/// <param name="manager">The docking manager owning this floating window.</param>
+		private void DeferShow(DockingManager manager)
+		{
+			if (ReferenceEquals(manager, _deferredShowManager))
+				return;
+
+			CancelDeferredShow();
+			_deferredShowManager = manager;
+			manager.Loaded += OnDeferredShowManagerLoaded;
+		}
+
+		/// <summary>
+		/// Stops waiting for the <see cref="DockingManager"/> to be loaded.
+		/// </summary>
+		private void CancelDeferredShow()
+		{
+			if (_deferredShowManager == null)
+				return;
+
+			_deferredShowManager.Loaded -= OnDeferredShowManagerLoaded;
+			_deferredShowManager = null;
+		}
+
+		private void OnDeferredShowManagerLoaded(object sender, RoutedEventArgs e)
+		{
+			CancelDeferredShow();
+			if (_isClosing)
+				return;
+
+			Show();
 		}
 
 		private const double KeyboardMoveStep = 10.0;

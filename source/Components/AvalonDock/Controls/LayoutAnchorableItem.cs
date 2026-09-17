@@ -17,6 +17,7 @@ namespace AvalonDock.Controls
 		private ICommand _defaultHideCommand;
 		private ICommand _defaultAutoHideCommand;
 		private ICommand _defaultDockCommand;
+		private ICommand _defaultDetachToWindowCommand;
 		private readonly ReentrantFlag _visibilityReentrantFlag = new ReentrantFlag();
 		private readonly ReentrantFlag _anchorableVisibilityReentrantFlag = new ReentrantFlag();
 
@@ -69,6 +70,56 @@ namespace AvalonDock.Controls
 		private bool CanExecuteHideCommand(object parameter) => LayoutElement != null && _anchorable.CanHide;
 
 		private void ExecuteHideCommand(object parameter) => _anchorable?.Root?.Manager?.ExecuteHideCommand(_anchorable);
+
+		/// <summary>
+		/// <see cref="DetachToWindowCommand"/> dependency property.
+		/// </summary>
+		public static readonly DependencyProperty DetachToWindowCommandProperty = DependencyProperty.Register(nameof(DetachToWindowCommand), typeof(ICommand), typeof(LayoutAnchorableItem),
+				new FrameworkPropertyMetadata(null, OnDetachToWindowCommandChanged, CoerceDetachToWindowCommandValue));
+
+		/// <summary>
+		/// Gets or sets the command that moves this anchorable into a standalone window.
+		/// </summary>
+		/// <remarks>
+		/// Executing it while the anchorable is already detached returns it to the layout, so a single
+		/// menu entry toggles the mode.
+		/// </remarks>
+		[Bindable(true)]
+		[Description("Gets/sets the command to execute when the anchorable is moved into a standalone window.")]
+		[Category("Other")]
+		public ICommand DetachToWindowCommand
+		{
+			get => (ICommand)GetValue(DetachToWindowCommandProperty);
+			set => SetValue(DetachToWindowCommandProperty, value);
+		}
+
+		/// <summary>Handles changes to the <see cref="DetachToWindowCommand"/> property.</summary>
+		private static void OnDetachToWindowCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((LayoutAnchorableItem)d).OnDetachToWindowCommandChanged(e);
+
+		/// <summary>
+		/// Raises the detach to window command changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
+		protected virtual void OnDetachToWindowCommandChanged(DependencyPropertyChangedEventArgs e)
+		{
+		}
+
+		/// <summary>Coerces the <see cref="DetachToWindowCommand"/> value.</summary>
+		private static object CoerceDetachToWindowCommandValue(DependencyObject d, object value) => value;
+
+		private bool CanExecuteDetachToWindowCommand(object parameter) =>
+			LayoutElement != null && _anchorable?.Root?.Manager != null && _anchorable.CanFloat;
+
+		private void ExecuteDetachToWindowCommand(object parameter)
+		{
+			var manager = _anchorable?.Root?.Manager;
+			if (manager == null) return;
+
+			if (manager.IsDetached(_anchorable))
+				manager.ReattachAnchorable(_anchorable);
+			else
+				manager.DetachAnchorableToWindow(_anchorable);
+		}
 
 		/// <summary>
 		/// <see cref="AutoHideCommand"/> dependency property.
@@ -247,6 +298,7 @@ namespace AvalonDock.Controls
 			_defaultHideCommand = new RelayCommand<object>(ExecuteHideCommand, CanExecuteHideCommand);
 			_defaultAutoHideCommand = new RelayCommand<object>(ExecuteAutoHideCommand, CanExecuteAutoHideCommand);
 			_defaultDockCommand = new RelayCommand<object>(ExecuteDockCommand, CanExecuteDockCommand);
+			_defaultDetachToWindowCommand = new RelayCommand<object>(ExecuteDetachToWindowCommand, CanExecuteDetachToWindowCommand);
 			base.InitDefaultCommands();
 		}
 
@@ -256,6 +308,7 @@ namespace AvalonDock.Controls
 			if (HideCommand == _defaultHideCommand) BindingOperations.ClearBinding(this, HideCommandProperty);
 			if (AutoHideCommand == _defaultAutoHideCommand) BindingOperations.ClearBinding(this, AutoHideCommandProperty);
 			if (DockCommand == _defaultDockCommand) BindingOperations.ClearBinding(this, DockCommandProperty);
+			if (DetachToWindowCommand == _defaultDetachToWindowCommand) BindingOperations.ClearBinding(this, DetachToWindowCommandProperty);
 			base.ClearDefaultBindings();
 		}
 
@@ -265,6 +318,7 @@ namespace AvalonDock.Controls
 			if (HideCommand == null) HideCommand = _defaultHideCommand;
 			if (AutoHideCommand == null) AutoHideCommand = _defaultAutoHideCommand;
 			if (DockCommand == null) DockCommand = _defaultDockCommand;
+			if (DetachToWindowCommand == null) DetachToWindowCommand = _defaultDetachToWindowCommand;
 			Visibility = _anchorable.IsVisible ? Visibility.Visible : Visibility.Hidden;
 			base.SetDefaultBindings();
 		}

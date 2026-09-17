@@ -133,6 +133,15 @@ namespace AvalonDock.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Window.
+        /// </summary>
+        public static string Anchorable_DetachToWindow {
+            get {
+                return ResourceManager.GetString("Anchorable_DetachToWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Float.
         /// </summary>
         public static string Anchorable_Float {

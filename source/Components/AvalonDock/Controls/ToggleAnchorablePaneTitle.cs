@@ -83,7 +83,9 @@ namespace AvalonDock.Controls
 				current = VisualTreeHelper.GetParent(current);
 			}
 
-			return null;
+			// Inside a detached window this title is the root of its own visual tree, so the manager can
+			// only be reached through the model.
+			return Model?.Root?.Manager as ToggleDockingManager;
 		}
 	}
 }
