@@ -729,7 +729,7 @@ namespace AvalonDock.Controls
 		/// </remarks>
 		internal void SyncInheritedProperty(DependencyProperty property)
 		{
-			if (property == null || _isClosing)
+			if (property == null || property.ReadOnly || _isClosing)
 				return;
 
 			var manager = Model?.Root?.Manager;
