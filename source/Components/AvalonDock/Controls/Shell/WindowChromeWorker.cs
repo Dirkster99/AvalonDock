@@ -1140,8 +1140,8 @@ namespace Microsoft.Windows.Shell
 				(int)Math.Floor(region.Top),
 				(int)Math.Ceiling(region.Right) + 1,
 				(int)Math.Ceiling(region.Bottom) + 1,
-				(int)Math.Ceiling(radius),
-				(int)Math.Ceiling(radius));
+				(int)Math.Ceiling(radius * 2),
+				(int)Math.Ceiling(radius * 2));
 		}
 
 		/// <summary>
