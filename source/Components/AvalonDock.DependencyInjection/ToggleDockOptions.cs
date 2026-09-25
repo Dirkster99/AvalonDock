@@ -5,7 +5,11 @@ namespace AvalonDock.DependencyInjection
 	/// Register via <see cref="DockLayoutBuilder.ConfigureToggleDock"/>
 	/// and resolve in your window to apply settings.
 	/// </summary>
-	public class ToggleDockOptions
+	/// <remarks>
+	/// Inherits the manager wide switches of <see cref="DockingOptions"/>, which are applied to the
+	/// layout automatically and therefore need no code in the window.
+	/// </remarks>
+	public class ToggleDockOptions : DockingOptions
 	{
 		/// <summary>Gets or sets the sidebar toggle button size. Default is 25.</summary>
 		public double ButtonSize { get; set; } = 25;

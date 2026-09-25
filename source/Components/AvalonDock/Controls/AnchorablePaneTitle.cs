@@ -92,6 +92,15 @@ namespace AvalonDock.Controls
 		protected override void OnMouseLeave(MouseEventArgs e)
 		{
 			base.OnMouseLeave(e);
+
+			// While the content is hosted by a standalone window there is nothing to tear out of the
+			// layout: dragging the caption is the operating system moving that window.
+			if (Model?.Root?.Manager?.IsDetached(Model) == true)
+			{
+				_isMouseDown = false;
+				return;
+			}
+
 			if (_isMouseDown && e.LeftButton == MouseButtonState.Pressed)
 			{
 				var pane = this.FindVisualAncestor<LayoutAnchorablePaneControl>();
@@ -120,6 +129,7 @@ namespace AvalonDock.Controls
 
 			// Start a drag & drop action for a LayoutAnchorable
 			if (e.Handled || Model.CanMove == false) return;
+			if (Model.Root?.Manager?.IsDetached(Model) == true) return;
 			var attachFloatingWindow = false;
 			var parentFloatingWindow = Model.FindParent<LayoutAnchorableFloatingWindow>();
 			if (parentFloatingWindow != null) attachFloatingWindow = parentFloatingWindow.Descendents().OfType<LayoutAnchorablePane>().Count() == 1;

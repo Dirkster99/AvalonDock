@@ -128,7 +128,7 @@ Represents a tool window. Extends `LayoutContent`.
 
 | Method | Description |
 |:-------|:------------|
-| `Show()` | Show the anchorable in its previous location. |
+| `Show()` | Show the anchorable in its previous location, or in an existing tool window pane if that location is no longer part of the layout. |
 | `Hide()` | Hide the anchorable. |
 | `ToggleAutoHide()` | Toggle auto-hide state. |
 

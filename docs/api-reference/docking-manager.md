@@ -30,8 +30,10 @@ System.Windows.Controls.Control
 | Property | Type | Description |
 |:---------|:-----|:------------|
 | `Layout` | `LayoutRoot` | The root of the layout tree. Set this to define or replace the entire layout. |
+| `DockLayout` | `IRootDock` | The MVVM layout model. When set, the manager keeps this ViewModel tree in sync with the internal layout. Leave it `null` for classic (v4.x) mode. |
 | `Theme` | `Theme` | The active theme. Change at runtime to switch themes. |
 | `ActiveContent` | `object` | The currently active content (document or anchorable). Bindable. |
+| `LayoutEngine` | `ILayoutEngine` | The engine performing layout tree operations. Overridden by `ToggleDockingManager`. |
 
 ### Data Binding (MVVM)
 
@@ -39,9 +41,12 @@ System.Windows.Controls.Control
 |:---------|:-----|:------------|
 | `DocumentsSource` | `IEnumerable` | Bind to a collection of document view models. |
 | `AnchorablesSource` | `IEnumerable` | Bind to a collection of anchorable view models. |
-| `DocumentTemplate` | `DataTemplate` | Default template for rendering documents. |
-| `AnchorableTemplate` | `DataTemplate` | Default template for rendering anchorables. |
+| `LayoutItemTemplate` | `DataTemplate` | Default template for rendering the content of documents and anchorables. |
 | `LayoutItemTemplateSelector` | `DataTemplateSelector` | Select templates based on content type. |
+| `DocumentHeaderTemplate` | `DataTemplate` | Template for the tab header of a document. |
+| `DocumentTitleTemplate` | `DataTemplate` | Template for the title of a document. |
+| `AnchorableHeaderTemplate` | `DataTemplate` | Template for the header of an anchorable. |
+| `AnchorableTitleTemplate` | `DataTemplate` | Template for the title of an anchorable. |
 | `LayoutItemContainerStyle` | `Style` | Style applied to `LayoutItem` containers (target type: `LayoutItem`). |
 | `LayoutItemContainerStyleSelector` | `StyleSelector` | Select container styles based on content type. |
 
@@ -50,8 +55,12 @@ System.Windows.Controls.Control
 | Property | Type | Description |
 |:---------|:-----|:------------|
 | `AllowMixedOrientation` | `bool` | Allow panels with mixed horizontal/vertical orientation. |
+| `AllowFloatingWindows` | `bool` | Whether content can be torn off into floating windows at all. Default `true`. See [Floating Windows]({{ site.baseurl }}{% link concepts/floating-windows.md %}). |
+| `AllowDetachedWindows` | `bool` | Whether anchorables can be moved into standalone top level windows ("Window" view mode). Default `true`. |
 | `ShowSystemMenu` | `bool` | Show system menu on floating windows. |
 | `AllowDrop` | `bool` | Enable drag-and-drop docking (inherited from WPF). |
+| `AutoHideDelay` | `int` | Delay in milliseconds before an auto-hidden tool window slides shut. |
+| `SupportsAutoHideFlyout` | `bool` | Whether auto-hidden anchorables are shown in the classic slide-out flyout. `false` for `ToggleDockingManager`, which presents them through its sidebar buttons. |
 
 ### Layout Update Strategy
 
@@ -66,6 +75,12 @@ System.Windows.Controls.Control
 | Method | Returns | Description |
 |:-------|:--------|:------------|
 | `GetFloatingWindows()` | `IEnumerable<LayoutFloatingWindowControl>` | Get all active floating windows. |
+| `DockAllFloatingWindows()` | `void` | Dock the content of every floating window back into the layout and close the windows. |
+| `DetachAnchorableToWindow(anchorable)` | `void` | Move the content of an anchorable into a standalone top level window. See [Floating Windows]({{ site.baseurl }}{% link concepts/floating-windows.md %}). |
+| `ReattachAnchorable(anchorable)` | `void` | Close that window and return the content to the layout. |
+| `ReattachAllDetachedAnchorables()` | `void` | Return every detached anchorable to the layout. |
+| `IsDetached(anchorable)` | `bool` | Whether the anchorable is currently hosted by a standalone window. |
+| `DetachedAnchorables` | `IEnumerable<LayoutAnchorable>` | The anchorables currently hosted by standalone windows. |
 
 ---
 
@@ -91,8 +106,11 @@ System.Windows.Controls.Control
 
 | Event | Args | Description |
 |:------|:-----|:------------|
-| `ContentDocked` | `ContentDockedEventArgs` | When floating content is docked back. |
-| `ContentFloating` | `ContentFloatingEventArgs` | When docked content starts floating. |
+| `ContentFloating` | `ContentFloatingEventArgs` | Before docked content starts floating. Cancellable. |
+| `ContentFloated` | `ContentFloatedEventArgs` | After content has been floated. |
+| `ContentDocking` | `ContentDockingEventArgs` | Before floating content is docked back. Cancellable. |
+| `ContentDocked` | `ContentDockedEventArgs` | After content has been docked. |
+| `LayoutFloatingWindowControlCreated` | `LayoutFloatingWindowControlCreatedEventArgs` | When a floating window control is created. |
 | `LayoutFloatingWindowControlClosed` | `LayoutFloatingWindowControlClosedEventArgs` | When a floating window control is closed. |
 
 ### Layout Events

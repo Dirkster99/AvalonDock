@@ -15,9 +15,9 @@ Practical how-to guides for integrating AvalonDock with MVVM, dependency injecti
 
 | Guide | Description |
 |:------|:------------|
-| [MVVM Integration]({% link guides/mvvm.md %}) | Bind documents and anchorables to view models. |
-| [ToggleDockingManager]({% link guides/toggle-docking-manager.md %}) | VS Code / Rider-style sidebar toggle docking. |
-| [Dependency Injection]({% link guides/dependency-injection.md %}) | Register AvalonDock services with DI containers. |
-| [Theming]({% link guides/theming.md %}) | Apply and switch themes at runtime. |
-| [Layout Serialization]({% link guides/serialization.md %}) | Save and restore layouts in XML or JSON. |
-| [Custom Themes]({% link guides/custom-themes.md %}) | Create your own theme from scratch. |
+| [MVVM Integration]({{ site.baseurl }}{% link guides/mvvm.md %}) | Bind documents and anchorables to view models. |
+| [ToggleDockingManager]({{ site.baseurl }}{% link guides/toggle-docking-manager.md %}) | VS Code / Rider-style sidebar toggle docking. |
+| [Dependency Injection]({{ site.baseurl }}{% link guides/dependency-injection.md %}) | Register AvalonDock services with DI containers. |
+| [Theming]({{ site.baseurl }}{% link guides/theming.md %}) | Apply and switch themes at runtime. |
+| [Layout Serialization]({{ site.baseurl }}{% link guides/serialization.md %}) | Save and restore layouts in XML or JSON. |
+| [Custom Themes]({{ site.baseurl }}{% link guides/custom-themes.md %}) | Create your own theme from scratch. |

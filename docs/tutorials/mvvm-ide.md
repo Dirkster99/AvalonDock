@@ -669,8 +669,8 @@ That's it — `DockLayoutService` automatically places it in the layout based on
 
 ## Next Steps
 
-- Add [Layout Persistence]({% link tutorials/layout-persistence.md %}) to save and restore the user's panel arrangement
-- Apply a [Custom Theme]({% link tutorials/styling-and-theming.md %}) to match your application's branding
+- Add [Layout Persistence]({{ site.baseurl }}{% link tutorials/layout-persistence.md %}) to save and restore the user's panel arrangement
+- Apply a [Custom Theme]({{ site.baseurl }}{% link tutorials/styling-and-theming.md %}) to match your application's branding
 - See the `AvalonDockCodeApp` project in the repository for the full reference implementation with a terminal, file icons, and syntax highlighting
-- Review the [MVVM Guide]({% link guides/mvvm.md %}) for additional patterns (template selectors, style selectors)
-- Review the [DI Guide]({% link guides/dependency-injection.md %}) for all available DI extension methods
+- Review the [MVVM Guide]({{ site.baseurl }}{% link guides/mvvm.md %}) for additional patterns (template selectors, style selectors)
+- Review the [DI Guide]({{ site.baseurl }}{% link guides/dependency-injection.md %}) for all available DI extension methods

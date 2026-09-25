@@ -30,3 +30,6 @@ nupkg/
 .nuget/
 .idea/
 .librewpf-nuget/
+
+# WPF temporary project files generated during builds
+*_wpftmp.csproj

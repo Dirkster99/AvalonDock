@@ -61,10 +61,25 @@ namespace AvalonDock.Controls
 			_closeTimer.Interval = TimeSpan.FromMilliseconds(_manager.AutoHideDelay);
 			_closeTimer.Tick += (s, e) =>
 			{
-				if (_manager.AutoHideWindow.IsWin32MouseOver ||
-					((LayoutAnchorable)_manager.AutoHideWindow.Model).IsActive ||
-					_manager.AutoHideWindow.IsResizing)
+				var autoHideWindow = _manager?.AutoHideWindow;
+				if (autoHideWindow == null)
+				{
+					StopCloseTimer();
 					return;
+				}
+
+				try
+				{
+					if (autoHideWindow.IsWin32MouseOver || 
+						autoHideWindow.IsResizing ||
+						autoHideWindow.Model is LayoutAnchorable model && model.IsActive)
+						return;
+				}
+				catch (InvalidOperationException)
+				{
+					// Visual/HWND can be temporarily invalid while layout is changing.
+					// HwndHost/source was disposed while timer was still running.
+				}
 
 				StopCloseTimer();
 			};
@@ -78,7 +93,7 @@ namespace AvalonDock.Controls
 		private void StopCloseTimer()
 		{
 			_closeTimer.Stop();
-			_manager.AutoHideWindow.Hide();
+			_manager.AutoHideWindow?.Hide();
 			_currentAutohiddenAnchor = null;
 		}
 	}

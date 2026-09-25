@@ -18,7 +18,7 @@ namespace AvalonDockTest;
 /// anchorables through its sidebar toggle buttons, see
 /// <see cref="DockingManager.SupportsAutoHideFlyout"/>), and must not crash when the
 /// anchorable's parent chain is detached while the layout is being restructured
-/// (e.g. by the ToggleLayoutEngine during OpenDefaultToolboxes).
+/// (e.g. by the ToggleLayoutEngine during ApplyInitialToolboxState).
 /// </summary>
 [TestFixture]
 [Apartment(ApartmentState.STA)]

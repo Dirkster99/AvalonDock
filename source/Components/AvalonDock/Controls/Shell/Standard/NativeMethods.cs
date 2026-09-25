@@ -3219,9 +3219,19 @@ namespace Standard
 		PARENTNOTIFY = 0x0210,
 
 		/// <summary>
+		/// The SIZING value.
+		/// </summary>
+		SIZING = 0x0214,
+
+		/// <summary>
 		/// The CAPTURECHANGED value.
 		/// </summary>
 		CAPTURECHANGED = 0x0215,
+
+		/// <summary>
+		/// The MOVING value.
+		/// </summary>
+		MOVING = 0x0216,
 
 		/// <summary>
 		/// The POWERBROADCAST value.

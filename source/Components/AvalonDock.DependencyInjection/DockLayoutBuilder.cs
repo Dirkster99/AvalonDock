@@ -12,8 +12,19 @@ namespace AvalonDock.DependencyInjection
 	{
 		private readonly IServiceCollection _services;
 
-		/// <summary>Gets a value indicating whether <see cref="ConfigureToggleDock"/> was called.</summary>
-		internal bool ToggleDockConfigured { get; private set; }
+		/// <summary>
+		/// The single options object of this builder.
+		/// </summary>
+		/// <remarks>
+		/// There is one instance rather than one per configure method, because
+		/// <see cref="ToggleDockOptions"/> is a <see cref="DockingOptions"/>: keeping them apart would
+		/// let an application configure two objects and leave the order of the calls deciding which of
+		/// them the layout ends up following.
+		/// </remarks>
+		private readonly ToggleDockOptions _options = new ToggleDockOptions();
+
+		/// <summary>Whether <see cref="_options"/> has already been put into the service collection.</summary>
+		private bool _optionsRegistered;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DockLayoutBuilder"/> class.
@@ -25,16 +36,67 @@ namespace AvalonDock.DependencyInjection
 		}
 
 		/// <summary>
+		/// Registers the options, so that they can be resolved even when no configure method was called.
+		/// </summary>
+		internal void RegisterOptions() => EnsureOptionsRegistered();
+
+		/// <summary>
+		/// Puts the options into the service collection, once, under both the type the toggle docking
+		/// manager asks for and the base type carrying the manager wide switches.
+		/// </summary>
+		/// <remarks>
+		/// Done from the configure methods rather than only from
+		/// <see cref="ServiceCollectionExtensions.AddDockLayoutService(IServiceCollection, Action{DockLayoutBuilder})"/>,
+		/// because this builder is public: an application may drive it itself, and configuring it has
+		/// always been what registered the options.
+		/// </remarks>
+		private void EnsureOptionsRegistered()
+		{
+			if (_optionsRegistered) return;
+			_optionsRegistered = true;
+
+			_services.AddSingleton(_options);
+			_services.AddSingleton<DockingOptions>(_options);
+		}
+
+		/// <summary>
+		/// Configures the manager wide docking behaviour - whether floating windows and standalone
+		/// windows are available at all.
+		/// </summary>
+		/// <param name="configure">Optional delegate to configure the options.</param>
+		/// <returns>This builder for chaining.</returns>
+		/// <remarks>
+		/// The settings are applied to the layout of <c>IDockLayoutService</c>, so a docking manager
+		/// bound to that layout follows them without any further wiring.
+		/// </remarks>
+		/// <example>
+		/// <code>
+		/// services.AddDockLayoutService(dock =>
+		/// {
+		///     dock.ConfigureDocking(o =>
+		///     {
+		///         o.AllowFloatingWindows = false;
+		///         o.AllowDetachedWindows = false;
+		///     });
+		/// });
+		/// </code>
+		/// </example>
+		public DockLayoutBuilder ConfigureDocking(Action<DockingOptions>? configure = null)
+		{
+			configure?.Invoke(_options);
+			EnsureOptionsRegistered();
+			return this;
+		}
+
+		/// <summary>
 		/// Configures <see cref="ToggleDockOptions"/> for the toggle docking manager.
 		/// </summary>
 		/// <param name="configure">Optional delegate to configure the options.</param>
 		/// <returns>This builder for chaining.</returns>
 		public DockLayoutBuilder ConfigureToggleDock(Action<ToggleDockOptions>? configure = null)
 		{
-			var options = new ToggleDockOptions();
-			configure?.Invoke(options);
-			_services.AddSingleton(options);
-			ToggleDockConfigured = true;
+			configure?.Invoke(_options);
+			EnsureOptionsRegistered();
 			return this;
 		}
 

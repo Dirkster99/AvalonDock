@@ -1,0 +1,24 @@
+﻿<Window x:Class="AvalonDockTest.Views.InheritedPropertyTestWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:avalondock="https://github.com/Dirkster99/AvalonDock"
+        Title="Inherited Property Test Window" Height="600" Width="800">
+    <avalondock:DockingManager x:Name="dockingManager">
+        <avalondock:LayoutRoot>
+            <avalondock:LayoutPanel Orientation="Horizontal">
+                <avalondock:LayoutDocumentPaneGroup>
+                    <avalondock:LayoutDocumentPane>
+                        <avalondock:LayoutDocument x:Name="Document1" ContentId="Document1" Title="Document 1">
+                            <Label x:Name="DocumentContent" Content="Document 1" />
+                        </avalondock:LayoutDocument>
+                    </avalondock:LayoutDocumentPane>
+                </avalondock:LayoutDocumentPaneGroup>
+                <avalondock:LayoutAnchorablePane DockWidth="200">
+                    <avalondock:LayoutAnchorable x:Name="Anchorable1" ContentId="Anchorable1" Title="Anchorable 1" CanFloat="True">
+                        <Label x:Name="AnchorableContent" Content="Anchorable 1" />
+                    </avalondock:LayoutAnchorable>
+                </avalondock:LayoutAnchorablePane>
+            </avalondock:LayoutPanel>
+        </avalondock:LayoutRoot>
+    </avalondock:DockingManager>
+</Window>
