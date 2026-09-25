@@ -10,6 +10,8 @@
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <PackageId>AvalonDockCodeApp</PackageId>
+        <!-- Sample app: no XML documentation file, so StyleCop's XML comment analysis stays off -->
+        <NoWarn>$(NoWarn);SA0001</NoWarn>
     </PropertyGroup>
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>

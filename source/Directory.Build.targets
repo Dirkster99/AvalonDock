@@ -18,4 +18,28 @@
 		</ItemGroup>
 	</Target>
 
+	<!--
+		LibreWPF: executables get ProGPU.Wpf.Sdk.PortableBootstrap.cs compiled in from the SDK package.
+		It is not our code and has no file header, so StyleCop would report SA1633/SA1649 for it. Mark
+		it as generated code through a global analyzer config written next to the build outputs.
+	-->
+	<Target Name="_LibreWpfMarkPortableBootstrapGenerated"
+	        BeforeTargets="CoreCompile"
+	        Condition="'@(Compile->WithMetadataValue('Link', 'ProGPU.Wpf.Sdk.PortableBootstrap.cs'))' != ''">
+		<PropertyGroup>
+			<_LibreWpfBootstrapGlobalConfig>$(IntermediateOutputPath)LibreWpf.PortableBootstrap.globalconfig</_LibreWpfBootstrapGlobalConfig>
+		</PropertyGroup>
+		<ItemGroup>
+			<_LibreWpfBootstrapSection Include="@(Compile->WithMetadataValue('Link', 'ProGPU.Wpf.Sdk.PortableBootstrap.cs')->'[%(FullPath)]'->Replace('\', '/'))" />
+		</ItemGroup>
+		<WriteLinesToFile File="$(_LibreWpfBootstrapGlobalConfig)"
+		                  Lines="is_global = true;@(_LibreWpfBootstrapSection);generated_code = true"
+		                  Overwrite="true"
+		                  WriteOnlyWhenDifferent="true" />
+		<ItemGroup>
+			<EditorConfigFiles Include="$(_LibreWpfBootstrapGlobalConfig)" />
+			<FileWrites Include="$(_LibreWpfBootstrapGlobalConfig)" />
+		</ItemGroup>
+	</Target>
+
 </Project>
