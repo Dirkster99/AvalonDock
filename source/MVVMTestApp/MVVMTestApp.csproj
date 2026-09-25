@@ -1,10 +1,34 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="LibreWPF.Sdk">
+  <PropertyGroup>
+    <!-- Where the DevFlow agent sources live. Defaults to a ui-labs checkout beside this repository;
+         override with -p:DevFlowAgentPath=<dir> (CI checks it out inside the workspace). -->
+    <DevFlowAgentPath Condition="'$(DevFlowAgentPath)' == ''">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../ui-labs/src/DevFlow'))</DevFlowAgentPath>
+  </PropertyGroup>
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net9.0-windows;net48</TargetFrameworks>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>AvalonDock.MVVMTestApp</RootNamespace>
+    <AssemblyName>MVVMTestApp</AssemblyName>
     <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <GitVersion_NoFetchEnabled>true</GitVersion_NoFetchEnabled>
+    <GitVersionTaskEnabled>false</GitVersionTaskEnabled>
+    <NoWarn>$(NoWarn);NU1504</NoWarn>
   </PropertyGroup>
+
+  <!-- LeXtudio.DevFlow.Agent.WPF pulls newer preview transport packages than ProGPU.Wpf.Sdk's own
+       pin, so these are raised to the higher version to resolve NU1605 downgrade-treated-as-error.
+       The SDK contributes both packages itself at the lower version, so this pin is a second item
+       for the same package and NuGet reports NU1504. Update= cannot be used instead: the SDK adds
+       its items after the project body is evaluated, so an Update here matches nothing and the pin
+       silently reverts. Suppressing the warning keeps the higher version explicit and deliberate;
+       without the suppression the Windows job fails, since it builds with warnings as errors. -->
+  <ItemGroup>
+    <PackageReference Include="System.Windows.Extensions" Version="11.0.0-preview.5.26302.115" />
+    <PackageReference Include="System.IO.Packaging" Version="11.0.0-preview.5.26302.115" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="Images\document.png" />
@@ -19,6 +43,14 @@
     <ProjectReference Include="..\Components\AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.csproj" />
     <ProjectReference Include="..\Components\AvalonDock.Serializer.Xml\AvalonDock.Serializer.Xml.csproj" />
     <ProjectReference Include="..\Components\AvalonDock\AvalonDock.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Local checkout rather than the published package: see the matching comment in
+         TestApp.csproj. the Linux mouse injection (XTest) is on upstream
+         master (lextudio/ui-labs#3, merged) but not in a release yet. -->
+    <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.LibreWpf/LeXtudio.DevFlow.Agent.LibreWpf.csproj" />
+    <ProjectReference Include="$(DevFlowAgentPath)/LeXtudio.DevFlow.Agent.Core/LeXtudio.DevFlow.Agent.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,5 +82,16 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+
+  <Target Name="RemoveDesktopRuntimeFramework" AfterTargets="ProcessFrameworkReferences" BeforeTargets="FixupRuntimeFrameworkVersions">
+    <ItemGroup>
+      <RuntimeFramework Remove="@(RuntimeFramework)" Condition="'%(RuntimeFramework.Identity)' == 'Microsoft.WindowsDesktop.App'" />
+    </ItemGroup>
+  </Target>
+  <Target Name="RemoveTransitiveDesktopFramework" AfterTargets="ResolvePackageAssets" BeforeTargets="AddTransitiveFrameworkReferences">
+    <ItemGroup>
+      <TransitiveFrameworkReference Remove="@(TransitiveFrameworkReference)" Condition="'%(TransitiveFrameworkReference.Identity)' == 'Microsoft.WindowsDesktop.App'" />
+    </ItemGroup>
+  </Target>
 
 </Project>

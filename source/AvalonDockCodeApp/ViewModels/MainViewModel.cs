@@ -44,7 +44,7 @@ public partial class MainViewModel : ObservableObject
 
 			// Default: open the AvalonDock source folder
 			var defaultPath = Path.GetFullPath(
-				Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\.."));
+				Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", ".."));
 			if (Directory.Exists(defaultPath))
 			{
 				folderExplorer.LoadFolder(defaultPath);

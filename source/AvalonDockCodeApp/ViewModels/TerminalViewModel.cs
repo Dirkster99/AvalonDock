@@ -32,6 +32,14 @@ public partial class TerminalViewModel : ObservableToolboxBase, IDisposable
 		StartShell();
 	}
 
+	private static string GetDefaultShell()
+	{
+		if (OperatingSystem.IsWindows())
+			return "powershell";
+
+		return Environment.GetEnvironmentVariable("SHELL") ?? "/bin/bash";
+	}
+
 	private void StartShell()
 	{
 		try
@@ -40,7 +48,7 @@ public partial class TerminalViewModel : ObservableToolboxBase, IDisposable
 			{
 				StartInfo = new ProcessStartInfo
 				{
-					FileName = "powershell",
+					FileName = GetDefaultShell(),
 					UseShellExecute = false,
 					RedirectStandardInput = true,
 					RedirectStandardOutput = true,
