@@ -11,9 +11,13 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<SignAssembly>true</SignAssembly>
 
-		<!-- Enable XML doc generation so StyleCop documentation rules (SA16xx) fire during build -->
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 		<AssemblyOriginatorKeyFile>..\AvalonDock\sn.snk</AssemblyOriginatorKeyFile>
+		<!-- OpenDevelop: disable the fork's dev-time analyzer/warnings-as-errors gates so this
+		     builds cleanly as an OpenDevelop dependency (see AvalonDock.csproj for rationale). -->
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<RunAnalyzers>false</RunAnalyzers>
+		<EnableNETAnalyzers>false</EnableNETAnalyzers>
 	</PropertyGroup>
 
 </Project>

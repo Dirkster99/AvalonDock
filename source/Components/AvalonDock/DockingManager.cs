@@ -2053,13 +2053,27 @@ namespace AvalonDock
 		{
 #if DEBUG
 			if (_logicalChildren.Select(ch => ch.GetValueOrDefault<object>()).Contains(element))
-				throw new InvalidOperationException();
+				throw new InvalidOperationException(DescribeDuplicateLogicalChild(element));
 #endif
 			if (_logicalChildren.Select(ch => ch.GetValueOrDefault<object>()).Contains(element))
 				return;
 
 			_logicalChildren.Add(new WeakReference(element));
 			AddLogicalChild(element);
+		}
+
+		/// <summary>Temporary diagnostic: describes why a logical child is being registered twice.</summary>
+		private string DescribeDuplicateLogicalChild(object element)
+		{
+			var owners = Layout?.Descendents().OfType<LayoutContent>()
+				.Where(c => ReferenceEquals(c.Content, element))
+				.Select(c => $"{c.GetType().Name}#{c.GetHashCode():x}(id={c.ContentId},root={(ReferenceEquals(c.Root, Layout) ? "same" : c.Root == null ? "null" : "other")},hasItem={_layoutItems.Any(i => i.LayoutElement == c)})")
+				.ToArray() ?? new string[0];
+			var itemContents = _layoutItems.Count(i => ReferenceEquals(i.LayoutElement?.Content, element));
+			return $"DUPLICATE logical child: element={element.GetType().Name}#{element.GetHashCode():x}; " +
+				$"logicalChildren={_logicalChildren.Count}; layoutItems={_layoutItems.Count}; " +
+				$"layoutItemsReferencingThisContent={itemContents}; " +
+				$"ownersInLayout=[{string.Join(" | ", owners)}]";
 		}
 
 		/// <summary>Removes an element from the logical children collection maintained by the docking manager.</summary>
@@ -2111,9 +2125,11 @@ namespace AvalonDock
 		IOverlayWindow IOverlayWindowHost.ShowOverlayWindow(LayoutFloatingWindowControl draggingWindow)
 		{
 			CreateOverlayWindow(draggingWindow);
-			_overlayWindow.EnableDropTargets();
-			_overlayWindow.Show();
-			return _overlayWindow;
+			var overlayWindow = _overlayWindow;
+			overlayWindow.EnableDropTargets();
+			overlayWindow.Show();
+			overlayWindow.AlignNativePosition();
+			return overlayWindow;
 		}
 
 		/// <inheritdoc/>
@@ -2506,14 +2522,25 @@ namespace AvalonDock
 
 			LayoutFloatingWindowControlCreated?.Invoke(this, new LayoutFloatingWindowControlCreatedEventArgs(fwc));
 
-			fwc.AttachDrag();
-			fwc.Show();
-
-			if (firstContent != null)
+			// Defer AttachDrag/Show onto a fresh dispatcher frame instead of calling them synchronously
+			// here. This method runs re-entrantly inside input dispatch (AnchorablePaneTitle.OnMouseLeave
+			// -> here while the mouse button is held), and Window.Show() during input processing reaches an
+			// unshimmed user32 GetWindowLong path on non-Windows backends (LibreWPF) which throws
+			// DllNotFoundException 'PresentationNative_cor3.dll'. StartDraggingFloatingWindowForContent
+			// already shows on a BeginInvoke(Send) frame for exactly this reason - mirror it here.
+			var contentToFloat = firstContent;
+			Dispatcher.BeginInvoke(
+				new Action(() =>
 			{
-				ContentFloated?.Invoke(this, new ContentFloatedEventArgs(firstContent));
-				_coreContentFloated?.Invoke(this, new Core.Events.ContentEventArgs(firstContent));
-			}
+				fwc.AttachDrag();
+				fwc.Show();
+
+				if (contentToFloat != null)
+				{
+					ContentFloated?.Invoke(this, new ContentFloatedEventArgs(contentToFloat));
+					_coreContentFloated?.Invoke(this, new Core.Events.ContentEventArgs(contentToFloat));
+				}
+			}), DispatcherPriority.Send);
 		}
 
 		/// <summary>Enumerates floating windows in z-order.</summary>
@@ -2545,28 +2572,43 @@ namespace AvalonDock
 
 			var parentWindow = Window.GetWindow(this);
 			var windowParentHandle = parentWindow != null ? new WindowInteropHelper(parentWindow).Handle : Process.GetCurrentProcess().MainWindowHandle;
-			var b = Win32Helper.GetWindowZOrder(windowParentHandle, out var mainWindow_z);
-			var currentHandle = Win32Helper.GetWindow(windowParentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDFIRST);
-			while (currentHandle != IntPtr.Zero)
+			try
 			{
-				for (int i = 0; i < _fwList.Count; i++)
+				var b = Win32Helper.GetWindowZOrder(windowParentHandle, out var mainWindow_z);
+				var currentHandle = Win32Helper.GetWindow(windowParentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDFIRST);
+				while (currentHandle != IntPtr.Zero)
 				{
-					var fw = _fwList[i];
-					if (fw is IOverlayWindowHost host && fw != dragFloatingWindow && fw.IsVisible)
+					for (int i = 0; i < _fwList.Count; i++)
 					{
-						var fw_hwnd = new WindowInteropHelper(fw).Handle;
-						if (currentHandle == fw_hwnd && fw.Model.Root != null && fw.Model.Root.Manager == this)
+						var fw = _fwList[i];
+						if (fw is IOverlayWindowHost host && fw != dragFloatingWindow && fw.IsVisible)
 						{
-							if (fw.OwnedByDockingManagerWindow || (Win32Helper.GetWindowZOrder(fw_hwnd, out var fw_z) && fw_z > mainWindow_z))
-								topFloatingWindows.Add(host);
-							else
-								bottomFloatingWindows.Add(host);
-							break;
+							var fw_hwnd = new WindowInteropHelper(fw).Handle;
+							if (currentHandle == fw_hwnd && fw.Model.Root != null && fw.Model.Root.Manager == this)
+							{
+								if (fw.OwnedByDockingManagerWindow || (Win32Helper.GetWindowZOrder(fw_hwnd, out var fw_z) && fw_z > mainWindow_z))
+									topFloatingWindows.Add(host);
+								else
+									bottomFloatingWindows.Add(host);
+								break;
+							}
 						}
 					}
-				}
 
-				currentHandle = Win32Helper.GetWindow(currentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDNEXT);
+					currentHandle = Win32Helper.GetWindow(currentHandle, (uint)Win32Helper.GetWindow_Cmd.GW_HWNDNEXT);
+				}
+			}
+			catch
+			{
+				// The Win32 z-order walk (shimmed by the portable windowing backend) can fail or
+				// silently come up empty; falling back to a plain enumeration keeps drags usable.
+				topFloatingWindows.Clear();
+				bottomFloatingWindows.Clear();
+				foreach (var fw in _fwList)
+				{
+					if (fw is IOverlayWindowHost host && fw != dragFloatingWindow && fw.IsVisible && fw.Model.Root != null && fw.Model.Root.Manager == this)
+						topFloatingWindows.Add(host);
+				}
 			}
 
 			overlayWindowHosts.AddRange(topFloatingWindows);
@@ -3321,11 +3363,20 @@ namespace AvalonDock
 			else
 				_overlayWindow.Owner = null;
 
-			var rectWindow = new Rect(this.PointToScreenDPIWithoutFlowDirection(new Point()), this.TransformActualSizeToAncestor());
+			var rectWindow = this.GetScreenArea();
+			var tl = this.PointToScreenDPI(new Point(0, 0));
+			var br = this.PointToScreenDPI(new Point(this.ActualWidth, this.ActualHeight));
+			System.Console.Error.WriteLine(
+				$"[OVL-TRACE] CreateOverlayWindow manager.ActualSize=({this.ActualWidth}x{this.ActualHeight}) " +
+				$"PointToScreen TL=({tl.X},{tl.Y}) BR=({br.X},{br.Y}) => GetScreenArea=({rectWindow.Left},{rectWindow.Top},{rectWindow.Width},{rectWindow.Height}) " +
+				$"bottom={rectWindow.Top + rectWindow.Height}");
 			_overlayWindow.Left = rectWindow.Left;
 			_overlayWindow.Top = rectWindow.Top;
 			_overlayWindow.Width = rectWindow.Width;
 			_overlayWindow.Height = rectWindow.Height;
+			System.Console.Error.WriteLine(
+				$"[OVL-TRACE] CreateOverlayWindow set overlay Left/Top/Width/Height = " +
+				$"{_overlayWindow.Left}/{_overlayWindow.Top}/{_overlayWindow.Width}/{_overlayWindow.Height}");
 		}
 
 		private void DestroyOverlayWindow()
@@ -3953,8 +4004,7 @@ namespace AvalonDock
 				Top = fwTop,
 				Left = fwLeft
 			};
-			// fwc.Owner = Window.GetWindow(this);
-			// fwc.SetParentToMainWindowOf(this);
+			fwc.UpdateOwnership();
 			_fwList.Add(fwc);
 			Layout.CollectGarbage();
 			InvalidateArrange();
@@ -4051,8 +4101,7 @@ namespace AvalonDock
 				};
 			}
 
-			// fwc.Owner = Window.GetWindow(this);
-			// fwc.SetParentToMainWindowOf(this);
+			fwc.UpdateOwnership();
 			_fwList.Add(fwc);
 			Layout.CollectGarbage();
 			UpdateLayout();

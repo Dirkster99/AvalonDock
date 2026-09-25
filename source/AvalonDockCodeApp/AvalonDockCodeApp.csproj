@@ -1,4 +1,4 @@
-<Project Sdk="LibreWPF.Sdk/0.1.0-preview.65">
+<Project Sdk="LibreWPF.Sdk">
     <PropertyGroup>
         <RootNamespace>ToggleTestApp</RootNamespace>
         <TargetFrameworks>$(TestTargetFrameworks)</TargetFrameworks>
