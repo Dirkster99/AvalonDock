@@ -53,6 +53,17 @@ namespace AvalonDock.Controls
 		internal LayoutAutoHideWindowControl()
 		{
 			_sizeChangedHandler = ViewboxZoomChanged;
+
+			// A portable visual-only HwndHost does not call BuildWindowCore.  It must
+			// therefore own its presenter before HwndHost attaches it to the portable
+			// presentation source.
+			if (HostsContentAsVisualChild)
+			{
+				AutomationProperties.SetName(_internalHostPresenter, "InternalWindowHost");
+				AddVisualChild(_internalHostPresenter);
+				AddLogicalChild(_internalHostPresenter);
+				_presenterIsVisualChild = true;
+			}
 		}
 
 		/// <summary>
@@ -137,6 +148,12 @@ namespace AvalonDock.Controls
 		private bool _presenterIsVisualChild;
 
 		/// <summary>
+		/// Uses the derived control's ordinary visual tree for a portable presentation source.
+		/// Native Windows presentation sources continue to use the child HWND path below.
+		/// </summary>
+		protected override bool UsesPortableVisualHosting => HostsContentAsVisualChild;
+
+		/// <summary>
 		/// Shows the control.
 		/// </summary>
 		/// <param name="anchor">The anchor.</param>
@@ -163,7 +180,8 @@ namespace AvalonDock.Controls
 			Visibility = Visibility.Visible;
 			InvalidateMeasure();
 			UpdateWindowPos();
-			Win32Helper.BringWindowToTop(_internalHwndSource.Handle);
+			if (_internalHwndSource != null)
+				Win32Helper.BringWindowToTop(_internalHwndSource.Handle);
 		}
 
 		/// <summary>
@@ -232,19 +250,7 @@ namespace AvalonDock.Controls
 			});
 			AutomationProperties.SetName(_internalHostPresenter, "InternalWindowHost");
 
-			if (HostsContentAsVisualChild)
-			{
-				// Leave the child window empty and render the content through the WPF visual tree.
-				if (!_presenterIsVisualChild)
-				{
-					AddVisualChild(_internalHostPresenter);
-					_presenterIsVisualChild = true;
-				}
-			}
-			else
-			{
-				_internalHwndSource.RootVisual = _internalHostPresenter;
-			}
+			_internalHwndSource.RootVisual = _internalHostPresenter;
 
 			AddLogicalChild(_internalHostPresenter);
 			Win32Helper.BringWindowToTop(_internalHwndSource.Handle);
