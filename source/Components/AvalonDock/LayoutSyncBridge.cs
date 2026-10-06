@@ -91,9 +91,9 @@ namespace AvalonDock
 				var side = AlignmentToAnchorSide(toolDock.Alignment);
 				foreach (var child in toolDock.VisibleDockables)
 				{
+					_contentToSide[child] = side;
 					if (!_anchorableModels.Contains(child))
 						_anchorableModels.Add(child);
-					_contentToSide[child] = side;
 				}
 
 				SubscribeCollection(toolDock.VisibleDockables, OnAnchorableCollectionChanged);
@@ -211,10 +211,12 @@ namespace AvalonDock
 						var addSide = FindSideForSender(sender);
 						foreach (var item in e.NewItems)
 						{
-							if (!_anchorableModels.Contains(item))
-								_anchorableModels.Add(item);
+							// The side first: adding to the models inserts the anchorable right away, and the
+							// layout strategy looks the side up while it does.
 							if (addSide.HasValue)
 								_contentToSide[item] = addSide.Value;
+							if (!_anchorableModels.Contains(item))
+								_anchorableModels.Add(item);
 						}
 
 						break;
