@@ -8,12 +8,15 @@ namespace TestApp
         public UserControl1()
         {
             InitializeComponent();
+            HandleCreated += OnControlHandleCreated;
         }
 
-        protected override void OnLoad(EventArgs e)
+        // HandleCreated rather than an OnLoad override: LibreWinForms, which backs
+        // System.Windows.Forms on the portable backend, has neither OnLoad nor a Load event, and this
+        // control is compiled for every platform. HandleCreated is also the more accurate trigger -
+        // it is exactly when the child handles this reads become valid.
+        private void OnControlHandleCreated(object sender, EventArgs e)
         {
-            base.OnLoad(e);
-
             label1.Text = textBox1.Handle.ToString();
             label2.Text = textBox2.Handle.ToString();
         }

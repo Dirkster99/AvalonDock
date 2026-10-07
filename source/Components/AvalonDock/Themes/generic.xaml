@@ -553,7 +553,10 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type avalonDockControls:OverlayWindow}">
-					<Canvas x:Name="PART_DropTargetsContainer" Opacity="0.9">
+					<Canvas
+						x:Name="PART_DropTargetsContainer"
+						ClipToBounds="True"
+						Opacity="0.9">
 						<Path
 							x:Name="PART_PreviewBox"
 							Fill="AliceBlue"

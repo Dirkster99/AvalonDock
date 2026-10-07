@@ -30,6 +30,15 @@ namespace AvalonDock.Controls
 		bool HitTestScreen(Point dragPoint);
 
 		/// <summary>
+		/// Gets this target's detection area in screen coordinates (the inverse of the transform
+		/// <see cref="HitTestScreen"/> applies to incoming points), so a caller can compute a screen
+		/// point guaranteed to land on this specific target. Test-only surface (see
+		/// TestInternalsVisibleTo.cs): lets DevFlow integration tests target a precise
+		/// <see cref="DropTargetType"/> compass indicator instead of guessing screen offsets.
+		/// </summary>
+		Rect GetScreenBounds();
+
+		/// <summary>
 		/// Executes the drop operation.
 		/// </summary>
 		/// <param name="floatingWindow">The floating Window.</param>

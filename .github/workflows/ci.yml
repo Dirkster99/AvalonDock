@@ -3,6 +3,8 @@ name: CI
 on:
   pull_request:
     branches: [master, 'release/**']
+  # The Linux job below cannot be validated on a developer machine, so allow it to be run on demand.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -12,9 +14,29 @@ jobs:
     name: Build & Test
     runs-on: windows-latest
 
+    env:
+      DevFlowAgentPath: ${{ github.workspace }}/ui-labs/src/DevFlow
+
     steps:
+      # The maui-labs submodule contains generator snapshot files whose paths exceed MAX_PATH, so
+      # checking it out on Windows fails with "Filename too long" without this.
+      - name: Enable long paths
+        run: git config --global core.longpaths true
+
       - name: Checkout
         uses: actions/checkout@v7
+
+      # TestApp and MVVMTestApp reference the DevFlow agent from source on this branch, so the
+      # solution does not build anywhere without it. See the Linux job for why it is a source
+      # reference rather than a package.
+      - name: Checkout DevFlow agent (ui-labs)
+        uses: actions/checkout@v7
+        with:
+          repository: lextudio/ui-labs
+          ref: master
+          path: ui-labs
+          fetch-depth: 0
+          submodules: recursive
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
@@ -26,8 +48,15 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore source/AvalonDock.sln
 
+      # No --warnaserror on the command line: it overrides every project in the graph, and the graph
+      # now reaches outside this repository. TestApp and MVVMTestApp reference the DevFlow agent from
+      # source, so the switch was escalating warnings in third-party ui-labs code (CS0649 on interop
+      # structs whose fields the native side assigns) into build failures here. It also overrode the
+      # six projects in this repo that deliberately opt out with TreatWarningsAsErrors=false. The
+      # zero-warnings policy is unaffected: source/Directory.Build.props sets
+      # TreatWarningsAsErrors=true for everything that has not opted out.
       - name: Build
-        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore --warnaserror
+        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore
 
       - name: Test (Unit Tests)
         run: >
@@ -57,3 +86,122 @@ jobs:
           name: test-results
           path: TestResults/*.trx
           retention-days: 14
+
+  # Linux counterpart to the FlaUI job above, and runs alongside it: FlaUI drives the Windows build,
+  # DevFlow drives the LibreWPF/ProGPU build on Linux. Both are real end-to-end UI tests - this one
+  # launches the TestApp and drives it with actual X11 pointer events via XTest, which is why it needs
+  # a headless X server with no physical pointer. It cannot be run meaningfully on a desktop that is
+  # in use: any stray mouse movement lands inside a drag and fails it.
+  devflow-linux:
+    name: DevFlow Drag/Dock Tests (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # This job has never completed on a runner - the risk is GLFW getting a GL context under Mesa's
+    # software rasteriser. Keep it non-blocking until it has been green a few times, then delete this
+    # line so it actually gates pull requests.
+    continue-on-error: true
+
+    env:
+      # TestApp references the DevFlow agent from source (see its csproj); point it at the checkout
+      # below. MSBuild picks environment variables up as properties, so the fixture's own
+      # `dotnet run` inherits this too.
+      DevFlowAgentPath: ${{ github.workspace }}/ui-labs/src/DevFlow
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # The agent is referenced from source, not as a package: the Linux XTest input backend it needs
+      # is on upstream master (lextudio/ui-labs#3, merged) but is not in any release yet - the newest,
+      # 0.2.2, predates the merge, and 0.2.0 additionally shipped an Aarch64-only DLL that fails to
+      # load on x64. Drop this step and restore the PackageReference in TestApp.csproj/MVVMTestApp.csproj
+      # once a release contains it.
+      - name: Checkout DevFlow agent (ui-labs)
+        uses: actions/checkout@v7
+        with:
+          repository: lextudio/ui-labs
+          ref: master
+          path: ui-labs
+          # Its projects run GitVersion.MsBuild, which refuses to work on the shallow clone
+          # actions/checkout produces by default ("Repository is a shallow clone").
+          fetch-depth: 0
+          # Agent.Core compiles sources out of the external/maui-labs submodule.
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      # xvfb supplies the X server, including XTEST which the input injection needs. openbox supplies
+      # what a bare Xvfb does not: an EWMH window manager. Without one there is no
+      # _NET_CLIENT_LIST_STACKING, so the floating-window z-order checks degrade to skips - exactly
+      # the blind spot these tests were changed to stop having - and nothing stacks or positions the
+      # floating toplevels the way a real desktop would. LibreWPF's ProGPU backend needs a GL context,
+      # which on a runner means Mesa's software rasteriser.
+      - name: Install headless desktop stack
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            xvfb openbox x11-utils x11-xserver-utils \
+            libx11-6 libxtst6 libxrandr2 libxi6 libxcursor1 libxinerama1 \
+            libgl1 libglx-mesa0 libegl1 libgbm1 \
+            mesa-vulkan-drivers libvulkan1
+
+      - name: Start X server and window manager
+        run: |
+          Xvfb :99 -screen 0 1920x1080x24 +extension RANDR +extension GLX +extension XTEST &
+          for _ in $(seq 1 30); do xdpyinfo -display :99 >/dev/null 2>&1 && break; sleep 1; done
+          xdpyinfo -display :99 >/dev/null || { echo "::error::Xvfb failed to start"; exit 1; }
+          DISPLAY=:99 openbox &
+          # Wait for the WM to advertise EWMH, otherwise every z-order assertion silently skips.
+          for _ in $(seq 1 30); do
+            DISPLAY=:99 xprop -root _NET_SUPPORTED 2>/dev/null | grep -q _NET_CLIENT_LIST_STACKING && break
+            sleep 1
+          done
+          DISPLAY=:99 xprop -root _NET_SUPPORTED | grep -q _NET_CLIENT_LIST_STACKING \
+            || echo "::warning::EWMH stacking unavailable - z-order assertions will skip"
+          echo "DISPLAY=:99" >> "$GITHUB_ENV"
+
+      # Prebuild in Debug so the fixture can start the app with --no-build and stay inside its
+      # 120s startup deadline; `dotnet run` defaults to Debug, so the configurations must match.
+      - name: Build TestApp and tests
+        run: |
+          dotnet build source/TestApp/TestApp.csproj --configuration Debug
+          dotnet build source/DevFlowIntegrationTests/DevFlowIntegrationTests.csproj --configuration Debug
+
+      - name: Test (DevFlow UI Tests)
+        env:
+          # ProGPU renders through wgpu. Left to itself it picks the GLES/EGL backend, which on a
+          # headless runner dies creating the second window's surface:
+          #   wgpu-hal/src/gles/egl.rs unwrap() on Err(BadAccess) -> non-unwinding panic -> abort
+          # A docking test opens floating windows and a drop-target overlay, so a second surface is
+          # not optional. Force wgpu onto Vulkan and point it at Mesa's software rasteriser
+          # (lavapipe), which supports multiple window surfaces.
+          # WGPU_BACKEND had no effect - the crash stayed in the GLES/EGL backend - so ProGPU
+          # selects it itself and the env var is not consulted. Left in place in case a later build
+          # honours it, but the load-bearing setting is EGL_PLATFORM: without it Mesa has no DRI
+          # device to infer a platform from on a headless runner and can resolve to something other
+          # than X11, which is a plausible source of the BadAccess when a window surface is created.
+          WGPU_BACKEND: vulkan
+          VK_ICD_FILENAMES: /usr/share/vulkan/icd.d/lvp_icd.x86_64.json
+          EGL_PLATFORM: x11
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          GALLIUM_DRIVER: llvmpipe
+          DEVFLOW_TESTAPP_NO_BUILD: '1'
+        working-directory: source/DevFlowIntegrationTests/bin/Debug/net10.0
+        run: >
+          ./AvalonDock.DevFlowIntegrationTests
+          --report-ctrf
+          --results-directory "$GITHUB_WORKSPACE/TestResults"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: devflow-linux-results
+          path: |
+            TestResults/**
+            /tmp/avalondock-devflow-testapp-*.log
+          retention-days: 14
+          if-no-files-found: warn
