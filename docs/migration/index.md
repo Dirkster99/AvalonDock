@@ -161,6 +161,7 @@ v5.0.0 updates the supported frameworks:
 | .NET Framework 4.8 | ✅ Supported |
 | .NET Core 3.0 | ❌ Dropped |
 | .NET 5 | ❌ Dropped |
+| .NET 8 | ✅ Supported (re-added after v5.0.2) |
 | .NET 9 | ✅ Supported |
 | .NET 10 | ✅ Supported (new) |
 

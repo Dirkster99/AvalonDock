@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)
 [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.svg)](http://nuget.org/packages/Dirkster.AvalonDock)
 
-![Net48](https://badgen.net/badge/Framework/.NET&nbsp;4.8/blue) ![Net9](https://badgen.net/badge/Framework/.NET&nbsp;9/blue) ![Net10](https://badgen.net/badge/Framework/.NET&nbsp;10/blue)
+![Net48](https://badgen.net/badge/Framework/.NET&nbsp;4.8/blue) ![Net8](https://badgen.net/badge/Framework/.NET&nbsp;8/blue) ![Net9](https://badgen.net/badge/Framework/.NET&nbsp;9/blue) ![Net10](https://badgen.net/badge/Framework/.NET&nbsp;10/blue)
 
 Support this project with a :star: — report an issue, or even better, place a pull request :mailbox: :blush:
 
@@ -329,6 +329,7 @@ AvalonDock.DependencyInjection  IServiceCollection extensions
   └── netstandard2.0
 
 AvalonDock                 WPF docking library (DockingManager, ToggleDockingManager)
+  ├── net8.0-windows
   ├── net9.0-windows
   ├── net10.0-windows
   └── net48
@@ -385,6 +386,7 @@ Version 5.0.0 includes several breaking changes. See the full [Breaking Changes]
 ### Supported Frameworks
 
 - **.NET Framework 4.8**
+- **.NET 8.0** (`net8.0-windows`)
 - **.NET 9.0** (`net9.0-windows`)
 - **.NET 10.0** (`net10.0-windows`)
 

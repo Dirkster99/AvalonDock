@@ -30,5 +30,5 @@ Get up and running with AvalonDock in minutes. This section covers installation,
 ## Prerequisites
 
 - **Windows** — AvalonDock is a WPF library and requires Windows.
-- **.NET 9**, **.NET 10**, or **.NET Framework 4.8** SDK.
+- **.NET 8**, **.NET 9**, **.NET 10**, or **.NET Framework 4.8** SDK.
 - **Visual Studio 2022** or later (recommended), or any editor with .NET CLI support.
