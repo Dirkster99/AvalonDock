@@ -97,7 +97,8 @@ If the project builds without errors, you're ready to go. Head to the [Quick Sta
 |:----------|:----------|
 | .NET 10 (`net10.0-windows`) | ✅ |
 | .NET 9 (`net9.0-windows`) | ✅ |
+| .NET 8 (`net8.0-windows`) | ✅ |
 | .NET Framework 4.8 (`net48`) | ✅ |
 
 {: .note }
-Make sure your project targets one of the supported frameworks. AvalonDock requires the `-windows` TFM suffix for .NET 9+ projects.
+Make sure your project targets one of the supported frameworks. AvalonDock requires the `-windows` TFM suffix for .NET 8+ projects.

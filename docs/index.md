@@ -37,7 +37,7 @@ AvalonDock is used by [many open source and commercial projects](https://github.
 | **MVVM Support** | First-class MVVM integration with view model binding. |
 | **Dependency Injection** | Built-in DI support via `Microsoft.Extensions.DependencyInjection`. |
 | **6 Built-in Themes** | Arc, VS2013, VS2010, Expression, Metro, and Aero themes included. |
-| **Multi-Target** | Supports .NET 9, .NET 10, and .NET Framework 4.8. |
+| **Multi-Target** | Supports .NET 8, .NET 9, .NET 10, and .NET Framework 4.8. |
 
 ---
 
@@ -95,6 +95,7 @@ AvalonDock is used by [many open source and commercial projects](https://github.
 |:----------|:-------|
 | .NET 10 | ✅ Supported |
 | .NET 9 | ✅ Supported |
+| .NET 8 | ✅ Supported |
 | .NET Framework 4.8 | ✅ Supported |
 
 {: .note }
