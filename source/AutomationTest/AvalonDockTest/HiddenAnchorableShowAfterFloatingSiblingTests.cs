@@ -75,7 +75,7 @@ namespace AvalonDockTest
 			}
 			finally
 			{
-				window.Close();
+				CloseHostingWindow(window, dockingManager);
 			}
 		}
 
@@ -111,7 +111,7 @@ namespace AvalonDockTest
 			}
 			finally
 			{
-				window.Close();
+				CloseHostingWindow(window, dockingManager);
 			}
 		}
 
@@ -337,6 +337,23 @@ namespace AvalonDockTest
 				Top = -10000,
 				Content = dockingManager,
 			};
+		}
+
+		/// <summary>
+		/// Docks every floating anchorable back before closing the window. Unloading the
+		/// <see cref="DockingManager"/> only hides its floating windows, and a window left behind on the
+		/// STA thread of this fixture crashes the test host once that thread is gone.
+		/// </summary>
+		/// <param name="window">The window hosting the docking manager.</param>
+		/// <param name="dockingManager">The docking manager hosted by the window.</param>
+		private static void CloseHostingWindow(Window window, DockingManager dockingManager)
+		{
+			foreach (var floating in dockingManager.Layout.Descendents().OfType<LayoutAnchorable>().Where(a => a.IsFloating).ToArray())
+				floating.Dock();
+
+			Settle(window);
+			window.Close();
+			DoEvents();
 		}
 
 		/// <summary>
