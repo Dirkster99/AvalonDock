@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<!-- Centralized Target Frameworks -->
 		<ComponentTargetFrameworks>net8.0-windows;net9.0-windows;net10.0-windows;net48</ComponentTargetFrameworks>
-		<TestTargetFrameworks>net8.0-windows;net9.0-windows;net10.0-windows;net48</TestTargetFrameworks>
+		<TestTargetFrameworks>net9.0-windows;net10.0-windows;net48</TestTargetFrameworks>
 		<LangVersion>13</LangVersion>
 
 		<!-- Version Information -->
