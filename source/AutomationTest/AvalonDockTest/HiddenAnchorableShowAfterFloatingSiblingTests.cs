@@ -135,7 +135,8 @@ namespace AvalonDockTest
 			{
 				Assert.That(paneControl.IsVisible, Is.True, $"The pane control of {anchorable.Title} is not visible {when}.");
 				Assert.That(paneControl.ActualWidth, Is.GreaterThan(0d), $"The pane control of {anchorable.Title} has no width {when} (Issue #677).");
-				Assert.That(paneControl.ActualHeight, Is.GreaterThan(0d), $"The pane control of {anchorable.Title} has no height {when} (Issue #677).");
+				Assert.That(paneControl.ActualHeight, Is.GreaterThan(0d),
+					$"The pane control of {anchorable.Title} has no height {when} (Issue #677).{Environment.NewLine}{DescribeLayout(dockingManager)}");
 
 				foreach (var panelControl in AncestorsOf<LayoutPanelControl>(paneControl, dockingManager))
 				{
@@ -147,6 +148,71 @@ namespace AvalonDockTest
 				}
 			});
 		}
+
+		/// <summary>
+		/// Describes the docked layout - the model tree and the grid controls showing it - so a failure
+		/// says which element lost its size.
+		/// </summary>
+		/// <param name="dockingManager">The docking manager to describe.</param>
+		/// <returns>A multi-line description.</returns>
+		private static string DescribeLayout(DockingManager dockingManager)
+		{
+			var text = new System.Text.StringBuilder();
+			text.AppendLine("Model:");
+			DescribeModel(dockingManager.Layout.RootPanel, 1, text);
+
+			text.AppendLine("Grid controls:");
+			foreach (var grid in dockingManager.FindVisualChildren<Grid>().OfType<ILayoutControl>())
+			{
+				var control = (Grid)grid;
+				text.Append("  ").Append(control.GetType().Name)
+					.Append(" model=").Append(grid.Model.GetType().Name)
+					.Append(" modelVisible=").Append(PropertyOf(grid.Model, "IsVisible"))
+					.Append(" dockHeight=").Append(PropertyOf(grid.Model, "DockHeight"))
+					.Append(" actual=").Append(control.ActualWidth).Append('x').Append(control.ActualHeight)
+					.Append(" visibility=").Append(control.Visibility)
+					.Append(" row=").Append(Grid.GetRow(control))
+					.Append(" col=").Append(Grid.GetColumn(control))
+					.Append(" modelChildren=").Append(((ILayoutContainer)grid.Model).ChildrenCount)
+					.Append(" uiChildren=").Append(control.Children.Count)
+					.Append(" rows=[")
+					.Append(string.Join(", ", control.RowDefinitions.Select(r => $"{r.Height}/{r.ActualHeight}")))
+					.Append("] cols=[")
+					.Append(string.Join(", ", control.ColumnDefinitions.Select(c => $"{c.Width}/{c.ActualWidth}")))
+					.AppendLine("]");
+			}
+
+			return text.ToString();
+		}
+
+		/// <summary>Appends one line per element of the model tree below <paramref name="element"/>.</summary>
+		/// <param name="element">The element to describe.</param>
+		/// <param name="depth">The indentation depth.</param>
+		/// <param name="text">The text to append to.</param>
+		private static void DescribeModel(ILayoutElement element, int depth, System.Text.StringBuilder text)
+		{
+			text.Append(new string(' ', depth * 2)).Append(element.GetType().Name);
+			if (element is ILayoutOrientableGroup orientable) text.Append(' ').Append(orientable.Orientation);
+			text.Append(" visible=").Append(PropertyOf(element, "IsVisible"))
+				.Append(" dockWidth=").Append(PropertyOf(element, "DockWidth"))
+				.Append(" dockHeight=").Append(PropertyOf(element, "DockHeight"));
+
+			if (element is LayoutContent content) text.Append(" title=").Append(content.Title);
+			text.AppendLine();
+
+			if (element is ILayoutContainer container)
+			{
+				foreach (var child in container.Children)
+					DescribeModel(child, depth + 1, text);
+			}
+		}
+
+		/// <summary>Reads a public property by name; the layout interfaces declaring them are internal.</summary>
+		/// <param name="element">The element to read from.</param>
+		/// <param name="name">The name of the property.</param>
+		/// <returns>The value, or "-" if the element has no such property.</returns>
+		private static object PropertyOf(object element, string name) =>
+			element.GetType().GetProperty(name)?.GetValue(element) ?? "-";
 
 		/// <summary>Walks the visual tree up from <paramref name="start"/> to <paramref name="stop"/>.</summary>
 		/// <typeparam name="T">The type of the ancestors to return.</typeparam>
