@@ -3,6 +3,8 @@ namespace AvalonDockTest
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
+	using System.Runtime.ExceptionServices;
+	using System.Threading;
 	using System.Windows;
 	using System.Windows.Controls;
 	using System.Windows.Media;
@@ -42,7 +44,7 @@ namespace AvalonDockTest
 		/// </param>
 		[TestCase(true, TestName = "ShowAfterFloatingSibling_GetsASize_DocumentBelow_Issue677")]
 		[TestCase(false, TestName = "ShowAfterFloatingSibling_GetsASize_ToolWindowBelow_Issue677")]
-		public void ShowAfterFloatingSibling_GetsASize_Issue677(bool documentBelowTheRow)
+		public void ShowAfterFloatingSibling_GetsASize_Issue677(bool documentBelowTheRow) => RunOnOwnUiThread(() =>
 		{
 			var window = CreateHostingWindow(documentBelowTheRow, out var dockingManager, out var anchorableA, out var anchorableB);
 			try
@@ -77,7 +79,7 @@ namespace AvalonDockTest
 			{
 				CloseHostingWindow(window, dockingManager);
 			}
-		}
+		});
 
 		/// <summary>
 		/// The issue reports that docking the floating sibling again does not bring the tool window back.
@@ -85,7 +87,7 @@ namespace AvalonDockTest
 		/// <param name="documentBelowTheRow">See <see cref="ShowAfterFloatingSibling_GetsASize_Issue677"/>.</param>
 		[TestCase(true, TestName = "ShowAfterFloatingSibling_GetsASizeAfterSiblingIsDocked_DocumentBelow_Issue677")]
 		[TestCase(false, TestName = "ShowAfterFloatingSibling_GetsASizeAfterSiblingIsDocked_ToolWindowBelow_Issue677")]
-		public void ShowAfterFloatingSibling_GetsASizeAfterSiblingIsDocked_Issue677(bool documentBelowTheRow)
+		public void ShowAfterFloatingSibling_GetsASizeAfterSiblingIsDocked_Issue677(bool documentBelowTheRow) => RunOnOwnUiThread(() =>
 		{
 			var window = CreateHostingWindow(documentBelowTheRow, out var dockingManager, out var anchorableA, out var anchorableB);
 			try
@@ -113,7 +115,7 @@ namespace AvalonDockTest
 			{
 				CloseHostingWindow(window, dockingManager);
 			}
-		}
+		});
 
 		/// <summary>
 		/// The cause of #677 in the model alone: a <see cref="LayoutPanel"/> that went invisible did not
@@ -337,6 +339,36 @@ namespace AvalonDockTest
 				Top = -10000,
 				Content = dockingManager,
 			};
+		}
+
+		/// <summary>
+		/// Runs a test that shows windows on an STA thread of its own and shuts that thread's dispatcher
+		/// down before the thread ends. Without the shutdown WPF never unhooks the windows it subclassed,
+		/// and the test host crashes as soon as one of them gets a message after the thread is gone.
+		/// </summary>
+		/// <param name="test">The test body.</param>
+		private static void RunOnOwnUiThread(Action test)
+		{
+			ExceptionDispatchInfo failure = null;
+			var thread = new Thread(() =>
+			{
+				try
+				{
+					test();
+				}
+				catch (Exception e)
+				{
+					failure = ExceptionDispatchInfo.Capture(e);
+				}
+				finally
+				{
+					Dispatcher.CurrentDispatcher.InvokeShutdown();
+				}
+			});
+			thread.SetApartmentState(ApartmentState.STA);
+			thread.Start();
+			thread.Join();
+			failure?.Throw();
 		}
 
 		/// <summary>
