@@ -116,6 +116,42 @@ namespace AvalonDockTest
 		}
 
 		/// <summary>
+		/// The cause of #677 in the model alone: a <see cref="LayoutPanel"/> that went invisible did not
+		/// recompute its visibility when a pane group inside it became visible again, so the grid above
+		/// kept the row of the panel at zero height.
+		/// </summary>
+		[Test]
+		public void PanelBecomesVisibleAgain_WhenAHiddenAnchorableInsideIsShown_Issue677()
+		{
+			var anchorableA = new LayoutAnchorable { Title = "A", ContentId = "A" };
+			var anchorableB = new LayoutAnchorable { Title = "B", ContentId = "B" };
+			var groupA = new LayoutAnchorablePaneGroup(new LayoutAnchorablePane(anchorableA));
+			var row = new LayoutPanel { Orientation = Orientation.Horizontal };
+			row.Children.Add(groupA);
+			row.Children.Add(new LayoutAnchorablePaneGroup(new LayoutAnchorablePane(anchorableB)));
+
+			var column = new LayoutPanel { Orientation = Orientation.Vertical };
+			column.Children.Add(row);
+			column.Children.Add(new LayoutAnchorablePane(new LayoutAnchorable { Title = "Below", ContentId = "Below" }));
+			var layout = new LayoutRoot { RootPanel = column };
+
+			anchorableB.Hide();
+
+			// What floating A leaves behind once CollectGarbage has removed its emptied pane group.
+			row.Children.Remove(groupA);
+			Assert.That(row.IsVisible, Is.False, "The row was expected to be invisible with B hidden and A gone.");
+
+			anchorableB.Show();
+
+			Assert.Multiple(() =>
+			{
+				Assert.That(anchorableB.IsVisible, Is.True, "Show left panel B invisible.");
+				Assert.That(anchorableB.Root, Is.SameAs(layout));
+				Assert.That(row.IsVisible, Is.True, "The row holding the shown anchorable stayed invisible (Issue #677).");
+			});
+		}
+
+		/// <summary>
 		/// Asserts that the pane control hosting <paramref name="anchorable"/>, and every
 		/// <see cref="LayoutPanelControl"/> above it, was given a size by the layout.
 		/// </summary>
