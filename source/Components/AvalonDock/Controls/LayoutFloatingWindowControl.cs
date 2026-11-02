@@ -95,6 +95,12 @@ namespace AvalonDock.Controls
 		/// </summary>
 		internal Point DragDelta { get; set; }
 
+		/// <summary>
+		/// Gets whether the window is closing or already closed
+		/// (it can no longer be shown or hidden).
+		/// </summary>
+		internal bool IsClosing => _isClosing;
+
 		public abstract ILayoutElement Model { get; }
 
 		#region IsContentImmutable

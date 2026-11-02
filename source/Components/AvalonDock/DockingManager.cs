@@ -245,9 +245,10 @@ namespace AvalonDock
 				RightSidePanel = CreateUIElementForModel(Layout.RightSide) as LayoutAnchorSideControl;
 				BottomSidePanel = CreateUIElementForModel(Layout.BottomSide) as LayoutAnchorSideControl;
 
+				// CreateUIElementForModel already adds the floating window to _fwList (issue #254)
 				foreach (var fw in Layout.FloatingWindows.ToArray())
 					if (fw.IsValid)
-						_fwList.Add(CreateUIElementForModel(fw) as LayoutFloatingWindowControl);
+						CreateUIElementForModel(fw);
 
 				foreach (var fw in _fwList.ToArray())
 				{
@@ -1723,6 +1724,11 @@ namespace AvalonDock
 
 				Dispatcher.BeginInvoke(new Action(() =>
 				{
+					// The window may have been closed before this deferred call runs
+					// (e.g. the Layout was replaced again in the same Loaded pass).
+					if (newFW.IsClosing)
+						return;
+
 					if (newFW.Content != null || (newFW.Model as LayoutAnchorableFloatingWindow)?.IsVisible == true)
 						newFW.Show();
 					else
