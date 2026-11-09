@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   packages: write
+  id-token: write # required for NuGet Trusted Publishing (OIDC)
 
 jobs:
   build-test-publish:
@@ -131,11 +132,21 @@ jobs:
           path: nupkg/*.nupkg
           retention-days: 30
 
+      # NuGet Trusted Publishing: exchanges the GitHub OIDC token for a short-lived
+      # (1 hour) nuget.org API key. No long-lived API key secret has to be rotated.
+      # Requires a Trusted Publishing policy on nuget.org for this repo + release.yml,
+      # and the repo variable NUGET_USER set to the nuget.org profile name (not e-mail).
+      - name: NuGet login (OIDC)
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
       - name: Push to NuGet.org
         shell: bash
         run: |
           dotnet nuget push nupkg/*.nupkg \
-          --api-key "${{ secrets.AVALONDOCK_APP_KEY }}" \
+          --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" \
           --source https://api.nuget.org/v3/index.json \
           --skip-duplicate
 
@@ -179,7 +190,7 @@ jobs:
             while IFS= read -r version; do
               echo "  Unlisting $package $version ..."
               dotnet nuget delete "$package" "$version" \
-                --api-key "${{ secrets.AVALONDOCK_APP_KEY }}" \
+                --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" \
                 --source https://api.nuget.org/v3/index.json \
                 --non-interactive || echo "  Warning: Failed to unlist $package $version"
             done <<< "$preview_versions"
