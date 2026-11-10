@@ -90,6 +90,8 @@
 									<avalonDockControls:ContextMenuEx ItemsSource="{Binding Model.ChildrenSorted, RelativeSource={RelativeSource TemplatedParent}}">
 										<avalonDockControls:ContextMenuEx.ItemContainerStyle>
 											<Style BasedOn="{StaticResource {x:Type MenuItem}}" TargetType="{x:Type avalonDockControls:MenuItemEx}">
+												<Setter Property="HorizontalContentAlignment" Value="Left" />
+												<Setter Property="VerticalContentAlignment" Value="Center" />
 												<Setter Property="HeaderTemplate" Value="{Binding Path=Root.Manager.DocumentPaneMenuItemHeaderTemplate}" />
 												<Setter Property="HeaderTemplateSelector" Value="{Binding Path=Root.Manager.DocumentPaneMenuItemHeaderTemplateSelector}" />
 												<Setter Property="IconTemplate" Value="{Binding Path=Root.Manager.IconContentTemplate}" />

@@ -118,6 +118,8 @@
     </Style>
 
     <Style BasedOn="{StaticResource AvalonDockThemeVS2022MenuItemStyle}" TargetType="{x:Type avalonDockControls:MenuItemEx}">
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="IconTemplate" Value="{Binding Path=Root.Manager.IconContentTemplate}" />
         <Setter Property="IconTemplateSelector" Value="{Binding Path=Root.Manager.IconContentTemplateSelector}" />
         <Setter Property="Command" Value="{Binding Path=., Converter={avalonDockConverters:ActivateCommandLayoutItemFromLayoutModelConverter}}" />
