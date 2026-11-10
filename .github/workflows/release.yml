@@ -136,11 +136,21 @@ jobs:
       # (1 hour) nuget.org API key. No long-lived API key secret has to be rotated.
       # Requires a Trusted Publishing policy on nuget.org for this repo + release.yml,
       # and the repo variable NUGET_USER set to the nuget.org profile name (not e-mail).
+      - name: Verify NUGET_USER is configured
+        shell: bash
+        env:
+          NUGET_USER: ${{ vars.NUGET_USER || secrets.NUGET_USER }}
+        run: |
+          if [ -z "$NUGET_USER" ]; then
+            echo "::error::NUGET_USER is not set. Add it under Settings > Secrets and variables > Actions > Variables (repository scope) with your nuget.org profile name (not e-mail)."
+            exit 1
+          fi
+
       - name: NuGet login (OIDC)
         id: nuget-login
         uses: NuGet/login@v1
         with:
-          user: ${{ vars.NUGET_USER }}
+          user: ${{ vars.NUGET_USER || secrets.NUGET_USER }}
 
       - name: Push to NuGet.org
         shell: bash
