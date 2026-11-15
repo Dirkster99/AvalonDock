@@ -423,10 +423,14 @@ namespace AvalonDock.DevFlowIntegrationTests
 				var fromYi = (int)Math.Round(fromY);
 				var toXi = (int)Math.Round(toX);
 				var toYi = (int)Math.Round(toY);
-				var arguments = new List<string> { "-w", "40", $"m:{fromXi},{fromYi}", "w:250", $"dd:{fromXi},{fromYi}" };
+				// Explicit "w:40" pauses instead of cliclick's "-w 40" option: the CliclickSharp.exe shipped in
+				// LeXtudio.DevFlow.Agent.Core 0.3.1 (nuget.org) treats "-w" as a command on Windows and exits 1
+				// before the drag runs. The explicit waits behave the same with macOS cliclick.
+				var arguments = new List<string> { $"m:{fromXi},{fromYi}", "w:250", $"dd:{fromXi},{fromYi}" };
 				for (var step = 1; step <= 24; step++)
 				{
 					var progress = step / 24d;
+					arguments.Add("w:40");
 					arguments.Add($"dm:{Math.Round(fromX + (toX - fromX) * progress)},{Math.Round(fromY + (toY - fromY) * progress)}");
 				}
 				arguments.Add($"w:{Math.Max(250, holdMilliseconds)}");
