@@ -48,7 +48,7 @@ Tests must be run single-threaded (`-m:1`) because WPF requires STA (Single-Thre
 | Category | Command | Description |
 |:---------|:--------|:------------|
 | Unit Tests | `dotnet test --filter "Category!=FlaUI" -m:1` | Fast unit tests |
-| UI Tests | `dotnet test --filter "Category=FlaUI" --framework net10.0-windows -m:1` | FlaUI-based UI automation tests |
+| UI Tests | `dotnet test --filter "Category=FlaUI" --framework net10.0-windows -m:1` (repeat with `net11.0-windows`) | FlaUI-based UI automation tests |
 
 ## Solution Structure
 

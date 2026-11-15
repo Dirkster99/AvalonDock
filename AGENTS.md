@@ -29,10 +29,11 @@ dotnet test source/AvalonDock.sln --configuration Release --no-restore --filter 
 
 ### FlaUI UI Tests
 
-These are UI automation tests that launch actual WPF windows. Run them separately, targeting .NET 10:
+These are UI automation tests that launch actual WPF windows. Run them separately, once per framework (.NET 10 and .NET 11):
 
 ```powershell
 dotnet test source/AvalonDock.sln --configuration Release --no-restore --filter "Category=FlaUI" --framework net10.0-windows -m:1
+dotnet test source/AvalonDock.sln --configuration Release --no-restore --filter "Category=FlaUI" --framework net11.0-windows -m:1
 ```
 
 ## Project Structure
