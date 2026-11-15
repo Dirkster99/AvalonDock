@@ -84,16 +84,21 @@ implementation of either interface has to add them.
 | .NET Framework 4.5.2 | ❌ **Removed** |
 | .NET Core 3.0 / 3.1 | ❌ **Removed** |
 | .NET 5.0 | ❌ **Removed** |
-| .NET 6.0 / 7.0 / 8.0 | ❌ **Not targeted** |
+| .NET 6.0 / 7.0 | ❌ **Not targeted** |
+| .NET 8.0 | ✅ Re-added after v5.0.2 |
 
 **Supported frameworks in v5.0.0:**
 - .NET Framework 4.8
+- .NET 8.0 (with `-windows` TFM, re-added after v5.0.2)
 - .NET 9.0 (with `-windows` TFM)
 - .NET 10.0 (with `-windows` TFM)
 
 **Fix:** Update your project to target one of the supported frameworks:
 
 ```xml
+<!-- .NET 8 -->
+<TargetFramework>net8.0-windows</TargetFramework>
+
 <!-- .NET 9 -->
 <TargetFramework>net9.0-windows</TargetFramework>
 

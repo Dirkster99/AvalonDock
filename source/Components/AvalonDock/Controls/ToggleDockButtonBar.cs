@@ -151,7 +151,6 @@ namespace AvalonDock.Controls
 			{
 				var layoutItem = manager.GetLayoutItemFromModel(Anchorable) as LayoutAnchorableItem;
 				layoutItem?.HideCommand?.Execute(null);
-				manager.RemoveButtonFromAllBars(Anchorable);
 			};
 
 			menu.Items.Insert(0, hideItem);

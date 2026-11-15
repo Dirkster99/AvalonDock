@@ -5,11 +5,11 @@ name: CI
 on:
   pull_request:
     branches: [master, 'release/**']
-  # The OpenAvalon work happens on this branch. A push that only touches the LibreWPF line (its
+  # The LibreWPF work happens on this branch. A push that only touches the LibreWPF line (its
   # projects, the DevFlow suite, its workflows) or documentation cannot change this line's result, so
   # it does not start a second, redundant run next to CI (LibreWPF).
   push:
-    branches: [opendevelop]
+    branches: [librewpf]
     paths-ignore:
       - '**/*.LibreWPF.csproj'
       - 'source/AvalonDock.LibreWPF.sln'
@@ -44,15 +44,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Setup .NET 11 preview SDK
-        uses: actions/setup-dotnet@v5
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 11.0.x
-          dotnet-quality: preview
-      - name: Setup .NET 10 runtime
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: 10.0.x
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
 
       - name: Cache NuGet packages
         uses: actions/cache@v5
@@ -84,7 +82,19 @@ jobs:
           dotnet test source/AvalonDock.sln
           --configuration Release
           --no-restore
+          --filter "Category!=FlaUI"
           --logger "trx;LogFilePrefix=unit-test-results"
+          --results-directory TestResults
+          -m:1
+
+      - name: Test (FlaUI UI Tests)
+        run: >
+          dotnet test source/AvalonDock.sln
+          --configuration Release
+          --no-restore
+          --filter "Category=FlaUI"
+          --framework net10.0-windows
+          --logger "trx;LogFilePrefix=flaui-test-results"
           --results-directory TestResults
           -m:1
 

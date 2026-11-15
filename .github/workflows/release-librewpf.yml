@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: "Also publish the packages to GitHub Packages, replacing any same-version packages (opendevelop branch only; no tag, no GitHub Release)"
+        description: "Also publish the packages to GitHub Packages, replacing any same-version packages (librewpf branch only; no tag, no GitHub Release)"
         type: boolean
         default: false
 
@@ -27,7 +27,7 @@ env:
 
 jobs:
   # Testing belongs to CI (LibreWPF), which runs the DevFlow suite on every leg for each push to
-  # opendevelop. This workflow does not test again: it builds and packs the closure once, on macOS
+  # librewpf. This workflow does not test again: it builds and packs the closure once, on macOS
   # (the packages are RID-neutral), and a publish requires that CI already passed the same commit.
   build:
     name: Build and pack
@@ -54,16 +54,15 @@ jobs:
         run: |
           tested=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci-librewpf.yml/runs?head_sha=$GITHUB_SHA&event=push&status=success" --jq '.workflow_runs[0].html_url // empty')
           if [ -z "$tested" ]; then
-            echo "::error::CI (LibreWPF) has not passed $GITHUB_SHA. Push it to opendevelop and wait for CI first."
+            echo "::error::CI (LibreWPF) has not passed $GITHUB_SHA. Push it to librewpf and wait for CI first."
             exit 1
           fi
           echo "Tested by $tested"
 
-      - name: Setup .NET 11 preview SDK
-        uses: actions/setup-dotnet@v5
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 11.0.x
-          dotnet-quality: preview
+          dotnet-version: 10.0.x
 
       # OpenAvalon republishes the same 0.1.0-preview.N versions with new bits, and NuGet never looks a
       # package up again once it is in the global packages folder - so a cache keyed only on the pinned
@@ -202,18 +201,17 @@ jobs:
     name: Publish GitHub Packages
     needs: build
     # Two ways in: pushing a v* tag (also creates the GitHub Release), or running this workflow by hand
-    # with the `publish` input on the opendevelop branch (packages only).
+    # with the `publish` input on the librewpf branch (packages only).
     if: >-
       (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/librewpf-v')) ||
-      (github.event_name == 'workflow_dispatch' && inputs.publish && github.ref == 'refs/heads/opendevelop')
+      (github.event_name == 'workflow_dispatch' && inputs.publish && github.ref == 'refs/heads/librewpf')
     runs-on: windows-2025
     steps:
       # global.json pins an SDK, and `dotnet nuget push` resolves it before running.
-      - name: Setup .NET 11 preview SDK
-        uses: actions/setup-dotnet@v5
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 11.0.x
-          dotnet-quality: preview
+          dotnet-version: 10.0.x
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0

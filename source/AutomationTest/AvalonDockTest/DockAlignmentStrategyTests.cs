@@ -23,6 +23,23 @@ public class DockAlignmentStrategyTests
 		return root;
 	}
 
+	/// <summary>
+	/// A document pane followed by a docked anchorable pane holding one anchorable: on the right
+	/// in a horizontal panel, at the bottom in a vertical one.
+	/// </summary>
+	private static LayoutRoot CreateLayoutWithDockedPane(System.Windows.Controls.Orientation orientation, out LayoutAnchorablePane pane)
+	{
+		var root = new LayoutRoot();
+		var panel = new LayoutPanel { Orientation = orientation };
+		panel.Children.Add(new LayoutDocumentPane());
+		pane = new LayoutAnchorablePane();
+		pane.Children.Add(new LayoutAnchorable { Content = new object() });
+		panel.Children.Add(pane);
+		root.RootPanel = new LayoutPanel { Orientation = System.Windows.Controls.Orientation.Horizontal };
+		root.RootPanel.Children.Add(panel);
+		return root;
+	}
+
 	[Test]
 	public void BeforeInsertAnchorable_PlacesLeft_WhenMappedToLeft()
 	{
@@ -157,6 +174,54 @@ public class DockAlignmentStrategyTests
 		Assert.That(layout.LeftSide.Children.SelectMany(g => g.Children).Count(), Is.EqualTo(1));
 		Assert.That(layout.RightSide.Children.SelectMany(g => g.Children).Count(), Is.EqualTo(1));
 		Assert.That(layout.BottomSide.Children.SelectMany(g => g.Children).Count(), Is.EqualTo(1));
+	}
+
+	[Test]
+	public void BeforeInsertAnchorable_JoinsADockedPaneOnTheSameSide_InsteadOfAutoHiding()
+	{
+		var content = new object();
+		var map = new Dictionary<object, AnchorSide> { { content, AnchorSide.Bottom } };
+		var strategy = new DockAlignmentStrategy(map);
+		var layout = CreateLayoutWithDockedPane(System.Windows.Controls.Orientation.Vertical, out var bottomPane);
+		var anchorable = new LayoutAnchorable { Content = content };
+
+		bool handled = strategy.BeforeInsertAnchorable(layout, anchorable, null!);
+
+		Assert.That(handled, Is.True);
+		Assert.That(bottomPane.Children, Does.Contain(anchorable), "joins the pinned pane as another tab");
+		Assert.That(layout.BottomSide?.Children.SelectMany(g => g.Children) ?? Enumerable.Empty<LayoutAnchorable>(), Does.Not.Contain(anchorable));
+	}
+
+	[Test]
+	public void BeforeInsertAnchorable_AutoHides_WhenOnlyAnotherSideHasADockedPane()
+	{
+		var content = new object();
+		var map = new Dictionary<object, AnchorSide> { { content, AnchorSide.Bottom } };
+		var strategy = new DockAlignmentStrategy(map);
+		var layout = CreateLayoutWithDockedPane(System.Windows.Controls.Orientation.Horizontal, out var rightPane);
+		var anchorable = new LayoutAnchorable { Content = content };
+
+		bool handled = strategy.BeforeInsertAnchorable(layout, anchorable, null!);
+
+		Assert.That(handled, Is.True);
+		Assert.That(rightPane.Children, Does.Not.Contain(anchorable));
+		Assert.That(layout.BottomSide.Children.SelectMany(g => g.Children), Does.Contain(anchorable));
+	}
+
+	[Test]
+	public void BeforeInsertAnchorable_AutoHides_WhenThePaneOnThatSideIsEmpty()
+	{
+		var content = new object();
+		var map = new Dictionary<object, AnchorSide> { { content, AnchorSide.Bottom } };
+		var strategy = new DockAlignmentStrategy(map);
+		var layout = CreateLayoutWithDockedPane(System.Windows.Controls.Orientation.Vertical, out var bottomPane);
+		bottomPane.Children.Clear();
+		var anchorable = new LayoutAnchorable { Content = content };
+
+		bool handled = strategy.BeforeInsertAnchorable(layout, anchorable, null!);
+
+		Assert.That(handled, Is.True);
+		Assert.That(layout.BottomSide.Children.SelectMany(g => g.Children), Does.Contain(anchorable), "an empty pane is not shown, so it is no place to dock");
 	}
 
 	[Test]

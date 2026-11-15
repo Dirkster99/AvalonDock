@@ -3,13 +3,13 @@
 		<!-- This fork can be checked out below OpenDevelop, which uses central package management. -->
 		<ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
 		<!-- Centralized Target Frameworks -->
-		<ComponentTargetFrameworks>net9.0-windows;net10.0-windows;net48</ComponentTargetFrameworks>
+		<ComponentTargetFrameworks>net8.0-windows;net9.0-windows;net10.0-windows;net48</ComponentTargetFrameworks>
 		<TestTargetFrameworks>net9.0-windows;net10.0-windows;net48</TestTargetFrameworks>
 		<LangVersion>13</LangVersion>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 
 		<!-- Version Information -->
-		<VersionPrefix>5.0.1</VersionPrefix>
+		<VersionPrefix>5.0.2</VersionPrefix>
 		<AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
 		<FileVersion>$(VersionPrefix).0</FileVersion>
 		<Company>Open Source</Company>

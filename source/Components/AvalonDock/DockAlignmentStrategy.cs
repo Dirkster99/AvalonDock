@@ -31,6 +31,15 @@ namespace AvalonDock
 			if (!_contentToSide.TryGetValue(anchorableToShow.Content, out var side))
 				return false;
 
+			// A pane already docked on that side takes the anchorable as another tab, so it does not
+			// end up auto hidden next to a pinned pane on the same side.
+			var dockedPane = FindDockedPane(layout, side);
+			if (dockedPane != null)
+			{
+				dockedPane.Children.Add(anchorableToShow);
+				return true;
+			}
+
 			var anchorSide = GetLayoutAnchorSide(layout, side);
 			if (anchorSide == null)
 				return false;
@@ -60,6 +69,20 @@ namespace AvalonDock
 		/// <inheritdoc/>
 		public void AfterInsertDocument(LayoutRoot layout, LayoutDocument anchorableShown)
 		{
+		}
+
+		/// <summary>
+		/// Finds a visible anchorable pane docked in the root panel on the given side; panes in
+		/// floating windows and the auto hide groups are not part of the root panel.
+		/// </summary>
+		/// <param name="layout">The layout.</param>
+		/// <param name="side">The side.</param>
+		/// <returns>The pane, or <see langword="null"/> when none is docked on that side.</returns>
+		private static LayoutAnchorablePane FindDockedPane(LayoutRoot layout, AnchorSide side)
+		{
+			return layout.RootPanel?.Descendents()
+				.OfType<LayoutAnchorablePane>()
+				.FirstOrDefault(pane => pane.IsVisible && pane.Parent is ILayoutOrientableGroup && pane.GetSide() == side);
 		}
 
 		private static LayoutAnchorSide GetLayoutAnchorSide(LayoutRoot layout, AnchorSide side)

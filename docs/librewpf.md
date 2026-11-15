@@ -819,8 +819,8 @@ dotnet run --project source/DevFlowIntegrationTests/DevFlowIntegrationTests.cspr
   -class AvalonDock.DevFlowIntegrationTests.ToolWindowTests -parallel none
 ```
 
-The local build needs `global.json` pinned to `11.0.100-rc.1.26425.128` and the GitHub Packages
-credentials for `openavalon-github` in the environment; restore `global.json` afterwards. Do not
+The local build uses the .NET 10 SDK pinned in `global.json` and needs the GitHub Packages
+credentials for `openavalon-github` in the environment. Do not
 inject native input into a developer's desktop for these suites - the native-input cases assume the
 application owns the pointer and are verified in CI.
 

@@ -132,6 +132,12 @@ If the project builds without errors, you're ready to go. Head to the [Quick Sta
 | Framework | Supported |
 |:----------|:----------|
 | .NET 10 (`net10.0-windows`) | ✅ |
+| .NET 9 (`net9.0-windows`) | ✅ |
+| .NET 8 (`net8.0-windows`) | ✅ |
+| .NET Framework 4.8 (`net48`) | ✅ |
 
 {: .note }
-The LibreWPF packages are built for `net10.0-windows` only, with `LibreWPF.Sdk`; they restore and run on Windows, macOS and Linux. Use the upstream `Dirkster.AvalonDock*` packages from nuget.org for .NET 9 or .NET Framework 4.8.
+Make sure your project targets one of the supported frameworks. AvalonDock requires the `-windows` TFM suffix for .NET 8+ projects.
+
+{: .note }
+The LibreWPF packages (`*.LibreWPF`) are built for `net10.0-windows` only, with `LibreWPF.Sdk`; they restore and run on Windows, macOS and Linux. The classic `Dirkster.AvalonDock*` packages cover the full framework list above.

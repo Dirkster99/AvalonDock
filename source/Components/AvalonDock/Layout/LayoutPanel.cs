@@ -9,9 +9,15 @@ namespace AvalonDock.Layout
 	/// <summary>
 	/// Represents a layout panel.
 	/// </summary>
+	/// <remarks>
+	/// The panel implements <see cref="ILayoutElementWithVisibility"/> so that a child changing its
+	/// visibility makes the panel recompute its own. Without it a panel only did so when its children
+	/// collection changed: a row of tool windows that went invisible stayed invisible - and collapsed to
+	/// zero height - after a tool window in one of its panes was shown again (#677).
+	/// </remarks>
 	[ContentProperty(nameof(Children))]
 	[Serializable]
-	public class LayoutPanel : LayoutPositionableGroup<ILayoutPanelElement>, ILayoutPanelElement, ILayoutOrientableGroup
+	public class LayoutPanel : LayoutPositionableGroup<ILayoutPanelElement>, ILayoutPanelElement, ILayoutOrientableGroup, ILayoutElementWithVisibility
 	{
 		private Orientation _orientation;
 

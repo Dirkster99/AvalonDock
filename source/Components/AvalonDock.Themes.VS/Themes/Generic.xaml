@@ -65,6 +65,8 @@
     </Style>
 
     <Style BasedOn="{StaticResource AvalonDockThemeVs2013MenuItemStyle}" TargetType="{x:Type avalonDockControls:MenuItemEx}">
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="IconTemplate" Value="{Binding Path=Root.Manager.IconContentTemplate}" />
         <Setter Property="IconTemplateSelector" Value="{Binding Path=Root.Manager.IconContentTemplateSelector}" />
         <Setter Property="Command" Value="{Binding Path=., Converter={avalonDockConverters:ActivateCommandLayoutItemFromLayoutModelConverter}}" />
@@ -2722,7 +2724,7 @@
         </Setter>
     </Style>
 
-    <!--  ToggleDockingManager: Arc theme ToggleAnchorablePaneTitle style  -->
+    <!--  ToggleDockingManager: VS theme ToggleAnchorablePaneTitle style  -->
     <Style TargetType="{x:Type avalonDockControls:ToggleAnchorablePaneTitle}">
         <Setter Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionInactiveBackground}}" />
         <Setter Property="Foreground" Value="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionInactiveText}}" />
@@ -2771,7 +2773,7 @@
                                 Height="15"
                                 VerticalAlignment="Center"
                                 Focusable="False"
-                                Style="{StaticResource AvalonDockThemeArcButtonStyle}"
+                                Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                 ToolTip="Options"
                                 Visibility="{Binding ShowHeaderOptionsButton, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=Visible, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
                                 <Canvas Width="10" Height="10" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -2795,7 +2797,7 @@
                                 VerticalAlignment="Center"
                                 Command="{Binding Path=LayoutItem.AutoHideCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                 Focusable="False"
-                                Style="{StaticResource AvalonDockThemeArcButtonStyle}"
+                                Style="{StaticResource AvalonDockThemeVs2013ButtonStyle}"
                                 ToolTip="Minimize"
                                 Visibility="{Binding ShowHeaderMinimizeButton, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:ToggleDockingManager}}, FallbackValue=Visible, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
                                 <Path
@@ -2891,7 +2893,7 @@
         </Setter>
     </Style>
 
-    <!--  ToggleDockingManager: Arc theme toggle anchorable pane style  -->
+    <!--  ToggleDockingManager: VS theme toggle anchorable pane style  -->
     <Style x:Key="ToggleAnchorablePaneControlStyle" TargetType="{x:Type avalonDockControls:LayoutAnchorablePaneControl}">
         <Setter Property="TabStripPlacement" Value="Bottom" />
         <Setter Property="Padding" Value="0" />
@@ -3079,7 +3081,7 @@
         </Setter>
     </Style>
 
-    <!--  ToggleDockingManager: Arc theme ToggleDockButton style  -->
+    <!--  ToggleDockingManager: VS theme ToggleDockButton style  -->
     <Style x:Key="{x:Type avalonDockControls:ToggleDockButton}" TargetType="{x:Type avalonDockControls:ToggleDockButton}">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
@@ -3178,7 +3180,7 @@
         </Setter>
     </Style>
 
-    <!--  ToggleDockingManager: inherits full Arc theme  -->
+    <!--  ToggleDockingManager: inherits full VS theme  -->
     <Style x:Key="{x:Type avalonDock:ToggleDockingManager}" TargetType="{x:Type avalonDock:ToggleDockingManager}"
            BasedOn="{StaticResource {x:Type avalonDock:DockingManager}}">
         <Setter Property="BorderThickness" Value="0" />

@@ -627,6 +627,23 @@ public class ToggleDockingManager : DockingManager
 	}
 
 	/// <inheritdoc/>
+	/// <remarks>
+	/// Every hide path - the sidebar button's "Hide" item, "View Mode > Hidden", the pane header and
+	/// application code running <see cref="LayoutAnchorableItem.HideCommand"/> - ends up here, so the
+	/// sidebar button is dropped in one place. A button left behind for a hidden anchorable is a
+	/// duplicate as soon as the anchorable is restored from the hidden panels menu.
+	/// </remarks>
+	internal override void ExecuteHideCommand(LayoutAnchorable anchorable)
+	{
+		base.ExecuteHideCommand(anchorable);
+
+		if (anchorable != null && anchorable.IsHidden)
+		{
+			RemoveFromAllBars(anchorable);
+		}
+	}
+
+	/// <inheritdoc/>
 	internal override void ExecuteAutoHideCommand(LayoutAnchorable anchorable)
 	{
 		if (anchorable == null)
@@ -1799,7 +1816,9 @@ public class ToggleDockingManager : DockingManager
 		targetSide.Children.Add(group);
 		group.Children.Add(anchorable);
 
-		// Add button to the appropriate bar
+		// Add button to the appropriate bar. Drop any button still around for this anchorable first,
+		// so restoring never leaves more than one button per anchorable.
+		RemoveFromAllBars(anchorable);
 		var bar = GetBarForZone(zone);
 		if (bar != null)
 		{
@@ -1816,15 +1835,6 @@ public class ToggleDockingManager : DockingManager
 
 		// Immediately open the restored anchorable
 		ToggleAnchorable(anchorable, zone);
-	}
-
-	/// <summary>
-	/// Removes the button for the specified anchorable from all button bars.
-	/// </summary>
-	/// <param name="anchorable">The anchorable whose button to remove.</param>
-	internal void RemoveButtonFromAllBars(LayoutAnchorable anchorable)
-	{
-		RemoveFromAllBars(anchorable);
 	}
 
 	private void RemoveFromAllBars(LayoutAnchorable anchorable)
@@ -1849,7 +1859,6 @@ public class ToggleDockingManager : DockingManager
 			if (bar.Items[i] is ToggleDockButton btn && btn.Anchorable == anchorable)
 			{
 				bar.Items.RemoveAt(i);
-				return;
 			}
 		}
 	}

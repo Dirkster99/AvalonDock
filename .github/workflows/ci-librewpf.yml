@@ -4,11 +4,11 @@
 name: CI (LibreWPF)
 
 on:
-  # The OpenAvalon work happens on this branch; every push runs all legs (empty inputs mean "all").
+  # The LibreWPF work happens on this branch; every push runs all legs (empty inputs mean "all").
   # A push that only touches the original WPF line (its FlaUI suite and workflows) or documentation
   # cannot change this result, so it does not start a redundant run.
   push:
-    branches: [opendevelop]
+    branches: [librewpf]
     paths-ignore:
       - 'source/AutomationTest/**'
       - 'source/AvalonDock.sln'
@@ -94,16 +94,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      # global.json pins 11.0.1xx: LibreWPF.Sdk 0.1.0-preview.69 is resolved by that SDK band, and
-      # without it `dotnet build` stops before restoring ("A compatible .NET SDK was not found",
-      # exit 155). The runtime stays .NET 10 because the apps target net10.0-windows.
-      - name: Setup .NET 11 preview SDK
-        uses: actions/setup-dotnet@v6
-        with:
-          dotnet-version: 11.0.x
-          dotnet-quality: preview
-
-      - name: Setup .NET 10 runtime
+      # global.json pins the .NET 10 SDK band; the apps target net10.0-windows.
+      - name: Setup .NET 10 SDK
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
