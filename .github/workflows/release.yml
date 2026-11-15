@@ -126,6 +126,41 @@ jobs:
           echo -e "\nCreated packages:"
           ls -1 nupkg/*.nupkg
 
+      # The LibreWPF packages are built from the same sources with LibreWPF.Sdk (pinned in global.json,
+      # restored from nuget.org) into bin/librewpf, so they do not touch the classic outputs packed above.
+      # They depend on the Dirkster.AvalonDock.Core package packed above. No --warnaserror: on the command
+      # line it would override the LibreWPF projects' TreatWarningsAsErrors=false.
+      - name: Build LibreWPF packages
+        shell: bash
+        run: |
+          projects=(
+            "source/Components/AvalonDock/AvalonDock.LibreWPF.csproj"
+            "source/Components/AvalonDock.Themes.VS/AvalonDock.Themes.VS.LibreWPF.csproj"
+            "source/Components/AvalonDock.Themes.VS2013/AvalonDock.Themes.VS2013.LibreWPF.csproj"
+          )
+
+          for project in "${projects[@]}"; do
+            echo "Building: $project"
+            dotnet build "$project" --configuration Release ${{ steps.version.outputs.VERSION_ARGS }}
+          done
+
+      - name: Pack LibreWPF packages
+        shell: bash
+        run: |
+          projects=(
+            "source/Components/AvalonDock/AvalonDock.LibreWPF.csproj"
+            "source/Components/AvalonDock.Themes.VS/AvalonDock.Themes.VS.LibreWPF.csproj"
+            "source/Components/AvalonDock.Themes.VS2013/AvalonDock.Themes.VS2013.LibreWPF.csproj"
+          )
+
+          for project in "${projects[@]}"; do
+            echo "Packing: $project"
+            dotnet pack "$project" --configuration Release --no-build -o nupkg/ ${{ steps.version.outputs.VERSION_ARGS }}
+          done
+
+          echo -e "\nCreated packages:"
+          ls -1 nupkg/*.nupkg
+
       - name: Upload NuGet packages
         uses: actions/upload-artifact@v7
         with:
@@ -180,6 +215,9 @@ jobs:
             "Dirkster.AvalonDock.Themes.VS"
             "Dirkster.AvalonDock.Themes.VS2010"
             "Dirkster.AvalonDock.Themes.VS2013"
+            "Dirkster.AvalonDock.LibreWPF"
+            "Dirkster.AvalonDock.Themes.VS.LibreWPF"
+            "Dirkster.AvalonDock.Themes.VS2013.LibreWPF"
           )
 
           for package in "${packages[@]}"; do

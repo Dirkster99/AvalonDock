@@ -36,6 +36,21 @@ namespace AvalonDock.DevFlowIntegrationTests
 				Assert.Skip($"Known macOS CI-runner gap: {gap}");
 		}
 
+		/// <summary>
+		/// ProGPU's hit test finds no region for the auto-hide anchors (they sit under a rotating
+		/// LayoutTransform, and the layout clip collapses to zero area). Fixed by ProGPU 02119efdf, which is
+		/// not in a ProGPU package on nuget.org yet (0.1.0-preview.70 does not contain it).
+		/// </summary>
+		public const string AutoHideClick =
+			"a click on an auto-hide anchor does not reach it: ProGPU's hit test collapses the rotated anchor's clip to zero area (fixed by ProGPU 02119efdf, not in a nuget.org ProGPU package yet)";
+
+		/// <summary>
+		/// Passed on the LibreWPF builds that carried ProGPU 02119efdf; with the nuget.org packages the click
+		/// reaches the tab but does not always activate it (the tab activates on mouse up).
+		/// </summary>
+		public const string ToolTabClick =
+			"a click on a tool-window tab does not reliably activate it with the nuget.org ProGPU packages (it passed on the builds carrying ProGPU 02119efdf)";
+
 		public const string MacNativeDrag =
 			"the cliclick-driven drag/resizer gesture does not reach AvalonDock on the macOS CI runner (no real desktop session); both cases pass on a Mac desktop";
 	}

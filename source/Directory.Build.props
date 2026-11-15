@@ -17,7 +17,7 @@
 		<Copyright>2017-2026</Copyright>
 		<Description>This assembly implements a docking layout system for WPF.</Description>
 		<PackageProjectUrl>https://github.com/Dirkster99/AvalonDock</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/lextudio/AvalonDock</RepositoryUrl>
+		<RepositoryUrl>https://github.com/Dirkster99/AvalonDock</RepositoryUrl>
 		<Authors>https://github.com/Dirkster99/AvalonDock</Authors>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -50,8 +50,8 @@
 		<!-- LibreWPF.Sdk defaults its net10 support packages (incl. Cryptography.Xml/Pkcs) to 10.0.11, flagged NU1902/NU1903; 10.0.13 is patched. -->
 		<ProGpuWpfNet10SupportPackageVersion>10.0.13</ProGpuWpfNet10SupportPackageVersion>
 		<NoWarn>$(NoWarn);NU5104</NoWarn>
-		<!-- The fork's dev-time quality gates belong to the WPF line; the LibreWPF packages are
-		     OpenDevelop dependencies and must build cleanly on the ProGPU platform. -->
+		<!-- The fork's dev-time quality gates belong to the WPF line; the LibreWPF packages
+		     must build cleanly on the ProGPU platform. -->
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
 		<RunAnalyzers>false</RunAnalyzers>
 		<EnableNETAnalyzers>false</EnableNETAnalyzers>

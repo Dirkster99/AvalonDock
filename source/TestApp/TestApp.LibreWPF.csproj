@@ -19,10 +19,9 @@
         <EnableWindowsTargeting>true</EnableWindowsTargeting>
         <GitVersion_NoFetchEnabled>true</GitVersion_NoFetchEnabled>
         <GitVersionTaskEnabled>false</GitVersionTaskEnabled>
-        <ProGpuWpfRuntimeFrameworkVersion>11.0.0-preview.1.26104.118</ProGpuWpfRuntimeFrameworkVersion>
         <!-- Only the canonical LibreWinForms packages are published on nuget.org; the SDK's default
              LibreWinForms.Compatibility.System.Windows.Forms runtime is not. -->
-        <ProGpuWpfUseCanonicalLibreWinForms Condition="'$(OS)' != 'Windows_NT'">true</ProGpuWpfUseCanonicalLibreWinForms>
+        <ProGpuWpfUseCanonicalLibreWinForms>true</ProGpuWpfUseCanonicalLibreWinForms>
        	<DefineConstants>$(DefineConstants);DEVFLOW</DefineConstants>
     </PropertyGroup>
     <ItemGroup>

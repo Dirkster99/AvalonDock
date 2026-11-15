@@ -16,6 +16,20 @@
 > Part three (section 11) is the 2026-10-27 plan to split this fork into two independent lines -
 > the original Windows-only WPF line and a LibreWPF line - with its status tracker.
 
+> **Current state in Dirkster99/AvalonDock (issue #609).** The LibreWPF line restores only from nuget.org
+> (`LibreWPF.Sdk` and `LibreWinForms.*` `0.1.0-preview.69`, `LeXtudio.DevFlow.*` `0.3.1`) with the .NET 10
+> SDK; there is no `NuGet.config` and no GitHub Packages feed. `release.yml` publishes
+> `Dirkster.AvalonDock.LibreWPF`, `Dirkster.AvalonDock.Themes.VS.LibreWPF` and
+> `Dirkster.AvalonDock.Themes.VS2013.LibreWPF` to nuget.org with the classic packages; `Core` and
+> `Serializer.Xml` are the shared classic packages. Differences from the OpenAvalon builds this log was
+> written against: the nuget.org packages have no visual `WindowsFormsHost` (TestApp shows a placeholder
+> unless `DEVFLOW_HOST_WINFORMS=1`, and the hosted WinForms cases skip), no `LibreControlHosting` (the
+> mnemonic case skips), and throw on `TextFormattingMode.Display` (the themes use
+> `PlatformTextOptions.TextFormattingMode`, which is `Ideal` under LibreWPF). The ProGPU clip fix `02119efdf`
+> is in no nuget.org ProGPU package yet, so the auto-hide and tool-tab click cases are known gaps again
+> (`KnownLibreWpfGaps.AutoHideClick`, `ToolTabClick`; `DEVFLOW_RUN_KNOWN_GAPS=1` runs them). References below to the
+> OpenAvalon/lextudio feeds, `opendevelop` and `release-librewpf.yml` are history.
+
 ## 1. Background: test infrastructure and the event chain
 
 The DropTargetZone integration tests drive real drags with **cliclick** (synthetic mouse events on
@@ -819,8 +833,7 @@ dotnet run --project source/DevFlowIntegrationTests/DevFlowIntegrationTests.cspr
   -class AvalonDock.DevFlowIntegrationTests.ToolWindowTests -parallel none
 ```
 
-The local build uses the .NET 10 SDK pinned in `global.json` and needs the GitHub Packages
-credentials for `openavalon-github` in the environment. Do not
+The local build uses the .NET 10 SDK pinned in `global.json`; every package restores from nuget.org. Do not
 inject native input into a developer's desktop for these suites - the native-input cases assume the
 application owns the pointer and are verified in CI.
 
@@ -894,8 +907,8 @@ source/
 .github/workflows/
   ci.yml                  WPF: Windows build, unit tests (and FlaUI)
   release.yml             WPF: tag v* -> nuget.org (upstream behaviour)
-  ci-librewpf.yml         LibreWPF: push to opendevelop + dispatch, DevFlow on five legs
-  release-librewpf.yml    LibreWPF: pack the OpenDevelop closure once (macOS) and publish it to GitHub Packages (tag librewpf-v*); no tests, requires a green CI (LibreWPF) push run for the commit
+  ci-librewpf.yml         LibreWPF: PRs to master, push to librewpf + dispatch, DevFlow on five legs
+                          (release.yml also builds and packs the three *.LibreWPF packages)
 ```
 
 Package mapping (what OpenDevelop consumes, from `NuGet.config`):

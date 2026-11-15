@@ -81,7 +81,7 @@
 	1) As it does not appear to add any additional value?
 	2) As it overwrites other ContextMenu styles (eg using MLib in Edi or Aehnlich)
 	<Style BasedOn="{StaticResource {x:Type ContextMenu}}" TargetType="{x:Type ContextMenu}">
-		<Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+		<Setter Property="TextOptions.TextFormattingMode" Value="{x:Static avalonDockControls:PlatformTextOptions.TextFormattingMode}" />
 		<Setter Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.Background}}" />
 		<Setter Property="Foreground" Value="{DynamicResource {x:Static reskeys:ResourceKeys.NavigatorWindowForeground}}" />
 		<Setter Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.PanelBorderBrush}}" />
@@ -844,7 +844,7 @@
 			Background="{DynamicResource {x:Static reskeys:ResourceKeys.AutoHideTabDefaultBackground}}"
 			BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.AutoHideTabDefaultBorder}}"
 			BorderThickness="0,0,0,6"
-			TextOptions.TextFormattingMode="Display"
+			TextOptions.TextFormattingMode="{x:Static avalonDockControls:PlatformTextOptions.TextFormattingMode}"
 			TextElement.Foreground="{DynamicResource {x:Static reskeys:ResourceKeys.AutoHideTabDefaultText}}">
 			<ContentPresenter
 				Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"

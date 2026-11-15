@@ -58,6 +58,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 		[Fact]
 		public async Task AutoHideWithTextBoxes_ContentAccessible_Issue62()
 		{
+			KnownLibreWpfGaps.SkipOnLibreWpf(KnownLibreWpfGaps.AutoHideClick);
 			using var client = await TryConnectAsync();
 
 			var anchorable = FindContent(await QueryLayoutAsync(client), "anchorables", "AutoHide2 Content");
@@ -112,6 +113,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 		[Fact]
 		public async Task AutoHideFlyout_IsResponsive_Issue10()
 		{
+			KnownLibreWpfGaps.SkipOnLibreWpf(KnownLibreWpfGaps.AutoHideClick);
 			using var client = await TryConnectAsync();
 
 			var anchorable = FindContent(await QueryLayoutAsync(client), "anchorables", "AutoHide1 Content");

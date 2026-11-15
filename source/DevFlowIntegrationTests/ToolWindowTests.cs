@@ -38,6 +38,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 		[Fact]
 		public async Task ClickToolWindowTab_ActivatesIt_Issue375()
 		{
+			KnownLibreWpfGaps.SkipOnLibreWpf(KnownLibreWpfGaps.ToolTabClick);
 			using var client = await TryConnectAsync();
 
 			// A real click on the tab's header, not a model change: #375 is about the tab's own
@@ -54,6 +55,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 		[Fact]
 		public async Task ToolWindowContent_IsAccessible()
 		{
+			KnownLibreWpfGaps.SkipOnLibreWpf(KnownLibreWpfGaps.ToolTabClick);
 			using var client = await TryConnectAsync();
 
 			await ClickTabAsync(client, "anchorable-tab", "toolWindow1");
@@ -118,6 +120,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 		[Fact]
 		public async Task ClickAutoHideTab_OpensFlyout_Issue169()
 		{
+			KnownLibreWpfGaps.SkipOnLibreWpf(KnownLibreWpfGaps.AutoHideClick);
 			using var client = await TryConnectAsync();
 
 			var layout = await QueryLayoutAsync(client);

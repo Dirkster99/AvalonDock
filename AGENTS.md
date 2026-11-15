@@ -12,7 +12,7 @@ The fork keeps two independent lines (see `docs/librewpf.md`, section 11):
 | SDK | `Microsoft.NET.Sdk.WindowsDesktop` (upstream shape, multi-target, analyzers on) | `LibreWPF.Sdk` on every OS, `LIBREWPF` and `DEVFLOW` defined by the project |
 | Solution | `source/AvalonDock.sln` | `source/AvalonDock.LibreWPF.sln` |
 | Tests | NUnit unit tests + FlaUI (Windows, real WPF) | DevFlow integration tests (Windows, macOS, Linux) |
-| CI / release | `ci.yml`, `release.yml` (tag `v*`, nuget.org) | `ci-librewpf.yml`, `release-librewpf.yml` (GitHub Packages, tag `librewpf-v*`) |
+| CI / release | `ci.yml`, `release.yml` (tag `v*`, nuget.org) | `ci-librewpf.yml`; released by `release.yml` with the WPF packages |
 | Packages | `Dirkster.AvalonDock*` | `Dirkster.AvalonDock*.LibreWPF` |
 
 `AvalonDock.Core`, the serializers, MVVM and DI projects are `netstandard2.0` and shared by both lines.
@@ -24,8 +24,8 @@ sits behind `#if DEVFLOW`. Keep both lines building.
 ## Prerequisites
 
 - **WPF line:** Windows to run it; it also *compiles* on macOS/Linux (`EnableWindowsTargeting`).
-- **LibreWPF line:** any OS; needs the GitHub Packages credentials for the `openavalon-github` source.
-- **.NET SDK:** the one pinned in `global.json` (11 preview).
+- **LibreWPF line:** any OS; `LibreWPF.Sdk` and its packages restore from nuget.org.
+- **.NET SDK:** the one pinned in `global.json` (10.0).
 
 ## Build
 
@@ -38,7 +38,7 @@ dotnet build source/AvalonDock.LibreWPF.sln --configuration Debug
 ```
 
 All warnings are errors in the WPF line (`source/Directory.Build.props`); the LibreWPF projects opt out
-because they are OpenDevelop dependencies.
+because the analyzers are dev-time gates of the WPF line, which shares the sources.
 
 ## Test
 

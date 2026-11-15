@@ -98,6 +98,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 		[Fact]
 		public async Task SaveLoadLayout_WithAutoHidePanels_Issue111()
 		{
+			KnownLibreWpfGaps.SkipOnLibreWpf(KnownLibreWpfGaps.AutoHideClick);
 			using var client = await TryConnectAsync();
 
 			var anchorable = FindContent(await QueryLayoutAsync(client), "anchorables", "AutoHide1 Content");
@@ -129,6 +130,7 @@ namespace AvalonDock.DevFlowIntegrationTests
 		[Fact]
 		public async Task SaveLoadLayout_WithToolWindowStates_Issue59()
 		{
+			KnownLibreWpfGaps.SkipOnLibreWpf(KnownLibreWpfGaps.ToolTabClick);
 			using var client = await TryConnectAsync();
 
 			// A tool window is activated before the save: #59 was an InvalidOperationException during

@@ -49,12 +49,15 @@ Read through this entire guide before starting your migration. Some changes inte
 ### After (v5.0.0)
 
 ```xml
-<PackageReference Include="Dirkster.AvalonDock.LibreWPF" Version="5.0.1" />
-<PackageReference Include="Dirkster.AvalonDock.Themes.VS2013.LibreWPF" Version="5.0.1" />
+<PackageReference Include="Dirkster.AvalonDock" Version="5.0.0" />
+<PackageReference Include="Dirkster.AvalonDock.Themes.VS2013" Version="5.0.0" />
 
 <!-- NEW: Serializers are now separate packages -->
-<PackageReference Include="Dirkster.AvalonDock.Serializer.Xml" Version="5.0.1" />
+<PackageReference Include="Dirkster.AvalonDock.Serializer.Xml" Version="5.0.0" />
 
+<!-- OPTIONAL: New packages available -->
+<PackageReference Include="Dirkster.AvalonDock.Mvvm" Version="5.0.0" />
+<PackageReference Include="Dirkster.AvalonDock.DependencyInjection" Version="5.0.0" />
 ```
 
 ---

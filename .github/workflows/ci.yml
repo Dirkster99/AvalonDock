@@ -15,7 +15,6 @@ on:
       - 'source/AvalonDock.LibreWPF.sln'
       - 'source/DevFlowIntegrationTests/**'
       - '.github/workflows/ci-librewpf.yml'
-      - '.github/workflows/release-librewpf.yml'
       - '.github/workflows/docs.yml'
       - 'docs/**'
       - '**/*.md'
@@ -28,12 +27,9 @@ concurrency:
 
 permissions:
   contents: read
-  packages: read
 
 env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
-  # OpenAvalon grants this repository's Actions GITHUB_TOKEN read access to its packages.
-  NuGetPackageSourceCredentials_openavalon-github: Username=${{ github.actor }};Password=${{ secrets.GITHUB_TOKEN }};ValidAuthenticationTypes=Basic
 
 jobs:
   build:
@@ -56,19 +52,10 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ${{ env.NUGET_PACKAGES }}
-          key: nuget-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('global.json', 'NuGet.config', 'source/**/*.csproj', 'source/**/*.props') }}
-
-      - name: Prepare GitHub Packages restore access
-        shell: pwsh
-        run: |
-          Copy-Item NuGet.config "$env:RUNNER_TEMP/NuGet.config"
-          dotnet nuget update source openavalon-github --username $env:GITHUB_ACTOR --password $env:GITHUB_TOKEN --store-password-in-clear-text --configfile "$env:RUNNER_TEMP/NuGet.config"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          key: nuget-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('global.json', 'source/**/*.csproj', 'source/**/*.props') }}
 
       - name: Restore dependencies
-        shell: pwsh
-        run: dotnet restore source/AvalonDock.sln --configfile "$env:RUNNER_TEMP/NuGet.config"
+        run: dotnet restore source/AvalonDock.sln
 
       # No --warnaserror on the command line: it overrides every project in the graph, including the
       # six projects in this repo that deliberately opt out with TreatWarningsAsErrors=false. The

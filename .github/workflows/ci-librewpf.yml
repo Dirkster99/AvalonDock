@@ -4,6 +4,8 @@
 name: CI (LibreWPF)
 
 on:
+  pull_request:
+    branches: [master, 'release/**']
   # The LibreWPF work happens on this branch; every push runs all legs (empty inputs mean "all").
   # A push that only touches the original WPF line (its FlaUI suite and workflows) or documentation
   # cannot change this result, so it does not start a redundant run.
@@ -38,12 +40,9 @@ concurrency:
 
 permissions:
   contents: read
-  packages: read
 
 env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
-  # OpenAvalon grants this repository's Actions GITHUB_TOKEN read access to its packages.
-  NuGetPackageSourceCredentials_openavalon-github: Username=${{ github.actor }};Password=${{ secrets.GITHUB_TOKEN }};ValidAuthenticationTypes=Basic
 
 jobs:
   # Picks the DevFlow legs, so a single slow or failing platform can be re-run on its own.
@@ -154,47 +153,11 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install cliclick
 
-      # OpenAvalon republishes the same 0.1.0-preview.N versions with new bits, and NuGet never looks a
-      # package up again once it is in the global packages folder - so a cache keyed only on the pinned
-      # version would keep testing an older build of the same version. The feed's own revision of the
-      # pinned LibreWPF.Sdk is what the key is derived from, which also proves the feed is reachable
-      # before anything is cached.
-      - name: Resolve the OpenAvalon package revision
-        id: feed
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          $sdk = (Get-Content global.json -Raw | ConvertFrom-Json).'msbuild-sdks'.'LibreWPF.Sdk'
-          if (-not $sdk) { throw 'global.json does not pin LibreWPF.Sdk.' }
-          $revisions = @(gh api --paginate "/orgs/lextudio/packages/nuget/librewpf.sdk/versions?per_page=100" --jq ".[] | select(.name == `"$sdk`") | .updated_at")
-          $revision = @($revisions | Where-Object { "$_" -match '\S' }) | Select-Object -First 1
-          if (-not $revision) {
-            # The org container API needs package read access this repository's token may not have. A
-            # key that is unique per run costs one cold restore; reusing a key it cannot invalidate
-            # could silently test an older build of the same version, which is the worse outcome.
-            Write-Warning "Cannot read the OpenAvalon revision of LibreWPF.Sdk $sdk; restoring without a cache hit."
-            $revision = "run-$env:GITHUB_RUN_ID"
-          }
-          # The DevFlow packages are republished at the nuget.org version number for the same reason.
-          $devflow = @(gh api --paginate "/orgs/lextudio/packages/nuget/lextudio.devflow.agent.core/versions?per_page=100" --jq ".[] | select(.name == `"0.3.1`") | .updated_at" 2>$null) |
-            Where-Object { "$_" -match '\S' } | Select-Object -First 1
-          if ($devflow) { $revision = "$revision-$devflow" }
-          "revision=$($revision -replace '[^0-9A-Za-z]', '')" >> $env:GITHUB_OUTPUT
-
       - name: Cache NuGet packages
         uses: actions/cache@v5
         with:
           path: ${{ env.NUGET_PACKAGES }}
-          key: nuget-${{ matrix.name }}-${{ steps.feed.outputs.revision }}-${{ hashFiles('global.json', 'NuGet.config', 'source/**/*.csproj', 'source/**/*.props') }}
-
-      - name: Prepare GitHub Packages restore access
-        shell: pwsh
-        run: |
-          Copy-Item NuGet.config "$env:RUNNER_TEMP/NuGet.config"
-          dotnet nuget update source openavalon-github --username $env:GITHUB_ACTOR --password $env:GITHUB_TOKEN --store-password-in-clear-text --configfile "$env:RUNNER_TEMP/NuGet.config"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          key: nuget-${{ matrix.name }}-${{ hashFiles('global.json', 'source/**/*.csproj', 'source/**/*.props') }}
 
       # Prebuild in Debug so the fixtures can start the apps with --no-build and stay inside their
       # 120s startup deadline; `dotnet run` defaults to Debug, so the configurations must match.
@@ -208,7 +171,7 @@ jobs:
             'source/DevFlowIntegrationTests/DevFlowIntegrationTests.csproj'
           )
           foreach ($project in $projects) {
-            dotnet build $project --configuration Debug --configfile "$env:RUNNER_TEMP/NuGet.config"
+            dotnet build $project --configuration Debug
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
 
@@ -225,9 +188,14 @@ jobs:
             x86_64) rid=linux-x64 ;;
             aarch64|arm64) rid=linux-arm64 ;;
           esac
-          native_dir=source/TestApp/bin/librewpf/Debug/net10.0-windows/runtimes/$rid/native
+          app_dir=source/TestApp/bin/librewpf/Debug/net10.0-windows
+          native_dir=$app_dir/runtimes/$rid/native
+          # The nuget.org LibreWPF.Sdk stages the native libraries next to the app instead.
           if [ ! -d "$native_dir" ]; then
-            echo "::error::$native_dir does not exist; the LibreWPF native staging changed."
+            native_dir=$app_dir
+          fi
+          if ! ls "$native_dir"/libprogpu_native*.so >/dev/null 2>&1; then
+            echo "::error::no libprogpu_native in $native_dir; the LibreWPF native staging changed."
             exit 1
           fi
           status=0
@@ -248,34 +216,6 @@ jobs:
           ls -l /usr/share/vulkan/icd.d 2>/dev/null || echo "no ICD directory"
           echo "--- Vulkan/GL loaders ---"
           ldconfig -p | grep -E 'libvulkan\.so|libEGL\.so|libGLX\.so|libOSMesa' || true
-
-      # NuGet source mapping already makes GitHub Packages the only candidate for these prefixes
-      # (the most specific pattern wins over nuget.org's `*`), but a package already present in the
-      # global packages folder is never looked up again. nuget.org publishes the same
-      # 0.1.0-preview.69 version with different bits (it still carries osx-x64 and lacks the
-      # OpenAvalon native staging), so a stale cache entry would silently test the wrong LibreWPF.
-      # Assert the recorded source instead of assuming it. The DevFlow packages are held to the same rule:
-      # their GitHub Packages build reuses the nuget.org version number on purpose, so a cached nuget.org
-      # copy would silently be the wrong bits.
-      - name: Verify the LibreWPF closure came from OpenAvalon
-        shell: bash
-        run: |
-          NUGET_PACKAGES="$(cygpath -u "$NUGET_PACKAGES" 2>/dev/null || echo "$NUGET_PACKAGES")"
-          expected='https://nuget.pkg.github.com/lextudio/index.json'
-          status=0
-          for meta in $NUGET_PACKAGES/librewpf.*/*/.nupkg.metadata \
-                      $NUGET_PACKAGES/librewinforms.*/*/.nupkg.metadata \
-                      $NUGET_PACKAGES/progpu.*/*/.nupkg.metadata \
-                      $NUGET_PACKAGES/lextudio.devflow.*/*/.nupkg.metadata; do
-            [ -f "$meta" ] || continue
-            # Published on nuget.org on purpose (see NuGet.config).
-            case "$meta" in */progpu.scene.native/*) continue ;; esac
-            if ! grep -q "\"source\": \"${expected}\"" "$meta"; then
-              echo "::error::${meta} came from $(grep -o '"source": "[^"]*"' "$meta" | cut -d'"' -f4) instead of OpenAvalon."
-              status=1
-            fi
-          done
-          exit "$status"
 
       # A click tool that is not DPI aware lands off target on a display scaled above 100%; record the scale
       # of the machine the Windows legs run on (the legs differ: x64 and arm64 runners).

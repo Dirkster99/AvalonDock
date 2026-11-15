@@ -153,10 +153,11 @@ namespace TestApp
 #if LIBREWPF
 			// LibreWinForms controls carry logical handles, so the interop pane needs LibreWPF's visual
 			// WindowsFormsHost: the host paints the control tree itself and forwards pointer, keyboard,
-			// text and focus, because there is no child HWND to parent. That shipped with LibreWPF
-			// 0.1.0-preview.69 on 2026-10-29 (docs/librewpf.md, section 11), so the pane is hosted by
-			// default; DEVFLOW_HOST_WINFORMS=0 restores the placeholder, for a package that predates it.
-			var hostsWinForms = Environment.GetEnvironmentVariable("DEVFLOW_HOST_WINFORMS") != "0";
+			// text and focus, because there is no child HWND to parent. The LibreWPF packages on nuget.org
+			// do not have it yet - their host throws "BuildWindowCore failed to return the hosted child
+			// window handle" at startup - so the pane shows a placeholder unless DEVFLOW_HOST_WINFORMS=1
+			// opts in, for a LibreWPF build that has the visual host.
+			var hostsWinForms = Environment.GetEnvironmentVariable("DEVFLOW_HOST_WINFORMS") == "1";
 #else
 			var hostsWinForms = OperatingSystem.IsWindows();
 #endif
@@ -170,9 +171,7 @@ namespace TestApp
 				// child window. The pane keeps its place in the layout (window and docking scenarios need it
 				// there) but shows a note instead of a host that cannot draw or forward input.
 #if LIBREWPF
-				// LibreWPF hosts the tree on every platform through its visual host, so a placeholder can
-				// only mean this run asked for it.
-				const string placeholder = "Windows Forms interop is switched off for this run (DEVFLOW_HOST_WINFORMS=0).";
+				const string placeholder = "Windows Forms interop needs LibreWPF's visual WindowsFormsHost; set DEVFLOW_HOST_WINFORMS=1 on a LibreWPF build that has it.";
 #else
 				const string placeholder = "Windows Forms interop is only available on Windows.";
 #endif
@@ -2262,7 +2261,8 @@ namespace TestApp
 				// at run time, and the cases that drive keyboard, text and a layout transform only mean
 				// something for the former - so they skip on this flag rather than on the OS, because the
 				// LibreWPF line runs on Windows too.
-				["visualHost"] = WinFormsHostIsVisual(),
+				// Without a hosted tree (the LibreWPF placeholder) there is nothing for those cases to drive.
+				["visualHost"] = root != null && WinFormsHostIsVisual(),
 				["hostHasWpfFocus"] = winFormsHost.IsKeyboardFocusWithin,
 				["pixelsPerUnitX"] = pixelsPerUnitX,
 				["pixelsPerUnitY"] = pixelsPerUnitY,
@@ -2419,7 +2419,21 @@ namespace TestApp
 				throw new InvalidOperationException("The interop pane hosts no WinForms control.");
 
 #if LIBREWPF
-			System.Windows.Forms.LibreControlHosting.DispatchInput(root, new LibreWinForms.Platform.LibreInputEvent(
+			// LibreControlHosting is not in the LibreWinForms packages published on nuget.org, so it is
+			// looked up at run time and the case reports itself unsupported where it is missing.
+			var dispatchInput = typeof(System.Windows.Forms.Control).Assembly
+				.GetType("System.Windows.Forms.LibreControlHosting")
+				?.GetMethod("DispatchInput", new[] { typeof(System.Windows.Forms.Control), typeof(LibreWinForms.Platform.LibreInputEvent) });
+			if (dispatchInput == null)
+			{
+				return System.Text.Json.JsonSerializer.Serialize(new Dictionary<string, object>
+				{
+					["supported"] = false,
+					["reason"] = "this LibreWinForms build has no LibreControlHosting.DispatchInput to deliver a system character to the hosted tree",
+				});
+			}
+
+			dispatchInput.Invoke(null, new object[] { root, new LibreWinForms.Platform.LibreInputEvent(
 				LibreWinForms.Platform.LibreInputEventKind.SystemTextInput,
 				Environment.TickCount64,
 				LibreWinForms.Platform.LibreInputModifiers.Alt,
@@ -2427,7 +2441,7 @@ namespace TestApp
 				letter,
 				default,
 				default,
-				LibreWinForms.Platform.LibrePointerButton.None));
+				LibreWinForms.Platform.LibrePointerButton.None) });
 			Dispatcher.Invoke(() => { }, DispatcherPriority.Background);
 			return QueryWinFormsTree();
 #else

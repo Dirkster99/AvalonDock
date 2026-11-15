@@ -77,11 +77,15 @@ AvalonDock is used by [many open source and commercial projects](https://github.
 
 | Package | Description |
 |:--------|:------------|
-| `Dirkster.AvalonDock.LibreWPF` | Core LibreWPF docking library |
-| `Dirkster.AvalonDock.Core` | Forked core; map the five package IDs in this table to the lextudio GitHub Packages feed |
-| `Dirkster.AvalonDock.Serializer.Xml` | Forked XML layout serializer |
-| `Dirkster.AvalonDock.Themes.VS.LibreWPF` | Visual Studio theme |
-| `Dirkster.AvalonDock.Themes.VS2013.LibreWPF` | VS2013 theme (Dark, Light, Blue) |
+| [Dirkster.AvalonDock](https://nuget.org/packages/Dirkster.AvalonDock) | Core docking library |
+| [Dirkster.AvalonDock.Mvvm](https://nuget.org/packages/Dirkster.AvalonDock.Mvvm) | MVVM base classes (no external dependencies) |
+| [Dirkster.AvalonDock.Mvvm.CommunityToolkit](https://nuget.org/packages/Dirkster.AvalonDock.Mvvm.CommunityToolkit) | CommunityToolkit.Mvvm integration |
+| [Dirkster.AvalonDock.Themes.Arc](https://nuget.org/packages/Dirkster.AvalonDock.Themes.Arc) | Modern Arc theme (Dark & Light) |
+| [Dirkster.AvalonDock.Themes.VS2013](https://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2013) | VS2013 theme (Dark, Light, Blue) |
+| [Dirkster.AvalonDock.Themes.VS2010](https://nuget.org/packages/Dirkster.AvalonDock.Themes.VS2010) | VS2010 theme |
+| [Dirkster.AvalonDock.Themes.Expression](https://nuget.org/packages/Dirkster.AvalonDock.Themes.Expression) | Expression Blend theme |
+| [Dirkster.AvalonDock.Themes.Metro](https://nuget.org/packages/Dirkster.AvalonDock.Themes.Metro) | Metro/WinUI theme |
+| [Dirkster.AvalonDock.Themes.Aero](https://nuget.org/packages/Dirkster.AvalonDock.Themes.Aero) | Classic Aero theme |
 
 ---
 
