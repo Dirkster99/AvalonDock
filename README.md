@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/release/Dirkster99/avalondock.svg)](https://github.com/Dirkster99/avalondock/releases/latest)
 [![NuGet](https://img.shields.io/nuget/dt/Dirkster.AvalonDock.svg)](http://nuget.org/packages/Dirkster.AvalonDock)
 
-![Net48](https://badgen.net/badge/Framework/.NET&nbsp;4.8/blue) ![Net8](https://badgen.net/badge/Framework/.NET&nbsp;8/blue) ![Net9](https://badgen.net/badge/Framework/.NET&nbsp;9/blue) ![Net10](https://badgen.net/badge/Framework/.NET&nbsp;10/blue)
+![Net48](https://badgen.net/badge/Framework/.NET&nbsp;4.8/blue) ![Net8](https://badgen.net/badge/Framework/.NET&nbsp;8/blue) ![Net9](https://badgen.net/badge/Framework/.NET&nbsp;9/blue) ![Net10](https://badgen.net/badge/Framework/.NET&nbsp;10/blue) ![Net11](https://badgen.net/badge/Framework/.NET&nbsp;11/blue)
 
 Support this project with a :star: — report an issue, or even better, place a pull request :mailbox: :blush:
 
@@ -332,6 +332,7 @@ AvalonDock                 WPF docking library (DockingManager, ToggleDockingMan
   ├── net8.0-windows
   ├── net9.0-windows
   ├── net10.0-windows
+  ├── net11.0-windows
   └── net48
 
 AvalonDock.Serializer.Xml  XML layout persistence (extracted from core in v5)
@@ -389,12 +390,13 @@ Version 5.0.0 includes several breaking changes. See the full [Breaking Changes]
 - **.NET 8.0** (`net8.0-windows`)
 - **.NET 9.0** (`net9.0-windows`)
 - **.NET 10.0** (`net10.0-windows`)
+- **.NET 11.0** (`net11.0-windows`)
 
 ---
 
 ## Building from Source
 
-This project requires **Windows** (WPF is Windows-only) and **.NET SDK 9.0.x / 10.0.x**.
+This project requires **Windows** (WPF is Windows-only) and **.NET SDK 9.0.x / 10.0.x / 11.0.x**.
 
 ```bash
 dotnet restore source/AvalonDock.sln
