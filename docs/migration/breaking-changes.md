@@ -86,12 +86,14 @@ implementation of either interface has to add them.
 | .NET 5.0 | ❌ **Removed** |
 | .NET 6.0 / 7.0 | ❌ **Not targeted** |
 | .NET 8.0 | ✅ Re-added after v5.0.2 |
+| .NET 11.0 | ✅ Added in v5.1.0 |
 
 **Supported frameworks in v5.0.0:**
 - .NET Framework 4.8
 - .NET 8.0 (with `-windows` TFM, re-added after v5.0.2)
 - .NET 9.0 (with `-windows` TFM)
 - .NET 10.0 (with `-windows` TFM)
+- .NET 11.0 (with `-windows` TFM, added in v5.1.0)
 
 **Fix:** Update your project to target one of the supported frameworks:
 
@@ -104,6 +106,9 @@ implementation of either interface has to add them.
 
 <!-- .NET 10 -->
 <TargetFramework>net10.0-windows</TargetFramework>
+
+<!-- .NET 11 -->
+<TargetFramework>net11.0-windows</TargetFramework>
 
 <!-- .NET Framework 4.8 -->
 <TargetFramework>net48</TargetFramework>

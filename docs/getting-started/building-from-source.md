@@ -15,7 +15,7 @@ This guide covers how to clone, build, and test AvalonDock locally.
 ## Prerequisites
 
 - **Windows** (WPF is Windows-only)
-- **.NET 9 SDK** and/or **.NET 10 SDK**
+- **.NET 9 SDK**, **.NET 10 SDK** and/or **.NET 11 SDK** (required to build the `net11.0-windows` target)
 - **Visual Studio 2022** or later (recommended)
 
 ## Clone the Repository
