@@ -2,7 +2,7 @@
     <PropertyGroup>
         <RootNamespace>TestApp</RootNamespace>
         <!-- The fork's test hooks use APIs newer than .NET Framework (upstream also built net48). -->
-        <TargetFrameworks>net9.0-windows;net10.0-windows</TargetFrameworks>
+        <TargetFrameworks>net10.0-windows;net11.0-windows</TargetFrameworks>
         <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
         <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>

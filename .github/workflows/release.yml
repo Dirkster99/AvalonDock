@@ -28,6 +28,7 @@ jobs:
             8.0.x
             9.0.x
             10.0.x
+            11.0.x
 
       - name: Determine version
         id: version
@@ -77,14 +78,25 @@ jobs:
           --results-directory TestResults
           -m:1
 
-      - name: Test (FlaUI UI Tests)
+      - name: Test (FlaUI UI Tests, .NET 10)
         run: >
           dotnet test source/AvalonDock.sln
           --configuration Release
           --no-restore
           --filter "Category=FlaUI"
           --framework net10.0-windows
-          --logger "trx;LogFilePrefix=flaui-test-results"
+          --logger "trx;LogFilePrefix=flaui-net10-test-results"
+          --results-directory TestResults
+          -m:1
+
+      - name: Test (FlaUI UI Tests, .NET 11)
+        run: >
+          dotnet test source/AvalonDock.sln
+          --configuration Release
+          --no-restore
+          --filter "Category=FlaUI"
+          --framework net11.0-windows
+          --logger "trx;LogFilePrefix=flaui-net11-test-results"
           --results-directory TestResults
           -m:1
 

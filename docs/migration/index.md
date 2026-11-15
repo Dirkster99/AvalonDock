@@ -164,6 +164,7 @@ v5.0.0 updates the supported frameworks:
 | .NET 8 | ✅ Supported (re-added after v5.0.2) |
 | .NET 9 | ✅ Supported |
 | .NET 10 | ✅ Supported (new) |
+| .NET 11 | ✅ Supported (added in v5.1.0) |
 
 {: .warning }
 If your project targets .NET Framework versions below 4.8, or .NET Core 3.x / .NET 5, you must update your target framework before upgrading to AvalonDock v5.0.0.

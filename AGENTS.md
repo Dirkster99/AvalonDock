@@ -25,7 +25,7 @@ sits behind `#if DEVFLOW`. Keep both lines building.
 
 - **WPF line:** Windows to run it; it also *compiles* on macOS/Linux (`EnableWindowsTargeting`).
 - **LibreWPF line:** any OS; `LibreWPF.Sdk` and its packages restore from nuget.org.
-- **.NET SDK:** the one pinned in `global.json` (10.0).
+- **.NET SDK:** 10.0 or newer (`global.json`); the WPF line also targets `net11.0-windows`, which needs the 11.0 SDK.
 
 ## Build
 
@@ -48,6 +48,7 @@ Tests must run with `-m:1` (single-threaded) because multiple test projects targ
 # WPF line: unit tests, then the FlaUI UI tests (Windows only)
 dotnet test source/AvalonDock.sln --configuration Release --no-restore --filter "Category!=FlaUI" -m:1
 dotnet test source/AvalonDock.sln --configuration Release --no-restore --filter "Category=FlaUI" --framework net10.0-windows -m:1
+dotnet test source/AvalonDock.sln --configuration Release --no-restore --filter "Category=FlaUI" --framework net11.0-windows -m:1
 ```
 
 LibreWPF line: build `source/AvalonDock.LibreWPF.sln` (Debug), then run

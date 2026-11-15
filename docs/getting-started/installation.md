@@ -95,6 +95,7 @@ If the project builds without errors, you're ready to go. Head to the [Quick Sta
 
 | Framework | Supported |
 |:----------|:----------|
+| .NET 11 (`net11.0-windows`) | ✅ |
 | .NET 10 (`net10.0-windows`) | ✅ |
 | .NET 9 (`net9.0-windows`) | ✅ |
 | .NET 8 (`net8.0-windows`) | ✅ |
