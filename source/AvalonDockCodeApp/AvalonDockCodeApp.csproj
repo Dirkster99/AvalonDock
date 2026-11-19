@@ -10,7 +10,13 @@
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <PackageId>AvalonDockCodeApp</PackageId>
+        <!-- Sample app: no XML documentation file, so StyleCop's XML comment analysis stays off -->
+        <NoWarn>$(NoWarn);SA0001</NoWarn>
     </PropertyGroup>
+    <!-- The DevFlow automation surface belongs to the LibreWPF twin (AvalonDockCodeApp.LibreWPF.csproj). -->
+    <ItemGroup>
+        <Compile Remove="MainWindow.DevFlowActions.cs" />
+    </ItemGroup>
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>

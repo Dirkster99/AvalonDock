@@ -1,11 +1,35 @@
+# The original WPF line: Windows, real WPF, unit tests and the FlaUI UI tests. The LibreWPF line has its
+# own workflow (ci-librewpf.yml); see docs/librewpf.md, section 11.
 name: CI
 
 on:
   pull_request:
     branches: [master, 'release/**']
+  # The LibreWPF work happens on this branch. A push that only touches the LibreWPF line (its
+  # projects, the DevFlow suite, its workflows) or documentation cannot change this line's result, so
+  # it does not start a second, redundant run next to CI (LibreWPF).
+  push:
+    branches: [librewpf]
+    paths-ignore:
+      - '**/*.LibreWPF.csproj'
+      - 'source/AvalonDock.LibreWPF.sln'
+      - 'source/DevFlowIntegrationTests/**'
+      - '.github/workflows/ci-librewpf.yml'
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+      - '**/*.md'
+  workflow_dispatch:
+
+# A newer push supersedes a run that is still going; manual runs are never cancelled by it.
+concurrency:
+  group: ci-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 permissions:
   contents: read
+
+env:
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
 
 jobs:
   build:
@@ -25,11 +49,21 @@ jobs:
             10.0.x
             11.0.x
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('global.json', 'source/**/*.csproj', 'source/**/*.props') }}
+
       - name: Restore dependencies
         run: dotnet restore source/AvalonDock.sln
 
+      # No --warnaserror on the command line: it overrides every project in the graph, including the
+      # six projects in this repo that deliberately opt out with TreatWarningsAsErrors=false. The
+      # zero-warnings policy is unaffected: source/Directory.Build.props sets
+      # TreatWarningsAsErrors=true for everything that has not opted out.
       - name: Build
-        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore --warnaserror
+        run: dotnet build source/AvalonDock.sln --configuration Release --no-restore
 
       - name: Test (Unit Tests)
         run: >

@@ -44,7 +44,17 @@ namespace AvalonDock.Controls
 						{
 							var childPositionableModelWidthActualSize = _model.Children[i] as ILayoutPositionableElement as ILayoutPositionableElementWithActualSize;
 							var childDockMinWidth = (_model.Children[i] as ILayoutPositionableElement).CalculatedDockMinWidth();
-							var widthToSet = Math.Max(childPositionableModelWidthActualSize.ActualWidth, childDockMinWidth);
+
+							// Freezing a Star pane to its rendered width is only meaningful once that
+							// width is actually known. On the LibreWPF backend a Star column renders
+							// at the content minimum instead of expanding, so the measured width of a
+							// pane just docked from a floating window is its minimum and freezing to
+							// it collapses the pane into a title-bar sliver. Prefer the floating
+							// window's size (kept on the model) and fall back to the rendered width
+							// only when no floating size is available.
+							var widthToSet = childPositionableModelWidthActualSize.FloatingWidth > childDockMinWidth
+								? childPositionableModelWidthActualSize.FloatingWidth
+								: childPositionableModelWidthActualSize.ActualWidth;
 
 							widthToSet = Math.Min(widthToSet, ActualWidth / 2.0);
 							widthToSet = Math.Max(widthToSet, childDockMinWidth);
@@ -82,7 +92,13 @@ namespace AvalonDock.Controls
 						{
 							var childPositionableModelWidthActualSize = _model.Children[i] as ILayoutPositionableElement as ILayoutPositionableElementWithActualSize;
 							var childDockMinHeight = (_model.Children[i] as ILayoutPositionableElement).CalculatedDockMinHeight();
-							var heightToSet = Math.Max(childPositionableModelWidthActualSize.ActualHeight, childDockMinHeight);
+
+							// See the horizontal branch: prefer the floating window's size when the
+							// rendered height is the collapsed minimum (LibreWPF Star-row behavior).
+							var heightToSet = childPositionableModelWidthActualSize.FloatingHeight > childDockMinHeight
+								? childPositionableModelWidthActualSize.FloatingHeight
+								: childPositionableModelWidthActualSize.ActualHeight;
+
 							heightToSet = Math.Min(heightToSet, ActualHeight / 2.0);
 							heightToSet = Math.Max(heightToSet, childDockMinHeight);
 							(_model.Children[i] as ILayoutPositionableElement).DockHeight = new GridLength(heightToSet, GridUnitType.Pixel);

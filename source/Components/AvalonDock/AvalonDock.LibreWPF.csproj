@@ -1,0 +1,42 @@
+<Project Sdk="LibreWPF.Sdk">
+	<!-- The LibreWPF twin of AvalonDock.csproj: same folder, same sources, LibreWPF.Sdk instead of
+	     Microsoft.NET.Sdk.WindowsDesktop (see source/Directory.Build.props and docs/librewpf.md, section 11).
+	     The assembly keeps the WPF name because the XAML uses pack://application:,,,/AvalonDock;component/... URIs. -->
+	<PropertyGroup>
+		<AssemblyName>AvalonDock</AssemblyName>
+		<RootNamespace>AvalonDock</RootNamespace>
+		<PackageId>Dirkster.AvalonDock.LibreWPF</PackageId>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Resource Include="**\*.png"/>
+	</ItemGroup>
+
+	<!-- The Win32 window chrome is replaced by the portable one. -->
+	<ItemGroup>
+		<Compile Remove="Controls\Shell\**\*.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AvalonDock.Core\AvalonDock.Core.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.ca-ES.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+</Project>

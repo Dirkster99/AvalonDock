@@ -398,6 +398,10 @@ Version 5.0.0 includes several breaking changes. See the full [Breaking Changes]
 
 This project requires **Windows** (WPF is Windows-only) and **.NET SDK 9.0.x / 10.0.x / 11.0.x**.
 
+The LibreWPF line (`source/AvalonDock.LibreWPF.sln`, packages `Dirkster.AvalonDock*.LibreWPF`) builds on
+Windows, macOS and Linux with the .NET 10 SDK; `LibreWPF.Sdk` and its packages restore from nuget.org.
+See [docs/librewpf.md](docs/librewpf.md).
+
 ```bash
 dotnet restore source/AvalonDock.sln
 dotnet build source/AvalonDock.sln --configuration Release --no-restore

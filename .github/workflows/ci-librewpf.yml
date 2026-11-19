@@ -1,0 +1,408 @@
+# The LibreWPF line: *.LibreWPF.csproj projects built with LibreWPF.Sdk on every OS and tested by the
+# cross-platform DevFlow suite. The original WPF line (Windows, real WPF, FlaUI) has its own workflow
+# (ci.yml); see docs/librewpf.md, section 11.
+name: CI (LibreWPF)
+
+on:
+  pull_request:
+    branches: [master, 'release/**']
+  # The LibreWPF work happens on this branch; every push runs all legs (empty inputs mean "all").
+  # A push that only touches the original WPF line (its FlaUI suite and workflows) or documentation
+  # cannot change this result, so it does not start a redundant run.
+  push:
+    branches: [librewpf]
+    paths-ignore:
+      - 'source/AutomationTest/**'
+      - 'source/AvalonDock.sln'
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/docs.yml'
+      - 'docs/**'
+      - '**/*.md'
+  # The legs cannot all be validated on a developer machine (they need a throwaway X server on Linux
+  # and a GUI session on macOS), so allow them to be run on demand.
+  workflow_dispatch:
+    inputs:
+      legs:
+        description: 'DevFlow legs to run, comma separated (linux-x64, macos-arm64, windows-x64) or "all"'
+        default: all
+      test_args:
+        description: 'Extra arguments for the DevFlow test executable, e.g. --filter-class AvalonDock.DevFlowIntegrationTests.SmokeTests'
+        default: ''
+      run_known_gaps:
+        description: 'Run the cases skipped as known LibreWPF gaps (sets DEVFLOW_RUN_KNOWN_GAPS=1)'
+        type: boolean
+        default: false
+# A newer push supersedes a run that is still going; manual runs are never cancelled by it.
+concurrency:
+  group: ci-librewpf-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
+
+permissions:
+  contents: read
+
+env:
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  # Picks the DevFlow legs, so a single slow or failing platform can be re-run on its own.
+  plan:
+    name: Plan DevFlow legs
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.legs.outputs.matrix }}
+    steps:
+      - id: legs
+        shell: bash
+        env:
+          LEGS: ${{ inputs.legs }}
+        run: |
+          all='[{"name":"linux-x64","runner":"ubuntu-24.04"},{"name":"macos-arm64","runner":"macos-15"},{"name":"windows-x64","runner":"windows-2025"}]'
+          legs="$(echo "$LEGS" | tr -d '[:space:]')"
+          if [ -z "$legs" ] || [ "$legs" = all ]; then
+            matrix="$all"
+          else
+            matrix="$(echo "$all" | jq -c --arg legs ",$legs," '[.[] | .name as $n | select($legs | contains("," + $n + ","))]')"
+          fi
+          if [ "$matrix" = '[]' ] || [ -z "$matrix" ]; then
+            echo "::error::No DevFlow leg matches '$LEGS'."
+            exit 1
+          fi
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  # One end-to-end UI suite, every platform AvalonDock ships for. It launches TestApp (and, where a
+  # test needs it, AvalonDockCodeApp) and drives them through the DevFlow agent: no per-platform UI
+  # automation framework, so a test that passes on one leg is the same test on the others. On Linux
+  # the agent's pointer events are real XTest events, which is why the leg needs its own X server
+  # with no physical pointer - a stray mouse movement from anyone sharing the machine lands inside a
+  # drag and fails it.
+  devflow:
+    name: DevFlow UI Tests (${{ matrix.name }})
+    needs: plan
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    # Every leg gates. A leg can still be marked "experimental": true above to report without failing
+    # the run while it is being brought up.
+    continue-on-error: ${{ matrix.experimental == true }}
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # global.json pins the .NET 10 SDK band; the apps target net10.0-windows.
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      # xvfb supplies the X server, including XTEST which the input injection needs. openbox supplies
+      # what a bare Xvfb does not: an EWMH window manager. Without one there is no
+      # _NET_CLIENT_LIST_STACKING, so the floating-window z-order checks degrade to skips - exactly
+      # the blind spot these tests were changed to stop having - and nothing stacks or positions the
+      # floating toplevels the way a real desktop would. LibreWPF's ProGPU backend needs a GL context,
+      # which on a runner means Mesa's software rasteriser.
+      # Silk.NET's GLFW build is linked against the whole X11 extension set, Wayland and libdecor, so a
+      # runner missing any of them cannot even dlopen libglfw - which surfaces as Silk's opaque
+      # "Couldn't find a suitable window platform. (GlfwPlatform - not applicable)" instead of a
+      # loader error. Install them explicitly (ProGPU's own CI also installs libxkbcommon and the xcb
+      # set) rather than relying on what the image happens to carry.
+      - name: Install headless desktop stack (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            xvfb openbox x11-utils x11-xserver-utils \
+            libx11-6 libx11-xcb1 libxext6 libxtst6 libxrandr2 libxrender1 libxxf86vm1 \
+            libxi6 libxcursor1 libxinerama1 \
+            libxkbcommon0 libwayland-client0 libwayland-cursor0 libwayland-egl1 libdecor-0-0 \
+            libgl1 libglx-mesa0 libegl1 libgbm1 \
+            mesa-vulkan-drivers libvulkan1 \
+            libc++1 libc++abi1 libunwind8
+
+      - name: Start X server and window manager (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          Xvfb :99 -screen 0 1920x1080x24 +extension RANDR +extension GLX +extension XTEST &
+          for _ in $(seq 1 30); do xdpyinfo -display :99 >/dev/null 2>&1 && break; sleep 1; done
+          xdpyinfo -display :99 >/dev/null || { echo "::error::Xvfb failed to start"; exit 1; }
+          DISPLAY=:99 openbox &
+          # Wait for the WM to advertise EWMH, otherwise every z-order assertion silently skips.
+          for _ in $(seq 1 30); do
+            DISPLAY=:99 xprop -root _NET_SUPPORTED 2>/dev/null | grep -q _NET_CLIENT_LIST_STACKING && break
+            sleep 1
+          done
+          DISPLAY=:99 xprop -root _NET_SUPPORTED | grep -q _NET_CLIENT_LIST_STACKING \
+            || echo "::warning::EWMH stacking unavailable - z-order assertions will skip"
+          echo "DISPLAY=:99" >> "$GITHUB_ENV"
+          # GLFW probes Wayland before X11 and gets noisy (or picks Wayland) without this; an Xvfb
+          # desktop is X11, and ProGPU's selector honours the override.
+          runtime_dir="$(mktemp -d)"
+          chmod 700 "$runtime_dir"
+          {
+            echo "XDG_RUNTIME_DIR=$runtime_dir"
+            echo "PROGPU_WPF_LINUX_WINDOWING=x11"
+          } >> "$GITHUB_ENV"
+
+      # macOS has no Xvfb equivalent: the agent posts real CGEvent events, and cliclick is the tool
+      # that does it (the agent picks it up from PATH). Without it only the non-input tests can run.
+      - name: Install cliclick (macOS)
+        if: runner.os == 'macOS'
+        run: brew install cliclick
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: nuget-${{ matrix.name }}-${{ hashFiles('global.json', 'source/**/*.csproj', 'source/**/*.props') }}
+
+      # Prebuild in Debug so the fixtures can start the apps with --no-build and stay inside their
+      # 120s startup deadline; `dotnet run` defaults to Debug, so the configurations must match.
+      # AvalonDockCodeApp is built off Windows too: it hosts the ToggleDockingManager suite.
+      - name: Build sample apps and tests (Debug)
+        shell: pwsh
+        run: |
+          $projects = @(
+            'source/TestApp/TestApp.LibreWPF.csproj',
+            'source/AvalonDockCodeApp/AvalonDockCodeApp.LibreWPF.csproj',
+            'source/DevFlowIntegrationTests/DevFlowIntegrationTests.csproj'
+          )
+          foreach ($project in $projects) {
+            dotnet build $project --configuration Debug
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      # A RID-less build keeps the native runtime assets under runtimes/<rid>/native instead of next
+      # to the app, and both Silk (libglfw) and ProGPU's driver (libprogpu_native -> libwgpu_native)
+      # load them by bare name. Put that folder on the loader path - eng/progpu-wpf-linux-*.sh publish
+      # with a RID for the same reason - and fail here, with the actual missing library, instead of
+      # letting GLFW report that no window platform is available.
+      - name: Expose the Linux native libraries
+        if: runner.os == 'Linux'
+        run: |
+          rid="$(uname -m)"
+          case "$rid" in
+            x86_64) rid=linux-x64 ;;
+            aarch64|arm64) rid=linux-arm64 ;;
+          esac
+          app_dir=source/TestApp/bin/librewpf/Debug/net10.0-windows
+          native_dir=$app_dir/runtimes/$rid/native
+          # The nuget.org LibreWPF.Sdk stages the native libraries next to the app instead.
+          if [ ! -d "$native_dir" ]; then
+            native_dir=$app_dir
+          fi
+          if ! ls "$native_dir"/libprogpu_native*.so >/dev/null 2>&1; then
+            echo "::error::no libprogpu_native in $native_dir; the LibreWPF native staging changed."
+            exit 1
+          fi
+          status=0
+          for lib in "$native_dir"/*.so*; do
+            missing="$(ldd "$lib" 2>/dev/null | awk '/not found/ {print $1}' | sort -u | tr '\n' ' ')"
+            if [ -n "$missing" ]; then
+              echo "::error::$(basename "$lib") is missing $missing"
+              status=1
+            fi
+          done
+          if [ "$status" -ne 0 ]; then
+            exit 1
+          fi
+          echo "LD_LIBRARY_PATH=$GITHUB_WORKSPACE/$native_dir" >> "$GITHUB_ENV"
+          # Recorded so a wgpu failure in the test step can be read against the actual stack: with
+          # automatic backend selection this says whether lavapipe was even reachable.
+          echo "--- Vulkan ICDs ---"
+          ls -l /usr/share/vulkan/icd.d 2>/dev/null || echo "no ICD directory"
+          echo "--- Vulkan/GL loaders ---"
+          ldconfig -p | grep -E 'libvulkan\.so|libEGL\.so|libGLX\.so|libOSMesa' || true
+
+      # A click tool that is not DPI aware lands off target on a display scaled above 100%; record the scale
+      # of the machine the Windows leg runs on.
+      # The native-input cases click the real desktop, so it has to look like one. Two runner-image
+      # defaults broke them while every API call still reported success:
+      # - windows-11-arm (formerly a leg) logs in to the Windows first-logon privacy page ("Choose privacy settings
+      #   for your device"), a full-screen window above everything, so each real click landed on it
+      #   and WPF saw no mouse input at all.
+      # - The agent's console window sits over the left of the desktop; with it
+      #   minimised the last windows-x64 failure (a floating window not following a caption drag)
+      #   went away.
+      # Full-window dragging is also asserted on (the images already have it), since without it the
+      # Win32 move loop moves a window only on release. Screenshots before/after are uploaded.
+      - name: Prepare the Windows desktop
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Add-Type -Namespace Native -Name Desk -MemberDefinition @'
+          public delegate bool EnumProc(System.IntPtr hwnd, System.IntPtr lParam);
+          [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)] public struct RECT { public int L, T, R, B; }
+          [System.Runtime.InteropServices.DllImport("user32.dll")] public static extern bool EnumWindows(EnumProc proc, System.IntPtr lParam);
+          [System.Runtime.InteropServices.DllImport("user32.dll")] public static extern bool IsWindowVisible(System.IntPtr hwnd);
+          [System.Runtime.InteropServices.DllImport("user32.dll")] public static extern bool GetWindowRect(System.IntPtr hwnd, out RECT r);
+          [System.Runtime.InteropServices.DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(System.IntPtr hwnd, out uint pid);
+          [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)] public static extern int GetClassName(System.IntPtr hwnd, System.Text.StringBuilder s, int n);
+          [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)] public static extern int GetWindowText(System.IntPtr hwnd, System.Text.StringBuilder s, int n);
+          [System.Runtime.InteropServices.DllImport("user32.dll")] public static extern bool ShowWindow(System.IntPtr hwnd, int cmd);
+          [System.Runtime.InteropServices.DllImport("user32.dll")] public static extern uint GetDpiForSystem();
+          [System.Runtime.InteropServices.DllImport("user32.dll")] public static extern int GetSystemMetrics(int i);
+          [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)] public static extern bool SystemParametersInfo(uint action, uint param, ref int value, uint winIni);
+          [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)] public static extern bool SystemParametersInfo(uint action, uint param, System.IntPtr value, uint winIni);
+          '@
+          function Get-TopWindows {
+            $list = New-Object System.Collections.Generic.List[object]
+            [void][Native.Desk]::EnumWindows({ param($h, $l)
+              if ([Native.Desk]::IsWindowVisible($h)) {
+                $r = New-Object Native.Desk+RECT; [void][Native.Desk]::GetWindowRect($h, [ref]$r)
+                if (($r.R - $r.L) -gt 0 -and ($r.B - $r.T) -gt 0) {
+                  $c = New-Object System.Text.StringBuilder 256; [void][Native.Desk]::GetClassName($h, $c, 256)
+                  $t = New-Object System.Text.StringBuilder 256; [void][Native.Desk]::GetWindowText($h, $t, 256)
+                  $procId = [uint32]0; [void][Native.Desk]::GetWindowThreadProcessId($h, [ref]$procId)
+                  $name = (Get-Process -Id $procId -ErrorAction SilentlyContinue).ProcessName
+                  $list.Add([pscustomobject]@{ Handle = $h; Process = $name; Pid = $procId; Class = "$c"; Title = "$t"; Rect = "$($r.L),$($r.T) $($r.R - $r.L)x$($r.B - $r.T)" })
+                }
+              }
+              $true }, [IntPtr]::Zero)
+            $list
+          }
+          function Save-Desktop([string]$name) {
+            Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+            $b = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+            $bmp = New-Object System.Drawing.Bitmap $b.Width, $b.Height
+            [System.Drawing.Graphics]::FromImage($bmp).CopyFromScreen($b.Location, [System.Drawing.Point]::Empty, $b.Size)
+            New-Item -ItemType Directory -Force "$env:GITHUB_WORKSPACE/TestResults" | Out-Null
+            $bmp.Save("$env:GITHUB_WORKSPACE/TestResults/$name.png")
+          }
+
+          "system DPI = $([Native.Desk]::GetDpiForSystem()) (96 = 100%), screen = $([Native.Desk]::GetSystemMetrics(0)) x $([Native.Desk]::GetSystemMetrics(1)), arch = $env:PROCESSOR_ARCHITECTURE, session = $((Get-Process -Id $PID).SessionId)"
+          "== visible top-level windows before"
+          Get-TopWindows | Format-Table Process, Pid, Class, Title, Rect -AutoSize | Out-String -Width 220
+          Save-Desktop 'desktop-as-provisioned'
+
+          # First-logon/privacy UI. The page is hosted by these processes; stop them and keep the
+          # experience from being offered again.
+          New-Item -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\OOBE' -Force | Out-Null
+          Set-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\OOBE' -Name DisablePrivacyExperience -Value 1 -Type DWord
+          foreach ($name in 'WWAHost', 'CloudExperienceHostBroker', 'UserOOBEBroker', 'OOBENetworkConnectionFlow', 'msoobe') {
+            Get-Process -Name $name -ErrorAction SilentlyContinue | ForEach-Object { "stopping $($_.ProcessName) ($($_.Id))"; Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue }
+          }
+          # Closing the first-logon page drops the session onto an open Start menu over the middle of
+          # the screen (it opened a few seconds later and was not in the window list). It is a shell
+          # surface that cannot be minimised; Esc closes it and is harmless when nothing is open.
+          Add-Type -AssemblyName System.Windows.Forms
+          for ($i = 0; $i -lt 3; $i++) {
+            Start-Sleep -Seconds 2
+            Get-TopWindows | Where-Object { $_.Process -in 'StartMenuExperienceHost', 'SearchHost', 'ShellExperienceHost' } |
+              ForEach-Object { "shell surface $($_.Process) '$($_.Title)' $($_.Rect)" }
+            [System.Windows.Forms.SendKeys]::SendWait('{ESC}')
+          }
+          # Whatever is still visible and is not the shell gets minimised (SW_MINIMIZE).
+          Get-TopWindows | Where-Object { $_.Process -ne 'explorer' -and $_.Class -notin 'Shell_TrayWnd', 'Shell_SecondaryTrayWnd', 'Progman', 'WorkerW' } |
+            ForEach-Object { "minimising $($_.Process) '$($_.Title)' [$($_.Class)]"; [void][Native.Desk]::ShowWindow($_.Handle, 6) }
+
+          # windows-11-arm (formerly a leg) ran `wsl.exe --update --confirm --prompt-before-exit` from
+          # backgroundTaskHost every 30 s, each time in a new Windows Terminal window that became the
+          # foreground window over TestApp. A watchdog for the rest of the job stops exactly that
+          # command and its window, and records what started it; the runner cleans it up with the job.
+          # Other wsl.exe processes are left alone: the x64 image's provisioning agent probes WSL with
+          # a windowless `wsl -u root -e ls`.
+          $watchdog = Join-Path $env:RUNNER_TEMP 'desktop-watchdog.ps1'
+          $watchdogLog = Join-Path $env:RUNNER_TEMP 'desktop-watchdog.log'
+          Set-Content -Path $watchdog -Value @'
+          param([string]$Log)
+          while ($true) {
+            foreach ($p in @(Get-CimInstance Win32_Process -Filter "Name = 'wsl.exe'" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like '*--update*' })) {
+              $parent = Get-CimInstance Win32_Process -Filter "ProcessId = $($p.ParentProcessId)" -ErrorAction SilentlyContinue
+              Add-Content $Log "$(Get-Date -Format HH:mm:ss.fff) stopping $($p.Name) ($($p.ProcessId)) '$($p.CommandLine)' started by $($parent.Name) ($($p.ParentProcessId)) '$($parent.CommandLine)'"
+              Stop-Process -Id $p.ProcessId -Force -ErrorAction SilentlyContinue
+            }
+            foreach ($t in @(Get-Process -Name WindowsTerminal -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -like '*wsl*' })) {
+              Add-Content $Log "$(Get-Date -Format HH:mm:ss.fff) closing WindowsTerminal ($($t.Id)) '$($t.MainWindowTitle)'"
+              Stop-Process -Id $t.Id -Force -ErrorAction SilentlyContinue
+            }
+            Start-Sleep -Milliseconds 500
+          }
+          '@
+          Start-Process pwsh -WindowStyle Hidden -ArgumentList '-NoProfile', '-File', $watchdog, '-Log', $watchdogLog
+          Start-Sleep -Seconds 2
+          if (Test-Path $watchdogLog) { Get-Content $watchdogLog }
+
+          $full = 0; [void][Native.Desk]::SystemParametersInfo(0x0026, 0, [ref]$full, 0)
+          $set = [Native.Desk]::SystemParametersInfo(0x0025, 1, [IntPtr]::Zero, 3)
+          $after = 0; [void][Native.Desk]::SystemParametersInfo(0x0026, 0, [ref]$after, 0)
+          "drag full windows: was=$full set=$set now=$after"
+
+          Start-Sleep -Seconds 1
+          "== visible top-level windows after"
+          Get-TopWindows | Format-Table Process, Pid, Class, Title, Rect -AutoSize | Out-String -Width 220
+          Save-Desktop 'desktop-before-tests'
+          exit 0
+
+      - name: Test (DevFlow UI Tests)
+        shell: pwsh
+        working-directory: source/DevFlowIntegrationTests/bin/Debug/net10.0
+        env:
+          DEVFLOW_TESTAPP_NO_BUILD: '1'
+          TEST_ARGS: ${{ inputs.test_args }}
+          DEVFLOW_RUN_KNOWN_GAPS: ${{ inputs.run_known_gaps && '1' || '' }}
+          # LibreWPF's own GPU hit-test trace (owners found at each hit point), for gap investigations.
+          PROGPU_WPF_TRACE_HIT_TEST: ${{ inputs.run_known_gaps && '1' || '' }}
+          # ProGPU renders through wgpu over GLFW, so the windowing environment has to look like a
+          # real X11 desktop with software rendering. These are the settings LibreWPF's own
+          # eng/progpu-wpf-linux-multi-window-smoke.sh uses - that harness opens several top-level
+          # windows, which is exactly what a docking test does with floating panes.
+          #
+          # Do not force a backend here. WGPU_BACKEND is not the knob ProGPU reads (it has
+          # PROGPU_WGPU_BACKEND, and explicit selection needs a ProGPU-owned wgpu-native), and
+          # asking for Vulkan on this runner aborted TestApp inside wgpuInstanceCreateSurface:
+          # wgpu-core instance.rs:521 unwraps the HAL surface, which is None when the instance has
+          # no backend at all, i.e. Vulkan had failed to initialise. Automatic selection keeps the
+          # GLES/EGL instance as a fallback, and Mesa resolves it to llvmpipe.
+          EGL_PLATFORM: x11
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          GALLIUM_DRIVER: llvmpipe
+          # Prints ProGPU's [WGPUCONTEXT] trace: which backend the instance got, which adapter was
+          # requested and where surface creation stopped. The apps' console logs are uploaded as an
+          # artifact, so a failure here is diagnosable without another run.
+          PROGPU_BACKEND_DIAGNOSTICS: '1'
+        run: |
+          $exe = if ($IsWindows) { './AvalonDock.DevFlowIntegrationTests.exe' } else { './AvalonDock.DevFlowIntegrationTests' }
+          $extra = if ($env:TEST_ARGS) { $env:TEST_ARGS -split ' ' } else { @() }
+          & $exe --report-ctrf --results-directory "$env:GITHUB_WORKSPACE/TestResults" @extra
+          exit $LASTEXITCODE
+
+      # upload-artifact computes one root for all its paths, and the runner temp folder is not under
+      # the workspace on Windows ("is not a parent directory of ...avalondock-devflow-testapp-9223.log"),
+      # which dropped every Windows result. Collect the application logs next to the test results.
+      - name: Collect application logs
+        if: always()
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force "$env:GITHUB_WORKSPACE/TestResults" | Out-Null
+          foreach ($dir in @($env:RUNNER_TEMP, '/tmp')) {
+            if ($dir -and (Test-Path $dir)) {
+              Get-ChildItem -Path $dir -Filter 'avalondock-devflow-*.log' -ErrorAction SilentlyContinue |
+                Copy-Item -Destination "$env:GITHUB_WORKSPACE/TestResults"
+            }
+          }
+          # CliclickSharp's own record of every SendInput: result, last error and where the cursor ended.
+          $cliclickLog = Join-Path ([IO.Path]::GetTempPath()) 'cliclick-sharp-windows.log'
+          if (Test-Path $cliclickLog) {
+            Copy-Item $cliclickLog "$env:GITHUB_WORKSPACE/TestResults"
+            Get-Content $cliclickLog -Tail 40
+          }
+          # What the desktop watchdog had to stop during the tests (Windows; see "Prepare the Windows desktop").
+          $watchdogLog = Join-Path "$env:RUNNER_TEMP" 'desktop-watchdog.log'
+          if (Test-Path $watchdogLog) {
+            Copy-Item $watchdogLog "$env:GITHUB_WORKSPACE/TestResults"
+            '== desktop watchdog'
+            Get-Content $watchdogLog
+          }
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: devflow-results-${{ matrix.name }}
+          path: TestResults/**
+          retention-days: 14
+          if-no-files-found: warn

@@ -2,52 +2,68 @@
 
 Instructions for AI coding agents working on this repository.
 
+## Two lines in one repository
+
+The fork keeps two independent lines (see `docs/librewpf.md`, section 11):
+
+| | WPF line | LibreWPF line |
+|---|---|---|
+| Projects | `source/Components/*/X.csproj`, `TestApp`, `MVVMTestApp`, `AvalonDockCodeApp`, `AutomationTest` | `*.LibreWPF.csproj`, next to the WPF twin |
+| SDK | `Microsoft.NET.Sdk.WindowsDesktop` (upstream shape, multi-target, analyzers on) | `LibreWPF.Sdk` on every OS, `LIBREWPF` and `DEVFLOW` defined by the project |
+| Solution | `source/AvalonDock.sln` | `source/AvalonDock.LibreWPF.sln` |
+| Tests | NUnit unit tests + FlaUI (Windows, real WPF) | DevFlow integration tests (Windows, macOS, Linux) |
+| CI / release | `ci.yml`, `release.yml` (tag `v*`, nuget.org) | `ci-librewpf.yml`; released by `release.yml` with the WPF packages |
+| Packages | `Dirkster.AvalonDock*` | `Dirkster.AvalonDock*.LibreWPF` |
+
+`AvalonDock.Core`, the serializers, MVVM and DI projects are `netstandard2.0` and shared by both lines.
+Source files are shared too: a LibreWPF project compiles the sources of its own folder, so a change to
+`source/Components/AvalonDock/**` lands in both lines. Code that only makes sense on the portable
+backend goes under `Platform/LibreWPF/` or behind `#if LIBREWPF`; the DevFlow surface of the samples
+sits behind `#if DEVFLOW`. Keep both lines building.
+
 ## Prerequisites
 
-- **OS:** Windows (required — WPF projects only build on Windows)
-- **.NET SDK:** 9.0.x, 10.0.x and 11.0.x
-- **Solution file:** `source/AvalonDock.sln`
+- **WPF line:** Windows to run it; it also *compiles* on macOS/Linux (`EnableWindowsTargeting`).
+- **LibreWPF line:** any OS; `LibreWPF.Sdk` and its packages restore from nuget.org.
+- **.NET SDK:** 10.0 or newer (`global.json`); the WPF line also targets `net11.0-windows`, which needs the 11.0 SDK.
 
 ## Build
 
 ```powershell
+# WPF line
 dotnet restore source/AvalonDock.sln
-dotnet build source/AvalonDock.sln --configuration Release --no-restore --warnaserror
+dotnet build source/AvalonDock.sln --configuration Release --no-restore
+# LibreWPF line
+dotnet build source/AvalonDock.LibreWPF.sln --configuration Debug
 ```
 
-`--warnaserror` is required — all warnings are treated as errors in CI.
+All warnings are errors in the WPF line (`source/Directory.Build.props`); the LibreWPF projects opt out
+because the analyzers are dev-time gates of the WPF line, which shares the sources.
 
 ## Test
 
 Tests must run with `-m:1` (single-threaded) because multiple test projects target .NET Framework and cannot run in parallel.
 
-### Unit Tests
-
 ```powershell
+# WPF line: unit tests, then the FlaUI UI tests (Windows only)
 dotnet test source/AvalonDock.sln --configuration Release --no-restore --filter "Category!=FlaUI" -m:1
-```
-
-### FlaUI UI Tests
-
-These are UI automation tests that launch actual WPF windows. Run them separately, once per framework (.NET 10 and .NET 11):
-
-```powershell
 dotnet test source/AvalonDock.sln --configuration Release --no-restore --filter "Category=FlaUI" --framework net10.0-windows -m:1
 dotnet test source/AvalonDock.sln --configuration Release --no-restore --filter "Category=FlaUI" --framework net11.0-windows -m:1
 ```
 
+LibreWPF line: build `source/AvalonDock.LibreWPF.sln` (Debug), then run
+`source/DevFlowIntegrationTests` (see `docs/librewpf.md`, "Running the suite").
+
 ## Project Structure
 
-- `source/Components/AvalonDock` — Main WPF docking library
-- `source/Components/AvalonDock.Core` — UI-agnostic core (interfaces, models, serialization base). Targets `netstandard2.0;net9.0`. Has `GenerateDocumentationFile` enabled — all public members must have XML doc comments.
-- `source/Components/AvalonDock.Themes.*` — Theme packages
-- `source/Components/AvalonDock.Serializer.Xml` — XML layout serializer
-- `source/Components/AvalonDock.Serializer.Json` — JSON layout serializer
-- `source/Components/AvalonDock.DependencyInjection` — DI registration extensions
-- `source/Components/AvalonDock.Mvvm` — MVVM base classes (DockableBase, ToolboxBase)
-- `source/AutomationTest/` — Unit and FlaUI test projects
-- `source/TestApp`, `source/MVVMTestApp` — Classic sample applications
-- `source/AvalonDockCodeApp` — ToggleDockingManager sample, driven by the FlaUI toggle-dock tests
+- `source/Components/AvalonDock` - main docking library (`AvalonDock.csproj` and `AvalonDock.LibreWPF.csproj`)
+- `source/Components/AvalonDock.Core` - UI-agnostic core (interfaces, models, serialization base). Targets `netstandard2.0;net9.0`. Has `GenerateDocumentationFile` enabled - all public members must have XML doc comments.
+- `source/Components/AvalonDock.Themes.*` - theme packages (each with a `.LibreWPF` twin)
+- `source/Components/AvalonDock.Serializer.Xml`, `.Serializer.Json`, `.DependencyInjection`, `.Mvvm*` - shared
+- `source/AutomationTest/` - unit and FlaUI test projects (WPF line)
+- `source/DevFlowIntegrationTests/` - cross-platform integration tests (LibreWPF line)
+- `source/TestApp`, `source/MVVMTestApp` - classic sample applications
+- `source/AvalonDockCodeApp` - ToggleDockingManager sample, driven by the FlaUI toggle-dock tests
 
 ## Code Style
 

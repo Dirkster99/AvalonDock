@@ -288,7 +288,7 @@
                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                         <TextBlock Text="AvalonDock Code" FontSize="28" FontWeight="Light"
                                                    Foreground="{DynamicResource AppText}" HorizontalAlignment="Center" />
-                                        <TextBlock Text="Toggle Docking Demo — v5.0.0" FontSize="14"
+                                        <TextBlock Text="Toggle Docking Demo — v5.0.1" FontSize="14"
                                                    Foreground="{DynamicResource AppSubText}" HorizontalAlignment="Center" Margin="0,8,0,24" />
                                         <TextBlock Foreground="{DynamicResource AppSubText}" FontSize="13" TextAlignment="Center" LineHeight="24">
                                             <Run Text="Click sidebar icons to toggle panels" /><LineBreak />
@@ -313,7 +313,7 @@
             <Grid>
                 <TextBlock Text="Ready" Foreground="{DynamicResource AppSubText}" FontSize="11" />
                 <TextBlock HorizontalAlignment="Right" Foreground="{DynamicResource AppSubText}" FontSize="11">
-                    <Run Text="AvalonDock v5.0.0" />
+                    <Run Text="AvalonDock v5.0.1" />
                     <Run Text=" • " />
                     <Run Text="ToggleDockingManager" />
                     <Run Text=" • " />

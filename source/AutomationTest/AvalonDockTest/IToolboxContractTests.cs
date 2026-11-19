@@ -17,7 +17,7 @@ namespace AvalonDockTest
 		{
 			var prop = typeof(IToolbox).GetProperty("ToolTipText");
 			Assert.That(prop, Is.Not.Null);
-			Assert.That(prop!.PropertyType, Is.EqualTo(typeof(string)));
+			Assert.That(prop.PropertyType, Is.EqualTo(typeof(string)));
 			Assert.That(prop.GetMethod, Is.Not.Null);
 			Assert.That(prop.SetMethod, Is.Not.Null);
 		}
@@ -27,7 +27,7 @@ namespace AvalonDockTest
 		{
 			var prop = typeof(IToolbox).GetProperty("Zone");
 			Assert.That(prop, Is.Not.Null);
-			Assert.That(prop!.PropertyType, Is.EqualTo(typeof(DockZone)));
+			Assert.That(prop.PropertyType, Is.EqualTo(typeof(DockZone)));
 			Assert.That(prop.GetMethod, Is.Not.Null);
 			Assert.That(prop.SetMethod, Is.Not.Null);
 		}
@@ -37,7 +37,7 @@ namespace AvalonDockTest
 		{
 			var prop = typeof(IToolbox).GetProperty("IsOpenByDefault");
 			Assert.That(prop, Is.Not.Null);
-			Assert.That(prop!.PropertyType, Is.EqualTo(typeof(bool)));
+			Assert.That(prop.PropertyType, Is.EqualTo(typeof(bool)));
 		}
 
 		[Test]
@@ -45,7 +45,7 @@ namespace AvalonDockTest
 		{
 			var prop = typeof(IToolbox).GetProperty("Icon");
 			Assert.That(prop, Is.Not.Null);
-			Assert.That(prop!.PropertyType, Is.EqualTo(typeof(object)));
+			Assert.That(prop.PropertyType, Is.EqualTo(typeof(object)));
 		}
 
 		[Test]
@@ -67,7 +67,7 @@ namespace AvalonDockTest
 		{
 			var method = typeof(IDockable).GetMethod("OnClose");
 			Assert.That(method, Is.Not.Null);
-			Assert.That(method!.ReturnType, Is.EqualTo(typeof(bool)));
+			Assert.That(method.ReturnType, Is.EqualTo(typeof(bool)));
 		}
 
 		[Test]
@@ -75,7 +75,7 @@ namespace AvalonDockTest
 		{
 			var method = typeof(IDockable).GetMethod("OnSelected");
 			Assert.That(method, Is.Not.Null);
-			Assert.That(method!.ReturnType, Is.EqualTo(typeof(void)));
+			Assert.That(method.ReturnType, Is.EqualTo(typeof(void)));
 		}
 	}
 }

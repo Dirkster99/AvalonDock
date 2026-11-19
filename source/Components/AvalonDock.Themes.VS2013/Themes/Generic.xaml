@@ -81,7 +81,7 @@
 	1) As it does not appear to add any additional value?
 	2) As it overwrites other ContextMenu styles (eg using MLib in Edi or Aehnlich)
 	<Style BasedOn="{StaticResource {x:Type ContextMenu}}" TargetType="{x:Type ContextMenu}">
-		<Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+		<Setter Property="TextOptions.TextFormattingMode" Value="{x:Static avalonDockControls:PlatformTextOptions.TextFormattingMode}" />
 		<Setter Property="Background" Value="{DynamicResource {x:Static reskeys:ResourceKeys.Background}}" />
 		<Setter Property="Foreground" Value="{DynamicResource {x:Static reskeys:ResourceKeys.NavigatorWindowForeground}}" />
 		<Setter Property="BorderBrush" Value="{DynamicResource {x:Static reskeys:ResourceKeys.PanelBorderBrush}}" />
@@ -214,6 +214,7 @@
 								x:Name="HeaderPanel"
 								Grid.Row="0"
 								Grid.Column="0"
+								WrapTabs="{Binding Model.Root.Manager.DocumentTabsWrap, RelativeSource={RelativeSource TemplatedParent}}"
 								Margin="0"
 								IsItemsHost="true"
 								KeyboardNavigation.TabIndex="1" />
@@ -843,7 +844,7 @@
 			Background="{DynamicResource {x:Static reskeys:ResourceKeys.AutoHideTabDefaultBackground}}"
 			BorderBrush="{DynamicResource {x:Static reskeys:ResourceKeys.AutoHideTabDefaultBorder}}"
 			BorderThickness="0,0,0,6"
-			TextOptions.TextFormattingMode="Display"
+			TextOptions.TextFormattingMode="{x:Static avalonDockControls:PlatformTextOptions.TextFormattingMode}"
 			TextElement.Foreground="{DynamicResource {x:Static reskeys:ResourceKeys.AutoHideTabDefaultText}}">
 			<ContentPresenter
 				Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
@@ -1405,9 +1406,25 @@
 								Grid.Column="1"
 								HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
 								VerticalAlignment="{TemplateBinding VerticalAlignment}"
-								Content="{TemplateBinding AutoHideWindow}" />
+								Content="{TemplateBinding AutoHideWindow}"
+								IsHitTestVisible="False" />
 						</Grid>
 					</Border>
+					<ControlTemplate.Triggers>
+						<!-- PART_AutoHideArea is stretched over the same cell as LayoutRootPanel (the whole
+						     document/tool area) so a flyout can render on top of it while a pane is
+						     auto-hidden, but its AutoHideWindow content exists for the DockingManager's
+						     whole lifetime (SetupAutoHideWindow assigns it unconditionally) and only
+						     toggles Visibility - it is never actually removed. On the portable (non-Windows)
+						     hit-testing path this ContentPresenter itself was found to be hit even while
+						     its content is Hidden, silently swallowing every drag-drop (e.g. a toolbox item
+						     dropped onto a WpfDesign canvas underneath) that lands anywhere over the central
+						     docking area. Keep it hit-test-inert except while an auto-hide flyout is
+						     actually showing. -->
+						<DataTrigger Binding="{Binding AutoHideWindow.Visibility, RelativeSource={RelativeSource TemplatedParent}}" Value="Visible">
+							<Setter TargetName="PART_AutoHideArea" Property="IsHitTestVisible" Value="True" />
+						</DataTrigger>
+					</ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
@@ -2952,7 +2969,7 @@
 						BorderThickness="{TemplateBinding BorderThickness}"
 						CornerRadius="4"
 						Padding="{TemplateBinding Padding}"
-						TextOptions.TextFormattingMode="Display"
+						TextOptions.TextFormattingMode="{x:Static avalonDockControls:PlatformTextOptions.TextFormattingMode}"
 						SnapsToDevicePixels="True">
 						<StackPanel x:Name="ContentPanel" Orientation="Horizontal"
 							HorizontalAlignment="Center" VerticalAlignment="Center">

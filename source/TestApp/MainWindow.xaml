@@ -140,7 +140,17 @@
                             CanHide="False"
                             ContentId="WinFormsWindow"
                             ToolTip="My WinForms Tool">
-                            <winformsIntegration:WindowsFormsHost x:Name="winFormsHost" />
+                            <!--
+                                The hosted WinForms content paints its own colors: a white background with
+                                black text. WindowsFormsHost maps the WPF Foreground/Background it inherits
+                                onto the hosted tree, so without these the dark theme's white foreground
+                                reaches the WinForms controls and the button caption and text-box content are
+                                drawn white on white.
+                            -->
+                            <winformsIntegration:WindowsFormsHost
+                                x:Name="winFormsHost"
+                                Background="White"
+                                Foreground="Black" />
                         </LayoutAnchorable>
                     </LayoutAnchorablePane>
                     <LayoutDocumentPaneGroup>

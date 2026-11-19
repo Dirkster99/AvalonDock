@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 using AvalonDock.Layout;
+using AvalonDock.Platform;
 
 namespace AvalonDock.Controls
 {
@@ -104,6 +105,53 @@ namespace AvalonDock.Controls
 			return HitTest(_targetElement.TransformToDeviceDPI(dragPoint));
 		}
 
+		/// <inheritdoc/>
+		public Rect GetScreenBounds()
+		{
+			if (_detectionRect == null || _detectionRect.Length == 0)
+				return Rect.Empty;
+
+			// _detectionRect is compared against TransformToDeviceDPI(dragPoint) - i.e. dragPoint / dpiScale
+			// (TransformExtentions.TransformToDeviceDPI) - so invert that scale to recover real screen
+			// coordinates from the stored rect. Union all detection rects: some targets (e.g. auto-hide
+			// pane strips) report more than one.
+			var compositionTarget = PresentationSource.FromVisual(_targetElement)?.CompositionTarget;
+			var scaleX = compositionTarget?.TransformToDevice.M11 ?? 1.0;
+			var scaleY = compositionTarget?.TransformToDevice.M22 ?? 1.0;
+			if (!IsFinite(scaleX) || scaleX <= 0.0) scaleX = 1.0;
+			if (!IsFinite(scaleY) || scaleY <= 0.0) scaleY = 1.0;
+
+			// A portable source reports screen coordinates in logical units, and PointToScreenDPI does not
+			// divide them by the DPI scale, so the stored rectangles are already screen coordinates; scaling
+			// them up again doubled every indicator position on a Retina display. The rule is the one
+			// PointToScreenDPI uses (PlatformHelper.UsesLogicalScreenCoordinates).
+			if (PlatformHelper.UsesLogicalScreenCoordinates(_targetElement))
+			{
+				scaleX = 1.0;
+				scaleY = 1.0;
+			}
+
+			var union = Rect.Empty;
+			foreach (var rect in _detectionRect)
+			{
+				// During a layout transition an indicator can briefly be measured against a host whose
+				// available size is smaller than its insets. Such a target is not hittable in that frame;
+				// do not let its transient negative extent make diagnostics (or automation) throw while
+				// enumerating the other, valid targets.
+				if (!IsFinite(rect.X) || !IsFinite(rect.Y) ||
+					!IsFinite(rect.Width) || !IsFinite(rect.Height) ||
+					rect.Width < 0.0 || rect.Height < 0.0)
+				{
+					continue;
+				}
+
+				var screenRect = new Rect(rect.X * scaleX, rect.Y * scaleY, rect.Width * scaleX, rect.Height * scaleY);
+				union.Union(screenRect);
+			}
+
+			return union;
+		}
+
 		/// <summary>
 		/// Drops the specified floating window onto the target.
 		/// </summary>
@@ -197,5 +245,11 @@ namespace AvalonDock.Controls
 		{
 			SetIsDraggingOver(TargetElement, false);
 		}
+
+		/// <summary>
+		/// Equivalent of double.IsFinite, which does not exist on net48 - one of the frameworks this
+		/// assembly still targets on Windows.
+		/// </summary>
+		private static bool IsFinite(double value) => !double.IsNaN(value) && !double.IsInfinity(value);
 	}
 }

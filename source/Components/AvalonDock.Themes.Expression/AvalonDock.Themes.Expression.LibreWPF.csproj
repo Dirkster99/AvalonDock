@@ -1,0 +1,19 @@
+<Project Sdk="LibreWPF.Sdk">
+	<!-- The LibreWPF twin of AvalonDock.Themes.Expression.csproj (see source/Directory.Build.props). -->
+	<PropertyGroup>
+		<AssemblyName>AvalonDock.Themes.Expression</AssemblyName>
+		<RootNamespace>AvalonDock.Themes</RootNamespace>
+		<PackageId>Dirkster.AvalonDock.Themes.Expression.LibreWPF</PackageId>
+		<AssemblyOriginatorKeyFile>sn.snk</AssemblyOriginatorKeyFile>
+		<SignAssembly>true</SignAssembly>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Resource Include="**\*.png"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AvalonDock\AvalonDock.LibreWPF.csproj"/>
+	</ItemGroup>
+</Project>
