@@ -24,7 +24,7 @@ on:
   workflow_dispatch:
     inputs:
       legs:
-        description: 'DevFlow legs to run, comma separated (linux-x64, linux-arm64, macos-arm64, windows-x64, windows-arm64) or "all"'
+        description: 'DevFlow legs to run, comma separated (linux-x64, macos-arm64, windows-x64) or "all"'
         default: all
       test_args:
         description: 'Extra arguments for the DevFlow test executable, e.g. --filter-class AvalonDock.DevFlowIntegrationTests.SmokeTests'
@@ -57,7 +57,7 @@ jobs:
         env:
           LEGS: ${{ inputs.legs }}
         run: |
-          all='[{"name":"linux-x64","runner":"ubuntu-24.04"},{"name":"linux-arm64","runner":"ubuntu-24.04-arm"},{"name":"macos-arm64","runner":"macos-15"},{"name":"windows-x64","runner":"windows-2025"},{"name":"windows-arm64","runner":"windows-11-arm"}]'
+          all='[{"name":"linux-x64","runner":"ubuntu-24.04"},{"name":"macos-arm64","runner":"macos-15"},{"name":"windows-x64","runner":"windows-2025"}]'
           legs="$(echo "$LEGS" | tr -d '[:space:]')"
           if [ -z "$legs" ] || [ "$legs" = all ]; then
             matrix="$all"
@@ -218,13 +218,13 @@ jobs:
           ldconfig -p | grep -E 'libvulkan\.so|libEGL\.so|libGLX\.so|libOSMesa' || true
 
       # A click tool that is not DPI aware lands off target on a display scaled above 100%; record the scale
-      # of the machine the Windows legs run on (the legs differ: x64 and arm64 runners).
+      # of the machine the Windows leg runs on.
       # The native-input cases click the real desktop, so it has to look like one. Two runner-image
       # defaults broke them while every API call still reported success:
-      # - windows-11-arm logs in to the Windows first-logon privacy page ("Choose privacy settings
+      # - windows-11-arm (formerly a leg) logs in to the Windows first-logon privacy page ("Choose privacy settings
       #   for your device"), a full-screen window above everything, so each real click landed on it
       #   and WPF saw no mouse input at all.
-      # - The agent's console window sits over the left of the desktop on both images; with it
+      # - The agent's console window sits over the left of the desktop; with it
       #   minimised the last windows-x64 failure (a floating window not following a caption drag)
       #   went away.
       # Full-window dragging is also asserted on (the images already have it), since without it the
@@ -299,29 +299,12 @@ jobs:
           Get-TopWindows | Where-Object { $_.Process -ne 'explorer' -and $_.Class -notin 'Shell_TrayWnd', 'Shell_SecondaryTrayWnd', 'Progman', 'WorkerW' } |
             ForEach-Object { "minimising $($_.Process) '$($_.Title)' [$($_.Class)]"; [void][Native.Desk]::ShowWindow($_.Handle, 6) }
 
-          # windows-11-arm's WSL app runs `wsl.exe --update --confirm --prompt-before-exit` from
-          # backgroundTaskHost every 30 s, each time in a new Windows Terminal window that becomes the
-          # foreground window over TestApp (the failures named it: WindowsTerminal, title
-          # 'C:\Windows\system32\wsl.exe'). A watchdog for the rest of the job stops exactly that
+          # windows-11-arm (formerly a leg) ran `wsl.exe --update --confirm --prompt-before-exit` from
+          # backgroundTaskHost every 30 s, each time in a new Windows Terminal window that became the
+          # foreground window over TestApp. A watchdog for the rest of the job stops exactly that
           # command and its window, and records what started it; the runner cleans it up with the job.
           # Other wsl.exe processes are left alone: the x64 image's provisioning agent probes WSL with
           # a windowless `wsl -u root -e ls`.
-          # The retries come from the update never finishing: --prompt-before-exit leaves it waiting for
-          # a key, and stopping it counts as a failed update. Finish the update here, before the tests,
-          # so the background task has nothing left to do; the watchdog stays as the safety net and its
-          # log shows whether it still had to step in.
-          if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') {
-            $sw = [Diagnostics.Stopwatch]::StartNew()
-            $update = Start-Process wsl.exe -ArgumentList '--update', '--web-download' -WindowStyle Hidden -PassThru
-            if ($update.WaitForExit(300000)) {
-              "wsl --update finished with exit code $($update.ExitCode) after $([int]$sw.Elapsed.TotalSeconds) s"
-            } else {
-              "wsl --update did not finish within 300 s; stopping it"
-              Stop-Process -Id $update.Id -Force -ErrorAction SilentlyContinue
-            }
-            wsl.exe --version 2>&1 | Out-String
-          }
-
           $watchdog = Join-Path $env:RUNNER_TEMP 'desktop-watchdog.ps1'
           $watchdogLog = Join-Path $env:RUNNER_TEMP 'desktop-watchdog.log'
           Set-Content -Path $watchdog -Value @'

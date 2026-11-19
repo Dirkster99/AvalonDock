@@ -8,7 +8,7 @@
 > source-change to local-feed replacement procedure.
 >
 > Part two (section 9) is the 2026-10 work that replaces the FlaUI UI tests with DevFlow suites so
-> one suite runs on Windows x64/ARM64, macOS arm64 and Linux x64/ARM64. It records what is done,
+> one suite runs on Windows x64, macOS arm64 and Linux x64. It records what is done,
 > what CI shows, and what is left.
 >
 > The older splitter-drag fixes are kept as history (section 10).
@@ -551,10 +551,8 @@ agent, so **one suite** runs on:
 | Leg | Runner | Backend |
 |---|---|---|
 | windows-x64 | windows-2025 | real WPF |
-| windows-arm64 | windows-11-arm | real WPF |
 | macos-arm64 | macos-15 | LibreWPF (CoreGraphics/AppKit), cliclick for native input |
 | linux-x64 | ubuntu-24.04 | LibreWPF on Xvfb + openbox, XTest for native input |
-| linux-arm64 | ubuntu-24.04-arm | same as linux-x64 |
 
 When the port finishes the suite is 57 existing DevFlow cases + 92 ported = **149 cases**. The 57
 existing cases already prove the infrastructure is cross-platform (agent, fixtures, two ports, real
@@ -885,7 +883,7 @@ The consequences seen in the CI runs of 2026-10-27:
    `$(ComponentTargetFrameworks)` multi-target, `Dirkster.AvalonDock*` package ids), the unit tests and
    the FlaUI tests. Its CI and its release are independent.
 2. **LibreWPF gets its own csprojs and its own packages**, built with `Sdk="LibreWPF.Sdk"` on every OS,
-   tested by the cross-platform DevFlow suite (Windows x64/ARM64, macOS arm64, Linux x64/ARM64).
+   tested by the cross-platform DevFlow suite (Windows x64, macOS arm64, Linux x64).
 3. Packages that do not touch WPF types may be shared by both lines (`AvalonDock.Core`,
    `AvalonDock.Serializer.Xml`, `.Json`, `.Mvvm*`, `.DependencyInjection`: all `netstandard2.0`).
 
@@ -950,7 +948,7 @@ compiles that folder's sources with the normal globs. What keeps the twins apart
 |---|---|---|
 | `AvalonDockTest` unit tests | Windows, real WPF | the original line is intact (upstream-style CI) |
 | FlaUI (`Category=FlaUI`) | Windows, real WPF | UIA-level behaviour on real WPF - this is the baseline that replaces "passes on real WPF" from the DevFlow suite |
-| DevFlow integration tests | linux-x64/arm64, macos-arm64, **windows-x64/arm64 on LibreWPF** | LibreWPF behaviour; Windows legs now use the LibreWpf agent, which implements click/drag/press/drag-move/release natively there |
+| DevFlow integration tests | linux-x64, macos-arm64, **windows-x64 on LibreWPF** | LibreWPF behaviour; Windows legs now use the LibreWpf agent, which implements click/drag/press/drag-move/release natively there |
 
 Consequences: the 39 Windows skips disappear for a good reason (the agent in use implements the
 input), `KnownLibreWpfGaps.IsLibreWpf` becomes constant `true` (the gap list is then judged against the
