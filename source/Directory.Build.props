@@ -1,9 +1,12 @@
 <Project>
 	<PropertyGroup>
+		<!-- This fork can be checked out below OpenDevelop, which uses central package management. -->
+		<ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
 		<!-- Centralized Target Frameworks -->
 		<ComponentTargetFrameworks>net8.0-windows;net9.0-windows;net10.0-windows;net11.0-windows;net48</ComponentTargetFrameworks>
 		<TestTargetFrameworks>net10.0-windows;net11.0-windows;net48</TestTargetFrameworks>
 		<LangVersion>13</LangVersion>
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 
 		<!-- Version Information -->
 		<VersionPrefix>5.1.0</VersionPrefix>
@@ -17,17 +20,47 @@
 		<RepositoryUrl>https://github.com/Dirkster99/AvalonDock</RepositoryUrl>
 		<Authors>https://github.com/Dirkster99/AvalonDock</Authors>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>WPF avalondock docking layout MVVM</PackageTags>
 
 		<!-- Single source of truth for the license shipped in every NuGet package -->
 		<PackageLicenseSourceFile>$(MSBuildThisFileDirectory)..\LICENSE</PackageLicenseSourceFile>
+		<PackageReadmeSourceFile>$(MSBuildThisFileDirectory)..\README.md</PackageReadmeSourceFile>
 
 		<!-- Enforce zero warnings policy -->
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 	</PropertyGroup>
+	<!--
+		The LibreWPF line: projects named *.LibreWPF.csproj (and the temporary *.LibreWPF_*_wpftmp.csproj the markup compiler derives) sit next to their WPF twin, build with
+		LibreWPF.Sdk on every OS and define LIBREWPF; the WPF projects never import that SDK. They are
+		not linked from another folder because the WPF markup compiler flattens the BAML of XAML pages
+		that live outside the project folder (two Generic.xaml files overwrite each other), so each one
+		compiles the sources of its own folder and keeps its obj/bin apart from the WPF project's.
+		See docs/librewpf.md, section 11.
+	-->
+	<PropertyGroup Condition="$(MSBuildProjectName.Contains('.LibreWPF'))">
+		<BaseIntermediateOutputPath>$(MSBuildProjectDirectory)\obj\librewpf\</BaseIntermediateOutputPath>
+		<MSBuildProjectExtensionsPath>$(BaseIntermediateOutputPath)</MSBuildProjectExtensionsPath>
+		<BaseOutputPath>$(MSBuildProjectDirectory)\bin\librewpf\</BaseOutputPath>
+		<DefaultItemExcludes>$(DefaultItemExcludes);obj/**;bin/**</DefaultItemExcludes>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<!-- Defined by the project, not by $(OS): ProGPU-only code sits behind it in the shared sources. -->
+		<DefineConstants>$(DefineConstants);LIBREWPF</DefineConstants>
+		<!-- LibreWPF.Sdk defaults its net10 support packages (incl. Cryptography.Xml/Pkcs) to 10.0.11, flagged NU1902/NU1903; 10.0.13 is patched. -->
+		<ProGpuWpfNet10SupportPackageVersion>10.0.13</ProGpuWpfNet10SupportPackageVersion>
+		<NoWarn>$(NoWarn);NU5104</NoWarn>
+		<!-- The fork's dev-time quality gates belong to the WPF line; the LibreWPF packages
+		     must build cleanly on the ProGPU platform. -->
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<RunAnalyzers>false</RunAnalyzers>
+		<EnableNETAnalyzers>false</EnableNETAnalyzers>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+	</PropertyGroup>
 	<ItemGroup>
 		<!-- Pack the shared root LICENSE into every package without copying it per project -->
 		<None Include="$(PackageLicenseSourceFile)" Pack="true" PackagePath="" Visible="false" />
+		<None Include="$(PackageReadmeSourceFile)" Pack="true" PackagePath="" Visible="false" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers"

@@ -1,0 +1,6 @@
+<Project>
+  <!-- Prevent a parent checkout's central package policy from rewriting this fork's explicit pins. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>

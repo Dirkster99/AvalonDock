@@ -42,6 +42,7 @@
 								x:Name="HeaderPanel"
 								Grid.Row="0"
 								Grid.Column="0"
+								WrapTabs="{Binding Model.Root.Manager.DocumentTabsWrap, RelativeSource={RelativeSource TemplatedParent}}"
 								Margin="4,0,16,0"
 								IsItemsHost="true"
 								KeyboardNavigation.TabIndex="1" />

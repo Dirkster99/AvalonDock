@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
     <PropertyGroup>
         <RootNamespace>TestApp</RootNamespace>
-        <TargetFrameworks>net10.0-windows;net11.0-windows;net48</TargetFrameworks>
+        <!-- The fork's test hooks use APIs newer than .NET Framework (upstream also built net48). -->
+        <TargetFrameworks>net10.0-windows;net11.0-windows</TargetFrameworks>
         <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
         <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
@@ -9,11 +10,20 @@
         <OutputType>WinExe</OutputType>
         <StartupObject />
         <AssemblyName>TestApp</AssemblyName>
+        <!-- Signed with the same key as AvalonDock so AvalonDock's InternalsVisibleTo("TestApp") can
+             list this assembly's public key (strong-name-signed assemblies require friend assemblies
+             to be identified by public key, not name alone). Test-only; not part of any shipped app. -->
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../Components/AvalonDock/sn.snk</AssemblyOriginatorKeyFile>
         <!-- Sample app: allow warnings -->
         <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
        </PropertyGroup>
     <ItemGroup>
         <Resource Include="**\*.png" />
+    </ItemGroup>
+    <!-- The DevFlow automation surface belongs to the LibreWPF twin (TestApp.LibreWPF.csproj). -->
+    <ItemGroup>
+        <Compile Remove="MainWindow.DevFlowActions.cs" />
     </ItemGroup>
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>

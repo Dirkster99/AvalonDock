@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>AvalonDock.DevFlowIntegrationTests</RootNamespace>
+    <AssemblyName>AvalonDock.DevFlowIntegrationTests</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+    <LangVersion>latest</LangVersion>
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+    <UseMSBuildTestInfrastructure>true</UseMSBuildTestInfrastructure>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+  </PropertyGroup>
+
+  <!-- Pure HTTP client test suite: it drives the running MVVMTestApp over the
+       DevFlow agent and never references AvalonDock/WPF, so it builds and runs on
+       the stock .NET SDK (no ProGPU runtime needed to host the tests). -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+    <PackageReference Include="xunit.v3.mtp-v2" Version="3.2.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <!-- Only for the CliclickSharp helper its build targets copy next to the tests (macOS and Windows
+         pointer injection for the held-drag cases); the suite itself still talks plain HTTP. -->
+    <PackageReference Include="LeXtudio.DevFlow.Agent.Core" Version="0.3.1" />
+  </ItemGroup>
+
+</Project>

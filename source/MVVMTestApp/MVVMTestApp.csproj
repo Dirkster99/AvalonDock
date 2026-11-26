@@ -6,6 +6,11 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <!-- The DevFlow diagnostic actions belong to the LibreWPF twin (MVVMTestApp.LibreWPF.csproj). -->
+  <ItemGroup>
+    <Compile Remove="DockDiagnostics.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Remove="Images\document.png" />
     <None Remove="Images\property-blue.png" />

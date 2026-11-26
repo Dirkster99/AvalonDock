@@ -1,0 +1,42 @@
+<Project Sdk="LibreWPF.Sdk">
+    <PropertyGroup>
+        <RootNamespace>ToggleTestApp</RootNamespace>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <ApplicationIcon />
+        <OutputType>WinExe</OutputType>
+        <StartupObject />
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <PackageId>AvalonDockCodeApp</PackageId>
+        <!-- Sample app: no XML documentation file, so StyleCop's XML comment analysis stays off -->
+        <NoWarn>$(NoWarn);SA0001</NoWarn>
+    	<DefineConstants>$(DefineConstants);DEVFLOW</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Components\AvalonDock\AvalonDock.LibreWPF.csproj" />
+        <ProjectReference Include="..\Components\AvalonDock.Core\AvalonDock.Core.csproj" />
+        <ProjectReference Include="..\Components\AvalonDock.Mvvm\AvalonDock.Mvvm.csproj" />
+        <ProjectReference Include="..\Components\AvalonDock.Mvvm.CommunityToolkit\AvalonDock.Mvvm.CommunityToolkit.csproj" />
+        <ProjectReference Include="..\Components\AvalonDock.DependencyInjection\AvalonDock.DependencyInjection.csproj" />
+        <ProjectReference Include="..\Components\AvalonDock.Serializer.Xml\AvalonDock.Serializer.Xml.csproj" />
+        <ProjectReference Include="..\Components\AvalonDock.Themes.Arc\AvalonDock.Themes.Arc.LibreWPF.csproj" />
+        <ProjectReference Include="..\Components\AvalonDock.Themes.VS\AvalonDock.Themes.VS.LibreWPF.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AvalonEdit" Version="6.3.1.120" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
+    </ItemGroup>
+    <ItemGroup>
+        <!-- The DevFlow agent (nuget.org) is what drives this app from the integration tests; it is a
+             sample-app dependency only, never part of the AvalonDock packages. The WPF and LibreWPF
+             agents differ in their native input implementation, so pick by host OS like TestApp. -->
+        <PackageReference Include="LeXtudio.DevFlow.Agent.LibreWpf" Version="0.3.1" />
+        <PackageReference Include="LeXtudio.DevFlow.Agent.Core" Version="0.3.1" />
+    </ItemGroup>
+</Project>

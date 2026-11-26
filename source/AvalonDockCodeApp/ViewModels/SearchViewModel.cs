@@ -275,7 +275,7 @@ public partial class SearchViewModel : ObservableToolboxBase
 				var options = matchCase ? RegexOptions.None : RegexOptions.IgnoreCase;
 				try
 				{
-					regex = new Regex(searchText, options);
+					regex = new Regex(searchText, options, TimeSpan.FromSeconds(1));
 				}
 				catch (ArgumentException)
 				{
@@ -322,6 +322,10 @@ public partial class SearchViewModel : ObservableToolboxBase
 		}
 		catch (UnauthorizedAccessException)
 		{
+		}
+		catch (RegexMatchTimeoutException)
+		{
+			// Keep matches collected before this file exceeded its regex budget.
 		}
 
 		return matches;

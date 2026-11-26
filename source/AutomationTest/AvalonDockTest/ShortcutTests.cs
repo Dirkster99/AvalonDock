@@ -36,7 +36,7 @@ namespace AvalonDockTest
 		{
 			var prop = typeof(IToolbox).GetProperty(nameof(IToolbox.Shortcut));
 			Assert.That(prop, Is.Not.Null);
-			Assert.That(prop!.PropertyType, Is.EqualTo(typeof(string)));
+			Assert.That(prop.PropertyType, Is.EqualTo(typeof(string)));
 			Assert.That(prop.GetMethod, Is.Not.Null);
 			Assert.That(prop.SetMethod, Is.Not.Null);
 		}

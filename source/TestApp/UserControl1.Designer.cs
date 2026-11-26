@@ -31,6 +31,7 @@ namespace TestApp
         {
 			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.textBox2 = new System.Windows.Forms.TextBox();
+			this.mnemonicButton = new System.Windows.Forms.Button();
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
@@ -49,7 +50,17 @@ namespace TestApp
 			this.textBox2.Margin = new System.Windows.Forms.Padding(8, 9, 8, 9);
 			this.textBox2.Name = "textBox2";
 			this.textBox2.Size = new System.Drawing.Size(336, 47);
-			this.textBox2.TabIndex = 0;
+			this.textBox2.TabIndex = 1;
+			// 
+			// mnemonicButton
+			// 
+			this.mnemonicButton.Location = new System.Drawing.Point(45, 372);
+			this.mnemonicButton.Margin = new System.Windows.Forms.Padding(8, 9, 8, 9);
+			this.mnemonicButton.Name = "mnemonicButton";
+			this.mnemonicButton.Size = new System.Drawing.Size(336, 50);
+			this.mnemonicButton.TabIndex = 2;
+			this.mnemonicButton.Text = "&Mnemonic target";
+			this.mnemonicButton.Click += new System.EventHandler(this.mnemonicButton_Click);
 			// 
 			// label1
 			// 
@@ -81,6 +92,7 @@ namespace TestApp
 			this.BackColor = System.Drawing.Color.White;
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
+			this.Controls.Add(this.mnemonicButton);
 			this.Controls.Add(this.textBox2);
 			this.Controls.Add(this.textBox1);
 			this.Margin = new System.Windows.Forms.Padding(8, 9, 8, 9);
@@ -94,6 +106,7 @@ namespace TestApp
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Button mnemonicButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
     }

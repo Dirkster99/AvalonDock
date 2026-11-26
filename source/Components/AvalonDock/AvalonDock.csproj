@@ -16,6 +16,13 @@
 		<Resource Include="**\*.png"/>
 	</ItemGroup>
 
+	<!-- The portable window chrome and the macOS/Linux platform services belong to the LibreWPF twin
+	     (AvalonDock.LibreWPF.csproj). -->
+	<ItemGroup>
+		<Compile Remove="Controls\Shell.Portable\**\*.cs" />
+		<Compile Remove="Platform\LibreWPF\**\*.cs" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="..\AvalonDock.Core\AvalonDock.Core.csproj" />
 	</ItemGroup>

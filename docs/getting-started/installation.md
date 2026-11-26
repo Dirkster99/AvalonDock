@@ -103,3 +103,17 @@ If the project builds without errors, you're ready to go. Head to the [Quick Sta
 
 {: .note }
 Make sure your project targets one of the supported frameworks. AvalonDock requires the `-windows` TFM suffix for .NET 8+ projects.
+
+---
+
+## LibreWPF (Windows, macOS, Linux)
+
+AvalonDock is also built for [LibreWPF](https://www.nuget.org/packages/LibreWPF.Sdk), a portable WPF implementation, as separate packages. They target `net10.0-windows`, are compiled with `LibreWPF.Sdk`, and run on Windows, macOS and Linux. Everything restores from nuget.org, so no extra package source is needed:
+
+```bash
+dotnet add package Dirkster.AvalonDock.LibreWPF
+dotnet add package Dirkster.AvalonDock.Themes.VS.LibreWPF
+dotnet add package Dirkster.AvalonDock.Themes.VS2013.LibreWPF
+```
+
+`Dirkster.AvalonDock.Core` and `Dirkster.AvalonDock.Serializer.Xml` are shared with the classic packages. Use the `.LibreWPF` packages only in a project built with `LibreWPF.Sdk`, and don't mix them with the classic `Dirkster.AvalonDock` package in the same app. Background and test notes are in `docs/librewpf.md` in the repository.

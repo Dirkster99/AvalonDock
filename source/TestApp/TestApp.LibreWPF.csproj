@@ -1,0 +1,66 @@
+<Project Sdk="LibreWPF.Sdk">
+    <PropertyGroup>
+        <RootNamespace>TestApp</RootNamespace>
+        <TargetFramework>net10.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+        <UseWindowsForms>true</UseWindowsForms>
+        <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+        <ApplicationIcon />
+        <OutputType>WinExe</OutputType>
+        <StartupObject />
+        <AssemblyName>TestApp</AssemblyName>
+        <!-- Signed with the same key as AvalonDock so AvalonDock's InternalsVisibleTo("TestApp") can
+             list this assembly's public key (strong-name-signed assemblies require friend assemblies
+             to be identified by public key, not name alone). Test-only; not part of any shipped app. -->
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../Components/AvalonDock/sn.snk</AssemblyOriginatorKeyFile>
+        <!-- Sample app: allow warnings -->
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
+        <GitVersion_NoFetchEnabled>true</GitVersion_NoFetchEnabled>
+        <GitVersionTaskEnabled>false</GitVersionTaskEnabled>
+        <!-- Only the canonical LibreWinForms packages are published on nuget.org; the SDK's default
+             LibreWinForms.Compatibility.System.Windows.Forms runtime is not. -->
+        <ProGpuWpfUseCanonicalLibreWinForms>true</ProGpuWpfUseCanonicalLibreWinForms>
+       	<DefineConstants>$(DefineConstants);DEVFLOW</DefineConstants>
+    </PropertyGroup>
+    <ItemGroup>
+        <Resource Include="**\*.png" />
+    </ItemGroup>
+    <!-- Gated the same way as the transitive removal below. These exist so the portable build does
+         not drag in the Windows desktop framework; applying them where the portable framework
+         references are NOT in use strips the real Microsoft.WindowsDesktop.App out from under the
+         app, which leaves WindowsFormsHost with nothing to host. -->
+    <ItemGroup Condition="'$(ProGpuWpfUsePortableFrameworkReferences)' == 'true'">
+        <FrameworkReference Remove="Microsoft.WindowsDesktop.App" />
+        <FrameworkReference Remove="Microsoft.WindowsDesktop.App.WPF" />
+    </ItemGroup>
+    <Target Name="_TestAppRemoveWindowsDesktopTransitiveFrameworkReferences"
+            BeforeTargets="AddTransitiveFrameworkReferences"
+            Condition="'$(ProGpuWpfUsePortableFrameworkReferences)' == 'true'">
+        <ItemGroup>
+            <TransitiveFrameworkReference Remove="Microsoft.WindowsDesktop.App" />
+            <TransitiveFrameworkReference Remove="Microsoft.WindowsDesktop.App.WPF" />
+            <TransitiveFrameworkReference Remove="Microsoft.WindowsDesktop.App.WindowsForms" />
+        </ItemGroup>
+    </Target>
+    <PropertyGroup>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Components\AvalonDock.Themes.VS\AvalonDock.Themes.VS.LibreWPF.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock\AvalonDock.LibreWPF.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Serializer.Xml\AvalonDock.Serializer.Xml.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Themes.Aero\AvalonDock.Themes.Aero.LibreWPF.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Themes.Expression\AvalonDock.Themes.Expression.LibreWPF.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Themes.Arc\AvalonDock.Themes.Arc.LibreWPF.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Themes.Metro\AvalonDock.Themes.Metro.LibreWPF.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Themes.VS2010\AvalonDock.Themes.VS2010.LibreWPF.csproj" />
+      <ProjectReference Include="..\Components\AvalonDock.Themes.VS2013\AvalonDock.Themes.VS2013.LibreWPF.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <!-- The DevFlow agent comes from nuget.org. -->
+      <PackageReference Include="LeXtudio.DevFlow.Agent.LibreWpf" Version="0.3.1" />
+      <PackageReference Include="LeXtudio.DevFlow.Agent.Core" Version="0.3.1" />
+    </ItemGroup>
+</Project>
