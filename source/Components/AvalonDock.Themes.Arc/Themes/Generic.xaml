@@ -674,9 +674,8 @@
 								Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
                                 <Path
 									x:Name="PART_ImgHidePin"
-									Width="10"
-									Height="10"
-									Margin="1,0,0,1"
+									Width="9"
+									Height="9"
 									VerticalAlignment="Center"
 									Data="{DynamicResource PinClose}"
 									Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionButtonInactiveGlyph}}"
@@ -1476,9 +1475,8 @@
 									Visibility="Hidden">
 									<Path
 										x:Name="PART_ImgPinClose"
-										Width="10"
-										Height="10"
-										Margin="1,0,0,1"
+										Width="9"
+										Height="9"
 										VerticalAlignment="Center"
 										Data="{DynamicResource PinClose}"
 										Fill="{DynamicResource {x:Static reskeys:ResourceKeys.ToolWindowCaptionActiveText}}"
@@ -2172,9 +2170,8 @@
 										Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={avalonDockConverters:BoolToVisibilityConverter}}">
 										<Path
 											x:Name="PART_ImgPinClose"
-											Width="10"
-											Height="10"
-											Margin="1,0,0,1"
+											Width="9"
+											Height="9"
 											VerticalAlignment="Center"
 											Data="{DynamicResource PinClose}"
 											Fill="{DynamicResource {x:Static reskeys:ResourceKeys.DocumentWellTabButtonSelectedInactiveGlyph}}"
